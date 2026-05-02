@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scientific Method Lab</title>
+<style>
+  :root {
+    --bg: #f5f7fb; --ink: #1c1f3a; --muted: #5b6184; --accent: #4f6df5;
+    --good: #1faa6f; --warn: #d99f15; --bad: #d04141; --card: #fff; --shadow: 0 6px 20px rgba(40,46,90,0.10);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 18px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+  .scenario { background: var(--card); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .scenario h2 { font-size: 16px; margin: 0 0 8px; color: var(--accent); }
+  .scenario p { margin: 0; line-height: 1.5; }
+  .panel { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 720px) { .panel { grid-template-columns: 1fr; } }
+  .col { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+  .col h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 0 0 12px; }
+  .step-bank, .step-track { display: flex; flex-direction: column; gap: 8px; min-height: 240px; }
+  .step {
+    background: linear-gradient(135deg, #eef1ff, #f6e9ff);
+    border: 1px solid #d2d7f7; border-radius: 10px; padding: 10px 12px; cursor: grab;
+    user-select: none; transition: transform .15s ease, box-shadow .15s;
+  }
+  .step.dragging { opacity: .4; }
+  .step:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+  .step .name { font-weight: 600; font-size: 14px; }
+  .step .hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .slot {
+    background: #f1f3fb; border: 2px dashed #c4c9e6; border-radius: 10px; padding: 10px 12px;
+    min-height: 56px; display: flex; align-items: center; gap: 8px; transition: background .15s;
+  }
+  .slot.over { background: #e7ecff; border-color: var(--accent); }
+  .slot .num { font-weight: 700; color: var(--accent); width: 22px; text-align: center; }
+  .slot .placeholder { color: var(--muted); font-size: 13px; }
+  .slot.correct { background: #e3f7ee; border-color: var(--good); border-style: solid; }
+  .slot.wrong { background: #fde8e8; border-color: var(--bad); border-style: solid; }
+  .actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  button {
+    padding: 10px 16px; border-radius: 10px; border: 0; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: white; transition: filter .12s;
+  }
+  button.secondary { background: #e7eaf6; color: var(--ink); }
+  button:hover { filter: brightness(1.05); }
+  .result { margin-top: 16px; padding: 12px 14px; border-radius: 10px; display: none; }
+  .result.show { display: block; }
+  .result.good { background: #e3f7ee; color: #0f7a4a; }
+  .result.bad { background: #fde8e8; color: #952a2a; }
+  .scenarios-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .pill {
+    padding: 6px 12px; border-radius: 999px; background: #e7eaf6; cursor: pointer; font-size: 13px;
+    border: 1px solid transparent;
+  }
+  .pill.active { background: var(--accent); color: white; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🔬 Scientific Method Lab</h1>
+  <p class="sub">Pick an everyday mystery, then drag each step on the left into the correct slot on the right. The order matters!</p>
+
+  <div class="scenarios-bar" id="scenariosBar"></div>
+
+  <div class="scenario" id="scenarioCard">
+    <h2 id="scTitle">Loading…</h2>
+    <p id="scText"></p>
+  </div>
+
+  <div class="panel">
+    <div class="col">
+      <h3>Steps to drag</h3>
+      <div class="step-bank" id="bank"></div>
+    </div>
+    <div class="col">
+      <h3>Your investigation order</h3>
+      <div class="step-track" id="track"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="checkBtn">Check my order</button>
+    <button id="resetBtn" class="secondary">Reset</button>
+  </div>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  const SCENARIOS = [
+    {
+      key: "ice",
+      title: "Why does ice float on water?",
+      text: "You see ice cubes bobbing on top of cold water in your glass. Most solids sink — why does ice float?",
+    },
+    {
+      key: "drying",
+      title: "Why do clothes dry faster on a windy day?",
+      text: "The same clothes hung in still air take longer to dry than clothes hung outside on a windy day.",
+    },
+    {
+      key: "plant",
+      title: "Why does the plant in the corner grow slower?",
+      text: "Two identical plants are placed in the same room. The one near the window grows twice as tall as the one in the corner.",
+    },
+  ];
+
+  const ALL_STEPS = [
+    { id: "observe", name: "1. Observe", hint: "Notice and describe what is happening." },
+    { id: "question", name: "2. Question", hint: "Ask a focused 'why' or 'how' about it." },
+    { id: "hypothesis", name: "3. Hypothesis", hint: "A testable explanation for the observation." },
+    { id: "experiment", name: "4. Experiment", hint: "Design and run a fair test." },
+    { id: "record", name: "5. Record", hint: "Write down what you measured." },
+    { id: "conclude", name: "6. Conclude", hint: "Decide whether your idea is supported." },
+  ];
+
+  let currentScenario = SCENARIOS[0];
+  const bankEl = document.getElementById("bank");
+  const trackEl = document.getElementById("track");
+  const result = document.getElementById("result");
+
+  function renderScenarioPills() {
+    const bar = document.getElementById("scenariosBar");
+    bar.innerHTML = "";
+    SCENARIOS.forEach((s) => {
+      const p = document.createElement("div");
+      p.className = "pill" + (s.key === currentScenario.key ? " active" : "");
+      p.textContent = s.title;
+      p.onclick = () => { currentScenario = s; loadScenario(); };
+      bar.appendChild(p);
+    });
+  }
+
+  function loadScenario() {
+    document.getElementById("scTitle").textContent = currentScenario.title;
+    document.getElementById("scText").textContent = currentScenario.text;
+    renderScenarioPills();
+    reset();
+  }
+
+  function buildStepEl(step) {
+    const el = document.createElement("div");
+    el.className = "step";
+    el.draggable = true;
+    el.dataset.id = step.id;
+    el.innerHTML = `<div class="name">${step.name.replace(/^\d+\.\s*/, "")}</div><div class="hint">${step.hint}</div>`;
+    el.addEventListener("dragstart", (e) => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", step.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    return el;
+  }
+
+  function buildSlot(idx) {
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.dataset.idx = idx;
+    slot.innerHTML = `<span class="num">${idx + 1}</span><span class="placeholder">Drop a step here…</span>`;
+    slot.addEventListener("dragover", (e) => { e.preventDefault(); slot.classList.add("over"); });
+    slot.addEventListener("dragleave", () => slot.classList.remove("over"));
+    slot.addEventListener("drop", (e) => {
+      e.preventDefault();
+      slot.classList.remove("over");
+      const id = e.dataTransfer.getData("text/plain");
+      // Move the step element from wherever it is into this slot.
+      const moving = document.querySelector(`.step[data-id="${id}"]`);
+      if (!moving) return;
+      // If slot already has a step, swap it back to bank.
+      const existing = slot.querySelector(".step");
+      if (existing) bankEl.appendChild(existing);
+      slot.querySelector(".placeholder")?.remove();
+      slot.appendChild(moving);
+    });
+    return slot;
+  }
+
+  function reset() {
+    bankEl.innerHTML = "";
+    trackEl.innerHTML = "";
+    result.classList.remove("show", "good", "bad");
+    // Shuffle bank
+    const shuffled = ALL_STEPS.slice().sort(() => Math.random() - 0.5);
+    shuffled.forEach((s) => bankEl.appendChild(buildStepEl(s)));
+    // Empty slots
+    for (let i = 0; i < ALL_STEPS.length; i++) trackEl.appendChild(buildSlot(i));
+    // Bank also accepts drops (return).
+    bankEl.addEventListener("dragover", (e) => e.preventDefault());
+    bankEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text/plain");
+      const moving = document.querySelector(`.step[data-id="${id}"]`);
+      if (moving) bankEl.appendChild(moving);
+    });
+  }
+
+  function check() {
+    const slots = trackEl.querySelectorAll(".slot");
+    let allCorrect = true;
+    slots.forEach((slot, i) => {
+      const step = slot.querySelector(".step");
+      slot.classList.remove("correct", "wrong");
+      if (!step) { allCorrect = false; slot.classList.add("wrong"); return; }
+      if (step.dataset.id === ALL_STEPS[i].id) slot.classList.add("correct");
+      else { slot.classList.add("wrong"); allCorrect = false; }
+    });
+    result.classList.add("show");
+    if (allCorrect) {
+      result.classList.add("good"); result.classList.remove("bad");
+      result.innerHTML = "🎉 Correct order! That's the scientific method. Try another mystery from the top.";
+    } else {
+      result.classList.add("bad"); result.classList.remove("good");
+      result.innerHTML = "Not quite. Reflect: science <strong>begins</strong> with observation, then a focused question, then a testable hypothesis, then an experiment to test it, then recording, then concluding. Try again!";
+    }
+  }
+
+  document.getElementById("checkBtn").addEventListener("click", check);
+  document.getElementById("resetBtn").addEventListener("click", reset);
+
+  loadScenario();
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3D projectile motion explorer</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; right:16px; pointer-events:none; }
+  #header > * { pointer-events:auto; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; max-width:420px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #panel-controls { top:16px; right:16px; width:280px; }
+  #panel-controls h2 { margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .row { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:13px; }
+  .row label { flex:1; color:#cdd5e2; }
+  .row input[type=range] { width:120px; accent-color:var(--accent); }
+  .row .val { width:60px; text-align:right; color:var(--accent); font-variant-numeric:tabular-nums; font-size:12px; }
+  #readout { margin-top:14px; padding:10px; background:rgba(96,165,250,0.08); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:#dbe1ec; }
+  #readout div { margin:4px 0; display:flex; justify-content:space-between; }
+  #readout span.k { color:var(--muted); }
+  #readout span.v { color:var(--accent); font-variant-numeric:tabular-nums; }
+  #buttons { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; pointer-events:none; }
+  #buttons > * { pointer-events:auto; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  button.primary:hover { background:#3b82f6; }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>3D projectile motion explorer</h1>
+    <p class="sub">Adjust launch speed, angle, gravity and bearing. Press Launch to animate the trajectory. Watch how range = v₀² sin(2θ)/g changes with each parameter, and observe the symmetric ascent/descent.</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="panel-controls">
+  <h2>Launch parameters</h2>
+  <div class="row"><label>Speed v₀</label><input id="speed" type="range" min="1" max="80" step="0.5" /><span class="val" id="speed-val"></span></div>
+  <div class="row"><label>Angle θ</label><input id="angle" type="range" min="0" max="89" step="0.5" /><span class="val" id="angle-val"></span></div>
+  <div class="row"><label>Gravity g</label><input id="grav" type="range" min="0.5" max="25" step="0.1" /><span class="val" id="grav-val"></span></div>
+  <div class="row"><label>Bearing</label><input id="azim" type="range" min="0" max="360" step="1" /><span class="val" id="azim-val"></span></div>
+  <div id="readout">
+    <div><span class="k">Range</span><span class="v" id="r-range"></span></div>
+    <div><span class="k">Max height</span><span class="v" id="r-height"></span></div>
+    <div><span class="k">Time of flight</span><span class="v" id="r-time"></span></div>
+  </div>
+</div>
+
+<div class="hint">Drag to orbit · Scroll to zoom</div>
+
+<div class="overlay" id="buttons">
+  <button class="primary" id="launch">Launch</button>
+  <button id="reset">Reset view</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const CONFIG = {"launch_speed_mps": 25.0, "launch_angle_deg": 45.0, "gravity_mps2": 9.8, "azimuth_deg": 30.0, "scene_units_per_metre": 0.4};
+
+// --- Scene boilerplate ---------------------------------------------
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(20, 14, 30);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 4; controls.maxDistance = 200;
+controls.target.set(0, 0, 0);
+
+// Lighting
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(20, 30, 10); scene.add(key);
+
+// Ground grid (XZ plane, y = 0). Side length scales with the largest
+// expected range (≈ 200 m) so the projectile rarely flies off the grid.
+const grid = new THREE.GridHelper(200, 40, 0x445069, 0x1f2940);
+grid.position.y = 0;
+scene.add(grid);
+
+// Compass / axes (small)
+const axes = new THREE.AxesHelper(3); axes.position.y = 0.02; scene.add(axes);
+
+// Launcher cannon (a small cone) — points along the launch vector.
+const cannon = new THREE.Group();
+const cannonMat = new THREE.MeshStandardMaterial({ color:0x60a5fa, metalness:0.4, roughness:0.4 });
+const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.4, 2.0, 24), cannonMat);
+barrel.position.y = 1.0; barrel.rotation.x = Math.PI/2;
+cannon.add(barrel);
+const tipLight = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 12), new THREE.MeshBasicMaterial({ color:0xfacc15 }));
+tipLight.position.set(0, 1.0, 1.0); cannon.add(tipLight);
+scene.add(cannon);
+
+// Trajectory line (drawn as we animate the projectile).
+const trailGeom = new THREE.BufferGeometry();
+const trailMaxPoints = 600;
+const trailPositions = new Float32Array(trailMaxPoints * 3);
+trailGeom.setAttribute("position", new THREE.BufferAttribute(trailPositions, 3));
+trailGeom.setDrawRange(0, 0);
+const trailMat = new THREE.LineBasicMaterial({ color:0xfb7185, linewidth:2 });
+const trail = new THREE.Line(trailGeom, trailMat);
+scene.add(trail);
+
+// Projectile (a sphere)
+const projectile = new THREE.Mesh(
+  new THREE.SphereGeometry(0.4, 24, 16),
+  new THREE.MeshStandardMaterial({ color:0xfacc15, emissive:0xfacc15, emissiveIntensity:0.4 }),
+);
+projectile.visible = false;
+scene.add(projectile);
+
+// Predicted parabola (full path drawn as a static helper line) so the
+// student sees the shape before launch.
+const previewGeom = new THREE.BufferGeometry();
+const previewMat = new THREE.LineDashedMaterial({ color:0x60a5fa, dashSize:0.4, gapSize:0.3, opacity:0.6, transparent:true });
+const preview = new THREE.Line(previewGeom, previewMat);
+scene.add(preview);
+
+// --- Parameter state -----------------------------------------------
+const state = {
+  v0: CONFIG.launch_speed_mps ?? 20,
+  theta: CONFIG.launch_angle_deg ?? 45,
+  g: CONFIG.gravity_mps2 ?? 9.8,
+  azim: CONFIG.azimuth_deg ?? 0,
+  scale: CONFIG.scene_units_per_metre ?? 0.5,
+};
+
+const speedEl = document.getElementById("speed");
+const angleEl = document.getElementById("angle");
+const gravEl = document.getElementById("grav");
+const azimEl = document.getElementById("azim");
+speedEl.value = state.v0; angleEl.value = state.theta; gravEl.value = state.g; azimEl.value = state.azim;
+[speedEl, angleEl, gravEl, azimEl].forEach((el) => el.addEventListener("input", onChange));
+function readVals() {
+  state.v0 = +speedEl.value; state.theta = +angleEl.value; state.g = +gravEl.value; state.azim = +azimEl.value;
+  document.getElementById("speed-val").textContent = `${state.v0.toFixed(1)} m/s`;
+  document.getElementById("angle-val").textContent = `${state.theta.toFixed(1)}°`;
+  document.getElementById("grav-val").textContent = `${state.g.toFixed(1)} m/s²`;
+  document.getElementById("azim-val").textContent = `${state.azim.toFixed(0)}°`;
+}
+
+function physics() {
+  const thetaRad = state.theta * Math.PI / 180;
+  const range = state.v0*state.v0 * Math.sin(2*thetaRad) / state.g;
+  const hMax  = state.v0*state.v0 * Math.sin(thetaRad)**2 / (2*state.g);
+  const tFlight = 2 * state.v0 * Math.sin(thetaRad) / state.g;
+  return { range, hMax, tFlight };
+}
+
+function onChange() {
+  readVals();
+  const r = physics();
+  document.getElementById("r-range").textContent = `${r.range.toFixed(2)} m`;
+  document.getElementById("r-height").textContent = `${r.hMax.toFixed(2)} m`;
+  document.getElementById("r-time").textContent = `${r.tFlight.toFixed(2)} s`;
+  // Aim the cannon toward (azim, theta).
+  cannon.rotation.set(0, -state.azim * Math.PI/180, 0);
+  cannon.children[0].rotation.x = Math.PI/2 - state.theta * Math.PI/180;
+  drawPreview();
+}
+
+function trajectoryPoint(t) {
+  const thetaRad = state.theta * Math.PI / 180;
+  const azRad = state.azim * Math.PI / 180;
+  const horiz = state.v0 * Math.cos(thetaRad) * t;
+  const vert = state.v0 * Math.sin(thetaRad) * t - 0.5 * state.g * t * t;
+  // +x = east (azim 0 → +z), so use sin/cos for compass mapping.
+  const x = horiz * Math.sin(azRad);
+  const z = horiz * Math.cos(azRad);
+  // Convert metres → scene units.
+  return new THREE.Vector3(x * state.scale, Math.max(0, vert) * state.scale, z * state.scale);
+}
+
+function drawPreview() {
+  const r = physics();
+  const N = 100;
+  const pts = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const t = (i / (N - 1)) * r.tFlight;
+    const p = trajectoryPoint(t);
+    pts[i*3] = p.x; pts[i*3+1] = p.y; pts[i*3+2] = p.z;
+  }
+  preview.geometry.dispose();
+  preview.geometry = new THREE.BufferGeometry();
+  preview.geometry.setAttribute("position", new THREE.BufferAttribute(pts, 3));
+  preview.computeLineDistances();
+}
+
+// --- Launch animation -----------------------------------------------
+let launchStart = null;
+let launching = false;
+
+document.getElementById("launch").addEventListener("click", () => {
+  launchStart = performance.now();
+  launching = true;
+  projectile.visible = true;
+  trailGeom.setDrawRange(0, 0);
+});
+document.getElementById("reset").addEventListener("click", () => {
+  controls.reset();
+  camera.position.set(20, 14, 30);
+});
+
+function tickLaunch() {
+  if (!launching) return;
+  const r = physics();
+  const elapsed = (performance.now() - launchStart) / 1000;
+  // Animation slowed by 1.5x for visibility.
+  const t = Math.min(elapsed / 1.5, r.tFlight);
+  const p = trajectoryPoint(t);
+  projectile.position.copy(p);
+  // Append point to trail.
+  const i = trailGeom.drawRange.count;
+  if (i < trailMaxPoints) {
+    trailPositions[i*3]   = p.x;
+    trailPositions[i*3+1] = p.y;
+    trailPositions[i*3+2] = p.z;
+    trailGeom.attributes.position.needsUpdate = true;
+    trailGeom.setDrawRange(0, i + 1);
+  }
+  if (t >= r.tFlight) {
+    launching = false; // pin at landing
+  }
+}
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+function loop() {
+  tickLaunch();
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+
+onChange();
+loop();
+</script>
+</body>
+</html>

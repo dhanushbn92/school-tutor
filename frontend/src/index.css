@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* Design tokens — professional neutral palette with a blue primary.
+   Minimal set, shadcn/ui-compatible naming. */
+@theme {
+  --color-background: oklch(100% 0 0);
+  --color-foreground: oklch(15% 0.01 260);
+
+  --color-card: oklch(100% 0 0);
+  --color-card-foreground: oklch(15% 0.01 260);
+
+  --color-muted: oklch(96.5% 0.005 260);
+  --color-muted-foreground: oklch(46% 0.015 260);
+
+  --color-border: oklch(90% 0.008 260);
+  --color-input: oklch(90% 0.008 260);
+  --color-ring: oklch(56% 0.14 257);
+
+  --color-primary: oklch(56% 0.14 257);
+  --color-primary-foreground: oklch(98% 0 0);
+
+  --color-secondary: oklch(96% 0.007 260);
+  --color-secondary-foreground: oklch(20% 0.015 260);
+
+  --color-accent: oklch(96% 0.007 260);
+  --color-accent-foreground: oklch(20% 0.015 260);
+
+  --color-destructive: oklch(55% 0.2 27);
+  --color-destructive-foreground: oklch(98% 0 0);
+
+  --color-success: oklch(55% 0.14 152);
+  --color-warning: oklch(72% 0.15 71);
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Display font — applied to h1/h2/h3 (and CardTitle, since it's an h3).
+     Plus Jakarta Sans is a friendly geometric sans that adds personality
+     to page heros without compromising readability. The fallback chain
+     mirrors --font-sans so unstyled text doesn't reflow when the webfont
+     swaps in. */
+  --font-display: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+
+  /* Subject theme tokens — declared on :root (NOT inside @theme) so
+     Tailwind v4 doesn't tree-shake them. The CBSE catalogue has ~30
+     distinct subject names; we map every subject into one of six
+     colour families that read at a glance. Hues are well-spaced on the
+     OKLCH wheel so neighbouring subjects never look the same. Lightness
+     sits around 55–62% so badge text on a soft `color-mix` tint stays
+     AA-readable. Foregrounds are near-white because these tokens back
+     small filled chips and icon panels, not body text.
+
+       math     — Mathematics, Computer Science, Informatics, ICT
+       science  — Science, Physics, Chemistry, Biology, Biotech, PE…
+       social   — Social Science, History, Geography, Economics…
+       english  — English, Creative Writing
+       indian   — Hindi, Sanskrit, Urdu
+       arts     — Fine Art, Sangeet, Vocational Education, Knowledge Tradns
+
+     Why :root instead of @theme: tokens defined under @theme that are
+     only referenced via runtime (inline-style) CSS variables get
+     stripped during the build. Putting them on :root guarantees they
+     ship with the bundle. */
+  --color-subject-math: oklch(58% 0.18 258);
+  --color-subject-math-foreground: oklch(98% 0 0);
+  --color-subject-math-soft: oklch(95% 0.04 258);
+  --color-subject-science: oklch(60% 0.16 152);
+  --color-subject-science-foreground: oklch(98% 0 0);
+  --color-subject-science-soft: oklch(95% 0.04 152);
+  --color-subject-social: oklch(66% 0.18 65);
+  --color-subject-social-foreground: oklch(20% 0.02 65);
+  --color-subject-social-soft: oklch(96% 0.04 65);
+  --color-subject-english: oklch(60% 0.2 290);
+  --color-subject-english-foreground: oklch(98% 0 0);
+  --color-subject-english-soft: oklch(95% 0.04 290);
+  --color-subject-indian: oklch(64% 0.21 12);
+  --color-subject-indian-foreground: oklch(98% 0 0);
+  --color-subject-indian-soft: oklch(95% 0.04 12);
+  --color-subject-arts: oklch(62% 0.16 200);
+  --color-subject-arts-foreground: oklch(98% 0 0);
+  --color-subject-arts-soft: oklch(95% 0.04 200);
+  /* Fallback for unmapped subjects. */
+  --color-subject-default: oklch(56% 0.14 258);
+  --color-subject-default-foreground: oklch(98% 0 0);
+  --color-subject-default-soft: oklch(95% 0.04 258);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display-font cascade for headings. Picks up:
+     - h1 / h2 / h3 used directly by page heroes
+     - <CardTitle> from shadcn/ui (renders as <h3>)
+     - any future heading element
+
+   Tighter letter-spacing at large sizes — Plus Jakarta Sans has wide
+   default tracking that reads loose on big titles. The `font-feature-
+   settings` enables small contextual alternates that PJS ships with for
+   a touch of polish without changing the silhouette. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  font-feature-settings: "ss01", "cv11";
+}
+h1 {
+  letter-spacing: -0.02em;
+}
+
+/* Gentle floating animations for decorative hero blobs. Each variant
+   uses a different period + amplitude so multiple blobs in the same
+   panel drift independently — looks organic, not mechanical. Motion is
+   ~10px max so it's noticeable without being distracting; respects
+   prefers-reduced-motion via the override at the bottom. */
+@keyframes float-slow {
+  0%, 100% { transform: translate(0px, 0px); }
+  50% { transform: translate(-12px, 14px); }
+}
+@keyframes float-medium {
+  0%, 100% { transform: translate(0px, 0px); }
+  50% { transform: translate(10px, -12px); }
+}
+@keyframes float-fast {
+  0%, 100% { transform: translate(0px, 0px); }
+  50% { transform: translate(8px, 10px); }
+}
+.animate-float-slow {
+  animation: float-slow 14s ease-in-out infinite;
+}
+.animate-float-medium {
+  animation: float-medium 11s ease-in-out infinite;
+}
+.animate-float-fast {
+  animation: float-fast 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-medium,
+  .animate-float-fast {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#22d3ee; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; max-width:430px; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #panel-controls { top:16px; right:16px; width:300px; }
+  #panel-controls h2 { margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .row { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:13px; }
+  .row label { flex:1; color:#cdd5e2; }
+  .row input[type=range] { width:130px; accent-color:var(--accent); }
+  .row .val { width:60px; text-align:right; color:var(--accent); font-variant-numeric:tabular-nums; font-size:12px; }
+  .row select { background:rgba(11,16,32,0.6); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:6px 8px; font-size:13px; }
+  #buttons { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; pointer-events:none; }
+  #buttons > * { pointer-events:auto; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>__TITLE__</h1>
+    <p class="sub">__INSTRUCTIONS__</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="panel-controls">
+  <h2>Wave parameters</h2>
+  <div class="row"><label>Mode</label>
+    <select id="mode"><option value="transverse">Transverse</option><option value="longitudinal">Longitudinal</option><option value="standing">Standing</option></select>
+  </div>
+  <div class="row"><label>Amplitude A</label><input id="amp" type="range" min="0.1" max="4" step="0.05" /><span class="val" id="amp-val"></span></div>
+  <div class="row"><label>Wavelength λ</label><input id="lambda" type="range" min="0.5" max="20" step="0.1" /><span class="val" id="lambda-val"></span></div>
+  <div class="row"><label>Frequency f</label><input id="freq" type="range" min="0.05" max="5" step="0.05" /><span class="val" id="freq-val"></span></div>
+  <div class="row"><label>Speed v = fλ</label><span class="val" id="speed-val" style="width:auto"></span></div>
+</div>
+
+<div class="hint">Drag to orbit · Scroll to zoom</div>
+
+<div class="overlay" id="buttons">
+  <button id="pause">Pause</button>
+  <button id="reset-view">Reset view</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+// CONFIG = { wave_kind, amplitude, wavelength, frequency_hz, string_length, show_axes }
+const CONFIG = __WAVE_JSON__;
+
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(0, 6, 18);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 4; controls.maxDistance = 80;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(8, 12, 6); scene.add(key);
+
+// Axes
+let axesHelper = null;
+if (CONFIG.show_axes !== false) {
+  axesHelper = new THREE.AxesHelper(4); axesHelper.position.y = -2; scene.add(axesHelper);
+}
+
+// Particles representing the medium. A row of small spheres along x.
+const N = 220;
+const stringLength = CONFIG.string_length ?? 20;
+const particles = [];
+const partMat = new THREE.MeshStandardMaterial({ color:0x22d3ee, emissive:0x22d3ee, emissiveIntensity:0.35, roughness:0.4 });
+for (let i = 0; i < N; i++) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 8), partMat);
+  const x = -stringLength/2 + (i / (N - 1)) * stringLength;
+  m.position.set(x, 0, 0);
+  particles.push({ mesh: m, x0: x });
+  scene.add(m);
+}
+
+// Connecting line for transverse mode (helps perceive the waveform).
+const lineGeom = new THREE.BufferGeometry();
+const linePositions = new Float32Array(N * 3);
+lineGeom.setAttribute("position", new THREE.BufferAttribute(linePositions, 3));
+const line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({ color:0x67e8f9, transparent:true, opacity:0.7 }));
+scene.add(line);
+
+// --- State -----------------------------------------------------------
+const state = {
+  mode: CONFIG.wave_kind || "transverse",
+  amp: CONFIG.amplitude ?? 1.5,
+  lambda: CONFIG.wavelength ?? 4,
+  freq: CONFIG.frequency_hz ?? 0.5,
+};
+let paused = false;
+
+const modeEl = document.getElementById("mode");
+const ampEl = document.getElementById("amp");
+const lamEl = document.getElementById("lambda");
+const freqEl = document.getElementById("freq");
+modeEl.value = state.mode;
+ampEl.value = state.amp;
+lamEl.value = state.lambda;
+freqEl.value = state.freq;
+
+function refreshLabels() {
+  document.getElementById("amp-val").textContent = `${state.amp.toFixed(2)}`;
+  document.getElementById("lambda-val").textContent = `${state.lambda.toFixed(2)}`;
+  document.getElementById("freq-val").textContent = `${state.freq.toFixed(2)} Hz`;
+  document.getElementById("speed-val").textContent = `${(state.freq * state.lambda).toFixed(2)} u/s`;
+}
+modeEl.addEventListener("change", () => { state.mode = modeEl.value; });
+ampEl.addEventListener("input", () => { state.amp = +ampEl.value; refreshLabels(); });
+lamEl.addEventListener("input", () => { state.lambda = +lamEl.value; refreshLabels(); });
+freqEl.addEventListener("input", () => { state.freq = +freqEl.value; refreshLabels(); });
+
+document.getElementById("pause").addEventListener("click", (e) => { paused = !paused; e.target.textContent = paused ? "Resume" : "Pause"; });
+document.getElementById("reset-view").addEventListener("click", () => { controls.reset(); camera.position.set(0, 6, 18); });
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+let elapsed = 0; let lastTime = performance.now();
+function loop() {
+  const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+  if (!paused) elapsed += dt;
+  const k = (2 * Math.PI) / state.lambda;
+  const omega = 2 * Math.PI * state.freq;
+
+  for (let i = 0; i < N; i++) {
+    const p = particles[i]; const x = p.x0;
+    let dy = 0, dx = 0;
+    if (state.mode === "transverse") {
+      dy = state.amp * Math.sin(k * x - omega * elapsed);
+    } else if (state.mode === "longitudinal") {
+      // Displace along x; particles bunch up (compressions) and spread out (rarefactions).
+      dx = state.amp * 0.4 * Math.sin(k * x - omega * elapsed);
+    } else {
+      // Standing: superposition of two opposite travelling waves → 2A sin(kx) cos(ωt).
+      dy = 2 * state.amp * Math.sin(k * x) * Math.cos(omega * elapsed);
+    }
+    p.mesh.position.set(x + dx, dy, 0);
+    linePositions[i*3]   = x + dx;
+    linePositions[i*3+1] = dy;
+    linePositions[i*3+2] = 0;
+  }
+  lineGeom.attributes.position.needsUpdate = true;
+  // Hide the connecting line in longitudinal mode (where displacement is along x and a line is
+  // visually misleading).
+  line.visible = state.mode !== "longitudinal";
+
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+
+refreshLabels();
+loop();
+</script>
+</body>
+</html>

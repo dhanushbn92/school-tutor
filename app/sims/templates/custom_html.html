@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  /* Chrome around the sandboxed iframe. The chrome runs in the
+     parent (trusted) origin; the iframe runs as opaque-null. */
+  :root { --bg:#070b18; --panel:rgba(15,20,35,0.92); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#a855f7; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #shell { height:100%; display:grid; grid-template-rows: auto 1fr; }
+  header { padding:14px 18px; background:var(--panel); border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:14px; flex-wrap:wrap; }
+  header .info { flex:1; min-width:0; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:3px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:rgba(168,85,247,0.16); border:1px solid var(--accent); color:var(--accent); font-size:11px; letter-spacing:0.04em; text-transform:uppercase; }
+  .badge::before { content:"🛡"; }
+  .libs { font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; font-size:11px; color:var(--muted); padding:3px 9px; border:1px dashed var(--border); border-radius:6px; }
+  #frame-host { position:relative; min-height:0; }
+  iframe { width:100%; height:100%; border:0; background:#0b1020; display:block; }
+  /* When fullscreen toggled, parent header collapses for more sim space. */
+  body.collapsed header { display:none; }
+  #toggle { background:transparent; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:5px 12px; font-size:12px; cursor:pointer; }
+  #toggle:hover { color:var(--accent); border-color:var(--accent); }
+</style>
+</head>
+<body>
+<div id="shell">
+  <header>
+    <div class="info">
+      <h1>__TITLE__</h1>
+      <p class="sub">__INSTRUCTIONS__</p>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+      <span class="badge" title="The simulation below runs in a sandboxed iframe with no access to platform data, cookies or the parent page.">Sandboxed</span>
+      <span class="libs" id="libs" style="display:none">uses: __LIBS__</span>
+      <button id="toggle">Hide chrome</button>
+    </div>
+  </header>
+  <div id="frame-host">
+    <!--
+      The author-supplied HTML lives in the iframe's `srcdoc`. The
+      sandbox is `allow-scripts` ONLY: the iframe runs as a null
+      origin, so scripts inside it have no access to:
+        - cookies / localStorage / sessionStorage
+        - the parent window or its DOM
+        - top-level navigation
+        - form submission
+      They CAN load CDN scripts (Three.js, d3, math.js, etc.) since
+      cross-origin script tags work in any sandbox configuration.
+    -->
+    <iframe id="sim" sandbox="allow-scripts" srcdoc="__SRCDOC__" referrerpolicy="no-referrer" loading="lazy" title="__TITLE__"></iframe>
+  </div>
+</div>
+<script>
+  // Wire the libs hint (only shown when the renderer left a non-empty list).
+  (function wireLibs() {
+    var el = document.getElementById("libs");
+    var raw = el && el.textContent.replace(/^uses:\s*/, "").trim();
+    if (!raw) { if (el) el.style.display = "none"; }
+    else el.style.display = "";
+  })();
+
+  // Collapse-the-chrome toggle so a student can give the sim full screen.
+  document.getElementById("toggle").addEventListener("click", function () {
+    document.body.classList.toggle("collapsed");
+    this.textContent = document.body.classList.contains("collapsed") ? "Show chrome" : "Hide chrome";
+  });
+</script>
+</body>
+</html>

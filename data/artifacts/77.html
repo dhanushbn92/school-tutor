@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Wonderful World of Science</title>
+<style>
+  :root { --bg:#050711; --panel:rgba(15,20,35,0.82); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; pointer-events:none; }
+  .overlay > * { pointer-events:auto; }
+  #header { top:16px; left:16px; right:16px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .panel { background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; max-width:420px; }
+  h1 { margin:0; font-size:18px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  input[type=range] { width:120px; accent-color: var(--accent); }
+  #info { top:84px; right:16px; width:320px; max-height:calc(100vh - 200px); overflow:auto; display:none; }
+  #info.open { display:block; }
+  #info h2 { margin:0 0 4px; font-size:16px; }
+  #info .kind { display:inline-block; padding:2px 10px; font-size:11px; letter-spacing:.5px; text-transform:uppercase; background:rgba(96,165,250,.15); color:var(--accent); border-radius:999px; margin-bottom:8px; }
+  #info p { margin:8px 0; font-size:13px; line-height:1.5; color:#dbe1ec; }
+  #info .fact { margin-top:10px; padding:10px; background:rgba(96,165,250,.08); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:var(--muted); font-style:italic; }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; z-index:1; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>The Wonderful World of Science</h1>
+    <p class="sub">Explore the world of science by interacting with the different areas of study. Click on each object to learn more about it.</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="info" role="complementary" aria-live="polite">
+  <span class="kind" id="info-kind">Object</span>
+  <h2 id="info-name">Name</h2>
+  <p id="info-desc"></p>
+  <div class="fact" id="info-fact"></div>
+  <button id="info-close" style="margin-top:10px">Close</button>
+</div>
+
+<div class="overlay" id="controls">
+  <span class="pill">
+    Speed <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
+    <span id="speed-val">1.0x</span>
+  </span>
+  <button id="reset-view">Reset view</button>
+  <button id="toggle-orbits">Toggle orbits</button>
+  <button id="toggle-labels">Toggle labels</button>
+</div>
+
+<div class="hint">Drag to rotate · Scroll to zoom · Click an object to learn more</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.164.1",
+    "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+
+// ---- LLM-provided data ----
+// Each entry is { name, kind, orbit_position, description, fun_fact }.
+// orbit_position 0 = centre; 1, 2, 3, ... = outward orbits/shells.
+const OBJECTS = [{"name": "Science", "kind": "Centre", "orbit_position": 0, "description": "Science is a way of thinking, observing, and doing things to understand the world we live in and to uncover the secrets of the universe.", "fun_fact": "Science is all around us, from the food we eat to the stars in the sky."}, {"name": "Physics", "kind": "Branch of Science", "orbit_position": 1, "description": "Physics is the study of the natural world around us, including energy, matter, and the laws that govern their behavior.", "fun_fact": "Physics helps us understand how things move and interact with each other."}, {"name": "Chemistry", "kind": "Branch of Science", "orbit_position": 1, "description": "Chemistry is the study of the building blocks of matter and how they interact with each other.", "fun_fact": "Chemistry helps us understand how different substances are made and how they can be used."}, {"name": "Biology", "kind": "Branch of Science", "orbit_position": 1, "description": "Biology is the study of living things, including plants, animals, and microorganisms.", "fun_fact": "Biology helps us understand how living things grow, adapt, and interact with their environment."}, {"name": "Astronomy", "kind": "Branch of Science", "orbit_position": 2, "description": "Astronomy is the study of the universe, including stars, planets, and galaxies.", "fun_fact": "Astronomy helps us understand the vastness of the universe and our place in it."}, {"name": "Earth Science", "kind": "Branch of Science", "orbit_position": 2, "description": "Earth Science is the study of our planet, including its geology, atmosphere, and oceans.", "fun_fact": "Earth Science helps us understand how our planet works and how we can protect it."}, {"name": "Scientific Method", "kind": "Process", "orbit_position": 3, "description": "The scientific method is a step-by-step process used to solve problems and answer questions.", "fun_fact": "The scientific method involves observing, questioning, hypothesizing, experimenting, and analyzing results."}];
+
+// Visual presets keyed on lowercase name. Lets the LLM pick descriptive
+// names (Earth, Sun, Mitochondria, Nucleus, ...) and get a nice colour /
+// size if we happen to know it. Anything not in this table falls back to
+// the kind-based defaults below.
+const NAME_PRESETS = {
+  // Astronomy
+  sun:     { color:0xffc36b, emissive:0xffaa33, radius:2.6 },
+  mercury: { color:0xb1b1b1, radius:0.38 },
+  venus:   { color:0xe8c07d, radius:0.52 },
+  earth:   { color:0x3b82f6, radius:0.55 },
+  moon:    { color:0xcccccc, radius:0.18 },
+  mars:    { color:0xd1603c, radius:0.47 },
+  jupiter: { color:0xd5a878, radius:1.4 },
+  saturn:  { color:0xe0bd7b, radius:1.2, ring:true },
+  uranus:  { color:0x7dd3c0, radius:0.88 },
+  neptune: { color:0x4f7ff9, radius:0.86 },
+  pluto:   { color:0xc9b8a8, radius:0.22 },
+  // Atomic
+  nucleus:  { color:0xef4444, emissive:0xa33020, radius:1.6 },
+  proton:   { color:0xef4444, radius:0.42 },
+  neutron:  { color:0x9ca3af, radius:0.42 },
+  electron: { color:0x60a5fa, radius:0.22 },
+  // Cell
+  mitochondria: { color:0xf97316, radius:0.55 },
+  chloroplast:  { color:0x22c55e, radius:0.6 },
+  ribosome:     { color:0xa855f7, radius:0.22 },
+  vacuole:      { color:0x60a5fa, radius:0.7 },
+};
+
+// Generic colour palette used for outer-orbit objects when nothing else
+// matches — keeps the scene visually distinct.
+const FALLBACK_PALETTE = [
+  0x60a5fa, 0xa855f7, 0x22c55e, 0xf97316, 0xef4444,
+  0xeab308, 0x14b8a6, 0xf472b6, 0x84cc16, 0x06b6d4,
+];
+
+function presetFor(name, kind, fallbackIndex) {
+  const nameKey = (name || "").toLowerCase().trim();
+  if (NAME_PRESETS[nameKey]) return NAME_PRESETS[nameKey];
+
+  // Kind-based defaults. Only "Star"/"Sun"/"Centre" types are emissive; the
+  // rest are matte spheres with a colour from the fallback palette.
+  const k = (kind || "").toLowerCase();
+  if (/(^|\s)(star|sun|centre|center|nucleus|core)(\s|$)/.test(k)) {
+    return { color:0xffd6a5, emissive:0xffaa33, radius:2.4 };
+  }
+  if (/(moon|satellite)/.test(k))   return { color:0xbfbfbf, radius:0.2 };
+  if (/asteroid/.test(k))            return { color:0x999084, radius:0.18 };
+  if (/electron/.test(k))            return { color:0x60a5fa, radius:0.22 };
+
+  // Default: pick from the palette so every object on the same orbit looks
+  // distinct even with vague kinds.
+  const colour = FALLBACK_PALETTE[fallbackIndex % FALLBACK_PALETTE.length];
+  return { color: colour, radius: 0.6 };
+}
+
+// ---- three.js scene ----
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 2000);
+camera.position.set(0, 14, 28);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = "absolute";
+labelRenderer.domElement.style.top = "0";
+labelRenderer.domElement.style.pointerEvents = "none";
+sceneEl.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 5;
+controls.maxDistance = 120;
+
+// Subtle starfield background — gives depth regardless of subject matter.
+(function buildStars() {
+  const g = new THREE.BufferGeometry();
+  const count = 2500;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = 600;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i*3+2] = r * Math.cos(phi);
+  }
+  g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const m = new THREE.PointsMaterial({ size:0.5, color:0xffffff, sizeAttenuation:false, opacity:0.4, transparent:true });
+  scene.add(new THREE.Points(g, m));
+})();
+
+// Gentle ambient + a point light at the centre once we know where it is.
+scene.add(new THREE.AmbientLight(0x606070, 1.0));
+
+// Build the scene from LLM data.
+const sorted = [...OBJECTS].sort((a, b) => a.orbit_position - b.orbit_position);
+const orbitCount = Math.max(1, sorted.filter(o => o.orbit_position > 0).length);
+const orbitStep = 3.0;       // distance between orbits (units)
+const orbitStart = 5.0;      // radius of innermost orbit
+const orbitEnd = orbitStart + orbitStep * (orbitCount - 1);
+
+const sceneObjects = [];     // { obj, mesh, orbit, radius, speed, phase }
+const orbitLines = [];
+const labels = [];
+
+sorted.forEach((obj, index) => {
+  const preset = presetFor(obj.name, obj.kind, index);
+  if (obj.orbit_position === 0) {
+    // Centre object — emissive sphere + a point light at the origin.
+    const geom = new THREE.SphereGeometry(preset.radius, 48, 48);
+    const mat = new THREE.MeshStandardMaterial({
+      color: preset.color,
+      emissive: preset.emissive ?? 0xaa5500,
+      emissiveIntensity: 1.3,
+      roughness: 1,
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.userData.obj = obj;
+    scene.add(mesh);
+
+    const light = new THREE.PointLight(0xffddaa, 2.5, 0, 0.8);
+    light.position.set(0, 0, 0);
+    scene.add(light);
+
+    attachLabel(mesh, obj.name);
+    sceneObjects.push({ obj, mesh, orbit:0, radius:preset.radius, speed:0, phase:0 });
+  } else {
+    const orbitIndex = obj.orbit_position - 1;
+    const radius = orbitStart + orbitStep * orbitIndex;
+
+    const geom = new THREE.SphereGeometry(preset.radius, 32, 32);
+    const mat = new THREE.MeshStandardMaterial({
+      color: preset.color,
+      roughness: 0.75,
+      metalness: 0.05,
+    });
+    const mesh = new THREE.Mesh(geom, mat);
+    const phase = Math.random() * Math.PI * 2;
+    mesh.position.set(radius * Math.cos(phase), 0, radius * Math.sin(phase));
+    mesh.userData.obj = obj;
+    scene.add(mesh);
+
+    // Optional ring (e.g. Saturn-like). Triggered only by explicit preset.
+    if (preset.ring) {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(preset.radius * 1.4, preset.radius * 2.2, 48),
+        new THREE.MeshBasicMaterial({ color: 0xe5d7b3, side: THREE.DoubleSide, transparent:true, opacity:0.6 }),
+      );
+      ring.rotation.x = -Math.PI / 2.5;
+      mesh.add(ring);
+    }
+
+    // Circular orbit path — visible by default, toggleable.
+    const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, Math.PI * 2, false, 0);
+    const points = curve.getPoints(128).map(p => new THREE.Vector3(p.x, 0, p.y));
+    const orbitLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints(points),
+      new THREE.LineBasicMaterial({ color: 0x314060, transparent:true, opacity:0.35 }),
+    );
+    scene.add(orbitLine);
+    orbitLines.push(orbitLine);
+
+    attachLabel(mesh, obj.name);
+
+    // Outer orbits move slower (rough Keplerian flavour). Works for atoms,
+    // planets, and any centred 3D model where outer = slower reads naturally.
+    const baseSpeed = 0.35 / Math.sqrt(radius / orbitStart);
+    sceneObjects.push({ obj, mesh, orbit:radius, radius:preset.radius, speed:baseSpeed, phase });
+  }
+
+  void orbitEnd;
+  void index;
+});
+
+function attachLabel(mesh, name) {
+  const div = document.createElement("div");
+  div.textContent = name;
+  div.style.cssText = "color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; letter-spacing:.2px; white-space:nowrap;";
+  const label = new CSS2DObject(div);
+  label.position.set(0, mesh.geometry.parameters.radius * 1.6 + 0.5, 0);
+  mesh.add(label);
+  labels.push(label);
+}
+
+// ---- Interactivity: click to open info panel ----
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const infoPanel = document.getElementById("info");
+const infoName = document.getElementById("info-name");
+const infoDesc = document.getElementById("info-desc");
+const infoFact = document.getElementById("info-fact");
+const infoKind = document.getElementById("info-kind");
+document.getElementById("info-close").addEventListener("click", () => infoPanel.classList.remove("open"));
+
+renderer.domElement.addEventListener("click", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const meshes = sceneObjects.map(s => s.mesh);
+  const hits = raycaster.intersectObjects(meshes, false);
+  if (hits.length === 0) return;
+  const obj = hits[0].object.userData.obj;
+  openInfo(obj);
+});
+
+function openInfo(obj) {
+  infoName.textContent = obj.name;
+  infoDesc.textContent = obj.description;
+  infoFact.textContent = obj.fun_fact ? "Did you know? " + obj.fun_fact : "";
+  infoKind.textContent = (obj.kind || "object").toLowerCase();
+  infoPanel.classList.add("open");
+}
+
+// ---- Controls ----
+let speedMultiplier = 1;
+const speedSlider = document.getElementById("speed");
+const speedVal = document.getElementById("speed-val");
+speedSlider.addEventListener("input", (e) => {
+  speedMultiplier = parseFloat(e.target.value);
+  speedVal.textContent = speedMultiplier.toFixed(2) + "x";
+});
+
+let orbitsVisible = true;
+document.getElementById("toggle-orbits").addEventListener("click", () => {
+  orbitsVisible = !orbitsVisible;
+  orbitLines.forEach(l => (l.visible = orbitsVisible));
+});
+
+let labelsVisible = true;
+document.getElementById("toggle-labels").addEventListener("click", () => {
+  labelsVisible = !labelsVisible;
+  labels.forEach(l => (l.visible = labelsVisible));
+});
+
+document.getElementById("reset-view").addEventListener("click", () => {
+  camera.position.set(0, 14, 28);
+  controls.target.set(0, 0, 0);
+});
+
+// ---- Resize + animate ----
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const clock = new THREE.Clock();
+function animate() {
+  const dt = clock.getDelta();
+  sceneObjects.forEach(s => {
+    if (s.orbit === 0) {
+      s.mesh.rotation.y += dt * 0.2 * speedMultiplier;
+      return;
+    }
+    s.phase += s.speed * dt * speedMultiplier;
+    s.mesh.position.set(s.orbit * Math.cos(s.phase), 0, s.orbit * Math.sin(s.phase));
+    s.mesh.rotation.y += dt * 0.8 * speedMultiplier;
+  });
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

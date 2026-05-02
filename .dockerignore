@@ -1,0 +1,55 @@
+# Keep the build context small and free of secrets / state.
+# Anything not explicitly required by `app/` at runtime should be excluded.
+
+# VCS + IDE
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+*.swp
+
+# Python build / cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.egg-info
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+.venv
+venv
+env
+
+# Local artifacts + dev DB — Cloud Run uses GCS + Postgres, never these.
+data/
+school_tuter.db
+school_tuter.db-journal
+*.sqlite
+*.sqlite3
+
+# Frontend lives in its own deploy pipeline (Firebase Hosting).
+frontend/
+
+# Docs, tests, throwaway scratch.
+docs/
+tests/
+tmp/
+README.md
+
+# Secrets — must never end up in the image.
+.env
+.env.*
+*.pem
+*.key
+
+# Docker meta
+Dockerfile
+.dockerignore
+
+# OS junk
+.DS_Store
+Thumbs.db

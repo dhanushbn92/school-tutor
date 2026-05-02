@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Newton&#x27;s third law in fields — gravitational dipole</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#a855f7; --pos:#ef4444; --neg:#3b82f6; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; max-width:430px; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #legend { top:16px; right:16px; width:240px; }
+  #legend h2 { margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .legend-row { display:flex; align-items:center; gap:10px; margin:6px 0; font-size:13px; }
+  .swatch { width:14px; height:14px; border-radius:50%; flex:none; }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; pointer-events:none; }
+  #controls > * { pointer-events:auto; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  input[type=range] { width:130px; accent-color:var(--accent); }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+  .node-label { color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>Newton&#x27;s third law in fields — gravitational dipole</h1>
+    <p class="sub">Drag to rotate around two massive bodies. Each body pulls the other with an equal-and-opposite force; the field lines visualise the gravitational pull both bodies experience.</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="legend">
+  <h2 id="legend-title">Legend</h2>
+  <div class="legend-row"><span class="swatch" style="background:#ef4444"></span><span>Positive source</span></div>
+  <div class="legend-row"><span class="swatch" style="background:#3b82f6"></span><span>Negative source</span></div>
+  <div class="legend-row"><span class="swatch" style="background:#fbbf24"></span><span>Field line</span></div>
+</div>
+
+<div class="hint">Drag to rotate · Scroll to zoom</div>
+
+<div class="overlay" id="controls">
+  <span class="pill">Density <input id="density" type="range" min="6" max="48" step="1" /><span id="density-val"></span></span>
+  <span class="pill">Length <input id="length" type="range" min="2" max="30" step="0.5" /><span id="length-val"></span></span>
+  <button id="reset-view">Reset view</button>
+  <button id="toggle-anim">Pause flow</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+
+// CONFIG = { field_kind, sources: [...], line_density, line_length }
+const CONFIG = {"field_kind": "gravitational", "sources": [{"name": "Earth", "x": -3.0, "y": 0.0, "z": 0.0, "magnitude": 4.0, "label": "Earth"}, {"name": "Moon", "x": 3.0, "y": 0.0, "z": 0.0, "magnitude": 1.0, "label": "Moon"}], "line_density": 18, "line_length": 14.0};
+const FIELD_KIND = CONFIG.field_kind || "electric";
+
+document.getElementById("legend-title").textContent =
+  FIELD_KIND === "electric" ? "Electric field" :
+  FIELD_KIND === "gravitational" ? "Gravitational field" :
+  "Magnetic field";
+
+// --- Scene boilerplate ----------------------------------------------
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(20, 14, 26);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = "absolute"; labelRenderer.domElement.style.top = "0"; labelRenderer.domElement.style.pointerEvents = "none";
+sceneEl.appendChild(labelRenderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 4; controls.maxDistance = 200;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(10, 20, 8); scene.add(key);
+
+// --- Source spheres -------------------------------------------------
+const SOURCES = (CONFIG.sources || []);
+const sourceMeshes = [];
+SOURCES.forEach((s) => {
+  const isPositive = (s.magnitude ?? 0) >= 0;
+  const color = (FIELD_KIND === "gravitational")
+    ? 0x84cc16
+    : (FIELD_KIND === "magnetic")
+    ? (isPositive ? 0xef4444 : 0x3b82f6)
+    : (isPositive ? 0xef4444 : 0x3b82f6);
+  const r = 0.5 + Math.min(1.5, Math.abs(s.magnitude ?? 1) * 0.2);
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(r, 32, 24),
+    new THREE.MeshStandardMaterial({ color, emissive:color, emissiveIntensity:0.4, roughness:0.4 }),
+  );
+  mesh.position.set(s.x, s.y, s.z);
+  scene.add(mesh); sourceMeshes.push(mesh);
+  // Label
+  const div = document.createElement("div"); div.className = "node-label"; div.textContent = s.label || s.name;
+  const lab = new CSS2DObject(div); lab.position.set(0, r + 0.6, 0); mesh.add(lab);
+});
+
+// --- Field-line geometry --------------------------------------------
+// We compute streamlines numerically: start at evenly distributed
+// points on a small sphere around each source and integrate the field
+// outward (or inward, depending on the field kind and sign).
+const lineGroup = new THREE.Group(); scene.add(lineGroup);
+const linesData = [];   // { positions: Float32Array[], material }
+
+function fieldVectorAt(p) {
+  // Sum of contributions from all sources.
+  const f = new THREE.Vector3();
+  for (const s of SOURCES) {
+    const r = new THREE.Vector3(p.x - s.x, p.y - s.y, p.z - s.z);
+    const dist = Math.max(r.length(), 0.4);
+    r.divideScalar(dist);   // unit vector
+    const factor = (s.magnitude ?? 1) / (dist * dist);
+    f.addScaledVector(r, factor);
+  }
+  // Gravitational fields always point INTO the source — flip.
+  if (FIELD_KIND === "gravitational") f.multiplyScalar(-1);
+  return f;
+}
+
+function buildFieldLines(density, maxLen) {
+  // Drop existing.
+  while (lineGroup.children.length) lineGroup.remove(lineGroup.children[0]);
+  linesData.length = 0;
+
+  const STEP = 0.25;       // integration step in scene units
+  const STEPS = Math.max(20, Math.floor(maxLen / STEP));
+  const seedRadius = 0.7;  // start just outside the source sphere
+
+  // Precompute source radii so we can stop a streamline cleanly when it
+  // re-enters any source's surface.
+  const sourceRadii = SOURCES.map(s => 0.5 + Math.min(1.5, Math.abs(s.magnitude ?? 1) * 0.2));
+
+  SOURCES.forEach((src, srcIdx) => {
+    const sourceSign = Math.sign(src.magnitude ?? 1) || 1;
+    // Pick the integration direction so the line ALWAYS emanates from
+    // this source. Without this, gravitational lines (whose field
+    // points inward) collapse into the source and become invisible.
+    //   - gravitational: field points inward → step OUTWARD = -f
+    //   - electric/magnetic positive source: f points outward → step +f
+    //   - electric/magnetic negative source: f points inward (relative
+    //     to that source's contribution) → step against f, but f also
+    //     gets contributions from other sources, so we use sourceSign
+    //     as the per-source dir multiplier.
+    const dirSign = (FIELD_KIND === "gravitational") ? -1 : sourceSign;
+
+    // Distribute seeds on a sphere using golden-spiral so they're
+    // evenly spread without clumping at the poles.
+    const N = density;
+    const phiStep = Math.PI * (3 - Math.sqrt(5));
+    for (let k = 0; k < N; k++) {
+      const y = 1 - (k / (N - 1)) * 2;          // y from 1 to -1
+      const r = Math.sqrt(Math.max(0, 1 - y*y));
+      const theta = phiStep * k;
+      const seedDir = new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r);
+      const seedR = sourceRadii[srcIdx] + 0.08;  // just outside the surface
+      const start = new THREE.Vector3(src.x, src.y, src.z).addScaledVector(seedDir, seedR);
+
+      // Walk the streamline. We track filledSteps separately so the
+      // BufferAttribute knows where the real data ends.
+      const positions = new Float32Array(STEPS * 3);
+      const p = start.clone();
+      let filled = 0;
+      for (let i = 0; i < STEPS; i++) {
+        positions[i*3] = p.x; positions[i*3+1] = p.y; positions[i*3+2] = p.z;
+        filled = i + 1;
+        const f = fieldVectorAt(p);
+        f.multiplyScalar(dirSign);
+        const len = f.length();
+        if (len < 1e-3) break;            // stagnation point
+        if (p.length() > 60) break;       // wandered off
+        f.divideScalar(len);              // unit-step direction
+        p.addScaledVector(f, STEP);
+        // Stop if the line has wandered into ANOTHER source — keeps
+        // the picture clean and prevents lines from passing through.
+        let hit = false;
+        for (let j = 0; j < SOURCES.length; j++) {
+          if (j === srcIdx) continue;
+          const o = SOURCES[j];
+          const dx = p.x - o.x, dy = p.y - o.y, dz = p.z - o.z;
+          if (dx*dx + dy*dy + dz*dz < (sourceRadii[j] + 0.05) ** 2) {
+            // Stamp a final point inside the other source so the line
+            // visibly terminates there (rather than ending in midair).
+            positions[filled*3]   = p.x;
+            positions[filled*3+1] = p.y;
+            positions[filled*3+2] = p.z;
+            filled = filled + 1;
+            hit = true; break;
+          }
+        }
+        if (hit) break;
+      }
+      // Need at least 2 vertices for a line to be visible.
+      if (filled < 2) continue;
+
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      // Critical: only draw the actually-filled portion. Without this,
+      // the trailing zero-vertices in `positions` collapse to the
+      // origin and produce phantom lines pointing at (0,0,0).
+      geom.setDrawRange(0, filled);
+      const mat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent:true, opacity:0.7 });
+      const line = new THREE.Line(geom, mat);
+      lineGroup.add(line);
+      linesData.push({ positions, total: filled });
+    }
+  });
+}
+
+// --- Animated "flow" along the lines: bright dashes that march. ----
+// Implemented by cycling each line's draw range. The window size is
+// adapted to each line's total length so SHORT lines still pulse
+// instead of going dark.
+let flowOffset = 0; let flowing = true;
+function tickFlow(dt) {
+  if (!flowing) return;
+  flowOffset = (flowOffset + dt * 30) % 1000;
+  lineGroup.children.forEach((line, i) => {
+    const total = linesData[i]?.total ?? 0;
+    if (total < 2) return;
+    // Window covers ~40% of the line's length, with a sane minimum.
+    const win = Math.max(4, Math.min(total, Math.floor(total * 0.4)));
+    if (total <= win) {
+      // Line is shorter than the window — just show all of it.
+      line.geometry.setDrawRange(0, total);
+      return;
+    }
+    const cycle = total;        // how far the window travels per loop
+    const start = Math.floor(flowOffset) % cycle;
+    const end = Math.min(total, start + win);
+    line.geometry.setDrawRange(start, end - start);
+  });
+}
+
+// --- Controls --------------------------------------------------------
+let density = CONFIG.line_density ?? 18;
+let length = CONFIG.line_length ?? 12;
+const densityEl = document.getElementById("density");
+const lengthEl = document.getElementById("length");
+densityEl.value = density; lengthEl.value = length;
+function updateLabels() {
+  document.getElementById("density-val").textContent = `${density}`;
+  document.getElementById("length-val").textContent = `${length}`;
+}
+// Slider values update live (`input`) so the student sees the picture
+// change while dragging — `change` only fires on release, which makes
+// the controls feel dead. Throttling-style debouncing isn't needed:
+// rebuilding 18-line scenes is cheap.
+densityEl.addEventListener("input", () => { density = +densityEl.value; updateLabels(); buildFieldLines(density, length); });
+lengthEl.addEventListener("input", () => { length = +lengthEl.value; updateLabels(); buildFieldLines(density, length); });
+document.getElementById("reset-view").addEventListener("click", () => { controls.reset(); camera.position.set(20, 14, 26); });
+document.getElementById("toggle-anim").addEventListener("click", (e) => {
+  flowing = !flowing;
+  e.target.textContent = flowing ? "Pause flow" : "Resume flow";
+  // When paused, restore each line to its actual filled length (not
+  // Infinity, which would over-draw into the trailing zero-vertices).
+  if (!flowing) {
+    lineGroup.children.forEach((l, i) => {
+      const total = linesData[i]?.total ?? 0;
+      l.geometry.setDrawRange(0, total);
+    });
+  }
+});
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+let lastTime = performance.now();
+function loop() {
+  const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+  tickFlow(dt);
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+
+updateLabels();
+buildFieldLines(density, length);
+loop();
+</script>
+</body>
+</html>

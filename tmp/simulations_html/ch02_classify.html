@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sort the Living World</title>
+<style>
+  :root {
+    --bg: #eaf6ed; --ink: #1d3220; --muted: #4f6f56; --accent: #2f8d5b;
+    --good: #1faa6f; --bad: #d04141; --card: #fff; --shadow: 0 6px 20px rgba(20,60,30,0.08);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: linear-gradient(180deg, #f1faf2, #e3eef0); color: var(--ink); min-height: 100vh; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 18px 80px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+  .mode-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .pill {
+    padding: 6px 14px; border-radius: 999px; background: white; cursor: pointer; font-size: 13px;
+    border: 1px solid #c7e0cd; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .scoreboard { display: flex; align-items: center; gap: 16px; background: var(--card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow); margin-bottom: 14px; flex-wrap: wrap; }
+  .score, .left { font-weight: 600; font-size: 14px; }
+  .score b { color: var(--accent); margin-left: 4px; }
+  .left b { color: var(--muted); margin-left: 4px; }
+
+  .stage { background: var(--card); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
+  .stage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 760px) { .stage-grid { grid-template-columns: 1fr; } }
+  .creatures { min-height: 220px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+  .creature {
+    background: linear-gradient(135deg, #ffffff, #f0fbf2); border: 1px solid #c7e0cd; border-radius: 12px;
+    padding: 10px 14px; cursor: grab; user-select: none; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .creature .emoji { font-size: 22px; }
+  .creature .name { font-weight: 600; font-size: 14px; }
+  .creature.dragging { opacity: .4; }
+  .bins { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .bins { grid-template-columns: 1fr; } }
+  .bin {
+    background: #f3faf4; border: 2px dashed #aacfb6; border-radius: 12px; padding: 10px;
+    min-height: 130px; transition: background .15s, border-color .15s;
+  }
+  .bin.over { background: #e2f3e8; border-color: var(--accent); }
+  .bin h4 { margin: 0 0 4px; font-size: 14px; color: var(--accent); }
+  .bin .desc { color: var(--muted); font-size: 11px; margin-bottom: 6px; }
+  .bin .holding { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bin .placed {
+    background: white; border: 1px solid #c7e0cd; border-radius: 8px; padding: 4px 8px; font-size: 12px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .bin.flash-good { animation: flashGood .4s; }
+  .bin.flash-bad { animation: flashBad .4s; }
+  @keyframes flashGood { 0% { background: #b8eccb; } 100% { background: #f3faf4; } }
+  @keyframes flashBad { 0% { background: #f7c8c8; } 100% { background: #f3faf4; } }
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: white; padding: 10px 14px; border-radius: 10px;
+    opacity: 0; transition: opacity .2s; pointer-events: none; font-size: 13px; max-width: 80%; text-align: center;
+  }
+  .toast.show { opacity: .92; }
+  button { padding: 8px 14px; border-radius: 10px; border: 0; font-weight: 600; cursor: pointer; background: var(--accent); color: white; }
+  button.secondary { background: #d8e6dc; color: var(--ink); }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .done {
+    margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: #e3f7ee; color: #0f7a4a; display: none;
+  }
+  .done.show { display: block; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌿 Sort the Living World</h1>
+  <p class="sub">Drag each creature into the right group. Pick a different way to sort below.</p>
+
+  <div class="mode-bar" id="modeBar"></div>
+
+  <div class="scoreboard">
+    <div class="score">Score:<b id="score">0</b></div>
+    <div class="left">Left:<b id="left">0</b></div>
+    <button class="secondary" id="resetBtn" style="margin-left:auto;">Reset round</button>
+  </div>
+
+  <div class="stage">
+    <div class="stage-grid">
+      <div>
+        <h3 style="margin:0 0 8px;font-size:13px;text-transform:uppercase;color:var(--muted);">Creatures</h3>
+        <div class="creatures" id="creatures"></div>
+      </div>
+      <div>
+        <h3 style="margin:0 0 8px;font-size:13px;text-transform:uppercase;color:var(--muted);">Drop here</h3>
+        <div class="bins" id="bins"></div>
+      </div>
+    </div>
+    <div class="done" id="done">All sorted! Try a different mode from the top.</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const ITEMS = [
+    { id:"cow",      emoji:"🐄", name:"Cow",      habitat:"Land",    food:"Herbivore", group:"Mammal" },
+    { id:"lion",     emoji:"🦁", name:"Lion",     habitat:"Land",    food:"Carnivore", group:"Mammal" },
+    { id:"sparrow",  emoji:"🐦", name:"Sparrow",  habitat:"Air/Tree",food:"Omnivore",  group:"Bird"   },
+    { id:"eagle",    emoji:"🦅", name:"Eagle",    habitat:"Air/Tree",food:"Carnivore", group:"Bird"   },
+    { id:"fish",     emoji:"🐟", name:"Fish",     habitat:"Water",   food:"Carnivore", group:"Fish"   },
+    { id:"frog",     emoji:"🐸", name:"Frog",     habitat:"Both",    food:"Carnivore", group:"Amphibian" },
+    { id:"lizard",   emoji:"🦎", name:"Lizard",   habitat:"Land",    food:"Carnivore", group:"Reptile" },
+    { id:"bee",      emoji:"🐝", name:"Bee",      habitat:"Air/Tree",food:"Herbivore", group:"Insect" },
+    { id:"crow",     emoji:"🦤", name:"Crow",     habitat:"Air/Tree",food:"Omnivore",  group:"Bird"   },
+    { id:"turtle",   emoji:"🐢", name:"Turtle",   habitat:"Both",    food:"Omnivore",  group:"Reptile"},
+    { id:"deer",     emoji:"🦌", name:"Deer",     habitat:"Land",    food:"Herbivore", group:"Mammal" },
+    { id:"butterfly",emoji:"🦋", name:"Butterfly",habitat:"Air/Tree",food:"Herbivore", group:"Insect" },
+  ];
+
+  const MODES = [
+    { key: "habitat", label: "By habitat",
+      bins: [
+        { name: "Land",     desc: "Lives mostly on the ground." },
+        { name: "Water",    desc: "Lives in water." },
+        { name: "Air/Tree", desc: "Flies or perches on trees." },
+        { name: "Both",     desc: "Land + water." },
+      ],
+      keyOf: (i) => i.habitat,
+    },
+    { key: "food", label: "By food",
+      bins: [
+        { name: "Herbivore", desc: "Eats only plants." },
+        { name: "Carnivore", desc: "Eats only animals." },
+        { name: "Omnivore",  desc: "Eats both." },
+      ],
+      keyOf: (i) => i.food,
+    },
+    { key: "group", label: "By animal group",
+      bins: [
+        { name: "Mammal",    desc: "Hair/fur, feeds milk." },
+        { name: "Bird",      desc: "Feathers, lays eggs." },
+        { name: "Reptile",   desc: "Scaly skin, lays eggs." },
+        { name: "Amphibian", desc: "Land + water." },
+        { name: "Fish",      desc: "Lives in water, gills." },
+        { name: "Insect",    desc: "Six legs, often wings." },
+      ],
+      keyOf: (i) => i.group,
+    },
+  ];
+
+  let mode = MODES[0];
+  let score = 0;
+  const $ = (id) => document.getElementById(id);
+  const toast = (msg) => {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1400);
+  };
+
+  function renderModeBar() {
+    const bar = $("modeBar");
+    bar.innerHTML = "";
+    MODES.forEach((m) => {
+      const p = document.createElement("div");
+      p.className = "pill" + (m.key === mode.key ? " active" : "");
+      p.textContent = m.label;
+      p.onclick = () => { mode = m; round(); };
+      bar.appendChild(p);
+    });
+  }
+
+  function buildCreature(item) {
+    const el = document.createElement("div");
+    el.className = "creature";
+    el.draggable = true;
+    el.dataset.id = item.id;
+    el.innerHTML = `<span class="emoji">${item.emoji}</span><span class="name">${item.name}</span>`;
+    el.addEventListener("dragstart", (e) => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", item.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    return el;
+  }
+
+  function buildBin(b) {
+    const bin = document.createElement("div");
+    bin.className = "bin";
+    bin.dataset.name = b.name;
+    bin.innerHTML = `<h4>${b.name}</h4><div class="desc">${b.desc}</div><div class="holding"></div>`;
+    bin.addEventListener("dragover", (e) => { e.preventDefault(); bin.classList.add("over"); });
+    bin.addEventListener("dragleave", () => bin.classList.remove("over"));
+    bin.addEventListener("drop", (e) => {
+      e.preventDefault();
+      bin.classList.remove("over");
+      const id = e.dataTransfer.getData("text/plain");
+      const item = ITEMS.find((i) => i.id === id);
+      if (!item) return;
+      if (mode.keyOf(item) === b.name) {
+        score += 10;
+        $("score").textContent = score;
+        bin.classList.add("flash-good");
+        setTimeout(() => bin.classList.remove("flash-good"), 400);
+        const placed = document.createElement("div");
+        placed.className = "placed";
+        placed.innerHTML = `${item.emoji} ${item.name}`;
+        bin.querySelector(".holding").appendChild(placed);
+        const live = document.querySelector(`.creature[data-id="${id}"]`);
+        if (live) live.remove();
+        $("left").textContent = document.querySelectorAll("#creatures .creature").length;
+        if (document.querySelectorAll("#creatures .creature").length === 0) {
+          $("done").classList.add("show");
+        }
+      } else {
+        score = Math.max(0, score - 3);
+        $("score").textContent = score;
+        bin.classList.add("flash-bad");
+        setTimeout(() => bin.classList.remove("flash-bad"), 400);
+        toast(`Not quite — ${item.name} doesn't go in ${b.name}. Try again.`);
+      }
+    });
+    return bin;
+  }
+
+  function round() {
+    score = 0; $("score").textContent = "0"; $("done").classList.remove("show");
+    renderModeBar();
+    const c = $("creatures"); c.innerHTML = "";
+    const shuffled = ITEMS.slice().sort(() => Math.random() - 0.5);
+    shuffled.forEach((it) => c.appendChild(buildCreature(it)));
+    $("left").textContent = ITEMS.length;
+    const bins = $("bins"); bins.innerHTML = "";
+    mode.bins.forEach((b) => bins.appendChild(buildBin(b)));
+  }
+
+  $("resetBtn").addEventListener("click", round);
+  round();
+</script>
+</body>
+</html>

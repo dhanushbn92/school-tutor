@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anatomy of a vector — labelled diagram</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#a855f7; --ok:#22c55e; --bad:#ef4444; }
+  html,body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { padding:20px; box-sizing:border-box; }
+  header { max-width:980px; margin:0 auto 14px; }
+  h1 { margin:0; font-size:20px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+  #wrap { max-width:980px; margin:0 auto; display:grid; grid-template-columns: 1fr 280px; gap:18px; }
+  #stage { position:relative; background:#0a0e1a; border:1px solid var(--border); border-radius:14px; overflow:hidden; aspect-ratio: 16 / 10; }
+  #stage img { width:100%; height:100%; object-fit:contain; user-select:none; pointer-events:none; }
+  .hotspot { position:absolute; border-radius:50%; border:2px solid var(--accent); background:rgba(168,85,247,0.18); cursor:pointer; transform:translate(-50%, -50%); transition: transform 100ms ease, background 100ms ease, border-color 100ms ease; }
+  .hotspot:hover { transform:translate(-50%, -50%) scale(1.1); background:rgba(168,85,247,0.32); }
+  .hotspot.placed { border-color:var(--accent); background:rgba(168,85,247,0.45); }
+  .hotspot.ok { border-color:var(--ok); background:rgba(34,197,94,0.35); }
+  .hotspot.bad { border-color:var(--bad); background:rgba(239,68,68,0.35); }
+  .hotspot .name { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:6px; padding:2px 8px; background:rgba(10,14,25,0.85); border:1px solid var(--border); border-radius:999px; color:var(--text); font-size:11px; white-space:nowrap; pointer-events:none; }
+  #side { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px; }
+  #side h2 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  #info { font-size:13px; color:#dbe1ec; line-height:1.5; min-height:60px; }
+  #info .lab { font-weight:600; color:var(--text); margin-bottom:4px; }
+  #labels { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .label-chip { padding:6px 12px; background:var(--bg); border:1px solid var(--border); border-radius:999px; font-size:13px; cursor:grab; user-select:none; }
+  .label-chip.dragging { opacity:0.45; cursor:grabbing; }
+  .label-chip.placed { background:rgba(168,85,247,0.18); border-color:var(--accent); }
+  #actions { display:flex; gap:10px; margin-top:14px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  #score { font-size:13px; color:var(--muted); margin-top:8px; }
+  #score.ok { color:var(--ok); } #score.bad { color:var(--bad); }
+  @media (max-width: 760px) { #wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Anatomy of a vector — labelled diagram</h1>
+  <p class="sub">Click each part of the vector to learn its name and meaning.</p>
+</header>
+
+<div id="wrap">
+  <div id="stage">
+    <img id="img" alt="" />
+    <!-- hotspots injected here -->
+  </div>
+  <aside id="side">
+    <h2 id="side-title">Hotspots</h2>
+    <div id="info">Click a hotspot to learn more.</div>
+    <div id="labels"></div>
+    <div id="actions">
+      <button class="primary" id="check" style="display:none">Check</button>
+      <button id="reset" style="display:none">Reset</button>
+    </div>
+    <div id="score"></div>
+  </aside>
+</div>
+
+<script>
+  // CONFIG = { image_url, image_alt, hotspots: [...], quiz_mode }
+  const CONFIG = {"image_url": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20400%22%20width%3D%22640%22%20height%3D%22400%22%20preserveAspectRatio%3D%22xMidYMid%20meet%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cmarker%20id%3D%22va%22%20markerWidth%3D%2212%22%20markerHeight%3D%2212%22%20refX%3D%2210%22%20refY%3D%226%22%20orient%3D%22auto%22%3E%0A%20%20%20%20%20%20%3Cpolygon%20points%3D%220%2C0%2012%2C6%200%2C12%22%20fill%3D%22%2322d3ee%22%2F%3E%0A%20%20%20%20%3C%2Fmarker%3E%0A%20%20%20%20%3Cmarker%20id%3D%22ca%22%20markerWidth%3D%2212%22%20markerHeight%3D%2212%22%20refX%3D%2210%22%20refY%3D%226%22%20orient%3D%22auto%22%3E%0A%20%20%20%20%20%20%3Cpolygon%20points%3D%220%2C0%2012%2C6%200%2C12%22%20fill%3D%22%23a855f7%22%2F%3E%0A%20%20%20%20%3C%2Fmarker%3E%0A%20%20%20%20%3Cmarker%20id%3D%22aa%22%20markerWidth%3D%2210%22%20markerHeight%3D%2210%22%20refX%3D%229%22%20refY%3D%225%22%20orient%3D%22auto%22%3E%0A%20%20%20%20%20%20%3Cpolygon%20points%3D%220%2C0%2010%2C5%200%2C10%22%20fill%3D%22%2394a3b8%22%2F%3E%0A%20%20%20%20%3C%2Fmarker%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22640%22%20height%3D%22400%22%20fill%3D%22%230f1730%22%2F%3E%0A%20%20%3C%21--%20Faint%20grid%20for%20orientation%20--%3E%0A%20%20%3Cg%20stroke%3D%22rgba%28255%2C255%2C255%2C0.04%29%22%20stroke-width%3D%221%22%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20%20y1%3D%2240%22%20x2%3D%2280%22%20%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%22180%22%20y1%3D%2240%22%20x2%3D%22180%22%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%22280%22%20y1%3D%2240%22%20x2%3D%22280%22%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%22380%22%20y1%3D%2240%22%20x2%3D%22380%22%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%22480%22%20y1%3D%2240%22%20x2%3D%22480%22%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%22580%22%20y1%3D%2240%22%20x2%3D%22580%22%20y2%3D%22320%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20y1%3D%2240%22%20%20x2%3D%22600%22%20y2%3D%2240%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22100%22%20x2%3D%22600%22%20y2%3D%22100%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22160%22%20x2%3D%22600%22%20y2%3D%22160%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22220%22%20x2%3D%22600%22%20y2%3D%22220%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22280%22%20x2%3D%22600%22%20y2%3D%22280%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3C%21--%20Axes%20%28slightly%20thicker%2C%20with%20arrows%29%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22320%22%20x2%3D%22608%22%20y2%3D%22320%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20marker-end%3D%22url%28%23aa%29%22%2F%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22320%22%20x2%3D%2280%22%20%20y2%3D%2232%22%20%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20marker-end%3D%22url%28%23aa%29%22%2F%3E%0A%20%20%3Ctext%20x%3D%22615%22%20y%3D%22335%22%20fill%3D%22%23cbd5e1%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%3Ex%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2258%22%20y%3D%2228%22%20fill%3D%22%23cbd5e1%22%20font-family%3D%22sans-serif%22%20font-size%3D%2218%22%3Ey%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2258%22%20y%3D%22340%22%20fill%3D%22%23cbd5e1%22%20font-family%3D%22sans-serif%22%20font-size%3D%2214%22%3EO%3C%2Ftext%3E%0A%20%20%3C%21--%20Component%20projections%20%28drawn%20behind%20the%20vector%20for%20layering%29%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22320%22%20x2%3D%22473%22%20y2%3D%22320%22%20stroke%3D%22%23a855f7%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%227%204%22%20marker-end%3D%22url%28%23ca%29%22%2F%3E%0A%20%20%3Cline%20x1%3D%22480%22%20y1%3D%22320%22%20x2%3D%22480%22%20y2%3D%2288%22%20stroke%3D%22%23a855f7%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%227%204%22%20marker-end%3D%22url%28%23ca%29%22%2F%3E%0A%20%20%3C%21--%20The%20vector%20itself%20%28cyan%2C%20on%20top%29%20--%3E%0A%20%20%3Cline%20x1%3D%2280%22%20y1%3D%22320%22%20x2%3D%22473%22%20y2%3D%2285%22%20stroke%3D%22%2322d3ee%22%20stroke-width%3D%225%22%20marker-end%3D%22url%28%23va%29%22%2F%3E%0A%20%20%3C%21--%20Vector%20%2F%20component%20labels%20--%3E%0A%20%20%3Ctext%20x%3D%22252%22%20y%3D%22190%22%20fill%3D%22%2322d3ee%22%20font-family%3D%22sans-serif%22%20font-size%3D%2222%22%20font-weight%3D%22bold%22%20font-style%3D%22italic%22%3Ea%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%22232%22%20y%3D%22356%22%20fill%3D%22%23a855f7%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%3Ea_x%20%3D%20a%20cos%20%26%23952%3B%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%22498%22%20y%3D%22208%22%20fill%3D%22%23a855f7%22%20font-family%3D%22sans-serif%22%20font-size%3D%2215%22%3Ea_y%20%3D%20a%20sin%20%26%23952%3B%3C%2Ftext%3E%0A%20%20%3C%21--%20Angle%20arc%20and%20theta%20label%20--%3E%0A%20%20%3Cpath%20d%3D%22M%20140%20320%20A%2060%2060%200%200%200%20117%20282%22%20stroke%3D%22%2322d3ee%22%20stroke-width%3D%222.5%22%20fill%3D%22none%22%2F%3E%0A%20%20%3Ctext%20x%3D%22148%22%20y%3D%22308%22%20fill%3D%22%2322d3ee%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220%22%20font-style%3D%22italic%22%3E%26%23952%3B%3C%2Ftext%3E%0A%3C%2Fsvg%3E", "image_alt": "Vector diagram with components and angle theta", "hotspots": [{"label": "Tail (origin)", "description": "Starting point of the vector. By convention we anchor vectors at the origin so their components can be read directly off the axes.", "x_pct": 12.5, "y_pct": 80.0, "radius_pct": 4.0}, {"label": "Head (arrow tip)", "description": "The pointed end. The vector's direction is from tail to head; its magnitude is the length |a| of this segment.", "x_pct": 74.2, "y_pct": 21.3, "radius_pct": 4.0}, {"label": "x-component", "description": "Projection of the vector onto the x-axis: a_x = a cos \u03b8. This is the part of the vector that points along x.", "x_pct": 43.8, "y_pct": 80.0, "radius_pct": 4.0}, {"label": "y-component", "description": "Projection of the vector onto the y-axis: a_y = a sin \u03b8. This is the part of the vector that points along y.", "x_pct": 75.0, "y_pct": 50.0, "radius_pct": 4.0}], "quiz_mode": false};
+  const QUIZ = !!CONFIG.quiz_mode;
+
+  const img = document.getElementById("img");
+  img.src = CONFIG.image_url;
+  img.alt = CONFIG.image_alt || "Diagram";
+
+  const stage = document.getElementById("stage");
+  const sideTitle = document.getElementById("side-title");
+  const labelsEl = document.getElementById("labels");
+  const infoEl = document.getElementById("info");
+  const scoreEl = document.getElementById("score");
+
+  // Render hotspots.
+  function placeHotspots() {
+    // Clear any previously placed hotspot DOM (we may re-render on reset).
+    Array.from(stage.querySelectorAll(".hotspot")).forEach(el => el.remove());
+    CONFIG.hotspots.forEach((h, i) => {
+      const el = document.createElement("div");
+      el.className = "hotspot";
+      el.dataset.idx = String(i);
+      const d = h.radius_pct * 2;
+      el.style.left = `${h.x_pct}%`;
+      el.style.top = `${h.y_pct}%`;
+      el.style.width = `${d}%`;
+      el.style.height = `${d}%`;
+      if (!QUIZ) {
+        const tag = document.createElement("div");
+        tag.className = "name";
+        tag.textContent = h.label;
+        el.appendChild(tag);
+      }
+      el.addEventListener("click", () => onHotspotClick(i));
+      el.addEventListener("dragover", (e) => { if (QUIZ) e.preventDefault(); });
+      el.addEventListener("drop", (e) => { if (QUIZ) onDrop(e, i); });
+      stage.appendChild(el);
+    });
+  }
+
+  function onHotspotClick(i) {
+    if (QUIZ) return;
+    const h = CONFIG.hotspots[i];
+    infoEl.innerHTML = `<div class="lab"></div><div class="desc"></div>`;
+    infoEl.querySelector(".lab").textContent = h.label;
+    infoEl.querySelector(".desc").textContent = h.description || "";
+  }
+
+  // Quiz mode: shuffle the labels into a draggable list. Each hotspot
+  // remembers which label was dropped on it.
+  const placedByHotspot = new Map();
+  function shuffle(a) { return a.map(v => [Math.random(), v]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+
+  function setupQuiz() {
+    sideTitle.textContent = "Drag a label to a hotspot";
+    document.getElementById("check").style.display = "";
+    document.getElementById("reset").style.display = "";
+    const order = shuffle(CONFIG.hotspots.map((_, i) => i));
+    labelsEl.innerHTML = "";
+    order.forEach((idx) => {
+      const chip = document.createElement("div");
+      chip.className = "label-chip";
+      chip.textContent = CONFIG.hotspots[idx].label;
+      chip.draggable = true;
+      chip.dataset.idx = String(idx);
+      chip.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", String(idx)); chip.classList.add("dragging"); });
+      chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      labelsEl.appendChild(chip);
+    });
+  }
+
+  function onDrop(e, hotspotIdx) {
+    e.preventDefault();
+    const labelIdx = Number(e.dataTransfer.getData("text/plain"));
+    if (Number.isNaN(labelIdx)) return;
+    placedByHotspot.set(hotspotIdx, labelIdx);
+    // Visually mark
+    const hs = stage.querySelector(`.hotspot[data-idx="${hotspotIdx}"]`);
+    hs.classList.add("placed");
+    if (!hs.querySelector(".name")) {
+      const tag = document.createElement("div");
+      tag.className = "name";
+      hs.appendChild(tag);
+    }
+    hs.querySelector(".name").textContent = CONFIG.hotspots[labelIdx].label;
+    // Mark the chip as placed (still draggable so the student can move it)
+    Array.from(labelsEl.children).forEach(c => {
+      if (Number(c.dataset.idx) === labelIdx) c.classList.add("placed");
+    });
+  }
+
+  document.getElementById("check").addEventListener("click", () => {
+    let ok = 0;
+    CONFIG.hotspots.forEach((h, i) => {
+      const placed = placedByHotspot.get(i);
+      const correct = placed === i;
+      const el = stage.querySelector(`.hotspot[data-idx="${i}"]`);
+      el.classList.toggle("ok", correct);
+      el.classList.toggle("bad", placed !== undefined && !correct);
+      if (correct) ok++;
+    });
+    const total = CONFIG.hotspots.length;
+    scoreEl.textContent = `${ok} of ${total} placed correctly`;
+    scoreEl.className = ok === total ? "ok" : (ok > 0 ? "" : "bad");
+  });
+
+  document.getElementById("reset").addEventListener("click", () => {
+    placedByHotspot.clear();
+    scoreEl.textContent = ""; scoreEl.className = "";
+    placeHotspots();
+    if (QUIZ) setupQuiz();
+  });
+
+  // Init
+  if (img.complete) startInit(); else img.addEventListener("load", startInit);
+  function startInit() {
+    placeHotspots();
+    if (QUIZ) setupQuiz();
+  }
+</script>
+</body>
+</html>

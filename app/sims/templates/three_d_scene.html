@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.85); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; pointer-events:none; }
+  .overlay > * { pointer-events:auto; }
+  #header { top:16px; left:16px; right:16px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .panel { background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; max-width:420px; }
+  h1 { margin:0; font-size:18px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  input[type=range] { width:120px; accent-color: var(--accent); }
+  #info { top:84px; right:16px; width:320px; max-height:calc(100vh - 200px); overflow:auto; display:none; }
+  #info.open { display:block; }
+  #info h2 { margin:0 0 4px; font-size:16px; }
+  #info .kind { display:inline-block; padding:2px 10px; font-size:11px; letter-spacing:.5px; text-transform:uppercase; background:rgba(96,165,250,.15); color:var(--accent); border-radius:999px; margin-bottom:8px; }
+  #info p { margin:8px 0; font-size:13px; line-height:1.5; color:#dbe1ec; }
+  #info .fact { margin-top:10px; padding:10px; background:rgba(96,165,250,.08); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:var(--muted); font-style:italic; }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; z-index:1; }
+  .node-label { color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; letter-spacing:.2px; white-space:nowrap; }
+  .edge-label { color:#bcd0f2; font-size:11px; padding:1px 6px; background:rgba(10,14,25,0.55); border:1px solid rgba(96,165,250,0.2); border-radius:999px; letter-spacing:.2px; white-space:nowrap; opacity:0.85; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>__TITLE__</h1>
+    <p class="sub">__INSTRUCTIONS__</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="info" role="complementary" aria-live="polite">
+  <span class="kind" id="info-kind">Node</span>
+  <h2 id="info-name">Name</h2>
+  <p id="info-desc"></p>
+  <div class="fact" id="info-fact"></div>
+  <button id="info-close" style="margin-top:10px">Close</button>
+</div>
+
+<div class="overlay" id="controls">
+  <span class="pill">
+    Spin <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
+    <span id="speed-val">1.0x</span>
+  </span>
+  <button id="reset-view">Reset view</button>
+  <button id="toggle-edges">Toggle connections</button>
+  <button id="toggle-labels">Toggle labels</button>
+</div>
+
+<div class="hint">Drag to rotate · Scroll to zoom · Click an object to learn more</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://esm.sh/three@0.164.1",
+    "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+
+// ---- LLM-provided data ----
+// Each object: { name, kind, description, fun_fact, x, y, z, size, color }
+// Each edge:   { from_name, to_name, label }
+const OBJECTS = __OBJECTS_JSON__;
+const EDGES   = __EDGES_JSON__;
+
+// High-contrast palette used when an object has no explicit color. Indexed
+// by object position so each node looks distinct on screen.
+const PALETTE = [
+  0x60a5fa, 0xa855f7, 0x22c55e, 0xf97316, 0xef4444,
+  0xeab308, 0x14b8a6, 0xf472b6, 0x84cc16, 0x06b6d4,
+  0xfb7185, 0x8b5cf6,
+];
+
+function colorFor(obj, index) {
+  if (obj.color && /^#[0-9a-fA-F]{3,8}$/.test(obj.color)) {
+    return new THREE.Color(obj.color);
+  }
+  return new THREE.Color(PALETTE[index % PALETTE.length]);
+}
+
+// ---- three.js scene ----
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 2000);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = "absolute";
+labelRenderer.domElement.style.top = "0";
+labelRenderer.domElement.style.pointerEvents = "none";
+sceneEl.appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 4;
+controls.maxDistance = 80;
+
+// Soft starfield for depth — much subtler than the previous solar-system bg
+// so it doesn't dominate non-astronomy scenes.
+(function buildStars() {
+  const g = new THREE.BufferGeometry();
+  const count = 1500;
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const r = 600;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos((Math.random() * 2) - 1);
+    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    positions[i*3+2] = r * Math.cos(phi);
+  }
+  g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const m = new THREE.PointsMaterial({ size:0.5, color:0xffffff, sizeAttenuation:false, opacity:0.25, transparent:true });
+  scene.add(new THREE.Points(g, m));
+})();
+
+// Lighting that doesn't assume a centred bright object.
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+keyLight.position.set(8, 12, 6);
+scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0x9bb4ff, 0.45);
+fillLight.position.set(-10, 4, -6);
+scene.add(fillLight);
+
+// ---- Build nodes ----
+const nodeMap = new Map();   // name -> { obj, mesh, position }
+const nodeMeshes = [];       // for raycasting
+const nodeLabels = [];
+
+OBJECTS.forEach((obj, index) => {
+  const radius = Math.max(0.2, Math.min(5, obj.size ?? 1));
+  const geom = new THREE.SphereGeometry(radius, 32, 24);
+  const mat = new THREE.MeshStandardMaterial({
+    color: colorFor(obj, index),
+    roughness: 0.55,
+    metalness: 0.05,
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.position.set(obj.x ?? 0, obj.y ?? 0, obj.z ?? 0);
+  mesh.userData.obj = obj;
+  scene.add(mesh);
+  nodeMeshes.push(mesh);
+
+  // Hover/click hit area for tiny spheres — small invisible sphere wrapper.
+  if (radius < 0.5) {
+    const hit = new THREE.Mesh(
+      new THREE.SphereGeometry(0.6, 16, 12),
+      new THREE.MeshBasicMaterial({ visible: false }),
+    );
+    hit.userData.obj = obj;
+    mesh.add(hit);
+    nodeMeshes.push(hit);
+  }
+
+  // CSS2D label hovering above the sphere.
+  const div = document.createElement("div");
+  div.textContent = obj.name;
+  div.className = "node-label";
+  const label = new CSS2DObject(div);
+  label.position.set(0, radius + 0.6, 0);
+  mesh.add(label);
+  nodeLabels.push(label);
+
+  nodeMap.set(obj.name, { obj, mesh, position: mesh.position.clone() });
+});
+
+// ---- Build edges ----
+const edgeLines = [];
+const edgeLabels = [];
+
+(EDGES || []).forEach((edge) => {
+  const a = nodeMap.get(edge.from_name);
+  const b = nodeMap.get(edge.to_name);
+  if (!a || !b) return;
+
+  const mat = new THREE.LineBasicMaterial({
+    color: 0x8aa4d6,
+    transparent: true,
+    opacity: 0.55,
+    linewidth: 1,
+  });
+  const geom = new THREE.BufferGeometry().setFromPoints([a.position, b.position]);
+  const line = new THREE.Line(geom, mat);
+  scene.add(line);
+  edgeLines.push(line);
+
+  if (edge.label) {
+    const div = document.createElement("div");
+    div.textContent = edge.label;
+    div.className = "edge-label";
+    const label = new CSS2DObject(div);
+    const mid = a.position.clone().add(b.position).multiplyScalar(0.5);
+    label.position.copy(mid);
+    scene.add(label);
+    edgeLabels.push(label);
+  }
+});
+
+// ---- Frame the camera around the actual data ----
+function frameCamera() {
+  if (nodeMeshes.length === 0) {
+    camera.position.set(0, 8, 16);
+    controls.target.set(0, 0, 0);
+    return;
+  }
+  const box = new THREE.Box3();
+  OBJECTS.forEach((o) => {
+    box.expandByPoint(new THREE.Vector3(o.x ?? 0, o.y ?? 0, o.z ?? 0));
+  });
+  // Pad by the largest sphere so nothing clips.
+  const maxR = OBJECTS.reduce((m, o) => Math.max(m, o.size ?? 1), 1);
+  box.expandByScalar(maxR + 0.5);
+
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const distance = Math.max(8, maxDim * 1.6);
+
+  camera.position.set(center.x + distance * 0.3, center.y + distance * 0.45, center.z + distance);
+  controls.target.copy(center);
+  controls.update();
+}
+frameCamera();
+
+// ---- Interactivity: click to open info panel ----
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const infoPanel = document.getElementById("info");
+const infoName = document.getElementById("info-name");
+const infoDesc = document.getElementById("info-desc");
+const infoFact = document.getElementById("info-fact");
+const infoKind = document.getElementById("info-kind");
+document.getElementById("info-close").addEventListener("click", () => infoPanel.classList.remove("open"));
+
+renderer.domElement.addEventListener("click", (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(nodeMeshes, true);
+  if (hits.length === 0) return;
+  let target = hits[0].object;
+  // Walk up the parent chain to find the userData.obj (handles invisible
+  // hit-area children).
+  while (target && !target.userData?.obj) target = target.parent;
+  if (!target?.userData?.obj) return;
+  openInfo(target.userData.obj);
+});
+
+function openInfo(obj) {
+  infoName.textContent = obj.name;
+  infoDesc.textContent = obj.description ?? "";
+  infoFact.textContent = obj.fun_fact ? "Did you know? " + obj.fun_fact : "";
+  infoKind.textContent = (obj.kind || "object").toLowerCase();
+  infoPanel.classList.add("open");
+}
+
+// ---- Controls ----
+let speedMultiplier = 1;
+const speedSlider = document.getElementById("speed");
+const speedVal = document.getElementById("speed-val");
+speedSlider.addEventListener("input", (e) => {
+  speedMultiplier = parseFloat(e.target.value);
+  speedVal.textContent = speedMultiplier.toFixed(2) + "x";
+});
+
+let edgesVisible = true;
+document.getElementById("toggle-edges").addEventListener("click", () => {
+  edgesVisible = !edgesVisible;
+  edgeLines.forEach(l => (l.visible = edgesVisible));
+  edgeLabels.forEach(l => (l.visible = edgesVisible));
+});
+
+let labelsVisible = true;
+document.getElementById("toggle-labels").addEventListener("click", () => {
+  labelsVisible = !labelsVisible;
+  nodeLabels.forEach(l => (l.visible = labelsVisible));
+});
+
+document.getElementById("reset-view").addEventListener("click", frameCamera);
+
+// ---- Resize + animate ----
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const clock = new THREE.Clock();
+function animate() {
+  const dt = clock.getDelta();
+  // Each node spins gently on its own axis. No orbital motion — positions
+  // are static, dictated by the LLM's chosen layout.
+  nodeMap.forEach(({ mesh }) => {
+    mesh.rotation.y += dt * 0.4 * speedMultiplier;
+  });
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vectors in action — Earth&#x27;s orbit and inclination</title>
+<style>
+  :root { --bg:#070b18; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#fbbf24; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; max-width:430px; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
+  #info { top:16px; right:16px; width:300px; display:none; }
+  #info.open { display:block; }
+  #info h2 { margin:0 0 6px; font-size:16px; }
+  #info p { margin:6px 0; font-size:13px; line-height:1.5; color:#dbe1ec; }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; pointer-events:none; }
+  #controls > * { pointer-events:auto; }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  input[type=range] { width:120px; accent-color:var(--accent); }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+  .node-label { color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>Vectors in action — Earth&#x27;s orbit and inclination</h1>
+    <p class="sub">Click any body for info. Adjust orbital speed; toggle orbit rings. Notice that Mars&#x27;s orbit is tilted: its inclination is a vector concept (the orbital plane&#x27;s normal makes an angle with Earth&#x27;s).</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="info">
+  <h2 id="info-name">Body</h2>
+  <p id="info-desc"></p>
+  <button id="info-close" style="margin-top:6px">Close</button>
+</div>
+
+<div class="hint">Drag to orbit · Scroll to zoom · Click a body to learn more</div>
+
+<div class="overlay" id="controls">
+  <span class="pill">Speed <input id="speed" type="range" min="0" max="4" step="0.05" value="1" /><span id="speed-val">1.0×</span></span>
+  <button id="pause">Pause</button>
+  <button id="reset-view">Reset view</button>
+  <button id="toggle-orbits">Toggle orbits</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+
+// CONFIG = { central_name, central_description, central_size, central_color, bodies: [...] }
+const CONFIG = {"central_name": "Sun", "central_description": "A G-type main-sequence star at the centre of the Solar System. Its gravitational field provides the centripetal force keeping the planets in orbit.", "central_size": 2.2, "central_color": "#fbbf24", "bodies": [{"name": "Mercury", "description": "Smallest planet; closest to the Sun. Orbital period \u2248 88 days.", "radius": 4.0, "period_seconds": 4.5, "size": 0.4, "color": "#9ca3af", "inclination_deg": 0.0, "phase_deg": 0.0}, {"name": "Venus", "description": "Brightest planet. Atmosphere is mostly CO\u2082; surface temperature \u2248 460 \u00b0C.", "radius": 6.0, "period_seconds": 8.0, "size": 0.6, "color": "#fde68a", "inclination_deg": 0.0, "phase_deg": 0.0}, {"name": "Earth", "description": "Our home. Take its orbit as the reference plane (inclination 0\u00b0).", "radius": 8.5, "period_seconds": 12.0, "size": 0.7, "color": "#3b82f6", "inclination_deg": 0.0, "phase_deg": 0.0}, {"name": "Mars", "description": "The 'Red Planet'. Orbital plane tilted ~1.85\u00b0 relative to Earth's.", "radius": 11.0, "period_seconds": 18.0, "size": 0.55, "color": "#ef4444", "inclination_deg": 7.0, "phase_deg": 0.0}, {"name": "Jupiter", "description": "Largest planet. Hosts >90 confirmed moons.", "radius": 14.0, "period_seconds": 32.0, "size": 1.2, "color": "#fbbf24", "inclination_deg": 3.0, "phase_deg": 0.0}]};
+
+const PALETTE = [0x60a5fa, 0x22c55e, 0xf97316, 0xa855f7, 0xef4444, 0xeab308, 0x14b8a6, 0xf472b6, 0x84cc16, 0x06b6d4];
+function colorFor(c, i) { return (c && /^#[0-9a-fA-F]{3,8}$/.test(c)) ? new THREE.Color(c) : new THREE.Color(PALETTE[i % PALETTE.length]); }
+
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x070b18);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(0, 14, 28);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = "absolute"; labelRenderer.domElement.style.top = "0"; labelRenderer.domElement.style.pointerEvents = "none";
+sceneEl.appendChild(labelRenderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06; controls.minDistance = 4; controls.maxDistance = 200;
+
+// Stars
+(function stars() {
+  const g = new THREE.BufferGeometry(); const N = 1500; const pos = new Float32Array(N*3);
+  for (let i = 0; i < N; i++) {
+    const r = 600, theta = Math.random()*Math.PI*2, phi = Math.acos(Math.random()*2 - 1);
+    pos[i*3] = r*Math.sin(phi)*Math.cos(theta); pos[i*3+1] = r*Math.sin(phi)*Math.sin(theta); pos[i*3+2] = r*Math.cos(phi);
+  }
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({ size:0.5, color:0xffffff, sizeAttenuation:false, opacity:0.3, transparent:true })));
+})();
+
+// Light at the centre (the central body glows; otherwise an ambient
+// fill keeps satellites visible from all sides).
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sunLight = new THREE.PointLight(0xfff5cc, 1.6, 0, 2);
+sunLight.position.set(0, 0, 0); scene.add(sunLight);
+
+// Central body
+const centralColor = colorFor(CONFIG.central_color, 0);
+const central = new THREE.Mesh(
+  new THREE.SphereGeometry(CONFIG.central_size ?? 1.5, 48, 32),
+  new THREE.MeshStandardMaterial({ color:centralColor, emissive:centralColor, emissiveIntensity:0.5, roughness:0.4 }),
+);
+central.userData.body = { name: CONFIG.central_name, description: CONFIG.central_description };
+scene.add(central);
+
+// Label for central body
+{
+  const div = document.createElement("div"); div.className = "node-label"; div.textContent = CONFIG.central_name;
+  const lab = new CSS2DObject(div); lab.position.set(0, (CONFIG.central_size ?? 1.5) + 0.6, 0);
+  central.add(lab);
+}
+
+// Orbiting bodies
+const orbits = [];
+const bodyMeshes = [central];
+const orbitRings = [];
+
+(CONFIG.bodies || []).forEach((b, i) => {
+  const inclination = (b.inclination_deg ?? 0) * Math.PI / 180;
+  const phase = (b.phase_deg ?? 0) * Math.PI / 180;
+  const color = colorFor(b.color, i + 1);
+
+  // Orbit ring
+  const ringGeom = new THREE.BufferGeometry();
+  const N = 128; const pts = new Float32Array(N * 3);
+  for (let k = 0; k < N; k++) {
+    const a = (k / (N - 1)) * Math.PI * 2;
+    pts[k*3] = b.radius * Math.cos(a); pts[k*3+1] = 0; pts[k*3+2] = b.radius * Math.sin(a);
+  }
+  ringGeom.setAttribute("position", new THREE.BufferAttribute(pts, 3));
+  const ring = new THREE.LineLoop(ringGeom, new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.4 }));
+  ring.rotation.x = inclination;
+  scene.add(ring); orbitRings.push(ring);
+
+  // Body mesh
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(b.size ?? 0.6, 32, 24),
+    new THREE.MeshStandardMaterial({ color, roughness:0.55, metalness:0.05 }),
+  );
+  mesh.userData.body = { name: b.name, description: b.description };
+  scene.add(mesh); bodyMeshes.push(mesh);
+
+  const div = document.createElement("div"); div.className = "node-label"; div.textContent = b.name;
+  const lab = new CSS2DObject(div); lab.position.set(0, (b.size ?? 0.6) + 0.6, 0); mesh.add(lab);
+
+  orbits.push({ mesh, radius: b.radius, period: b.period_seconds, inclination, phase });
+});
+
+// --- Interaction: click body to show description ----------------------
+const ray = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+function onClick(ev) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+  ray.setFromCamera(mouse, camera);
+  const hit = ray.intersectObjects(bodyMeshes, false)[0];
+  if (!hit) return;
+  const body = hit.object.userData.body;
+  document.getElementById("info-name").textContent = body.name;
+  document.getElementById("info-desc").textContent = body.description;
+  document.getElementById("info").classList.add("open");
+}
+renderer.domElement.addEventListener("click", onClick);
+document.getElementById("info-close").addEventListener("click", () => document.getElementById("info").classList.remove("open"));
+
+// --- Controls ---------------------------------------------------------
+let speedFactor = 1.0; let paused = false; let showOrbits = true;
+const speedEl = document.getElementById("speed");
+speedEl.addEventListener("input", () => {
+  speedFactor = +speedEl.value;
+  document.getElementById("speed-val").textContent = `${speedFactor.toFixed(2)}×`;
+});
+document.getElementById("pause").addEventListener("click", (e) => { paused = !paused; e.target.textContent = paused ? "Resume" : "Pause"; });
+document.getElementById("reset-view").addEventListener("click", () => { controls.reset(); camera.position.set(0, 14, 28); });
+document.getElementById("toggle-orbits").addEventListener("click", () => { showOrbits = !showOrbits; orbitRings.forEach(r => r.visible = showOrbits); });
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+let elapsed = 0; let lastTime = performance.now();
+function loop() {
+  const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+  if (!paused) elapsed += dt * speedFactor;
+
+  orbits.forEach(({ mesh, radius, period, inclination, phase }) => {
+    const omega = (2 * Math.PI) / period;
+    const a = phase + omega * elapsed;
+    const x = radius * Math.cos(a);
+    const z = radius * Math.sin(a);
+    // Apply inclination by rotating about the x axis.
+    const y = -z * Math.sin(inclination);
+    const z2 = z * Math.cos(inclination);
+    mesh.position.set(x, y, z2);
+  });
+
+  // Slowly self-rotate the central body for visual life.
+  central.rotation.y += 0.002 * speedFactor;
+
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

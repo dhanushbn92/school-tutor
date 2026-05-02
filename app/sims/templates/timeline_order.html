@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; --ok:#22c55e; --bad:#ef4444; }
+  html,body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { padding:24px; box-sizing:border-box; }
+  header { max-width:780px; margin:0 auto 16px; }
+  h1 { margin:0; font-size:22px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:6px 0 0; font-size:14px; color:var(--muted); }
+  #board { max-width:780px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:14px; cursor:grab; transition:transform 120ms ease, border-color 120ms ease; }
+  .card.dragging { opacity:0.5; cursor:grabbing; }
+  .card.drag-over { border-color:var(--accent); }
+  .card .num { width:30px; height:30px; flex:none; border-radius:50%; background:rgba(96,165,250,.15); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; }
+  .card .body { flex:1; min-width:0; }
+  .card .label { font-weight:500; font-size:15px; }
+  .card .desc { margin-top:4px; font-size:13px; color:var(--muted); line-height:1.5; }
+  .card .badge { font-size:18px; flex:none; }
+  .card.ok { border-color:var(--ok); }
+  .card.ok .badge { color:var(--ok); }
+  .card.bad { border-color:var(--bad); }
+  .card.bad .badge { color:var(--bad); }
+  #actions { max-width:780px; margin:18px auto 0; display:flex; align-items:center; gap:12px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 18px; font-size:14px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  button.primary:hover { background:#3b82f6; }
+  #score { font-size:13px; color:var(--muted); }
+  #score.ok { color:var(--ok); }
+  #score.bad { color:var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1>__TITLE__</h1>
+  <p class="sub">__INSTRUCTIONS__</p>
+</header>
+
+<div id="board" aria-label="Drag to reorder"></div>
+
+<div id="actions">
+  <button class="primary" id="check">Check order</button>
+  <button id="reset">Shuffle again</button>
+  <span id="score"></span>
+</div>
+
+<script>
+  // Each event: { label, description, correct_position }
+  const EVENTS = __EVENTS_JSON__;
+
+  const board = document.getElementById("board");
+  const scoreEl = document.getElementById("score");
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Render a fresh shuffled order of cards.
+  function render() {
+    board.innerHTML = "";
+    let order = shuffle(EVENTS.map((_, i) => i));
+    // Tiny safety: if we randomly happened on the correct order, swap two.
+    if (order.every((idx, slot) => EVENTS[idx].correct_position === slot + 1) && order.length >= 2) {
+      [order[0], order[1]] = [order[1], order[0]];
+    }
+    order.forEach((idx, slot) => {
+      const ev = EVENTS[idx];
+      const card = document.createElement("div");
+      card.className = "card";
+      card.draggable = true;
+      card.dataset.idx = String(idx);
+      card.innerHTML = `
+        <div class="num">${slot + 1}</div>
+        <div class="body">
+          <div class="label"></div>
+          <div class="desc"></div>
+        </div>
+        <div class="badge"></div>
+      `;
+      card.querySelector(".label").textContent = ev.label;
+      const descEl = card.querySelector(".desc");
+      if (ev.description) descEl.textContent = ev.description; else descEl.remove();
+      board.appendChild(card);
+    });
+    wireDragAndDrop();
+    scoreEl.textContent = "";
+    scoreEl.className = "";
+  }
+
+  function refreshNumbers() {
+    Array.from(board.children).forEach((card, i) => {
+      card.querySelector(".num").textContent = String(i + 1);
+    });
+  }
+
+  let dragging = null;
+
+  function wireDragAndDrop() {
+    Array.from(board.children).forEach((card) => {
+      card.addEventListener("dragstart", () => { dragging = card; card.classList.add("dragging"); });
+      card.addEventListener("dragend", () => { dragging?.classList.remove("dragging"); dragging = null; refreshNumbers(); });
+      card.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (!dragging || dragging === card) return;
+        const rect = card.getBoundingClientRect();
+        const above = (e.clientY - rect.top) < rect.height / 2;
+        card.classList.add("drag-over");
+        if (above) board.insertBefore(dragging, card);
+        else board.insertBefore(dragging, card.nextSibling);
+      });
+      card.addEventListener("dragleave", () => card.classList.remove("drag-over"));
+      card.addEventListener("drop", (e) => { e.preventDefault(); card.classList.remove("drag-over"); });
+    });
+  }
+
+  document.getElementById("check").addEventListener("click", () => {
+    let correct = 0;
+    Array.from(board.children).forEach((card, i) => {
+      const idx = Number(card.dataset.idx);
+      const ok = EVENTS[idx].correct_position === i + 1;
+      card.classList.toggle("ok", ok);
+      card.classList.toggle("bad", !ok);
+      card.querySelector(".badge").textContent = ok ? "✓" : "✗";
+      if (ok) correct++;
+    });
+    const total = EVENTS.length;
+    scoreEl.textContent = `${correct} of ${total} in the right slot`;
+    scoreEl.className = correct === total ? "ok" : (correct > 0 ? "" : "bad");
+  });
+
+  document.getElementById("reset").addEventListener("click", render);
+
+  render();
+</script>
+</body>
+</html>

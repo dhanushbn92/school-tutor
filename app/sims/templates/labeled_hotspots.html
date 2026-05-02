@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#a855f7; --ok:#22c55e; --bad:#ef4444; }
+  html,body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { padding:20px; box-sizing:border-box; }
+  header { max-width:980px; margin:0 auto 14px; }
+  h1 { margin:0; font-size:20px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+  #wrap { max-width:980px; margin:0 auto; display:grid; grid-template-columns: 1fr 280px; gap:18px; }
+  #stage { position:relative; background:#0a0e1a; border:1px solid var(--border); border-radius:14px; overflow:hidden; aspect-ratio: 16 / 10; }
+  #stage img { width:100%; height:100%; object-fit:contain; user-select:none; pointer-events:none; }
+  .hotspot { position:absolute; border-radius:50%; border:2px solid var(--accent); background:rgba(168,85,247,0.18); cursor:pointer; transform:translate(-50%, -50%); transition: transform 100ms ease, background 100ms ease, border-color 100ms ease; }
+  .hotspot:hover { transform:translate(-50%, -50%) scale(1.1); background:rgba(168,85,247,0.32); }
+  .hotspot.placed { border-color:var(--accent); background:rgba(168,85,247,0.45); }
+  .hotspot.ok { border-color:var(--ok); background:rgba(34,197,94,0.35); }
+  .hotspot.bad { border-color:var(--bad); background:rgba(239,68,68,0.35); }
+  .hotspot .name { position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:6px; padding:2px 8px; background:rgba(10,14,25,0.85); border:1px solid var(--border); border-radius:999px; color:var(--text); font-size:11px; white-space:nowrap; pointer-events:none; }
+  #side { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px; }
+  #side h2 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  #info { font-size:13px; color:#dbe1ec; line-height:1.5; min-height:60px; }
+  #info .lab { font-weight:600; color:var(--text); margin-bottom:4px; }
+  #labels { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .label-chip { padding:6px 12px; background:var(--bg); border:1px solid var(--border); border-radius:999px; font-size:13px; cursor:grab; user-select:none; }
+  .label-chip.dragging { opacity:0.45; cursor:grabbing; }
+  .label-chip.placed { background:rgba(168,85,247,0.18); border-color:var(--accent); }
+  #actions { display:flex; gap:10px; margin-top:14px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  #score { font-size:13px; color:var(--muted); margin-top:8px; }
+  #score.ok { color:var(--ok); } #score.bad { color:var(--bad); }
+  @media (max-width: 760px) { #wrap { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>__TITLE__</h1>
+  <p class="sub">__INSTRUCTIONS__</p>
+</header>
+
+<div id="wrap">
+  <div id="stage">
+    <img id="img" alt="" />
+    <!-- hotspots injected here -->
+  </div>
+  <aside id="side">
+    <h2 id="side-title">Hotspots</h2>
+    <div id="info">Click a hotspot to learn more.</div>
+    <div id="labels"></div>
+    <div id="actions">
+      <button class="primary" id="check" style="display:none">Check</button>
+      <button id="reset" style="display:none">Reset</button>
+    </div>
+    <div id="score"></div>
+  </aside>
+</div>
+
+<script>
+  // CONFIG = { image_url, image_alt, hotspots: [...], quiz_mode }
+  const CONFIG = __HOTSPOTS_JSON__;
+  const QUIZ = !!CONFIG.quiz_mode;
+
+  const img = document.getElementById("img");
+  img.src = CONFIG.image_url;
+  img.alt = CONFIG.image_alt || "Diagram";
+
+  const stage = document.getElementById("stage");
+  const sideTitle = document.getElementById("side-title");
+  const labelsEl = document.getElementById("labels");
+  const infoEl = document.getElementById("info");
+  const scoreEl = document.getElementById("score");
+
+  // Render hotspots.
+  function placeHotspots() {
+    // Clear any previously placed hotspot DOM (we may re-render on reset).
+    Array.from(stage.querySelectorAll(".hotspot")).forEach(el => el.remove());
+    CONFIG.hotspots.forEach((h, i) => {
+      const el = document.createElement("div");
+      el.className = "hotspot";
+      el.dataset.idx = String(i);
+      const d = h.radius_pct * 2;
+      el.style.left = `${h.x_pct}%`;
+      el.style.top = `${h.y_pct}%`;
+      el.style.width = `${d}%`;
+      el.style.height = `${d}%`;
+      if (!QUIZ) {
+        const tag = document.createElement("div");
+        tag.className = "name";
+        tag.textContent = h.label;
+        el.appendChild(tag);
+      }
+      el.addEventListener("click", () => onHotspotClick(i));
+      el.addEventListener("dragover", (e) => { if (QUIZ) e.preventDefault(); });
+      el.addEventListener("drop", (e) => { if (QUIZ) onDrop(e, i); });
+      stage.appendChild(el);
+    });
+  }
+
+  function onHotspotClick(i) {
+    if (QUIZ) return;
+    const h = CONFIG.hotspots[i];
+    infoEl.innerHTML = `<div class="lab"></div><div class="desc"></div>`;
+    infoEl.querySelector(".lab").textContent = h.label;
+    infoEl.querySelector(".desc").textContent = h.description || "";
+  }
+
+  // Quiz mode: shuffle the labels into a draggable list. Each hotspot
+  // remembers which label was dropped on it.
+  const placedByHotspot = new Map();
+  function shuffle(a) { return a.map(v => [Math.random(), v]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+
+  function setupQuiz() {
+    sideTitle.textContent = "Drag a label to a hotspot";
+    document.getElementById("check").style.display = "";
+    document.getElementById("reset").style.display = "";
+    const order = shuffle(CONFIG.hotspots.map((_, i) => i));
+    labelsEl.innerHTML = "";
+    order.forEach((idx) => {
+      const chip = document.createElement("div");
+      chip.className = "label-chip";
+      chip.textContent = CONFIG.hotspots[idx].label;
+      chip.draggable = true;
+      chip.dataset.idx = String(idx);
+      chip.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", String(idx)); chip.classList.add("dragging"); });
+      chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
+      labelsEl.appendChild(chip);
+    });
+  }
+
+  function onDrop(e, hotspotIdx) {
+    e.preventDefault();
+    const labelIdx = Number(e.dataTransfer.getData("text/plain"));
+    if (Number.isNaN(labelIdx)) return;
+    placedByHotspot.set(hotspotIdx, labelIdx);
+    // Visually mark
+    const hs = stage.querySelector(`.hotspot[data-idx="${hotspotIdx}"]`);
+    hs.classList.add("placed");
+    if (!hs.querySelector(".name")) {
+      const tag = document.createElement("div");
+      tag.className = "name";
+      hs.appendChild(tag);
+    }
+    hs.querySelector(".name").textContent = CONFIG.hotspots[labelIdx].label;
+    // Mark the chip as placed (still draggable so the student can move it)
+    Array.from(labelsEl.children).forEach(c => {
+      if (Number(c.dataset.idx) === labelIdx) c.classList.add("placed");
+    });
+  }
+
+  document.getElementById("check").addEventListener("click", () => {
+    let ok = 0;
+    CONFIG.hotspots.forEach((h, i) => {
+      const placed = placedByHotspot.get(i);
+      const correct = placed === i;
+      const el = stage.querySelector(`.hotspot[data-idx="${i}"]`);
+      el.classList.toggle("ok", correct);
+      el.classList.toggle("bad", placed !== undefined && !correct);
+      if (correct) ok++;
+    });
+    const total = CONFIG.hotspots.length;
+    scoreEl.textContent = `${ok} of ${total} placed correctly`;
+    scoreEl.className = ok === total ? "ok" : (ok > 0 ? "" : "bad");
+  });
+
+  document.getElementById("reset").addEventListener("click", () => {
+    placedByHotspot.clear();
+    scoreEl.textContent = ""; scoreEl.className = "";
+    placeHotspots();
+    if (QUIZ) setupQuiz();
+  });
+
+  // Init
+  if (img.complete) startInit(); else img.addEventListener("load", startInit);
+  function startInit() {
+    placeHotspots();
+    if (QUIZ) setupQuiz();
+  }
+</script>
+</body>
+</html>

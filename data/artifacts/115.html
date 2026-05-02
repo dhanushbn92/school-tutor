@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match each Newton&#x27;s-laws scenario to the correct numerical answer</title>
+  <style>
+    :root { --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --accent:#2563eb; --ok:#16a34a; --err:#dc2626; --muted:#64748b; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #0f172a; margin: 0; padding: 24px; }
+    header { max-width: 960px; margin: 0 auto 24px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    p.instructions { color: var(--muted); margin: 0; }
+    main { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .col h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; }
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .card:hover { border-color: var(--accent); }
+    .card.selected { border-color: var(--accent); background: #eff6ff; }
+    .card.ok { border-color: var(--ok); background: #f0fdf4; cursor: default; }
+    .card.err { border-color: var(--err); background: #fef2f2; }
+    .card.done { opacity: .55; cursor: default; }
+    footer { max-width: 960px; margin: 20px auto 0; display:flex; justify-content: space-between; align-items: center; color: var(--muted); }
+    button { background: var(--accent); color: white; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Match each Newton&#x27;s-laws scenario to the correct numerical answer</h1>
+    <p class="instructions">Each card on the left poses a problem on Newton&#x27;s laws, friction or momentum. Drag it to the matching numerical answer on the right. Take g = 10 m/s² unless stated.</p>
+  </header>
+  <main>
+    <div class="col">
+      <h2>Terms</h2>
+      <div id="terms"></div>
+    </div>
+    <div class="col">
+      <h2>Match</h2>
+      <div id="matches"></div>
+    </div>
+  </main>
+  <footer>
+    <span id="score">Score: 0 / <span id="total">0</span></span>
+    <button id="reset" type="button">Reset</button>
+  </footer>
+  <script>
+    const PAIRS = [{"term": "Net F = 16 N on m = 4 kg \u2192 a", "match": "4 m/s\u00b2"}, {"term": "F = 30 N on m = 6 kg \u2192 a", "match": "5 m/s\u00b2"}, {"term": "F = 50 N on 5-kg block, \u03bc_k = 0.3 \u2192 a", "match": "7 m/s\u00b2"}, {"term": "F = 20 N on 5-kg block, \u03bc_k = 0.2 \u2192 a", "match": "2 m/s\u00b2"}, {"term": "0.1-kg ball at 20 m/s caught in 0.05 s \u2192 avg F", "match": "40 N"}, {"term": "0.5-kg ball at 4 m/s rebounds at 4 m/s \u2192 |\u0394p|", "match": "4 kg\u00b7m/s"}, {"term": "Gun 2 kg fires 0.005 kg @ 500 m/s \u2192 recoil v", "match": "1.25 m/s"}, {"term": "Skater 80 kg throws 4 kg @ 5 m/s \u2192 skater recoil", "match": "0.25 m/s"}, {"term": "3 kg @ 8 m/s + 1 kg at rest stick \u2192 common v", "match": "6 m/s"}, {"term": "5 kg @ 6 m/s + 1 kg at rest stick \u2192 common v", "match": "5 m/s"}, {"term": "Atwood 6-kg & 4-kg \u2192 a", "match": "2 m/s\u00b2"}, {"term": "Atwood 6-kg & 4-kg \u2192 tension", "match": "48 N"}, {"term": "Frictionless 30\u00b0 incline \u2192 a down slope", "match": "5 m/s\u00b2"}, {"term": "Block on 30\u00b0 incline \u03bc_k = 0.2 \u2192 a (down)", "match": "3.27 m/s\u00b2"}];
+    const termsEl = document.getElementById("terms");
+    const matchesEl = document.getElementById("matches");
+    const scoreEl = document.getElementById("score");
+    document.getElementById("total").textContent = PAIRS.length;
+
+    function shuffle(arr) { return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]); }
+
+    let selectedTerm = null;
+    let correct = 0;
+
+    function render() {
+      termsEl.innerHTML = "";
+      matchesEl.innerHTML = "";
+      selectedTerm = null;
+      correct = 0;
+      scoreEl.firstChild.textContent = `Score: 0 / `;
+
+      PAIRS.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = p.term;
+        card.dataset.index = index;
+        card.addEventListener("click", () => onTermClick(card, index));
+        termsEl.appendChild(card);
+      });
+      shuffle(PAIRS.map((p, i) => ({ text: p.match, index: i }))).forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = m.text;
+        card.dataset.index = m.index;
+        card.addEventListener("click", () => onMatchClick(card, m.index));
+        matchesEl.appendChild(card);
+      });
+    }
+
+    function onTermClick(card, index) {
+      if (card.classList.contains("done")) return;
+      termsEl.querySelectorAll(".card.selected").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedTerm = { el: card, index };
+    }
+
+    function onMatchClick(card, index) {
+      if (card.classList.contains("done") || !selectedTerm) return;
+      if (selectedTerm.index === index) {
+        selectedTerm.el.classList.add("ok", "done");
+        selectedTerm.el.classList.remove("selected");
+        card.classList.add("ok", "done");
+        correct += 1;
+        scoreEl.firstChild.textContent = `Score: ${correct} / `;
+        selectedTerm = null;
+      } else {
+        card.classList.add("err");
+        setTimeout(() => card.classList.remove("err"), 500);
+      }
+    }
+
+    document.getElementById("reset").addEventListener("click", render);
+    render();
+  </script>
+</body>
+</html>

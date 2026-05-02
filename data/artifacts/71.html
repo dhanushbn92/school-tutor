@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Build a Balanced Plate</title>
+<style>
+  :root {
+    --bg: #fff8ef; --ink: #2c2418; --muted: #6f5f4c; --accent: #d97a30;
+    --good: #1faa6f; --warn: #e0a32a; --bad: #d04141; --card: #ffffff;
+    --shadow: 0 6px 22px rgba(120, 70, 20, 0.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: linear-gradient(180deg, #fff8ef, #fff); color: var(--ink); min-height: 100vh; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 18px 80px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+
+  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
+  @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+
+  .plateCard, .sideCard { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; }
+
+  /* The plate is rendered as a centred SVG so we can position drop zones precisely. */
+  .plate-stage { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 520px; margin: 0 auto; }
+  svg.plate { width: 100%; height: 100%; display: block; }
+
+  .zone {
+    position: absolute; border-radius: 50%; border: 2px dashed transparent;
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .zone.over { background: rgba(217,122,48,0.12); border-color: var(--accent); }
+  .zone .label {
+    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
+    background: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    color: var(--accent); border: 1px solid #f4d6b5; box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  }
+  .placed-food {
+    background: white; border: 1px solid #f4dcc5; border-radius: 10px; padding: 4px 8px;
+    font-size: 12px; line-height: 1.1; cursor: grab; box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  .pantry { display: flex; flex-wrap: wrap; gap: 8px; min-height: 120px; }
+  .food {
+    background: linear-gradient(135deg, #ffffff, #fff3e3); border: 1px solid #f4d6b5; border-radius: 12px;
+    padding: 8px 12px; cursor: grab; user-select: none; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .food.dragging { opacity: .35; }
+  .food .emoji { font-size: 20px; }
+  .food .name { font-weight: 600; font-size: 13px; }
+
+  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 0 0 12px; }
+
+  .meter { display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row .lbl { width: 84px; font-size: 12px; color: var(--ink); font-weight: 600; }
+  .bar { flex: 1; height: 12px; background: #f1e3d0; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar > .fill { height: 100%; background: var(--accent); width: 0%; transition: width .25s; }
+  .bar > .target {
+    position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(0,0,0,.3);
+  }
+  .scoreCard {
+    background: linear-gradient(135deg, #fff8ef, #ffe8d2); border-radius: 12px; padding: 12px 14px;
+    margin-top: 14px; text-align: center;
+  }
+  .scoreCard .face { font-size: 38px; line-height: 1; }
+  .scoreCard .verdict { font-size: 14px; font-weight: 700; margin-top: 6px; }
+  .scoreCard .hint { font-size: 12px; color: var(--muted); margin-top: 4px; min-height: 16px; }
+
+  button { padding: 8px 14px; border-radius: 10px; border: 0; font-weight: 600; cursor: pointer; background: var(--accent); color: white; }
+  button.secondary { background: #f0e1cf; color: var(--ink); }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍽️ Build a Balanced Plate</h1>
+  <p class="sub">Drag foods from the pantry on the right onto the right slice of the plate. Watch the nutrient meter fill up — try to balance every nutrient!</p>
+
+  <div class="layout">
+    <div class="plateCard">
+      <div class="plate-stage" id="stage">
+        <!-- Plate is a quartered circle. Pizza-slice colours come from the chapter's food groups. -->
+        <svg class="plate" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="98" fill="#ffffff" stroke="#e1c9aa" stroke-width="2"/>
+          <!-- 4 slices -->
+          <path d="M100,100 L100,3 A97 97 0 0 1 197,100 Z" fill="#fff1d6"/>
+          <path d="M100,100 L197,100 A97 97 0 0 1 100,197 Z" fill="#ffe8d2"/>
+          <path d="M100,100 L100,197 A97 97 0 0 1 3,100 Z" fill="#fff7e8"/>
+          <path d="M100,100 L3,100 A97 97 0 0 1 100,3 Z" fill="#fff3df"/>
+          <line x1="100" y1="3"  x2="100" y2="197" stroke="#f0d6b3" stroke-dasharray="4 4"/>
+          <line x1="3"   y1="100" x2="197" y2="100" stroke="#f0d6b3" stroke-dasharray="4 4"/>
+          <circle cx="100" cy="100" r="98" fill="none" stroke="#d8b88a" stroke-width="3"/>
+        </svg>
+        <!-- Drop zones positioned over the four quarters -->
+        <div class="zone" data-bin="Carbohydrates" style="top:8%;right:8%;width:40%;height:40%;">
+          <span class="label">Carbs</span>
+        </div>
+        <div class="zone" data-bin="Proteins" style="bottom:8%;right:8%;width:40%;height:40%;">
+          <span class="label">Proteins</span>
+        </div>
+        <div class="zone" data-bin="Fruits/Vegetables" style="bottom:8%;left:8%;width:40%;height:40%;">
+          <span class="label">Fruits / Veg</span>
+        </div>
+        <div class="zone" data-bin="Dairy/Fats" style="top:8%;left:8%;width:40%;height:40%;">
+          <span class="label">Dairy / Fats</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="checkBtn">Check balance</button>
+        <button id="resetBtn" class="secondary">Reset plate</button>
+      </div>
+      <div class="scoreCard" id="scoreCard">
+        <div class="face" id="face">😐</div>
+        <div class="verdict" id="verdict">Add a few foods and check your balance.</div>
+        <div class="hint" id="hint"></div>
+      </div>
+    </div>
+
+    <div class="sideCard">
+      <h3>Pantry</h3>
+      <div class="pantry" id="pantry"></div>
+
+      <h3 style="margin-top:18px;">Nutrient meter</h3>
+      <div class="meter" id="meter"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Each food maps to one plate slice + provides several nutrients (0-2 units).
+  const FOODS = [
+    { id: "rice",     emoji: "🍚", name: "Rice",     bin: "Carbohydrates",     n: { carb:2 } },
+    { id: "roti",     emoji: "🫓", name: "Roti",     bin: "Carbohydrates",     n: { carb:2, fibre:1 } },
+    { id: "potato",   emoji: "🥔", name: "Potato",   bin: "Carbohydrates",     n: { carb:2 } },
+    { id: "dal",      emoji: "🍲", name: "Dal",      bin: "Proteins",          n: { protein:2, fibre:1 } },
+    { id: "egg",      emoji: "🥚", name: "Egg",      bin: "Proteins",          n: { protein:2, fat:1 } },
+    { id: "paneer",   emoji: "🧀", name: "Paneer",   bin: "Proteins",          n: { protein:2, fat:1, calcium:1 } },
+    { id: "chicken",  emoji: "🍗", name: "Chicken",  bin: "Proteins",          n: { protein:2, fat:1 } },
+    { id: "spinach",  emoji: "🥬", name: "Spinach",  bin: "Fruits/Vegetables", n: { vitamin:2, iron:2, fibre:1 } },
+    { id: "carrot",   emoji: "🥕", name: "Carrot",   bin: "Fruits/Vegetables", n: { vitamin:2, fibre:1 } },
+    { id: "apple",    emoji: "🍎", name: "Apple",    bin: "Fruits/Vegetables", n: { vitamin:1, fibre:1 } },
+    { id: "banana",   emoji: "🍌", name: "Banana",   bin: "Fruits/Vegetables", n: { carb:1, vitamin:1, fibre:1 } },
+    { id: "milk",     emoji: "🥛", name: "Milk",     bin: "Dairy/Fats",        n: { protein:1, calcium:2, fat:1 } },
+    { id: "curd",     emoji: "🍶", name: "Curd",     bin: "Dairy/Fats",        n: { protein:1, calcium:1 } },
+    { id: "ghee",     emoji: "🫙", name: "Ghee",     bin: "Dairy/Fats",        n: { fat:2 } },
+    { id: "peanut",   emoji: "🥜", name: "Peanut",   bin: "Dairy/Fats",        n: { fat:2, protein:1 } },
+  ];
+
+  const NUTRIENTS = [
+    { key:"carb",    label:"Carbs",    target: 3 },
+    { key:"protein", label:"Protein",  target: 3 },
+    { key:"fat",     label:"Fat",      target: 2 },
+    { key:"vitamin", label:"Vitamin",  target: 2 },
+    { key:"calcium", label:"Calcium",  target: 1 },
+    { key:"iron",    label:"Iron",     target: 1 },
+    { key:"fibre",   label:"Fibre",    target: 2 },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const placed = []; // [{id, bin}]
+
+  function buildFood(food, fromPlate = false) {
+    const el = document.createElement(fromPlate ? "div" : "div");
+    el.className = fromPlate ? "placed-food" : "food";
+    el.draggable = true;
+    el.dataset.id = food.id;
+    el.innerHTML = fromPlate
+      ? `${food.emoji}<span style="font-size:12px;">${food.name}</span>`
+      : `<span class="emoji">${food.emoji}</span><span class="name">${food.name}</span>`;
+    el.addEventListener("dragstart", (e) => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", food.id);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+    return el;
+  }
+
+  function renderPantry() {
+    const p = $("pantry"); p.innerHTML = "";
+    const onPlate = new Set(placed.map(x => x.id));
+    FOODS.filter((f) => !onPlate.has(f.id)).forEach((f) => p.appendChild(buildFood(f)));
+    // Pantry accepts drops too (to remove from plate).
+    p.ondragover = (e) => e.preventDefault();
+    p.ondrop = (e) => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData("text/plain");
+      const idx = placed.findIndex((x) => x.id === id);
+      if (idx >= 0) placed.splice(idx, 1);
+      renderPlate(); renderPantry(); renderMeter();
+    };
+  }
+
+  function renderPlate() {
+    document.querySelectorAll(".zone").forEach((z) => {
+      z.querySelectorAll(".placed-food").forEach((c) => c.remove());
+    });
+    placed.forEach(({ id, bin }) => {
+      const food = FOODS.find((f) => f.id === id);
+      const z = document.querySelector(`.zone[data-bin="${bin}"]`);
+      if (z && food) z.appendChild(buildFood(food, true));
+    });
+  }
+
+  function totals() {
+    const totals = Object.fromEntries(NUTRIENTS.map((n) => [n.key, 0]));
+    placed.forEach(({ id }) => {
+      const f = FOODS.find((x) => x.id === id);
+      if (!f) return;
+      Object.entries(f.n).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; });
+    });
+    return totals;
+  }
+
+  function renderMeter() {
+    const m = $("meter"); m.innerHTML = "";
+    const t = totals();
+    NUTRIENTS.forEach((n) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      const haveBars = t[n.key];
+      const targetBars = n.target;
+      const max = Math.max(targetBars * 2, 4);
+      const pct = Math.min(100, (haveBars / max) * 100);
+      const targetPct = Math.min(100, (targetBars / max) * 100);
+      row.innerHTML = `
+        <span class="lbl">${n.label}</span>
+        <div class="bar"><div class="fill" style="width:${pct}%"></div><div class="target" style="left:${targetPct}%"></div></div>
+        <span style="width: 56px; text-align: right; font-size: 12px;">${haveBars}/${targetBars}</span>
+      `;
+      m.appendChild(row);
+    });
+    updateScore(t);
+  }
+
+  function updateScore(t) {
+    const reached = NUTRIENTS.filter((n) => t[n.key] >= n.target).length;
+    const total = NUTRIENTS.length;
+    let face = "😐"; let verdict = "Add a few foods and check your balance."; let hint = "";
+    if (reached === 0 && placed.length === 0) {
+      face = "🍽️"; verdict = "Empty plate!"; hint = "Drag foods from the pantry.";
+    } else if (reached >= total) {
+      face = "🤩"; verdict = "Perfectly balanced plate!";
+      hint = "Every nutrient target met. Try a different combination.";
+    } else if (reached >= total - 2) {
+      face = "🙂"; verdict = "Almost balanced — just one or two nutrients to go.";
+      const missing = NUTRIENTS.filter((n) => t[n.key] < n.target).map((n) => n.label).slice(0, 3);
+      hint = `Try foods that add: ${missing.join(", ")}.`;
+    } else {
+      face = "😶"; verdict = "Plate is unbalanced.";
+      const missing = NUTRIENTS.filter((n) => t[n.key] < n.target).map((n) => n.label).slice(0, 3);
+      hint = missing.length ? `Missing: ${missing.join(", ")}.` : "";
+    }
+    $("face").textContent = face;
+    $("verdict").textContent = verdict;
+    $("hint").textContent = hint;
+  }
+
+  function setupZones() {
+    document.querySelectorAll(".zone").forEach((zone) => {
+      zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("over"); });
+      zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+      zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("over");
+        const id = e.dataTransfer.getData("text/plain");
+        const food = FOODS.find((f) => f.id === id);
+        if (!food) return;
+        const expected = food.bin;
+        const targetBin = zone.dataset.bin;
+        if (expected !== targetBin) {
+          // Bounce: brief shake then send back
+          zone.style.transform = "translateX(-6px)";
+          setTimeout(() => zone.style.transform = "translateX(6px)", 90);
+          setTimeout(() => zone.style.transform = "", 180);
+          flashHint(`${food.name} belongs in ${expected}.`);
+          return;
+        }
+        // Add to placed (replace if already present)
+        const idx = placed.findIndex((p) => p.id === id);
+        if (idx >= 0) placed.splice(idx, 1);
+        placed.push({ id, bin: targetBin });
+        renderPlate(); renderPantry(); renderMeter();
+      });
+    });
+  }
+
+  function flashHint(msg) {
+    $("hint").textContent = msg;
+    $("hint").style.color = "var(--accent)";
+    setTimeout(() => $("hint").style.color = "var(--muted)", 1200);
+  }
+
+  $("checkBtn").addEventListener("click", () => {
+    const t = totals(); updateScore(t);
+  });
+  $("resetBtn").addEventListener("click", () => {
+    placed.length = 0; renderPlate(); renderPantry(); renderMeter();
+  });
+
+  setupZones();
+  renderPantry();
+  renderMeter();
+</script>
+</body>
+</html>

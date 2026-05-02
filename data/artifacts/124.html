@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vectors in chemistry — H2O bond vectors in 3D</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#34d399; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #scene { position:fixed; inset:0; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; max-width:430px; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+  #info { top:16px; right:16px; width:300px; display:none; }
+  #info.open { display:block; }
+  #info h2 { margin:0 0 6px; font-size:16px; }
+  #info p { margin:6px 0; font-size:13px; line-height:1.5; color:#dbe1ec; }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; pointer-events:none; }
+  #controls > * { pointer-events:auto; }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+  .atom-label { color:#e8ecf5; font-size:11px; padding:1px 7px; background:rgba(10,14,25,0.65); border:1px solid rgba(255,255,255,0.15); border-radius:999px; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+
+<div class="overlay" id="header">
+  <div class="panel">
+    <h1>Vectors in chemistry — H2O bond vectors in 3D</h1>
+    <p class="sub">Drag to rotate. The two O-H bonds are vector quantities; their geometric sum (the dipole moment) is non-zero, which is why water is polar.</p>
+  </div>
+</div>
+
+<div class="overlay panel" id="info">
+  <h2 id="info-name">Atom</h2>
+  <p id="info-desc"></p>
+  <button id="info-close" style="margin-top:6px">Close</button>
+</div>
+
+<div class="hint">Drag to rotate · Scroll to zoom · Click an atom for info</div>
+
+<div class="overlay" id="controls">
+  <span class="pill">Rotate <input id="spin" type="range" min="0" max="3" step="0.05" value="0.6" /></span>
+  <button id="reset-view">Reset view</button>
+  <button id="toggle-labels">Toggle labels</button>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+
+// CONFIG = { name, description, atoms: [...], bonds: [...] }
+const CONFIG = {"name": "Water (H2O)", "description": "Bent geometry; H-O-H bond angle approx 104.5 degrees.", "atoms": [{"name": "O1", "element": "O", "x": 0.0, "y": 0.0, "z": 0.0, "color": null, "description": "Central oxygen atom (sp3 hybrid). Each O-H bond is a vector pointing toward a hydrogen."}, {"name": "H1", "element": "H", "x": 0.76, "y": 0.59, "z": 0.0, "color": null, "description": "One of two hydrogens, bonded by a single covalent bond."}, {"name": "H2", "element": "H", "x": -0.76, "y": 0.59, "z": 0.0, "color": null, "description": "The other hydrogen."}], "bonds": [{"from_atom": "O1", "to_atom": "H1", "order": 1}, {"from_atom": "O1", "to_atom": "H2", "order": 1}]};
+
+// CPK colour scheme — standard for chemistry visualisation.
+const CPK = {
+  H: 0xffffff, C: 0x222222, N: 0x3050f8, O: 0xff0d0d, F: 0x90e050, P: 0xff8000, S: 0xffff30,
+  Cl: 0x1ff01f, Br: 0xa62929, I: 0x940094, Na: 0xab5cf2, Mg: 0x8aff00, K: 0x8f40d4,
+  Ca: 0x3dff00, Fe: 0xe06633, Cu: 0xc88033, Zn: 0x7d80b0, Si: 0xf0c8a0,
+};
+// Approximate covalent radii in scene units (Angstrom-ish, scaled).
+const RADII = { H: 0.32, C: 0.55, N: 0.55, O: 0.5, F: 0.5, P: 0.7, S: 0.7,
+  Cl: 0.7, Br: 0.85, I: 1.0, Na: 1.0, Mg: 1.0, K: 1.2, Ca: 1.2, Fe: 0.95, Cu: 0.9, Zn: 0.9, Si: 0.85 };
+function colorFor(elem) { return CPK[elem] !== undefined ? CPK[elem] : 0xc0c0c0; }
+function radiusFor(elem) { return RADII[elem] !== undefined ? RADII[elem] : 0.6; }
+
+const sceneEl = document.getElementById("scene");
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(6, 5, 10);
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+sceneEl.appendChild(renderer.domElement);
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = "absolute"; labelRenderer.domElement.style.top = "0"; labelRenderer.domElement.style.pointerEvents = "none";
+sceneEl.appendChild(labelRenderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.06; controls.minDistance = 2; controls.maxDistance = 60;
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(10, 12, 8); scene.add(key);
+const fill = new THREE.DirectionalLight(0xb6c8ff, 0.4); fill.position.set(-8, 4, -6); scene.add(fill);
+
+// Container so we can rotate the whole molecule for the spin control.
+const mol = new THREE.Group(); scene.add(mol);
+
+// Centre the molecule on the average atom position so the camera frames it nicely.
+const atoms = CONFIG.atoms || [];
+let cx = 0, cy = 0, cz = 0;
+atoms.forEach(a => { cx += a.x; cy += a.y; cz += a.z; });
+cx /= atoms.length; cy /= atoms.length; cz /= atoms.length;
+
+const atomMeshes = []; const labelObjs = []; const atomByName = new Map();
+atoms.forEach((a) => {
+  const elem = (a.element || "C").trim();
+  const r = radiusFor(elem);
+  const c = a.color && /^#[0-9a-fA-F]{3,8}$/.test(a.color) ? new THREE.Color(a.color) : new THREE.Color(colorFor(elem));
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(r, 32, 24),
+    new THREE.MeshStandardMaterial({ color: c, roughness:0.4, metalness:0.05 }),
+  );
+  mesh.position.set(a.x - cx, a.y - cy, a.z - cz);
+  mesh.userData.atom = a;
+  mol.add(mesh); atomMeshes.push(mesh); atomByName.set(a.name, mesh);
+
+  const div = document.createElement("div"); div.className = "atom-label"; div.textContent = a.name;
+  const lab = new CSS2DObject(div); lab.position.set(0, r + 0.35, 0); mesh.add(lab); labelObjs.push(lab);
+});
+
+// Bonds: draw as cylinders between atom centres. Double / triple bonds
+// use 2 / 3 parallel cylinders offset perpendicular to the bond axis.
+function makeBondCylinders(a, b, order) {
+  const va = atomByName.get(a.name).position;
+  const vb = atomByName.get(b.name).position;
+  const dir = new THREE.Vector3().subVectors(vb, va);
+  const len = dir.length();
+  if (len < 0.01) return [];
+  const mid = new THREE.Vector3().addVectors(va, vb).multiplyScalar(0.5);
+  const up = new THREE.Vector3(0, 1, 0);
+  const quat = new THREE.Quaternion().setFromUnitVectors(up, dir.clone().normalize());
+
+  // Pick a perpendicular axis for the offset of double/triple bond cylinders.
+  const perp = new THREE.Vector3(1, 0, 0);
+  if (Math.abs(dir.clone().normalize().dot(perp)) > 0.95) perp.set(0, 0, 1);
+  perp.crossVectors(dir, perp).normalize();
+
+  const off = 0.18;
+  const offsets = order === 1 ? [0] : (order === 2 ? [-off/2, off/2] : [-off, 0, off]);
+
+  return offsets.map((o) => {
+    const cyl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.08, 0.08, len, 16),
+      new THREE.MeshStandardMaterial({ color: 0xcdd5e2, roughness:0.5, metalness:0.05 }),
+    );
+    cyl.quaternion.copy(quat);
+    cyl.position.copy(mid).addScaledVector(perp, o);
+    return cyl;
+  });
+}
+
+(CONFIG.bonds || []).forEach((b) => {
+  const a1 = atomByName.get(b.from_atom)?.userData.atom;
+  const a2 = atomByName.get(b.to_atom)?.userData.atom;
+  if (!a1 || !a2) return;
+  makeBondCylinders(a1, a2, b.order || 1).forEach(c => mol.add(c));
+});
+
+// --- Interaction ---
+const ray = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+function onClick(ev) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+  ray.setFromCamera(mouse, camera);
+  const hit = ray.intersectObjects(atomMeshes, false)[0];
+  if (!hit) return;
+  const a = hit.object.userData.atom;
+  document.getElementById("info-name").textContent = `${a.name} (${a.element})`;
+  document.getElementById("info-desc").textContent = a.description || `Element: ${a.element}.`;
+  document.getElementById("info").classList.add("open");
+}
+renderer.domElement.addEventListener("click", onClick);
+document.getElementById("info-close").addEventListener("click", () => document.getElementById("info").classList.remove("open"));
+
+// --- Spin control ---
+let spinSpeed = 0.6;
+document.getElementById("spin").addEventListener("input", (e) => { spinSpeed = +e.target.value; });
+document.getElementById("reset-view").addEventListener("click", () => { controls.reset(); camera.position.set(6, 5, 10); });
+document.getElementById("toggle-labels").addEventListener("click", () => {
+  const visible = !labelObjs[0]?.element.style.display || labelObjs[0]?.element.style.display !== "none";
+  labelObjs.forEach(l => l.element.style.display = visible ? "none" : "");
+});
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+let lastTime = performance.now();
+function loop() {
+  const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+  mol.rotation.y += spinSpeed * dt * 0.4;
+  controls.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

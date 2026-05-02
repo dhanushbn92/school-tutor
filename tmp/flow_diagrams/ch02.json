@@ -1,0 +1,24 @@
+{
+  "title": "Plant Classification · Decision Tree",
+  "description": "A simple flow to classify a plant in front of you by stem and height.",
+  "nodes": [
+    {"id": "start",   "label": "🌱 Look at the plant",  "kind": "start"},
+    {"id": "tall",    "label": "Is the stem thick, hard and woody?",     "kind": "decision"},
+    {"id": "tree",    "label": "Tree",                  "kind": "end",  "detail": "Tall plants with thick woody stems (e.g. mango, neem)."},
+    {"id": "shrub_q", "label": "Is the stem hard but branching near the base?", "kind": "decision"},
+    {"id": "shrub",   "label": "Shrub",                 "kind": "end",  "detail": "Medium-sized plants with hard branching stems (e.g. rose, lemon)."},
+    {"id": "soft",    "label": "Is the stem soft and green?",            "kind": "decision"},
+    {"id": "herb",    "label": "Herb",                  "kind": "end",  "detail": "Short plants with soft green stems (e.g. tulsi, mint)."},
+    {"id": "other",   "label": "Special form (climber / creeper)",       "kind": "end",  "detail": "Some plants need support to grow up or spread along the ground."}
+  ],
+  "edges": [
+    {"src": "start",   "dst": "tall"},
+    {"src": "tall",    "dst": "tree",    "label": "Yes"},
+    {"src": "tall",    "dst": "shrub_q", "label": "No"},
+    {"src": "shrub_q", "dst": "shrub",   "label": "Yes"},
+    {"src": "shrub_q", "dst": "soft",    "label": "No"},
+    {"src": "soft",    "dst": "herb",    "label": "Yes"},
+    {"src": "soft",    "dst": "other",   "label": "No"}
+  ],
+  "outcome_codes_covered": ["6-SCI-DLW-02", "6-SCI-DLW-04"]
+}

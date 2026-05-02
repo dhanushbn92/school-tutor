@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match each expression to its simplified value</title>
+  <style>
+    :root { --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --accent:#2563eb; --ok:#16a34a; --err:#dc2626; --muted:#64748b; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #0f172a; margin: 0; padding: 24px; }
+    header { max-width: 960px; margin: 0 auto 24px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    p.instructions { color: var(--muted); margin: 0; }
+    main { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .col h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; }
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .card:hover { border-color: var(--accent); }
+    .card.selected { border-color: var(--accent); background: #eff6ff; }
+    .card.ok { border-color: var(--ok); background: #f0fdf4; cursor: default; }
+    .card.err { border-color: var(--err); background: #fef2f2; }
+    .card.done { opacity: .55; cursor: default; }
+    footer { max-width: 960px; margin: 20px auto 0; display:flex; justify-content: space-between; align-items: center; color: var(--muted); }
+    button { background: var(--accent); color: white; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Match each expression to its simplified value</h1>
+    <p class="instructions">Each card on the left shows an expression involving exponents or radicals. Drag it to its correct simplified form on the right. Pull-out perfect powers, apply laws of exponents, and rationalise denominators where needed.</p>
+  </header>
+  <main>
+    <div class="col">
+      <h2>Terms</h2>
+      <div id="terms"></div>
+    </div>
+    <div class="col">
+      <h2>Match</h2>
+      <div id="matches"></div>
+    </div>
+  </main>
+  <footer>
+    <span id="score">Score: 0 / <span id="total">0</span></span>
+    <button id="reset" type="button">Reset</button>
+  </footer>
+  <script>
+    const PAIRS = [{"term": "2^7 \u00f7 2^3", "match": "16 (= 2^4)"}, {"term": "3^0", "match": "1 (any non-zero base to the 0 is 1)"}, {"term": "5^(\u22122)", "match": "1/25"}, {"term": "27^(2/3)", "match": "9 (= 3\u00b2)"}, {"term": "16^(3/4)", "match": "8 (= 2\u00b3)"}, {"term": "(8/27)^(2/3)", "match": "4/9"}, {"term": "9^(\u22121/2)", "match": "1/3"}, {"term": "\u221a72", "match": "6\u221a2"}, {"term": "\u221a50 + \u221a18", "match": "8\u221a2"}, {"term": "3\u221a24 (cube root of 24)", "match": "2 \u00b7 3\u221a3"}, {"term": "1 / \u221a5", "match": "\u221a5 / 5"}, {"term": "1 / (3 + \u221a5)", "match": "(3 \u2212 \u221a5) / 4"}, {"term": "1 / (\u221a7 \u2212 \u221a3)", "match": "(\u221a7 + \u221a3) / 4"}, {"term": "(2 + \u221a3) / (2 \u2212 \u221a3)", "match": "7 + 4\u221a3"}];
+    const termsEl = document.getElementById("terms");
+    const matchesEl = document.getElementById("matches");
+    const scoreEl = document.getElementById("score");
+    document.getElementById("total").textContent = PAIRS.length;
+
+    function shuffle(arr) { return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]); }
+
+    let selectedTerm = null;
+    let correct = 0;
+
+    function render() {
+      termsEl.innerHTML = "";
+      matchesEl.innerHTML = "";
+      selectedTerm = null;
+      correct = 0;
+      scoreEl.firstChild.textContent = `Score: 0 / `;
+
+      PAIRS.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = p.term;
+        card.dataset.index = index;
+        card.addEventListener("click", () => onTermClick(card, index));
+        termsEl.appendChild(card);
+      });
+      shuffle(PAIRS.map((p, i) => ({ text: p.match, index: i }))).forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = m.text;
+        card.dataset.index = m.index;
+        card.addEventListener("click", () => onMatchClick(card, m.index));
+        matchesEl.appendChild(card);
+      });
+    }
+
+    function onTermClick(card, index) {
+      if (card.classList.contains("done")) return;
+      termsEl.querySelectorAll(".card.selected").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedTerm = { el: card, index };
+    }
+
+    function onMatchClick(card, index) {
+      if (card.classList.contains("done") || !selectedTerm) return;
+      if (selectedTerm.index === index) {
+        selectedTerm.el.classList.add("ok", "done");
+        selectedTerm.el.classList.remove("selected");
+        card.classList.add("ok", "done");
+        correct += 1;
+        scoreEl.firstChild.textContent = `Score: ${correct} / `;
+        selectedTerm = null;
+      } else {
+        card.classList.add("err");
+        setTimeout(() => card.classList.remove("err"), 500);
+      }
+    }
+
+    document.getElementById("reset").addEventListener("click", render);
+    render();
+  </script>
+</body>
+</html>

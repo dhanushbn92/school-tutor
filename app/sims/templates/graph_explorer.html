@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>__TITLE__</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#22d3ee; --grid:rgba(255,255,255,0.08); --curve:#fbbf24; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  body { display:grid; grid-template-columns: 1fr 320px; }
+  #plot { position:relative; }
+  #plot canvas { display:block; width:100%; height:100%; }
+  #side { background:var(--panel); border-left:1px solid var(--border); padding:18px; overflow:auto; }
+  h1 { margin:0 0 4px; font-size:18px; font-weight:600; }
+  p.sub { margin:0 0 14px; font-size:13px; color:var(--muted); line-height:1.5; }
+  .formula { background:rgba(34,211,238,0.08); border-left:3px solid var(--accent); padding:10px 12px; border-radius:6px; font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; font-size:13px; color:#dbe1ec; margin-bottom:14px; word-break:break-word; }
+  h2 { margin:14px 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .row { display:grid; grid-template-columns: 1fr 130px 60px; gap:10px; align-items:center; margin:8px 0; font-size:13px; }
+  .row label { color:#cdd5e2; }
+  .row input[type=range] { width:100%; accent-color:var(--accent); }
+  .row .val { text-align:right; color:var(--accent); font-variant-numeric:tabular-nums; font-size:12px; }
+  .axis-label { position:absolute; color:var(--muted); font-size:12px; pointer-events:none; }
+  .readout { position:absolute; top:14px; left:14px; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:12px; color:#dbe1ec; pointer-events:none; }
+  .readout span.k { color:var(--muted); margin-right:6px; }
+  .readout span.v { color:var(--accent); font-variant-numeric:tabular-nums; }
+  /* Always-on peak readout in the side panel — gives the student
+     immediate numerical feedback that the curve has updated, even
+     when the auto-scaled axes hide the visual difference. */
+  .peak { background:rgba(251,191,36,0.08); border-left:3px solid #fbbf24; padding:10px 12px; border-radius:6px; }
+  .peak-row { display:flex; justify-content:space-between; margin:3px 0; font-size:13px; font-family:"JetBrains Mono",ui-monospace,Consolas,monospace; }
+  .peak-row .k { color:var(--muted); }
+  .peak-row .v { color:#fbbf24; font-variant-numeric:tabular-nums; font-weight:600; }
+  .reset-btn { display:block; width:100%; margin-top:14px; padding:8px 12px; background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; font-size:12px; cursor:pointer; }
+  .reset-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .err { color:#fca5a5; font-size:12px; margin-top:6px; }
+  @media (max-width: 720px) { body { grid-template-columns: 1fr; grid-template-rows: 60vh 1fr; } #side { border-left:none; border-top:1px solid var(--border); } }
+</style>
+</head>
+<body>
+<div id="plot">
+  <canvas id="canvas"></canvas>
+  <div class="axis-label" id="x-axis-label" style="bottom:6px; right:14px"></div>
+  <div class="axis-label" id="y-axis-label" style="top:6px; left:14px; transform:rotate(-90deg); transform-origin:top left;"></div>
+  <div class="readout" id="readout">
+    <div><span class="k">at x =</span><span class="v" id="ro-x">—</span></div>
+    <div><span class="k">y =</span><span class="v" id="ro-y">—</span></div>
+  </div>
+</div>
+<aside id="side">
+  <h1>__TITLE__</h1>
+  <p class="sub">__INSTRUCTIONS__</p>
+  <div class="formula" id="formula"></div>
+  <h2>Peak value</h2>
+  <div class="peak" id="peak">
+    <div class="peak-row"><span class="k">max y</span><span class="v" id="peak-y">—</span></div>
+    <div class="peak-row"><span class="k">at x</span><span class="v" id="peak-x">—</span></div>
+  </div>
+  <h2>Parameters</h2>
+  <div id="sliders"></div>
+  <button class="reset-btn" id="reset-defaults" type="button">Reset to defaults</button>
+  <div class="err" id="err"></div>
+</aside>
+
+<!-- math.js, UMD build (defines a global `math`). cdnjs is preferred over
+     esm.sh here because esm.sh transforms everything to ES modules, which
+     would not expose the global the inline script below relies on. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.min.js" crossorigin="anonymous"></script>
+<script>
+  // CONFIG = {
+  //   expression, x_var, x_min, x_max, x_label, y_label,
+  //   sliders: [{name, label, min, max, initial, step, unit}],
+  //   constants: {name: value} | null,
+  //   samples
+  // }
+  const CONFIG = __GRAPH_JSON__;
+
+  document.getElementById("formula").textContent = `${CONFIG.y_label || "y"} = ${CONFIG.expression}`;
+  document.getElementById("x-axis-label").textContent = CONFIG.x_label || CONFIG.x_var || "x";
+  document.getElementById("y-axis-label").textContent = CONFIG.y_label || "y";
+
+  // Build sliders. We keep an array of `{el, valEl, spec}` so the
+  // Reset-to-defaults button can both restore the underlying state
+  // AND visually snap each slider back to its initial position.
+  const slidersWrap = document.getElementById("sliders");
+  const sliderState = {};
+  const sliderControls = [];
+  (CONFIG.sliders || []).forEach((s) => {
+    sliderState[s.name] = s.initial;
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<label></label><input type="range" data-name="${s.name}" min="${s.min}" max="${s.max}" step="${s.step ?? 0.1}" value="${s.initial}" /><span class="val"></span>`;
+    row.querySelector("label").textContent = `${s.label}${s.unit ? " (" + s.unit + ")" : ""}`;
+    const inputEl = row.querySelector("input");
+    const valEl = row.querySelector(".val");
+    valEl.textContent = `${(+s.initial).toFixed(2)}`;
+    slidersWrap.appendChild(row);
+    sliderControls.push({ el: inputEl, valEl, spec: s });
+    inputEl.addEventListener("input", (e) => {
+      sliderState[s.name] = +e.target.value;
+      valEl.textContent = `${(+e.target.value).toFixed(2)}`;
+      draw();
+    });
+  });
+
+  // Reset-to-defaults: visually snap every slider AND its readout AND
+  // sliderState back to the initial values, then redraw.
+  document.getElementById("reset-defaults").addEventListener("click", () => {
+    sliderControls.forEach(({ el, valEl, spec }) => {
+      el.value = String(spec.initial);
+      sliderState[spec.name] = spec.initial;
+      valEl.textContent = `${(+spec.initial).toFixed(2)}`;
+    });
+    draw();
+  });
+
+  // --- Compile expression once for performance --------------------------
+  let compiled = null; let scope = {};
+  function rebuildScope() {
+    scope = { ...(CONFIG.constants || {}), ...sliderState };
+  }
+  // Defensive: if the math.js CDN fails (network blocked, URL drift,
+  // CSP), surface a clear, actionable message rather than the cryptic
+  // "math is not defined".
+  if (typeof math === "undefined") {
+    document.getElementById("err").textContent =
+      "Math library failed to load (network blocked or CDN unreachable). " +
+      "Reload the page; if it persists, ask the platform admin to check the simulation CDN.";
+  } else {
+    try {
+      compiled = math.compile(CONFIG.expression);
+    } catch (err) {
+      document.getElementById("err").textContent = `Expression error: ${err.message}`;
+    }
+  }
+
+  // --- Canvas drawing ----------------------------------------------------
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  let cssW = 0, cssH = 0; const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    const r = canvas.parentElement.getBoundingClientRect();
+    cssW = r.width; cssH = r.height;
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+    canvas.style.width = `${cssW}px`; canvas.style.height = `${cssH}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener("resize", resize);
+
+  function sample() {
+    if (!compiled) return null;
+    rebuildScope();
+    const N = CONFIG.samples ?? 200;
+    const xs = new Float64Array(N), ys = new Float64Array(N);
+    let yMin = Infinity, yMax = -Infinity;
+    for (let i = 0; i < N; i++) {
+      const x = CONFIG.x_min + (i / (N - 1)) * (CONFIG.x_max - CONFIG.x_min);
+      let y;
+      try {
+        scope[CONFIG.x_var || "x"] = x;
+        y = compiled.evaluate(scope);
+      } catch {
+        y = NaN;
+      }
+      xs[i] = x; ys[i] = y;
+      if (Number.isFinite(y)) { if (y < yMin) yMin = y; if (y > yMax) yMax = y; }
+    }
+    if (!Number.isFinite(yMin) || !Number.isFinite(yMax)) {
+      yMin = -1; yMax = 1;
+    } else if (yMin === yMax) {
+      yMin -= 1; yMax += 1;
+    }
+    const padding = (yMax - yMin) * 0.1;
+    return { xs, ys, yMin: yMin - padding, yMax: yMax + padding };
+  }
+
+  function draw() {
+    if (!cssW || !cssH) return;
+    ctx.fillStyle = "#0b1020"; ctx.fillRect(0, 0, cssW, cssH);
+    const padL = 50, padR = 16, padT = 32, padB = 32;
+    const w = cssW - padL - padR, h = cssH - padT - padB;
+    if (w <= 0 || h <= 0) return;
+
+    const data = sample();
+    if (!data) return;
+
+    const xMin = CONFIG.x_min, xMax = CONFIG.x_max;
+    const yMin = data.yMin, yMax = data.yMax;
+    const sx = (x) => padL + ((x - xMin) / (xMax - xMin)) * w;
+    const sy = (y) => padT + (1 - (y - yMin) / (yMax - yMin)) * h;
+
+    // Grid lines + axis ticks (5 each).
+    ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i <= 5; i++) {
+      const x = padL + (i / 5) * w;
+      ctx.moveTo(x, padT); ctx.lineTo(x, padT + h);
+      const y = padT + (i / 5) * h;
+      ctx.moveTo(padL, y); ctx.lineTo(padL + w, y);
+    }
+    ctx.stroke();
+
+    // Axes (x = 0, y = 0 if visible).
+    ctx.strokeStyle = "rgba(255,255,255,0.3)"; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    if (yMin <= 0 && yMax >= 0) { const y0 = sy(0); ctx.moveTo(padL, y0); ctx.lineTo(padL + w, y0); }
+    if (xMin <= 0 && xMax >= 0) { const x0 = sx(0); ctx.moveTo(x0, padT); ctx.lineTo(x0, padT + h); }
+    ctx.stroke();
+
+    // Axis tick labels.
+    ctx.fillStyle = "#9aa3b2"; ctx.font = "11px ui-monospace,Consolas,monospace";
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (let i = 0; i <= 5; i++) {
+      const xv = xMin + (i / 5) * (xMax - xMin);
+      ctx.fillText(xv.toFixed(2), padL + (i / 5) * w, padT + h + 6);
+    }
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (let i = 0; i <= 5; i++) {
+      const yv = yMax - (i / 5) * (yMax - yMin);
+      ctx.fillText(yv.toFixed(2), padL - 6, padT + (i / 5) * h);
+    }
+
+    // The curve.
+    ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    let pen = false;
+    let peakIdx = -1, peakY = -Infinity;
+    for (let i = 0; i < data.xs.length; i++) {
+      const x = sx(data.xs[i]);
+      const y = data.ys[i];
+      if (!Number.isFinite(y)) { pen = false; continue; }
+      const py = sy(y);
+      if (!pen) { ctx.moveTo(x, py); pen = true; } else { ctx.lineTo(x, py); }
+      if (y > peakY) { peakY = y; peakIdx = i; }
+    }
+    ctx.stroke();
+
+    // Peak marker — gives the eye an immediate anchor that moves as
+    // the sliders change (the auto-scaled axes can otherwise hide the
+    // visual difference between two parameter settings).
+    if (peakIdx >= 0) {
+      const peakX = data.xs[peakIdx];
+      const px = sx(peakX), py = sy(peakY);
+      // Dashed guides down to the x-axis and across to the y-axis.
+      ctx.strokeStyle = "rgba(251,191,36,0.45)";
+      ctx.setLineDash([4, 3]); ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px, py); ctx.lineTo(px, padT + h);
+      ctx.moveTo(padL, py); ctx.lineTo(px, py);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Marker dot.
+      ctx.fillStyle = "#fbbf24";
+      ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+      // Inline numeric label next to the marker.
+      ctx.fillStyle = "#fef3c7"; ctx.font = "12px ui-monospace,Consolas,monospace";
+      ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+      ctx.fillText(`peak: ${peakY.toFixed(2)} @ ${peakX.toFixed(2)}`, px + 9, py - 4);
+
+      // Always-on side-panel readout.
+      document.getElementById("peak-y").textContent = peakY.toFixed(2);
+      document.getElementById("peak-x").textContent = peakX.toFixed(2);
+    } else {
+      document.getElementById("peak-y").textContent = "—";
+      document.getElementById("peak-x").textContent = "—";
+    }
+  }
+
+  // Hover crosshair / readout.
+  canvas.addEventListener("mousemove", (e) => {
+    const r = canvas.getBoundingClientRect();
+    const padL = 50, padR = 16, padT = 32, padB = 32;
+    const w = r.width - padL - padR, h = r.height - padT - padB;
+    const px = e.clientX - r.left, py = e.clientY - r.top;
+    if (px < padL || px > padL + w || py < padT || py > padT + h) return;
+    const x = CONFIG.x_min + ((px - padL) / w) * (CONFIG.x_max - CONFIG.x_min);
+    rebuildScope(); scope[CONFIG.x_var || "x"] = x;
+    let y;
+    try { y = compiled.evaluate(scope); } catch { y = NaN; }
+    document.getElementById("ro-x").textContent = x.toFixed(2);
+    document.getElementById("ro-y").textContent = Number.isFinite(y) ? y.toFixed(3) : "—";
+  });
+
+  // Initial layout + first draw.
+  setTimeout(resize, 0);
+</script>
+</body>
+</html>
