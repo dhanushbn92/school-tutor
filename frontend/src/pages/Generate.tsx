@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectLabel,
   SelectSeparator,
@@ -379,23 +380,37 @@ export function GeneratePage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {SIM_TEMPLATES.map((t, i) => (
-                        <Fragment key={t.value}>
-                          {/* When this option opens a new section,
-                              emit a separator above (except for the
-                              very first section) plus the group's
-                              uppercase label. Selecting an item
-                              still selects normally; the separator
-                              and label are inert. */}
-                          {t.group && (
-                            <>
-                              {i > 0 && <SelectSeparator />}
-                              <SelectLabel>{t.group}</SelectLabel>
-                            </>
-                          )}
-                          <SelectItem value={t.value}>{t.label}</SelectItem>
-                        </Fragment>
-                      ))}
+                      {/* Partition the flat SIM_TEMPLATES list at every
+                          item that starts a new group. Each partition
+                          renders as a Radix `SelectGroup` with its
+                          own `SelectLabel`. This is the structure
+                          Radix expects — wrapping `Label` directly
+                          inside `Content` (without `Group`) caused
+                          the page to blank on simulation selection in
+                          some browsers. */}
+                      {(() => {
+                        const groups: { name: string | null; items: typeof SIM_TEMPLATES }[] = [];
+                        for (const t of SIM_TEMPLATES) {
+                          if (t.group || groups.length === 0) {
+                            groups.push({ name: t.group ?? null, items: [t] });
+                          } else {
+                            groups[groups.length - 1].items.push(t);
+                          }
+                        }
+                        return groups.map((g, gi) => (
+                          <Fragment key={g.name ?? `__nogroup_${gi}`}>
+                            {gi > 0 && <SelectSeparator />}
+                            <SelectGroup>
+                              {g.name && <SelectLabel>{g.name}</SelectLabel>}
+                              {g.items.map((t) => (
+                                <SelectItem key={t.value} value={t.value}>
+                                  {t.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </Fragment>
+                        ));
+                      })()}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-(--color-muted-foreground)">
