@@ -28,7 +28,11 @@ from app.llm.schemas.diagram import DiagramOutput
 from app.llm.schemas.lesson_plan import LessonPlanOutput
 from app.llm.schemas.ppt import PPTOutlineOutput
 from app.llm.schemas.quiz import QuizOutput
-from app.llm.schemas.simulation import SimulationOutput
+from app.llm.schemas.simulation import (
+    SimulationOutput,
+    expand_to_simulation_output,
+    simulation_schema_for_template,
+)
 from app.llm.schemas.worksheet import WorksheetOutput, WorksheetQuestion
 from app.models.curriculum import BloomLevel, LearningOutcome
 from app.models.generation import GeneratedContent, GeneratedContentStatus, GeneratedContentType
@@ -345,18 +349,49 @@ def _run_simulation_job(db: Session, row: GeneratedContent) -> None:
             f"Supported: {sorted(_SIMULATION_TEMPLATES)}"
         )
 
+    # Token-budget optimisation. The full SimulationOutput schema
+    # serialises to ~6 K tokens because it has to describe all 15
+    # template-specific config types. When the admin pinned a specific
+    # template, we only need that ONE template's fields in the schema —
+    # typically 500-1 500 tokens. Big difference on Groq's 12 K
+    # per-request TPM ceiling.
+    #
+    # Plus: the simulation prompt needs less prose context than e.g.
+    # worksheet (which writes a lesson-style narrative). Trim the
+    # chapter text to a tighter 8 K chars (~2 K tokens) for sim only.
+    if forced_template:
+        schema_model = simulation_schema_for_template(forced_template)
+    else:
+        # Auto-pick: the LLM has to choose, so it does need to see
+        # all 15 template options. Stuck with the larger schema here
+        # (recommend Anthropic for "auto" if Groq free tier blows up).
+        schema_model = SimulationOutput
+    SIM_MAX_CHAPTER_CHARS = 8_000
+    chapter_text_for_sim = req.chapter_text
+    if len(chapter_text_for_sim) > SIM_MAX_CHAPTER_CHARS:
+        chapter_text_for_sim = chapter_text_for_sim[:SIM_MAX_CHAPTER_CHARS] + "\n…[further truncated for simulation prompt]"
+    sim_req = req.model_copy(update={"chapter_text": chapter_text_for_sim})
+
     log.info(
-        "generation job %s: calling LLM for simulation ch=%s (template=%s)",
+        "generation job %s: calling LLM for simulation ch=%s (template=%s, schema=%s)",
         row.id,
         context["chapter_number"],
         forced_template or "auto",
+        schema_model.__name__,
     )
-    sim = provider.generate_structured(
+    raw = provider.generate_structured(
         system=SIMULATION_SYSTEM_PROMPT,
-        user=build_simulation_user_prompt(req, forced_template=forced_template),
-        response_model=SimulationOutput,
+        user=build_simulation_user_prompt(sim_req, forced_template=forced_template),
+        response_model=schema_model,
         temperature=float(options.get("temperature", 0.3)),
     )
+    # Widen back to the full SimulationOutput so downstream code (renderer,
+    # validator) sees the canonical type. For the auto path, raw IS already
+    # a SimulationOutput; for the forced path we round-trip through the dict.
+    if isinstance(raw, SimulationOutput):
+        sim = raw
+    else:
+        sim = expand_to_simulation_output(raw.model_dump())
 
     html_bytes = render_simulation_html(sim)
     artifact_path = get_artifact_store().save(content_id=row.id, extension="html", data=html_bytes)

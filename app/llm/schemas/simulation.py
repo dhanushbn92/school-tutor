@@ -639,3 +639,90 @@ class SimulationOutput(BaseModel):
                         f"edge connects '{edge.from_name}' to itself"
                     )
         return self
+
+
+# ---------- per-template schema views (token-budget optimisation) ----------
+#
+# When the platform admin picks a SPECIFIC simulation template (vs. "Auto
+# (let AI pick)"), we don't need to send the LLM the JSON schema for all
+# 15 templates' optional fields — just the one it's going to fill. The
+# full SimulationOutput schema serialises to ~6 K tokens; a per-template
+# slice is typically ~500–1 500 tokens.
+#
+# The function below returns a small Pydantic model tailored to one
+# template, with:
+#   - `template` pinned to the matching Literal value
+#   - the four common fields (title / instructions / outcome_codes_covered)
+#   - exactly the optional fields the template's validator demands
+#
+# Output of an LLM call against the small model can be widened to the
+# full `SimulationOutput` via `.model_dump()` + `SimulationOutput.model_validate()`.
+
+from pydantic import create_model
+
+# Mapping from template name → list of (field_name, type_annotation) tuples.
+# Each list contains JUST the optional fields that template's validator
+# requires. Adding a new template means adding one entry here.
+_TEMPLATE_FIELDS: dict[str, list[tuple[str, type]]] = {
+    "match_pairs":         [("pairs", list[MatchPair])],
+    "categorize":          [("bins", list[CategorizeBin]), ("items", list[CategorizeItem])],
+    "three_d_scene":       [("objects_3d", list[SceneObject3D]), ("edges_3d", list[SceneEdge3D] | None)],
+    "timeline_order":      [("events_timeline", list[TimelineEvent])],
+    "three_d_projectile":  [("projectile", ProjectileConfig)],
+    "three_d_orbit":       [("orbit", OrbitScene)],
+    "three_d_field_lines": [("field_lines", FieldLineScene)],
+    "three_d_wave":        [("wave", WaveScene)],
+    "graph_explorer":      [("graph", GraphExplorer)],
+    "labeled_hotspots":    [("hotspots", LabeledHotspots)],
+    "sentence_builder":    [("sentence", SentenceBuilder)],
+    "vocab_pairs":         [("vocab", VocabPairs)],
+    "molecule_3d":         [("molecule", Molecule3D)],
+    "circuit_2d":          [("circuit", Circuit2D)],
+    "custom_html":         [("custom", CustomHtml)],
+}
+
+
+def simulation_schema_for_template(template: str) -> type[BaseModel]:
+    """Return a small Pydantic model whose JSON schema is just the
+    fields needed for one specific simulation template. Used to keep
+    the system prompt under provider per-request token limits.
+
+    The returned model is structurally a SUBSET of SimulationOutput, so
+    a call to `result.model_dump()` round-trips through
+    `SimulationOutput.model_validate()` without changes.
+    """
+    if template not in _TEMPLATE_FIELDS:
+        raise ValueError(f"Unknown simulation template: {template!r}")
+
+    base_fields: dict[str, tuple[type, Any]] = {
+        # Pin the template literal so the LLM can't drift to a different one.
+        "template": (Literal[template], ...),  # type: ignore[valid-type]
+        "title": (str, Field(min_length=5, max_length=200)),
+        "instructions": (str, Field(min_length=10, max_length=500)),
+        "outcome_codes_covered": (list[str], Field(default_factory=list)),
+    }
+    # Add the template-specific required field(s).
+    for name, type_ in _TEMPLATE_FIELDS[template]:
+        base_fields[name] = (type_, ...)
+
+    # Dynamically build a Pydantic v2 model. The class name is purely
+    # informational (shows up in the schema's "title") so we keep it
+    # readable.
+    model_cls = create_model(
+        f"SimulationOutput_{template}",
+        __base__=BaseModel,
+        **base_fields,
+    )
+    return model_cls
+
+
+def expand_to_simulation_output(narrow_dump: dict) -> "SimulationOutput":
+    """Take a dict produced by a per-template model and re-validate as
+    the full `SimulationOutput`. The narrow model is a structural subset,
+    so this just runs the full validator (which checks any
+    cross-field invariants the narrow model didn't enforce)."""
+    return SimulationOutput.model_validate(narrow_dump)
+
+
+# `Any` import is needed for the tuple type annotation above.
+from typing import Any  # noqa: E402  (kept here because it's only used by the helper)
