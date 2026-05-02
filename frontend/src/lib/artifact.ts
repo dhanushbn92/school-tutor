@@ -56,6 +56,37 @@ export async function openArtifact(
   } catch (err) {
     // Don't leave a blank tab hanging if the fetch fails.
     tab?.close();
+    // For 4xx errors the backend returns JSON in the response body
+    // (e.g. {"detail": "Auto-heal failed: ..."}). Axios delivers it
+    // as a Blob because we asked for responseType:"blob" — convert
+    // back to text so the user sees an actionable error message in
+    // the toast instead of the generic axios "Request failed with
+    // status code 410". Falls through to the original error if the
+    // response shape isn't recognisable.
+    const axiosErr = err as { response?: { status?: number; data?: Blob } };
+    const blobBody = axiosErr?.response?.data;
+    if (blobBody instanceof Blob) {
+      try {
+        const text = await blobBody.text();
+        const parsed = JSON.parse(text) as { detail?: string };
+        const status = axiosErr.response?.status ?? "?";
+        if (parsed?.detail) {
+          toast.error(`Couldn't open simulation (HTTP ${status}): ${parsed.detail}`);
+          return;
+        }
+      } catch {
+        /* fall through */
+      }
+    }
+    // Network errors (no response from server) also land here. Distinguish
+    // these from server errors so admins can tell whether the request
+    // even arrived.
+    if (!axiosErr?.response) {
+      toast.error(
+        "Network error reaching the server. Check your connection; if it persists, the backend may be down or returning a 5xx without CORS headers.",
+      );
+      return;
+    }
     throw err;
   }
 
