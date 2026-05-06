@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match each development concept to its meaning</title>
+  <style>
+    :root { --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --accent:#2563eb; --ok:#16a34a; --err:#dc2626; --muted:#64748b; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #0f172a; margin: 0; padding: 24px; }
+    header { max-width: 960px; margin: 0 auto 24px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    p.instructions { color: var(--muted); margin: 0; }
+    main { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .col h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; }
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .card:hover { border-color: var(--accent); }
+    .card.selected { border-color: var(--accent); background: #eff6ff; }
+    .card.ok { border-color: var(--ok); background: #f0fdf4; cursor: default; }
+    .card.err { border-color: var(--err); background: #fef2f2; }
+    .card.done { opacity: .55; cursor: default; }
+    footer { max-width: 960px; margin: 20px auto 0; display:flex; justify-content: space-between; align-items: center; color: var(--muted); }
+    button { background: var(--accent); color: white; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Match each development concept to its meaning</h1>
+    <p class="instructions">Drag each term on the left to the matching definition on the right. Concepts include income, indicators, public facilities, HDI components and sustainability ideas.</p>
+  </header>
+  <main>
+    <div class="col">
+      <h2>Terms</h2>
+      <div id="terms"></div>
+    </div>
+    <div class="col">
+      <h2>Match</h2>
+      <div id="matches"></div>
+    </div>
+  </main>
+  <footer>
+    <span id="score">Score: 0 / <span id="total">0</span></span>
+    <button id="reset" type="button">Reset</button>
+  </footer>
+  <script>
+    const PAIRS = [{"term": "Per capita income", "match": "Total income of a country \u00f7 total population"}, {"term": "World Bank", "match": "International body that classifies countries by income"}, {"term": "Public facility", "match": "Government-provided service like a public school or PHC"}, {"term": "Public goods", "match": "Benefits everyone and cannot be sold individually"}, {"term": "Infant Mortality Rate", "match": "Children dying per 1000 live births in a year"}, {"term": "Literacy rate", "match": "Proportion of population aged 7+ that is literate"}, {"term": "Net Attendance Ratio", "match": "Children of age 6\u201310 attending school as % of all such children"}, {"term": "Life expectancy", "match": "Average expected length of life of a person at birth"}, {"term": "Human Development Index", "match": "UNDP composite of income, life expectancy and schooling"}, {"term": "UNDP", "match": "UN body that publishes the Human Development Report"}, {"term": "Sustainable development", "match": "Meeting present needs without compromising future generations"}, {"term": "Groundwater extraction", "match": "India is the world's largest; resource is being over-pumped"}, {"term": "Crude oil reserves", "match": "World's reserves last only ~35\u201340 years at current rates"}];
+    const termsEl = document.getElementById("terms");
+    const matchesEl = document.getElementById("matches");
+    const scoreEl = document.getElementById("score");
+    document.getElementById("total").textContent = PAIRS.length;
+
+    function shuffle(arr) { return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]); }
+
+    let selectedTerm = null;
+    let correct = 0;
+
+    function render() {
+      termsEl.innerHTML = "";
+      matchesEl.innerHTML = "";
+      selectedTerm = null;
+      correct = 0;
+      scoreEl.firstChild.textContent = `Score: 0 / `;
+
+      PAIRS.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = p.term;
+        card.dataset.index = index;
+        card.addEventListener("click", () => onTermClick(card, index));
+        termsEl.appendChild(card);
+      });
+      shuffle(PAIRS.map((p, i) => ({ text: p.match, index: i }))).forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = m.text;
+        card.dataset.index = m.index;
+        card.addEventListener("click", () => onMatchClick(card, m.index));
+        matchesEl.appendChild(card);
+      });
+    }
+
+    function onTermClick(card, index) {
+      if (card.classList.contains("done")) return;
+      termsEl.querySelectorAll(".card.selected").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedTerm = { el: card, index };
+    }
+
+    function onMatchClick(card, index) {
+      if (card.classList.contains("done") || !selectedTerm) return;
+      if (selectedTerm.index === index) {
+        selectedTerm.el.classList.add("ok", "done");
+        selectedTerm.el.classList.remove("selected");
+        card.classList.add("ok", "done");
+        correct += 1;
+        scoreEl.firstChild.textContent = `Score: ${correct} / `;
+        selectedTerm = null;
+      } else {
+        card.classList.add("err");
+        setTimeout(() => card.classList.remove("err"), 500);
+      }
+    }
+
+    document.getElementById("reset").addEventListener("click", render);
+    render();
+  </script>
+</body>
+</html>

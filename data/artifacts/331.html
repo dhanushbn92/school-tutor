@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sort each scenario into AP, NOT AP, or recognise the formula to apply</title>
+<style>
+  :root { --bg:#f6f7fb; --card:#ffffff; --border:#e2e6ef; --ink:#0f172a; --muted:#64748b; --accent:#2563eb; --accent-soft:#eff6ff; --ok:#16a34a; --ok-soft:#ecfdf5; --err:#dc2626; --err-soft:#fef2f2; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; min-height:100vh; padding:24px; }
+  header { max-width:1100px; margin:0 auto 20px; }
+  h1 { margin:0 0 4px; font-size:24px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:0; color:var(--muted); }
+  main { max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 260px 1fr; gap:22px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  section h2 { margin:0 0 10px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
+  #pool { min-height:180px; }
+  #pool-items { display:flex; flex-wrap:wrap; gap:8px; }
+  .item { background:#f1f5f9; border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:14px; cursor:grab; user-select:none; transition: border-color .15s, transform .1s, box-shadow .15s; }
+  .item:hover { border-color:var(--accent); }
+  .item.dragging { opacity:0.5; cursor:grabbing; }
+  .item.ok { background:var(--ok-soft); border-color:var(--ok); color:#14532d; }
+  .item.err { background:var(--err-soft); border-color:var(--err); color:#7f1d1d; animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+  #bins { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+  .bin { background:#fafbff; border:2px dashed var(--border); border-radius:12px; padding:14px; min-height:170px; transition: border-color .15s, background .15s; }
+  .bin.drop { border-color:var(--accent); background:var(--accent-soft); }
+  .bin-name { font-weight:600; font-size:14px; margin-bottom:2px; }
+  .bin-desc { color:var(--muted); font-size:12px; margin-bottom:10px; line-height:1.4; }
+  .bin-items { display:flex; flex-wrap:wrap; gap:6px; min-height:32px; }
+  footer { max-width:1100px; margin:20px auto 0; display:flex; justify-content:space-between; align-items:center; color:var(--muted); }
+  .status { font-size:14px; }
+  .status .n-correct { color:var(--ok); font-weight:600; }
+  .status .n-remaining { font-weight:600; color:var(--ink); }
+  button { background:var(--accent); color:white; border:0; padding:8px 18px; border-radius:8px; font-size:14px; cursor:pointer; font-weight:500; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--border); }
+  button:disabled { background:#94a3b8; cursor:not-allowed; }
+  .banner { display:none; margin-top:10px; padding:12px 14px; background:var(--ok-soft); border:1px solid var(--ok); border-radius:10px; color:#14532d; font-size:14px; }
+  .banner.show { display:block; animation: pop .3s ease-out; }
+  @keyframes pop { from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1} }
+  .feedback-tip { font-size:12px; color:var(--muted); font-style:italic; margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sort each scenario into AP, NOT AP, or recognise the formula to apply</h1>
+  <p class="sub">Drag each card into the bin that best describes the situation. Watch for the keyword &#x27;difference&#x27;: constant difference ⇒ AP. For AP situations, decide whether the question wants a particular term (use aₙ) or a partial sum (use Sₙ).</p>
+</header>
+
+<main>
+  <section id="pool" aria-label="Items to categorise">
+    <h2>Items</h2>
+    <div id="pool-items"></div>
+    <div class="feedback-tip" id="tip">Drag items into the correct bin on the right.</div>
+  </section>
+
+  <section aria-label="Categories">
+    <h2>Bins</h2>
+    <div id="bins"></div>
+    <div class="banner" id="done-banner">
+      Great job! You sorted everything correctly.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="status">
+    <span class="n-correct" id="n-correct">0</span> of
+    <span class="n-remaining" id="n-total">0</span> sorted correctly.
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button class="ghost" id="shuffle">Shuffle</button>
+    <button class="ghost" id="reset">Reset</button>
+  </div>
+</footer>
+
+<script>
+const BINS  = [{"name": "AP \u2014 apply nth term a\u2099", "description": "Constant common difference and the question asks for one specific term."}, {"name": "AP \u2014 apply sum S\u2099", "description": "Constant common difference and the question asks for the total over a stretch of terms."}, {"name": "NOT an AP", "description": "Consecutive differences are not all equal."}, {"name": "AM / Inserting means", "description": "Question is about the arithmetic mean of two numbers or inserting means between them."}];
+const ITEMS = [{"name": "Find the 25th term of 5, 8, 11, 14, \u2026", "correct_bin": "AP \u2014 apply nth term a\u2099", "explanation": "Constant d = 3; one specific term requested."}, {"name": "Which term of 3, 7, 11, 15, \u2026 equals 99?", "correct_bin": "AP \u2014 apply nth term a\u2099", "explanation": "Reverse a\u2099 formula to solve for n."}, {"name": "a\u2084 = 14 and a\u2081\u2080 = 38; find the AP.", "correct_bin": "AP \u2014 apply nth term a\u2099", "explanation": "Use two-term recovery to find (a, d)."}, {"name": "Find the sum of the first 20 terms of 5, 8, 11, \u2026", "correct_bin": "AP \u2014 apply sum S\u2099", "explanation": "Constant d; partial sum requested."}, {"name": "Compute 2 + 4 + 6 + \u2026 + 100", "correct_bin": "AP \u2014 apply sum S\u2099", "explanation": "Last term given; use S\u2099 = n/2 \u00b7 (a + l)."}, {"name": "Total of 12 monthly instalments \u2014 first 500, each next \u221225", "correct_bin": "AP \u2014 apply sum S\u2099", "explanation": "Total = sum of an AP."}, {"name": "1, 4, 9, 16, 25, \u2026", "correct_bin": "NOT an AP", "explanation": "Differences 3, 5, 7, 9 \u2014 not constant."}, {"name": "1, 1, 2, 3, 5, 8 (Fibonacci)", "correct_bin": "NOT an AP", "explanation": "Differences 0, 1, 1, 2, 3 \u2014 not constant."}, {"name": "1, 2, 4, 8, 16 (powers of 2)", "correct_bin": "NOT an AP", "explanation": "Ratios constant (geometric); differences not."}, {"name": "Find the AM of 17 and 23", "correct_bin": "AM / Inserting means", "explanation": "AM(a, b) = (a + b)/2 = 20."}, {"name": "Insert 4 arithmetic means between 3 and 23", "correct_bin": "AM / Inserting means", "explanation": "d = (b \u2212 a)/(n + 1) = 4; means 7, 11, 15, 19."}, {"name": "Place A between a and b so that a, A, b is an AP", "correct_bin": "AM / Inserting means", "explanation": "A is the AM of a and b."}];
+
+const poolEl = document.getElementById("pool-items");
+const binsEl = document.getElementById("bins");
+const nCorrect = document.getElementById("n-correct");
+const nTotal = document.getElementById("n-total");
+const doneBanner = document.getElementById("done-banner");
+const tip = document.getElementById("tip");
+
+nTotal.textContent = ITEMS.length;
+let placements = {};   // itemName -> binName (or null for pool)
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function render() {
+  poolEl.innerHTML = "";
+  const itemsInPool = shuffleArray(ITEMS.filter(i => !placements[i.name] || placements[i.name] === "__pool__"));
+  itemsInPool.forEach(it => poolEl.appendChild(makeChip(it)));
+
+  binsEl.innerHTML = "";
+  BINS.forEach(bin => {
+    const wrap = document.createElement("div");
+    wrap.className = "bin";
+    wrap.dataset.bin = bin.name;
+    wrap.innerHTML = `
+      <div class="bin-name">${escapeHtml(bin.name)}</div>
+      ${bin.description ? `<div class="bin-desc">${escapeHtml(bin.description)}</div>` : ""}
+      <div class="bin-items" data-bin="${escapeHtml(bin.name)}"></div>
+    `;
+    binsEl.appendChild(wrap);
+
+    const inThisBin = ITEMS.filter(i => placements[i.name] === bin.name);
+    const itemsContainer = wrap.querySelector(".bin-items");
+    inThisBin.forEach(it => itemsContainer.appendChild(makeChip(it, true)));
+
+    // Drag targets
+    wrap.addEventListener("dragover", (e) => { e.preventDefault(); wrap.classList.add("drop"); });
+    wrap.addEventListener("dragleave", () => wrap.classList.remove("drop"));
+    wrap.addEventListener("drop", (e) => {
+      e.preventDefault();
+      wrap.classList.remove("drop");
+      const itemName = e.dataTransfer.getData("text/plain");
+      placeItem(itemName, bin.name);
+    });
+  });
+
+  updateStatus();
+}
+
+function makeChip(item, placed = false) {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.draggable = true;
+  div.textContent = item.name;
+  div.dataset.name = item.name;
+  if (placed) {
+    const ok = placements[item.name] === item.correct_bin;
+    div.classList.add(ok ? "ok" : "err");
+    if (!ok && item.explanation) {
+      div.title = "Hint: " + item.explanation;
+    } else if (ok && item.explanation) {
+      div.title = item.explanation;
+    }
+  }
+  div.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", item.name);
+    div.classList.add("dragging");
+  });
+  div.addEventListener("dragend", () => div.classList.remove("dragging"));
+  return div;
+}
+
+function placeItem(itemName, binName) {
+  const item = ITEMS.find(i => i.name === itemName);
+  if (!item) return;
+  placements[itemName] = binName;
+  render();
+  if (item.correct_bin !== binName && item.explanation) {
+    tip.textContent = `${item.name}: ${item.explanation}`;
+  } else if (item.correct_bin === binName) {
+    tip.textContent = item.explanation ? `Correct — ${item.explanation}` : "Correct!";
+  }
+}
+
+function updateStatus() {
+  const correct = ITEMS.filter(i => placements[i.name] === i.correct_bin).length;
+  nCorrect.textContent = correct;
+  nCorrect.style.color = correct === ITEMS.length ? "var(--ok)" : "";
+  if (correct === ITEMS.length) {
+    doneBanner.classList.add("show");
+  } else {
+    doneBanner.classList.remove("show");
+  }
+}
+
+document.getElementById("reset").addEventListener("click", () => {
+  placements = {};
+  tip.textContent = "Drag items into the correct bin on the right.";
+  render();
+});
+document.getElementById("shuffle").addEventListener("click", render);
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+render();
+</script>
+</body>
+</html>

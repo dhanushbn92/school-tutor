@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sort each fraction by its decimal expansion</title>
+<style>
+  :root { --bg:#f6f7fb; --card:#ffffff; --border:#e2e6ef; --ink:#0f172a; --muted:#64748b; --accent:#2563eb; --accent-soft:#eff6ff; --ok:#16a34a; --ok-soft:#ecfdf5; --err:#dc2626; --err-soft:#fef2f2; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; min-height:100vh; padding:24px; }
+  header { max-width:1100px; margin:0 auto 20px; }
+  h1 { margin:0 0 4px; font-size:24px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:0; color:var(--muted); }
+  main { max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 260px 1fr; gap:22px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  section h2 { margin:0 0 10px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
+  #pool { min-height:180px; }
+  #pool-items { display:flex; flex-wrap:wrap; gap:8px; }
+  .item { background:#f1f5f9; border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:14px; cursor:grab; user-select:none; transition: border-color .15s, transform .1s, box-shadow .15s; }
+  .item:hover { border-color:var(--accent); }
+  .item.dragging { opacity:0.5; cursor:grabbing; }
+  .item.ok { background:var(--ok-soft); border-color:var(--ok); color:#14532d; }
+  .item.err { background:var(--err-soft); border-color:var(--err); color:#7f1d1d; animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+  #bins { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+  .bin { background:#fafbff; border:2px dashed var(--border); border-radius:12px; padding:14px; min-height:170px; transition: border-color .15s, background .15s; }
+  .bin.drop { border-color:var(--accent); background:var(--accent-soft); }
+  .bin-name { font-weight:600; font-size:14px; margin-bottom:2px; }
+  .bin-desc { color:var(--muted); font-size:12px; margin-bottom:10px; line-height:1.4; }
+  .bin-items { display:flex; flex-wrap:wrap; gap:6px; min-height:32px; }
+  footer { max-width:1100px; margin:20px auto 0; display:flex; justify-content:space-between; align-items:center; color:var(--muted); }
+  .status { font-size:14px; }
+  .status .n-correct { color:var(--ok); font-weight:600; }
+  .status .n-remaining { font-weight:600; color:var(--ink); }
+  button { background:var(--accent); color:white; border:0; padding:8px 18px; border-radius:8px; font-size:14px; cursor:pointer; font-weight:500; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--border); }
+  button:disabled { background:#94a3b8; cursor:not-allowed; }
+  .banner { display:none; margin-top:10px; padding:12px 14px; background:var(--ok-soft); border:1px solid var(--ok); border-radius:10px; color:#14532d; font-size:14px; }
+  .banner.show { display:block; animation: pop .3s ease-out; }
+  @keyframes pop { from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1} }
+  .feedback-tip { font-size:12px; color:var(--muted); font-style:italic; margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Sort each fraction by its decimal expansion</h1>
+  <p class="sub">For each fraction, decide whether its decimal expansion TERMINATES or is NON-TERMINATING (repeating). Hint: look at the denominator after reducing to lowest terms. If it is 2^m · 5^n only — terminates. Otherwise — non-terminating.</p>
+</header>
+
+<main>
+  <section id="pool" aria-label="Items to categorise">
+    <h2>Items</h2>
+    <div id="pool-items"></div>
+    <div class="feedback-tip" id="tip">Drag items into the correct bin on the right.</div>
+  </section>
+
+  <section aria-label="Categories">
+    <h2>Bins</h2>
+    <div id="bins"></div>
+    <div class="banner" id="done-banner">
+      Great job! You sorted everything correctly.
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="status">
+    <span class="n-correct" id="n-correct">0</span> of
+    <span class="n-remaining" id="n-total">0</span> sorted correctly.
+  </div>
+  <div style="display:flex; gap:8px;">
+    <button class="ghost" id="shuffle">Shuffle</button>
+    <button class="ghost" id="reset">Reset</button>
+  </div>
+</footer>
+
+<script>
+const BINS  = [{"name": "Terminating", "description": "Denominator (in lowest terms) has ONLY 2's and 5's as prime factors."}, {"name": "Non-terminating (repeating)", "description": "Denominator has a prime factor OTHER than 2 or 5."}, {"name": "Irrational (not rational at all)", "description": "Cannot be written as p/q; decimal is non-terminating, non-repeating."}];
+const ITEMS = [{"name": "1/2", "correct_bin": "Terminating", "explanation": "Denominator is 2."}, {"name": "3/4", "correct_bin": "Terminating", "explanation": "Denominator 4 = 2\u00b2."}, {"name": "1/8", "correct_bin": "Terminating", "explanation": "Denominator 8 = 2\u00b3."}, {"name": "7/8", "correct_bin": "Terminating", "explanation": "Denominator 8 = 2\u00b3."}, {"name": "17/40", "correct_bin": "Terminating", "explanation": "40 = 2\u00b3\u00b75."}, {"name": "13/3125", "correct_bin": "Terminating", "explanation": "3125 = 5\u2075."}, {"name": "1/3", "correct_bin": "Non-terminating (repeating)", "explanation": "Denominator 3 \u2014 non-2/5 prime."}, {"name": "1/7", "correct_bin": "Non-terminating (repeating)", "explanation": "Denominator 7."}, {"name": "23/30", "correct_bin": "Non-terminating (repeating)", "explanation": "30 = 2\u00b73\u00b75 \u2014 has a 3."}, {"name": "1/12", "correct_bin": "Non-terminating (repeating)", "explanation": "12 = 2\u00b2\u00b73 \u2014 has a 3."}, {"name": "\u221a2", "correct_bin": "Irrational (not rational at all)", "explanation": "Famous irrational."}, {"name": "\u03c0", "correct_bin": "Irrational (not rational at all)", "explanation": "Pi is irrational (and transcendental)."}];
+
+const poolEl = document.getElementById("pool-items");
+const binsEl = document.getElementById("bins");
+const nCorrect = document.getElementById("n-correct");
+const nTotal = document.getElementById("n-total");
+const doneBanner = document.getElementById("done-banner");
+const tip = document.getElementById("tip");
+
+nTotal.textContent = ITEMS.length;
+let placements = {};   // itemName -> binName (or null for pool)
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function render() {
+  poolEl.innerHTML = "";
+  const itemsInPool = shuffleArray(ITEMS.filter(i => !placements[i.name] || placements[i.name] === "__pool__"));
+  itemsInPool.forEach(it => poolEl.appendChild(makeChip(it)));
+
+  binsEl.innerHTML = "";
+  BINS.forEach(bin => {
+    const wrap = document.createElement("div");
+    wrap.className = "bin";
+    wrap.dataset.bin = bin.name;
+    wrap.innerHTML = `
+      <div class="bin-name">${escapeHtml(bin.name)}</div>
+      ${bin.description ? `<div class="bin-desc">${escapeHtml(bin.description)}</div>` : ""}
+      <div class="bin-items" data-bin="${escapeHtml(bin.name)}"></div>
+    `;
+    binsEl.appendChild(wrap);
+
+    const inThisBin = ITEMS.filter(i => placements[i.name] === bin.name);
+    const itemsContainer = wrap.querySelector(".bin-items");
+    inThisBin.forEach(it => itemsContainer.appendChild(makeChip(it, true)));
+
+    // Drag targets
+    wrap.addEventListener("dragover", (e) => { e.preventDefault(); wrap.classList.add("drop"); });
+    wrap.addEventListener("dragleave", () => wrap.classList.remove("drop"));
+    wrap.addEventListener("drop", (e) => {
+      e.preventDefault();
+      wrap.classList.remove("drop");
+      const itemName = e.dataTransfer.getData("text/plain");
+      placeItem(itemName, bin.name);
+    });
+  });
+
+  updateStatus();
+}
+
+function makeChip(item, placed = false) {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.draggable = true;
+  div.textContent = item.name;
+  div.dataset.name = item.name;
+  if (placed) {
+    const ok = placements[item.name] === item.correct_bin;
+    div.classList.add(ok ? "ok" : "err");
+    if (!ok && item.explanation) {
+      div.title = "Hint: " + item.explanation;
+    } else if (ok && item.explanation) {
+      div.title = item.explanation;
+    }
+  }
+  div.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", item.name);
+    div.classList.add("dragging");
+  });
+  div.addEventListener("dragend", () => div.classList.remove("dragging"));
+  return div;
+}
+
+function placeItem(itemName, binName) {
+  const item = ITEMS.find(i => i.name === itemName);
+  if (!item) return;
+  placements[itemName] = binName;
+  render();
+  if (item.correct_bin !== binName && item.explanation) {
+    tip.textContent = `${item.name}: ${item.explanation}`;
+  } else if (item.correct_bin === binName) {
+    tip.textContent = item.explanation ? `Correct — ${item.explanation}` : "Correct!";
+  }
+}
+
+function updateStatus() {
+  const correct = ITEMS.filter(i => placements[i.name] === i.correct_bin).length;
+  nCorrect.textContent = correct;
+  nCorrect.style.color = correct === ITEMS.length ? "var(--ok)" : "";
+  if (correct === ITEMS.length) {
+    doneBanner.classList.add("show");
+  } else {
+    doneBanner.classList.remove("show");
+  }
+}
+
+document.getElementById("reset").addEventListener("click", () => {
+  placements = {};
+  tip.textContent = "Drag items into the correct bin on the right.";
+  render();
+});
+document.getElementById("shuffle").addEventListener("click", render);
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+render();
+</script>
+</body>
+</html>
