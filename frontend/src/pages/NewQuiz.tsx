@@ -146,7 +146,10 @@ export function NewQuizPage() {
         difficulty_mix: useDifficultyMix ? scaledMix : undefined,
         cognitive_mix: useCognitiveMix ? scaledCognitiveMix : undefined,
       });
-      toast.success(`Quiz ready (#${created.id}) · ${created.questions.length} questions sampled`);
+      toast.success(
+        `Quiz ready (#${created.id}) · ${created.questions.length} questions sampled. ` +
+          `Tap Publish on the next page to share it with the section.`,
+      );
       navigate(`/assessments/${created.id}`);
     } catch (err) {
       toast.error(humanError(err));
@@ -421,11 +424,14 @@ export function NewQuizPage() {
               count, drop a filter, or ping the platform team to expand that area of the bank.
             </p>
             <p>
-              After creation the quiz is in <strong>DRAFT</strong>. Open it from{" "}
+              After creation the quiz lands in <strong>DRAFT</strong> and is invisible
+              to students. The detail page that opens next has a{" "}
+              <strong>Publish to section</strong> button — one click and the quiz
+              becomes visible to everyone in the section. You can also publish from the{" "}
               <Link to="/assessments" className="text-(--color-primary) underline-offset-4 hover:underline">
                 Assessments
               </Link>{" "}
-              to publish it to the section.
+              list using the inline Publish action.
             </p>
             <p className="rounded-md bg-(--color-muted) px-3 py-2 text-xs text-(--color-muted-foreground)">
               <ArrowRight className="mr-1 inline h-3 w-3" />
