@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>कहानी की घटनाओं को सही क्रम में लगाओ</title>
+<style>
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#22d3ee; --ok:#22c55e; --bad:#ef4444; }
+  html,body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { padding:24px; box-sizing:border-box; }
+  header { max-width:780px; margin:0 auto 14px; }
+  h1 { margin:0; font-size:20px; font-weight:600; }
+  p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+  .target { margin:10px 0 0; padding:10px 14px; background:rgba(34,211,238,0.08); border-left:3px solid var(--accent); border-radius:6px; font-size:14px; color:#dbe1ec; }
+  #wrap { max-width:780px; margin:0 auto; }
+  h2 { margin:18px 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .zone { min-height:60px; padding:10px; border:1px dashed var(--border); border-radius:12px; display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; }
+  .zone.over { border-color:var(--accent); background:rgba(34,211,238,0.06); }
+  .tile { padding:10px 14px; background:var(--panel); border:1px solid var(--border); border-radius:10px; font-size:15px; cursor:grab; user-select:none; transition: transform 100ms ease, border-color 100ms ease; }
+  .tile.dragging { opacity:0.4; cursor:grabbing; }
+  .tile.ok { border-color:var(--ok); background:rgba(34,197,94,0.15); }
+  .tile.bad { border-color:var(--bad); background:rgba(239,68,68,0.15); }
+  .tile.distract { font-style:italic; color:var(--muted); }
+  #actions { margin-top:14px; display:flex; gap:10px; align-items:center; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  #score { font-size:13px; color:var(--muted); }
+  #score.ok { color:var(--ok); } #score.bad { color:var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1>कहानी की घटनाओं को सही क्रम में लगाओ</h1>
+  <p class="sub">नीचे &#x27;गोल&#x27; कहानी की घटनाएँ अव्यवस्थित दी गई हैं। हर पट्टी (tile) को उसकी सही जगह पर रखो ताकि कहानी सही क्रम में बने।</p>
+  <div class="target" id="target" style="display:none"></div>
+</header>
+
+<div id="wrap">
+  <h2>Build the answer (drag tiles here)</h2>
+  <div class="zone" id="answer" data-zone="answer"></div>
+  <h2>Tile bank</h2>
+  <div class="zone" id="bank" data-zone="bank"></div>
+  <div id="actions">
+    <button class="primary" id="check">Check</button>
+    <button id="reset">Reset</button>
+    <span id="score"></span>
+  </div>
+</div>
+
+<script>
+  // CONFIG = { target_label, tiles: [{text, correct_position}], distractor_tiles: [...] }
+  const CONFIG = {"target_label": "\u0917\u094b\u0932 \u2014 \u0915\u0939\u093e\u0928\u0940 \u0915\u093e \u0938\u0939\u0940 \u0915\u094d\u0930\u092e", "tiles": [{"text": "\u092e\u094b\u0939\u0932\u094d\u0932\u0947 \u0915\u0947 \u092c\u091a\u094d\u091a\u0947 \u0936\u093e\u092e \u0915\u094b \u092e\u0948\u0926\u093e\u0928 \u092e\u0947\u0902 \u092b\u093c\u0941\u091f\u092c\u0949\u0932 \u0916\u0947\u0932\u0928\u0947 \u091c\u092e\u093e \u0939\u0941\u090f\u0964", "correct_position": 1}, {"text": "\u0926\u094b \u091f\u0940\u092e\u0947\u0902 \u092c\u0928\u0940\u0902 \u2014 \u0930\u093e\u0939\u0941\u0932 \u0915\u0940 \u0914\u0930 \u0905\u092e\u093f\u0924 \u0915\u0940\u0964", "correct_position": 2}, {"text": "\u0905\u092e\u093f\u0924 \u0928\u0947 \u0930\u093e\u0939\u0941\u0932 \u0915\u094b '\u091b\u094b\u091f\u093e' \u0915\u0939\u0915\u0930 \u0924\u093e\u0928\u093e \u092e\u093e\u0930\u093e\u0964", "correct_position": 3}, {"text": "\u0916\u0947\u0932 \u0936\u0941\u0930\u0942 \u0939\u0941\u0906; \u092c\u0940\u0938 \u092e\u093f\u0928\u091f \u092e\u0947\u0902 \u0938\u094d\u0915\u094b\u0930 \u090f\u0915-\u090f\u0915 \u0930\u0939\u093e\u0964", "correct_position": 4}, {"text": "\u0905\u091a\u093e\u0928\u0915 \u0917\u0947\u0902\u0926 \u0930\u093e\u0939\u0941\u0932 \u0915\u0947 \u092a\u093e\u0938 \u0906\u0908\u0964", "correct_position": 5}, {"text": "\u0930\u093e\u0939\u0941\u0932 \u0928\u0947 \u092b\u0941\u0930\u094d\u0924\u0940 \u0938\u0947 \u092c\u0921\u093c\u0947 \u0916\u093f\u0932\u093e\u0921\u093c\u093f\u092f\u094b\u0902 \u0915\u094b \u091a\u0915\u092e\u093e \u0926\u093f\u092f\u093e\u0964", "correct_position": 6}, {"text": "\u0909\u0938\u0928\u0947 \u090f\u0915 \u091c\u093c\u094b\u0930\u0926\u093e\u0930 \u0915\u093f\u0915 \u092e\u093e\u0930\u0940 \u0914\u0930 \u0917\u0947\u0902\u0926 \u0917\u094b\u0932\u092a\u094b\u0938\u094d\u091f \u092e\u0947\u0902 \u091a\u0932\u0940 \u0917\u0908\u0964", "correct_position": 7}, {"text": "\u091f\u0940\u092e \u0928\u0947 \u0916\u093c\u0941\u0936\u0940 \u092e\u0947\u0902 \u0930\u093e\u0939\u0941\u0932 \u0915\u094b \u0915\u0902\u0927\u094b\u0902 \u092a\u0930 \u0909\u0920\u093e \u0932\u093f\u092f\u093e\u0964", "correct_position": 8}, {"text": "\u0905\u092e\u093f\u0924 \u0928\u0947 \u0906\u0917\u0947 \u092c\u0922\u093c\u0915\u0930 \u0905\u092a\u0928\u0940 \u0917\u093c\u0932\u0924\u0940 \u092e\u093e\u0928\u0940\u0964", "correct_position": 9}], "distractor_tiles": ["\u0930\u093e\u0939\u0941\u0932 \u0928\u0947 \u0939\u093e\u0930 \u092e\u093e\u0928 \u0932\u0940 \u0914\u0930 \u0918\u0930 \u091a\u0932\u093e \u0917\u092f\u093e\u0964", "\u0905\u092e\u093f\u0924 \u0928\u0947 \u0930\u093e\u0939\u0941\u0932 \u0915\u094b \u091f\u0940\u092e \u0938\u0947 \u0928\u093f\u0915\u093e\u0932 \u0926\u093f\u092f\u093e\u0964"]};
+  if (CONFIG.target_label) {
+    const el = document.getElementById("target");
+    el.style.display = "";
+    el.textContent = CONFIG.target_label;
+  }
+
+  const bank = document.getElementById("bank");
+  const answer = document.getElementById("answer");
+
+  function shuffle(a) { return a.map(v => [Math.random(), v]).sort((p, q) => p[0] - q[0]).map(p => p[1]); }
+
+  function build() {
+    bank.innerHTML = ""; answer.innerHTML = "";
+    document.getElementById("score").textContent = "";
+    document.getElementById("score").className = "";
+    const all = [];
+    (CONFIG.tiles || []).forEach((t, i) => all.push({ text: t.text, correctPos: t.correct_position, distract: false, key: `t${i}` }));
+    (CONFIG.distractor_tiles || []).forEach((text, i) => all.push({ text, correctPos: null, distract: true, key: `d${i}` }));
+    shuffle(all).forEach(t => bank.appendChild(makeTile(t)));
+  }
+
+  function makeTile(t) {
+    const el = document.createElement("div");
+    el.className = "tile" + (t.distract ? " distract" : "");
+    el.draggable = true;
+    el.textContent = t.text;
+    el.dataset.correct = t.correctPos !== null ? String(t.correctPos) : "distract";
+    el.dataset.key = t.key;
+    el.addEventListener("dragstart", (e) => { dragging = el; el.classList.add("dragging"); e.dataTransfer.setData("text/plain", t.key); });
+    el.addEventListener("dragend", () => { dragging?.classList.remove("dragging"); dragging = null; });
+    return el;
+  }
+
+  let dragging = null;
+
+  // Drop targets: both zones accept tiles. The answer zone reorders by drop position.
+  [bank, answer].forEach((zone) => {
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("over"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault(); zone.classList.remove("over");
+      if (!dragging) return;
+      // Insertion point: after the last child whose right edge is to the
+      // left of the drop x, OR before the first whose center is to the right.
+      const x = e.clientX;
+      const children = Array.from(zone.children).filter(c => c !== dragging);
+      let inserted = false;
+      for (const c of children) {
+        const r = c.getBoundingClientRect();
+        if (x < r.left + r.width / 2) {
+          zone.insertBefore(dragging, c);
+          inserted = true; break;
+        }
+      }
+      if (!inserted) zone.appendChild(dragging);
+      // Clear any per-tile feedback markers when re-arranging.
+      dragging.classList.remove("ok"); dragging.classList.remove("bad");
+    });
+  });
+
+  document.getElementById("check").addEventListener("click", () => {
+    const tiles = Array.from(answer.children);
+    let ok = 0;
+    tiles.forEach((el, i) => {
+      const correct = el.dataset.correct;
+      const isOk = correct !== "distract" && Number(correct) === i + 1;
+      el.classList.toggle("ok", isOk);
+      el.classList.toggle("bad", !isOk);
+      if (isOk) ok++;
+    });
+    const total = (CONFIG.tiles || []).length;
+    const allCorrectPlaced = tiles.length === total && ok === total;
+    const score = document.getElementById("score");
+    score.textContent = `${ok} of ${total} in the right slot${tiles.length !== total ? ` (${tiles.length} placed)` : ""}`;
+    score.className = allCorrectPlaced ? "ok" : (ok > 0 ? "" : "bad");
+  });
+
+  document.getElementById("reset").addEventListener("click", build);
+
+  build();
+</script>
+</body>
+</html>

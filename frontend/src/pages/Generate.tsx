@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -26,7 +26,10 @@ import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -66,13 +69,66 @@ const CONTENT_TYPES: { value: GeneratedContentType; label: string; needsChapter:
   { value: "simulation", label: "Simulation (HTML)", needsChapter: true },
 ];
 
-type SimTemplate = "auto" | "three_d_scene" | "categorize" | "match_pairs";
+// Keep this in sync with `SimulationTemplate` in
+// `app/llm/schemas/simulation.py`. The dropdown is grouped by family
+// in the order it renders so admins can scan by use-case.
+type SimTemplate =
+  | "auto"
+  // Generic 2D activities
+  | "match_pairs"
+  | "categorize"
+  | "timeline_order"
+  | "sentence_builder"
+  | "vocab_pairs"
+  | "labeled_hotspots"
+  // 2D math/science
+  | "graph_explorer"
+  | "circuit_2d"
+  // 3D scenes
+  | "three_d_scene"
+  | "three_d_projectile"
+  | "three_d_orbit"
+  | "three_d_field_lines"
+  | "three_d_wave"
+  | "molecule_3d"
+  // Tier-2 escape hatch
+  | "custom_html";
 
-const SIM_TEMPLATES: { value: SimTemplate; label: string; description: string }[] = [
+interface SimTemplateOption {
+  value: SimTemplate;
+  label: string;
+  /** Optional heading shown ABOVE this option to break the list into
+   *  visually-grouped sections in the dropdown. */
+  group?: string;
+  description: string;
+}
+
+const SIM_TEMPLATES: SimTemplateOption[] = [
+  // Auto
   { value: "auto", label: "Auto (let AI pick)", description: "Recommended — AI picks the best visual model for the chapter." },
-  { value: "three_d_scene", label: "3D Simulation", description: "Three.js 3D scene with a centre and surrounding objects — works for solar systems, atoms, cells, plant parts, and any topic with a clear 'centre + things around it' structure." },
-  { value: "categorize", label: "Drag-and-sort", description: "Students drag items into labelled bins. Works for any classification topic." },
-  { value: "match_pairs", label: "Match the pairs", description: "Vocabulary-drill activity. Fallback when no model-based view applies." },
+
+  // Generic 2D activities — work for any subject.
+  { value: "match_pairs",      group: "Activities (any subject)",   label: "Match the pairs",            description: "Two-column matching drill. Good for term ↔ definition, English ↔ translation, formula ↔ name." },
+  { value: "categorize",       label: "Drag-and-sort (categorize)", description: "Drag items into labelled bins. Works for any classification topic — number sets, parts of speech, taxonomic groups." },
+  { value: "timeline_order",   label: "Timeline / sequence",         description: "Drag events into chronological or causal order. Useful for processes, life cycles, problem-solving steps, historical events." },
+  { value: "sentence_builder", label: "Sentence builder",            description: "Drag word/symbol tiles into the correct order. Languages grammar, mathematical proofs, logical syllogisms. Distractor tiles supported." },
+  { value: "vocab_pairs",      label: "Vocabulary pairs / memory",   description: "Specialised pairs game with optional audio + image cards. Ships with a flip-and-find memory mode." },
+  { value: "labeled_hotspots", label: "Labelled hotspots on an image", description: "Image with clickable hotspots. Anatomy, chemistry apparatus, geography maps, language image-vocab. Optional drag-the-label quiz mode." },
+
+  // 2D Math / Science.
+  { value: "graph_explorer",   group: "Math / Physics / Chemistry", label: "Graph explorer (function plotter)", description: "Slider-driven function plotting via math.js. y = a sin(bx + c), exponential decay, projectile range, dose-response, pH curves." },
+  { value: "circuit_2d",       label: "Circuit schematic (2D)",       description: "Schematic-style circuit canvas with batteries, resistors, capacitors, switches. Auto-computes total R + I for series / parallel topologies." },
+
+  // 3D scenes.
+  { value: "three_d_scene",      group: "3D scenes (Three.js)", label: "3D scene (generic)",  description: "Centre + surrounding objects with edges. Works for solar systems, atoms, food webs, cells, ecosystems." },
+  { value: "three_d_projectile", label: "3D projectile motion",         description: "Interactive launch with sliders for v0, angle, gravity, bearing. Animated trajectory + range / height / time of flight readouts." },
+  { value: "three_d_orbit",      label: "3D orbital motion",             description: "Animated orbits with adjustable radii, periods, inclinations. Works for planetary systems, electron-around-nucleus, satellites." },
+  { value: "three_d_field_lines", label: "3D field lines",               description: "Numerical streamlines around point sources for electric / magnetic / gravitational fields. Live density + length sliders." },
+  { value: "three_d_wave",       label: "3D wave (string)",             description: "Animated wave with sliders for amplitude, wavelength, frequency. Switch between transverse, longitudinal, and standing modes." },
+  { value: "molecule_3d",        label: "3D molecule (atoms + bonds)",  description: "Atom-and-bond viewer with CPK colouring. Click an atom for info. Single / double / triple bonds. Use for water, methane, benzene, DNA bases, amino acids." },
+
+  // Tier-2 escape hatch.
+  { value: "custom_html",        group: "Bespoke", label: "Custom HTML (sandboxed)", description: "Fully bespoke per-lesson sim. The LLM emits a self-contained HTML document that runs inside a sandboxed iframe (no platform data access). Use only when no template above fits — admin review required before publish." },
 ];
 
 type Mode = "generate" | "upload" | "structured" | "onboard";
@@ -324,11 +380,37 @@ export function GeneratePage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {SIM_TEMPLATES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
-                        </SelectItem>
-                      ))}
+                      {/* Partition the flat SIM_TEMPLATES list at every
+                          item that starts a new group. Each partition
+                          renders as a Radix `SelectGroup` with its
+                          own `SelectLabel`. This is the structure
+                          Radix expects — wrapping `Label` directly
+                          inside `Content` (without `Group`) caused
+                          the page to blank on simulation selection in
+                          some browsers. */}
+                      {(() => {
+                        const groups: { name: string | null; items: typeof SIM_TEMPLATES }[] = [];
+                        for (const t of SIM_TEMPLATES) {
+                          if (t.group || groups.length === 0) {
+                            groups.push({ name: t.group ?? null, items: [t] });
+                          } else {
+                            groups[groups.length - 1].items.push(t);
+                          }
+                        }
+                        return groups.map((g, gi) => (
+                          <Fragment key={g.name ?? `__nogroup_${gi}`}>
+                            {gi > 0 && <SelectSeparator />}
+                            <SelectGroup>
+                              {g.name && <SelectLabel>{g.name}</SelectLabel>}
+                              {g.items.map((t) => (
+                                <SelectItem key={t.value} value={t.value}>
+                                  {t.label}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </Fragment>
+                        ));
+                      })()}
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-(--color-muted-foreground)">

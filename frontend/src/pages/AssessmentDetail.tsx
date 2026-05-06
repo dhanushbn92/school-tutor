@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, Lock, Send, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import {
@@ -12,11 +13,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
+import { humanError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import {
   useAssessment,
   useAssessmentSubmissions,
+  useCloseAssessment,
   useMySubmissions,
+  usePublishAssessment,
 } from "@/lib/queries";
 import { formatDateTime, formatMarks } from "@/lib/utils";
 
@@ -35,6 +39,9 @@ export function AssessmentDetailPage() {
   const teacherSubsQ = useAssessmentSubmissions(isTeacherOrAdmin ? id : undefined);
   const mySubsQ = useMySubmissions();
   const mySubmission = (mySubsQ.data ?? []).find((s) => s.assessment_id === id);
+
+  const publishMut = usePublishAssessment();
+  const closeMut = useCloseAssessment();
 
   if (assessmentQ.isLoading) {
     return (
@@ -60,6 +67,22 @@ export function AssessmentDetailPage() {
 
   const a = assessmentQ.data;
   const orderedQuestions = [...a.questions].sort((x, y) => x.order - y.order);
+
+  const handlePublish = () => {
+    publishMut.mutate(a.id, {
+      onSuccess: () =>
+        toast.success(`"${a.title}" is now published — students in section #${a.section_id} can see it.`),
+      onError: (err) => toast.error(humanError(err)),
+    });
+  };
+
+  const handleClose = () => {
+    closeMut.mutate(a.id, {
+      onSuccess: () =>
+        toast.success(`"${a.title}" is closed — no further submissions.`),
+      onError: (err) => toast.error(humanError(err)),
+    });
+  };
 
   return (
     <ThemedPage>
@@ -88,11 +111,42 @@ export function AssessmentDetailPage() {
           </>
         }
         actions={
-          <Button asChild variant="outline">
-            <Link to="/assessments">
-              <ArrowLeft className="h-4 w-4" /> All assessments
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {isTeacherOrAdmin && a.status === "DRAFT" && (
+              <Button
+                size="sm"
+                onClick={handlePublish}
+                disabled={publishMut.isPending}
+              >
+                {publishMut.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                Publish
+              </Button>
+            )}
+            {isTeacherOrAdmin && a.status === "PUBLISHED" && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleClose}
+                disabled={closeMut.isPending}
+              >
+                {closeMut.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Lock className="h-4 w-4" />
+                )}
+                Close
+              </Button>
+            )}
+            <Button asChild variant="outline">
+              <Link to="/assessments">
+                <ArrowLeft className="h-4 w-4" /> All assessments
+              </Link>
+            </Button>
+          </div>
         }
       />
 
@@ -103,6 +157,79 @@ export function AssessmentDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed">{a.instructions}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/*
+       * Teacher / admin status panel.
+       *
+       * Quizzes from /assessments/from-bank land in DRAFT and stay invisible
+       * to students until published — easy to forget. This card is the loud
+       * primary affordance: it tells the teacher exactly which side of the
+       * publish line they are on, what the next move is, and what publishing
+       * does. The header button is a secondary shortcut for return visits.
+       *
+       * State machine surfaced here matches the backend (assessments.py):
+       *   DRAFT     → "Publish" call-to-action (primary)
+       *   PUBLISHED → "Close" (outline, less prominent)
+       *   CLOSED    → terminal, just a confirmation message.
+       */}
+      {isTeacherOrAdmin && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Status &amp; visibility</CardTitle>
+            <CardDescription>
+              {a.status === "DRAFT" &&
+                "Only you can see this quiz right now. Publish to share it with the section."}
+              {a.status === "PUBLISHED" &&
+                `Live since ${formatDateTime(a.published_at)}. Close it once everyone has had a chance to submit.`}
+              {a.status === "CLOSED" &&
+                "Closed — no new submissions accepted. Existing submissions stay available for grading and review."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-3">
+              {a.status === "DRAFT" && (
+                <Button
+                  size="lg"
+                  onClick={handlePublish}
+                  disabled={publishMut.isPending}
+                >
+                  {publishMut.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
+                  Publish to section
+                </Button>
+              )}
+              {a.status === "PUBLISHED" && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={closeMut.isPending}
+                >
+                  {closeMut.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Lock className="h-5 w-5" />
+                  )}
+                  Close quiz
+                </Button>
+              )}
+              {a.status === "CLOSED" && (
+                <Badge variant="outline" className="gap-1">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Closed
+                </Badge>
+              )}
+              {a.status !== "DRAFT" && a.published_at && (
+                <span className="text-xs text-(--color-muted-foreground)">
+                  Published {formatDateTime(a.published_at)}
+                </span>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

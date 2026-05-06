@@ -1178,6 +1178,56 @@ export function useCreateAssessmentFromBank() {
   });
 }
 
+/**
+ * Publish a DRAFT assessment to its section so students can see + take it.
+ *
+ * Backend route: POST /assessments/{id}/publish (assessments.py:181).
+ * 400 if the assessment is already PUBLISHED or CLOSED — the state machine
+ * is one-way DRAFT → PUBLISHED → CLOSED. Surface the server message verbatim
+ * via humanError() so the teacher sees "Assessment is PUBLISHED, not DRAFT"
+ * rather than a generic toast.
+ */
+export function usePublishAssessment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (assessmentId: number) => {
+      const { data } = await api.post<Assessment>(
+        `/assessments/${assessmentId}/publish`,
+      );
+      return data;
+    },
+    onSuccess: (assessment) => {
+      // Refresh the detail view + the teacher's assessments list + any list
+      // a learner might be viewing (their own /me/assessments query).
+      qc.invalidateQueries({ queryKey: ["assessment", assessment.id] });
+      qc.invalidateQueries({ queryKey: ["me", "assessments"] });
+    },
+  });
+}
+
+/**
+ * Close a PUBLISHED assessment so no further submissions land. The detail
+ * view stays open so teachers can still grade and review existing
+ * submissions.
+ *
+ * Backend route: POST /assessments/{id}/close (assessments.py:193).
+ */
+export function useCloseAssessment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (assessmentId: number) => {
+      const { data } = await api.post<Assessment>(
+        `/assessments/${assessmentId}/close`,
+      );
+      return data;
+    },
+    onSuccess: (assessment) => {
+      qc.invalidateQueries({ queryKey: ["assessment", assessment.id] });
+      qc.invalidateQueries({ queryKey: ["me", "assessments"] });
+    },
+  });
+}
+
 
 export function useCreateInterventionNote() {
   const qc = useQueryClient();

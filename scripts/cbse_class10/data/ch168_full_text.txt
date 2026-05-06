@@ -1,0 +1,124 @@
+CHAPTER 1 — REAL NUMBERS
+
+Introduction
+
+In earlier classes you met natural numbers, whole numbers, integers, rational numbers and irrational numbers. Together, all of these form the REAL NUMBERS. This chapter sharpens our view of integers and rationals using two powerful ideas: Euclid's division lemma (and the algorithm built on it) and the fundamental theorem of arithmetic. We will use these to study divisibility, find HCF and LCM efficiently, prove that certain numbers (like √2) are irrational, and determine when a rational number's decimal terminates.
+
+
+1.1 EUCLID'S DIVISION LEMMA AND ALGORITHM
+
+EUCLID'S DIVISION LEMMA. Given any two positive integers a and b, there exist UNIQUE integers q (quotient) and r (remainder) such that
+    a = b · q + r,        0 ≤ r < b.
+
+Read this carefully. Whenever we divide one positive integer a by another positive integer b, we get a quotient q and a remainder r — and the remainder is always at least 0 and strictly less than b. This sounds elementary, but its consequences are deep.
+
+EUCLID'S DIVISION ALGORITHM (a method to find the HCF). To find the HCF of two positive integers a and b (with a > b):
+1. Apply the lemma: a = b · q₁ + r₁ with 0 ≤ r₁ < b.
+2. If r₁ = 0, then b is the HCF.
+3. If r₁ ≠ 0, apply the lemma to b and r₁: b = r₁ · q₂ + r₂.
+4. Continue this process. Each step the remainders decrease, so the process must end.
+5. The last NON-ZERO remainder is the HCF.
+
+Example. Find HCF(420, 130).
+- 420 = 130 · 3 + 30.
+- 130 = 30 · 4 + 10.
+- 30 = 10 · 3 + 0.
+- Last non-zero remainder = 10. So HCF(420, 130) = 10.
+
+This is faster than listing factors when the numbers are large.
+
+
+1.2 THE FUNDAMENTAL THEOREM OF ARITHMETIC
+
+THEOREM. Every composite number can be expressed (factorised) as a PRODUCT OF PRIMES, and this factorisation is UNIQUE except for the order of the factors.
+
+Some examples:
+- 12 = 2 · 2 · 3 = 2² · 3.
+- 60 = 2² · 3 · 5.
+- 100 = 2² · 5².
+- 72 = 2³ · 3².
+
+Why does this matter? Because once you know the prime factorisation, finding the HCF and LCM of two numbers is mechanical:
+
+HCF (Highest Common Factor): take the SMALLEST power of each PRIME that appears in BOTH factorisations.
+LCM (Least Common Multiple): take the LARGEST power of every PRIME that appears in EITHER factorisation.
+
+Example. Find HCF and LCM of 24 and 36.
+- 24 = 2³ · 3.
+- 36 = 2² · 3².
+- HCF = 2² · 3 = 12.
+- LCM = 2³ · 3² = 72.
+Check: 24 · 36 = 864 = 12 · 72 — confirms HCF · LCM = product of the two numbers.
+
+Always true: HCF(a, b) · LCM(a, b) = a · b.
+
+Example for three numbers. HCF and LCM of 6, 72 and 120.
+- 6 = 2 · 3.
+- 72 = 2³ · 3².
+- 120 = 2³ · 3 · 5.
+- HCF = 2 · 3 = 6 (smallest powers of primes common to ALL three).
+- LCM = 2³ · 3² · 5 = 360 (largest power of every prime appearing in any of them).
+
+
+1.3 IRRATIONAL NUMBERS
+
+A number is RATIONAL if it can be written as p/q where p, q are integers and q ≠ 0. Examples: 1/2, 7, −5/3.
+
+A number is IRRATIONAL if it CANNOT be written as p/q.
+
+Some famous irrationals: √2, √3, √5, π, e. (All non-perfect-square roots of natural numbers, and certain transcendental numbers like π.)
+
+THEOREM. √2 is irrational.
+
+Proof (by contradiction). Suppose √2 is rational. Then √2 = p/q for some integers p, q with q ≠ 0 and HCF(p, q) = 1 (we can always reduce to lowest terms).
+
+Squaring: 2 = p²/q², so p² = 2q². This means p² is EVEN, hence p is EVEN. Write p = 2k.
+
+Then p² = 4k² = 2q², so q² = 2k². So q² is EVEN, hence q is EVEN.
+
+But now both p and q are even — contradicting HCF(p, q) = 1. So our assumption was wrong, and √2 is IRRATIONAL.
+
+Similar arguments prove √3, √5, √7, … are irrational.
+
+Useful theorem. The sum or difference of a rational and an irrational is irrational. The product of a non-zero rational and an irrational is irrational.
+
+So 5 + √2, √3 − 1, 2 · √2, and π/3 are all irrational. (Be careful: an irrational TIMES an irrational can be rational — e.g. √2 · √2 = 2.)
+
+
+1.4 RATIONAL NUMBERS AND THEIR DECIMALS
+
+Every rational number has a decimal expansion. There are exactly two cases:
+(a) TERMINATING: the decimal has a finite number of digits. Example: 1/4 = 0.25.
+(b) NON-TERMINATING REPEATING: the decimal goes on forever, but a fixed group of digits repeats. Example: 1/3 = 0.3̄, 1/7 = 0.142857̄.
+
+Conversely, every terminating decimal and every non-terminating REPEATING decimal is rational.
+
+Non-terminating, NON-REPEATING decimals are IRRATIONAL.
+
+WHEN does a rational number have a TERMINATING decimal? Look at its denominator.
+
+THEOREM. Let x = p/q (in lowest terms). Then x has a TERMINATING decimal expansion if and only if the prime factorisation of q is of the form 2^m · 5^n (where m, n are non-negative integers). Otherwise, x has a non-terminating repeating decimal.
+
+Examples.
+- 7/8: q = 8 = 2³. Form 2^m · 5^n with m = 3, n = 0. → terminates. 7/8 = 0.875.
+- 17/40: q = 40 = 2³ · 5. → terminates. 17/40 = 0.425.
+- 23/30: q = 30 = 2 · 3 · 5. The factor of 3 means → does NOT terminate. 23/30 = 0.76̄6̄6̄… (here the 6 repeats).
+- 1/12: q = 12 = 2² · 3. The factor of 3 means → does NOT terminate. 1/12 = 0.083̄.
+
+Important corollary: a fraction in LOWEST TERMS terminates if and only if the denominator's only prime factors are 2 and 5.
+
+How long is the terminating decimal? The number of digits after the decimal point equals the LARGER of m and n in the factorisation 2^m · 5^n.
+- 7/8 = 7/2³: m = 3, n = 0 → 3 digits → 0.875.
+- 17/40 = 17/(2³ · 5): m = 3, n = 1 → 3 digits → 0.425.
+
+
+SUMMARY
+
+- Euclid's division lemma: a = b · q + r with 0 ≤ r < b.
+- Euclid's algorithm finds HCF by repeated lemma applications; the last non-zero remainder is the HCF.
+- Fundamental Theorem of Arithmetic: unique prime factorisation for every composite number.
+- HCF (smallest powers of common primes) × LCM (largest powers of all primes) = product of the numbers.
+- √2, √3, √5 are irrational (proved by contradiction).
+- Rational + irrational = irrational; non-zero rational × irrational = irrational.
+- Rational p/q (in lowest terms) terminates as a decimal iff q has only 2's and 5's in its prime factorisation.
+- Number of decimal digits = max(m, n) for q = 2^m · 5^n.

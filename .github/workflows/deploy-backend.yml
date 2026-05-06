@@ -1,0 +1,113 @@
+# Build the FastAPI image and deploy to Cloud Run on every push to main
+# that touches the backend. Path filters keep frontend-only PRs from
+# triggering this workflow.
+#
+# Auth: Workload Identity Federation (no static credentials in GitHub).
+# See docs/setup_cicd.md for the one-time GCP setup of the WIF pool,
+# provider, service account and IAM bindings.
+
+name: Deploy backend (Cloud Run)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "Dockerfile"
+      - "requirements.txt"
+      - ".dockerignore"
+      - "migrations/**"
+      - ".github/workflows/deploy-backend.yml"
+  # Manual run for hot-fixes / first-time validation.
+  workflow_dispatch:
+
+# Required for WIF: the workflow must be allowed to mint an OIDC ID token
+# that GCP exchanges for a short-lived service-account access token.
+permissions:
+  contents: read
+  id-token: write
+
+# Concurrency guard: only one backend deploy at a time. New runs cancel
+# any in-progress run on the same ref so a rapid sequence of pushes
+# doesn't queue up redundant deploys.
+concurrency:
+  group: deploy-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to GCP via Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker "${GCP_REGION}-docker.pkg.dev" --quiet
+        env:
+          GCP_REGION: ${{ secrets.GCP_REGION }}
+
+      - name: Build & push image (tag = commit SHA)
+        id: image
+        run: |
+          set -euo pipefail
+          IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/${AR_REPO}/${SERVICE_NAME}:${GITHUB_SHA}"
+          echo "Building $IMAGE"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          # Also tag :latest for human convenience; revisions reference :sha.
+          docker tag "$IMAGE" "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/${AR_REPO}/${SERVICE_NAME}:latest"
+          docker push "${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/${AR_REPO}/${SERVICE_NAME}:latest"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+        env:
+          GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+          GCP_REGION: ${{ secrets.GCP_REGION }}
+          AR_REPO: ${{ secrets.GCP_AR_REPO }}
+          SERVICE_NAME: ${{ secrets.GCP_SERVICE_NAME }}
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ secrets.GCP_SERVICE_NAME }}
+          region: ${{ secrets.GCP_REGION }}
+          image: ${{ steps.image.outputs.image }}
+          flags: --allow-unauthenticated --port=8080
+          # Each runtime env var below comes from a GitHub Secret.
+          # ARTIFACT_BACKEND is fixed to gcs since Cloud Run's filesystem
+          # is ephemeral; if you ever switch back to local for some
+          # reason, change this line and re-run.
+          env_vars: |
+            ARTIFACT_BACKEND=gcs
+            GCS_BUCKET=${{ secrets.GCS_BUCKET }}
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            ALLOWED_ORIGINS=${{ secrets.ALLOWED_ORIGINS }}
+            LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}
+            ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+
+      - name: Smoke check the new revision
+        # Cloud Run already does its own startup probe, but a quick
+        # OpenAPI fetch from the workflow side proves the deploy is
+        # actually serving requests, not just "alive".
+        run: |
+          set -euo pipefail
+          URL=$(gcloud run services describe "${SERVICE_NAME}" --region "${GCP_REGION}" --format='value(status.url)')
+          echo "Service URL: $URL"
+          curl -fsS "$URL/openapi.json" > /dev/null
+          echo "openapi: ok"
+        env:
+          GCP_REGION: ${{ secrets.GCP_REGION }}
+          SERVICE_NAME: ${{ secrets.GCP_SERVICE_NAME }}

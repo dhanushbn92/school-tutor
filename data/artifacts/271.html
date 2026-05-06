@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Match each event, leader or symbol to its description</title>
+  <style>
+    :root { --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0; --accent:#2563eb; --ok:#16a34a; --err:#dc2626; --muted:#64748b; }
+    body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #0f172a; margin: 0; padding: 24px; }
+    header { max-width: 960px; margin: 0 auto 24px; }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    p.instructions { color: var(--muted); margin: 0; }
+    main { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .col h2 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px; }
+    .card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+    .card:hover { border-color: var(--accent); }
+    .card.selected { border-color: var(--accent); background: #eff6ff; }
+    .card.ok { border-color: var(--ok); background: #f0fdf4; cursor: default; }
+    .card.err { border-color: var(--err); background: #fef2f2; }
+    .card.done { opacity: .55; cursor: default; }
+    footer { max-width: 960px; margin: 20px auto 0; display:flex; justify-content: space-between; align-items: center; color: var(--muted); }
+    button { background: var(--accent); color: white; border: 0; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Match each event, leader or symbol to its description</h1>
+    <p class="instructions">Drag each item on the left to the correct description on the right. Includes leaders, dates, allegories and key concepts from the chapter.</p>
+  </header>
+  <main>
+    <div class="col">
+      <h2>Terms</h2>
+      <div id="terms"></div>
+    </div>
+    <div class="col">
+      <h2>Match</h2>
+      <div id="matches"></div>
+    </div>
+  </main>
+  <footer>
+    <span id="score">Score: 0 / <span id="total">0</span></span>
+    <button id="reset" type="button">Reset</button>
+  </footer>
+  <script>
+    const PAIRS = [{"term": "Fr\u00e9d\u00e9ric Sorrieu (1848)", "match": "Painter who visualised a world of democratic and social Republics"}, {"term": "1789", "match": "Year of the French Revolution"}, {"term": "Civil Code (1804)", "match": "Napoleon's code \u2014 equality, property, abolition of feudal privileges"}, {"term": "Johann Gottfried Herder", "match": "Romantic thinker \u2014 true nation lives in folk culture and language"}, {"term": "Treaty of Constantinople (1832)", "match": "Recognised Greek independence from the Ottoman Empire"}, {"term": "Lord Byron", "match": "English Romantic poet who fought for Greece and died there in 1824"}, {"term": "Frankfurt Parliament (1848)", "match": "All-German assembly that drafted a constitution; rejected by Prussia"}, {"term": "Otto von Bismarck", "match": "Prussian statesman who led the unification of Germany"}, {"term": "1871", "match": "Year Wilhelm I was proclaimed German Emperor at Versailles"}, {"term": "Giuseppe Mazzini", "match": "Founded 'Young Italy' to unify Italy as a republic"}, {"term": "Count Cavour", "match": "Sardinian minister whose diplomacy led to Italian unification"}, {"term": "Giuseppe Garibaldi", "match": "Led volunteer Red Shirts; won South Italy in 1860"}, {"term": "Marianne", "match": "Female allegory of France with red cap and tricolour"}, {"term": "Germania", "match": "Female allegory of Germany with a crown of oak leaves"}, {"term": "Act of Union (1707)", "match": "Created the United Kingdom of Great Britain (England + Scotland)"}, {"term": "First World War (1914)", "match": "Conflict triggered by Balkan rivalries and great-power competition"}];
+    const termsEl = document.getElementById("terms");
+    const matchesEl = document.getElementById("matches");
+    const scoreEl = document.getElementById("score");
+    document.getElementById("total").textContent = PAIRS.length;
+
+    function shuffle(arr) { return arr.map(v => [Math.random(), v]).sort((a, b) => a[0] - b[0]).map(x => x[1]); }
+
+    let selectedTerm = null;
+    let correct = 0;
+
+    function render() {
+      termsEl.innerHTML = "";
+      matchesEl.innerHTML = "";
+      selectedTerm = null;
+      correct = 0;
+      scoreEl.firstChild.textContent = `Score: 0 / `;
+
+      PAIRS.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = p.term;
+        card.dataset.index = index;
+        card.addEventListener("click", () => onTermClick(card, index));
+        termsEl.appendChild(card);
+      });
+      shuffle(PAIRS.map((p, i) => ({ text: p.match, index: i }))).forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = m.text;
+        card.dataset.index = m.index;
+        card.addEventListener("click", () => onMatchClick(card, m.index));
+        matchesEl.appendChild(card);
+      });
+    }
+
+    function onTermClick(card, index) {
+      if (card.classList.contains("done")) return;
+      termsEl.querySelectorAll(".card.selected").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      selectedTerm = { el: card, index };
+    }
+
+    function onMatchClick(card, index) {
+      if (card.classList.contains("done") || !selectedTerm) return;
+      if (selectedTerm.index === index) {
+        selectedTerm.el.classList.add("ok", "done");
+        selectedTerm.el.classList.remove("selected");
+        card.classList.add("ok", "done");
+        correct += 1;
+        scoreEl.firstChild.textContent = `Score: ${correct} / `;
+        selectedTerm = null;
+      } else {
+        card.classList.add("err");
+        setTimeout(() => card.classList.remove("err"), 500);
+      }
+    }
+
+    document.getElementById("reset").addEventListener("click", render);
+    render();
+  </script>
+</body>
+</html>

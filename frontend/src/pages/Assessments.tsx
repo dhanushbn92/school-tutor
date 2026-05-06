@@ -5,9 +5,11 @@ import {
   GraduationCap,
   Loader2,
   Plus,
+  Send,
   Sparkles,
   User as UserIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import {
@@ -20,8 +22,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
+import { humanError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { useMyAssessments, useMySubmissions } from "@/lib/queries";
+import {
+  useMyAssessments,
+  useMySubmissions,
+  usePublishAssessment,
+} from "@/lib/queries";
 import { formatDateTime } from "@/lib/utils";
 
 export function AssessmentsPage() {
@@ -34,6 +41,9 @@ export function AssessmentsPage() {
   const submissionByAssessment = new Map(
     (submissionsQ.data ?? []).map((s) => [s.assessment_id, s]),
   );
+  // Inline publish for teachers / admins. We track the in-flight assessment
+  // id so multiple rows can disable independently while one is pending.
+  const publishMut = usePublishAssessment();
 
   return (
     <ThemedPage>
@@ -200,6 +210,31 @@ export function AssessmentsPage() {
                               Take
                               <ArrowRight className="h-3.5 w-3.5" />
                             </Link>
+                          </Button>
+                        ) : canBuild && a.status === "DRAFT" ? (
+                          // One-click publish from the list. The disabled
+                          // state intentionally guards only the row whose
+                          // mutation is currently running, so a teacher can
+                          // queue several drafts in quick succession.
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              publishMut.mutate(a.id, {
+                                onSuccess: () =>
+                                  toast.success(`"${a.title}" published.`),
+                                onError: (err) => toast.error(humanError(err)),
+                              })
+                            }
+                            disabled={
+                              publishMut.isPending && publishMut.variables === a.id
+                            }
+                          >
+                            {publishMut.isPending && publishMut.variables === a.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <Send className="h-3.5 w-3.5" />
+                            )}
+                            Publish
                           </Button>
                         ) : null}
                       </td>
