@@ -1403,7 +1403,7 @@ function CreateBookCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base md:text-lg">Create book</CardTitle>
+        <CardTitle className="text-base md:text-lg">Add book</CardTitle>
         <CardDescription>
           Add a book under an existing subject. The platform admin's
           subject picker shows every board, so you can attach a book to
@@ -1510,7 +1510,7 @@ function CreateBookCard() {
             ) : (
               <BookPlus className="h-4 w-4" />
             )}
-            Create book
+            Add book
           </Button>
         </form>
       </CardContent>
@@ -1632,7 +1632,7 @@ function CreateChapterCard({ onCreated }: { onCreated: (id: number) => void }) {
       } catch (err) {
         toast.error(
           `Couldn't auto-create a default book: ${humanError(err)}. ` +
-            `Use the "Create book" card above and try again.`,
+            `Use the "Add book" card above and try again.`,
         );
         return;
       }
@@ -1760,7 +1760,7 @@ function CreateChapterCard({ onCreated }: { onCreated: (id: number) => void }) {
                   {selectedSubject?.board} {selectedSubject?.name} (Default)
                 </strong>{" "}
                 automatically when you click <em>Create chapter</em>. Use
-                the <em>Create book</em> card above first if you want a
+                the <em>Add book</em> card above first if you want a
                 specific book title / academic year.
               </p>
             )}
