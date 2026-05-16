@@ -27,13 +27,19 @@ import { cn } from "@/lib/utils";
  *
  * If a returning user wants the intro again they can clear the flag:
  *
- *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen")
+ *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen-v2")
  *
  * Role-aware copy
  *   The headline + one-line lead are tuned per role so the welcome
  *   feels personally addressed rather than generic.
  */
-const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen";
+// Bumped from `…hero-intro-seen` to `…-v2` when the scene was rebuilt
+// from a stick figure to the full Vidyārthi archer. Users who dismissed
+// the old version still have the v1 key set; bumping forces a one-time
+// replay so everyone sees the new scene without having to fiddle with
+// devtools. Bump this suffix again whenever a redesign warrants a
+// forced re-watch.
+const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen-v2";
 
 /** Total time the overlay stays visible, in ms. Matches the archer
  *  scene's 7.5 s cycle plus a beat of "hold the moment" plus the
