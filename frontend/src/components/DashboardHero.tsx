@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Dhananjaya intro overlay — shown once, then gone.
+ * Dhananjaya intro overlay — plays every time the dashboard mounts.
  *
  * The platform's first impression is a single cinematic moment: a
  * hand-painted Vidyārthi archer scene drifts in from a soft sand-toned
@@ -17,25 +17,19 @@ import { cn } from "@/lib/utils";
  * whole thing dissolves away to reveal the dashboard underneath.
  *
  * Behaviour
- *   - On the FIRST visit per device (localStorage flag absent): the
- *     overlay mounts above the dashboard. The image + text play
- *     through a 7.5 s cycle, then a final 1 s container fade dismisses
- *     anything that hasn't already cleared. Auto-unmounts.
- *   - On every visit afterwards: the component renders nothing. The
- *     dashboard widgets show immediately, uncluttered.
- *
- * If a returning user wants the intro again they can clear the flag:
- *
- *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen-v3")
+ *   - On every dashboard mount (page refresh, route navigation back to
+ *     /dashboard, sign-in): the overlay plays. There's no
+ *     once-per-device gating — the user explicitly asked for it on
+ *     every visit because they want the brand moment as a recurring
+ *     ritual rather than a one-shot tutorial.
+ *   - A small "Skip" affordance in the corner dismisses the overlay
+ *     immediately for users in a hurry. No state is persisted across
+ *     mounts, so the next dashboard visit shows the intro again.
  *
  * Role-aware copy
  *   The headline + one-line lead are tuned per role so the welcome
  *   feels personally addressed rather than generic.
  */
-// Bumped to -v3 when the scene moved from a hand-drawn SVG character
-// to the painted hero illustration. Forces everyone — including users
-// who already dismissed v1 or v2 — to see the new intro exactly once.
-const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen-v3";
 
 /** Total time the inner image animation runs (must match the keyframes
  *  in VidyarthiArcher). After this elapses we still hold the overlay
@@ -76,31 +70,16 @@ export function DashboardHero({
   /** Optional first-name for the headline. */
   userName?: string;
 }) {
-  // Read the storage flag lazily so we don't trigger an unnecessary
-  // mount when the user has already seen the intro.
-  const [phase, setPhase] = useState<Phase>(() => {
-    if (typeof window === "undefined") return "done";
-    try {
-      return window.localStorage.getItem(STORAGE_KEY) === "1" ? "done" : "playing";
-    } catch {
-      return "done";
-    }
-  });
-
-  // Record "seen" the moment the intro starts so a mid-play refresh
-  // doesn't replay it.
-  useEffect(() => {
-    if (phase !== "playing") return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, "1");
-    } catch {
-      /* private mode or storage disabled — in-memory state suffices */
-    }
-  }, [phase]);
+  // Always start playing on mount. No localStorage gating — the
+  // overlay is meant to be a recurring ritual, not a one-shot tutorial.
+  // If we ever want to opt some users out (accessibility, repeat-
+  // visitor preference) it'd be a per-account toggle, not localStorage.
+  const [phase, setPhase] = useState<Phase>("playing");
 
   // Two timers drive the playing → fading → done transition. Cleanup
   // clears both on unmount so a fast route-change can't leave a
-  // dangling timer behind.
+  // dangling timer behind. Both timers re-arm on every mount because
+  // the entire effect runs whenever the component remounts.
   useEffect(() => {
     if (phase !== "playing") return;
     const fadeAt = window.setTimeout(() => setPhase("fading"), INNER_ANIMATION_MS);
@@ -112,6 +91,14 @@ export function DashboardHero({
   }, [phase]);
 
   if (phase === "done") return null;
+
+  // Manual skip path: collapse to "fading" immediately so the user
+  // gets the same graceful 1 s container fade rather than a jarring
+  // hard-cut. The "done" timer is already armed and will unmount us
+  // after the fade completes.
+  const handleSkip = () => {
+    if (phase === "playing") setPhase("fading");
+  };
 
   return (
     <div
@@ -127,6 +114,17 @@ export function DashboardHero({
       style={{ transitionDuration: `${CONTAINER_FADE_MS}ms` }}
       aria-hidden={phase !== "playing"}
     >
+      {/* Skip — small, unobtrusive, top-right. Users in a hurry can
+          dismiss without the full 7.5 s playthrough. */}
+      <button
+        type="button"
+        onClick={handleSkip}
+        className="absolute right-5 top-5 rounded-md border border-[#C9BC97] bg-white/60 px-3 py-1.5 text-xs font-medium text-[#5C4A33] backdrop-blur transition hover:bg-white/80"
+        aria-label="Skip the welcome animation and go straight to the dashboard"
+      >
+        Skip →
+      </button>
+
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 text-center text-[#2A1F12]">
         {/* Top chrome: logo + brand name + tagline. Small, doesn't
             compete with the illustration for attention. */}
