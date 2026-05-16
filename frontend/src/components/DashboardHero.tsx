@@ -70,13 +70,23 @@ export function DashboardHero(_props: DashboardHeroProps) {
       className="pointer-events-none fixed inset-0 z-30"
       aria-hidden="true"
     >
-      {/* Warm backdrop — covers the entire viewport during the hold,
-          then dissolves on the cross-fade. Cream colour matches the
-          illustration's paper tone so the dissolve feels painterly. */}
+      {/* Warm backdrop — a radial cream gradient rather than a flat
+          wash. Solid at the centre where the archer image sits, then
+          fading out toward the screen edges so the dashboard peeks
+          through at the corners from the very first frame. The
+          dashboard becomes more visible the further you look from
+          centre; in the centre the cream hides everything underneath.
+          On the cross-fade the whole backdrop dissolves to nothing. */}
       <div
         className="absolute inset-0 transition-opacity"
         style={{
-          backgroundColor: "#F1E8D5",
+          background:
+            "radial-gradient(circle at center, " +
+            "#F1E8D5 0%, " +
+            "#F1E8D5 30%, " +
+            "rgba(241,232,213, 0.85) 50%, " +
+            "rgba(241,232,213, 0.5) 70%, " +
+            "rgba(241,232,213, 0) 100%)",
           opacity: isWatermark ? 0 : 1,
           transitionDuration: `${FADE_MS}ms`,
           transitionTimingFunction: "ease-in-out",
