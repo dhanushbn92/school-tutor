@@ -5,7 +5,6 @@ import {
   Building2,
   ClipboardList,
   FolderOpen,
-  GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -17,8 +16,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useAuth } from "@/lib/auth";
 import { useMySchool } from "@/lib/queries";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/lib/types";
 
@@ -120,8 +121,8 @@ export function Shell() {
               <Menu className="h-4 w-4" />
             </Button>
             <div className="md:hidden flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-(--color-primary)" />
-              <span className="text-sm font-semibold">School Tuter</span>
+              <BrandLogo size={22} />
+              <span className="text-sm font-semibold">{BRAND_NAME}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -168,12 +169,12 @@ function SidebarContent({
 }) {
   return (
     <>
-      <div className="flex items-center gap-2 px-5 py-4">
-        <GraduationCap className="h-6 w-6 text-(--color-primary)" />
+      <div className="flex items-center gap-2.5 px-5 py-4">
+        <BrandLogo size={32} />
         <div className="flex flex-col leading-tight">
           <span className="text-sm font-semibold tracking-tight">{tenantName}</span>
           <span className="text-[11px] text-(--color-muted-foreground)">
-            {tenantSubtitle} &middot; on School Tuter
+            {tenantSubtitle} &middot; on {BRAND_NAME}
           </span>
         </div>
       </div>

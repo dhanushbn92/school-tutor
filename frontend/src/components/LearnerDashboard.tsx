@@ -21,6 +21,7 @@ import {
 } from "recharts";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
+import { DashboardHero } from "@/components/DashboardHero";
 import { StatCard } from "@/components/StatCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
@@ -97,6 +98,10 @@ export function LearnerDashboard() {
 
   return (
     <ThemedPage>
+      <DashboardHero
+        role="learner"
+        userName={(user?.full_name ?? "").split(/\s+/)[0] || undefined}
+      />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={

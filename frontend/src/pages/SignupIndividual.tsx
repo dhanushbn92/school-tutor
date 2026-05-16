@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { GraduationCap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
+import { BRAND_NAME } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -70,9 +72,9 @@ export function SignupIndividualPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-(--color-muted) p-6">
-      <div className="mb-6 flex items-center gap-2 text-(--color-foreground)">
-        <GraduationCap className="h-7 w-7 text-(--color-primary)" />
-        <span className="text-lg font-semibold tracking-tight">School Tuter</span>
+      <div className="mb-6 flex items-center gap-2.5 text-(--color-foreground)">
+        <BrandLogo size={36} />
+        <span className="text-lg font-semibold tracking-tight">{BRAND_NAME}</span>
       </div>
       <Card className="w-full max-w-md">
         <CardHeader>

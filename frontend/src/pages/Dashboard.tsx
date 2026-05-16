@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
+import { DashboardHero } from "@/components/DashboardHero";
 import { LearnerDashboard } from "@/components/LearnerDashboard";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import { useAuth } from "@/lib/auth";
@@ -100,8 +101,19 @@ export function DashboardPage() {
   const isPlatformAdmin = user?.role === "platform_admin";
   const isSchoolAdmin = user?.role === "school_admin";
 
+  // Map our backend role string to the bucket DashboardHero understands.
+  // school_admin + teacher share most operational chrome but the hero
+  // copy benefits from distinguishing the two.
+  const heroRole: "teacher" | "school_admin" | "platform_admin" = isPlatformAdmin
+    ? "platform_admin"
+    : isSchoolAdmin
+      ? "school_admin"
+      : "teacher";
+
   return (
     <ThemedPage>
+      <DashboardHero role={heroRole} userName={firstWord(user?.full_name ?? "")} />
+
       <PageHeader
         title={`Welcome, ${firstWord(user?.full_name ?? "")}`}
         description={
