@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
  * Plays every time the dashboard mounts — a refresh or a route
  * change back to /dashboard replays it. No localStorage gating.
  */
-const HOLD_MS = 2200;     // time the image stays at full opacity
+const HOLD_MS = 1200;     // time the image stays at full opacity
 const FADE_MS = 2000;     // duration of the fade-out
 const TOTAL_MS = HOLD_MS + FADE_MS + 200; // small buffer before unmount
 
