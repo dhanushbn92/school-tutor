@@ -37,7 +37,9 @@ from app.llm.schemas.diagram import DiagramOutput
 from app.llm.schemas.flow_diagram import FlowDiagramOutput
 from app.llm.schemas.lesson_plan import LessonPlanOutput
 from app.llm.schemas.ppt import PPTOutlineOutput
+from app.llm.schemas.simulation import SimulationOutput
 from app.llm.schemas.worksheet import WorksheetOutput
+from app.rendering.simulation_html import render_simulation_html
 from pydantic import BaseModel, ValidationError
 from app.services.artifact_repair import (
     ArtifactRepairError,
@@ -416,6 +418,200 @@ def upload_structured_content(
         llm_model=None,
     )
     db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+# --------------------------------------------------------------------------
+# Simulation HTML upload (platform admin manual simulation upload)
+#
+# The admin authors a complete self-contained HTML simulation locally
+# (e.g. a Three.js or D3 demo) and uploads the .html file. We wrap it as
+# a SimulationOutput using the `custom_html` template, which means it
+# inherits the same sandboxed-iframe rendering and audit-trail story as
+# LLM-generated custom_html simulations — no special-case path through
+# the rest of the platform.
+#
+# Why a dedicated route rather than extending /upload-structured:
+#   - multipart is the natural fit for "upload a file"
+#   - we get to apply HTML-specific validation (extension + size)
+#   - admin doesn't need to know about the wrapping JSON shape
+# --------------------------------------------------------------------------
+_SIMULATION_UPLOAD_MAX_BYTES = 200_000  # matches CustomHtml.html_body cap
+
+
+@router.post(
+    "/upload-simulation",
+    response_model=GeneratedContentRead,
+    status_code=201,
+)
+async def upload_simulation_file(
+    title: str = Form(..., min_length=5, max_length=200),
+    class_level: int = Form(..., ge=1, le=12),
+    subject_id: int = Form(...),
+    chapter_id: int | None = Form(default=None),
+    topic_id: int | None = Form(default=None),
+    instructions: str | None = Form(default=None, max_length=500),
+    outcome_codes: str | None = Form(
+        default=None,
+        description=(
+            "Comma-separated outcome codes (optional). Each must already exist "
+            "on the chapter; unknown codes are dropped silently."
+        ),
+    ),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: User = Depends(require_platform_admin),
+):
+    """Upload a hand-crafted HTML simulation as a SIMULATION content row.
+
+    The uploaded HTML is stored as `output_json.custom.html_body` inside a
+    `custom_html` SimulationOutput. The same renderer the LLM pipeline uses
+    wraps the body in a sandboxed iframe and writes the resulting HTML to
+    the artifact store, so the new row is indistinguishable from a
+    generated one at view-time.
+
+    Status is set to APPROVED immediately — these are admin-curated, not
+    LLM drafts — so they appear in the catalog without a review step.
+    """
+    # 1. Validate file extension. .html or .htm only — JSON simulation
+    # uploads should go through /upload-structured (once SIMULATION is
+    # added to that map; see follow-up).
+    filename = (file.filename or "").lower()
+    if not (filename.endswith(".html") or filename.endswith(".htm")):
+        raise HTTPException(
+            status_code=400,
+            detail="Only .html / .htm files are accepted for simulation upload.",
+        )
+
+    # 2. Read with a hard size cap to match the schema's html_body limit.
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty file.")
+    if len(raw) > _SIMULATION_UPLOAD_MAX_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                f"HTML file too large; limit is "
+                f"{_SIMULATION_UPLOAD_MAX_BYTES // 1024} KB."
+            ),
+        )
+    try:
+        html_body = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=400,
+            detail="HTML file must be valid UTF-8 (no binary content).",
+        )
+
+    # 3. Validate the curriculum FK chain — mirror the other upload routes.
+    cls = db.scalar(select(SchoolClass).where(SchoolClass.level == class_level))
+    if cls is None:
+        raise HTTPException(status_code=400, detail=f"Class level {class_level} not configured")
+    subject = db.get(Subject, subject_id)
+    if subject is None or subject.class_id != cls.id:
+        raise HTTPException(status_code=400, detail="Subject does not belong to that class")
+    chapter = None
+    if chapter_id is not None:
+        chapter = db.get(Chapter, chapter_id)
+        if chapter is None:
+            raise HTTPException(status_code=400, detail="Unknown chapter_id")
+        book = db.get(Book, chapter.book_id) if chapter.book_id else None
+        if book is None or book.subject_id != subject_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Chapter does not belong to that subject",
+            )
+
+    # 4. Build the SimulationOutput payload. The schema's `custom_html`
+    # validator (in simulation.py) enforces the <!DOCTYPE html / <html>
+    # check, so a malformed HTML upload is rejected here with a 400.
+    outcome_codes_list: list[str] = []
+    if outcome_codes:
+        outcome_codes_list = [
+            c.strip() for c in outcome_codes.split(",") if c.strip()
+        ]
+    # The simulation schema requires `instructions` (min_length 10). Default
+    # to a generic blurb if the admin didn't provide one — they're uploading
+    # a finished simulation, so forcing them to write instructions twice is
+    # bad UX. Admin-supplied text takes precedence and must clear min_length
+    # on its own merits (we don't pad-trim it).
+    effective_instructions = (instructions or "").strip()
+    if not effective_instructions:
+        effective_instructions = (
+            "Interactive simulation — explore the controls and observe "
+            "what happens."
+        )
+    payload = {
+        "template": "custom_html",
+        "title": title.strip(),
+        "instructions": effective_instructions,
+        "outcome_codes_covered": outcome_codes_list,
+        "custom": {
+            "html_body": html_body,
+            "requires_libraries": [],
+        },
+    }
+    try:
+        validated = SimulationOutput.model_validate(payload)
+    except ValidationError as e:
+        errors = e.errors()[:5]
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": "Uploaded HTML failed SimulationOutput validation",
+                "errors": [
+                    {
+                        "loc": ".".join(str(p) for p in err["loc"]),
+                        "msg": err["msg"],
+                        "type": err["type"],
+                    }
+                    for err in errors
+                ],
+            },
+        ) from e
+
+    # 5. Pick an academic year (same precedence as the other upload routes).
+    year = db.scalar(select(AcademicYear).where(AcademicYear.is_current.is_(True)))
+    if year is None:
+        year = db.scalar(select(AcademicYear).order_by(AcademicYear.id.desc()))
+    if year is None:
+        raise HTTPException(
+            status_code=500,
+            detail="No academic year configured on the platform.",
+        )
+
+    # 6. Insert the row, render the artifact, save. Mirrors the loader
+    # pattern exactly (see scripts/cbse_class10/51_load_ch256.py and
+    # friends) so the resulting row has the same shape as a curated load.
+    now = datetime.now(timezone.utc)
+    row = GeneratedContent(
+        content_type=GeneratedContentType.SIMULATION,
+        academic_year=year.name,
+        class_level=class_level,
+        subject_id=subject_id,
+        chapter_id=chapter.id if chapter else None,
+        topic_id=topic_id,
+        title=title.strip(),
+        status=GeneratedContentStatus.APPROVED,
+        published_at=now,
+        published_by_id=user.id,
+        created_by_id=user.id,
+        cache_key=f"upload:simulation:{user.id}:{now.isoformat()}",
+        request_options={
+            "source": "manual_simulation_upload",
+            "uploaded_filename": file.filename or "upload.html",
+        },
+        output_json=validated.model_dump(),
+        llm_model=None,
+    )
+    db.add(row)
+    db.flush()  # need row.id for the artifact filename
+
+    store = get_artifact_store()
+    rendered = render_simulation_html(validated)
+    row.artifact_url = store.save(content_id=row.id, extension="html", data=rendered)
     db.commit()
     db.refresh(row)
     return row

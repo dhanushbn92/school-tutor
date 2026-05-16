@@ -1033,6 +1033,49 @@ export function useUploadStructuredContent() {
   });
 }
 
+/**
+ * Platform-admin-only multipart upload of a hand-crafted HTML simulation.
+ *
+ * Backend route: POST /generated-content/upload-simulation. The server
+ * wraps the uploaded HTML inside a SimulationOutput with the custom_html
+ * template, validates against the same Pydantic schema the LLM pipeline
+ * uses, renders through render_simulation_html (sandboxed iframe), and
+ * persists a SIMULATION GeneratedContent row with status=APPROVED.
+ */
+export function useUploadSimulation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      title: string;
+      class_level: number;
+      subject_id: number;
+      chapter_id?: number | null;
+      topic_id?: number | null;
+      instructions?: string | null;
+      /** Comma-separated outcome codes (optional). */
+      outcome_codes?: string | null;
+      file: File;
+    }) => {
+      const form = new FormData();
+      form.append("title", input.title);
+      form.append("class_level", String(input.class_level));
+      form.append("subject_id", String(input.subject_id));
+      if (input.chapter_id != null) form.append("chapter_id", String(input.chapter_id));
+      if (input.topic_id != null) form.append("topic_id", String(input.topic_id));
+      if (input.instructions) form.append("instructions", input.instructions);
+      if (input.outcome_codes) form.append("outcome_codes", input.outcome_codes);
+      form.append("file", input.file);
+      const { data } = await api.post<GeneratedContent>(
+        "/generated-content/upload-simulation",
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["generated-content"] }),
+  });
+}
+
 /** Platform-admin-only multipart upload of supplementary documents (PDF/DOCX). */
 export function useUploadExtraContent() {
   const qc = useQueryClient();
