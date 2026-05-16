@@ -11,43 +11,39 @@ import { cn } from "@/lib/utils";
 /**
  * Dhananjaya intro overlay — shown once, then gone.
  *
- * The platform's first impression isn't a stat card; it's an animated
- * scene. A vidyārthi (student) draws a recurve bow and looses an arrow
- * across the screen to a target — the full draw → aim → release →
- * impact cycle plays exactly once, fades, and the dashboard takes over.
+ * The platform's first impression is a single cinematic moment: a
+ * hand-painted Vidyārthi archer scene drifts in from a soft sand-toned
+ * backdrop, holds while the welcome text fades in alongside, and the
+ * whole thing dissolves away to reveal the dashboard underneath.
  *
  * Behaviour
  *   - On the FIRST visit per device (localStorage flag absent): the
- *     overlay mounts above the dashboard with a graceful fade-in,
- *     plays one 7.5 s archer cycle, fades out over 1 s, and unmounts.
- *     The flag is set when the overlay starts so a refresh mid-play
- *     doesn't replay it.
+ *     overlay mounts above the dashboard. The image + text play
+ *     through a 7.5 s cycle, then a final 1 s container fade dismisses
+ *     anything that hasn't already cleared. Auto-unmounts.
  *   - On every visit afterwards: the component renders nothing. The
  *     dashboard widgets show immediately, uncluttered.
  *
  * If a returning user wants the intro again they can clear the flag:
  *
- *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen-v2")
+ *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen-v3")
  *
  * Role-aware copy
  *   The headline + one-line lead are tuned per role so the welcome
  *   feels personally addressed rather than generic.
  */
-// Bumped from `…hero-intro-seen` to `…-v2` when the scene was rebuilt
-// from a stick figure to the full Vidyārthi archer. Users who dismissed
-// the old version still have the v1 key set; bumping forces a one-time
-// replay so everyone sees the new scene without having to fiddle with
-// devtools. Bump this suffix again whenever a redesign warrants a
-// forced re-watch.
-const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen-v2";
+// Bumped to -v3 when the scene moved from a hand-drawn SVG character
+// to the painted hero illustration. Forces everyone — including users
+// who already dismissed v1 or v2 — to see the new intro exactly once.
+const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen-v3";
 
-/** Total time the overlay stays visible, in ms. Matches the archer
- *  scene's 7.5 s cycle plus a beat of "hold the moment" plus the
- *  fade-out duration so the user sees the arrow land before things
- *  start dissolving. */
-const INTRO_PLAY_MS = 7500;
-const INTRO_FADE_OUT_MS = 1000;
-const INTRO_TOTAL_MS = INTRO_PLAY_MS + INTRO_FADE_OUT_MS;
+/** Total time the inner image animation runs (must match the keyframes
+ *  in VidyarthiArcher). After this elapses we still hold the overlay
+ *  for a short tail so any text fades that lag behind catch up before
+ *  the container itself dismisses. */
+const INNER_ANIMATION_MS = 7500;
+const CONTAINER_FADE_MS = 1000;
+const INTRO_TOTAL_MS = INNER_ANIMATION_MS + CONTAINER_FADE_MS;
 
 type RoleKey = "learner" | "teacher" | "school_admin" | "platform_admin";
 
@@ -80,39 +76,34 @@ export function DashboardHero({
   /** Optional first-name for the headline. */
   userName?: string;
 }) {
-  // Initial phase: skip entirely if we've already shown the intro on
-  // this device. Reading localStorage in the useState initializer is
-  // a one-time synchronous read; safe and lazy.
+  // Read the storage flag lazily so we don't trigger an unnecessary
+  // mount when the user has already seen the intro.
   const [phase, setPhase] = useState<Phase>(() => {
     if (typeof window === "undefined") return "done";
     try {
       return window.localStorage.getItem(STORAGE_KEY) === "1" ? "done" : "playing";
     } catch {
-      // Private mode / disabled storage — fall through to "done" so we
-      // never spam the intro every page load.
       return "done";
     }
   });
 
-  // Record that the user has seen the intro AS SOON AS it starts. If
-  // they refresh mid-play we don't want to replay; the intent is
-  // strictly once-per-device. Wrapped in try/catch in case storage is
-  // blocked (private mode, browser policy, etc.).
+  // Record "seen" the moment the intro starts so a mid-play refresh
+  // doesn't replay it.
   useEffect(() => {
     if (phase !== "playing") return;
     try {
       window.localStorage.setItem(STORAGE_KEY, "1");
     } catch {
-      /* storage unavailable — the in-memory flag is enough for now */
+      /* private mode or storage disabled — in-memory state suffices */
     }
   }, [phase]);
 
-  // Drive the playing → fading → done transition with two timers. We
-  // store them on a ref-like array so the cleanup function can clear
-  // both even if the component unmounts mid-transition.
+  // Two timers drive the playing → fading → done transition. Cleanup
+  // clears both on unmount so a fast route-change can't leave a
+  // dangling timer behind.
   useEffect(() => {
     if (phase !== "playing") return;
-    const fadeAt = window.setTimeout(() => setPhase("fading"), INTRO_PLAY_MS);
+    const fadeAt = window.setTimeout(() => setPhase("fading"), INNER_ANIMATION_MS);
     const doneAt = window.setTimeout(() => setPhase("done"), INTRO_TOTAL_MS);
     return () => {
       window.clearTimeout(fadeAt);
@@ -120,47 +111,69 @@ export function DashboardHero({
     };
   }, [phase]);
 
-  // After the intro has finished (whether by timeout or because the
-  // user has seen it before), we render nothing — the dashboard
-  // widgets get the full canvas. This is by design: the intro is a
-  // delightful first impression, not permanent dashboard furniture.
   if (phase === "done") return null;
 
   return (
     <div
+      // Full-bleed overlay. The backdrop is a warm sand tone that
+      // matches the illustration so the image doesn't sit on a
+      // jarringly-different surface.
       className={cn(
-        // Full-bleed overlay positioned inside the page's main scroll
-        // container. We use position: fixed so the intro sits over
-        // whatever the dashboard renders underneath. z-index above
-        // the page header but below toasts / modals.
-        "fixed inset-0 z-40 flex items-center justify-center bg-(--color-card)/95",
-        "backdrop-blur-sm transition-opacity",
+        "fixed inset-0 z-40 flex items-center justify-center",
+        "bg-gradient-to-b from-[#F5EFE0] via-[#EFE6D2] to-[#E2D5B5]",
+        "transition-opacity",
         phase === "fading" ? "opacity-0 pointer-events-none" : "opacity-100",
       )}
-      style={{ transitionDuration: `${INTRO_FADE_OUT_MS}ms` }}
+      style={{ transitionDuration: `${CONTAINER_FADE_MS}ms` }}
       aria-hidden={phase !== "playing"}
     >
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 text-center text-(--color-foreground)">
-        <BrandLogo size={64} />
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 text-center text-[#2A1F12]">
+        {/* Top chrome: logo + brand name + tagline. Small, doesn't
+            compete with the illustration for attention. */}
+        <div className="flex items-center gap-3 opacity-0 animate-[fade-in_0.8s_ease-in-out_0.2s_forwards]">
+          <BrandLogo size={48} />
+          <div className="flex flex-col items-start leading-tight">
+            <span className="font-display text-xl font-semibold tracking-tight">
+              {BRAND_NAME}
+            </span>
+            <span className="font-display text-[10px] uppercase tracking-[0.22em] text-(--color-primary)">
+              {BRAND_TAGLINE}
+            </span>
+          </div>
+        </div>
+
+        {/* The hero illustration — the centerpiece. Constrained to a
+            comfortable max-width so it doesn't dominate huge screens. */}
+        <div className="w-full max-w-4xl">
+          <VidyarthiArcher playOnce />
+        </div>
+
+        {/* Welcome headline + role-aware lead. Fades in slightly
+            after the image so the reader's eye lands on the picture
+            first, then the text. */}
+        <div className="space-y-3 opacity-0 animate-[fade-in_0.8s_ease-in-out_1.3s_forwards]">
+          <h1 className="font-display text-2xl font-semibold tracking-tight md:text-4xl">
             {ROLE_HEADLINE[role]}
             {userName ? `, ${userName}` : ""}.
           </h1>
-          <p className="font-display text-xs uppercase tracking-[0.22em] text-(--color-primary)">
-            {BRAND_NAME} &middot; {BRAND_TAGLINE}
+          <p className="mx-auto max-w-xl text-sm leading-relaxed text-[#5C4A33] md:text-base">
+            {ROLE_INTRO[role]}
+          </p>
+          <p className="mx-auto max-w-xl text-xs italic text-[#7A6648] md:text-sm">
+            &ldquo;{BRAND_PHILOSOPHY}&rdquo;
           </p>
         </div>
-        <div className="w-full max-w-3xl rounded-2xl border border-(--color-border) bg-(--color-card) shadow-sm">
-          <VidyarthiArcher playOnce />
-        </div>
-        <p className="max-w-xl text-base leading-relaxed text-(--color-muted-foreground)">
-          {ROLE_INTRO[role]}
-        </p>
-        <p className="max-w-xl text-sm italic text-(--color-foreground)/80">
-          &ldquo;{BRAND_PHILOSOPHY}&rdquo;
-        </p>
       </div>
+
+      {/* One-off fade-in keyframe defined locally so we don't need to
+          touch the global stylesheet. The two text blocks above use
+          this same animation with staggered delays. */}
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
