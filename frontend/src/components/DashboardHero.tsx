@@ -1,39 +1,47 @@
 import { useEffect, useState } from "react";
-import { Sparkles, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/BrandLogo";
 import { VidyarthiArcher } from "@/components/VidyarthiArcher";
 import {
   BRAND_NAME,
   BRAND_PHILOSOPHY,
-  BRAND_QUOTES,
   BRAND_TAGLINE,
 } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 /**
- * The dashboard's first-impression panel: brand identity + practice
- * philosophy + a small archer animation. Shown above the existing
- * stat cards so the platform's personality reads at a glance before
- * the user dives into operational widgets.
+ * Dhananjaya intro overlay — shown once, then gone.
  *
- * Two presentations:
- *   - First visit (no localStorage flag): a generous hero with the
- *     full archer scene, a one-line CTA explaining what the platform
- *     is for, and a dismiss control that sets the flag.
- *   - Repeat visits: a compact band — logo, rotating quote, and a
- *     slim archer strip — that takes much less vertical room.
+ * The platform's first impression isn't a stat card; it's an animated
+ * scene. A vidyārthi (student) draws a recurve bow and looses an arrow
+ * across the screen to a target — the full draw → aim → release →
+ * impact cycle plays exactly once, fades, and the dashboard takes over.
  *
- * The localStorage key is namespaced under `dhananjaya:` so it doesn't
- * collide with any existing per-account preferences and is easy to
- * grep / reset during onboarding tests.
+ * Behaviour
+ *   - On the FIRST visit per device (localStorage flag absent): the
+ *     overlay mounts above the dashboard with a graceful fade-in,
+ *     plays one 7.5 s archer cycle, fades out over 1 s, and unmounts.
+ *     The flag is set when the overlay starts so a refresh mid-play
+ *     doesn't replay it.
+ *   - On every visit afterwards: the component renders nothing. The
+ *     dashboard widgets show immediately, uncluttered.
  *
- * Role-aware copy: each role gets a one-line context lead so the hero
- * feels personally addressed rather than generic. Learners see a
- * "draw your bow" framing; teachers see a "guide every shot" framing;
- * platform admins see a curation framing.
+ * If a returning user wants the intro again they can clear the flag:
+ *
+ *     localStorage.removeItem("dhananjaya:dashboard:hero-intro-seen")
+ *
+ * Role-aware copy
+ *   The headline + one-line lead are tuned per role so the welcome
+ *   feels personally addressed rather than generic.
  */
 const STORAGE_KEY = "dhananjaya:dashboard:hero-intro-seen";
+
+/** Total time the overlay stays visible, in ms. Matches the archer
+ *  scene's 7.5 s cycle plus a beat of "hold the moment" plus the
+ *  fade-out duration so the user sees the arrow land before things
+ *  start dissolving. */
+const INTRO_PLAY_MS = 7500;
+const INTRO_FADE_OUT_MS = 1000;
+const INTRO_TOTAL_MS = INTRO_PLAY_MS + INTRO_FADE_OUT_MS;
 
 type RoleKey = "learner" | "teacher" | "school_admin" | "platform_admin";
 
@@ -45,7 +53,7 @@ const ROLE_INTRO: Record<RoleKey, string> = {
   school_admin:
     "See the whole range. Weak topics, intervention notes, and class-wide trends — surfaced where you can act on them.",
   platform_admin:
-    "Curate the practice ground. Author content, approve questions, and shape the catalog that every learner draws from.",
+    "Curate the practice ground. Author content, approve questions, and shape the catalog every learner draws from.",
 };
 
 const ROLE_HEADLINE: Record<RoleKey, string> = {
@@ -54,6 +62,8 @@ const ROLE_HEADLINE: Record<RoleKey, string> = {
   school_admin: "Welcome to your school",
   platform_admin: "Welcome, curator",
 };
+
+type Phase = "playing" | "fading" | "done";
 
 export function DashboardHero({
   role,
@@ -64,159 +74,87 @@ export function DashboardHero({
   /** Optional first-name for the headline. */
   userName?: string;
 }) {
-  const [introSeen, setIntroSeen] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
+  // Initial phase: skip entirely if we've already shown the intro on
+  // this device. Reading localStorage in the useState initializer is
+  // a one-time synchronous read; safe and lazy.
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (typeof window === "undefined") return "done";
     try {
-      return window.localStorage.getItem(STORAGE_KEY) === "1";
+      return window.localStorage.getItem(STORAGE_KEY) === "1" ? "done" : "playing";
     } catch {
-      // Private mode / disabled storage — fall back to "already seen"
-      // so we don't spam every page load with the intro.
-      return true;
+      // Private mode / disabled storage — fall through to "done" so we
+      // never spam the intro every page load.
+      return "done";
     }
   });
 
-  // Rotate the quotes on the compact band. Stable per-mount index so
-  // a reload picks a new one without thrashing every render. useState's
-  // lazy initializer is the pure-render way to make a one-time random
-  // pick (the callback runs exactly once on mount, off the render path).
-  const [quote] = useState(() =>
-    BRAND_QUOTES[Math.floor(Math.random() * BRAND_QUOTES.length)],
-  );
-
-  function dismissIntro() {
-    setIntroSeen(true);
+  // Record that the user has seen the intro AS SOON AS it starts. If
+  // they refresh mid-play we don't want to replay; the intent is
+  // strictly once-per-device. Wrapped in try/catch in case storage is
+  // blocked (private mode, browser policy, etc.).
+  useEffect(() => {
+    if (phase !== "playing") return;
     try {
       window.localStorage.setItem(STORAGE_KEY, "1");
     } catch {
-      // Storage may be unavailable; the in-memory flip is enough for
-      // this session.
+      /* storage unavailable — the in-memory flag is enough for now */
     }
-  }
+  }, [phase]);
 
-  // Auto-dismiss the intro after 18s so a learner who walks away from
-  // the screen still lands on the working dashboard when they return.
+  // Drive the playing → fading → done transition with two timers. We
+  // store them on a ref-like array so the cleanup function can clear
+  // both even if the component unmounts mid-transition.
   useEffect(() => {
-    if (introSeen) return;
-    const t = window.setTimeout(dismissIntro, 18_000);
-    return () => window.clearTimeout(t);
-    // dismissIntro is defined inline above; its deps are stable, so
-    // omitting it from the dep array is safe and avoids re-arming the
-    // timer on every render.
-  }, [introSeen]);
+    if (phase !== "playing") return;
+    const fadeAt = window.setTimeout(() => setPhase("fading"), INTRO_PLAY_MS);
+    const doneAt = window.setTimeout(() => setPhase("done"), INTRO_TOTAL_MS);
+    return () => {
+      window.clearTimeout(fadeAt);
+      window.clearTimeout(doneAt);
+    };
+  }, [phase]);
 
-  if (!introSeen) {
-    return <IntroPanel role={role} userName={userName} onDismiss={dismissIntro} />;
-  }
-  return <CompactBand role={role} quote={quote} />;
-}
+  // After the intro has finished (whether by timeout or because the
+  // user has seen it before), we render nothing — the dashboard
+  // widgets get the full canvas. This is by design: the intro is a
+  // delightful first impression, not permanent dashboard furniture.
+  if (phase === "done") return null;
 
-/**
- * First-visit hero. Big, generous, with the archer animation centred.
- * One CTA: dismiss. Auto-dismisses after 18 s.
- */
-function IntroPanel({
-  role,
-  userName,
-  onDismiss,
-}: {
-  role: RoleKey;
-  userName?: string;
-  onDismiss: () => void;
-}) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-(--color-border) bg-gradient-to-br",
-        // Subtle brand-flavoured gradient — navy on the left fading to
-        // a warm cream on the right so the colourful arrows pop.
-        "from-(--color-card) via-(--color-card) to-(--color-muted)",
-        "p-6 md:p-8 mb-6 text-(--color-foreground)",
+        // Full-bleed overlay positioned inside the page's main scroll
+        // container. We use position: fixed so the intro sits over
+        // whatever the dashboard renders underneath. z-index above
+        // the page header but below toasts / modals.
+        "fixed inset-0 z-40 flex items-center justify-center bg-(--color-card)/95",
+        "backdrop-blur-sm transition-opacity",
+        phase === "fading" ? "opacity-0 pointer-events-none" : "opacity-100",
       )}
+      style={{ transitionDuration: `${INTRO_FADE_OUT_MS}ms` }}
+      aria-hidden={phase !== "playing"}
     >
-      {/* Dismiss button — corner placement keeps it out of the reading
-          path but always reachable. */}
-      <button
-        type="button"
-        onClick={onDismiss}
-        className="absolute right-3 top-3 rounded-md p-1 text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)"
-        aria-label="Dismiss the welcome panel"
-      >
-        <X className="h-4 w-4" />
-      </button>
-
-      <div className="grid items-center gap-6 lg:grid-cols-[1fr_minmax(0,1.2fr)]">
-        <div className="space-y-4">
-          <BrandLogo size={56} />
-          <div>
-            <h1 className="font-display text-3xl font-semibold tracking-tight md:text-4xl">
-              {ROLE_HEADLINE[role]}
-              {userName ? `, ${userName}` : ""}.
-            </h1>
-            <p className="mt-1 font-display text-sm uppercase tracking-[0.18em] text-(--color-primary)">
-              {BRAND_NAME} &middot; {BRAND_TAGLINE}
-            </p>
-          </div>
-          <p className="max-w-prose text-base leading-relaxed text-(--color-muted-foreground)">
-            {ROLE_INTRO[role]}
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 text-center text-(--color-foreground)">
+        <BrandLogo size={64} />
+        <div className="space-y-2">
+          <h1 className="font-display text-3xl font-semibold tracking-tight md:text-5xl">
+            {ROLE_HEADLINE[role]}
+            {userName ? `, ${userName}` : ""}.
+          </h1>
+          <p className="font-display text-xs uppercase tracking-[0.22em] text-(--color-primary)">
+            {BRAND_NAME} &middot; {BRAND_TAGLINE}
           </p>
-          <p className="max-w-prose text-sm italic leading-relaxed text-(--color-foreground)/80">
-            &ldquo;{BRAND_PHILOSOPHY}&rdquo;
-          </p>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button onClick={onDismiss} size="sm">
-              <Sparkles className="h-4 w-4" /> Start exploring
-            </Button>
-            <span className="self-center text-xs text-(--color-muted-foreground)">
-              This welcome shows only on your first visit.
-            </span>
-          </div>
         </div>
-
-        <div className="relative">
-          <VidyarthiArcher className="text-(--color-foreground)" />
+        <div className="w-full max-w-3xl rounded-2xl border border-(--color-border) bg-(--color-card) shadow-sm">
+          <VidyarthiArcher playOnce />
         </div>
+        <p className="max-w-xl text-base leading-relaxed text-(--color-muted-foreground)">
+          {ROLE_INTRO[role]}
+        </p>
+        <p className="max-w-xl text-sm italic text-(--color-foreground)/80">
+          &ldquo;{BRAND_PHILOSOPHY}&rdquo;
+        </p>
       </div>
-    </div>
-  );
-}
-
-/**
- * Repeat-visit band. A slim row that keeps the brand visible without
- * eating screen real estate. The rotating quote is a quiet reminder
- * of the platform's practice ethos.
- */
-function CompactBand({
-  role,
-  quote,
-}: {
-  role: RoleKey;
-  quote: { text: string; attribution?: string };
-}) {
-  return (
-    <div className="mb-6 flex flex-col gap-3 rounded-lg border border-(--color-border) bg-(--color-card) p-4 md:flex-row md:items-center md:justify-between md:gap-6">
-      <div className="flex items-start gap-3">
-        <BrandLogo size={36} />
-        <div className="space-y-0.5">
-          <p className="font-display text-sm font-semibold tracking-tight">
-            {BRAND_NAME} &middot;{" "}
-            <span className="text-(--color-muted-foreground)">{BRAND_TAGLINE}</span>
-          </p>
-          <p className="text-xs italic text-(--color-muted-foreground)">
-            &ldquo;{quote.text}&rdquo;
-            {quote.attribution && (
-              <span className="ml-1 not-italic">— {quote.attribution}</span>
-            )}
-          </p>
-        </div>
-      </div>
-      {/* Compact archer strip — present on every visit so the brand
-          motif is reinforced, but small enough not to dominate. The
-          role prop is accepted here for future per-role tweaks; for now
-          we render the same strip everywhere. */}
-      <VidyarthiArcher compact className="hidden w-[260px] flex-shrink-0 text-(--color-foreground) md:block" />
-      {/* `role` is destructured for the API consumer signature even
-          though the strip is identical for now. */}
-      <span className="sr-only">Viewing as {role}</span>
     </div>
   );
 }

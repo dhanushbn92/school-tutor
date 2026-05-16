@@ -2,20 +2,24 @@ import { BRAND_ARROW_COLORS, BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 /**
- * The Dhananjaya brand mark — a tight cluster of stylised arrows
- * pointing up-and-forward, echoing the reference image the design ask
- * was rooted in: one big lead arrow with smaller arrows trailing in
- * formation.
+ * The Dhananjaya brand mark.
  *
- * The shape language is the "shoulder + shaft" arrow from the reference:
- * an L-bend that suggests forward motion AND ascent at once. Each arrow
- * is a single path so the SVG is small (under 2 KB) and crisp at any
- * size.
+ * The reference image was a flock of nine multi-colour arrows in
+ * formation. Trying to recreate all nine arrows in a 24-48 px logo
+ * read as visual noise — the small arrows blurred into specks. So
+ * the production mark distils the reference down to its essence:
  *
- * Two variants:
- *   - `<BrandLogo />`        — icon only, square. Use in tight chrome.
- *   - `<BrandLogo withText />` — icon + Dhananjaya wordmark. Use in
- *                                sidebars and login chrome.
+ *   three chunky upward-pointing arrows in a stair-step formation,
+ *   smallest at the bottom-left growing to a bold navy lead arrow at
+ *   the top-right.
+ *
+ * The metaphor is the platform's pitch in one glance: each practice
+ * cycle is another arrow rising further than the last. The shape is
+ * a single filled polygon (no strokes, no curves) so it stays crisp
+ * at any size and renders the same on every browser.
+ *
+ *   <BrandLogo />          — icon only.
+ *   <BrandLogo withText /> — icon + Dhananjaya wordmark.
  */
 export function BrandLogo({
   withText = false,
@@ -27,9 +31,9 @@ export function BrandLogo({
   className?: string;
 }) {
   const C = BRAND_ARROW_COLORS;
-  // 100x100 viewBox keeps the math readable. The "shoulder arrow" path
-  // is reused via <use> with transform per arrow, so colour and position
-  // are independent variables.
+  // A 100 × 100 viewBox keeps the per-arrow translate / scale numbers
+  // easy to read. Each <use> is one filled polygon, so even at 24 px
+  // the logo doesn't lose detail to anti-aliasing.
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <svg
@@ -42,52 +46,33 @@ export function BrandLogo({
       >
         <defs>
           {/*
-            One arrow definition, reused via <use>. The shape is an
-            L-bend pointing up-and-right: shaft starts mid-left, bends
-            up at the shoulder, and ends in a chevron arrowhead.
-            Reference: the multi-colour arrows in the design ask.
+            Master arrow path. A chunky upward arrow with a strong
+            triangular head:
+              - head spans the top 45 % of the height (y = 5 .. 50)
+              - shaft is centred, 30 units wide (x = 35 .. 65)
+              - shaft fills the bottom 45 % of the height
+            The result reads as a confident "↑" at every scale.
           */}
-          <path
-            id="dh-arrow"
-            d="
-              M 0 22
-              L 14 22
-              L 14 14
-              L 24 14
-              L 24 0
-              L 36 0
-              L 36 6
-              L 30 6
-              L 30 14
-              L 24 14
-              L 24 22
-              L 22 22
-              L 22 30
-              L 0 30
-              Z
-              M 30 0
-              L 36 0
-              L 36 6
-              Z
-            "
-          />
+          <path id="dh-arrow" d="M 50 5 L 90 50 L 65 50 L 65 95 L 35 95 L 35 50 L 10 50 Z" />
         </defs>
 
-        {/* The big lead arrow — navy, top-right, larger than the rest. */}
-        <use href="#dh-arrow" transform="translate(52 16) scale(1.25)" fill={C.navy} />
+        {/*
+          All three arrows live inside a single <g> tilted slightly to
+          the right — the arrows now look like they're in flight,
+          carrying momentum, rather than statically planted. A 12°
+          tilt is enough to suggest motion without making the lead
+          arrow look unstable.
+        */}
+        <g transform="rotate(12 50 50)">
+          {/* Smallest supporting arrow — orange, bottom-left. */}
+          <use href="#dh-arrow" transform="translate(0 58) scale(0.32)" fill={C.orange} />
 
-        {/* Smaller arrows trailing in a loose formation. The transforms
-            roughly recreate the spatial vibe of the reference: a couple
-            on the left, a couple on the bottom, one yellow above the
-            lead arrow. */}
-        <use href="#dh-arrow" transform="translate(10 36) scale(0.7)" fill={C.orange} />
-        <use href="#dh-arrow" transform="translate(34 14) scale(0.45)" fill={C.magenta} />
-        <use href="#dh-arrow" transform="translate(44 4)  scale(0.4)"  fill={C.yellow} />
-        <use href="#dh-arrow" transform="translate(20 56) scale(0.5)"  fill={C.teal} />
-        <use href="#dh-arrow" transform="translate(8 70)  scale(0.55)" fill={C.navy} opacity="0.85" />
-        <use href="#dh-arrow" transform="translate(34 68) scale(0.85)" fill={C.green} />
-        <use href="#dh-arrow" transform="translate(68 60) scale(0.7)"  fill={C.purple} />
-        <use href="#dh-arrow" transform="translate(74 36) scale(0.4)"  fill={C.gray} />
+          {/* Mid supporting arrow — green, slightly above + right of orange. */}
+          <use href="#dh-arrow" transform="translate(22 28) scale(0.46)" fill={C.green} />
+
+          {/* Lead arrow — navy, top-right, biggest. */}
+          <use href="#dh-arrow" transform="translate(43 -3) scale(0.62)" fill={C.navy} />
+        </g>
       </svg>
       {withText && (
         <span className="flex flex-col leading-tight">
