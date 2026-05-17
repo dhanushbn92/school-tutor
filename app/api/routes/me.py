@@ -169,6 +169,11 @@ class QuickQuizRequest(BaseModel):
         ),
     )
     title: str | None = Field(default=None, max_length=200)
+    # Optional time-bound quiz. None means untimed; an int means the
+    # take-quiz UI will show a countdown banner and auto-submit when
+    # the timer hits zero. Mirrors the same field on Assessment so the
+    # student's quick quiz behaves like a teacher-assigned one.
+    duration_minutes: int | None = Field(default=None, ge=1, le=180)
 
 
 @router.post("/quick-quiz", response_model=AssessmentRead, status_code=201)
@@ -316,6 +321,9 @@ def quick_quiz(
         title=title,
         instructions="Self-paced practice quiz.",
         total_marks=total,
+        # Optional time-bound quiz. The take-quiz UI shows a
+        # countdown banner + auto-submits at zero when this is set.
+        duration_minutes=payload.duration_minutes,
         published_at=datetime.now(timezone.utc),
         created_by_id=user.id,
     )

@@ -1168,6 +1168,9 @@ export function useQuickQuiz() {
       cognitive_mix?: Record<string, number>;
       kind?: "mixed" | "subjective" | "objective";
       title?: string;
+      /** Optional minute budget. null / omitted = untimed; an integer
+       *  enables the countdown banner + auto-submit on the take page. */
+      duration_minutes?: number | null;
     }) => {
       const { data } = await api.post<Assessment>("/me/quick-quiz", body);
       return data;

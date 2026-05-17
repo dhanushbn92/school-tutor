@@ -66,6 +66,12 @@ export function QuickQuizPage() {
   const [mode, setMode] = useState<"single" | "cumulative">("single");
   const [kind, setKind] = useState<QuizKind>("mixed");
   const [selectedChapters, setSelectedChapters] = useState<number[]>([]);
+  // Time-bound is opt-in for self-directed practice — the default is
+  // untimed so a learner can pause / think / look something up
+  // without losing progress. Flipping it on enables the same countdown
+  // banner + auto-submit the teacher-assigned quizzes use.
+  const [timed, setTimed] = useState(false);
+  const [duration, setDuration] = useState(15);
 
   const quick = useQuickQuiz();
 
@@ -98,6 +104,9 @@ export function QuickQuizPage() {
         chapter_ids: mode === "cumulative" ? selectedChapters : undefined,
         question_count: DEFAULT_COUNT_BY_KIND[kind],
         kind,
+        // null when the learner left the quiz untimed; an integer
+        // when they want the countdown + auto-submit.
+        duration_minutes: timed ? duration : null,
       });
       toast.success("Quiz ready — get started!");
       navigate(`/assessments/${created.id}/take`);
@@ -243,6 +252,45 @@ export function QuickQuizPage() {
                   </p>
                 </div>
               )}
+
+              {/* Time-bound toggle. Off by default for self-directed
+                  practice (a learner should be able to pause and
+                  think); flipping it on enables the take-page
+                  countdown + auto-submit at zero. */}
+              <div className="space-y-1.5 rounded-md border border-(--color-border) p-3">
+                <Label className="flex cursor-pointer items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={timed}
+                    onChange={(e) => setTimed(e.target.checked)}
+                    className="h-4 w-4 rounded border-(--color-input) accent-(--color-primary)"
+                  />
+                  Time-bound — simulate exam conditions
+                </Label>
+                {timed ? (
+                  <div className="flex items-center gap-2 pl-6">
+                    <Label htmlFor="qq-duration" className="text-xs text-(--color-muted-foreground)">
+                      Minutes
+                    </Label>
+                    <input
+                      id="qq-duration"
+                      type="number"
+                      min={1}
+                      max={180}
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      className="w-20 rounded-md border border-(--color-input) bg-transparent px-2 py-1 text-sm"
+                    />
+                    <span className="text-xs text-(--color-muted-foreground)">
+                      A countdown appears at the top; the quiz auto-submits at zero.
+                    </span>
+                  </div>
+                ) : (
+                  <p className="pl-6 text-xs text-(--color-muted-foreground)">
+                    Untimed — take as long as you like to think through each answer.
+                  </p>
+                )}
+              </div>
 
               <Button
                 type="submit"
