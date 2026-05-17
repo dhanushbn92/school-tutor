@@ -62,10 +62,15 @@ export function DashboardHero(_props: DashboardHeroProps) {
 
   return (
     <div
-      // Full-viewport, centred. pointer-events-none means the
-      // dashboard is interactive from the first frame — the splash
-      // is decoration, never a gate.
-      className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center"
+      // Full-viewport container, but the image is anchored to the
+      // TOP of the screen (items-start) rather than vertically
+      // centred — that's where the user wants the practice ritual
+      // to live. The bottom of the viewport stays free so the
+      // dashboard widgets underneath are visible from the first
+      // frame; the picture simply dissolves above them.
+      // pointer-events-none means the dashboard is interactive from
+      // frame zero — the splash is decoration, never a gate.
+      className="pointer-events-none fixed inset-0 z-30 flex items-start justify-center pt-10 md:pt-16"
       aria-hidden="true"
     >
       <style>{`
@@ -97,7 +102,11 @@ export function DashboardHero(_props: DashboardHeroProps) {
       <img
         src="/vidyarthi-hero.png"
         alt=""
-        className="dh-hero-image block max-h-[80vmin] max-w-[80vmin] object-contain"
+        // Constrained to roughly the top half of the viewport
+        // (max-h: 55vh) so the dashboard below stays in view while
+        // the splash plays. Width caps at 70vmin so the image keeps
+        // its breathing room on wide monitors.
+        className="dh-hero-image block max-h-[55vh] max-w-[70vmin] object-contain"
         style={{
           // Soft elliptical mask. Full opacity through the heart of
           // the picture, fading smoothly to transparent at the
