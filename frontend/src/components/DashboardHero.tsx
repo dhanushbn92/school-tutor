@@ -1,51 +1,43 @@
 import { useEffect, useState } from "react";
 
 /**
- * Dashboard intro splash + persistent watermark.
+ * Dashboard intro splash.
  *
- * On every dashboard mount the Vidyārthi archer illustration appears
- * as a soft circular vignette in the centre of the screen — the
- * archer is at the heart of the bright spot, and the picture fades
- * smoothly to transparent toward the edges (no hard rectangular
- * border). It holds briefly, then cross-fades: the cream backdrop
- * dissolves to nothing (revealing the dashboard + sidebar) and the
- * image settles into a faint full-screen watermark that lingers
- * quietly for the rest of the visit.
+ * One image. One animation. One easing curve. Gone.
  *
- * Timing
- *   0 – 1.2 s    full-opacity circular vignette + cream backdrop
- *   1.2 – 3.2 s  2-second cross-fade — backdrop → 0, image → 0.07
- *   3.2 s +      watermark holds until the dashboard unmounts
+ * Previous attempts layered a radial cream backdrop, a vignette
+ * mask, a discrete "hold / fade / watermark" state machine, and
+ * cross-fades between two opacity tracks. Each piece looked fine in
+ * isolation; together they read as "staged" — the moving parts gave
+ * away that something was happening.
  *
- * The circular focus
- *   - The archer in the source illustration sits at roughly 23% from
- *     the left of the canvas. To put him at the centre of the
- *     circular crop we shift the image horizontally with translate()
- *     while keeping height filling the container, then clip with
- *     overflow + border-radius.
- *   - On top of that we apply a radial-gradient mask: full opacity
- *     out to 42% of the radius, falling to zero at the edge. The
- *     result is a vignette with no hard outline — the picture
- *     dissolves softly into the cream backdrop.
+ * This version is the minimum that meets the brief:
  *
- * Plays on every dashboard mount (page refresh, route navigation
- * back to /dashboard, sign-in). No localStorage gating — the user
- * wants this as a recurring brand moment, not a one-shot tutorial.
+ *   - No backdrop. The dashboard is visible the whole time, behind
+ *     the illustration. As the illustration fades, the dashboard
+ *     gradually emerges — that's literally "fade out to background".
+ *   - No state machine. A single CSS keyframe animation drives the
+ *     entire 7-second cycle. Cubic-bezier easing on both ends keeps
+ *     the motion buttery; no two-phase joins to give the artifice
+ *     away.
+ *   - A soft elliptical mask softens the image's own rectangular
+ *     edges into the page so the picture dissolves into the
+ *     dashboard rather than sitting on it like a cut-out.
+ *
+ * Timeline (7 s total)
+ *   0.0 — 0.5 s   gentle fade in (0 → 1) so the picture appears,
+ *                 it doesn't pop onto the screen
+ *   0.5 — 2.0 s   hold at full opacity — the viewer has time to
+ *                 actually take the scene in
+ *   2.0 — 7.0 s   long, smooth fade out (1 → 0). The dashboard
+ *                 widgets underneath become more legible every
+ *                 frame; by the end the image is gone.
+ *
+ * Plays on every dashboard mount (page refresh, route navigation,
+ * sign-in) — the user wants the practice ritual as a recurring
+ * moment, not a one-shot tutorial.
  */
-const HOLD_MS = 1200;
-const FADE_MS = 2000;
-const WATERMARK_OPACITY = 0.07;
-/** Horizontal shift applied to the image inside its circular frame
- *  so the archer (~23% from the left of the source illustration)
- *  lands at the centre of the visible circle. */
-const ARCHER_SHIFT_PCT = -23;
-/** CSS radial-gradient mask. Tuned so the bright core comfortably
- *  contains the archer, with a generous soft falloff to the edges
- *  so the vignette never feels hard. Two prefixes for cross-browser
- *  coverage (Chromium/Safari accept -webkit, Firefox accepts the
- *  unprefixed property). */
-const VIGNETTE_MASK =
-  "radial-gradient(circle at 50% 50%, rgba(0,0,0,1) 42%, rgba(0,0,0,0.55) 72%, rgba(0,0,0,0) 100%)";
+const ANIMATION_MS = 7000;
 
 // Props are accepted but unused — kept on the type so the existing
 // call-sites continue to compile without edits.
@@ -56,80 +48,72 @@ interface DashboardHeroProps {
 
 export function DashboardHero(_props: DashboardHeroProps) {
   void _props;
-  const [phase, setPhase] = useState<"holding" | "watermark">("holding");
+  const [done, setDone] = useState(false);
 
+  // Single timer: unmount once the animation has completed. A small
+  // buffer keeps us from yanking the element while the last frame
+  // is still painting.
   useEffect(() => {
-    const t = window.setTimeout(() => setPhase("watermark"), HOLD_MS);
+    const t = window.setTimeout(() => setDone(true), ANIMATION_MS + 200);
     return () => window.clearTimeout(t);
   }, []);
 
-  const isWatermark = phase === "watermark";
+  if (done) return null;
 
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-30"
+      // Full-viewport, centred. pointer-events-none means the
+      // dashboard is interactive from the first frame — the splash
+      // is decoration, never a gate.
+      className="pointer-events-none fixed inset-0 z-30 flex items-center justify-center"
       aria-hidden="true"
     >
-      {/* Warm backdrop — a radial cream gradient rather than a flat
-          wash. Solid at the centre where the archer image sits, then
-          fading out toward the screen edges so the dashboard peeks
-          through at the corners from the very first frame. The
-          dashboard becomes more visible the further you look from
-          centre; in the centre the cream hides everything underneath.
-          On the cross-fade the whole backdrop dissolves to nothing. */}
-      <div
-        className="absolute inset-0 transition-opacity"
+      <style>{`
+        /* Single keyframe set drives the entire cycle. Stops at 7 %
+           and 28 % give us a gentle fade-in and a brief hold without
+           introducing a separate animation or state transition.
+           The cubic-bezier curve keeps the motion smooth at every
+           inflection point. */
+        @keyframes dh-hero-fade {
+          0%   { opacity: 0; }
+          7%   { opacity: 1; }
+          28%  { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        .dh-hero-image {
+          animation: dh-hero-fade ${ANIMATION_MS}ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+          will-change: opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          /* Users who opted out of motion get a quick, simple fade
+             rather than the full 7 s ritual. The splash is
+             decorative; respecting the OS preference is the right
+             call. */
+          .dh-hero-image {
+            animation-duration: 600ms;
+          }
+        }
+      `}</style>
+      <img
+        src="/vidyarthi-hero.png"
+        alt=""
+        className="dh-hero-image block max-h-[80vmin] max-w-[80vmin] object-contain"
         style={{
-          background:
-            "radial-gradient(circle at center, " +
-            "#F1E8D5 0%, " +
-            "#F1E8D5 30%, " +
-            "rgba(241,232,213, 0.85) 50%, " +
-            "rgba(241,232,213, 0.5) 70%, " +
-            "rgba(241,232,213, 0) 100%)",
-          opacity: isWatermark ? 0 : 1,
-          transitionDuration: `${FADE_MS}ms`,
-          transitionTimingFunction: "ease-in-out",
+          // Soft elliptical mask. Full opacity through the heart of
+          // the picture, fading smoothly to transparent at the
+          // corners so the illustration dissolves into the dashboard
+          // instead of stamping a hard rectangular edge onto it.
+          maskImage:
+            "radial-gradient(ellipse at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)",
+        }}
+        onError={(e) => {
+          // Asset missing → render nothing rather than the browser's
+          // broken-image icon.
+          (e.currentTarget as HTMLImageElement).style.display = "none";
         }}
       />
-
-      {/* Circular vignette frame. Centred on the viewport, sized
-          relative to the smaller viewport dimension so it scales
-          gracefully on mobile and large monitors alike. The radial
-          mask gives it a soft circular falloff with no hard rim. */}
-      <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden transition-opacity"
-        style={{
-          width: "min(70vmin, 640px)",
-          height: "min(70vmin, 640px)",
-          opacity: isWatermark ? WATERMARK_OPACITY : 1,
-          transitionDuration: `${FADE_MS}ms`,
-          transitionTimingFunction: "ease-in-out",
-          maskImage: VIGNETTE_MASK,
-          WebkitMaskImage: VIGNETTE_MASK,
-        }}
-      >
-        {/* The image is positioned inside the circle with a horizontal
-            shift so the archer (left-of-centre in the source) lands at
-            the visual centre of the bright spot. Height fills the
-            container; width is allowed to overflow either side and is
-            clipped by the parent's overflow-hidden. */}
-        <img
-          src="/vidyarthi-hero.png"
-          alt=""
-          className="absolute h-full w-auto max-w-none"
-          style={{
-            left: "50%",
-            top: "50%",
-            transform: `translate(${ARCHER_SHIFT_PCT}%, -50%)`,
-          }}
-          onError={(e) => {
-            // Missing asset → hide silently rather than show the
-            // browser's broken-image icon.
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
-      </div>
     </div>
   );
 }
