@@ -66,11 +66,13 @@ export function QuickQuizPage() {
   const [mode, setMode] = useState<"single" | "cumulative">("single");
   const [kind, setKind] = useState<QuizKind>("mixed");
   const [selectedChapters, setSelectedChapters] = useState<number[]>([]);
-  // Time-bound is opt-in for self-directed practice — the default is
-  // untimed so a learner can pause / think / look something up
-  // without losing progress. Flipping it on enables the same countdown
-  // banner + auto-submit the teacher-assigned quizzes use.
-  const [timed, setTimed] = useState(false);
+  // Time-bound is ON by default. Earlier this was opt-in (off by
+  // default) on the theory that self-directed practice should be
+  // relaxed, but learners consistently expected to see a timer the
+  // moment they hit Start — flipping the default removes the
+  // "where's my timer?" confusion. Untick it explicitly for an
+  // open-book / untimed session.
+  const [timed, setTimed] = useState(true);
   const [duration, setDuration] = useState(15);
 
   const quick = useQuickQuiz();
