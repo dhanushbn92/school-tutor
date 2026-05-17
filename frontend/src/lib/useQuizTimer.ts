@@ -3,30 +3,31 @@ import { useCallback, useEffect, useState } from "react";
 /**
  * Client-side quiz countdown for time-bound assessments.
  *
+ * The earlier version of this hook had a subtle bug: it initialised
+ * `startedAt` in a `useState` lazy initialiser, which runs only on
+ * mount. On the first render the assessment data hadn't loaded yet,
+ * so `enabled` was false and `startedAt` was set to `null`. Once the
+ * assessment data arrived and `enabled` flipped to true, the lazy
+ * initialiser never re-ran — `startedAt` stayed null forever, the
+ * tick effect early-exited, and no timer ever appeared.
+ *
+ * Fix: initialise `startedAt` in a useEffect that re-runs whenever
+ * `enabled` becomes true. The persisted localStorage value carries
+ * the start time across page refreshes within the same attempt.
+ *
  * Design choices
  *
  *   - The start time is persisted in `localStorage` keyed by the
- *     assessment id, so a page refresh in the middle of an attempt
- *     keeps counting from the same starting moment rather than
- *     restarting from zero.
+ *     assessment id (`dhananjaya:quiz-started:<id>`), so a page
+ *     refresh in the middle of an attempt keeps counting from the
+ *     same starting moment rather than restarting from zero.
  *   - If a learner walks away and comes back after the deadline,
- *     `secondsLeft` is immediately 0 on mount, which lets the caller
- *     trigger an auto-submit with whatever answers are currently in
- *     state (likely none) on the very next render.
- *   - The hook only runs the interval when `enabled` is true. Once
- *     the parent submits — manually or automatically — it should
- *     flip `enabled` to false and call `clear()` so the persisted
- *     start time is removed and a future replay isn't immediately
- *     "already over".
- *
- * What this hook is NOT
- *
- *   - Server-enforced. The backend will accept a submission whenever
- *     it arrives; this hook is a learner-facing nudge + an auto-
- *     submit convenience. A determined user can clear localStorage
- *     and reset their own clock — which we consider acceptable for
- *     v1. Strict enforcement is a server "started_at" field, which
- *     is a clean follow-up if it's needed.
+ *     `secondsLeft` is immediately 0 on the next tick, which lets
+ *     the caller trigger an auto-submit with whatever answers are
+ *     currently in state (likely none).
+ *   - When the parent flips `enabled` to false on submit and calls
+ *     `clear()`, the persisted start time is removed so a future
+ *     replay starts fresh rather than "already over".
  *
  * Returns
  *   secondsLeft   integer seconds remaining (clamped at 0)
@@ -58,50 +59,72 @@ export function useQuizTimer({
       ? `dhananjaya:quiz-started:${assessmentId}`
       : null;
 
-  // Lazy init: read or create the start timestamp. We do this once on
-  // mount; subsequent renders don't re-evaluate. The check guards
-  // against SSR (no window) and the not-yet-known assessment id case.
-  const [startedAt] = useState<number | null>(() => {
-    if (
-      !enabled ||
-      storageKey === null ||
-      totalSeconds === 0 ||
-      typeof window === "undefined"
-    ) {
-      return null;
-    }
+  // Start time — null until the timer is first enabled with a
+  // positive duration. After that it's a stable epoch-ms value
+  // (either freshly captured or restored from localStorage).
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  // Default to the full duration so the banner renders sensibly
+  // during the brief moment before the tick effect computes the
+  // actual remaining time.
+  const [secondsLeft, setSecondsLeft] = useState<number>(totalSeconds);
+
+  // Initialise startedAt the first time the timer is enabled. We
+  // can't do this in a lazy useState initialiser because that runs
+  // exactly once on mount — usually BEFORE the assessment data has
+  // loaded and `enabled` has flipped true. A useEffect re-runs
+  // whenever its deps change, so we pick up the flip.
+  useEffect(() => {
+    if (!enabled) return;
+    if (storageKey === null || totalSeconds === 0) return;
+    if (startedAt !== null) return; // already initialised
+    let ts: number;
     try {
       const existing = window.localStorage.getItem(storageKey);
       if (existing) {
         const parsed = Number(existing);
-        if (Number.isFinite(parsed) && parsed > 0) return parsed;
+        ts = Number.isFinite(parsed) && parsed > 0 ? parsed : Date.now();
+      } else {
+        ts = Date.now();
+        window.localStorage.setItem(storageKey, String(ts));
       }
-      const now = Date.now();
-      window.localStorage.setItem(storageKey, String(now));
-      return now;
     } catch {
-      // Storage blocked → fall back to in-memory only. The countdown
-      // still works for this session; refresh will reset it.
-      return Date.now();
+      ts = Date.now();
     }
-  });
+    // Intentional setState-in-effect: this is the bridge between
+    // the external "assessment loaded → timer enabled" signal and
+    // the internal startedAt state. There is no cleaner pure-render
+    // way to do this lazy initialisation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStartedAt(ts);
+  }, [enabled, storageKey, totalSeconds, startedAt]);
 
-  const [secondsLeft, setSecondsLeft] = useState<number>(() => {
-    if (startedAt === null) return totalSeconds;
-    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-    return Math.max(0, totalSeconds - elapsed);
-  });
+  // Keep secondsLeft in sync with totalSeconds when the duration
+  // changes (e.g. it was 0 on first render before the assessment
+  // loaded, then became a positive number afterwards). Without this
+  // the banner can briefly read "0:00" before the tick effect runs.
+  useEffect(() => {
+    if (startedAt === null) {
+      // Intentional setState-in-effect: external value changed
+      // (totalSeconds went from 0 to N), the banner needs to update.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSecondsLeft(totalSeconds);
+    }
+  }, [totalSeconds, startedAt]);
 
   // The ticker. Runs at 1 Hz while the timer is active. We compute
   // remaining time from `startedAt` rather than decrementing a
   // counter, which keeps the display correct even if the tab is
   // backgrounded and the interval drifts.
   useEffect(() => {
-    if (!enabled || startedAt === null) return;
-    const id = window.setInterval(() => {
+    if (!enabled || startedAt === null || totalSeconds === 0) return;
+    // Update once immediately so the banner doesn't show stale
+    // "full duration" for up to 1 s after startedAt is set.
+    const update = () => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
       setSecondsLeft(Math.max(0, totalSeconds - elapsed));
-    }, 1000);
+    };
+    update();
+    const id = window.setInterval(update, 1000);
     return () => window.clearInterval(id);
   }, [enabled, startedAt, totalSeconds]);
 
@@ -127,7 +150,7 @@ export function useQuizTimer({
  *   2. Local fallback (localStorage `dhananjaya:quiz-duration:<id>`)
  *      written by the QuickQuiz form on creation. This belt-and-
  *      braces fallback exists because the backend has on at least
- *      one occasion silently dropped the field — the user picked 3
+ *      one occasion silently dropped the field — the user picked N
  *      minutes, the row went in with NULL, and the take page showed
  *      no banner. Stashing locally means the timer still works for
  *      self-created quizzes regardless of backend state.
