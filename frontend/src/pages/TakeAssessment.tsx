@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { formatClock, useQuizTimer } from "@/lib/useQuizTimer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import {
@@ -104,16 +105,95 @@ export function TakeAssessmentPage() {
     }
   }, [existingSubQ.data, submission, questionsQ.data]);
 
-  // Hook MUST be above the conditional returns below — moving it down breaks
-  // Rules of Hooks (number of hooks differs across renders).
+  // Hooks MUST live above the conditional returns below — moving them
+  // down breaks Rules of Hooks (number of hooks differs across renders).
   const questionsById = useMemo(
     () => new Map((questionsQ.data ?? []).map((q) => [q.id, q])),
     [questionsQ.data],
   );
 
-  // The existing-submission auto-resume flow needs both questions and the
-  // submission detail. Show "Loading your results…" while those finish so
-  // the user doesn't see the take form flash before the results view.
+  // Time-bound assessment? `duration_minutes` is null on untimed quizzes
+  // and a positive integer otherwise. The timer is only active in the
+  // take view — once we have a Submission the timer is moot and the
+  // storage key gets cleared so a re-open lands on the results view
+  // rather than a fresh countdown.
+  const isTimed =
+    (assessmentQ.data?.duration_minutes ?? null) !== null && submission === null;
+  const { secondsLeft, totalSeconds, clear: clearTimer } = useQuizTimer({
+    assessmentId: aid,
+    durationMinutes: assessmentQ.data?.duration_minutes,
+    enabled: isTimed,
+  });
+
+  // Auto-submit guard — fire at most once per page lifetime. Without
+  // this, a transient failure on the auto-submit could re-fire the
+  // effect every tick.
+  const autoSubmitFiredRef = useRef(false);
+
+  // handleSubmit is declared as a function declaration (hoisted) so the
+  // auto-submit useEffect below can reference it even though it lives
+  // earlier in source order. Function declarations are hoisted; const
+  // arrow functions are not — keeping this as a declaration is
+  // deliberate.
+  async function handleSubmit(e?: FormEvent) {
+    if (e) e.preventDefault();
+    if (!assessmentQ.data) return;
+    const stringified: Record<string, string> = {};
+    for (const [k, v] of Object.entries(answers)) {
+      if (v && v.trim()) stringified[k] = v;
+    }
+    try {
+      const sub = await submitMut.mutateAsync({
+        assessment_id: assessmentQ.data.id,
+        answers: stringified,
+      });
+      setSubmission(sub);
+      // Backend always evaluates objective questions immediately;
+      // subjective ones are left for student self-review against the
+      // answer key. The toast surfaces only the auto-scored portion.
+      const hasSubjective = sub.answers.some((sa) => sa.marks_awarded === null);
+      toast.success(
+        hasSubjective
+          ? `Submitted — review your subjective answers below`
+          : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
+      );
+      // Clear the persisted start time so a future re-open doesn't race
+      // a fresh countdown against the existing submission.
+      clearTimer();
+    } catch (err) {
+      toast.error(humanError(err));
+    }
+  }
+
+  // Auto-submit when the timer hits zero. Runs only if (a) the quiz is
+  // time-bound, (b) it hasn't fired yet, (c) the user hasn't already
+  // submitted, and (d) the submit mutation isn't already in flight.
+  // The toast warns the learner so the submission doesn't feel sudden.
+  useEffect(() => {
+    if (!isTimed) return;
+    if (autoSubmitFiredRef.current) return;
+    if (submission) return;
+    if (submitMut.isPending) return;
+    if (secondsLeft > 0) return;
+    autoSubmitFiredRef.current = true;
+    toast.warning("Time's up — submitting your answers now.");
+    // Intentional setState-in-effect: this effect is the bridge
+    // between the timer (external state) and the submission. Calling
+    // handleSubmit (which mutates state) is the whole point. The ref
+    // guards against repeated firing.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void handleSubmit();
+    // We omit handleSubmit / submission / submitMut.isPending from
+    // the deps array because re-running on those changes would either
+    // no-op (ref guard) or cause a double submit we explicitly want
+    // to avoid.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondsLeft, isTimed]);
+
+  // The existing-submission auto-resume flow needs both questions and
+  // the submission detail. Show "Loading your results…" while those
+  // finish so the user doesn't see the take form flash before the
+  // results view.
   const resumingExisting = existingSubId !== undefined && submission === null;
   if (
     assessmentQ.isLoading ||
@@ -143,32 +223,6 @@ export function TakeAssessmentPage() {
   }
 
   const a = assessmentQ.data;
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const stringified: Record<string, string> = {};
-    for (const [k, v] of Object.entries(answers)) {
-      if (v && v.trim()) stringified[k] = v;
-    }
-    try {
-      const sub = await submitMut.mutateAsync({
-        assessment_id: a.id,
-        answers: stringified,
-      });
-      setSubmission(sub);
-      // Backend always evaluates objective questions immediately; subjective
-      // ones are left for student self-review against the answer key. The
-      // toast surfaces only the auto-scored portion.
-      const hasSubjective = sub.answers.some((sa) => sa.marks_awarded === null);
-      toast.success(
-        hasSubjective
-          ? `Submitted — review your subjective answers below`
-          : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
-      );
-    } catch (err) {
-      toast.error(humanError(err));
-    }
-  }
 
   // Results view (after submit)
   if (submission) {
@@ -250,6 +304,21 @@ export function TakeAssessmentPage() {
   }
 
   // Take-quiz view
+  //
+  // Timer styling buckets — the banner gets progressively more urgent
+  // as the deadline approaches. The thresholds are proportional to
+  // the full duration rather than absolute seconds so a 5-minute quiz
+  // and a 90-minute quiz both have a sensible warning band.
+  const fractionLeft = totalSeconds > 0 ? secondsLeft / totalSeconds : 1;
+  const timerIntent: "ok" | "warning" | "critical" =
+    !isTimed
+      ? "ok"
+      : fractionLeft <= 0.1 || secondsLeft <= 30
+        ? "critical"
+        : fractionLeft <= 0.33
+          ? "warning"
+          : "ok";
+
   return (
     <ThemedPage>
       <PageHeader
@@ -257,7 +326,10 @@ export function TakeAssessmentPage() {
         description={
           <>
             <Badge variant="outline" className="mr-2">{a.type}</Badge>
-            {a.duration_minutes && (
+            {/* Static "N min" badge — only shown when the timer
+                banner below isn't doing the job (i.e. either the
+                quiz isn't timed, or we're showing the result view). */}
+            {a.duration_minutes && !isTimed && (
               <span className="inline-flex items-center gap-1 text-(--color-muted-foreground)">
                 <Clock className="h-3 w-3" /> {a.duration_minutes} min
               </span>
@@ -277,6 +349,40 @@ export function TakeAssessmentPage() {
           </Button>
         }
       />
+
+      {/* Live timer banner — sticks below the app header so it's
+          always in view while the learner scrolls through questions.
+          Colour shifts ok → warning → critical as the deadline
+          approaches; the critical state pulses to draw the eye. */}
+      {isTimed && (
+        <div
+          className={cn(
+            "sticky top-14 z-10 mb-4 flex items-center justify-between gap-3 rounded-md border px-4 py-2.5 text-sm shadow-sm backdrop-blur",
+            timerIntent === "ok" &&
+              "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
+            timerIntent === "warning" &&
+              "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_14%,var(--color-card))] text-(--color-foreground)",
+            timerIntent === "critical" &&
+              "border-(--color-destructive) bg-[color-mix(in_oklab,var(--color-destructive)_14%,var(--color-card))] text-(--color-foreground)",
+            timerIntent === "critical" && "animate-pulse",
+          )}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="inline-flex items-center gap-2 font-medium">
+            <Clock className="h-4 w-4" />
+            Time remaining
+          </span>
+          <span className="flex items-center gap-3">
+            <span className="text-lg font-semibold tabular-nums leading-none">
+              {formatClock(secondsLeft)}
+            </span>
+            <span className="hidden text-xs text-(--color-muted-foreground) sm:inline">
+              of {a.duration_minutes} min total
+            </span>
+          </span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         {questionIds.map((qid, idx) => {

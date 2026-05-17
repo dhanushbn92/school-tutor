@@ -77,6 +77,11 @@ export function NewQuizPage() {
 
   const [title, setTitle] = useState("");
   const [questionCount, setQuestionCount] = useState(8);
+  // Time-bound is the platform default — a finite-time quiz is closer to
+  // a real exam — but the user can flip it off for an untimed practice
+  // session. When `timed` is false we send duration_minutes: null to
+  // the backend, which stores it and the take-quiz page renders no timer.
+  const [timed, setTimed] = useState(true);
   const [duration, setDuration] = useState(20);
   const [presetIndex, setPresetIndex] = useState<string>("0");
   const [useDifficultyMix, setUseDifficultyMix] = useState(true);
@@ -141,7 +146,9 @@ export function NewQuizPage() {
         topic_id: topicId ?? null,
         type: "QUIZ",
         title: title.trim(),
-        duration_minutes: duration,
+        // null when the admin chose "untimed" — backend stores it as
+        // NULL and the take-quiz page renders no timer banner.
+        duration_minutes: timed ? duration : null,
         question_count: questionCount,
         difficulty_mix: useDifficultyMix ? scaledMix : undefined,
         cognitive_mix: useCognitiveMix ? scaledCognitiveMix : undefined,
@@ -309,15 +316,36 @@ export function NewQuizPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="duration">Duration (min)</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    min={5}
-                    max={180}
-                    value={duration}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                  />
+                  {/* Time-bound toggle + conditional duration input.
+                      The toggle is what the teacher reaches for first
+                      ("is this an exam-style quiz or open practice?");
+                      the duration field only appears when relevant so
+                      the form doesn't carry a dead field for untimed
+                      quizzes. */}
+                  <Label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={timed}
+                      onChange={(e) => setTimed(e.target.checked)}
+                      className="h-4 w-4 rounded border-(--color-input) accent-(--color-primary)"
+                    />
+                    Time-bound
+                  </Label>
+                  {timed ? (
+                    <Input
+                      id="duration"
+                      type="number"
+                      min={1}
+                      max={180}
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      aria-label="Duration in minutes"
+                    />
+                  ) : (
+                    <p className="text-xs text-(--color-muted-foreground)">
+                      Untimed — students can take as long as they like.
+                    </p>
+                  )}
                 </div>
               </div>
 
