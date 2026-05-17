@@ -110,6 +110,30 @@ export function QuickQuizPage() {
         // when they want the countdown + auto-submit.
         duration_minutes: timed ? duration : null,
       });
+      // Belt-and-braces: also stash the chosen duration in localStorage
+      // keyed by the returned assessment id. The take-quiz page reads
+      // this as a fallback when assessment.duration_minutes comes back
+      // null (which can happen if the running backend hasn't reloaded
+      // the QuickQuizRequest schema and silently dropped the field).
+      // Teacher-assigned quizzes — where duration is set server-side
+      // by NewQuiz / from-bank — don't need this; the take page
+      // prefers the server value when it's present.
+      try {
+        if (timed && duration > 0) {
+          window.localStorage.setItem(
+            `dhananjaya:quiz-duration:${created.id}`,
+            String(duration),
+          );
+        } else {
+          // Explicit "untimed" — overwrite any leftover entry so a
+          // re-creation with the same id can't inherit a stale timer.
+          window.localStorage.removeItem(
+            `dhananjaya:quiz-duration:${created.id}`,
+          );
+        }
+      } catch {
+        /* private mode / disabled storage — non-fatal */
+      }
       toast.success("Quiz ready — get started!");
       navigate(`/assessments/${created.id}/take`);
     } catch (err) {

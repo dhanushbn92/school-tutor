@@ -112,16 +112,28 @@ export function TakeAssessmentPage() {
     [questionsQ.data],
   );
 
-  // Time-bound assessment? `duration_minutes` is null on untimed quizzes
-  // and a positive integer otherwise. The timer is only active in the
-  // take view — once we have a Submission the timer is moot and the
-  // storage key gets cleared so a re-open lands on the results view
-  // rather than a fresh countdown.
-  const isTimed =
-    (assessmentQ.data?.duration_minutes ?? null) !== null && submission === null;
+  // Time-bound assessment? duration comes from either the server
+  // (assessment.duration_minutes — teacher-assigned quizzes set this
+  // at creation) or, as a fallback, from a localStorage entry the
+  // QuickQuiz form wrote on creation (for self-started quizzes where
+  // the backend dropped the field). Whichever produces a positive
+  // value drives the timer.
+  const localFallback = (() => {
+    if (aid === undefined || typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem(`dhananjaya:quiz-duration:${aid}`);
+      const n = raw == null ? NaN : Number(raw);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    } catch {
+      return null;
+    }
+  })();
+  const effectiveDuration =
+    assessmentQ.data?.duration_minutes ?? localFallback ?? null;
+  const isTimed = effectiveDuration !== null && submission === null;
   const { secondsLeft, totalSeconds, clear: clearTimer } = useQuizTimer({
     assessmentId: aid,
-    durationMinutes: assessmentQ.data?.duration_minutes,
+    durationMinutes: effectiveDuration,
     enabled: isTimed,
   });
 
@@ -378,7 +390,7 @@ export function TakeAssessmentPage() {
               {formatClock(secondsLeft)}
             </span>
             <span className="hidden text-xs text-(--color-muted-foreground) sm:inline">
-              of {a.duration_minutes} min total
+              of {effectiveDuration} min total
             </span>
           </span>
         </div>

@@ -39,12 +39,20 @@ export function useQuizTimer({
   enabled,
 }: {
   assessmentId: number | undefined;
-  /** From `Assessment.duration_minutes`. null / undefined => no timer. */
+  /** From `Assessment.duration_minutes`. null / undefined falls back
+   *  to the locally-stashed duration the QuickQuiz form wrote on
+   *  creation (see resolveDurationMinutes below). */
   durationMinutes: number | null | undefined;
   /** Master switch — flip to false the moment a submission lands. */
   enabled: boolean;
 }): { secondsLeft: number; totalSeconds: number; clear: () => void } {
-  const totalSeconds = (durationMinutes ?? 0) * 60;
+  // Resolve the effective duration. Server value wins when it's a
+  // positive integer (teacher-assigned quizzes always have it). When
+  // the server returns null — typically a quick-quiz where the
+  // backend silently dropped the field — fall back to whatever the
+  // QuickQuiz form stashed in localStorage on creation.
+  const resolved = resolveDurationMinutes(assessmentId, durationMinutes);
+  const totalSeconds = resolved * 60;
   const storageKey =
     assessmentId !== undefined
       ? `dhananjaya:quiz-started:${assessmentId}`
@@ -107,6 +115,42 @@ export function useQuizTimer({
   }, [storageKey]);
 
   return { secondsLeft, totalSeconds, clear };
+}
+
+/**
+ * Pick the effective duration in minutes for an attempt.
+ *
+ * Priority:
+ *   1. Server value (assessment.duration_minutes) — always wins when
+ *      it's a positive integer. Teacher-assigned quizzes set this at
+ *      creation time, so the take page is fully driven by the DB.
+ *   2. Local fallback (localStorage `dhananjaya:quiz-duration:<id>`)
+ *      written by the QuickQuiz form on creation. This belt-and-
+ *      braces fallback exists because the backend has on at least
+ *      one occasion silently dropped the field — the user picked 3
+ *      minutes, the row went in with NULL, and the take page showed
+ *      no banner. Stashing locally means the timer still works for
+ *      self-created quizzes regardless of backend state.
+ *   3. Zero — no banner.
+ *
+ * Returns 0 when no timer should run.
+ */
+function resolveDurationMinutes(
+  assessmentId: number | undefined,
+  serverValue: number | null | undefined,
+): number {
+  if (typeof serverValue === "number" && serverValue > 0) return serverValue;
+  if (assessmentId === undefined || typeof window === "undefined") return 0;
+  try {
+    const raw = window.localStorage.getItem(
+      `dhananjaya:quiz-duration:${assessmentId}`,
+    );
+    if (raw == null) return 0;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  } catch {
+    return 0;
+  }
 }
 
 /**
