@@ -46,7 +46,21 @@ export function useQuizTimer({
   durationMinutes: number | null | undefined;
   /** Master switch — flip to false the moment a submission lands. */
   enabled: boolean;
-}): { secondsLeft: number; totalSeconds: number; clear: () => void } {
+}): {
+  /** Whole seconds remaining until the deadline. Always 0 when the
+   *  quiz is untimed (totalSeconds === 0); caller should display
+   *  `elapsedSeconds` instead in that case. */
+  secondsLeft: number;
+  /** Full duration in seconds. 0 when the quiz is untimed. */
+  totalSeconds: number;
+  /** Whole seconds elapsed since the attempt started. Tracked even
+   *  for untimed quizzes so the take-page can show an "elapsed time"
+   *  badge instead of leaving the area blank. */
+  elapsedSeconds: number;
+  /** Remove the persisted start time — call on submit so a future
+   *  reopen starts fresh rather than "already over". */
+  clear: () => void;
+} {
   // Resolve the effective duration. Server value wins when it's a
   // positive integer (teacher-assigned quizzes always have it). When
   // the server returns null — typically a quick-quiz where the
@@ -59,23 +73,27 @@ export function useQuizTimer({
       ? `dhananjaya:quiz-started:${assessmentId}`
       : null;
 
-  // Start time — null until the timer is first enabled with a
-  // positive duration. After that it's a stable epoch-ms value
-  // (either freshly captured or restored from localStorage).
+  // Start time — null until the timer is first enabled. After that
+  // it's a stable epoch-ms value (either freshly captured or
+  // restored from localStorage). NOTE: we initialise this for BOTH
+  // timed and untimed attempts so the elapsed-time display can run
+  // on untimed quizzes too; the totalSeconds check only gates the
+  // countdown side.
   const [startedAt, setStartedAt] = useState<number | null>(null);
-  // Default to the full duration so the banner renders sensibly
-  // during the brief moment before the tick effect computes the
-  // actual remaining time.
-  const [secondsLeft, setSecondsLeft] = useState<number>(totalSeconds);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   // Initialise startedAt the first time the timer is enabled. We
   // can't do this in a lazy useState initialiser because that runs
   // exactly once on mount — usually BEFORE the assessment data has
   // loaded and `enabled` has flipped true. A useEffect re-runs
   // whenever its deps change, so we pick up the flip.
+  //
+  // Note: storageKey is required (the elapsed timer needs to
+  // survive page reloads) but totalSeconds is NOT — an untimed
+  // attempt still gets a startedAt so we can show elapsed time.
   useEffect(() => {
     if (!enabled) return;
-    if (storageKey === null || totalSeconds === 0) return;
+    if (storageKey === null) return;
     if (startedAt !== null) return; // already initialised
     let ts: number;
     try {
@@ -96,37 +114,28 @@ export function useQuizTimer({
     // way to do this lazy initialisation.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setStartedAt(ts);
-  }, [enabled, storageKey, totalSeconds, startedAt]);
+  }, [enabled, storageKey, startedAt]);
 
-  // Keep secondsLeft in sync with totalSeconds when the duration
-  // changes (e.g. it was 0 on first render before the assessment
-  // loaded, then became a positive number afterwards). Without this
-  // the banner can briefly read "0:00" before the tick effect runs.
+  // The ticker. Runs at 1 Hz once startedAt is captured, regardless
+  // of whether the attempt is timed. We compute elapsed seconds
+  // from `startedAt` rather than decrementing a counter, which
+  // keeps the display correct even if the tab is backgrounded and
+  // the interval drifts.
   useEffect(() => {
-    if (startedAt === null) {
-      // Intentional setState-in-effect: external value changed
-      // (totalSeconds went from 0 to N), the banner needs to update.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSecondsLeft(totalSeconds);
-    }
-  }, [totalSeconds, startedAt]);
-
-  // The ticker. Runs at 1 Hz while the timer is active. We compute
-  // remaining time from `startedAt` rather than decrementing a
-  // counter, which keeps the display correct even if the tab is
-  // backgrounded and the interval drifts.
-  useEffect(() => {
-    if (!enabled || startedAt === null || totalSeconds === 0) return;
-    // Update once immediately so the banner doesn't show stale
-    // "full duration" for up to 1 s after startedAt is set.
+    if (!enabled || startedAt === null) return;
     const update = () => {
-      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-      setSecondsLeft(Math.max(0, totalSeconds - elapsed));
+      setElapsedSeconds(Math.max(0, Math.floor((Date.now() - startedAt) / 1000)));
     };
     update();
     const id = window.setInterval(update, 1000);
     return () => window.clearInterval(id);
-  }, [enabled, startedAt, totalSeconds]);
+  }, [enabled, startedAt]);
+
+  // Derived: how many whole seconds remain until the deadline. For
+  // untimed quizzes totalSeconds is 0 and secondsLeft is always 0
+  // (caller should display elapsedSeconds instead).
+  const secondsLeft =
+    totalSeconds > 0 ? Math.max(0, totalSeconds - elapsedSeconds) : 0;
 
   const clear = useCallback(() => {
     if (storageKey === null) return;
@@ -137,7 +146,7 @@ export function useQuizTimer({
     }
   }, [storageKey]);
 
-  return { secondsLeft, totalSeconds, clear };
+  return { secondsLeft, totalSeconds, elapsedSeconds, clear };
 }
 
 /**

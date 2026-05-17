@@ -130,11 +130,24 @@ export function TakeAssessmentPage() {
   })();
   const effectiveDuration =
     assessmentQ.data?.duration_minutes ?? localFallback ?? null;
+  // isTimed says "we have a countdown deadline"; the elapsed-time
+  // display is shown for both timed AND untimed attempts so every
+  // learner sees a working clock at the top of the page. The timer
+  // runs as long as the quiz is being taken (no submission yet)
+  // and an assessment has loaded — totalSeconds will be 0 on
+  // untimed attempts, which the banner detects to switch from
+  // countdown mode to elapsed-time mode.
   const isTimed = effectiveDuration !== null && submission === null;
-  const { secondsLeft, totalSeconds, clear: clearTimer } = useQuizTimer({
+  const timerEnabled = assessmentQ.data !== undefined && submission === null;
+  const {
+    secondsLeft,
+    totalSeconds,
+    elapsedSeconds,
+    clear: clearTimer,
+  } = useQuizTimer({
     assessmentId: aid,
     durationMinutes: effectiveDuration,
-    enabled: isTimed,
+    enabled: timerEnabled,
   });
 
   // Auto-submit guard — fire at most once per page lifetime. Without
@@ -335,21 +348,22 @@ export function TakeAssessmentPage() {
     <ThemedPage>
       <PageHeader
         title={a.title}
+        // PageHeader wraps `description` in a <p>, so we keep the
+        // children inline-only (spans, not Badges/<p>). React was
+        // logging DOM-nesting warnings (Badge → div inside p, then
+        // <p> inside <p>) — those don't break rendering but they
+        // were the real chatter in the console. Using spans with
+        // badge-ish styling sidesteps both warnings without losing
+        // the visual treatment.
         description={
           <>
-            <Badge variant="outline" className="mr-2">{a.type}</Badge>
-            {/* Static "N min" badge — only shown when the timer
-                banner below isn't doing the job (i.e. either the
-                quiz isn't timed, or we're showing the result view). */}
-            {a.duration_minutes && !isTimed && (
-              <span className="inline-flex items-center gap-1 text-(--color-muted-foreground)">
-                <Clock className="h-3 w-3" /> {a.duration_minutes} min
-              </span>
-            )}
+            <span className="mr-2 inline-flex items-center rounded-full border border-(--color-border) px-2.5 py-0.5 text-xs font-medium text-(--color-foreground)">
+              {a.type}
+            </span>
             {a.instructions && (
-              <p className="mt-2 max-w-2xl text-sm text-(--color-muted-foreground)">
+              <span className="text-sm text-(--color-muted-foreground)">
                 {a.instructions}
-              </p>
+              </span>
             )}
           </>
         }
@@ -362,39 +376,47 @@ export function TakeAssessmentPage() {
         }
       />
 
-      {/* Live timer banner — sticks below the app header so it's
-          always in view while the learner scrolls through questions.
-          Colour shifts ok → warning → critical as the deadline
-          approaches; the critical state pulses to draw the eye. */}
-      {isTimed && (
-        <div
-          className={cn(
-            "sticky top-14 z-10 mb-4 flex items-center justify-between gap-3 rounded-md border px-4 py-2.5 text-sm shadow-sm backdrop-blur",
-            timerIntent === "ok" &&
-              "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
-            timerIntent === "warning" &&
-              "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_14%,var(--color-card))] text-(--color-foreground)",
-            timerIntent === "critical" &&
-              "border-(--color-destructive) bg-[color-mix(in_oklab,var(--color-destructive)_14%,var(--color-card))] text-(--color-foreground)",
-            timerIntent === "critical" && "animate-pulse",
-          )}
-          role="status"
-          aria-live="polite"
-        >
-          <span className="inline-flex items-center gap-2 font-medium">
-            <Clock className="h-4 w-4" />
-            Time remaining
+      {/* Live timer banner — always visible while the quiz is being
+          taken. Two modes:
+            - Timed (effectiveDuration set): shows a countdown.
+              Colour shifts ok → warning → critical as the deadline
+              approaches; critical state pulses.
+            - Untimed: shows elapsed time so the learner has a sense
+              of how long they've been at it. No colour shift, no
+              auto-submit.
+          Either way the banner is unmistakable at the top of the
+          page — no more "where's my timer?" confusion. */}
+      <div
+        className={cn(
+          "sticky top-14 z-10 mb-4 flex items-center justify-between gap-3 rounded-md border px-4 py-2.5 text-sm shadow-sm backdrop-blur",
+          isTimed && timerIntent === "ok" &&
+            "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
+          isTimed && timerIntent === "warning" &&
+            "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_14%,var(--color-card))] text-(--color-foreground)",
+          isTimed && timerIntent === "critical" &&
+            "border-(--color-destructive) bg-[color-mix(in_oklab,var(--color-destructive)_14%,var(--color-card))] text-(--color-foreground)",
+          isTimed && timerIntent === "critical" && "animate-pulse",
+          !isTimed &&
+            "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
+        )}
+        role="status"
+        aria-live="polite"
+      >
+        <span className="inline-flex items-center gap-2 font-medium">
+          <Clock className="h-4 w-4" />
+          {isTimed ? "Time remaining" : "Elapsed time"}
+        </span>
+        <span className="flex items-center gap-3">
+          <span className="text-lg font-semibold tabular-nums leading-none">
+            {isTimed ? formatClock(secondsLeft) : formatClock(elapsedSeconds)}
           </span>
-          <span className="flex items-center gap-3">
-            <span className="text-lg font-semibold tabular-nums leading-none">
-              {formatClock(secondsLeft)}
-            </span>
-            <span className="hidden text-xs text-(--color-muted-foreground) sm:inline">
-              of {effectiveDuration} min total
-            </span>
+          <span className="hidden text-xs text-(--color-muted-foreground) sm:inline">
+            {isTimed
+              ? `of ${effectiveDuration} min total`
+              : "Untimed — take as long as you need"}
           </span>
-        </div>
-      )}
+        </span>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         {questionIds.map((qid, idx) => {
