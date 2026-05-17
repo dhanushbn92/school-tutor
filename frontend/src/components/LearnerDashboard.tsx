@@ -22,6 +22,7 @@ import {
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import { DashboardHero } from "@/components/DashboardHero";
+import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { StatCard } from "@/components/StatCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
@@ -102,6 +103,10 @@ export function LearnerDashboard() {
         role="learner"
         userName={(user?.full_name ?? "").split(/\s+/)[0] || undefined}
       />
+      {/* The platform's purpose panel — practice ethos + a primary
+          CTA pointing at the next quiz. Sits above the mastery
+          widgets so the practice prompt is unmissable. */}
+      <DashboardPurposePanel role="learner" />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={
