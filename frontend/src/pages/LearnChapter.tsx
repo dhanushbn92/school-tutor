@@ -1331,11 +1331,7 @@ function VisualsTab({
             </CardHeader>
             <CardContent className="overflow-x-auto">
               <div className="rounded-xl border border-(--color-border) bg-(--color-card) p-3">
-                {/* Visual tab — concept-map view. Same click-to-expand
-                    interaction as the summary mind map so kids get a
-                    consistent exploration model wherever they encounter
-                    one. */}
-                <MindMap data={data} interactive />
+                <MindMap data={data} />
               </div>
             </CardContent>
           </ThemedSection>
@@ -1704,10 +1700,7 @@ export function SummaryView({
         </CardHeader>
         <CardContent className="overflow-x-auto">
           <div className="rounded-lg border border-(--color-border) bg-(--color-card) p-2">
-            {/* Interactive: branches start collapsed; tap to expand
-                each branch's details as sub-pills. Lets a learner
-                explore the chapter one branch at a time. */}
-            <MindMap data={summary.overview_diagram} interactive />
+            <MindMap data={summary.overview_diagram} />
           </div>
         </CardContent>
       </Card>
@@ -1751,7 +1744,7 @@ function SectionBlock({
         </ul>
         {section.diagram && (
           <div className="overflow-x-auto rounded-md border border-(--color-border) bg-(--color-muted)/40 p-2">
-            <MindMap data={section.diagram} size={420} interactive />
+            <MindMap data={section.diagram} size={420} />
           </div>
         )}
       </CardContent>
