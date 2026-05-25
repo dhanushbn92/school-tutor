@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   NotebookPen,
+  Layers,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -62,6 +63,8 @@ const NAV: NavItem[] = [
   { to: "/quick-quiz", label: "Start a quiz", icon: <Sparkles className="h-4 w-4" />, roles: ["individual_learner", "student"] },
   // Stage 2 of the child-centric roadmap — "things I got wrong" review surface.
   { to: "/me/mistakes", label: "Review mistakes", icon: <RotateCcw className="h-4 w-4" />, roles: ["individual_learner", "student"] },
+  // Stage 7 of the child-centric roadmap — speedrun / surprise me / flashcards hub.
+  { to: "/practice", label: "Practice variety", icon: <Layers className="h-4 w-4" />, roles: ["individual_learner", "student"] },
 ];
 
 export function Shell() {

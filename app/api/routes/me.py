@@ -41,11 +41,13 @@ from app.services import (
     learner_practice_service,
     parent_encouragement_service,
     parent_link_service,
+    practice_variety_service,
     question_bank_service,
     school_service,
 )
 from app.services.parent_encouragement_service import EncouragementError
 from app.services.parent_link_service import ParentLinkError
+from app.services.practice_variety_service import PracticeVarietyError
 from app.services.question_bank_service import BankCoverageError
 
 
@@ -844,3 +846,44 @@ def list_sent_encouragements(
 
 
 # ---- end of Stage 6 endpoints ----
+
+
+# ---------- Practice variety hub — Stage 7 of child-centric roadmap ----------
+#
+# Three lightweight modes that complement the existing quick-quiz
+# flow. Speedrun reuses /me/quick-quiz directly from the frontend
+# (no new endpoint needed); only Surprise me and Flashcards need
+# fresh server-side sampling.
+
+
+@router.get("/practice/surprise")
+def get_practice_surprise(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """One random APPROVED question from the learner's syllabus.
+    Inline-rendered on the practice hub; no submission, no grading."""
+    try:
+        q = practice_variety_service.pick_surprise(db, user=user)
+    except PracticeVarietyError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return practice_variety_service.question_to_card_dict(q)
+
+
+@router.get("/practice/flashcards")
+def get_practice_flashcards(
+    chapter_id: int | None = Query(default=None),
+    count: int = Query(default=10, ge=1, le=30),
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """N factual / REMEMBER-bucket questions for flip-card practice.
+    Optional `chapter_id` scopes to a single chapter (still validated
+    against the learner's syllabus)."""
+    try:
+        qs = practice_variety_service.sample_flashcards(
+            db, user=user, count=count, chapter_id=chapter_id
+        )
+    except PracticeVarietyError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return [practice_variety_service.question_to_card_dict(q) for q in qs]

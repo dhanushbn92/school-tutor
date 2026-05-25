@@ -15,6 +15,8 @@ import { TakeAssessmentPage } from "@/pages/TakeAssessment";
 import { QuickQuizPage } from "@/pages/QuickQuiz";
 import { StampBookPage } from "@/pages/StampBook";
 import { MyMistakesPage } from "@/pages/MyMistakes";
+import { PracticePage } from "@/pages/Practice";
+import { FlashcardsPage } from "@/pages/Flashcards";
 import { SectionsPage } from "@/pages/Sections";
 import { SectionDetailPage } from "@/pages/SectionDetail";
 import { StudentDetailPage } from "@/pages/StudentDetail";
@@ -111,6 +113,22 @@ export default function App() {
                 element={
                   <RequireRole allowed={["individual_learner", "student"]}>
                     <MyMistakesPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="practice"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <PracticePage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="practice/flashcards"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <FlashcardsPage />
                   </RequireRole>
                 }
               />

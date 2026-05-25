@@ -34,8 +34,8 @@ not the execution order.
 | 4 | Story-shaped progress for learners (replace bare numbers) | 2 | ✅ Shipped 2026-05-25 |
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | ✅ Shipped 2026-05-26 |
 | 6 | Parent / guardian view | 9 | ✅ Shipped 2026-05-26 |
-| 7 | Practice variety — flashcards / speedrun / surprise me | 7 | **Up next** |
-| 8 | Audio support — read-aloud everywhere | 5 | Planned |
+| 7 | Practice variety — flashcards / speedrun / surprise me | 7 | ✅ Shipped 2026-05-26 |
+| 8 | Audio support — read-aloud everywhere | 5 | **Up next** |
 | 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | Planned |
 | 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | Planned |
 
@@ -609,6 +609,54 @@ have rewards to plug into.
 **Frontend**
 - New `/practice` route hub with cards for each mode.
 - Reuse the existing question-rendering components.
+
+### What shipped
+- `app/services/practice_variety_service.py` — `resolve_syllabus`
+  (class_level + subject_ids + chapter_ids for one learner),
+  `pick_surprise` (random APPROVED question via `ORDER BY
+  random()`), `sample_flashcards` (REMEMBER bucket with
+  UNDERSTAND-bucket top-up so a thin chapter still fills a deck).
+- Two new endpoints on `/me`, both learner-role-gated:
+  - `GET /me/practice/surprise` — one card payload.
+  - `GET /me/practice/flashcards?count=10&chapter_id=...` — N
+    factual cards for flip-card practice.
+- Speedrun deliberately reuses `/me/quick-quiz` with preset
+  params (5 questions, kind=objective, 3-minute timer) — no new
+  endpoint needed. All existing post-commit hooks (stamps,
+  points, mistakes, mascot reactions) fire automatically.
+- New `/practice` route (`<PracticePage />`):
+  - Three mode cards (Speedrun / Surprise me / Flashcards) each
+    with its own brand accent colour and a short tagline.
+  - Speedrun launcher samples a chapter via `/me/practice/surprise`
+    then posts `/me/quick-quiz`, navigates to take-quiz on success.
+  - "Surprise me" renders inline below the hub — answer is hidden
+    by default, "Show the answer" reveals correct + explanation.
+    "Another one" fetches a fresh question.
+- New `/practice/flashcards` route (`<FlashcardsPage />`):
+  - CSS 3D flip card (perspective + rotateY) — front shows the
+    question, back shows the answer + explanation.
+  - "Got it" / "Tricky" buttons advance the deck. Mascot reacts:
+    FIRES on "got it", RESTRING on "tricky".
+  - End-of-deck summary screen with got/tricky tallies + restart.
+- Sidebar nav: "Practice variety" link for `student` and
+  `individual_learner` (Layers icon).
+- Mascot integration throughout: DRAWN when launching speedrun
+  or rolling a surprise; FIRES on right-flashcard / answer reveal;
+  RESTRING on tricky-flashcard. All with short context messages.
+
+**Out of scope for Stage 7 (deliberately deferred)**
+- Wiring `match_pairs / categorize / timeline_order` simulation
+  templates into the practice hub — their interaction model
+  differs enough from MCQ/text that they need their own component.
+  The templates still render in the content library.
+- Persisting "tricky" flashcard marks to the DB. For v1 the tally
+  is session-only (in-memory). A future iteration could write to
+  a `flashcard_tricky(user_id, question_id, last_seen_at, count)`
+  table and surface a "revisit tricky cards" deck.
+- Speedrun-specific stamp kind. Speedrun completions earn the
+  regular `QUIZ_COMPLETED` stamp via the existing post-commit
+  hooks; if "speedrun completed X times" turns into a meaningful
+  signal we can add a `SPEEDRUN_COMPLETED` stamp kind later.
 
 ---
 

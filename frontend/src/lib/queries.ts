@@ -736,6 +736,66 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
   });
 }
 
+/* ---------- Practice variety hub (Stage 7 of child-centric roadmap) ---------- */
+
+/** Shape returned by /me/practice/surprise + /me/practice/flashcards.
+ *  Trimmed compared to Question — no review_notes / created_by etc.,
+ *  just what a flip-card or inline-reveal UI actually renders. */
+export interface PracticeCardQuestion {
+  id: number;
+  chapter_id: number | null;
+  type: QuestionType | string;
+  difficulty: QuestionDifficulty | string;
+  cognitive_level: BloomLevel | string;
+  text: string;
+  options: { choices?: string[] } | null;
+  correct_answer: string;
+  explanation: string | null;
+  marks: number;
+  outcome_code: string | null;
+}
+
+/** One random question from the learner's syllabus. Surprise me!
+ *  Refetch on demand (button click) — disabled by default so the
+ *  page doesn't burn a question on every dashboard tab focus. */
+export function useSurpriseQuestion(enabled: boolean) {
+  return useQuery({
+    queryKey: ["me", "practice", "surprise"],
+    queryFn: async () => {
+      const { data } = await api.get<PracticeCardQuestion>(
+        "/me/practice/surprise",
+      );
+      return data;
+    },
+    enabled,
+    // The whole point is freshness — never cache a "surprise".
+    staleTime: 0,
+    gcTime: 0,
+  });
+}
+
+/** Sampled factual / REMEMBER-bucket questions for the flashcards
+ *  surface. `count` defaults to 10; chapter_id is optional. */
+export function useFlashcards(params: { count?: number; chapter_id?: number; enabled?: boolean }) {
+  return useQuery({
+    queryKey: ["me", "practice", "flashcards", params.count ?? 10, params.chapter_id ?? null],
+    enabled: params.enabled !== false,
+    queryFn: async () => {
+      const { data } = await api.get<PracticeCardQuestion[]>(
+        "/me/practice/flashcards",
+        {
+          params: {
+            count: params.count ?? 10,
+            chapter_id: params.chapter_id,
+          },
+        },
+      );
+      return data;
+    },
+    staleTime: 0,
+  });
+}
+
 /* ---------- Parent / guardian (Stage 6 of child-centric roadmap) ---------- */
 
 export interface ParentInviteCode {
