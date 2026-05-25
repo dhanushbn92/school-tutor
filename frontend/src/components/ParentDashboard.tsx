@@ -13,7 +13,6 @@ import {
   Trophy,
 } from "lucide-react";
 import { BRAND_ARROW_COLORS } from "@/lib/brand";
-import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,18 +65,23 @@ export function ParentDashboard() {
 
   const firstName = (user?.full_name ?? "").split(/\s+/)[0] || "there";
 
+  const children = childrenQ.data ?? [];
+  const childCount = children.length;
+
   return (
     <ThemedPage>
-      <PageHeader
-        title={`Hello, ${firstName}`}
-        description="A gentle window into your child's practice. Drop a note any time — they'll see it on their dashboard."
-      />
+      {/* Stage 6.2 — warmer parent hero. Replaces the bare PageHeader
+          with a soft gradient panel that sets the encouraging tone
+          before any data lands. Mirrors the design language of the
+          learner DashboardPurposePanel so a parent who's also a
+          self-learner doesn't feel like they jumped products. */}
+      <ParentHero firstName={firstName} childCount={childCount} />
 
       {childrenQ.isLoading ? (
         <div className="flex items-center gap-2 text-sm text-(--color-muted-foreground)">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading your children…
         </div>
-      ) : !childrenQ.data || childrenQ.data.length === 0 ? (
+      ) : childCount === 0 ? (
         <Empty
           icon={<HeartHandshake className="h-6 w-6" />}
           title="No children linked yet"
@@ -87,8 +91,17 @@ export function ParentDashboard() {
           }
         />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {childrenQ.data.map((child) => (
+        // Single-child parents (the common case) get a centered,
+        // max-width card — no awkward half-page-empty layout. Multi-
+        // child parents fall back to a 2-column grid on wide screens.
+        <div
+          className={
+            childCount === 1
+              ? "mx-auto max-w-4xl"
+              : "grid gap-6 lg:grid-cols-2"
+          }
+        >
+          {children.map((child) => (
             <ChildCard
               key={child.user_id}
               childUserId={child.user_id}
@@ -98,6 +111,65 @@ export function ParentDashboard() {
         </div>
       )}
     </ThemedPage>
+  );
+}
+
+/* ----------------------------------------------------------------- */
+/* Parent hero — soft welcome panel                                  */
+/* ----------------------------------------------------------------- */
+
+function ParentHero({
+  firstName,
+  childCount,
+}: {
+  firstName: string;
+  childCount: number;
+}) {
+  return (
+    <div
+      className="relative mb-6 overflow-hidden rounded-xl border border-(--color-border) bg-gradient-to-br from-[color-mix(in_oklab,var(--color-primary)_8%,var(--color-card))] via-(--color-card) to-(--color-card) px-6 py-7 shadow-sm sm:px-8 sm:py-8"
+    >
+      {/* Decorative soft circles — purely cosmetic, kept low-opacity
+          so they read as "warm" not "loud". */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full"
+        style={{ backgroundColor: BRAND_ARROW_COLORS.orange, opacity: 0.08 }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-10 right-16 h-24 w-24 rounded-full"
+        style={{ backgroundColor: BRAND_ARROW_COLORS.green, opacity: 0.08 }}
+      />
+
+      <div className="relative flex items-start gap-4">
+        <span
+          className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: `${BRAND_ARROW_COLORS.navy}14`,
+            color: BRAND_ARROW_COLORS.navy,
+          }}
+        >
+          <HeartHandshake className="h-6 w-6" />
+        </span>
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
+            Hello, {firstName}
+          </h1>
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-(--color-muted-foreground) sm:text-base">
+            A gentle window into{" "}
+            {childCount === 1
+              ? "your child's practice"
+              : childCount > 1
+                ? `your ${childCount} children's practice`
+                : "your child's practice"}
+            . You'll see the rhythm, the wins, the chapters they're
+            growing through. Drop a note any time — they see it on
+            their dashboard.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -117,19 +189,33 @@ function ChildCard({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader>
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div>
-            <CardTitle className="font-display text-xl">{childName}</CardTitle>
-            <CardDescription>
-              {summary
-                ? `${summary.practice_days_count_this_week} of ${summary.target_days} practice days this week${summary.subject_name ? ` · ${summary.subject_name}` : ""}`
-                : "Loading their week…"}
-            </CardDescription>
+      <CardHeader className="bg-gradient-to-br from-(--color-muted)/40 to-transparent">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            {/* Initials avatar — gives the card a person, not a row. */}
+            <span
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display text-lg font-semibold"
+              style={{
+                backgroundColor: `${BRAND_ARROW_COLORS.green}1a`,
+                color: BRAND_ARROW_COLORS.green,
+                border: `1px solid ${BRAND_ARROW_COLORS.green}40`,
+              }}
+              aria-hidden="true"
+            >
+              {childInitials(childName)}
+            </span>
+            <div className="min-w-0">
+              <CardTitle className="font-display text-xl">{childName}</CardTitle>
+              <CardDescription className="mt-0.5">
+                {summary
+                  ? `${summary.practice_days_count_this_week} of ${summary.target_days} practice days this week${summary.subject_name ? ` · ${summary.subject_name}` : ""}`
+                  : "Loading their week…"}
+              </CardDescription>
+            </div>
           </div>
           {summary && summary.weekly_goal_met && (
-            <Badge variant="success" className="gap-1">
-              <Target className="h-3 w-3" /> Goal hit!
+            <Badge variant="success" className="gap-1 px-3 py-1 text-xs">
+              <Target className="h-3.5 w-3.5" /> Goal hit!
             </Badge>
           )}
         </div>
@@ -521,6 +607,17 @@ function StampsTally({
 }
 
 /* --- Encouragement composer --- */
+
+/** Two-letter initials for the avatar circle. "Aarav Mehta" -> "AM",
+ *  "Madonna" -> "M", "" -> "?". Trims whitespace + ignores extra
+ *  middle names so a three-word name still produces two letters. */
+function childInitials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "?";
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 
 const PRESET_MESSAGES: string[] = [
   "Proud of you — keep going!",
