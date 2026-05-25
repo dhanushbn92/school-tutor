@@ -26,12 +26,17 @@ already retries internally.
 
 from __future__ import annotations
 
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.llm import LLMError, get_llm_provider
 from app.llm.prompts.explain import build_user_prompt, system_prompt_for
+
+
+logger = logging.getLogger(__name__)
 from app.models import (
     Book,
     Chapter,
@@ -125,12 +130,36 @@ def get_or_generate(
             max_tokens=MAX_OUTPUT_TOKENS,
         )
     except LLMError as exc:
+        # Log the real cause so a server-log tail diagnoses provider
+        # outages / missing keys / rate limits. The user-facing message
+        # is intentionally vague to avoid leaking key names / vendor
+        # error blobs into the UI.
+        logger.warning(
+            "explain_service: LLM call failed for question_id=%s tier=%s: %s",
+            question_id,
+            tier,
+            exc,
+        )
+        raise ExplainError(
+            "I can't generate that explanation right now. Please try again in a moment."
+        ) from exc
+    except Exception as exc:  # pragma: no cover — defensive net
+        logger.exception(
+            "explain_service: unexpected error for question_id=%s tier=%s",
+            question_id,
+            tier,
+        )
         raise ExplainError(
             "I can't generate that explanation right now. Please try again in a moment."
         ) from exc
 
     text = (text or "").strip()
     if not text:
+        logger.warning(
+            "explain_service: LLM returned empty text for question_id=%s tier=%s",
+            question_id,
+            tier,
+        )
         raise ExplainError("The model returned an empty response — try again in a moment.")
 
     row = QuestionExtendedExplanation(
