@@ -24,6 +24,7 @@ import { DashboardHero } from "@/components/DashboardHero";
 import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { PracticeCard } from "@/components/PracticeCard";
 import { LearnerProgressNarrative } from "@/components/LearnerProgressNarrative";
+import { MascotToggleHint } from "@/components/MascotToggleHint";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
 import {
@@ -111,6 +112,10 @@ export function LearnerDashboard() {
       {/* "Your practice" card — weekly progress ring + stamp strip.
           Stage 1 of the child-centric roadmap. */}
       <PracticeCard />
+      {/* Stage 5 — only renders if the learner has previously turned
+          the Vidyārthi mascot off. Gives them a one-click path back
+          to enabling the companion so the off switch is reversible. */}
+      <MascotToggleHint />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={
