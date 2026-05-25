@@ -12,6 +12,7 @@ import { ManageSchoolPage } from "@/pages/ManageSchool";
 import { DashboardPage } from "@/pages/Dashboard";
 import { TakeAssessmentPage } from "@/pages/TakeAssessment";
 import { QuickQuizPage } from "@/pages/QuickQuiz";
+import { StampBookPage } from "@/pages/StampBook";
 import { SectionsPage } from "@/pages/Sections";
 import { SectionDetailPage } from "@/pages/SectionDetail";
 import { StudentDetailPage } from "@/pages/StudentDetail";
@@ -91,6 +92,14 @@ export default function App() {
                 element={
                   <RequireRole allowed={["individual_learner", "student"]}>
                     <QuickQuizPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="me/stamps"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <StampBookPage />
                   </RequireRole>
                 }
               />

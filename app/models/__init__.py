@@ -21,6 +21,7 @@ from app.models.curriculum import (
 )
 from app.models.generation import GeneratedContent, GeneratedContentStatus, GeneratedContentType
 from app.models.intervention import InterventionNote
+from app.models.learner_practice import LearnerStamp, LearnerWeeklyGoal, StampKind
 from app.models.mastery import CognitiveBucket, SkillMastery
 from app.models.question import Question, QuestionDifficulty, QuestionStatus, QuestionType
 from app.models.school import (
@@ -56,6 +57,8 @@ __all__ = [
     "GeneratedContentStatus",
     "GeneratedContentType",
     "InterventionNote",
+    "LearnerStamp",
+    "LearnerWeeklyGoal",
     "LearningOutcome",
     "Question",
     "QuestionDifficulty",
@@ -65,6 +68,7 @@ __all__ = [
     "SchoolClass",
     "Section",
     "SkillMastery",
+    "StampKind",
     "Student",
     "Subject",
     "Submission",

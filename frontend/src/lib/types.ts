@@ -806,3 +806,44 @@ export interface InterventionNote {
   note: string;
   created_at: string;
 }
+
+// ---------- Practice rhythm (Stage 1 of child-centric roadmap) ----------
+
+/** Stamp kinds the backend can award. UI does an exhaustive switch on
+ *  these; any unknown kind falls through to a generic rendering so
+ *  adding a new kind on the backend can never crash the stamp book. */
+export type StampKind =
+  | "QUIZ_COMPLETED"
+  | "PERFECT_SCORE"
+  | "PRACTICE_DAY"
+  | "WEEKLY_GOAL_MET";
+
+export interface LearnerStamp {
+  id: number;
+  kind: StampKind | string;
+  /** ISO timestamp string. */
+  earned_at: string;
+  /** Per-kind context blob. Shape depends on `kind`:
+   *   QUIZ_COMPLETED   { assessment_id, submission_id, total_awarded, max_marks }
+   *   PERFECT_SCORE    { assessment_id, submission_id, marks }
+   *   PRACTICE_DAY     { date: 'YYYY-MM-DD' }
+   *   WEEKLY_GOAL_MET  { week_start, target_days, days_achieved }
+   *  Callers should defensively narrow before destructuring. */
+  metadata: Record<string, unknown>;
+}
+
+export interface PracticeSummary {
+  /** Monday of the current ISO week, ISO date string. */
+  week_start: string;
+  /** Sunday of the current ISO week, ISO date string (inclusive). */
+  week_end: string;
+  /** Learner's target practice days for this week (1..7). */
+  target_days: number;
+  /** Distinct days the learner submitted at least one quiz this week. */
+  practice_days_this_week: string[];
+  practice_days_count_this_week: number;
+  /** All-time count of distinct practice days. */
+  practice_days_count_total: number;
+  weekly_goal_met: boolean;
+  recent_stamps: LearnerStamp[];
+}

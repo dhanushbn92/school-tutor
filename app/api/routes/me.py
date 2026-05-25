@@ -35,6 +35,7 @@ from app.services import (
     analytics_service,
     assessment_service,
     intervention_service,
+    learner_practice_service,
     question_bank_service,
     school_service,
 )
@@ -339,3 +340,62 @@ def quick_quiz(
 
 # Silence "imported but unused" — these are referenced via service modules.
 _ = (Book, AcademicYear)
+
+
+# ---------- Practice rhythm — Stage 1 of the child-centric roadmap ----------
+#
+# Three endpoints feed the "Your practice" card on the learner dashboard and
+# the upcoming stamp-book page:
+#   GET  /me/practice-summary     — week progress + recent stamps in one go
+#   PUT  /me/practice-summary/goal — learner-set weekly target (1..7 days)
+#   GET  /me/stamps               — full stamp history for the collection view
+# Learner role gating is enforced via require_learner.
+
+
+class WeeklyGoalUpdate(BaseModel):
+    target_days: int = Field(ge=1, le=7)
+
+
+@router.get("/practice-summary")
+def get_practice_summary(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    summary = learner_practice_service.practice_summary(db, user_id=user.id)
+    return {
+        "week_start": summary.week_start.isoformat(),
+        "week_end": summary.week_end.isoformat(),
+        "target_days": summary.target_days,
+        "practice_days_this_week": [d.isoformat() for d in summary.practice_days_this_week],
+        "practice_days_count_this_week": summary.practice_days_count_this_week,
+        "practice_days_count_total": summary.practice_days_count_total,
+        "weekly_goal_met": summary.weekly_goal_met,
+        "recent_stamps": [
+            learner_practice_service.stamp_to_dict(s) for s in summary.recent_stamps
+        ],
+    }
+
+
+@router.put("/practice-summary/goal")
+def update_practice_goal(
+    payload: WeeklyGoalUpdate,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    goal = learner_practice_service.set_weekly_goal(
+        db, user_id=user.id, target_days=payload.target_days
+    )
+    return {
+        "week_start": goal.week_start.isoformat(),
+        "target_days": goal.target_days,
+    }
+
+
+@router.get("/stamps")
+def list_my_stamps(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+    limit: int = Query(default=200, ge=1, le=500),
+):
+    stamps = learner_practice_service.list_stamps(db, user_id=user.id, limit=limit)
+    return [learner_practice_service.stamp_to_dict(s) for s in stamps]

@@ -23,6 +23,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import { DashboardHero } from "@/components/DashboardHero";
 import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
+import { PracticeCard } from "@/components/PracticeCard";
 import { StatCard } from "@/components/StatCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
@@ -107,6 +108,9 @@ export function LearnerDashboard() {
           CTA pointing at the next quiz. Sits above the mastery
           widgets so the practice prompt is unmissable. */}
       <DashboardPurposePanel role="learner" />
+      {/* "Your practice" card — weekly progress ring + stamp strip.
+          Stage 1 of the child-centric roadmap. */}
+      <PracticeCard />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={

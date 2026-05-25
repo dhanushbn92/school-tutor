@@ -15,7 +15,9 @@ import type {
   GeneratedContentStatus,
   GeneratedContentType,
   InterventionNote,
+  LearnerStamp,
   LearningOutcome,
+  PracticeSummary,
   Question,
   QuestionDifficulty,
   QuestionStatus,
@@ -648,6 +650,56 @@ export function useMySubmissions() {
     queryKey: ["me", "submissions"],
     queryFn: async () => {
       const { data } = await api.get<MySubmission[]>("/me/submissions");
+      return data;
+    },
+  });
+}
+
+/* ---------- Practice rhythm (Stage 1 of child-centric roadmap) ---------- */
+
+/**
+ * One-shot fetch for the "Your practice" dashboard card: this week's
+ * progress, the learner's weekly goal, and recent stamps. The backend
+ * computes everything from `submissions.submitted_at` so there's no
+ * write side-effect — safe to refetch freely.
+ */
+export function usePracticeSummary() {
+  return useQuery({
+    queryKey: ["me", "practice-summary"],
+    queryFn: async () => {
+      const { data } = await api.get<PracticeSummary>("/me/practice-summary");
+      return data;
+    },
+  });
+}
+
+/** Update the learner's weekly target (1..7 days). Backend clamps the
+ *  value, so a slider that lets through 0 or 10 would still be safe. */
+export function useSetWeeklyGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (target_days: number) => {
+      const { data } = await api.put<{ target_days: number; week_start: string }>(
+        "/me/practice-summary/goal",
+        { target_days },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "practice-summary"] });
+    },
+  });
+}
+
+/** Full history for the stamp-book collection page. Limit is generous;
+ *  paginate if any learner ever crosses 500 stamps. */
+export function useMyStamps(limit = 200) {
+  return useQuery({
+    queryKey: ["me", "stamps", limit],
+    queryFn: async () => {
+      const { data } = await api.get<LearnerStamp[]>("/me/stamps", {
+        params: { limit },
+      });
       return data;
     },
   });
