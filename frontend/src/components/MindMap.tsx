@@ -1,14 +1,24 @@
 import { useState } from "react";
 
-interface MindMapBranch {
+/**
+ * Recursive mind-map node. A `detail` can be either a plain string
+ * (leaf — just text inside a sub-pill) or another node that itself
+ * has children (and can be expanded further). The frontend renders
+ * both shapes; the LLM chapter-summary prompt currently emits the
+ * string variant, but a richer future prompt can ship a multi-level
+ * tree and this component will unfold it as deep as the data goes.
+ */
+export type MindMapDetail = string | MindMapNode;
+
+interface MindMapNode {
   label: string;
-  details?: string[];
+  details?: MindMapDetail[];
 }
 
 interface MindMapData {
   title?: string;
   central_term: string;
-  branches: MindMapBranch[];
+  branches: MindMapNode[];
 }
 
 const PALETTE = [
@@ -20,20 +30,34 @@ const PALETTE = [
   "oklch(72% 0.15 320)",
 ];
 
+// Truncate a label / detail to keep pills from overflowing the
+// canvas. Full text always lives in the SVG <title> tag so hovering
+// reveals it. The cap is conservative because long labels with
+// adjacent branches collide horizontally even in single-open mode.
+const MAX_LABEL_CHARS = 26;
+const truncate = (s: string) => (s.length > MAX_LABEL_CHARS ? `${s.slice(0, MAX_LABEL_CHARS - 1)}…` : s);
+
 /**
- * Radial mind-map: central term in the middle, branches on a circle.
+ * Radial mind-map: central term in the middle, branches arranged on
+ * a circle around it.
  *
  * Two modes:
+ *
  *   - Static (default, `interactive={false}`) — every branch's
- *     details render as small text labels next to the pill.
- *     Used inside flowing text (RichExplanationView block) where
- *     a non-interactive overview is the right thing.
- *   - Interactive (`interactive={true}`) — branches start collapsed
- *     showing only their label. Tap a branch to expand its details
- *     as sub-pills that fan out radially. Tap again to collapse.
- *     The chapter-summary surface on the Learn page uses this so
- *     kids can explore the chapter one branch at a time without
- *     being overwhelmed by every detail at once.
+ *     details render as small text labels next to the pill. Used
+ *     inside flowing text (the RichExplanationView block) where a
+ *     non-interactive overview is the right thing.
+ *
+ *   - Interactive (`interactive={true}`) — branches start collapsed.
+ *     Tap a branch to drill in. SINGLE-OPEN: opening one branch
+ *     auto-closes any previously open branch, which is the only
+ *     reliable way to keep variable-width sub-pills from colliding
+ *     with neighbouring branches on the SVG canvas. Sub-pills stack
+ *     in a straight line outward from the branch in its radial
+ *     direction (no arc fan). Sub-pills that themselves have
+ *     `details` are clickable too — opening one shows ITS sub-pills
+ *     stacked further out, so deeply nested trees unfold all the
+ *     way down.
  */
 export function MindMap({
   data,
@@ -44,28 +68,42 @@ export function MindMap({
   size?: number;
   interactive?: boolean;
 }) {
-  // Interactive mode reserves more vertical room so expanded sub-
-  // pills don't get clipped by the SVG viewport. Static mode keeps
-  // the original compact aspect.
-  const W = size;
-  const H = Math.max(interactive ? 460 : 360, Math.round(size * (interactive ? 0.95 : 0.78)));
+  // Interactive mode reserves a much bigger canvas because a fully-
+  // unfolded chain of nested pills can extend a long way from the
+  // centre. Static mode keeps the original compact aspect.
+  const W = interactive ? Math.round(size * 1.4) : size;
+  const H = interactive ? Math.round(size * 1.05) : Math.max(360, Math.round(size * 0.78));
   const cx = W / 2;
   const cy = H / 2;
-  const radius = Math.min(W, H) * (interactive ? 0.28 : 0.34);
+  const radius = Math.min(W, H) * (interactive ? 0.22 : 0.34);
 
-  // Track which branches are currently open. We use a Set so toggle
-  // is O(1) and rendering can quickly check membership. Hard-coded
-  // to "all collapsed at start" — the interaction is the feature;
-  // pre-expanding defeats the point.
-  const [openBranches, setOpenBranches] = useState<Set<number>>(new Set());
+  // Single-open path key. A path is a sequence of indices
+  // identifying which branch's nested chain is currently expanded.
+  // For example [0, 1, 2] = branch 0 -> its detail 1 -> that
+  // detail's nested detail 2. Empty string means nothing is open.
+  // String-encoded so React can use it as a key.
+  const [openPath, setOpenPath] = useState<number[]>([]);
 
-  function toggleBranch(i: number) {
-    setOpenBranches((prev) => {
-      const next = new Set(prev);
-      if (next.has(i)) next.delete(i);
-      else next.add(i);
-      return next;
-    });
+  function isPathOpen(p: number[]): boolean {
+    if (p.length > openPath.length) return false;
+    for (let i = 0; i < p.length; i++) {
+      if (openPath[i] !== p[i]) return false;
+    }
+    return true;
+  }
+
+  function togglePath(p: number[]) {
+    if (isPathOpen(p) && p.length === openPath.length) {
+      // Clicking the currently-open leaf: collapse this level.
+      setOpenPath(openPath.slice(0, -1));
+    } else if (isPathOpen(p)) {
+      // Clicking a node further along the same open chain: stay there.
+      setOpenPath(p);
+    } else {
+      // Clicking a fresh branch (or sub-branch): open exactly that path,
+      // closing whatever was open elsewhere.
+      setOpenPath(p);
+    }
   }
 
   return (
@@ -83,9 +121,12 @@ export function MindMap({
           const bx = cx + dirX * radius;
           const by = cy + dirY * radius;
           const colour = PALETTE[i % PALETTE.length];
-
-          const isOpen = openBranches.has(i);
           const details = branch.details ?? [];
+
+          const branchOpen = interactive && isPathOpen([i]);
+          // Dim non-open branches when one is open, to spotlight the
+          // current chain and keep visual noise down.
+          const isDimmed = interactive && openPath.length > 0 && !branchOpen;
 
           // Layout for static (non-interactive) text labels — kept
           // verbatim from the original implementation so existing
@@ -99,8 +140,7 @@ export function MindMap({
             dirX > 0.25 ? "start" : dirX < -0.25 ? "end" : "middle";
 
           return (
-            <g key={`${i}-${branch.label}`}>
-              {/* Spoke from the centre to the branch. */}
+            <g key={`${i}-${branch.label}`} opacity={isDimmed ? 0.3 : 1} style={{ transition: "opacity 0.2s ease" }}>
               <line
                 x1={cx}
                 y1={cy}
@@ -115,40 +155,50 @@ export function MindMap({
                 x={bx}
                 y={by}
                 text={branch.label}
+                fullText={branch.label}
                 fill={colour}
                 hasChildren={interactive && details.length > 0}
-                open={isOpen}
+                open={branchOpen}
                 onClick={
                   interactive && details.length > 0
-                    ? () => toggleBranch(i)
+                    ? () => togglePath([i])
                     : undefined
                 }
               />
 
               {!interactive &&
-                details.slice(0, 3).map((detail, di) => (
-                  <text
-                    key={di}
-                    x={bx + dox}
-                    y={by + doy + di * detailLineHeight * stackDir}
-                    textAnchor={anchor}
-                    fontSize={11}
-                    fill="oklch(35% 0.01 260)"
-                  >
-                    {detail.length > 30 ? `${detail.slice(0, 28)}…` : detail}
-                  </text>
-                ))}
+                details
+                  .slice(0, 3)
+                  .map((detail, di) => (
+                    <text
+                      key={di}
+                      x={bx + dox}
+                      y={by + doy + di * detailLineHeight * stackDir}
+                      textAnchor={anchor}
+                      fontSize={11}
+                      fill="oklch(35% 0.01 260)"
+                    >
+                      {(() => {
+                        const t = typeof detail === "string" ? detail : detail.label;
+                        return t.length > 30 ? `${t.slice(0, 28)}…` : t;
+                      })()}
+                    </text>
+                  ))}
 
-              {/* Interactive expand: details as sub-pills fanning out
-                  past the branch pill, only when open. */}
-              {interactive && isOpen && details.length > 0 && (
-                <SubPills
-                  branchX={bx}
-                  branchY={by}
+              {/* Recursive expansion. Renders the open chain only —
+                  single-open mode means at most one branch chain is
+                  visible at a time. */}
+              {interactive && branchOpen && (
+                <NestedChain
+                  details={details}
+                  startX={bx}
+                  startY={by}
                   dirX={dirX}
                   dirY={dirY}
                   colour={colour}
-                  details={details}
+                  pathSoFar={[i]}
+                  openPath={openPath}
+                  onToggle={togglePath}
                 />
               )}
             </g>
@@ -157,19 +207,17 @@ export function MindMap({
         <CentralPill x={cx} y={cy} text={data.central_term} />
       </svg>
 
-      {/* Caption only in interactive mode — a tiny "tap to explore"
-          nudge so a learner knows the diagram does more than sit
-          there. */}
       {interactive && (
         <div className="mt-2 text-center text-xs text-(--color-muted-foreground)">
-          Tap any branch to see what's inside.
-          {openBranches.size > 0 && (
+          Tap any branch to explore. Sub-points with a{" "}
+          <span className="font-mono">+</span> can be opened further.
+          {openPath.length > 0 && (
             <>
               {" · "}
               <button
                 type="button"
                 className="underline-offset-2 hover:underline"
-                onClick={() => setOpenBranches(new Set())}
+                onClick={() => setOpenPath([])}
               >
                 Collapse all
               </button>
@@ -181,87 +229,153 @@ export function MindMap({
   );
 }
 
-/* ---------- Interactive sub-pills ---------- */
+/* ---------- Nested chain (recursive sub-pill expansion) ---------- */
 
 /**
- * Lay out the details of one branch as small pills radiating
- * outward in a shallow arc. The fan opens around the branch's own
- * direction vector — pills always point AWAY from the centre so
- * adjacent branches' details don't crash into each other.
+ * Render one level of sub-pills extending outward from `(startX,
+ * startY)` along `(dirX, dirY)`. Each sub-pill sits a fixed
+ * distance further out than the previous level. If a sub-pill has
+ * its own details and is the currently-open one at this depth,
+ * recursively renders its chain too.
+ *
+ * The layout is strictly linear (no fan) so collisions with
+ * neighbouring branches are impossible: a single open chain only
+ * occupies the corridor along its branch's radial direction.
  */
-function SubPills({
-  branchX,
-  branchY,
+function NestedChain({
+  details,
+  startX,
+  startY,
   dirX,
   dirY,
   colour,
-  details,
+  pathSoFar,
+  openPath,
+  onToggle,
 }: {
-  branchX: number;
-  branchY: number;
+  details: MindMapDetail[];
+  startX: number;
+  startY: number;
   dirX: number;
   dirY: number;
   colour: string;
-  details: string[];
+  pathSoFar: number[];
+  openPath: number[];
+  onToggle: (p: number[]) => void;
 }) {
-  // Distance from the branch pill to the sub-pill centres.
-  const reach = 92;
-  // Angular spread of the fan, in radians. Wider fan for more
-  // details so they don't overlap.
-  const spread = Math.min(Math.PI * 0.55, 0.32 + details.length * 0.18);
-  const baseAngle = Math.atan2(dirY, dirX);
-  const startAngle = baseAngle - spread / 2;
-  const step = details.length === 1 ? 0 : spread / (details.length - 1);
+  // Per-level distances and offsets. We stack sub-pills LATERALLY
+  // (perpendicular to the branch's radial direction) so they don't
+  // sit on top of each other, then push the WHOLE stack outward as
+  // the chain descends.
+  const lateralSpacing = 32;
+  const radialStep = 78;
+  // Perpendicular unit vector for the lateral spread.
+  const perpX = -dirY;
+  const perpY = dirX;
+
+  // Centre the lateral spread around the branch's radial line.
+  const total = details.length;
+  const lateralStart = -((total - 1) * lateralSpacing) / 2;
 
   return (
     <>
-      {details.map((text, i) => {
-        const a = startAngle + i * step;
-        const sx = branchX + Math.cos(a) * reach;
-        const sy = branchY + Math.sin(a) * reach;
+      {details.map((detail, di) => {
+        const path = [...pathSoFar, di];
+        const isOpenLeaf =
+          openPath.length === path.length &&
+          path.every((v, i) => v === openPath[i]);
+        // For the path of an open chain to continue past this node,
+        // openPath[di-position] === di
+        const isOnOpenChain =
+          openPath.length > path.length &&
+          path.every((v, i) => v === openPath[i]);
+
+        const lateral = lateralStart + di * lateralSpacing;
+        const sx = startX + dirX * radialStep + perpX * lateral;
+        const sy = startY + dirY * radialStep + perpY * lateral;
+
+        const isNode = typeof detail !== "string";
+        const label = isNode ? (detail as MindMapNode).label : (detail as string);
+        const subDetails = isNode ? (detail as MindMapNode).details ?? [] : [];
+        const hasChildren = subDetails.length > 0;
+        const open = isOpenLeaf || isOnOpenChain;
+
         return (
           <g
-            key={i}
+            key={`${path.join("-")}`}
             className="animate-mindmap-pop"
             style={{
-              transformOrigin: `${branchX}px ${branchY}px`,
-              animationDelay: `${i * 50}ms`,
+              transformOrigin: `${startX}px ${startY}px`,
+              animationDelay: `${di * 40}ms`,
             }}
           >
             <line
-              x1={branchX}
-              y1={branchY}
+              x1={startX}
+              y1={startY}
               x2={sx}
               y2={sy}
               stroke={colour}
               strokeWidth={1.5}
               opacity={0.4}
             />
-            <SubPill x={sx} y={sy} text={text} fill={colour} />
+            <SubPill
+              x={sx}
+              y={sy}
+              text={label}
+              fullText={label}
+              fill={colour}
+              hasChildren={hasChildren}
+              open={open}
+              onClick={hasChildren ? () => onToggle(path) : undefined}
+            />
+
+            {/* Recurse only along the open chain. */}
+            {hasChildren && open && (
+              <NestedChain
+                details={subDetails}
+                startX={sx}
+                startY={sy}
+                dirX={dirX}
+                dirY={dirY}
+                colour={colour}
+                pathSoFar={path}
+                openPath={openPath}
+                onToggle={onToggle}
+              />
+            )}
           </g>
         );
       })}
-      {/* Keyframes are inline so the file is self-contained — no
-          global CSS edit needed for the pop animation. */}
+      {/* Pop animation — single inline style works for any
+          NestedChain instance. */}
       <style>{`
         @keyframes mindmap-pop {
-          0% { opacity: 0; transform: scale(0.5); }
-          70% { opacity: 1; transform: scale(1.05); }
+          0% { opacity: 0; transform: scale(0.6); }
+          70% { opacity: 1; transform: scale(1.04); }
           100% { opacity: 1; transform: scale(1); }
         }
         .animate-mindmap-pop {
-          animation: mindmap-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+          animation: mindmap-pop 0.26s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-mindmap-pop {
+            animation: none;
+          }
         }
       `}</style>
     </>
   );
 }
 
+/* ---------- Pills ---------- */
+
 function CentralPill({ x, y, text }: { x: number; y: number; text: string }) {
   const padX = 18;
-  const approxWidth = Math.max(110, text.length * 9 + padX * 2);
+  const display = truncate(text);
+  const approxWidth = Math.max(110, display.length * 9 + padX * 2);
   return (
     <g>
+      <title>{text}</title>
       <rect
         x={x - approxWidth / 2}
         y={y - 22}
@@ -279,7 +393,7 @@ function CentralPill({ x, y, text }: { x: number; y: number; text: string }) {
         fontWeight={600}
         fill="white"
       >
-        {text}
+        {display}
       </text>
     </g>
   );
@@ -289,6 +403,7 @@ function BranchPill({
   x,
   y,
   text,
+  fullText,
   fill,
   hasChildren = false,
   open = false,
@@ -297,21 +412,20 @@ function BranchPill({
   x: number;
   y: number;
   text: string;
+  fullText: string;
   fill: string;
   hasChildren?: boolean;
   open?: boolean;
   onClick?: () => void;
 }) {
-  // Slightly wider in interactive mode to fit the +/- chevron at
-  // the right edge of the pill.
+  const display = truncate(text);
   const chevWidth = hasChildren ? 18 : 0;
-  const approxWidth = Math.max(80, text.length * 7 + 18 + chevWidth);
+  const approxWidth = Math.max(80, display.length * 7 + 18 + chevWidth);
   const clickable = onClick !== undefined;
   return (
     <g
       onClick={onClick}
       style={clickable ? { cursor: "pointer" } : undefined}
-      // SVG focus/aria treatment so keyboard users can also expand.
       tabIndex={clickable ? 0 : undefined}
       role={clickable ? "button" : undefined}
       aria-pressed={clickable ? open : undefined}
@@ -326,6 +440,7 @@ function BranchPill({
           : undefined
       }
     >
+      <title>{fullText}</title>
       <rect
         x={x - approxWidth / 2}
         y={y - 14}
@@ -338,12 +453,12 @@ function BranchPill({
       <text
         x={hasChildren ? x - 6 : x}
         y={y + 4}
-        textAnchor={hasChildren ? "middle" : "middle"}
+        textAnchor="middle"
         fontSize={12}
         fontWeight={600}
         fill="white"
       >
-        {text}
+        {display}
       </text>
       {hasChildren && (
         <text
@@ -362,25 +477,52 @@ function BranchPill({
   );
 }
 
+/**
+ * Sub-pill. Can itself be clickable when its node has nested
+ * details — same +/- chevron treatment as a branch pill.
+ */
 function SubPill({
   x,
   y,
   text,
+  fullText,
   fill,
+  hasChildren = false,
+  open = false,
+  onClick,
 }: {
   x: number;
   y: number;
   text: string;
+  fullText: string;
   fill: string;
+  hasChildren?: boolean;
+  open?: boolean;
+  onClick?: () => void;
 }) {
-  // Cap displayed text so a long detail doesn't render off-screen.
-  // Full text lives in the `<title>` so hovering a sub-pill reveals
-  // it in a native tooltip — handy on desktop, ignored on touch.
-  const display = text.length > 38 ? `${text.slice(0, 36)}…` : text;
-  const approxWidth = Math.max(80, display.length * 6.6 + 18);
+  const display = truncate(text);
+  const chevWidth = hasChildren ? 16 : 0;
+  const approxWidth = Math.max(80, display.length * 6.6 + 18 + chevWidth);
+  const clickable = onClick !== undefined;
   return (
-    <g>
-      <title>{text}</title>
+    <g
+      onClick={onClick}
+      style={clickable ? { cursor: "pointer" } : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      role={clickable ? "button" : undefined}
+      aria-pressed={clickable ? open : undefined}
+      onKeyDown={
+        clickable
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+    >
+      <title>{fullText}</title>
       <rect
         x={x - approxWidth / 2}
         y={y - 13}
@@ -393,7 +535,7 @@ function SubPill({
         strokeWidth={1.5}
       />
       <text
-        x={x}
+        x={hasChildren ? x - 5 : x}
         y={y + 4}
         textAnchor="middle"
         fontSize={11}
@@ -401,6 +543,19 @@ function SubPill({
       >
         {display}
       </text>
+      {hasChildren && (
+        <text
+          x={x + approxWidth / 2 - 9}
+          y={y + 4}
+          textAnchor="middle"
+          fontSize={12}
+          fontWeight={700}
+          fill={fill}
+          aria-hidden="true"
+        >
+          {open ? "−" : "+"}
+        </text>
+      )}
     </g>
   );
 }
