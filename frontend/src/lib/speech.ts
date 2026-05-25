@@ -151,3 +151,158 @@ export function useSpeech(opts: UseSpeechOptions = {}) {
 
   return { speak, stop, isSpeaking, available: isSpeechAvailable() };
 }
+
+
+// ---------------------------------------------------------------------------
+// Stage 9 — verdict sound effects (Web Audio API)
+// ---------------------------------------------------------------------------
+//
+// Two tiny ear-pleasing chimes that play after a retry: a rising
+// pair of notes on correct, a single low note on wrong. Web Audio
+// gives us "play a short tone" without shipping audio files; we
+// generate them on the fly with an OscillatorNode.
+//
+// The toggle lives on the AudioSettings card; effects only fire
+// when `audio.sounds_enabled` (Stage 9 added) is True.
+
+
+type Note = { freq: number; duration: number; type?: OscillatorType };
+
+
+let _sharedCtx: AudioContext | null = null;
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === "undefined") return null;
+  const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Ctor) return null;
+  if (_sharedCtx === null) {
+    _sharedCtx = new Ctor();
+  }
+  // Some browsers suspend the AudioContext until a user gesture
+  // unlocks it. The verdict tone runs immediately after a click so
+  // the context should already be running, but resume defensively.
+  if (_sharedCtx.state === "suspended") {
+    void _sharedCtx.resume();
+  }
+  return _sharedCtx;
+}
+
+
+/** Play a sequence of notes via Web Audio. Each note is a short
+ *  oscillator + gain envelope; no external audio files. */
+function playSequence(notes: Note[]): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  let when = ctx.currentTime;
+  for (const note of notes) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = note.type ?? "sine";
+    osc.frequency.value = note.freq;
+    // Small fade-in / fade-out so the note doesn't click on
+    // start / end. 8ms ramps are inaudible as ramps but kill
+    // the click.
+    gain.gain.setValueAtTime(0, when);
+    gain.gain.linearRampToValueAtTime(0.2, when + 0.008);
+    gain.gain.linearRampToValueAtTime(0, when + note.duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(when);
+    osc.stop(when + note.duration + 0.05);
+    when += note.duration;
+  }
+}
+
+
+/** Cheerful rising chime — major third (C5 -> E5). */
+export function playCorrectChime(): void {
+  playSequence([
+    { freq: 523.25, duration: 0.12 }, // C5
+    { freq: 659.25, duration: 0.18 }, // E5
+  ]);
+}
+
+
+/** Soft "not yet" — single descending note in the alto register.
+ *  Deliberately NOT a buzzer or error sound; we don't want kids
+ *  to associate the chime with shame. */
+export function playNotYetChime(): void {
+  playSequence([
+    { freq: 392.0, duration: 0.18 }, // G4
+    { freq: 329.63, duration: 0.16 }, // E4
+  ]);
+}
+
+
+/** Bigger celebration chord progression for success-after-struggle. */
+export function playStruggleSuccessChime(): void {
+  playSequence([
+    { freq: 523.25, duration: 0.1 }, // C5
+    { freq: 659.25, duration: 0.1 }, // E5
+    { freq: 783.99, duration: 0.22 }, // G5
+  ]);
+}
+
+
+// ---------------------------------------------------------------------------
+// Sounds-enabled preference — per device, persisted in localStorage
+// ---------------------------------------------------------------------------
+//
+// Deliberately NOT stored server-side: "do my speakers chime?" is a
+// per-device concern (the school laptop and the phone want different
+// answers), and persisting it via localStorage keeps the existing
+// audio_preferences migration count down.
+
+
+const SOUNDS_STORAGE_KEY = "dhananjaya.sounds_enabled";
+
+
+export function getSoundsEnabled(): boolean {
+  if (typeof window === "undefined") return true;
+  const raw = window.localStorage.getItem(SOUNDS_STORAGE_KEY);
+  // Default ON — the chimes are short and pleasant. Users who want
+  // quiet flip the toggle on the AudioSettings card.
+  if (raw === null) return true;
+  return raw === "true";
+}
+
+
+export function setSoundsEnabled(value: boolean): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SOUNDS_STORAGE_KEY, String(value));
+  // Custom storage event so other tabs / siblings re-read.
+  window.dispatchEvent(
+    new StorageEvent("storage", {
+      key: SOUNDS_STORAGE_KEY,
+      newValue: String(value),
+    }),
+  );
+}
+
+
+export function useSoundsEnabled(): [boolean, (v: boolean) => void] {
+  const [enabled, setEnabled] = useState<boolean>(() => getSoundsEnabled());
+  useEffect(() => {
+    const onChange = (e: StorageEvent) => {
+      if (e.key !== SOUNDS_STORAGE_KEY) return;
+      setEnabled(e.newValue === "true");
+    };
+    window.addEventListener("storage", onChange);
+    return () => window.removeEventListener("storage", onChange);
+  }, []);
+  return [
+    enabled,
+    (v: boolean) => {
+      setSoundsEnabled(v);
+      setEnabled(v);
+    },
+  ];
+}
+
+
+/** Guard helper for verdict chimes — caller passes the chime fn,
+ *  we no-op when sounds are off. Saves callers a conditional. */
+export function maybePlay(chime: () => void): void {
+  if (!getSoundsEnabled()) return;
+  chime();
+}
+

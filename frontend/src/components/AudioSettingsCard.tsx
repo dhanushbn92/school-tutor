@@ -19,7 +19,14 @@ import {
   useAudioPreferences,
   useUpdateAudioPreferences,
 } from "@/lib/queries";
-import { isSpeechAvailable, useSpeech, useVoices } from "@/lib/speech";
+import {
+  isSpeechAvailable,
+  playCorrectChime,
+  playNotYetChime,
+  useSoundsEnabled,
+  useSpeech,
+  useVoices,
+} from "@/lib/speech";
 
 /**
  * Audio preferences card — Stage 8 of the child-centric roadmap.
@@ -45,6 +52,7 @@ export function AudioSettingsCard() {
   const voices = useVoices();
   const [previewVoice, setPreviewVoice] = useState<string | null>(null);
   const { speak } = useSpeech({ voiceUri: previewVoice });
+  const [soundsEnabled, setSoundsEnabled] = useSoundsEnabled();
 
   // Group voices by language family so the dropdown stays scannable
   // on systems with 30+ installed voices.
@@ -155,6 +163,45 @@ export function AudioSettingsCard() {
             <div className="mt-0.5 text-xs text-(--color-muted-foreground)">
               Each flashcard or "Surprise me" question starts reading
               automatically. Tap the 🔊 button anywhere to stop or restart.
+            </div>
+          </div>
+        </label>
+
+        {/* Stage 9 — sound effects toggle. Per-device (localStorage)
+            since whether speakers chime should depend on where you're
+            using the app, not your account. */}
+        <label className="flex items-start gap-3 rounded-md border border-(--color-border) p-3 text-sm">
+          <input
+            type="checkbox"
+            checked={soundsEnabled}
+            onChange={(e) => setSoundsEnabled(e.target.checked)}
+            className="mt-1 h-4 w-4 accent-(--color-primary)"
+          />
+          <div className="flex-1">
+            <div className="font-medium">Play a chime on right / not-yet</div>
+            <div className="mt-0.5 text-xs text-(--color-muted-foreground)">
+              A short, friendly tone after each retry. Not a buzzer —
+              just a gentle "got it" or "have another look".
+            </div>
+            <div className="mt-1.5 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-[11px]"
+                onClick={playCorrectChime}
+                disabled={!soundsEnabled}
+              >
+                Hear "right!"
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-[11px]"
+                onClick={playNotYetChime}
+                disabled={!soundsEnabled}
+              >
+                Hear "not yet"
+              </Button>
             </div>
           </div>
         </label>

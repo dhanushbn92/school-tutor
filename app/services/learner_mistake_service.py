@@ -41,6 +41,12 @@ from app.services.grading import auto_grade
 
 RESOLVED_THRESHOLD = 2  # consecutive_corrects required to resolve a mistake
 
+# Stage 9 — number of consecutive wrong retries before the UI offers
+# a hint. Tuned to be encouraging rather than punitive: three honest
+# tries before we step in, not one. Change here if it feels too
+# eager or too slow in practice.
+HINT_THRESHOLD = 3
+
 
 def upsert_for_submission(db: Session, submission: Submission) -> None:
     """Walk the submission's auto-graded answers and update the
@@ -88,14 +94,17 @@ def upsert_for_submission(db: Session, submission: Submission) -> None:
                         first_wrong_at=now,
                         last_attempted_at=now,
                         consecutive_corrects=0,
+                        wrong_streak=1,
                     )
                 )
         else:
             existing.last_attempted_at = now
             if is_correct:
                 existing.consecutive_corrects += 1
+                existing.wrong_streak = 0
             else:
                 existing.consecutive_corrects = 0
+                existing.wrong_streak = (existing.wrong_streak or 0) + 1
 
 
 # ---------------------------------------------------------------------------
@@ -230,6 +239,14 @@ class RetryResult:
     explanation: str | None
     consecutive_corrects: int
     resolved: bool
+    # Stage 9 — wrong-side streak (reset to 0 on correct). The UI uses
+    # this to decide when to surface a hint and when to celebrate
+    # "success after struggle". `was_struggling` is set when the
+    # retry was correct AFTER >= 2 wrong attempts in a row — the
+    # frontend lights up a bigger celebration in that case.
+    wrong_streak: int
+    hint_available: bool
+    was_struggling: bool
 
 
 def record_retry_attempt(
@@ -267,10 +284,17 @@ def record_retry_attempt(
     is_correct = awarded is not None and awarded >= question.marks
     now = datetime.now(timezone.utc)
     mistake.last_attempted_at = now
+    # Snapshot the pre-update wrong-streak so the response can flag
+    # "this was a success-after-struggle". `was_struggling` is True
+    # only when this attempt was correct AND the learner had already
+    # gotten the question wrong at least twice in a row before.
+    prior_wrong_streak = mistake.wrong_streak or 0
     if is_correct:
         mistake.consecutive_corrects += 1
+        mistake.wrong_streak = 0
     else:
         mistake.consecutive_corrects = 0
+        mistake.wrong_streak = prior_wrong_streak + 1
     db.commit()
 
     return RetryResult(
@@ -279,6 +303,9 @@ def record_retry_attempt(
         explanation=question.explanation,
         consecutive_corrects=mistake.consecutive_corrects,
         resolved=mistake.consecutive_corrects >= RESOLVED_THRESHOLD,
+        wrong_streak=mistake.wrong_streak,
+        hint_available=mistake.wrong_streak >= HINT_THRESHOLD,
+        was_struggling=is_correct and prior_wrong_streak >= 2,
     )
 
 
@@ -304,4 +331,6 @@ def entry_to_dict(entry: MistakeListEntry) -> dict[str, Any]:
         "first_wrong_at": entry.mistake.first_wrong_at,
         "last_attempted_at": entry.mistake.last_attempted_at,
         "consecutive_corrects": entry.mistake.consecutive_corrects,
+        "wrong_streak": entry.mistake.wrong_streak or 0,
+        "hint_available": (entry.mistake.wrong_streak or 0) >= HINT_THRESHOLD,
     }

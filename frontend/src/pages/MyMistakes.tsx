@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import {
   ArrowLeft,
   CheckCircle2,
+  HelpCircle,
   Loader2,
+  PartyPopper,
   RotateCcw,
   Sparkles,
-  XCircle,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
@@ -24,8 +25,14 @@ import { Empty } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { TellMeMore } from "@/components/TellMeMore";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
-import { useMyMistakes, useRetryMistake } from "@/lib/queries";
+import { useExplainTier, useMyMistakes, useRetryMistake } from "@/lib/queries";
 import { useMascot } from "@/lib/mascotContext";
+import {
+  maybePlay,
+  playCorrectChime,
+  playNotYetChime,
+  playStruggleSuccessChime,
+} from "@/lib/speech";
 import type { LearnerMistakeEntry, MistakeRetryResult } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 
@@ -130,26 +137,34 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
         onSuccess: (res) => {
           setVerdict(res);
           // Stage 5 — mascot reactions for the retry verdict.
-          // - resolved (two-right-in-a-row) → VICTORY: the mistake is
-          //   cleared off the list, the biggest celebration of the page
-          // - correct (first right, not yet resolved) → FIRES: arrow's
-          //   on target
-          // - wrong → RESTRING: encouraging "nock it again" pose
+          // Stage 9 — louder celebration on success-after-struggle.
           if (res.resolved) {
             mascot.reactWith("VICTORY", {
               message: "Cleared! That mistake is off your list.",
               autoResetMs: 7000,
             });
+            maybePlay(playStruggleSuccessChime);
+          } else if (res.was_struggling) {
+            // Correct after a wrong streak — the biggest emotional
+            // moment on this page. The verdict panel shows the
+            // celebration banner; we double up the mascot mood.
+            mascot.reactWith("VICTORY", {
+              message: "You stuck with it. That's mastery.",
+              autoResetMs: 7000,
+            });
+            maybePlay(playStruggleSuccessChime);
           } else if (res.correct) {
             mascot.reactWith("FIRES", {
               message: "Right! One more in a row and it's gone.",
               autoResetMs: 6000,
             });
+            maybePlay(playCorrectChime);
           } else {
             mascot.reactWith("RESTRING", {
               message: "Same question, fresh try — that's how mastery is built.",
               autoResetMs: 6000,
             });
+            maybePlay(playNotYetChime);
           }
         },
       },
@@ -233,6 +248,17 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
         )}
 
         {verdict && <VerdictPanel verdict={verdict} />}
+
+        {/* Stage 9 — Hint banner. Surfaces once the wrong-streak
+            has crossed the server's threshold (3 by default) OR
+            the latest retry verdict says hint_available. Stays
+            visible across reloads since it reads entry.hint_available
+            from the persisted server state. */}
+        {(entry.hint_available || verdict?.hint_available) &&
+          !verdict?.correct && (
+            <HintBanner questionId={entry.question_id} />
+          )}
+
         {/* Stage 3 — "Tell me more" chain. Shown after a retry so the
             learner has seen the verdict + correct answer first. */}
         {verdict && <TellMeMore questionId={entry.question_id} />}
@@ -268,13 +294,34 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
  *  answer (always — the learner has just tried this, no point hiding
  *  it), and the explanation if the question has one. */
 function VerdictPanel({ verdict }: { verdict: MistakeRetryResult }) {
+  // Stage 9 — escalating celebration for success-after-struggle.
+  // Same color palette as the regular "Right!" panel but with a
+  // bigger headline and a PartyPopper icon to make the "you stuck
+  // with it" moment visually distinct from a casual first-try win.
+  if (verdict.correct && verdict.was_struggling) {
+    return (
+      <div className="mt-4 overflow-hidden rounded-md border-2 border-emerald-400 bg-gradient-to-br from-emerald-100 to-emerald-50 p-4 text-sm text-emerald-950 shadow-sm dark:from-emerald-950/60 dark:to-emerald-950/20 dark:text-emerald-100">
+        <div className="flex items-center gap-2 font-display text-base font-semibold">
+          <PartyPopper className="h-5 w-5 animate-bounce" />
+          You stuck with it. That's mastery.
+        </div>
+        <div className="mt-1 text-xs opacity-90">
+          {verdict.resolved
+            ? "And that's two in a row — clearing this from your list."
+            : "One more correct retry and it's off your list for good."}
+        </div>
+        <VerdictAnswerRow verdict={verdict} />
+      </div>
+    );
+  }
+
   return (
     <div
       className={
         "mt-4 rounded-md border p-3 text-sm " +
         (verdict.correct
           ? "border-emerald-300 bg-emerald-50 text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100"
-          : "border-rose-300 bg-rose-50 text-rose-900 dark:bg-rose-950/40 dark:text-rose-100")
+          : "border-amber-300 bg-amber-50 text-amber-900 dark:bg-amber-950/40 dark:text-amber-100")
       }
     >
       <div className="flex items-center gap-2 font-medium">
@@ -288,11 +335,22 @@ function VerdictPanel({ verdict }: { verdict: MistakeRetryResult }) {
           </>
         ) : (
           <>
-            <XCircle className="h-4 w-4" />
-            Not quite. Have another look.
+            <Sparkles className="h-4 w-4" />
+            Not yet — have another look.
           </>
         )}
       </div>
+      <VerdictAnswerRow verdict={verdict} />
+    </div>
+  );
+}
+
+
+/** Answer + explanation block used by both the regular verdict
+ *  panel and the bigger "success after struggle" celebration. */
+function VerdictAnswerRow({ verdict }: { verdict: MistakeRetryResult }) {
+  return (
+    <>
       <div className="mt-2 flex items-start justify-between gap-2 text-xs">
         <div>
           <span className="font-medium">Correct answer:</span> {verdict.correct_answer}
@@ -310,6 +368,81 @@ function VerdictPanel({ verdict }: { verdict: MistakeRetryResult }) {
           <span className="font-medium">Why:</span> {verdict.explanation}
         </div>
       )}
+    </>
+  );
+}
+
+
+/* ----------------------------------------------------------------- */
+/* Stage 9 — Hint banner                                             */
+/* ----------------------------------------------------------------- */
+
+/** Surfaces once a learner has gotten the same question wrong three
+ *  times in a row. One tap fetches the ANALOGY tier from Stage 3
+ *  (the gentlest of the three "Tell me more" tiers — a relatable
+ *  parallel rather than a worked solution). Inline reveal, no
+ *  navigation away.
+ *
+ *  Deliberately a separate component from <TellMeMore /> because the
+ *  framing here is "help me get unstuck", not "go deeper". Same
+ *  endpoint under the hood.
+ */
+function HintBanner({ questionId }: { questionId: number }) {
+  // Lazy import to keep the file lean; useExplainTier already lives
+  // in queries.ts and is exercised by TellMeMore.
+  const explain = useExplainTier();
+  const [hintText, setHintText] = useState<string | null>(null);
+
+  function fetchHint() {
+    if (explain.isPending) return;
+    explain.mutate(
+      { question_id: questionId, tier: "ANALOGY" },
+      {
+        onSuccess: (res) => setHintText(res.text),
+      },
+    );
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-(--color-primary) bg-[color-mix(in_oklab,var(--color-primary)_8%,transparent)] p-3">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-(--color-primary-foreground)">
+          <HelpCircle className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="font-medium text-(--color-foreground)">
+            Stuck? Try an analogy.
+          </div>
+          <div className="mt-0.5 text-xs text-(--color-muted-foreground)">
+            We'll pull a kinder explanation that maps this concept onto
+            something familiar.
+          </div>
+          {!hintText && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-2"
+              onClick={fetchHint}
+              disabled={explain.isPending}
+            >
+              {explain.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
+              {explain.isPending ? "Thinking…" : "Show me a hint"}
+            </Button>
+          )}
+          {hintText && (
+            <div className="mt-2 rounded-md border border-(--color-border) bg-(--color-card) p-3 text-sm leading-relaxed">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 whitespace-pre-line">{hintText}</div>
+                <ReadAloudButton text={hintText} label="Read the hint" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

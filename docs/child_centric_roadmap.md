@@ -36,8 +36,8 @@ not the execution order.
 | 6 | Parent / guardian view | 9 | ✅ Shipped 2026-05-26 |
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | ✅ Shipped 2026-05-26 |
 | 8 | Audio support — read-aloud everywhere | 5 | ✅ Shipped 2026-05-26 |
-| 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | **Up next** |
-| 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | Planned |
+| 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | ✅ Shipped 2026-05-26 |
+| 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | **Up next** |
 
 ### Cadence
 
@@ -763,6 +763,62 @@ to be in place so we have hint material to draw from.
   first-try: confetti + an explicit "You stuck with it. That's
   mastery." line.
 - Sound effects (Stage 8 hooks make this easy), toggleable.
+
+### What shipped
+- Migration `20260526_0031` — `learner_mistakes.wrong_streak` column
+  (default 0). Wrong-side counterpart to `consecutive_corrects`;
+  resets on every correct retry, +1 on every wrong retry.
+- `learner_mistake_service`:
+  - `HINT_THRESHOLD = 3` — three honest tries before the hint
+    surfaces, not one.
+  - `record_retry_attempt` maintains `wrong_streak` alongside
+    `consecutive_corrects`. Returns `wrong_streak`, `hint_available`
+    (= wrong_streak >= threshold), and `was_struggling` (= correct
+    after a prior streak of 2+ wrongs) on every retry verdict.
+  - `entry_to_dict` also exposes `wrong_streak` + `hint_available`
+    so the dashboard's mistake list renders the hint button even
+    before the next retry, surviving page reloads.
+- Verdict copy softened from "Wrong" to **"Not yet — have another
+  look"** everywhere it appeared (TakeAssessment results badge +
+  MyMistakes verdict panel). Badge variant changed from
+  destructive-red to warning-amber on TakeAssessment for the same
+  reason: kids see this label often, it should read as "keep
+  going", not "you failed".
+- **Hint banner** on MyMistakes: once `hint_available` is true, a
+  one-click "Show me a hint" button appears. It fetches the
+  Stage-3 ANALOGY tier (the gentlest of the three) and reveals it
+  inline with a 🔊 button so the hint can be read aloud.
+- **Success-after-struggle celebration**: when a retry is correct
+  AND the learner had been wrong at least twice in a row before,
+  the verdict panel renders a bigger gradient banner with a
+  bouncing 🎉 and the line *"You stuck with it. That's mastery."*
+  Mascot transitions to VICTORY in parallel.
+- **Verdict chimes** (Stage 8 audio plumbing):
+  - `playCorrectChime` — rising third (C5 → E5) on a regular
+    correct retry.
+  - `playNotYetChime` — soft descending pair (G4 → E4) on a wrong
+    retry. Deliberately not a buzzer or error sound.
+  - `playStruggleSuccessChime` — three-note C-E-G arpeggio on a
+    resolved mistake or success-after-struggle.
+  - Web Audio API generates tones inline — no asset files.
+- **Sounds toggle** on the AudioSettings card (per-device,
+  localStorage) with two preview buttons: "Hear 'right!'" and
+  "Hear 'not yet'" so a learner can sanity-check before
+  committing.
+
+**Tuning knobs**
+- `HINT_THRESHOLD = 3` in `learner_mistake_service.py` — change
+  here to make the hint eagerer (lower) or rarer (higher).
+- Chime tones / durations in `frontend/src/lib/speech.ts` — Web
+  Audio frequencies are plain numbers; swap freely.
+
+### Deployment note (Stage 9)
+Run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+Existing mistake rows get `wrong_streak=0` via the server_default;
+the streak starts counting from the next wrong retry forward.
 
 ---
 

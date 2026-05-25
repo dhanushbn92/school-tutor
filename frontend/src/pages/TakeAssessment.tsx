@@ -7,7 +7,6 @@ import {
   Loader2,
   Send,
   Sparkles,
-  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatClock, useQuizTimer } from "@/lib/useQuizTimer";
@@ -604,8 +603,11 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
                 <CheckCircle2 className="h-3 w-3" /> Correct
               </Badge>
             ) : wrong ? (
-              <Badge variant="destructive" className="gap-1">
-                <XCircle className="h-3 w-3" /> Wrong
+              // Stage 9 — softened to "Not yet" (warning amber, not
+              // destructive red). Kids see this label often; we
+              // want it to read as "keep going", not "you failed".
+              <Badge variant="warning" className="gap-1">
+                <Sparkles className="h-3 w-3" /> Not yet
               </Badge>
             ) : partial ? (
               <Badge variant="warning">Partial</Badge>

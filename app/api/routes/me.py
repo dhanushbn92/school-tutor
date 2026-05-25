@@ -490,6 +490,10 @@ def retry_my_mistake(
         "explanation": result.explanation,
         "consecutive_corrects": result.consecutive_corrects,
         "resolved": result.resolved,
+        # Stage 9 — wrong-side counter + UI triggers.
+        "wrong_streak": result.wrong_streak,
+        "hint_available": result.hint_available,
+        "was_struggling": result.was_struggling,
     }
 
 

@@ -942,6 +942,12 @@ export interface LearnerMistakeEntry {
   last_attempted_at: string;
   /** 0 or 1 (>=2 is filtered out as resolved on the backend). */
   consecutive_corrects: number;
+  /** Stage 9 — wrong-in-a-row counter. Persisted server-side so a
+   *  stuck learner sees the hint button across reloads. */
+  wrong_streak: number;
+  /** True when wrong_streak >= the server's hint threshold. Surfaces
+   *  a "Want a hint?" button on the mistake card. */
+  hint_available: boolean;
 }
 
 export interface LearnerMistakesPage {
@@ -958,4 +964,14 @@ export interface MistakeRetryResult {
    *  threshold (twice-right rule) and the row will be filtered out of
    *  the active mistake list on the next refresh. */
   resolved: boolean;
+  /** Stage 9 — wrong-in-a-row counter for this question. Resets to 0
+   *  on every correct retry. Drives the "Want a hint?" surface. */
+  wrong_streak: number;
+  /** True when wrong_streak crossed the hint threshold (3 by default).
+   *  Frontend lights up the hint button. */
+  hint_available: boolean;
+  /** True when this retry was correct AND the learner had already
+   *  gotten the question wrong twice or more in a row before. Triggers
+   *  the bigger "you stuck with it" celebration. */
+  was_struggling: boolean;
 }

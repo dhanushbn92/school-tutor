@@ -165,6 +165,12 @@ class LearnerMistake(Base):
         DateTime(timezone=True), server_default=func.now(), index=True
     )
     consecutive_corrects: Mapped[int] = mapped_column(Integer, default=0)
+    # Stage 9 — wrong-side counterpart to consecutive_corrects.
+    # Resets to 0 on every correct retry; increments on every wrong
+    # retry. The UI surfaces a "Want a hint?" button once this hits
+    # the hint threshold, persisted server-side so the trigger
+    # survives page reloads + cross-device sessions.
+    wrong_streak: Mapped[int] = mapped_column(Integer, default=0)
 
 
 # ---------------------------------------------------------------------------
