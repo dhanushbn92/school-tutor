@@ -43,6 +43,7 @@ import type {
 import { BLOOM_TO_BUCKET, BUCKET_LABEL } from "@/lib/types";
 import { cn, formatMarks } from "@/lib/utils";
 import { RichExplanationView } from "@/components/RichExplanation";
+import { TellMeMore } from "@/components/TellMeMore";
 
 const BUCKET_ORDER: CognitiveBucket[] = ["FACTUAL", "UNDERSTANDING", "APPLICATION"];
 
@@ -637,6 +638,10 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
             <RichExplanationView data={q.explanation_rich} />
           </div>
         )}
+        {/* Stage 3 — "Tell me more" chain. Shown on every results card
+            so the learner can dig deeper into any question they just
+            saw the answer for, win or lose. */}
+        {q && <TellMeMore questionId={q.id} />}
         {sa.teacher_remark && (
           <div className="rounded-md border border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_10%,transparent)] p-3 text-sm">
             <span className="font-medium">Teacher remark: </span>

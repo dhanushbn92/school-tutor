@@ -19,6 +19,10 @@ from app.models.curriculum import (
     Subject,
     Topic,
 )
+from app.models.extended_explanation import (
+    ExplanationTier,
+    QuestionExtendedExplanation,
+)
 from app.models.generation import GeneratedContent, GeneratedContentStatus, GeneratedContentType
 from app.models.intervention import InterventionNote
 from app.models.learner_practice import (
@@ -61,6 +65,7 @@ __all__ = [
     "CognitiveBucket",
     "Enrollment",
     "EnrollmentStatus",
+    "ExplanationTier",
     "GeneratedContent",
     "GeneratedContentStatus",
     "GeneratedContentType",
@@ -74,6 +79,7 @@ __all__ = [
     "PointsSource",
     "Question",
     "QuestionDifficulty",
+    "QuestionExtendedExplanation",
     "QuestionStatus",
     "QuestionType",
     "School",

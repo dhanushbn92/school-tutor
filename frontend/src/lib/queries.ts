@@ -14,6 +14,8 @@ import type {
   GeneratedContent,
   GeneratedContentStatus,
   GeneratedContentType,
+  ExplanationTier,
+  ExtendedExplanation,
   InterventionNote,
   LearnerMistakesPage,
   LearnerStamp,
@@ -729,6 +731,30 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
           limit: filter.limit ?? 100,
         },
       });
+      return data;
+    },
+  });
+}
+
+/* ---------- "Tell me more" chain (Stage 3 of child-centric roadmap) ---------- */
+
+/** Lazy-fetch one tier of extended explanation for a question. Returns
+ *  a mutation rather than a query because the click is the intent —
+ *  we don't speculatively warm tiers the learner hasn't asked for.
+ *  The backend caches forever per (question, tier), so a second
+ *  click on the same chip is instant. */
+export function useExplainTier() {
+  return useMutation({
+    mutationFn: async ({
+      question_id,
+      tier,
+    }: {
+      question_id: number;
+      tier: ExplanationTier;
+    }) => {
+      const { data } = await api.post<ExtendedExplanation>(
+        `/questions/${question_id}/explain/${tier}`,
+      );
       return data;
     },
   });

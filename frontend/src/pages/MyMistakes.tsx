@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import { TellMeMore } from "@/components/TellMeMore";
 import { useMyMistakes, useRetryMistake } from "@/lib/queries";
 import type { LearnerMistakeEntry, MistakeRetryResult } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
@@ -202,6 +203,9 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
         )}
 
         {verdict && <VerdictPanel verdict={verdict} />}
+        {/* Stage 3 — "Tell me more" chain. Shown after a retry so the
+            learner has seen the verdict + correct answer first. */}
+        {verdict && <TellMeMore questionId={entry.question_id} />}
       </CardContent>
 
       <CardFooter className="justify-end gap-2">

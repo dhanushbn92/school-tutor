@@ -30,8 +30,8 @@ not the execution order.
 |---|---|---|---|
 | 1 | Streaks + small rewards, calibrated for kids | 3 | ✅ Shipped 2026-05-17 (d503ab0) |
 | 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | ✅ Shipped 2026-05-25 |
-| 3 | "Why?" — tell-me-more chain on every explanation | 6 | **Up next** |
-| 4 | Story-shaped progress for learners (replace bare numbers) | 2 | Planned |
+| 3 | "Why?" — tell-me-more chain on every explanation | 6 | ✅ Shipped 2026-05-25 |
+| 4 | Story-shaped progress for learners (replace bare numbers) | 2 | **Up next** |
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | Planned |
 | 6 | Parent / guardian view | 9 | Planned |
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | Planned |
@@ -294,6 +294,46 @@ revisiting mistakes, the next leap is depth of understanding.
   in WorksheetView, TakeAssessment (results), and the AI-tutor
   chat panel.
 - Loading spinner; cached tiers return instantly.
+
+### What shipped
+- Migration `20260525_0026` — `question_extended_explanation` table
+  with UNIQUE(question_id, tier) for race-safe lazy caching.
+- `ExplanationTier` StrEnum (DEEPER / ANALOGY / EXAMPLE) +
+  `QuestionExtendedExplanation` model.
+- `app/llm/prompts/explain.py` — shared India-context system voice
+  with three tier-specific directives. Tone matches the AI-tutor
+  chat so the two surfaces feel like one companion.
+- `app/services/explain_service.py` — `get_or_generate` reads the
+  cache first; on a miss, calls `LLMProvider.chat` with per-tier
+  temperature, writes the row, returns. Concurrent miss-races are
+  resolved by the UNIQUE constraint (loser re-reads winner's row).
+- `POST /questions/{question_id}/explain/{tier}` — any
+  authenticated role may request a tier. Returns 503 with a
+  friendly message on LLM failure so the UI can surface a "try
+  again" affordance without panicking.
+- `<TellMeMore />` component — three chips (Explain more / Give me
+  an analogy / Show a worked example). Each chip lazy-loads its
+  tier; loaded tiers expand inline with a clean re-collapse. Errors
+  show an in-place "try again" link.
+- Wired into TakeAssessment results (every question card) and
+  MyMistakes verdict panel (after a retry attempt).
+
+**Out of scope for Stage 3 (deliberately deferred)**
+- WorksheetView integration — the worksheet results surface lives
+  in a different render pipeline; adding TellMeMore there is a
+  thin follow-up but adds zero new architecture.
+- "Tell me more" on the AI-tutor chat panel — chat already has its
+  own follow-up mechanism (just type another message), so adding
+  the chip there is redundant.
+
+### Deployment note (Stage 3)
+Run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+Requires a working `LLM_PROVIDER` (anthropic / openai / groq /
+stub). The stub provider returns canned text — handy for end-to-end
+tests where the real LLM would be flaky / expensive.
 
 ---
 

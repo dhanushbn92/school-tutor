@@ -900,6 +900,22 @@ export interface HeatmapCell {
   practiced: boolean;
 }
 
+// ---------- "Tell me more" chain (Stage 3 of child-centric roadmap) ----------
+
+/** The three escalating tiers of extended explanation. The backend
+ *  generates these on demand via LLM and caches them forever per
+ *  (question, tier). New tiers may be added freely on the backend —
+ *  the frontend renders unknown tiers with a generic "More" label. */
+export type ExplanationTier = "DEEPER" | "ANALOGY" | "EXAMPLE";
+
+export interface ExtendedExplanation {
+  question_id: number;
+  tier: ExplanationTier | string;
+  text: string;
+  /** ISO timestamp the row was first generated. */
+  generated_at: string;
+}
+
 // ---------- Mistake review (Stage 2 of child-centric roadmap) ----------
 
 export interface LearnerMistakeEntry {
