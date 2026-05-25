@@ -319,9 +319,17 @@ export type GeneratedContentType =
   | "extra_content"
   | "flow_diagram";
 
+/** Each entry in a branch's `details` is either a plain string
+ *  (leaf — a single fact / point) or another nested branch with
+ *  its own children. The recursion lets a chapter summary's mind
+ *  map go as deep as the content warrants. Older chapter summaries
+ *  emitted only string details — those still type-check because
+ *  string is one half of the union. */
+export type ChapterSummaryDiagramDetail = string | ChapterSummaryDiagramBranch;
+
 export interface ChapterSummaryDiagramBranch {
   label: string;
-  details: string[];
+  details: ChapterSummaryDiagramDetail[];
 }
 
 export interface ChapterSummaryDiagram {

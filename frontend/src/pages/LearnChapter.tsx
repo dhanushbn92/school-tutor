@@ -37,7 +37,7 @@ import { Empty } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThemedSection, ThemedTitleMark } from "@/components/themed";
-import { MindMap } from "@/components/MindMap";
+import { MindMapInteractive } from "@/components/MindMapInteractive";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import type { FlowDiagramData } from "@/components/FlowDiagram";
 import { openArtifact } from "@/lib/artifact";
@@ -1329,10 +1329,8 @@ function VisualsTab({
                 Concept map
               </Badge>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <div className="rounded-xl border border-(--color-border) bg-(--color-card) p-3">
-                <MindMap data={data} />
-              </div>
+            <CardContent>
+              <MindMapInteractive data={data} height={520} />
             </CardContent>
           </ThemedSection>
         );
@@ -1698,10 +1696,8 @@ export function SummaryView({
           <CardTitle>Chapter summary</CardTitle>
           <CardDescription>{summary.intro}</CardDescription>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <div className="rounded-lg border border-(--color-border) bg-(--color-card) p-2">
-            <MindMap data={summary.overview_diagram} />
-          </div>
+        <CardContent>
+          <MindMapInteractive data={summary.overview_diagram} height={520} />
         </CardContent>
       </Card>
 
@@ -1743,9 +1739,7 @@ function SectionBlock({
           ))}
         </ul>
         {section.diagram && (
-          <div className="overflow-x-auto rounded-md border border-(--color-border) bg-(--color-muted)/40 p-2">
-            <MindMap data={section.diagram} size={420} />
-          </div>
+          <MindMapInteractive data={section.diagram} height={420} />
         )}
       </CardContent>
     </Card>
