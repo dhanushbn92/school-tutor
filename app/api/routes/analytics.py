@@ -18,7 +18,13 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 def student_mastery_grid(
     student_id: int,
     class_level: int = Query(..., ge=1, le=12),
-    subject_id: int = Query(...),
+    # subject_id is optional — omit it to get the whole-syllabus
+    # view (every subject in the class, chapters grouped by
+    # subject). The learner dashboard's syllabus map + the
+    # strongest / best-place tiles call without it; the existing
+    # per-subject views (Topic mastery map with the subject picker)
+    # pass it through.
+    subject_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):

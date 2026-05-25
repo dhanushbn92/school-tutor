@@ -63,6 +63,12 @@ interface ChapterRollup {
   chapter_id: number;
   chapter_number: number;
   chapter_title: string;
+  /** Optional per-chapter subject context. Populated when the
+   *  mastery query returns the whole syllabus (no subject filter).
+   *  When present, the syllabus map labels each row with the
+   *  subject so a multi-subject grid stays readable. */
+  subject_id: number | null;
+  subject_name: string | null;
   status: ChapterStatus;
   outcomes_total: number;
   outcomes_attempted: number;
@@ -84,6 +90,7 @@ interface OutcomePick {
   chapter_id: number;
   chapter_number: number;
   chapter_title: string;
+  subject_name: string | null;
   code: string;
   description: string;
   mastery: number | null;
@@ -295,7 +302,12 @@ function HighlightTile({
           <CardTitle className="text-base">{title}</CardTitle>
         </div>
         <CardDescription>
-          {subjectName ? `${subjectName} · ` : ""}
+          {/* Stage 4 fix — prefer the chapter's own subject_name
+              (from the whole-syllabus query) over the dashboard's
+              fallback "Science" so a Mathematics pick reads
+              "Mathematics · Ch 3. Algebra", not "Science · Ch 3.
+              Algebra". */}
+          {(pick.subject_name ?? subjectName) ? `${pick.subject_name ?? subjectName} · ` : ""}
           Ch {pick.chapter_number}. {pick.chapter_title}
         </CardDescription>
       </CardHeader>
@@ -331,6 +343,26 @@ function HighlightTile({
 /* ---------------- Topic-tree visual ------------------------------- */
 
 function TopicTree({ rollups }: { rollups: ChapterRollup[] }) {
+  // Group chapters by subject so a whole-syllabus view stays
+  // readable. A learner with one subject sees a single group; a
+  // learner with multiple subjects sees subject sub-headers
+  // (Mathematics, Science, English, ...). Insertion order from the
+  // backend ("ORDER BY subject name, chapter number") is preserved.
+  const groups: { subject_name: string; chapters: ChapterRollup[] }[] = [];
+  for (const ch of rollups) {
+    const key = ch.subject_name ?? "Your syllabus";
+    let group = groups[groups.length - 1];
+    if (!group || group.subject_name !== key) {
+      group = { subject_name: key, chapters: [] };
+      groups.push(group);
+    }
+    group.chapters.push(ch);
+  }
+  // When everything's one subject we drop the sub-header so the
+  // single-subject case looks unchanged from before this fix.
+  const showSubjectHeaders =
+    groups.length > 1 || (groups[0]?.subject_name ?? null) !== "Your syllabus";
+
   return (
     <Card>
       <CardHeader>
@@ -341,39 +373,57 @@ function TopicTree({ rollups }: { rollups: ChapterRollup[] }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-2">
-          {rollups.map((ch) => (
-            <li
-              key={ch.chapter_id}
-              className="flex items-start gap-3 rounded-md border border-(--color-border) px-3 py-2"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-medium">
-                    Ch {ch.chapter_number}. {ch.chapter_title}
+        <div className="space-y-5">
+          {groups.map((group) => (
+            <div key={group.subject_name}>
+              {showSubjectHeaders && groups.length > 1 && (
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-(--color-muted-foreground)">
+                    {group.subject_name}
                   </span>
-                  <ChapterStatusBadge status={ch.status} />
+                  <span className="h-px flex-1 bg-(--color-border)" />
+                  <span className="text-[10px] text-(--color-muted-foreground)">
+                    {group.chapters.length} chapter
+                    {group.chapters.length === 1 ? "" : "s"}
+                  </span>
                 </div>
-                <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
-                  {ch.outcomes_mastered}/{ch.outcomes_total} outcomes mastered
-                  {ch.outcomes_attempted > 0 &&
-                  ch.outcomes_attempted < ch.outcomes_total
-                    ? ` · ${ch.outcomes_attempted - ch.outcomes_mastered} in practice`
-                    : ""}
-                  {ch.outcomes_attempted === 0 ? " · not started" : ""}
-                </div>
-              </div>
-              <div
-                className="flex flex-wrap items-center gap-1 pt-0.5"
-                aria-label="outcome dots"
-              >
-                {ch.outcomes.map((o) => (
-                  <OutcomeDot key={o.code} outcome={o} />
+              )}
+              <ul className="space-y-2">
+                {group.chapters.map((ch) => (
+                  <li
+                    key={ch.chapter_id}
+                    className="flex items-start gap-3 rounded-md border border-(--color-border) px-3 py-2"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium">
+                          Ch {ch.chapter_number}. {ch.chapter_title}
+                        </span>
+                        <ChapterStatusBadge status={ch.status} />
+                      </div>
+                      <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
+                        {ch.outcomes_mastered}/{ch.outcomes_total} outcomes mastered
+                        {ch.outcomes_attempted > 0 &&
+                        ch.outcomes_attempted < ch.outcomes_total
+                          ? ` · ${ch.outcomes_attempted - ch.outcomes_mastered} in practice`
+                          : ""}
+                        {ch.outcomes_attempted === 0 ? " · not started" : ""}
+                      </div>
+                    </div>
+                    <div
+                      className="flex flex-wrap items-center gap-1 pt-0.5"
+                      aria-label="outcome dots"
+                    >
+                      {ch.outcomes.map((o) => (
+                        <OutcomeDot key={o.code} outcome={o} />
+                      ))}
+                    </div>
+                  </li>
                 ))}
-              </div>
-            </li>
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </CardContent>
     </Card>
   );
@@ -477,6 +527,8 @@ function rollupChapters(
       chapter_id: ch.chapter_id,
       chapter_number: ch.chapter_number,
       chapter_title: ch.chapter_title,
+      subject_id: ch.subject_id ?? null,
+      subject_name: ch.subject_name ?? null,
       status,
       outcomes_total,
       outcomes_attempted,
@@ -524,6 +576,7 @@ function pickStrongest(rollups: ChapterRollup[]): OutcomePick | null {
     chapter_id: best.ch.chapter_id,
     chapter_number: best.ch.chapter_number,
     chapter_title: best.ch.chapter_title,
+    subject_name: best.ch.subject_name,
     code: best.o.code,
     description: best.o.description,
     mastery: best.o.mastery,
@@ -558,6 +611,7 @@ function pickBestPlace(rollups: ChapterRollup[]): OutcomePick | null {
       chapter_id: weakest.ch.chapter_id,
       chapter_number: weakest.ch.chapter_number,
       chapter_title: weakest.ch.chapter_title,
+      subject_name: weakest.ch.subject_name,
       code: weakest.o.code,
       description: weakest.o.description,
       mastery: weakest.o.mastery,
@@ -573,6 +627,7 @@ function pickBestPlace(rollups: ChapterRollup[]): OutcomePick | null {
         chapter_id: ch.chapter_id,
         chapter_number: ch.chapter_number,
         chapter_title: ch.chapter_title,
+        subject_name: ch.subject_name,
         code: o.code,
         description: o.description,
         mastery: o.mastery,
@@ -590,6 +645,7 @@ function pickBestPlace(rollups: ChapterRollup[]): OutcomePick | null {
       chapter_id: fresh.chapter_id,
       chapter_number: fresh.chapter_number,
       chapter_title: fresh.chapter_title,
+      subject_name: fresh.subject_name,
       code: o.code,
       description: o.description,
       mastery: o.mastery,

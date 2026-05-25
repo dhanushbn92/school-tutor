@@ -693,6 +693,12 @@ export interface MasteryChapter {
   chapter_id: number;
   chapter_number: number;
   chapter_title: string;
+  /** Per-chapter subject context. Populated by the backend so the
+   *  learner's whole-syllabus view can label each row with the
+   *  subject it belongs to. Older single-subject callers may
+   *  ignore this. */
+  subject_id?: number | null;
+  subject_name?: string | null;
   outcomes: MasteryOutcome[];
 }
 
