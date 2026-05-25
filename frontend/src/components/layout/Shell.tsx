@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/BrandLogo";
 import { MascotCompanion } from "@/components/MascotCompanion";
+import { TakeABreakNudge } from "@/components/TakeABreakNudge";
 import { useAuth } from "@/lib/auth";
 import { useMySchool } from "@/lib/queries";
 import { MascotProvider } from "@/lib/MascotProvider";
@@ -165,6 +166,10 @@ export function Shell() {
           <MascotProvider>
             <Outlet />
             <MascotCompanion />
+            {/* Stage 10 — gentle "take a break" prompt after 20 min
+                of continuous practice. Self-gated to learners and
+                to learners who haven't disabled the nudge. */}
+            <TakeABreakNudge />
           </MascotProvider>
         </main>
       </div>

@@ -28,6 +28,7 @@ import { MascotToggleHint } from "@/components/MascotToggleHint";
 import { FamilyNotesCard } from "@/components/FamilyNotesCard";
 import { ParentInviteCard } from "@/components/ParentInviteCard";
 import { AudioSettingsCard } from "@/components/AudioSettingsCard";
+import { AccessibilityCard } from "@/components/AccessibilityCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
 import {
@@ -438,6 +439,14 @@ export function LearnerDashboard() {
           voice + autoplay preference. */}
       <div className="mt-6">
         <AudioSettingsCard />
+      </div>
+
+      {/* Stage 10 — accessibility toggles: dyslexia-friendly font,
+          high contrast, larger tap targets, take-a-break nudge.
+          All four are per-device (localStorage) so a phone can
+          have larger targets while the desktop stays normal. */}
+      <div className="mt-6">
+        <AccessibilityCard />
       </div>
 
       {/* Stage 6 — invite a parent / guardian. Sits at the bottom of

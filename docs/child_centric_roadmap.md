@@ -37,7 +37,7 @@ not the execution order.
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | ✅ Shipped 2026-05-26 |
 | 8 | Audio support — read-aloud everywhere | 5 | ✅ Shipped 2026-05-26 |
 | 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | ✅ Shipped 2026-05-26 |
-| 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | **Up next** |
+| 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | ✅ Shipped 2026-05-26 |
 
 ### Cadence
 
@@ -836,6 +836,78 @@ target.
 - Avatar customisation (extends the Stage 5 mascot work).
 - Settings page consolidating audio prefs (Stage 8), font (10),
   motion (existing), mascot equip (5), notifications (6).
+
+### What shipped
+- `frontend/src/lib/accessibility.ts` — four independent preference
+  hooks (font / contrast / touch / break-nudge), all per-device
+  via localStorage. The font / contrast / touch hooks set
+  `data-*` attributes on `<html>` so CSS overrides light up
+  declaratively in `index.css`.
+- `index.css` additions:
+  - `@font-face` for **OpenDyslexic** (MIT-licensed, hosted via
+    jsdelivr's `@fontsource/opendyslexic@5.0.4`). The font is
+    only requested when `data-font="dyslexia-friendly"` is set,
+    so learners who never enable it pay zero loading cost.
+  - High-contrast palette overrides on
+    `html[data-contrast="high"]` for both light + dark themes;
+    `outline: 3px solid currentColor` on focus.
+  - WCAG-AAA touch targets (44px min) on every interactive
+    element when `data-touch="large"` is set, plus a small bump
+    to the smallest typography (`.text-xs`, `.text-[10px]`).
+- `<AccessibilityCard />` on the learner dashboard — four
+  checkbox rows with icon + title + plain-English description.
+  Each toggle takes effect instantly; no save button.
+- `<TakeABreakNudge />` mounted in the Shell:
+  - Detects 20 minutes of CONTINUOUS use (`pointerdown` +
+    `keydown` + `scroll`; deliberately not `mousemove` because
+    it's too chatty).
+  - Resets the timer if the learner is idle for >5 minutes
+    (came back from being away — don't fire instantly).
+  - Surfaces a small floating banner: "You've been at it a
+    while" + "Five more minutes" / "Got it" actions + a ×
+    dismiss. Dismissal is session-scoped (intentionally not
+    persisted — the whole point is per-session observation).
+  - Gated by `useBreakNudgeEnabled()` + learner-role check.
+
+**Out of scope for Stage 10 (deliberately deferred)**
+- **Avatar customisation** — extending the mascot SVGs to
+  multiple outfits multiplies asset count (5 poses × N outfits).
+  The mascot is already opt-out; outfits are a "nice to have"
+  best paired with real illustration work.
+- **Settings page consolidation** — the existing per-feature
+  cards (Audio, Accessibility, Parent invite) are discoverable
+  in their existing dashboard locations. A unified
+  `/me/settings` page is cosmetic, not load-bearing, and would
+  fragment the user journey across the children-friendly
+  dashboard vs. an "admin"-feeling settings surface.
+
+### Deployment note (Stage 10)
+No migration. Pure frontend stage; the four preferences live in
+localStorage. Cosmetic accessibility overrides activate via CSS
+attribute selectors and only kick in when the corresponding
+toggle is on.
+
+---
+
+## 🎉 Roadmap complete
+
+All ten child-centric stages have shipped. The platform has
+evolved from "teacher tool" to "thing children want to open" —
+streaks + stamps + points + levels (1, 1.5), mistake review with
+twice-right resolution (2), LLM-backed "Tell me more" explanation
+chain (3), story-shaped progress narrative (4), Vidyārthi mascot
+with a five-mood state machine (5), invite-code parent view with
+deep insights but no surveillance (6, 6.1), practice variety hub
+with speedrun / surprise me / flashcards (7), browser-native
+read-aloud everywhere (8), kinder UX with hint chain + verdict
+chimes + struggle celebration (9), and now accessibility polish
+with OpenDyslexic + high contrast + larger tap targets + take-a-
+break nudge (10).
+
+The deferred follow-ups (weekly parent emails, avatar outfits,
+unified settings page, listen-and-repeat, simulation-template
+practice modes) are well-scoped and ready to pick up when their
+gating dependencies land.
 
 ---
 
