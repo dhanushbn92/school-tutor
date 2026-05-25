@@ -5,11 +5,12 @@ import {
   Building2,
   ClipboardList,
   FolderOpen,
-  GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
   NotebookPen,
+  Layers,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Users,
@@ -17,8 +18,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BrandLogo } from "@/components/BrandLogo";
+import { MascotCompanion } from "@/components/MascotCompanion";
+import { TakeABreakNudge } from "@/components/TakeABreakNudge";
 import { useAuth } from "@/lib/auth";
 import { useMySchool } from "@/lib/queries";
+import { MascotProvider } from "@/lib/MascotProvider";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/lib/types";
 
@@ -35,10 +41,11 @@ const ROLE_LABEL: Record<UserRole, string> = {
   teacher: "Teacher",
   student: "Student",
   individual_learner: "Self-learner",
+  parent: "Parent / guardian",
 };
 
 const NAV: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "student", "individual_learner"] },
+  { to: "/", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "student", "individual_learner", "parent"] },
   { to: "/learn", label: "Learn", icon: <BookOpenText className="h-4 w-4" />, roles: ["platform_admin", "student", "individual_learner", "teacher", "school_admin"] },
   { to: "/report-card", label: "Report card", icon: <ClipboardList className="h-4 w-4" />, roles: ["student", "individual_learner"] },
   { to: "/school-report", label: "School report", icon: <ClipboardList className="h-4 w-4" />, roles: ["school_admin"] },
@@ -55,6 +62,10 @@ const NAV: NavItem[] = [
   { to: "/tenants", label: "Tenants", icon: <Building2 className="h-4 w-4" />, roles: ["platform_admin"] },
   { to: "/ai-chat-admin", label: "AI tutor", icon: <ShieldCheck className="h-4 w-4" />, roles: ["platform_admin"] },
   { to: "/quick-quiz", label: "Start a quiz", icon: <Sparkles className="h-4 w-4" />, roles: ["individual_learner", "student"] },
+  // Stage 2 of the child-centric roadmap — "things I got wrong" review surface.
+  { to: "/me/mistakes", label: "Review mistakes", icon: <RotateCcw className="h-4 w-4" />, roles: ["individual_learner", "student"] },
+  // Stage 7 of the child-centric roadmap — speedrun / surprise me / flashcards hub.
+  { to: "/practice", label: "Practice variety", icon: <Layers className="h-4 w-4" />, roles: ["individual_learner", "student"] },
 ];
 
 export function Shell() {
@@ -120,8 +131,8 @@ export function Shell() {
               <Menu className="h-4 w-4" />
             </Button>
             <div className="md:hidden flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-(--color-primary)" />
-              <span className="text-sm font-semibold">School Tuter</span>
+              <BrandLogo size={22} />
+              <span className="text-sm font-semibold">{BRAND_NAME}</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -146,7 +157,20 @@ export function Shell() {
           </div>
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">
-          <Outlet />
+          {/* Stage 5 — wrap the entire learner-facing page tree in
+              the MascotProvider so any page can dispatch reactions
+              through useMascot(). The provider is cheap (a single
+              useState + memo) so we mount it unconditionally for all
+              roles; MascotCompanion itself gates the actual render
+              to learner roles only. */}
+          <MascotProvider>
+            <Outlet />
+            <MascotCompanion />
+            {/* Stage 10 — gentle "take a break" prompt after 20 min
+                of continuous practice. Self-gated to learners and
+                to learners who haven't disabled the nudge. */}
+            <TakeABreakNudge />
+          </MascotProvider>
         </main>
       </div>
     </div>
@@ -168,12 +192,12 @@ function SidebarContent({
 }) {
   return (
     <>
-      <div className="flex items-center gap-2 px-5 py-4">
-        <GraduationCap className="h-6 w-6 text-(--color-primary)" />
+      <div className="flex items-center gap-2.5 px-5 py-4">
+        <BrandLogo size={32} />
         <div className="flex flex-col leading-tight">
           <span className="text-sm font-semibold tracking-tight">{tenantName}</span>
           <span className="text-[11px] text-(--color-muted-foreground)">
-            {tenantSubtitle} &middot; on School Tuter
+            {tenantSubtitle} &middot; on {BRAND_NAME}
           </span>
         </div>
       </div>

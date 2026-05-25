@@ -19,9 +19,30 @@ from app.models.curriculum import (
     Subject,
     Topic,
 )
+from app.models.extended_explanation import (
+    ExplanationTier,
+    QuestionExtendedExplanation,
+)
 from app.models.generation import GeneratedContent, GeneratedContentStatus, GeneratedContentType
 from app.models.intervention import InterventionNote
+from app.models.learner_practice import (
+    LearnerAudioPreferences,
+    LearnerLoginDay,
+    LearnerMascotState,
+    LearnerMistake,
+    LearnerPointsLedger,
+    LearnerStamp,
+    LearnerWeeklyGoal,
+    PointsSource,
+    StampKind,
+)
 from app.models.mastery import CognitiveBucket, SkillMastery
+from app.models.parent_link import (
+    ParentChildLink,
+    ParentEncouragement,
+    ParentInviteCode,
+    ParentLinkStatus,
+)
 from app.models.question import Question, QuestionDifficulty, QuestionStatus, QuestionType
 from app.models.school import (
     Enrollment,
@@ -52,19 +73,34 @@ __all__ = [
     "CognitiveBucket",
     "Enrollment",
     "EnrollmentStatus",
+    "ExplanationTier",
     "GeneratedContent",
     "GeneratedContentStatus",
     "GeneratedContentType",
     "InterventionNote",
+    "LearnerAudioPreferences",
+    "LearnerLoginDay",
+    "LearnerMascotState",
+    "LearnerMistake",
+    "LearnerPointsLedger",
+    "LearnerStamp",
+    "LearnerWeeklyGoal",
     "LearningOutcome",
+    "ParentChildLink",
+    "ParentEncouragement",
+    "ParentInviteCode",
+    "ParentLinkStatus",
+    "PointsSource",
     "Question",
     "QuestionDifficulty",
+    "QuestionExtendedExplanation",
     "QuestionStatus",
     "QuestionType",
     "School",
     "SchoolClass",
     "Section",
     "SkillMastery",
+    "StampKind",
     "Student",
     "Subject",
     "Submission",

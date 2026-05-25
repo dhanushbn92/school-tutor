@@ -171,3 +171,107 @@ h1 {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted-foreground);
 }
+
+/* =================================================================
+ * Stage 10 — Accessibility overrides
+ * =================================================================
+ *
+ * Three opt-in modes, each driven by a data attribute on <html>
+ * set by frontend/src/lib/accessibility.ts. They compose: a learner
+ * can run dyslexia-friendly font + high contrast + large touch
+ * targets all at once.
+ */
+
+/* Dyslexia-friendly font -------------------------------------- */
+/*
+ * Loads OpenDyslexic (MIT-licensed) from jsdelivr's npm CDN. The
+ * @font-face only triggers an actual network request when something
+ * downstream sets `font-family: "OpenDyslexic"`, which happens only
+ * when data-font="dyslexia-friendly" is set on <html>. So learners
+ * who never enable the option pay no font-loading cost.
+ *
+ * Fallback chain: if the network is offline / blocked we degrade to
+ * Lexend (a Google-font with similar readability properties) and
+ * then to system-ui. Both fallbacks are widely available.
+ */
+@font-face {
+  font-family: "OpenDyslexic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5.0.4/files/opendyslexic-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5.0.4/files/opendyslexic-latin-700-normal.woff2") format("woff2");
+}
+html[data-font="dyslexia-friendly"],
+html[data-font="dyslexia-friendly"] body {
+  font-family:
+    "OpenDyslexic",
+    "Lexend",
+    "Lexend Deca",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  /* OpenDyslexic glyphs are visually heavier; a touch more spacing
+     keeps lines from feeling cramped. */
+  letter-spacing: 0.01em;
+  line-height: 1.55;
+}
+
+/* High contrast ---------------------------------------------- */
+/*
+ * Bumps the foreground/background contrast and darkens borders so
+ * card edges stay visible. Designed to play well with both the
+ * light and dark themes — we override variables, not raw colors.
+ */
+html[data-contrast="high"] {
+  --color-foreground: #000;
+  --color-background: #fff;
+  --color-card: #fff;
+  --color-border: #000;
+  --color-muted-foreground: #1a1a1a;
+}
+html[data-contrast="high"].dark,
+html[data-contrast="high"][data-theme="dark"] {
+  --color-foreground: #fff;
+  --color-background: #000;
+  --color-card: #000;
+  --color-border: #fff;
+  --color-muted-foreground: #e8e8e8;
+}
+html[data-contrast="high"] *:focus-visible {
+  outline: 3px solid currentColor !important;
+  outline-offset: 2px !important;
+}
+
+/* Large touch targets ---------------------------------------- */
+/*
+ * Bumps minimum click/tap area on interactive surfaces to ~48px
+ * (WCAG AAA hit-target guideline). Targets button + a + input via
+ * a CSS-only rule so we don't have to thread a prop through every
+ * component. Cards / icons / non-interactive blocks are untouched.
+ */
+html[data-touch="large"] button,
+html[data-touch="large"] a[role="button"],
+html[data-touch="large"] [role="button"],
+html[data-touch="large"] input[type="checkbox"],
+html[data-touch="large"] input[type="radio"] {
+  min-height: 44px;
+}
+html[data-touch="large"] button {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+html[data-touch="large"] .text-xs {
+  font-size: 0.825rem;
+  line-height: 1.4;
+}
+html[data-touch="large"] .text-\[11px\],
+html[data-touch="large"] .text-\[10px\] {
+  font-size: 0.78rem;
+}

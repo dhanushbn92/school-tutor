@@ -6,7 +6,11 @@ export type UserRole =
   | "school_admin"
   | "teacher"
   | "student"
-  | "individual_learner";
+  | "individual_learner"
+  // Stage 6 of the child-centric roadmap — guardian linked to one or
+  // more learners via invite codes. Parent users have no school_id
+  // (they only see children they've been explicitly linked to).
+  | "parent";
 
 export interface User {
   id: number;
@@ -689,6 +693,12 @@ export interface MasteryChapter {
   chapter_id: number;
   chapter_number: number;
   chapter_title: string;
+  /** Per-chapter subject context. Populated by the backend so the
+   *  learner's whole-syllabus view can label each row with the
+   *  subject it belongs to. Older single-subject callers may
+   *  ignore this. */
+  subject_id?: number | null;
+  subject_name?: string | null;
   outcomes: MasteryOutcome[];
 }
 
@@ -805,4 +815,169 @@ export interface InterventionNote {
   topic_id: number | null;
   note: string;
   created_at: string;
+}
+
+// ---------- Practice rhythm (Stage 1 of child-centric roadmap) ----------
+
+/** Stamp kinds the backend can award. UI does an exhaustive switch on
+ *  these; any unknown kind falls through to a generic rendering so
+ *  adding a new kind on the backend can never crash the stamp book. */
+export type StampKind =
+  | "QUIZ_COMPLETED"
+  | "PERFECT_SCORE"
+  | "PRACTICE_DAY"
+  | "WEEKLY_GOAL_MET";
+
+export interface LearnerStamp {
+  id: number;
+  kind: StampKind | string;
+  /** ISO timestamp string. */
+  earned_at: string;
+  /** Per-kind context blob. Shape depends on `kind`:
+   *   QUIZ_COMPLETED   { assessment_id, submission_id, total_awarded, max_marks }
+   *   PERFECT_SCORE    { assessment_id, submission_id, marks }
+   *   PRACTICE_DAY     { date: 'YYYY-MM-DD' }
+   *   WEEKLY_GOAL_MET  { week_start, target_days, days_achieved }
+   *  Callers should defensively narrow before destructuring. */
+  metadata: Record<string, unknown>;
+}
+
+export interface PracticeSummary {
+  /** Monday of the current ISO week, ISO date string. */
+  week_start: string;
+  /** Sunday of the current ISO week, ISO date string (inclusive). */
+  week_end: string;
+  /** Learner's target practice days for this week (1..7). */
+  target_days: number;
+  /** Distinct days the learner submitted at least one quiz this week. */
+  practice_days_this_week: string[];
+  practice_days_count_this_week: number;
+  /** All-time count of distinct practice days. */
+  practice_days_count_total: number;
+  weekly_goal_met: boolean;
+  recent_stamps: LearnerStamp[];
+  /** Stage 1.5 — login streak (consecutive days the learner has
+   *  signed in, with one freebie miss per ISO week). */
+  streak: StreakInfo;
+  /** Stage 1.5 — total points across the ledger. */
+  points_total: number;
+  /** Stage 1.5 — current level + progress to the next tier. */
+  level: LevelInfo;
+  /** Stage 1.5 — WEEKLY_GOAL_MET aggregations: all-time count + the
+   *  current consecutive-week run. */
+  weekly_goal_progress: WeeklyGoalProgress;
+  /** Stage 1.5 — one cell per day for the last ~12 weeks (rendered
+   *  as a GitHub-style consistency heatmap). */
+  heatmap: HeatmapCell[];
+}
+
+export interface StreakInfo {
+  /** Days in a row ending today (or the last logged-in day). */
+  current: number;
+  /** All-time longest streak. */
+  longest: number;
+  /** Grace misses already consumed in the current ISO week. */
+  grace_used_this_week: number;
+  /** Grace misses permitted per ISO week (currently 1). */
+  grace_allowed_per_week: number;
+}
+
+export interface LevelInfo {
+  /** Sanskrit-themed level name (Shishya / Vidyārthi / Ārya / Ācārya / Mahā-Ācārya). */
+  name: string;
+  /** One-line vibe / what this level means. */
+  blurb: string;
+  /** Minimum points required to enter this tier. */
+  min_points: number;
+  /** Name of the next tier; null at the top tier. */
+  next_name: string | null;
+  /** Threshold of the next tier; null at the top tier. */
+  next_min_points: number | null;
+  /** Points earned within the current tier (i.e. total - min_points). */
+  points_into_level: number;
+  /** Points still needed to reach the next tier; null at the top. */
+  points_to_next: number | null;
+}
+
+export interface WeeklyGoalProgress {
+  weeks_met_total: number;
+  weeks_met_run: number;
+}
+
+export interface HeatmapCell {
+  /** ISO date string (YYYY-MM-DD). */
+  day: string;
+  practiced: boolean;
+}
+
+// ---------- "Tell me more" chain (Stage 3 of child-centric roadmap) ----------
+
+/** The three escalating tiers of extended explanation. The backend
+ *  generates these on demand via LLM and caches them forever per
+ *  (question, tier). New tiers may be added freely on the backend —
+ *  the frontend renders unknown tiers with a generic "More" label. */
+export type ExplanationTier = "DEEPER" | "ANALOGY" | "EXAMPLE";
+
+export interface ExtendedExplanation {
+  question_id: number;
+  tier: ExplanationTier | string;
+  text: string;
+  /** ISO timestamp the row was first generated. */
+  generated_at: string;
+}
+
+// ---------- Mistake review (Stage 2 of child-centric roadmap) ----------
+
+export interface LearnerMistakeEntry {
+  question_id: number;
+  question_text: string;
+  question_type: QuestionType | string;
+  /** MCQ choices, when question_type === "MCQ". Null otherwise. */
+  options: string[] | null;
+  marks: number;
+  difficulty: QuestionDifficulty | string;
+  outcome_code: string | null;
+  chapter_id: number | null;
+  chapter_title: string | null;
+  chapter_number: number | null;
+  subject_id: number | null;
+  subject_name: string | null;
+  /** ISO timestamp. */
+  first_wrong_at: string;
+  /** ISO timestamp. */
+  last_attempted_at: string;
+  /** 0 or 1 (>=2 is filtered out as resolved on the backend). */
+  consecutive_corrects: number;
+  /** Stage 9 — wrong-in-a-row counter. Persisted server-side so a
+   *  stuck learner sees the hint button across reloads. */
+  wrong_streak: number;
+  /** True when wrong_streak >= the server's hint threshold. Surfaces
+   *  a "Want a hint?" button on the mistake card. */
+  hint_available: boolean;
+}
+
+export interface LearnerMistakesPage {
+  total_active: number;
+  items: LearnerMistakeEntry[];
+}
+
+export interface MistakeRetryResult {
+  correct: boolean;
+  correct_answer: string;
+  explanation: string | null;
+  consecutive_corrects: number;
+  /** True when consecutive_corrects has reached the resolution
+   *  threshold (twice-right rule) and the row will be filtered out of
+   *  the active mistake list on the next refresh. */
+  resolved: boolean;
+  /** Stage 9 — wrong-in-a-row counter for this question. Resets to 0
+   *  on every correct retry. Drives the "Want a hint?" surface. */
+  wrong_streak: number;
+  /** True when wrong_streak crossed the hint threshold (3 by default).
+   *  Frontend lights up the hint button. */
+  hint_available: boolean;
+  /** True when this retry was correct AND the learner had already
+   *  gotten the question wrong twice or more in a row before. Triggers
+   *  the bigger "you stuck with it" celebration. */
+  was_struggling: boolean;
 }

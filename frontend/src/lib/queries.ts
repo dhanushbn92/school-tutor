@@ -14,8 +14,14 @@ import type {
   GeneratedContent,
   GeneratedContentStatus,
   GeneratedContentType,
+  ExplanationTier,
+  ExtendedExplanation,
   InterventionNote,
+  LearnerMistakesPage,
+  LearnerStamp,
   LearningOutcome,
+  MistakeRetryResult,
+  PracticeSummary,
   Question,
   QuestionDifficulty,
   QuestionStatus,
@@ -653,6 +659,480 @@ export function useMySubmissions() {
   });
 }
 
+/* ---------- Practice rhythm (Stage 1 of child-centric roadmap) ---------- */
+
+/**
+ * One-shot fetch for the "Your practice" dashboard card: this week's
+ * progress, the learner's weekly goal, and recent stamps. The backend
+ * computes everything from `submissions.submitted_at` so there's no
+ * write side-effect — safe to refetch freely.
+ */
+export function usePracticeSummary() {
+  return useQuery({
+    queryKey: ["me", "practice-summary"],
+    queryFn: async () => {
+      const { data } = await api.get<PracticeSummary>("/me/practice-summary");
+      return data;
+    },
+  });
+}
+
+/** Update the learner's weekly target (1..7 days). Backend clamps the
+ *  value, so a slider that lets through 0 or 10 would still be safe. */
+export function useSetWeeklyGoal() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (target_days: number) => {
+      const { data } = await api.put<{ target_days: number; week_start: string }>(
+        "/me/practice-summary/goal",
+        { target_days },
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "practice-summary"] });
+    },
+  });
+}
+
+/** Full history for the stamp-book collection page. Limit is generous;
+ *  paginate if any learner ever crosses 500 stamps. */
+export function useMyStamps(limit = 200) {
+  return useQuery({
+    queryKey: ["me", "stamps", limit],
+    queryFn: async () => {
+      const { data } = await api.get<LearnerStamp[]>("/me/stamps", {
+        params: { limit },
+      });
+      return data;
+    },
+  });
+}
+
+/* ---------- Mistake review (Stage 2 of child-centric roadmap) ---------- */
+
+export interface MistakesFilter {
+  chapter_id?: number;
+  subject_id?: number;
+  limit?: number;
+}
+
+/** Things I got wrong: active mistakes only — resolved rows
+ *  (consecutive_corrects >= 2 by the twice-right rule) are filtered
+ *  out server-side. */
+export function useMyMistakes(filter: MistakesFilter = {}) {
+  return useQuery({
+    queryKey: ["me", "mistakes", filter],
+    queryFn: async () => {
+      const { data } = await api.get<LearnerMistakesPage>("/me/mistakes", {
+        params: {
+          chapter_id: filter.chapter_id,
+          subject_id: filter.subject_id,
+          limit: filter.limit ?? 100,
+        },
+      });
+      return data;
+    },
+  });
+}
+
+/* ---------- Audio / read-aloud (Stage 8 of child-centric roadmap) ---------- */
+
+export interface AudioPreferences {
+  autoplay_questions: boolean;
+  preferred_voice_uri: string | null;
+}
+
+/** Per-learner read-aloud settings. Lazily created on first GET so
+ *  existing accounts don't need a backfill. */
+export function useAudioPreferences() {
+  return useQuery({
+    queryKey: ["me", "audio-preferences"],
+    queryFn: async () => {
+      const { data } = await api.get<AudioPreferences>("/me/audio-preferences");
+      return data;
+    },
+    // Preferences rarely change; keep them warm for the session.
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function useUpdateAudioPreferences() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      payload: Partial<Pick<AudioPreferences, "autoplay_questions" | "preferred_voice_uri">>,
+    ) => {
+      const { data } = await api.patch<AudioPreferences>(
+        "/me/audio-preferences",
+        payload,
+      );
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(["me", "audio-preferences"], data);
+    },
+  });
+}
+
+/* ---------- Practice variety hub (Stage 7 of child-centric roadmap) ---------- */
+
+/** Shape returned by /me/practice/surprise + /me/practice/flashcards.
+ *  Trimmed compared to Question — no review_notes / created_by etc.,
+ *  just what a flip-card or inline-reveal UI actually renders. */
+export interface PracticeCardQuestion {
+  id: number;
+  chapter_id: number | null;
+  type: QuestionType | string;
+  difficulty: QuestionDifficulty | string;
+  cognitive_level: BloomLevel | string;
+  text: string;
+  options: { choices?: string[] } | null;
+  correct_answer: string;
+  explanation: string | null;
+  marks: number;
+  outcome_code: string | null;
+}
+
+/** One random question from the learner's syllabus. Surprise me!
+ *  Refetch on demand (button click) — disabled by default so the
+ *  page doesn't burn a question on every dashboard tab focus. */
+export function useSurpriseQuestion(enabled: boolean) {
+  return useQuery({
+    queryKey: ["me", "practice", "surprise"],
+    queryFn: async () => {
+      const { data } = await api.get<PracticeCardQuestion>(
+        "/me/practice/surprise",
+      );
+      return data;
+    },
+    enabled,
+    // The whole point is freshness — never cache a "surprise".
+    staleTime: 0,
+    gcTime: 0,
+  });
+}
+
+/** Sampled factual / REMEMBER-bucket questions for the flashcards
+ *  surface. `count` defaults to 10; chapter_id is optional. */
+export function useFlashcards(params: { count?: number; chapter_id?: number; enabled?: boolean }) {
+  return useQuery({
+    queryKey: ["me", "practice", "flashcards", params.count ?? 10, params.chapter_id ?? null],
+    enabled: params.enabled !== false,
+    queryFn: async () => {
+      const { data } = await api.get<PracticeCardQuestion[]>(
+        "/me/practice/flashcards",
+        {
+          params: {
+            count: params.count ?? 10,
+            chapter_id: params.chapter_id,
+          },
+        },
+      );
+      return data;
+    },
+    staleTime: 0,
+  });
+}
+
+/* ---------- Parent / guardian (Stage 6 of child-centric roadmap) ---------- */
+
+export interface ParentInviteCode {
+  code: string;
+  expires_at: string;
+  created_at?: string;
+}
+
+export interface ParentSummary {
+  user_id: number;
+  full_name: string;
+  email: string;
+}
+
+export interface ChildSummary {
+  user_id: number;
+  full_name: string;
+  email: string;
+}
+
+export interface ChildOutcomeHighlight {
+  code: string;
+  description: string;
+  mastery: number; // 0..1
+  attempts: number;
+  chapter_id: number | null;
+  chapter_number: number | null;
+  chapter_title: string | null;
+}
+
+export interface ChildWeeklySummary {
+  child: { user_id: number; full_name: string };
+  week_start: string;
+  week_end: string;
+  target_days: number;
+  practice_days_this_week: string[];
+  practice_days_count_this_week: number;
+  practice_days_count_total: number;
+  weekly_goal_met: boolean;
+  streak: {
+    current: number;
+    longest: number;
+    grace_used_this_week: number;
+    grace_allowed_per_week: number;
+  };
+  points_total: number;
+  level: {
+    name: string;
+    blurb: string;
+    min_points: number;
+    next_name: string | null;
+    next_min_points: number | null;
+    points_into_level: number;
+    points_to_next: number | null;
+  };
+  weekly_goal_progress: { weeks_met_total: number; weeks_met_run: number };
+  recent_stamps: LearnerStamp[];
+  // Stage 6 enrichment fields:
+  heatmap: { day: string; practiced: boolean }[];
+  subject_name: string | null;
+  class_level: number | null;
+  chapter_rollup: {
+    mastered: number;
+    in_practice: number;
+    to_explore: number;
+  };
+  strengths: ChildOutcomeHighlight[];
+  growing_in: ChildOutcomeHighlight[];
+  stamps_by_kind: Record<string, number>;
+}
+
+export interface FamilyEncouragement {
+  id: number;
+  parent_user_id: number;
+  message: string;
+  sent_at: string;
+  dismissed_at: string | null;
+}
+
+// --- Learner-side ---
+
+export function useMyParents() {
+  return useQuery({
+    queryKey: ["me", "parents"],
+    queryFn: async () => {
+      const { data } = await api.get<ParentSummary[]>("/me/parents");
+      return data;
+    },
+  });
+}
+
+export function useMyActiveInviteCodes() {
+  return useQuery({
+    queryKey: ["me", "parent-invite-codes"],
+    queryFn: async () => {
+      const { data } = await api.get<ParentInviteCode[]>(
+        "/me/parent-invite-codes",
+      );
+      return data;
+    },
+  });
+}
+
+export function useCreateParentInviteCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post<ParentInviteCode>(
+        "/me/parent-invite-codes",
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "parent-invite-codes"] });
+    },
+  });
+}
+
+export function useRevokeParent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (parent_user_id: number) => {
+      await api.delete(`/me/parents/${parent_user_id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "parents"] });
+    },
+  });
+}
+
+export function useMyEncouragements() {
+  return useQuery({
+    queryKey: ["me", "encouragements"],
+    queryFn: async () => {
+      const { data } = await api.get<FamilyEncouragement[]>(
+        "/me/encouragements",
+      );
+      return data;
+    },
+  });
+}
+
+export function useDismissEncouragement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await api.post(`/me/encouragements/${id}/dismiss`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "encouragements"] });
+    },
+  });
+}
+
+// --- Parent-side ---
+
+export function useMyChildren() {
+  return useQuery({
+    queryKey: ["me", "children"],
+    queryFn: async () => {
+      const { data } = await api.get<ChildSummary[]>("/me/children");
+      return data;
+    },
+  });
+}
+
+export function useChildWeeklySummary(childUserId: number | undefined) {
+  return useQuery({
+    queryKey: ["me", "children", childUserId, "weekly-summary"],
+    enabled: childUserId !== undefined,
+    queryFn: async () => {
+      const { data } = await api.get<ChildWeeklySummary>(
+        `/me/children/${childUserId}/weekly-summary`,
+      );
+      return data;
+    },
+  });
+}
+
+export function useSendEncouragement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      child_user_id,
+      message,
+    }: {
+      child_user_id: number;
+      message: string;
+    }) => {
+      const { data } = await api.post<FamilyEncouragement>(
+        `/me/children/${child_user_id}/encouragement`,
+        { message },
+      );
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({
+        queryKey: ["me", "children", vars.child_user_id, "encouragements"],
+      });
+    },
+  });
+}
+
+/* ---------- Vidyārthi mascot (Stage 5 of child-centric roadmap) ---------- */
+
+export interface MascotState {
+  enabled: boolean;
+  current_outfit: string;
+  available_outfits: string[];
+}
+
+/** Per-learner mascot preferences. The mascot itself reads `enabled`
+ *  and `current_outfit` from this query before rendering anything. */
+export function useMascotState() {
+  return useQuery({
+    queryKey: ["me", "mascot"],
+    queryFn: async () => {
+      const { data } = await api.get<MascotState>("/me/mascot");
+      return data;
+    },
+    // Mascot is a UI-affordance read; refetch on focus would be
+    // distracting (mascot popping back in mid-quiz). Use a long
+    // staleTime so a tab switch doesn't bounce it.
+    staleTime: 5 * 60_000,
+  });
+}
+
+/** Toggle the mascot on/off or equip a different outfit. */
+export function useUpdateMascot() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<Pick<MascotState, "enabled" | "current_outfit">>) => {
+      const { data } = await api.patch<MascotState>("/me/mascot", payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(["me", "mascot"], data);
+    },
+  });
+}
+
+/* ---------- "Tell me more" chain (Stage 3 of child-centric roadmap) ---------- */
+
+/** Lazy-fetch one tier of extended explanation for a question. Returns
+ *  a mutation rather than a query because the click is the intent —
+ *  we don't speculatively warm tiers the learner hasn't asked for.
+ *  The backend caches forever per (question, tier), so a second
+ *  click on the same chip is instant. */
+export function useExplainTier() {
+  return useMutation({
+    mutationFn: async ({
+      question_id,
+      tier,
+    }: {
+      question_id: number;
+      tier: ExplanationTier;
+    }) => {
+      const { data } = await api.post<ExtendedExplanation>(
+        `/questions/${question_id}/explain/${tier}`,
+      );
+      return data;
+    },
+  });
+}
+
+/** Single-question retry. The backend grades the answer, updates the
+ *  LearnerMistake row, and returns the verdict + correct answer +
+ *  explanation. Does NOT create a Submission — retries are revision
+ *  practice, not fresh attempts. */
+export function useRetryMistake() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      question_id,
+      answer_text,
+    }: {
+      question_id: number;
+      answer_text: string | null;
+    }) => {
+      const { data } = await api.post<MistakeRetryResult>(
+        `/me/mistakes/${question_id}/attempt`,
+        { answer_text },
+      );
+      return data;
+    },
+    onSuccess: (result) => {
+      // Always invalidate the list — even a wrong retry bumps
+      // last_attempted_at, which re-orders the cards.
+      qc.invalidateQueries({ queryKey: ["me", "mistakes"] });
+      if (result.resolved) {
+        // A resolved row may have just disappeared from the active
+        // list; the count chip should refresh too.
+        qc.invalidateQueries({ queryKey: ["me", "mistakes"] });
+      }
+    },
+  });
+}
+
 /* ---------- AI tutor chat (premium) ---------- */
 
 export interface ChatStatus {
@@ -897,11 +1377,16 @@ export function useStudentTrend(params: { student_id?: number; subject_id?: numb
     queryFn: async () => {
       const { data } = await api.get<StudentTrend>(
         `/analytics/students/${params.student_id}/trend`,
+        // subject_id is optional server-side now — omit it to get
+        // the cross-subject view. Axios drops `undefined` params.
         { params: { subject_id: params.subject_id } },
       );
       return data;
     },
-    enabled: params.student_id !== undefined && params.subject_id !== undefined,
+    // subject_id is no longer required — the dashboard's score-
+    // trend widget calls without one so a multi-subject learner
+    // sees their full quiz history.
+    enabled: params.student_id !== undefined,
   });
 }
 
@@ -1033,6 +1518,49 @@ export function useUploadStructuredContent() {
   });
 }
 
+/**
+ * Platform-admin-only multipart upload of a hand-crafted HTML simulation.
+ *
+ * Backend route: POST /generated-content/upload-simulation. The server
+ * wraps the uploaded HTML inside a SimulationOutput with the custom_html
+ * template, validates against the same Pydantic schema the LLM pipeline
+ * uses, renders through render_simulation_html (sandboxed iframe), and
+ * persists a SIMULATION GeneratedContent row with status=APPROVED.
+ */
+export function useUploadSimulation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      title: string;
+      class_level: number;
+      subject_id: number;
+      chapter_id?: number | null;
+      topic_id?: number | null;
+      instructions?: string | null;
+      /** Comma-separated outcome codes (optional). */
+      outcome_codes?: string | null;
+      file: File;
+    }) => {
+      const form = new FormData();
+      form.append("title", input.title);
+      form.append("class_level", String(input.class_level));
+      form.append("subject_id", String(input.subject_id));
+      if (input.chapter_id != null) form.append("chapter_id", String(input.chapter_id));
+      if (input.topic_id != null) form.append("topic_id", String(input.topic_id));
+      if (input.instructions) form.append("instructions", input.instructions);
+      if (input.outcome_codes) form.append("outcome_codes", input.outcome_codes);
+      form.append("file", input.file);
+      const { data } = await api.post<GeneratedContent>(
+        "/generated-content/upload-simulation",
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["generated-content"] }),
+  });
+}
+
 /** Platform-admin-only multipart upload of supplementary documents (PDF/DOCX). */
 export function useUploadExtraContent() {
   const qc = useQueryClient();
@@ -1125,6 +1653,9 @@ export function useQuickQuiz() {
       cognitive_mix?: Record<string, number>;
       kind?: "mixed" | "subjective" | "objective";
       title?: string;
+      /** Optional minute budget. null / omitted = untimed; an integer
+       *  enables the countdown banner + auto-submit on the take page. */
+      duration_minutes?: number | null;
     }) => {
       const { data } = await api.post<Assessment>("/me/quick-quiz", body);
       return data;

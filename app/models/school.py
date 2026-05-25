@@ -13,6 +13,11 @@ class UserRole(StrEnum):
     TEACHER = "teacher"
     STUDENT = "student"
     INDIVIDUAL_LEARNER = "individual_learner"
+    # Stage 6 of the child-centric roadmap — a guardian linked to one
+    # or more learners. Parent users don't belong to a school (they
+    # see only the children they've been explicitly linked to via the
+    # invite-code flow); the User.school_id remains NULL.
+    PARENT = "parent"
 
 
 class EnrollmentStatus(StrEnum):

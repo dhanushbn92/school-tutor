@@ -64,3 +64,31 @@ class IndividualSignupResponse(BaseModel):
     section_id: int
     student_id: int
     token: TokenResponse
+
+
+class ParentSignupRequest(BaseModel):
+    """Public parent / guardian onboarding (Stage 6 of the
+    child-centric roadmap). Differs from IndividualSignupRequest in
+    two ways:
+      - No `class_level` / `academic_year_id` — a parent doesn't have
+        a curriculum scope of their own.
+      - `invite_code` — required. Created by the learner via
+        `POST /me/parent-invite-codes` and handed to the parent. The
+        signup flow consumes the code and creates the parent ↔ child
+        link in the same transaction as the user row, so a
+        half-finished signup can't leave an orphaned parent account.
+    """
+
+    email: EmailStr
+    password: str = Field(min_length=8, max_length=128)
+    full_name: str = Field(min_length=2, max_length=200)
+    # Eight uppercase chars from the unambiguous set; whitespace is
+    # stripped + upper-cased server-side so a parent typing "abc 123 de"
+    # still resolves cleanly.
+    invite_code: str = Field(min_length=8, max_length=16)
+
+
+class ParentSignupResponse(BaseModel):
+    user: UserRead
+    child_user_id: int
+    token: TokenResponse

@@ -124,25 +124,48 @@ def build_student_grid(
     *,
     student_id: int,
     class_level: int,
-    subject_id: int,
+    subject_id: int | None = None,
 ) -> dict:
-    """Return a chapter -> outcome mastery grid for a student, ready for a heatmap.
+    """Return a chapter -> outcome mastery grid for a student.
 
-    Includes every outcome the subject syllabus defines, with `mastery=null` for
-    any the student has not yet attempted.
+    When `subject_id` is supplied, scopes to that one subject. When
+    omitted, aggregates across EVERY subject in the class — the
+    "whole syllabus" view a learner sees on their dashboard.
+
+    Includes every outcome the subject syllabus defines, with
+    `mastery=null` for any the student has not yet attempted.
+
+    Per-chapter rows in the returned payload now carry `subject_id`
+    + `subject_name` so a multi-subject grid still tells the learner
+    which subject each chapter belongs to.
     """
-    subject = db.get(Subject, subject_id)
-    chapters = list(
-        db.scalars(
-            select(Chapter)
-            .join(Book, Chapter.book_id == Book.id)
-            .join(Subject, Book.subject_id == Subject.id)
-            .join(SchoolClass, Subject.class_id == SchoolClass.id)
-            .where(SchoolClass.level == class_level, Subject.id == subject_id)
-            .order_by(Chapter.chapter_number)
-            .options(selectinload(Chapter.learning_outcomes))
-        )
+    subject = db.get(Subject, subject_id) if subject_id is not None else None
+    # Build a chapter query scoped to the class. When subject_id is
+    # given we additionally narrow by Subject.id; when omitted we
+    # return every chapter the class has across all subjects, ordered
+    # by (subject name, chapter number) so subjects group naturally
+    # in the syllabus map view.
+    chapter_stmt = (
+        select(Chapter, Subject)
+        .join(Book, Chapter.book_id == Book.id)
+        .join(Subject, Book.subject_id == Subject.id)
+        .join(SchoolClass, Subject.class_id == SchoolClass.id)
+        .where(SchoolClass.level == class_level)
+        .options(selectinload(Chapter.learning_outcomes))
     )
+    if subject_id is not None:
+        chapter_stmt = chapter_stmt.where(Subject.id == subject_id).order_by(
+            Chapter.chapter_number
+        )
+    else:
+        chapter_stmt = chapter_stmt.order_by(Subject.name, Chapter.chapter_number)
+    chapter_rows = list(db.execute(chapter_stmt).all())
+    # Each row is (Chapter, Subject) — unpack into a flat list with
+    # the matching subject so we can render it per row downstream.
+    chapters_with_subject: list[tuple[Chapter, Subject]] = [
+        (row[0], row[1]) for row in chapter_rows
+    ]
+    chapters = [c for c, _ in chapters_with_subject]
 
     mastery_rows = db.scalars(
         select(SkillMastery).where(SkillMastery.student_id == student_id)
@@ -164,7 +187,7 @@ def build_student_grid(
     bucket_totals: dict[str, dict[str, float | int]] = {
         b.value: {"sum": 0.0, "attempted": 0} for b in bucket_order
     }
-    for chapter in chapters:
+    for chapter, chapter_subject in chapters_with_subject:
         outcomes_payload = []
         for outcome in sorted(chapter.learning_outcomes, key=lambda lo: lo.code):
             total_outcomes += 1
@@ -220,6 +243,11 @@ def build_student_grid(
                 "chapter_id": chapter.id,
                 "chapter_number": chapter.chapter_number,
                 "chapter_title": chapter.title,
+                # Per-chapter subject context so a multi-subject grid
+                # (Stage 4+ syllabus map without a subject filter) can
+                # tell a learner which subject each chapter belongs to.
+                "subject_id": chapter_subject.id,
+                "subject_name": chapter_subject.name,
                 "outcomes": outcomes_payload,
             }
         )

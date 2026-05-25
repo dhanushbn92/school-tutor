@@ -33,7 +33,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
+import { DashboardHero } from "@/components/DashboardHero";
+import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { LearnerDashboard } from "@/components/LearnerDashboard";
+import { ParentDashboard } from "@/components/ParentDashboard";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import { useAuth } from "@/lib/auth";
 import {
@@ -51,6 +54,9 @@ export function DashboardPage() {
   const { user } = useAuth();
   if (user?.role === "student" || user?.role === "individual_learner") {
     return <LearnerDashboard />;
+  }
+  if (user?.role === "parent") {
+    return <ParentDashboard />;
   }
   const sectionsQ = useMySections();
   const firstSection = sectionsQ.data?.[0];
@@ -100,8 +106,27 @@ export function DashboardPage() {
   const isPlatformAdmin = user?.role === "platform_admin";
   const isSchoolAdmin = user?.role === "school_admin";
 
+  // Map our backend role string to the bucket DashboardHero understands.
+  // school_admin + teacher share most operational chrome but the hero
+  // copy benefits from distinguishing the two.
+  const heroRole: "teacher" | "school_admin" | "platform_admin" = isPlatformAdmin
+    ? "platform_admin"
+    : isSchoolAdmin
+      ? "school_admin"
+      : "teacher";
+
   return (
     <ThemedPage>
+      <DashboardHero role={heroRole} userName={firstWord(user?.full_name ?? "")} />
+
+      {/* The platform's purpose lives at the top of every dashboard so
+          new + returning users land on it before they scroll into
+          operational widgets. Headline + lead + primary CTA are all
+          role-tailored — a platform admin sees the curation framing,
+          a teacher sees the assignment framing, a school admin sees
+          the school-wide-pattern framing. */}
+      <DashboardPurposePanel role={heroRole} />
+
       <PageHeader
         title={`Welcome, ${firstWord(user?.full_name ?? "")}`}
         description={
@@ -143,33 +168,118 @@ export function DashboardPage() {
         }
       />
 
+      {/* Stat cards — chosen per role so each viewer sees the numbers
+          that match their job. A platform admin doesn't have classes
+          or students; a teacher doesn't curate the question bank;
+          a school admin watches both. */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="My classes"
-          value={sectionsQ.data?.length ?? 0}
-          sub={firstSection ? `Primary: ${firstSection.class_display_name} ${firstSection.name}` : "No classes yet"}
-          icon={<Users className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Students in my class"
-          value={studentsQ.data?.length ?? 0}
-          sub={firstSection ? `${firstSection.class_display_name}-${firstSection.name}` : undefined}
-          icon={<Users className="h-5 w-5" />}
-          intent="success"
-        />
-        <StatCard
-          label="Draft questions"
-          value={questionsQ.data?.length ?? 0}
-          sub="Awaiting your review"
-          icon={<NotebookPen className="h-5 w-5" />}
-          intent="warning"
-        />
-        <StatCard
-          label="Published assessments"
-          value={assessmentsQ.data?.filter((a) => a.status === "PUBLISHED").length ?? 0}
-          sub={`${assessmentsQ.data?.length ?? 0} total`}
-          icon={<ClipboardList className="h-5 w-5" />}
-        />
+        {isPlatformAdmin ? (
+          <>
+            {/* Catalog curator's view — focus on the practice catalog. */}
+            <StatCard
+              label="Draft questions"
+              value={questionsQ.data?.length ?? 0}
+              sub="Awaiting approval"
+              icon={<NotebookPen className="h-5 w-5" />}
+              intent="warning"
+            />
+            <StatCard
+              label="Recent generations"
+              value={generationsQ.data?.length ?? 0}
+              sub="Last 20 ready for publish"
+              icon={<FolderOpen className="h-5 w-5" />}
+              intent="success"
+            />
+            <StatCard
+              label="Published assessments"
+              value={
+                assessmentsQ.data?.filter((a) => a.status === "PUBLISHED").length ??
+                0
+              }
+              sub={`${assessmentsQ.data?.length ?? 0} total in flight`}
+              icon={<ClipboardList className="h-5 w-5" />}
+            />
+            <StatCard
+              label="Intervention notes"
+              value={notesQ.data?.length ?? 0}
+              sub="Filed across the platform"
+              icon={<AlertTriangle className="h-5 w-5" />}
+            />
+          </>
+        ) : isSchoolAdmin ? (
+          <>
+            {/* School-wide view — emphasise scope and reach. */}
+            <StatCard
+              label="Sections"
+              value={sectionsQ.data?.length ?? 0}
+              sub={
+                firstSection
+                  ? `Across ${availableClasses.classes.length} class levels`
+                  : "No classes yet"
+              }
+              icon={<Users className="h-5 w-5" />}
+            />
+            <StatCard
+              label="Students"
+              value={studentsQ.data?.length ?? 0}
+              sub={firstSection ? `${firstSection.class_display_name}-${firstSection.name}` : undefined}
+              icon={<Users className="h-5 w-5" />}
+              intent="success"
+            />
+            <StatCard
+              label="Published assessments"
+              value={
+                assessmentsQ.data?.filter((a) => a.status === "PUBLISHED").length ??
+                0
+              }
+              sub={`${assessmentsQ.data?.length ?? 0} total this term`}
+              icon={<ClipboardList className="h-5 w-5" />}
+            />
+            <StatCard
+              label="Intervention notes"
+              value={notesQ.data?.length ?? 0}
+              sub="Filed by your teachers"
+              icon={<AlertTriangle className="h-5 w-5" />}
+              intent="warning"
+            />
+          </>
+        ) : (
+          <>
+            {/* Teacher's view — classroom-scoped. */}
+            <StatCard
+              label="My classes"
+              value={sectionsQ.data?.length ?? 0}
+              sub={
+                firstSection
+                  ? `Primary: ${firstSection.class_display_name} ${firstSection.name}`
+                  : "No classes yet"
+              }
+              icon={<Users className="h-5 w-5" />}
+            />
+            <StatCard
+              label="My students"
+              value={studentsQ.data?.length ?? 0}
+              sub={firstSection ? `${firstSection.class_display_name}-${firstSection.name}` : undefined}
+              icon={<Users className="h-5 w-5" />}
+              intent="success"
+            />
+            <StatCard
+              label="Published quizzes"
+              value={
+                assessmentsQ.data?.filter((a) => a.status === "PUBLISHED").length ??
+                0
+              }
+              sub={`${assessmentsQ.data?.length ?? 0} total`}
+              icon={<ClipboardList className="h-5 w-5" />}
+            />
+            <StatCard
+              label="My notes"
+              value={notesQ.data?.length ?? 0}
+              sub="Filed about students"
+              icon={<AlertTriangle className="h-5 w-5" />}
+            />
+          </>
+        )}
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">

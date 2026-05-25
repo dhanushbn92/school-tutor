@@ -12,8 +12,10 @@ from app.db.session import get_db
 from app.models.curriculum import BloomLevel
 from app.models.question import Question, QuestionDifficulty, QuestionStatus, QuestionType
 from app.models.school import User
+from app.models.extended_explanation import ExplanationTier
 from app.schemas.question import ApprovalRequest, QuestionRead, QuestionUpdate
-from app.services import question_service
+from app.services import explain_service, question_service
+from app.services.explain_service import ExplainError
 
 
 router = APIRouter(prefix="/questions", tags=["questions"])
@@ -142,3 +144,37 @@ def reject_question(
     db.commit()
     db.refresh(q)
     return q
+
+
+# ---------- "Tell me more" chain — Stage 3 of child-centric roadmap ----------
+#
+# One endpoint per (question, tier) — POST so a click counts as an
+# intent to generate (and cache) rather than a cacheable GET. The
+# tier path-param is case-insensitive thanks to the StrEnum coercion,
+# but we accept the canonical uppercase form.
+#
+# Any authenticated user may request a tier. Generation is cached at
+# the question level, not the user level, so the first click warms
+# the cache for everyone else.
+
+
+@router.post("/{question_id}/explain/{tier}")
+def explain_question(
+    question_id: int,
+    tier: ExplanationTier,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Return (cached or freshly-generated) extended explanation for a
+    question at the requested tier. Generation is on-demand via LLM
+    and cached forever per (question, tier)."""
+    try:
+        row = explain_service.get_or_generate(
+            db, question_id=question_id, tier=tier, user=user
+        )
+    except ExplainError as exc:
+        # 503 — the model is upstream and may be transiently down;
+        # the frontend can render a "try again" affordance without
+        # treating this as a hard error.
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    return explain_service.to_dict(row)

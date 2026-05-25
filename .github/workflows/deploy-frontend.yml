@@ -1,6 +1,11 @@
 # Build the Vite SPA and ship it to Firebase Hosting on every push to
 # main that touches the frontend. Auth uses a Firebase service-account
 # JSON stored as a GitHub secret (see docs/setup_cicd.md).
+#
+# Hosting is multi-site: the SAME build is deployed to both
+#   • primary  →  school-tuter.web.app   (legacy URL, kept alive)
+#   • branded  →  school-tutor-hub.web.app (the canonical user-facing URL)
+# Targets are wired up in frontend/.firebaserc; firebase.json has both.
 
 name: Deploy frontend (Firebase Hosting)
 
@@ -45,7 +50,7 @@ jobs:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: npm run build
 
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting — primary (school-tuter.web.app)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -53,3 +58,14 @@ jobs:
           projectId: ${{ secrets.FIREBASE_PROJECT }}
           channelId: live
           entryPoint: ./frontend
+          target: primary
+
+      - name: Deploy to Firebase Hosting — branded (school-tutor-hub.web.app)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ secrets.FIREBASE_PROJECT }}
+          channelId: live
+          entryPoint: ./frontend
+          target: branded

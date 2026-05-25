@@ -53,6 +53,7 @@ import {
   useGeneratedContent,
   useSubjects,
   useUploadExtraContent,
+  useUploadSimulation,
   useUploadStructuredContent,
 } from "@/lib/queries";
 import { VALID_BOARDS } from "@/lib/boards";
@@ -150,6 +151,16 @@ export function GeneratePage() {
   const [activeId, setActiveId] = useState<number | undefined>(undefined);
   const activeGenQ = useGeneratedContent(activeId);
 
+  // Manual simulation upload — admin authors HTML locally, picks the same
+  // class/subject/chapter as the generate flow, and uploads. The row is
+  // saved as a SIMULATION (template=custom_html) with status=APPROVED.
+  // Shares class/subject/chapter state with the AI form so a single picker
+  // drives both paths.
+  const uploadSim = useUploadSimulation();
+  const simFileRef = useRef<HTMLInputElement | null>(null);
+  const [simUploadFile, setSimUploadFile] = useState<File | null>(null);
+  const [simUploadTitle, setSimUploadTitle] = useState("");
+
   // Auto-pick first options when they load
   useEffect(() => {
     if (!classLevel && classesQ.data && classesQ.data.length > 0) {
@@ -194,6 +205,54 @@ export function GeneratePage() {
       });
       setActiveId(row.id);
       toast.success(`Generation queued (id ${row.id})`);
+    } catch (err) {
+      toast.error(humanError(err));
+    }
+  }
+
+  /**
+   * Upload-handler for the hand-crafted simulation flow. Backend stores
+   * the HTML inside a custom_html SimulationOutput, validates the body,
+   * and renders into the same sandboxed iframe wrapper the LLM path uses.
+   *
+   * We require the same curriculum-context picks the AI form needs (class,
+   * subject, chapter is recommended) so the row lands in the right bucket
+   * in the catalog. Title defaults to the filename if the admin doesn't
+   * type one — small ergonomic shortcut, easy to override.
+   */
+  async function handleSimUpload() {
+    if (!simUploadFile) {
+      toast.error("Pick an HTML file to upload");
+      return;
+    }
+    if (!classLevel || !subjectId) {
+      toast.error("Pick a class and subject first");
+      return;
+    }
+    // Backend SimulationOutput.title requires min_length 5; pad short
+    // filename-derived defaults so the validator doesn't reject something
+    // like "x.html" → "x". A typed title bypasses this.
+    let effectiveTitle =
+      simUploadTitle.trim() ||
+      simUploadFile.name.replace(/\.[^.]+$/, "").slice(0, 200);
+    if (!simUploadTitle.trim() && effectiveTitle.length < 5) {
+      effectiveTitle = `${effectiveTitle} (simulation)`;
+    }
+    try {
+      const row = await uploadSim.mutateAsync({
+        title: effectiveTitle,
+        class_level: classLevel,
+        subject_id: subjectId,
+        chapter_id: chapterId ?? null,
+        file: simUploadFile,
+      });
+      setActiveId(row.id);
+      toast.success(`Simulation uploaded (id ${row.id})`);
+      // Clear the picker so the admin doesn't accidentally re-upload the
+      // same file. Title clears too — sane default for the next upload.
+      setSimUploadFile(null);
+      setSimUploadTitle("");
+      if (simFileRef.current) simFileRef.current.value = "";
     } catch (err) {
       toast.error(humanError(err));
     }
@@ -428,6 +487,73 @@ export function GeneratePage() {
                 Generate
               </Button>
             </form>
+
+            {/*
+             * Alternate path: upload a pre-built HTML simulation.
+             *
+             * Shown only when the admin has picked "Simulation (HTML)" so
+             * the option appears exactly when relevant. Reuses the class /
+             * subject / chapter picks from the main form above — single
+             * source of truth — and rides the same Pydantic validation +
+             * sandboxed-iframe renderer the LLM pipeline uses.
+             *
+             * The submit handler clears its own state on success so the
+             * admin can queue another upload without confusion.
+             */}
+            {contentType === "simulation" && (
+              <div className="mt-6 space-y-3 border-t border-(--color-border) pt-6">
+                <div>
+                  <p className="text-sm font-medium">Or upload your own simulation</p>
+                  <p className="text-xs text-(--color-muted-foreground)">
+                    Built a custom HTML/JS simulation yourself? Upload the{" "}
+                    <code>.html</code> file. We wrap it in a sandboxed iframe
+                    and attach it to the chapter you picked above.
+                    Limit: 200 KB.
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sim-upload-title">Title (optional)</Label>
+                  <Input
+                    id="sim-upload-title"
+                    placeholder="Defaults to the filename"
+                    value={simUploadTitle}
+                    onChange={(e) => setSimUploadTitle(e.target.value)}
+                    maxLength={200}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sim-upload-file">HTML file</Label>
+                  <Input
+                    id="sim-upload-file"
+                    ref={simFileRef}
+                    type="file"
+                    accept=".html,.htm,text/html"
+                    onChange={(e) =>
+                      setSimUploadFile(e.target.files?.[0] ?? null)
+                    }
+                  />
+                  {simUploadFile && (
+                    <p className="text-xs text-(--color-muted-foreground)">
+                      Selected: {simUploadFile.name} ({Math.round(simUploadFile.size / 1024)} KB)
+                    </p>
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleSimUpload}
+                  disabled={uploadSim.isPending || !simUploadFile}
+                >
+                  {uploadSim.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Upload simulation
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
         )}
@@ -1403,7 +1529,7 @@ function CreateBookCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base md:text-lg">Create book</CardTitle>
+        <CardTitle className="text-base md:text-lg">Add book</CardTitle>
         <CardDescription>
           Add a book under an existing subject. The platform admin's
           subject picker shows every board, so you can attach a book to
@@ -1510,7 +1636,7 @@ function CreateBookCard() {
             ) : (
               <BookPlus className="h-4 w-4" />
             )}
-            Create book
+            Add book
           </Button>
         </form>
       </CardContent>
@@ -1632,7 +1758,7 @@ function CreateChapterCard({ onCreated }: { onCreated: (id: number) => void }) {
       } catch (err) {
         toast.error(
           `Couldn't auto-create a default book: ${humanError(err)}. ` +
-            `Use the "Create book" card above and try again.`,
+            `Use the "Add book" card above and try again.`,
         );
         return;
       }
@@ -1760,7 +1886,7 @@ function CreateChapterCard({ onCreated }: { onCreated: (id: number) => void }) {
                   {selectedSubject?.board} {selectedSubject?.name} (Default)
                 </strong>{" "}
                 automatically when you click <em>Create chapter</em>. Use
-                the <em>Create book</em> card above first if you want a
+                the <em>Add book</em> card above first if you want a
                 specific book title / academic year.
               </p>
             )}

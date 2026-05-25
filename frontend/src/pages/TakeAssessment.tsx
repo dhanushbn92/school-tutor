@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -7,9 +7,9 @@ import {
   Loader2,
   Send,
   Sparkles,
-  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { formatClock, useQuizTimer } from "@/lib/useQuizTimer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
 import {
@@ -42,6 +42,9 @@ import type {
 import { BLOOM_TO_BUCKET, BUCKET_LABEL } from "@/lib/types";
 import { cn, formatMarks } from "@/lib/utils";
 import { RichExplanationView } from "@/components/RichExplanation";
+import { TellMeMore } from "@/components/TellMeMore";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
+import { useMascot } from "@/lib/mascotContext";
 
 const BUCKET_ORDER: CognitiveBucket[] = ["FACTUAL", "UNDERSTANDING", "APPLICATION"];
 
@@ -76,6 +79,7 @@ export function TakeAssessmentPage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const submitMut = useSubmitAssessment();
   const [submission, setSubmission] = useState<Submission | null>(null);
+  const mascot = useMascot();
 
   // If the learner already has a submission for this assessment, load it so
   // we render the results view immediately (no re-take attempt).
@@ -104,16 +108,156 @@ export function TakeAssessmentPage() {
     }
   }, [existingSubQ.data, submission, questionsQ.data]);
 
-  // Hook MUST be above the conditional returns below — moving it down breaks
-  // Rules of Hooks (number of hooks differs across renders).
+  // Hooks MUST live above the conditional returns below — moving them
+  // down breaks Rules of Hooks (number of hooks differs across renders).
   const questionsById = useMemo(
     () => new Map((questionsQ.data ?? []).map((q) => [q.id, q])),
     [questionsQ.data],
   );
 
-  // The existing-submission auto-resume flow needs both questions and the
-  // submission detail. Show "Loading your results…" while those finish so
-  // the user doesn't see the take form flash before the results view.
+  // Time-bound assessment? duration comes from either the server
+  // (assessment.duration_minutes — teacher-assigned quizzes set this
+  // at creation) or, as a fallback, from a localStorage entry the
+  // QuickQuiz form wrote on creation (for self-started quizzes where
+  // the backend dropped the field). Whichever produces a positive
+  // value drives the timer.
+  const localFallback = (() => {
+    if (aid === undefined || typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem(`dhananjaya:quiz-duration:${aid}`);
+      const n = raw == null ? NaN : Number(raw);
+      return Number.isFinite(n) && n > 0 ? n : null;
+    } catch {
+      return null;
+    }
+  })();
+  const effectiveDuration =
+    assessmentQ.data?.duration_minutes ?? localFallback ?? null;
+  // isTimed says "we have a countdown deadline"; the elapsed-time
+  // display is shown for both timed AND untimed attempts so every
+  // learner sees a working clock at the top of the page. The timer
+  // runs as long as the quiz is being taken (no submission yet)
+  // and an assessment has loaded — totalSeconds will be 0 on
+  // untimed attempts, which the banner detects to switch from
+  // countdown mode to elapsed-time mode.
+  const isTimed = effectiveDuration !== null && submission === null;
+  const timerEnabled = assessmentQ.data !== undefined && submission === null;
+  const {
+    secondsLeft,
+    totalSeconds,
+    elapsedSeconds,
+    clear: clearTimer,
+  } = useQuizTimer({
+    assessmentId: aid,
+    durationMinutes: effectiveDuration,
+    enabled: timerEnabled,
+  });
+
+  // Auto-submit guard — fire at most once per page lifetime. Without
+  // this, a transient failure on the auto-submit could re-fire the
+  // effect every tick.
+  const autoSubmitFiredRef = useRef(false);
+
+  // handleSubmit is declared as a function declaration (hoisted) so the
+  // auto-submit useEffect below can reference it even though it lives
+  // earlier in source order. Function declarations are hoisted; const
+  // arrow functions are not — keeping this as a declaration is
+  // deliberate.
+  async function handleSubmit(e?: FormEvent) {
+    if (e) e.preventDefault();
+    if (!assessmentQ.data) return;
+    const stringified: Record<string, string> = {};
+    for (const [k, v] of Object.entries(answers)) {
+      if (v && v.trim()) stringified[k] = v;
+    }
+    try {
+      const sub = await submitMut.mutateAsync({
+        assessment_id: assessmentQ.data.id,
+        answers: stringified,
+      });
+      setSubmission(sub);
+      // Backend always evaluates objective questions immediately;
+      // subjective ones are left for student self-review against the
+      // answer key. The toast surfaces only the auto-scored portion.
+      const hasSubjective = sub.answers.some((sa) => sa.marks_awarded === null);
+      toast.success(
+        hasSubjective
+          ? `Submitted — review your subjective answers below`
+          : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
+      );
+      // Stage 5 — mascot reaction on submission. VICTORY pose for a
+      // perfect score, plain FIRES for anything below perfect (the
+      // arrow still hit the target — there's something to celebrate).
+      const perfect =
+        sub.total_awarded !== null &&
+        sub.max_marks > 0 &&
+        sub.total_awarded >= sub.max_marks;
+      mascot.reactWith(perfect ? "VICTORY" : "FIRES", {
+        message: perfect
+          ? "Bullseye! Every mark earned."
+          : `Arrow's in. ${sub.total_awarded}/${sub.max_marks} this round.`,
+        autoResetMs: 6000,
+      });
+      // Clear the persisted start time so a future re-open doesn't race
+      // a fresh countdown against the existing submission.
+      clearTimer();
+    } catch (err) {
+      toast.error(humanError(err));
+    }
+  }
+
+  // Stage 5 — mascot mood follows quiz progress. Set DRAWN while the
+  // learner is mid-quiz. The submit handler itself transitions to
+  // FIRES / VICTORY; this effect intentionally skips that case so a
+  // dep-change-driven cleanup can't stomp on the celebration mood.
+  useEffect(() => {
+    if (assessmentQ.data && !submission && !submitMut.isPending) {
+      mascot.reactWith("DRAWN", { message: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assessmentQ.data, submission, submitMut.isPending]);
+
+  // Unmount-only cleanup. Splitting this from the mood-setting effect
+  // matters: if the cleanup lived in the effect above, every
+  // dependency change would reset the mascot — including the
+  // submission-just-landed render, which would erase the FIRES /
+  // VICTORY mood that handleSubmit just set.
+  useEffect(() => {
+    return () => {
+      mascot.reset();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-submit when the timer hits zero. Runs only if (a) the quiz is
+  // time-bound, (b) it hasn't fired yet, (c) the user hasn't already
+  // submitted, and (d) the submit mutation isn't already in flight.
+  // The toast warns the learner so the submission doesn't feel sudden.
+  useEffect(() => {
+    if (!isTimed) return;
+    if (autoSubmitFiredRef.current) return;
+    if (submission) return;
+    if (submitMut.isPending) return;
+    if (secondsLeft > 0) return;
+    autoSubmitFiredRef.current = true;
+    toast.warning("Time's up — submitting your answers now.");
+    // Intentional setState-in-effect: this effect is the bridge
+    // between the timer (external state) and the submission. Calling
+    // handleSubmit (which mutates state) is the whole point. The ref
+    // guards against repeated firing.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void handleSubmit();
+    // We omit handleSubmit / submission / submitMut.isPending from
+    // the deps array because re-running on those changes would either
+    // no-op (ref guard) or cause a double submit we explicitly want
+    // to avoid.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondsLeft, isTimed]);
+
+  // The existing-submission auto-resume flow needs both questions and
+  // the submission detail. Show "Loading your results…" while those
+  // finish so the user doesn't see the take form flash before the
+  // results view.
   const resumingExisting = existingSubId !== undefined && submission === null;
   if (
     assessmentQ.isLoading ||
@@ -143,32 +287,6 @@ export function TakeAssessmentPage() {
   }
 
   const a = assessmentQ.data;
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const stringified: Record<string, string> = {};
-    for (const [k, v] of Object.entries(answers)) {
-      if (v && v.trim()) stringified[k] = v;
-    }
-    try {
-      const sub = await submitMut.mutateAsync({
-        assessment_id: a.id,
-        answers: stringified,
-      });
-      setSubmission(sub);
-      // Backend always evaluates objective questions immediately; subjective
-      // ones are left for student self-review against the answer key. The
-      // toast surfaces only the auto-scored portion.
-      const hasSubjective = sub.answers.some((sa) => sa.marks_awarded === null);
-      toast.success(
-        hasSubjective
-          ? `Submitted — review your subjective answers below`
-          : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
-      );
-    } catch (err) {
-      toast.error(humanError(err));
-    }
-  }
 
   // Results view (after submit)
   if (submission) {
@@ -250,22 +368,41 @@ export function TakeAssessmentPage() {
   }
 
   // Take-quiz view
+  //
+  // Timer styling buckets — the banner gets progressively more urgent
+  // as the deadline approaches. The thresholds are proportional to
+  // the full duration rather than absolute seconds so a 5-minute quiz
+  // and a 90-minute quiz both have a sensible warning band.
+  const fractionLeft = totalSeconds > 0 ? secondsLeft / totalSeconds : 1;
+  const timerIntent: "ok" | "warning" | "critical" =
+    !isTimed
+      ? "ok"
+      : fractionLeft <= 0.1 || secondsLeft <= 30
+        ? "critical"
+        : fractionLeft <= 0.33
+          ? "warning"
+          : "ok";
+
   return (
     <ThemedPage>
       <PageHeader
         title={a.title}
+        // PageHeader wraps `description` in a <p>, so we keep the
+        // children inline-only (spans, not Badges/<p>). React was
+        // logging DOM-nesting warnings (Badge → div inside p, then
+        // <p> inside <p>) — those don't break rendering but they
+        // were the real chatter in the console. Using spans with
+        // badge-ish styling sidesteps both warnings without losing
+        // the visual treatment.
         description={
           <>
-            <Badge variant="outline" className="mr-2">{a.type}</Badge>
-            {a.duration_minutes && (
-              <span className="inline-flex items-center gap-1 text-(--color-muted-foreground)">
-                <Clock className="h-3 w-3" /> {a.duration_minutes} min
-              </span>
-            )}
+            <span className="mr-2 inline-flex items-center rounded-full border border-(--color-border) px-2.5 py-0.5 text-xs font-medium text-(--color-foreground)">
+              {a.type}
+            </span>
             {a.instructions && (
-              <p className="mt-2 max-w-2xl text-sm text-(--color-muted-foreground)">
+              <span className="text-sm text-(--color-muted-foreground)">
                 {a.instructions}
-              </p>
+              </span>
             )}
           </>
         }
@@ -277,6 +414,48 @@ export function TakeAssessmentPage() {
           </Button>
         }
       />
+
+      {/* Live timer banner — always visible while the quiz is being
+          taken. Two modes:
+            - Timed (effectiveDuration set): shows a countdown.
+              Colour shifts ok → warning → critical as the deadline
+              approaches; critical state pulses.
+            - Untimed: shows elapsed time so the learner has a sense
+              of how long they've been at it. No colour shift, no
+              auto-submit.
+          Either way the banner is unmistakable at the top of the
+          page — no more "where's my timer?" confusion. */}
+      <div
+        className={cn(
+          "sticky top-14 z-10 mb-4 flex items-center justify-between gap-3 rounded-md border px-4 py-2.5 text-sm shadow-sm backdrop-blur",
+          isTimed && timerIntent === "ok" &&
+            "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
+          isTimed && timerIntent === "warning" &&
+            "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_14%,var(--color-card))] text-(--color-foreground)",
+          isTimed && timerIntent === "critical" &&
+            "border-(--color-destructive) bg-[color-mix(in_oklab,var(--color-destructive)_14%,var(--color-card))] text-(--color-foreground)",
+          isTimed && timerIntent === "critical" && "animate-pulse",
+          !isTimed &&
+            "border-(--color-border) bg-(--color-card)/95 text-(--color-foreground)",
+        )}
+        role="status"
+        aria-live="polite"
+      >
+        <span className="inline-flex items-center gap-2 font-medium">
+          <Clock className="h-4 w-4" />
+          {isTimed ? "Time remaining" : "Elapsed time"}
+        </span>
+        <span className="flex items-center gap-3">
+          <span className="text-lg font-semibold tabular-nums leading-none">
+            {isTimed ? formatClock(secondsLeft) : formatClock(elapsedSeconds)}
+          </span>
+          <span className="hidden text-xs text-(--color-muted-foreground) sm:inline">
+            {isTimed
+              ? `of ${effectiveDuration} min total`
+              : "Untimed — take as long as you need"}
+          </span>
+        </span>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         {questionIds.map((qid, idx) => {
@@ -424,8 +603,11 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
                 <CheckCircle2 className="h-3 w-3" /> Correct
               </Badge>
             ) : wrong ? (
-              <Badge variant="destructive" className="gap-1">
-                <XCircle className="h-3 w-3" /> Wrong
+              // Stage 9 — softened to "Not yet" (warning amber, not
+              // destructive red). Kids see this label often; we
+              // want it to read as "keep going", not "you failed".
+              <Badge variant="warning" className="gap-1">
+                <Sparkles className="h-3 w-3" /> Not yet
               </Badge>
             ) : partial ? (
               <Badge variant="warning">Partial</Badge>
@@ -443,7 +625,12 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
           </div>
         </div>
         <CardTitle className="mt-2 text-base font-medium leading-snug">
-          Q{sa.__index}. {q?.text ?? `Question #${sa.question_id}`}
+          <span className="inline-flex items-start gap-2">
+            <span>Q{sa.__index}. {q?.text ?? `Question #${sa.question_id}`}</span>
+            {q?.text && (
+              <ReadAloudButton text={q.text} label="Read the question" />
+            )}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
@@ -457,9 +644,17 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
         </div>
         {q && (
           <div>
-            <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
-              {subjective ? "Answer key" : "Correct answer"}
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
+                {subjective ? "Answer key" : "Correct answer"}
+              </span>
+              <ReadAloudButton
+                text={
+                  q.correct_answer + (q.explanation ? `. ${q.explanation}` : "")
+                }
+                label="Read the answer"
+              />
+            </div>
             <div className="mt-1 rounded-md border border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)] p-3 whitespace-pre-wrap">
               {q.correct_answer}
             </div>
@@ -497,6 +692,10 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
             <RichExplanationView data={q.explanation_rich} />
           </div>
         )}
+        {/* Stage 3 — "Tell me more" chain. Shown on every results card
+            so the learner can dig deeper into any question they just
+            saw the answer for, win or lose. */}
+        {q && <TellMeMore questionId={q.id} />}
         {sa.teacher_remark && (
           <div className="rounded-md border border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_10%,transparent)] p-3 text-sm">
             <span className="font-medium">Teacher remark: </span>

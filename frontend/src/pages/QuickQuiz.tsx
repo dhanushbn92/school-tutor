@@ -66,6 +66,14 @@ export function QuickQuizPage() {
   const [mode, setMode] = useState<"single" | "cumulative">("single");
   const [kind, setKind] = useState<QuizKind>("mixed");
   const [selectedChapters, setSelectedChapters] = useState<number[]>([]);
+  // Time-bound is ON by default. Earlier this was opt-in (off by
+  // default) on the theory that self-directed practice should be
+  // relaxed, but learners consistently expected to see a timer the
+  // moment they hit Start — flipping the default removes the
+  // "where's my timer?" confusion. Untick it explicitly for an
+  // open-book / untimed session.
+  const [timed, setTimed] = useState(true);
+  const [duration, setDuration] = useState(15);
 
   const quick = useQuickQuiz();
 
@@ -98,7 +106,34 @@ export function QuickQuizPage() {
         chapter_ids: mode === "cumulative" ? selectedChapters : undefined,
         question_count: DEFAULT_COUNT_BY_KIND[kind],
         kind,
+        // null when the learner left the quiz untimed; an integer
+        // when they want the countdown + auto-submit.
+        duration_minutes: timed ? duration : null,
       });
+      // Belt-and-braces: also stash the chosen duration in localStorage
+      // keyed by the returned assessment id. The take-quiz page reads
+      // this as a fallback when assessment.duration_minutes comes back
+      // null (which can happen if the running backend hasn't reloaded
+      // the QuickQuizRequest schema and silently dropped the field).
+      // Teacher-assigned quizzes — where duration is set server-side
+      // by NewQuiz / from-bank — don't need this; the take page
+      // prefers the server value when it's present.
+      try {
+        if (timed && duration > 0) {
+          window.localStorage.setItem(
+            `dhananjaya:quiz-duration:${created.id}`,
+            String(duration),
+          );
+        } else {
+          // Explicit "untimed" — overwrite any leftover entry so a
+          // re-creation with the same id can't inherit a stale timer.
+          window.localStorage.removeItem(
+            `dhananjaya:quiz-duration:${created.id}`,
+          );
+        }
+      } catch {
+        /* private mode / disabled storage — non-fatal */
+      }
       toast.success("Quiz ready — get started!");
       navigate(`/assessments/${created.id}/take`);
     } catch (err) {
@@ -243,6 +278,45 @@ export function QuickQuizPage() {
                   </p>
                 </div>
               )}
+
+              {/* Time-bound toggle. Off by default for self-directed
+                  practice (a learner should be able to pause and
+                  think); flipping it on enables the take-page
+                  countdown + auto-submit at zero. */}
+              <div className="space-y-1.5 rounded-md border border-(--color-border) p-3">
+                <Label className="flex cursor-pointer items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={timed}
+                    onChange={(e) => setTimed(e.target.checked)}
+                    className="h-4 w-4 rounded border-(--color-input) accent-(--color-primary)"
+                  />
+                  Time-bound — simulate exam conditions
+                </Label>
+                {timed ? (
+                  <div className="flex items-center gap-2 pl-6">
+                    <Label htmlFor="qq-duration" className="text-xs text-(--color-muted-foreground)">
+                      Minutes
+                    </Label>
+                    <input
+                      id="qq-duration"
+                      type="number"
+                      min={1}
+                      max={180}
+                      value={duration}
+                      onChange={(e) => setDuration(Number(e.target.value))}
+                      className="w-20 rounded-md border border-(--color-input) bg-transparent px-2 py-1 text-sm"
+                    />
+                    <span className="text-xs text-(--color-muted-foreground)">
+                      A countdown appears at the top; the quiz auto-submits at zero.
+                    </span>
+                  </div>
+                ) : (
+                  <p className="pl-6 text-xs text-(--color-muted-foreground)">
+                    Untimed — take as long as you like to think through each answer.
+                  </p>
+                )}
+              </div>
 
               <Button
                 type="submit"

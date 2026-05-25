@@ -5,7 +5,6 @@ import {
   ClipboardList,
   Loader2,
   Sparkles,
-  Target,
   TrendingDown,
   TrendingUp,
   Trophy,
@@ -21,7 +20,15 @@ import {
 } from "recharts";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ThemedPage } from "@/components/themed";
-import { StatCard } from "@/components/StatCard";
+import { DashboardHero } from "@/components/DashboardHero";
+import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
+import { PracticeCard } from "@/components/PracticeCard";
+import { LearnerProgressNarrative } from "@/components/LearnerProgressNarrative";
+import { MascotToggleHint } from "@/components/MascotToggleHint";
+import { FamilyNotesCard } from "@/components/FamilyNotesCard";
+import { ParentInviteCard } from "@/components/ParentInviteCard";
+import { AudioSettingsCard } from "@/components/AudioSettingsCard";
+import { AccessibilityCard } from "@/components/AccessibilityCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
 import {
@@ -31,8 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { CognitiveBucket } from "@/lib/types";
-import { BUCKET_LABEL } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -52,7 +57,7 @@ import {
   useStudentTrend,
   useSubjects,
 } from "@/lib/queries";
-import { formatDateTime, formatPercent } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils";
 
 export function LearnerDashboard() {
   const { user } = useAuth();
@@ -67,14 +72,23 @@ export function LearnerDashboard() {
   // Find this user's own Student record (works for both school student + individual)
   const myStudent = studentsQ.data?.find((s) => s.user_id === user?.id);
 
+  // Whole-syllabus mastery (every subject in the class). Powers the
+  // narrative tiles, the strongest + best-place picks, the syllabus
+  // map, the strengths/focus lists, AND the topic mastery heatmap
+  // below — so a learner sees their entire syllabus on the
+  // dashboard, not just one default subject. The cognitive-bucket
+  // picker on the heatmap still works correctly across subjects
+  // (it filters by cognitive_level, not by subject).
   const masteryQ = useStudentMastery({
     student_id: myStudent?.id,
     class_level: section?.class_level ?? undefined,
-    subject_id: subject?.id,
+    // No subject_id — get all subjects.
   });
+  // Score trend across all subjects (no subject_id) so the line
+  // chart reflects the learner's full practice history rather than
+  // just one default subject.
   const trendQ = useStudentTrend({
     student_id: myStudent?.id,
-    subject_id: subject?.id,
   });
   const assessmentsQ = useMyAssessments();
 
@@ -92,11 +106,33 @@ export function LearnerDashboard() {
   }
 
   const summary = masteryQ.data?.summary;
-  const weakest = pickWeakestBucket(summary?.by_bucket);
+  // The four headline stat cards (and the per-bucket "Focus area" tile
+  // that consumed pickWeakestBucket) were retired in Stage 4 in favour
+  // of <LearnerProgressNarrative />. `summary` is still consumed by
+  // the lower strengths/weaknesses lists' empty-state copy.
   const { strengths, weaknesses } = pickOutcomeHighlights(masteryQ.data);
 
   return (
     <ThemedPage>
+      <DashboardHero
+        role="learner"
+        userName={(user?.full_name ?? "").split(/\s+/)[0] || undefined}
+      />
+      {/* The platform's purpose panel — practice ethos + a primary
+          CTA pointing at the next quiz. Sits above the mastery
+          widgets so the practice prompt is unmissable. */}
+      <DashboardPurposePanel role="learner" />
+      {/* "Your practice" card — weekly progress ring + stamp strip.
+          Stage 1 of the child-centric roadmap. */}
+      <PracticeCard />
+      {/* Stage 5 — only renders if the learner has previously turned
+          the Vidyārthi mascot off. Gives them a one-click path back
+          to enabling the companion so the off switch is reversible. */}
+      <MascotToggleHint />
+      {/* Stage 6 — "Notes from family" card. Renders nothing if no
+          undismissed parent encouragements exist, so it stays
+          invisible for learners without a linked parent. */}
+      <FamilyNotesCard />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={
@@ -123,49 +159,19 @@ export function LearnerDashboard() {
         }
       />
 
-      <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Outcomes mastered"
-          value={
-            summary
-              ? `${summary.outcomes_attempted}/${summary.outcomes_total}`
-              : "—"
-          }
-          sub={`${subject?.name ?? "—"} syllabus`}
-          icon={<TrendingUp className="h-5 w-5" />}
-        />
-        <StatCard
-          label="Average mastery"
-          value={formatPercent(summary?.average_mastery)}
-          sub="Across attempted outcomes"
-          icon={<TrendingUp className="h-5 w-5" />}
-          intent="success"
-        />
-        <StatCard
-          label="Focus area"
-          value={weakest ? BUCKET_LABEL[weakest.bucket] : "—"}
-          sub={
-            weakest
-              ? `Lowest at ${Math.round((weakest.mastery ?? 0) * 100)}% — try a ${BUCKET_LABEL[weakest.bucket].toLowerCase()}-heavy quiz`
-              : "Take a few quizzes to see where to focus."
-          }
-          icon={<Target className="h-5 w-5" />}
-          intent={weakest ? "warning" : undefined}
-        />
-        <StatCard
-          label="Quizzes taken"
-          value={trendQ.data?.summary.tests_evaluated ?? 0}
-          sub={
-            trendQ.data?.summary.average_percentage !== null &&
-            trendQ.data?.summary.average_percentage !== undefined
-              ? `Avg score ${trendQ.data.summary.average_percentage}%`
-              : isIndividual
-                ? "Tap Start a quiz to begin."
-                : "Your teacher hasn't assigned one yet."
-          }
-          icon={<ClipboardList className="h-5 w-5" />}
-        />
-      </div>
+      {/* Stage 4 — Story-shaped progress.
+          Replaces the four-card stat row (Outcomes mastered / Average
+          mastery / Focus area / Quizzes taken) with a narrative
+          rendering: three chapter-state tiles + strongest concept +
+          best-place-to-practise + a topic-tree visual. The bare numbers
+          aren't gone — they're folded into the dot grid and the
+          per-chapter "X/Y outcomes mastered" caption, where they
+          finally read as part of a story rather than a report card. */}
+      <LearnerProgressNarrative
+        data={masteryQ.data}
+        subjectName={subject?.name}
+        showPracticeLinks={isIndividual}
+      />
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         <Card>
@@ -276,7 +282,7 @@ export function LearnerDashboard() {
           {masteryQ.data ? (
             <MasteryHeatmap
               title="Topic mastery map"
-              description="How much of the syllabus you've practised so far. Cells fill in as you submit quizzes."
+              description="How much of your whole syllabus you've practised so far. Cells fill in as you submit quizzes."
               view={view}
               headerSlot={
                 <div className="w-48">
@@ -302,7 +308,14 @@ export function LearnerDashboard() {
               chapters={masteryQ.data.chapters.map((ch) => ({
                 chapter_id: ch.chapter_id,
                 chapter_number: ch.chapter_number,
-                chapter_title: ch.chapter_title,
+                // Prefix the chapter title with the subject name so a
+                // multi-subject heatmap row stays readable. Single-
+                // subject classes degrade gracefully — the prefix is
+                // omitted when there's no subject_name (the older
+                // single-subject API shape).
+                chapter_title: ch.subject_name
+                  ? `${ch.subject_name} · ${ch.chapter_title}`
+                  : ch.chapter_title,
                 outcomes: ch.outcomes.map((o) => ({
                   code: o.code,
                   description: o.description,
@@ -433,21 +446,34 @@ export function LearnerDashboard() {
           </Card>
         </div>
       </div>
+
+      {/* Stage 8 — audio / read-aloud settings. Sits with the other
+          "configure once" affordances at the bottom of the dashboard
+          rather than competing with the practice headline. The 🔊
+          button itself appears next to every question text across
+          the app; this card is just where the learner picks the
+          voice + autoplay preference. */}
+      <div className="mt-6">
+        <AudioSettingsCard />
+      </div>
+
+      {/* Stage 10 — accessibility toggles: dyslexia-friendly font,
+          high contrast, larger tap targets, take-a-break nudge.
+          All four are per-device (localStorage) so a phone can
+          have larger targets while the desktop stays normal. */}
+      <div className="mt-6">
+        <AccessibilityCard />
+      </div>
+
+      {/* Stage 6 — invite a parent / guardian. Sits at the bottom of
+          the dashboard rather than competing with the practice
+          headline; it's a "configure once" affordance, not a
+          day-to-day widget. */}
+      <div className="mt-6">
+        <ParentInviteCard />
+      </div>
     </ThemedPage>
   );
-}
-
-function pickWeakestBucket(
-  byBucket:
-    | Record<CognitiveBucket, { outcomes_attempted: number; average_mastery: number | null }>
-    | undefined,
-): { bucket: CognitiveBucket; mastery: number | null } | null {
-  if (!byBucket) return null;
-  const entries = (Object.entries(byBucket) as [CognitiveBucket, { average_mastery: number | null }][])
-    .filter(([, v]) => v.average_mastery !== null)
-    .sort((a, b) => (a[1].average_mastery ?? 1) - (b[1].average_mastery ?? 1));
-  if (entries.length === 0) return null;
-  return { bucket: entries[0][0], mastery: entries[0][1].average_mastery };
 }
 
 interface OutcomeHighlight {

@@ -8,10 +8,15 @@ import { RequireRole } from "@/components/layout/RequireRole";
 import { LoginPage } from "@/pages/Login";
 import { SignupSchoolPage } from "@/pages/SignupSchool";
 import { SignupIndividualPage } from "@/pages/SignupIndividual";
+import { SignupParentPage } from "@/pages/SignupParent";
 import { ManageSchoolPage } from "@/pages/ManageSchool";
 import { DashboardPage } from "@/pages/Dashboard";
 import { TakeAssessmentPage } from "@/pages/TakeAssessment";
 import { QuickQuizPage } from "@/pages/QuickQuiz";
+import { StampBookPage } from "@/pages/StampBook";
+import { MyMistakesPage } from "@/pages/MyMistakes";
+import { PracticePage } from "@/pages/Practice";
+import { FlashcardsPage } from "@/pages/Flashcards";
 import { SectionsPage } from "@/pages/Sections";
 import { SectionDetailPage } from "@/pages/SectionDetail";
 import { StudentDetailPage } from "@/pages/StudentDetail";
@@ -56,6 +61,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup-school" element={<SignupSchoolPage />} />
             <Route path="/signup-individual" element={<SignupIndividualPage />} />
+            <Route path="/signup-parent" element={<SignupParentPage />} />
             <Route
               path="/"
               element={
@@ -91,6 +97,38 @@ export default function App() {
                 element={
                   <RequireRole allowed={["individual_learner", "student"]}>
                     <QuickQuizPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="me/stamps"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <StampBookPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="me/mistakes"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <MyMistakesPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="practice"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <PracticePage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="practice/flashcards"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <FlashcardsPage />
                   </RequireRole>
                 }
               />

@@ -29,7 +29,7 @@ placeholders at the top:
 
 ```bash
 PROJECT_ID="school-tuter-prod"
-GITHUB_REPO="dhanushbn92/school-tutor"   # owner/repo
+GITHUB_REPO="dhanushbn92/school-tuter"   # owner/repo
 WIF_POOL="github-pool"
 WIF_PROVIDER="github"
 
@@ -141,7 +141,7 @@ You can paste these in any order. Names must match exactly.
 | `GCS_BUCKET`                     | Artifact bucket | e.g. `school-tuter-artifacts` |
 | `DATABASE_URL`                   | Production Postgres | `postgresql+psycopg://USER:PASS@HOST:5432/DB?sslmode=require` |
 | `JWT_SECRET`                     | Long random string | Same value the running service uses today |
-| `ALLOWED_ORIGINS`                | Frontend URLs | `https://school-tuter.web.app,https://school-tuter.firebaseapp.com` |
+| `ALLOWED_ORIGINS`                | Frontend URLs | `https://school-tuter.web.app,https://school-tuter.firebaseapp.com,https://school-tutor-hub.web.app,https://school-tutor-hub.firebaseapp.com` |
 | `LLM_PROVIDER`                   | `anthropic`, `groq`, or `openai` |  |
 | `ANTHROPIC_API_KEY`              | If using Anthropic | Otherwise leave blank |
 | `GROQ_API_KEY`                   | If using Groq |  |

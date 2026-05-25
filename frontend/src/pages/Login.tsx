@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { GraduationCap, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
+import { BRAND_NAME } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -45,9 +47,9 @@ export function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-(--color-muted) p-6">
-      <div className="mb-6 flex items-center gap-2 text-(--color-foreground)">
-        <GraduationCap className="h-7 w-7 text-(--color-primary)" />
-        <span className="text-lg font-semibold tracking-tight">School Tuter</span>
+      <div className="mb-6 flex items-center gap-2.5 text-(--color-foreground)">
+        <BrandLogo size={36} />
+        <span className="text-lg font-semibold tracking-tight">{BRAND_NAME}</span>
       </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
@@ -109,6 +111,15 @@ export function LoginPage() {
                   className="text-(--color-primary) underline-offset-4 hover:underline"
                 >
                   Onboard your school
+                </a>
+              </p>
+              <p>
+                Parent / guardian?{" "}
+                <a
+                  href="/signup-parent"
+                  className="text-(--color-primary) underline-offset-4 hover:underline"
+                >
+                  Sign up with an invite code
                 </a>
               </p>
               <p>Trouble signing in? Contact your school administrator.</p>
