@@ -44,6 +44,7 @@ import { BLOOM_TO_BUCKET, BUCKET_LABEL } from "@/lib/types";
 import { cn, formatMarks } from "@/lib/utils";
 import { RichExplanationView } from "@/components/RichExplanation";
 import { TellMeMore } from "@/components/TellMeMore";
+import { useMascot } from "@/lib/mascotContext";
 
 const BUCKET_ORDER: CognitiveBucket[] = ["FACTUAL", "UNDERSTANDING", "APPLICATION"];
 
@@ -78,6 +79,7 @@ export function TakeAssessmentPage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const submitMut = useSubmitAssessment();
   const [submission, setSubmission] = useState<Submission | null>(null);
+  const mascot = useMascot();
 
   // If the learner already has a submission for this assessment, load it so
   // we render the results view immediately (no re-take attempt).
@@ -183,6 +185,19 @@ export function TakeAssessmentPage() {
           ? `Submitted — review your subjective answers below`
           : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
       );
+      // Stage 5 — mascot reaction on submission. VICTORY pose for a
+      // perfect score, plain FIRES for anything below perfect (the
+      // arrow still hit the target — there's something to celebrate).
+      const perfect =
+        sub.total_awarded !== null &&
+        sub.max_marks > 0 &&
+        sub.total_awarded >= sub.max_marks;
+      mascot.reactWith(perfect ? "VICTORY" : "FIRES", {
+        message: perfect
+          ? "Bullseye! Every mark earned."
+          : `Arrow's in. ${sub.total_awarded}/${sub.max_marks} this round.`,
+        autoResetMs: 6000,
+      });
       // Clear the persisted start time so a future re-open doesn't race
       // a fresh countdown against the existing submission.
       clearTimer();
@@ -190,6 +205,29 @@ export function TakeAssessmentPage() {
       toast.error(humanError(err));
     }
   }
+
+  // Stage 5 — mascot mood follows quiz progress. Set DRAWN while the
+  // learner is mid-quiz. The submit handler itself transitions to
+  // FIRES / VICTORY; this effect intentionally skips that case so a
+  // dep-change-driven cleanup can't stomp on the celebration mood.
+  useEffect(() => {
+    if (assessmentQ.data && !submission && !submitMut.isPending) {
+      mascot.reactWith("DRAWN", { message: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assessmentQ.data, submission, submitMut.isPending]);
+
+  // Unmount-only cleanup. Splitting this from the mood-setting effect
+  // matters: if the cleanup lived in the effect above, every
+  // dependency change would reset the mascot — including the
+  // submission-just-landed render, which would erase the FIRES /
+  // VICTORY mood that handleSubmit just set.
+  useEffect(() => {
+    return () => {
+      mascot.reset();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-submit when the timer hits zero. Runs only if (a) the quiz is
   // time-bound, (b) it hasn't fired yet, (c) the user hasn't already

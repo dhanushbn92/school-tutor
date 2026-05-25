@@ -18,8 +18,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/BrandLogo";
+import { MascotCompanion } from "@/components/MascotCompanion";
 import { useAuth } from "@/lib/auth";
 import { useMySchool } from "@/lib/queries";
+import { MascotProvider } from "@/lib/MascotProvider";
 import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/lib/types";
@@ -150,7 +152,16 @@ export function Shell() {
           </div>
         </header>
         <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">
-          <Outlet />
+          {/* Stage 5 — wrap the entire learner-facing page tree in
+              the MascotProvider so any page can dispatch reactions
+              through useMascot(). The provider is cheap (a single
+              useState + memo) so we mount it unconditionally for all
+              roles; MascotCompanion itself gates the actual render
+              to learner roles only. */}
+          <MascotProvider>
+            <Outlet />
+            <MascotCompanion />
+          </MascotProvider>
         </main>
       </div>
     </div>

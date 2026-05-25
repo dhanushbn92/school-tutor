@@ -24,6 +24,7 @@ import { Empty } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { TellMeMore } from "@/components/TellMeMore";
 import { useMyMistakes, useRetryMistake } from "@/lib/queries";
+import { useMascot } from "@/lib/mascotContext";
 import type { LearnerMistakeEntry, MistakeRetryResult } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 
@@ -106,6 +107,7 @@ export function MyMistakesPage() {
  *  on each other. */
 function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
   const retry = useRetryMistake();
+  const mascot = useMascot();
   const [answer, setAnswer] = useState<string>("");
   const [verdict, setVerdict] = useState<MistakeRetryResult | null>(null);
 
@@ -124,7 +126,31 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
     retry.mutate(
       { question_id: entry.question_id, answer_text: text },
       {
-        onSuccess: (res) => setVerdict(res),
+        onSuccess: (res) => {
+          setVerdict(res);
+          // Stage 5 — mascot reactions for the retry verdict.
+          // - resolved (two-right-in-a-row) → VICTORY: the mistake is
+          //   cleared off the list, the biggest celebration of the page
+          // - correct (first right, not yet resolved) → FIRES: arrow's
+          //   on target
+          // - wrong → RESTRING: encouraging "nock it again" pose
+          if (res.resolved) {
+            mascot.reactWith("VICTORY", {
+              message: "Cleared! That mistake is off your list.",
+              autoResetMs: 7000,
+            });
+          } else if (res.correct) {
+            mascot.reactWith("FIRES", {
+              message: "Right! One more in a row and it's gone.",
+              autoResetMs: 6000,
+            });
+          } else {
+            mascot.reactWith("RESTRING", {
+              message: "Same question, fresh try — that's how mastery is built.",
+              autoResetMs: 6000,
+            });
+          }
+        },
       },
     );
   }

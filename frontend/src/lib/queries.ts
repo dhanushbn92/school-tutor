@@ -736,6 +736,44 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
   });
 }
 
+/* ---------- Vidyārthi mascot (Stage 5 of child-centric roadmap) ---------- */
+
+export interface MascotState {
+  enabled: boolean;
+  current_outfit: string;
+  available_outfits: string[];
+}
+
+/** Per-learner mascot preferences. The mascot itself reads `enabled`
+ *  and `current_outfit` from this query before rendering anything. */
+export function useMascotState() {
+  return useQuery({
+    queryKey: ["me", "mascot"],
+    queryFn: async () => {
+      const { data } = await api.get<MascotState>("/me/mascot");
+      return data;
+    },
+    // Mascot is a UI-affordance read; refetch on focus would be
+    // distracting (mascot popping back in mid-quiz). Use a long
+    // staleTime so a tab switch doesn't bounce it.
+    staleTime: 5 * 60_000,
+  });
+}
+
+/** Toggle the mascot on/off or equip a different outfit. */
+export function useUpdateMascot() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<Pick<MascotState, "enabled" | "current_outfit">>) => {
+      const { data } = await api.patch<MascotState>("/me/mascot", payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(["me", "mascot"], data);
+    },
+  });
+}
+
 /* ---------- "Tell me more" chain (Stage 3 of child-centric roadmap) ---------- */
 
 /** Lazy-fetch one tier of extended explanation for a question. Returns

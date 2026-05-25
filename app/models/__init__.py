@@ -27,6 +27,7 @@ from app.models.generation import GeneratedContent, GeneratedContentStatus, Gene
 from app.models.intervention import InterventionNote
 from app.models.learner_practice import (
     LearnerLoginDay,
+    LearnerMascotState,
     LearnerMistake,
     LearnerPointsLedger,
     LearnerStamp,
@@ -71,6 +72,7 @@ __all__ = [
     "GeneratedContentType",
     "InterventionNote",
     "LearnerLoginDay",
+    "LearnerMascotState",
     "LearnerMistake",
     "LearnerPointsLedger",
     "LearnerStamp",

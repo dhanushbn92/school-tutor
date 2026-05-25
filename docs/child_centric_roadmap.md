@@ -32,8 +32,8 @@ not the execution order.
 | 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | ✅ Shipped 2026-05-25 |
 | 3 | "Why?" — tell-me-more chain on every explanation | 6 | ✅ Shipped 2026-05-25 |
 | 4 | Story-shaped progress for learners (replace bare numbers) | 2 | ✅ Shipped 2026-05-25 |
-| 5 | Vidyārthi mascot reactions throughout the app | 1 | **Up next** |
-| 6 | Parent / guardian view | 9 | Planned |
+| 5 | Vidyārthi mascot reactions throughout the app | 1 | ✅ Shipped 2026-05-26 |
+| 6 | Parent / guardian view | 9 | **Up next** |
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | Planned |
 | 8 | Audio support — read-aloud everywhere | 5 | Planned |
 | 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | Planned |
@@ -425,6 +425,55 @@ by making the mascot react to the child's progress.
 **Frontend**
 - New `<MascotCompanion />` component, mountable per page.
 - Reuses the existing brand palette + arrow path.
+
+### What shipped
+- Migration `20260526_0027`: `learner_mascot_state(user_id,
+  enabled, current_outfit)` — lazy-created on first GET.
+- `GET /me/mascot` + `PATCH /me/mascot` — toggle visibility or
+  equip an outfit. Learner-role-gated.
+- `<MascotCompanion />` — pinned bottom-right, hidden for
+  non-learners. Self-contained SVG: head + kurta + bow, five poses
+  toggled by mood. CSS-keyframe breathing animation per pose so
+  the figure feels alive without burning the main thread.
+- Mascot state machine (`mascotContext.ts` + `MascotProvider.tsx`):
+  - `IDLE` — default, gentle breathing
+  - `DRAWN` — bow drawn, focused (while taking a quiz)
+  - `FIRES` — arrow flies; correct answer / submission
+  - `RESTRING` — bow lowered, wobble; wrong retry
+  - `VICTORY` — bow overhead with confetti dots; perfect score /
+    cleared mistake
+- Speech bubble overlay with context-appropriate one-liners:
+  - "Bullseye! Every mark earned." (perfect quiz)
+  - "Same question, fresh try — that's how mastery is built."
+    (wrong retry)
+  - "Cleared! That mistake is off your list." (resolved mistake)
+- Three layers of visibility control:
+  1. Role gating — mounts only for student / individual_learner
+  2. Server-side `enabled` flag — persists across devices, toggled
+     via the small "Turn off Vidyārthi" link
+  3. Session × button — quiets the mascot until next reload
+     without hitting the server (a friendly "I want quiet now")
+- Wired reactions into TakeAssessment (DRAWN mid-quiz, VICTORY on
+  perfect submission, FIRES otherwise) and MyMistakes retry
+  verdicts (VICTORY on resolved, FIRES on correct-not-yet-resolved,
+  RESTRING on wrong).
+
+**Out of scope for Stage 5 (deliberately deferred)**
+- Outfit unlocks — the `current_outfit` column + endpoint payload
+  are forward-compatible (any new outfit value can be added without
+  a migration) but only "default" is shipped. Multiple outfits
+  multiply asset count (5 poses × N outfits) and benefit from real
+  illustration work rather than geometric placeholders.
+- Mascot reactions on the dashboard / heatmap milestones — current
+  code triggers on quiz / retry events only.
+
+### Deployment note (Stage 5)
+Run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+The mascot is opt-out, not opt-in — existing learners get
+`enabled=True` on first `GET /me/mascot`.
 
 ---
 

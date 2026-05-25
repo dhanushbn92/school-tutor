@@ -24,6 +24,7 @@ from enum import StrEnum
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     Date,
     DateTime,
     ForeignKey,
@@ -207,6 +208,38 @@ class PointsSource(StrEnum):
     PERFECT_SCORE_BONUS = "PERFECT_SCORE_BONUS"
     PRACTICE_DAY_BONUS = "PRACTICE_DAY_BONUS"
     WEEKLY_GOAL_BONUS = "WEEKLY_GOAL_BONUS"
+
+
+class LearnerMascotState(Base):
+    """Per-learner state for the Vidyārthi mascot companion (Stage 5).
+
+    Lazily created — the first GET /me/mascot for a learner inserts a
+    row with `enabled=True` and `current_outfit='default'`. Toggling
+    visibility or equipping a new outfit updates the same row.
+
+    `current_outfit` is a free-form string for forward-compatibility:
+    new outfits can be shipped as a config change without a
+    migration. Until the unlock pipeline ships in a follow-up, only
+    "default" is a valid value.
+    """
+
+    __tablename__ = "learner_mascot_state"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_learner_mascot_user"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    current_outfit: Mapped[str] = mapped_column(String(40), default="default")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
 
 class LearnerPointsLedger(Base):

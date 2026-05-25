@@ -11,6 +11,7 @@ from app.auth.dependencies import (
     require_teacher_or_school_admin,
 )
 from app.db.session import get_db
+from app.models import LearnerMascotState
 from app.models.assessment import (
     Assessment,
     AssessmentQuestion,
@@ -483,3 +484,81 @@ def retry_my_mistake(
         "consecutive_corrects": result.consecutive_corrects,
         "resolved": result.resolved,
     }
+
+
+# ---------- Vidyārthi mascot — Stage 5 of the child-centric roadmap ----------
+#
+# Per-learner mascot state: enabled + current outfit. The frontend
+# uses `enabled` to decide whether to render the companion at all,
+# and `current_outfit` to pick the SVG variant. Lazily created on
+# first GET so existing learners don't need a backfill.
+
+
+# Valid outfit identifiers. Forward-compatible — adding "monsoon-kurta"
+# is a one-line edit + new SVG variant, no migration. Until the
+# unlock pipeline ships in a follow-up, only "default" is allowed.
+_VALID_OUTFITS: set[str] = {"default"}
+
+
+class MascotUpdate(BaseModel):
+    enabled: bool | None = None
+    current_outfit: str | None = Field(default=None, max_length=40)
+
+
+def _serialize_mascot(state: LearnerMascotState) -> dict:
+    return {
+        "enabled": state.enabled,
+        "current_outfit": state.current_outfit,
+        "available_outfits": sorted(_VALID_OUTFITS),
+    }
+
+
+@router.get("/mascot")
+def get_my_mascot(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    state = db.scalar(
+        select(LearnerMascotState).where(LearnerMascotState.user_id == user.id)
+    )
+    if state is None:
+        # Lazy-create on first read so existing learners get the
+        # default state without a backfill migration. Default to
+        # enabled — the mascot is opt-out, not opt-in.
+        state = LearnerMascotState(
+            user_id=user.id, enabled=True, current_outfit="default"
+        )
+        db.add(state)
+        db.commit()
+        db.refresh(state)
+    return _serialize_mascot(state)
+
+
+@router.patch("/mascot")
+def update_my_mascot(
+    payload: MascotUpdate,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    if payload.current_outfit is not None and payload.current_outfit not in _VALID_OUTFITS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown outfit {payload.current_outfit!r}. "
+            f"Valid: {sorted(_VALID_OUTFITS)}.",
+        )
+    state = db.scalar(
+        select(LearnerMascotState).where(LearnerMascotState.user_id == user.id)
+    )
+    if state is None:
+        state = LearnerMascotState(
+            user_id=user.id, enabled=True, current_outfit="default"
+        )
+        db.add(state)
+        db.flush()
+    if payload.enabled is not None:
+        state.enabled = payload.enabled
+    if payload.current_outfit is not None:
+        state.current_outfit = payload.current_outfit
+    db.commit()
+    db.refresh(state)
+    return _serialize_mascot(state)
