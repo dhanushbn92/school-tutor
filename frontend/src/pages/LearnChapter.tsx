@@ -14,6 +14,8 @@ import {
   Eye,
   EyeOff,
   FileText,
+  RotateCcw,
+  XCircle,
   GraduationCap,
   Layers,
   Lightbulb,
@@ -32,6 +34,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ThemedSection, ThemedTitleMark } from "@/components/themed";
 import { MindMap } from "@/components/MindMap";
 import { FlowDiagram } from "@/components/FlowDiagram";
@@ -1883,15 +1887,34 @@ export function LessonPlanView({ plan }: { plan: LessonPlanOutput }) {
  * TRUE_FALSE options render as a labelled list; the correct option gets a
  * subtle highlight when answers are revealed.
  */
+/**
+ * Worksheet rendered as a small interactive practice surface.
+ *
+ * Each question is editable in place: students click an option (MCQ /
+ * TRUE_FALSE), type their answer (FILL_BLANK, SHORT_ANSWER,
+ * LONG_ANSWER, CASE_BASED), and tap "Check answer" to see the verdict
+ * alongside the model answer + explanation. A separate "Show answer"
+ * path stays available for the "I just want to see it" case.
+ *
+ * State is per-question:
+ *   - `attempt[i]`  the learner's current input (string)
+ *   - `checked[i]`  true once they've checked → reveals verdict
+ *   - `revealed[i]` true if they tapped "Show answer" without
+ *                   attempting → reveals the answer with no verdict
+ *
+ * The "Show / hide all answers" master button at the top now flips
+ * the `revealed` bit en masse for the read-only path; it does NOT
+ * touch `attempt` or `checked` so a learner's typed answers survive
+ * a reveal-all toggle.
+ */
 export function WorksheetView({ worksheet }: { worksheet: WorksheetOutput }) {
-  // Two layers of state: a per-question reveal map plus a master "show all"
-  // bit. The master sets the per-question map in one shot rather than
-  // overriding it at render time, so individual toggles still work after
-  // the master flips.
+  const [attempt, setAttempt] = useState<Record<number, string>>({});
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
+
   const allRevealed =
     worksheet.questions.length > 0 &&
-    worksheet.questions.every((_, i) => revealed[i]);
+    worksheet.questions.every((_, i) => revealed[i] || checked[i]);
 
   function toggleAll() {
     if (allRevealed) {
@@ -1904,8 +1927,22 @@ export function WorksheetView({ worksheet }: { worksheet: WorksheetOutput }) {
       setRevealed(all);
     }
   }
-  function toggleOne(i: number) {
-    setRevealed((prev) => ({ ...prev, [i]: !prev[i] }));
+
+  function setAttemptFor(i: number, v: string) {
+    setAttempt((prev) => ({ ...prev, [i]: v }));
+    // Editing the attempt invalidates the verdict — they're trying again.
+    setChecked((prev) => ({ ...prev, [i]: false }));
+  }
+  function checkAnswer(i: number) {
+    setChecked((prev) => ({ ...prev, [i]: true }));
+  }
+  function showAnswer(i: number) {
+    setRevealed((prev) => ({ ...prev, [i]: true }));
+  }
+  function resetOne(i: number) {
+    setAttempt((prev) => ({ ...prev, [i]: "" }));
+    setChecked((prev) => ({ ...prev, [i]: false }));
+    setRevealed((prev) => ({ ...prev, [i]: false }));
   }
 
   return (
@@ -1947,8 +1984,13 @@ export function WorksheetView({ worksheet }: { worksheet: WorksheetOutput }) {
             key={i}
             index={i + 1}
             question={q}
+            attempt={attempt[i] ?? ""}
+            checked={!!checked[i]}
             revealed={!!revealed[i]}
-            onToggle={() => toggleOne(i)}
+            onAttemptChange={(v) => setAttemptFor(i, v)}
+            onCheck={() => checkAnswer(i)}
+            onShow={() => showAnswer(i)}
+            onReset={() => resetOne(i)}
           />
         ))}
       </CardContent>
@@ -1956,20 +1998,69 @@ export function WorksheetView({ worksheet }: { worksheet: WorksheetOutput }) {
   );
 }
 
+/**
+ * One worksheet question rendered as an interactive practice card.
+ *
+ * The render switches on `question.type`:
+ *   - MCQ / TRUE_FALSE → clickable option list (radio semantics).
+ *   - FILL_BLANK → single-line text input.
+ *   - SHORT_ANSWER / LONG_ANSWER / CASE_BASED → multi-line textarea
+ *     (rows scale with expected answer length).
+ *
+ * Verdict logic
+ *   For objective types (MCQ / TRUE_FALSE / FILL_BLANK) we can
+ *   auto-grade by comparing the attempt to `question.answer`
+ *   (case-insensitive, trimmed for FILL_BLANK). For subjective
+ *   types we cannot grade reliably, so we just show the model answer
+ *   side-by-side and let the learner self-evaluate.
+ */
 function WorksheetQuestionCard({
   index,
   question,
+  attempt,
+  checked,
   revealed,
-  onToggle,
+  onAttemptChange,
+  onCheck,
+  onShow,
+  onReset,
 }: {
   index: number;
   question: WorksheetQuestion;
+  attempt: string;
+  checked: boolean;
   revealed: boolean;
-  onToggle: () => void;
+  onAttemptChange: (v: string) => void;
+  onCheck: () => void;
+  onShow: () => void;
+  onReset: () => void;
 }) {
   const isMcq = question.type === "MCQ";
   const isTrueFalse = question.type === "TRUE_FALSE";
-  const showOptions = (isMcq || isTrueFalse) && (question.options?.length ?? 0) > 0;
+  const isFillBlank = question.type === "FILL_BLANK";
+  const isShortAnswer = question.type === "SHORT_ANSWER";
+  const isLongAnswer = question.type === "LONG_ANSWER";
+  const isCaseBased = question.type === "CASE_BASED";
+  const hasOptions = (isMcq || isTrueFalse) && (question.options?.length ?? 0) > 0;
+  // Objective types can be auto-graded by string comparison. Anything
+  // else needs side-by-side comparison with the model answer.
+  const isObjective = isMcq || isTrueFalse || isFillBlank;
+
+  // Verdict (only valid when `checked` is true and the type is
+  // objective). FILL_BLANK comparison is case-insensitive + trimmed
+  // because spelling variation shouldn't be the difference between
+  // "I knew it" and "I didn't".
+  const normalisedAttempt = attempt.trim();
+  const normalisedAnswer = question.answer.trim();
+  const isCorrect =
+    isObjective &&
+    (isFillBlank
+      ? normalisedAttempt.toLowerCase() === normalisedAnswer.toLowerCase()
+      : normalisedAttempt === normalisedAnswer);
+  const hasAttempt = normalisedAttempt.length > 0;
+  // The model answer is shown once the learner has either checked
+  // their answer or asked to see it directly.
+  const showAnswerPanel = checked || revealed;
 
   return (
     <div className="rounded-md border border-(--color-border) bg-(--color-card) p-3 text-sm">
@@ -1984,63 +2075,166 @@ function WorksheetQuestionCard({
             <Badge variant="outline">{question.outcome_code}</Badge>
           )}
         </div>
-        <Button size="sm" variant="ghost" onClick={onToggle}>
-          {revealed ? (
-            <>
-              <EyeOff className="h-3.5 w-3.5" /> Hide answer
-            </>
-          ) : (
-            <>
-              <Eye className="h-3.5 w-3.5" /> Show answer
-            </>
+        <div className="flex items-center gap-2">
+          {/* Verdict badge — only after Check on objective types. */}
+          {checked && isObjective && hasAttempt && (
+            isCorrect ? (
+              <Badge variant="success" className="gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Correct
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="gap-1">
+                <XCircle className="h-3 w-3" /> Try again
+              </Badge>
+            )
           )}
-        </Button>
+          {checked && !isObjective && (
+            <Badge variant="outline" className="gap-1">
+              Self-review
+            </Badge>
+          )}
+        </div>
       </div>
       <div className="mt-2 font-medium leading-snug">
         Q{index}. {question.question}
       </div>
 
-      {showOptions && (
-        <ul className="mt-2 space-y-1">
+      {/* --- INPUT SECTION ----------------------------------------- */}
+      {hasOptions && (
+        <ul className="mt-3 space-y-1.5">
           {question.options!.map((opt, j) => {
-            const isCorrect = revealed && opt === question.answer;
+            const selected = attempt === opt;
+            const isAnswerKey = opt === question.answer;
+            // Highlight green only if (a) we've checked or revealed
+            // AND (b) the option is the correct one. Selected-but-
+            // wrong gets a red border to make the mistake legible.
+            const showAsCorrect = showAnswerPanel && isAnswerKey;
+            const showAsWrong =
+              checked && selected && !isAnswerKey;
             return (
-              <li
-                key={j}
-                className={cn(
-                  "flex items-start gap-2 rounded-md border px-3 py-1.5 text-sm",
-                  isCorrect
-                    ? "border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)]"
-                    : "border-(--color-border)",
-                )}
-              >
-                <span className="font-mono text-xs text-(--color-muted-foreground)">
-                  {String.fromCharCode(65 + j)}.
-                </span>
-                <span>{opt}</span>
-                {isCorrect && (
-                  <Badge variant="success" className="ml-auto">
-                    Correct
-                  </Badge>
-                )}
+              <li key={j}>
+                <label
+                  className={cn(
+                    "flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2 text-sm transition-colors",
+                    showAsCorrect &&
+                      "border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_10%,transparent)]",
+                    showAsWrong &&
+                      "border-(--color-destructive) bg-[color-mix(in_oklab,var(--color-destructive)_8%,transparent)]",
+                    !showAsCorrect && !showAsWrong && selected &&
+                      "border-(--color-primary) bg-[color-mix(in_oklab,var(--color-primary)_8%,transparent)]",
+                    !showAsCorrect && !showAsWrong && !selected &&
+                      "border-(--color-border) hover:bg-(--color-muted)",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name={`ws-q-${index}`}
+                    value={opt}
+                    checked={selected}
+                    onChange={(e) => onAttemptChange(e.target.value)}
+                    className="h-4 w-4 accent-(--color-primary)"
+                  />
+                  <span className="font-mono text-xs text-(--color-muted-foreground)">
+                    {String.fromCharCode(65 + j)}.
+                  </span>
+                  <span className="flex-1">{opt}</span>
+                  {showAsCorrect && (
+                    <Badge variant="success" className="ml-auto">
+                      Correct answer
+                    </Badge>
+                  )}
+                </label>
               </li>
             );
           })}
         </ul>
       )}
+      {isFillBlank && (
+        <div className="mt-3 space-y-1.5">
+          <Label htmlFor={`ws-input-${index}`} className="sr-only">
+            Your answer
+          </Label>
+          <Input
+            id={`ws-input-${index}`}
+            value={attempt}
+            placeholder="Type your answer…"
+            onChange={(e) => onAttemptChange(e.target.value)}
+            className={cn(
+              checked && hasAttempt && isCorrect &&
+                "border-(--color-success) focus-visible:ring-(--color-success)",
+              checked && hasAttempt && !isCorrect &&
+                "border-(--color-destructive) focus-visible:ring-(--color-destructive)",
+            )}
+          />
+        </div>
+      )}
+      {(isShortAnswer || isLongAnswer || isCaseBased) && (
+        <div className="mt-3 space-y-1.5">
+          <Label htmlFor={`ws-input-${index}`} className="sr-only">
+            Your answer
+          </Label>
+          <textarea
+            id={`ws-input-${index}`}
+            value={attempt}
+            placeholder="Type your answer…"
+            onChange={(e) => onAttemptChange(e.target.value)}
+            rows={isShortAnswer ? 3 : isLongAnswer ? 6 : 7}
+            className="flex w-full rounded-md border border-(--color-input) bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-(--color-muted-foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)"
+          />
+        </div>
+      )}
 
-      {revealed && (
+      {/* --- ACTION ROW -------------------------------------------- */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {!checked && !revealed && (
+          <Button
+            size="sm"
+            onClick={onCheck}
+            disabled={!hasAttempt}
+            // Subtle "fill it in first" cue — disabled when there's
+            // nothing to check.
+          >
+            <CheckCircle2 className="h-3.5 w-3.5" /> Check answer
+          </Button>
+        )}
+        {!revealed && (
+          <Button size="sm" variant="outline" onClick={onShow}>
+            <Eye className="h-3.5 w-3.5" /> Show answer
+          </Button>
+        )}
+        {(checked || revealed) && (
+          <Button size="sm" variant="ghost" onClick={onReset}>
+            <RotateCcw className="h-3.5 w-3.5" /> Try again
+          </Button>
+        )}
+      </div>
+
+      {/* --- ANSWER PANEL ------------------------------------------ */}
+      {showAnswerPanel && (
         <div className="mt-3 space-y-2">
-          {/* For MCQ/TF the option highlight already shows the answer; only
-              non-option types need a dedicated answer panel. */}
-          {!showOptions && (
+          {/* For MCQ/TF the option highlight already shows the answer;
+              only non-option types need a dedicated answer panel. */}
+          {!hasOptions && (
             <div>
               <div className="text-[11px] uppercase tracking-wide text-(--color-muted-foreground)">
-                Answer
+                {isObjective ? "Correct answer" : "Model answer"}
               </div>
-              <div className="mt-1 rounded-md border border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)] p-3 whitespace-pre-wrap">
+              <div
+                className={cn(
+                  "mt-1 rounded-md p-3 whitespace-pre-wrap",
+                  isObjective
+                    ? "border border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)]"
+                    : "border border-(--color-primary)/40 bg-[color-mix(in_oklab,var(--color-primary)_6%,transparent)]",
+                )}
+              >
                 {question.answer}
               </div>
+              {!isObjective && checked && hasAttempt && (
+                <p className="mt-2 text-xs text-(--color-muted-foreground)">
+                  Compare your answer to the model and note what was
+                  missing — that comparison is the practice.
+                </p>
+              )}
             </div>
           )}
           {question.explanation && (
