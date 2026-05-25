@@ -27,6 +27,7 @@ import { LearnerProgressNarrative } from "@/components/LearnerProgressNarrative"
 import { MascotToggleHint } from "@/components/MascotToggleHint";
 import { FamilyNotesCard } from "@/components/FamilyNotesCard";
 import { ParentInviteCard } from "@/components/ParentInviteCard";
+import { AudioSettingsCard } from "@/components/AudioSettingsCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
 import {
@@ -427,6 +428,16 @@ export function LearnerDashboard() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Stage 8 — audio / read-aloud settings. Sits with the other
+          "configure once" affordances at the bottom of the dashboard
+          rather than competing with the practice headline. The 🔊
+          button itself appears next to every question text across
+          the app; this card is just where the learner picks the
+          voice + autoplay preference. */}
+      <div className="mt-6">
+        <AudioSettingsCard />
       </div>
 
       {/* Stage 6 — invite a parent / guardian. Sits at the bottom of

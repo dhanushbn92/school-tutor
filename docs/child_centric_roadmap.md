@@ -35,8 +35,8 @@ not the execution order.
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | ✅ Shipped 2026-05-26 |
 | 6 | Parent / guardian view | 9 | ✅ Shipped 2026-05-26 |
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | ✅ Shipped 2026-05-26 |
-| 8 | Audio support — read-aloud everywhere | 5 | **Up next** |
-| 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | Planned |
+| 8 | Audio support — read-aloud everywhere | 5 | ✅ Shipped 2026-05-26 |
+| 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | **Up next** |
 | 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | Planned |
 
 ### Cadence
@@ -684,6 +684,66 @@ done once the question surfaces are stable.
 **Frontend**
 - New `<ReadAloudButton text={...} lang={...} />` component.
 - Sprinkled in every text-rendering site.
+
+### What shipped
+- Migration `20260526_0030` — `learner_audio_preferences(user_id,
+  autoplay_questions, preferred_voice_uri)`. Lazy-created on first
+  GET so existing accounts don't need a backfill.
+- `GET /me/audio-preferences` + `PATCH /me/audio-preferences` —
+  toggle autoplay or pick a voice. Learner-role-gated.
+- `frontend/src/lib/speech.ts` — pure utilities around
+  `window.speechSynthesis`:
+  - `isSpeechAvailable()` — feature detect.
+  - `useVoices()` — reactive voice list (handles Chrome's async
+    `voiceschanged` event).
+  - `pickVoice(voices, lang, preferredUri)` — voice resolver with
+    sensible fallbacks (exact URI -> exact lang -> lang family ->
+    system default).
+  - `useSpeech({lang, voiceUri})` — imperative speak/stop with
+    auto-cancel on unmount and rate=0.95 (slightly slower for
+    younger learners).
+- `<ReadAloudButton text lang autoStart size label />` — drops in
+  next to any text. Renders nothing on browsers without
+  SpeechSynthesis support (some older Android). Toggles between
+  Volume2 / Pause icons; click toggles play / stop.
+- `<AudioSettingsCard />` on the learner dashboard — voice picker
+  (browser voices grouped by lang), autoplay toggle, "Test voice"
+  button that reads a short sample sentence.
+- ReadAloudButton wired into:
+  - **TakeAssessment** — every results-card question + correct
+    answer + explanation.
+  - **MyMistakes** — question text + retry verdict's correct
+    answer + explanation.
+  - **TellMeMore** — every revealed tier (deeper / analogy /
+    example) is read-aloud-able.
+  - **Surprise me** — question + answer reveal (honours autoplay).
+  - **Flashcards** — question side + answer side (autoplay fires
+    on each new card when enabled).
+- Autoplay support — surfaces that benefit from it (Surprise me
+  reveal, each Flashcard front) read `prefs.autoplay_questions`
+  and pass it as `autoStart`. Busy surfaces (TakeAssessment mid-
+  quiz) deliberately don't autoplay even when the toggle is on.
+
+**Out of scope for Stage 8 (deliberately deferred)**
+- "Listen + repeat" mode (`SpeechRecognition` API). Browser
+  support is patchy (Chrome-only, requires HTTPS, microphone
+  permission flows). When it lands we can add it behind a "if
+  recognition.available" gate.
+- Server-side TTS (e.g. ElevenLabs, AWS Polly) for richer voices.
+  The browser-native approach is free + offline-capable; we'll
+  revisit if voice quality becomes the bottleneck.
+- Per-language voice override (separate voice for English vs.
+  Hindi questions). Currently one voice picker covers all langs;
+  a future iteration could store a `{lang: voice_uri}` map.
+
+### Deployment note (Stage 8)
+Run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+Browsers that don't support `window.speechSynthesis` (some older
+Android stock browsers) render the rest of the UI unchanged — the
+🔊 buttons just don't appear.
 
 ---
 

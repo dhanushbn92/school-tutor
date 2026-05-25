@@ -12,7 +12,7 @@ from app.auth.dependencies import (
     require_teacher_or_school_admin,
 )
 from app.db.session import get_db
-from app.models import LearnerMascotState
+from app.models import LearnerAudioPreferences, LearnerMascotState
 from app.models.assessment import (
     Assessment,
     AssessmentQuestion,
@@ -868,6 +868,84 @@ def get_practice_surprise(
     except PracticeVarietyError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return practice_variety_service.question_to_card_dict(q)
+
+
+# ---------- Audio preferences — Stage 8 of child-centric roadmap ----------
+#
+# Per-learner read-aloud settings. The actual TTS runs in the browser
+# (window.speechSynthesis) so the backend is just a key-value store
+# that survives reloads + follows the learner across devices.
+
+
+class AudioPreferencesUpdate(BaseModel):
+    autoplay_questions: bool | None = None
+    preferred_voice_uri: str | None = Field(default=None, max_length=200)
+
+
+def _serialize_audio(prefs: LearnerAudioPreferences) -> dict:
+    return {
+        "autoplay_questions": prefs.autoplay_questions,
+        "preferred_voice_uri": prefs.preferred_voice_uri,
+    }
+
+
+@router.get("/audio-preferences")
+def get_my_audio_preferences(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Read-aloud preferences for the current learner. Lazy-created
+    on first read so existing accounts don't need a backfill."""
+    prefs = db.scalar(
+        select(LearnerAudioPreferences).where(
+            LearnerAudioPreferences.user_id == user.id
+        )
+    )
+    if prefs is None:
+        prefs = LearnerAudioPreferences(
+            user_id=user.id,
+            autoplay_questions=False,
+            preferred_voice_uri=None,
+        )
+        db.add(prefs)
+        db.commit()
+        db.refresh(prefs)
+    return _serialize_audio(prefs)
+
+
+@router.patch("/audio-preferences")
+def update_my_audio_preferences(
+    payload: AudioPreferencesUpdate,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Toggle autoplay or pick a different voice. Either field may
+    be omitted (or sent as null) to leave it unchanged. Sending
+    `preferred_voice_uri: null` explicitly resets to the browser
+    default — distinguishing this from "field absent" is impossible
+    with this PATCH shape, but in practice the frontend either picks
+    a voice or clears it, never partial."""
+    prefs = db.scalar(
+        select(LearnerAudioPreferences).where(
+            LearnerAudioPreferences.user_id == user.id
+        )
+    )
+    if prefs is None:
+        prefs = LearnerAudioPreferences(
+            user_id=user.id,
+            autoplay_questions=False,
+            preferred_voice_uri=None,
+        )
+        db.add(prefs)
+        db.flush()
+    if payload.autoplay_questions is not None:
+        prefs.autoplay_questions = payload.autoplay_questions
+    if payload.preferred_voice_uri is not None:
+        # Empty string = "reset to default". Non-empty = pick that voice.
+        prefs.preferred_voice_uri = payload.preferred_voice_uri or None
+    db.commit()
+    db.refresh(prefs)
+    return _serialize_audio(prefs)
 
 
 @router.get("/practice/flashcards")

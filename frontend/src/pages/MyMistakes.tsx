@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { TellMeMore } from "@/components/TellMeMore";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useMyMistakes, useRetryMistake } from "@/lib/queries";
 import { useMascot } from "@/lib/mascotContext";
 import type { LearnerMistakeEntry, MistakeRetryResult } from "@/lib/types";
@@ -180,7 +181,10 @@ function MistakeCard({ entry }: { entry: LearnerMistakeEntry }) {
           <span>{entry.marks} marks</span>
         </div>
         <CardTitle className="mt-2 text-base font-normal leading-relaxed">
-          {entry.question_text}
+          <span className="inline-flex items-start gap-2">
+            <span>{entry.question_text}</span>
+            <ReadAloudButton text={entry.question_text} label="Read the question" />
+          </span>
         </CardTitle>
         <CardDescription>
           First missed {formatDateTime(entry.first_wrong_at)}
@@ -289,8 +293,17 @@ function VerdictPanel({ verdict }: { verdict: MistakeRetryResult }) {
           </>
         )}
       </div>
-      <div className="mt-2 text-xs">
-        <span className="font-medium">Correct answer:</span> {verdict.correct_answer}
+      <div className="mt-2 flex items-start justify-between gap-2 text-xs">
+        <div>
+          <span className="font-medium">Correct answer:</span> {verdict.correct_answer}
+        </div>
+        <ReadAloudButton
+          text={
+            verdict.correct_answer +
+            (verdict.explanation ? `. ${verdict.explanation}` : "")
+          }
+          label="Read the answer"
+        />
       </div>
       {verdict.explanation && (
         <div className="mt-1 text-xs">

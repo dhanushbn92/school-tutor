@@ -44,6 +44,7 @@ import { BLOOM_TO_BUCKET, BUCKET_LABEL } from "@/lib/types";
 import { cn, formatMarks } from "@/lib/utils";
 import { RichExplanationView } from "@/components/RichExplanation";
 import { TellMeMore } from "@/components/TellMeMore";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useMascot } from "@/lib/mascotContext";
 
 const BUCKET_ORDER: CognitiveBucket[] = ["FACTUAL", "UNDERSTANDING", "APPLICATION"];
@@ -622,7 +623,12 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
           </div>
         </div>
         <CardTitle className="mt-2 text-base font-medium leading-snug">
-          Q{sa.__index}. {q?.text ?? `Question #${sa.question_id}`}
+          <span className="inline-flex items-start gap-2">
+            <span>Q{sa.__index}. {q?.text ?? `Question #${sa.question_id}`}</span>
+            {q?.text && (
+              <ReadAloudButton text={q.text} label="Read the question" />
+            )}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
@@ -636,9 +642,17 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
         </div>
         {q && (
           <div>
-            <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
-              {subjective ? "Answer key" : "Correct answer"}
-            </span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
+                {subjective ? "Answer key" : "Correct answer"}
+              </span>
+              <ReadAloudButton
+                text={
+                  q.correct_answer + (q.explanation ? `. ${q.explanation}` : "")
+                }
+                label="Read the answer"
+              />
+            </div>
             <div className="mt-1 rounded-md border border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)] p-3 whitespace-pre-wrap">
               {q.correct_answer}
             </div>

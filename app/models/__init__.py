@@ -26,6 +26,7 @@ from app.models.extended_explanation import (
 from app.models.generation import GeneratedContent, GeneratedContentStatus, GeneratedContentType
 from app.models.intervention import InterventionNote
 from app.models.learner_practice import (
+    LearnerAudioPreferences,
     LearnerLoginDay,
     LearnerMascotState,
     LearnerMistake,
@@ -77,6 +78,7 @@ __all__ = [
     "GeneratedContentStatus",
     "GeneratedContentType",
     "InterventionNote",
+    "LearnerAudioPreferences",
     "LearnerLoginDay",
     "LearnerMascotState",
     "LearnerMistake",

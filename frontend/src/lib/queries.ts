@@ -736,6 +736,45 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
   });
 }
 
+/* ---------- Audio / read-aloud (Stage 8 of child-centric roadmap) ---------- */
+
+export interface AudioPreferences {
+  autoplay_questions: boolean;
+  preferred_voice_uri: string | null;
+}
+
+/** Per-learner read-aloud settings. Lazily created on first GET so
+ *  existing accounts don't need a backfill. */
+export function useAudioPreferences() {
+  return useQuery({
+    queryKey: ["me", "audio-preferences"],
+    queryFn: async () => {
+      const { data } = await api.get<AudioPreferences>("/me/audio-preferences");
+      return data;
+    },
+    // Preferences rarely change; keep them warm for the session.
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function useUpdateAudioPreferences() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (
+      payload: Partial<Pick<AudioPreferences, "autoplay_questions" | "preferred_voice_uri">>,
+    ) => {
+      const { data } = await api.patch<AudioPreferences>(
+        "/me/audio-preferences",
+        payload,
+      );
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(["me", "audio-preferences"], data);
+    },
+  });
+}
+
 /* ---------- Practice variety hub (Stage 7 of child-centric roadmap) ---------- */
 
 /** Shape returned by /me/practice/surprise + /me/practice/flashcards.

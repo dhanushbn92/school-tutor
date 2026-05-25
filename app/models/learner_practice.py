@@ -210,6 +210,39 @@ class PointsSource(StrEnum):
     WEEKLY_GOAL_BONUS = "WEEKLY_GOAL_BONUS"
 
 
+class LearnerAudioPreferences(Base):
+    """Per-learner read-aloud preferences (Stage 8).
+
+    Lazily created — first GET /me/audio-preferences inserts a row
+    with defaults (`autoplay_questions=False`, `preferred_voice_uri=None`).
+    The actual TTS happens in the browser via SpeechSynthesis API;
+    this table just remembers the learner's picks so they survive
+    page reloads and follow them across devices.
+    """
+
+    __tablename__ = "learner_audio_preferences"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_learner_audio_user"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    autoplay_questions: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Free-form URI from SpeechSynthesisVoice.voiceURI. Null means
+    # "use the browser default for the text's language".
+    preferred_voice_uri: Mapped[str | None] = mapped_column(
+        String(200), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
 class LearnerMascotState(Base):
     """Per-learner state for the Vidyārthi mascot companion (Stage 5).
 

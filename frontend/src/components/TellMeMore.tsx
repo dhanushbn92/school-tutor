@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useExplainTier } from "@/lib/queries";
 import type { ExplanationTier, ExtendedExplanation } from "@/lib/types";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 /**
  * "Tell me more" chain — Stage 3 of the child-centric roadmap.
@@ -132,8 +133,11 @@ function TierBlock({
       </button>
 
       {open && data && (
-        <div className="mt-2 whitespace-pre-line rounded-md border border-(--color-border) bg-(--color-muted)/40 p-3 text-sm leading-relaxed text-(--color-foreground)">
-          {data.text}
+        <div className="mt-2 rounded-md border border-(--color-border) bg-(--color-muted)/40 p-3 text-sm leading-relaxed text-(--color-foreground)">
+          <div className="flex items-start gap-2">
+            <div className="flex-1 whitespace-pre-line">{data.text}</div>
+            <ReadAloudButton text={data.text} label="Read this aloud" />
+          </div>
         </div>
       )}
       {open && error && (

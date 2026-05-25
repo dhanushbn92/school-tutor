@@ -24,10 +24,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { api, humanError } from "@/lib/api";
-import { useSurpriseQuestion } from "@/lib/queries";
+import { useAudioPreferences, useSurpriseQuestion } from "@/lib/queries";
 import { BRAND_ARROW_COLORS } from "@/lib/brand";
 import { useMascot } from "@/lib/mascotContext";
 import type { PracticeCardQuestion } from "@/lib/queries";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 /**
  * Practice variety hub — Stage 7 of the child-centric roadmap.
@@ -218,6 +219,8 @@ function SurpriseSection() {
   const [revealed, setRevealed] = useState(false);
   const mascot = useMascot();
   const q = useSurpriseQuestion(active);
+  const audioPrefs = useAudioPreferences();
+  const autoplay = audioPrefs.data?.autoplay_questions ?? false;
 
   function rollAgain() {
     setRevealed(false);
@@ -302,7 +305,14 @@ function SurpriseSection() {
                   <Badge variant="secondary">{q.data.outcome_code}</Badge>
                 )}
               </div>
-              <p className="text-base leading-relaxed">{q.data.text}</p>
+              <div className="flex items-start gap-2">
+                <p className="flex-1 text-base leading-relaxed">{q.data.text}</p>
+                <ReadAloudButton
+                  text={q.data.text}
+                  autoStart={autoplay}
+                  label="Read the question"
+                />
+              </div>
               {q.data.type === "MCQ" && q.data.options?.choices && (
                 <ul className="ml-4 list-disc text-sm text-(--color-foreground)">
                   {q.data.options.choices.map((c) => (
@@ -316,9 +326,18 @@ function SurpriseSection() {
                 </Button>
               ) : (
                 <div className="rounded-md border border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)] p-3 text-sm">
-                  <div className="flex items-center gap-2 font-medium">
-                    <Trophy className="h-4 w-4 text-(--color-success)" />
-                    Answer
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 font-medium">
+                      <Trophy className="h-4 w-4 text-(--color-success)" />
+                      Answer
+                    </div>
+                    <ReadAloudButton
+                      text={
+                        q.data.correct_answer +
+                        (q.data.explanation ? `. ${q.data.explanation}` : "")
+                      }
+                      label="Read the answer"
+                    />
                   </div>
                   <div className="mt-1 whitespace-pre-wrap">{q.data.correct_answer}</div>
                   {q.data.explanation && (

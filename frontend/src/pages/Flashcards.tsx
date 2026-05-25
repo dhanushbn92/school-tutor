@@ -22,9 +22,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Empty } from "@/components/ui/empty";
-import { useFlashcards } from "@/lib/queries";
+import { useAudioPreferences, useFlashcards } from "@/lib/queries";
 import { BRAND_ARROW_COLORS } from "@/lib/brand";
 import { useMascot } from "@/lib/mascotContext";
+import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 /**
  * Flashcards mode — Stage 7 of the child-centric roadmap.
@@ -44,6 +45,8 @@ type CardVerdict = "got_it" | "tricky" | null;
 
 export function FlashcardsPage() {
   const cardsQ = useFlashcards({ count: 10 });
+  const audioPrefs = useAudioPreferences();
+  const autoplay = audioPrefs.data?.autoplay_questions ?? false;
   const mascot = useMascot();
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -150,12 +153,15 @@ export function FlashcardsPage() {
           </div>
 
           <Flashcard
+            // Key on the card id so autoStart re-fires per new card.
+            key={current.id}
             question={current.text}
             answer={current.correct_answer}
             explanation={current.explanation}
             outcomeCode={current.outcome_code}
             flipped={flipped}
             onFlip={flip}
+            autoplay={autoplay}
           />
 
           <div className="mt-4 grid grid-cols-2 gap-3">
@@ -193,6 +199,7 @@ function Flashcard({
   outcomeCode,
   flipped,
   onFlip,
+  autoplay,
 }: {
   question: string;
   answer: string;
@@ -200,6 +207,7 @@ function Flashcard({
   outcomeCode: string | null;
   flipped: boolean;
   onFlip: () => void;
+  autoplay: boolean;
 }) {
   return (
     <button
@@ -230,11 +238,22 @@ function Flashcard({
             <span className="flex items-center gap-1">
               <Layers className="h-3.5 w-3.5" /> Question
             </span>
-            {outcomeCode && (
-              <Badge variant="secondary" className="text-[10px]">
-                {outcomeCode}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2">
+              {outcomeCode && (
+                <Badge variant="secondary" className="text-[10px]">
+                  {outcomeCode}
+                </Badge>
+              )}
+              {/* Stop click-propagation so tapping 🔊 doesn't also
+                  flip the card. */}
+              <span onClick={(e) => e.stopPropagation()}>
+                <ReadAloudButton
+                  text={question}
+                  autoStart={autoplay}
+                  label="Read the question"
+                />
+              </span>
+            </div>
           </div>
           <div className="flex flex-1 items-center justify-center">
             <p className="font-display text-lg leading-relaxed text-(--color-foreground)">
@@ -255,8 +274,16 @@ function Flashcard({
             backgroundColor: `color-mix(in oklab, ${BRAND_ARROW_COLORS.green} 6%, var(--color-card))`,
           }}
         >
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-(--color-success)">
-            <Sparkles className="h-3.5 w-3.5" /> Answer
+          <div className="mb-2 flex items-center justify-between gap-2 text-xs font-medium text-(--color-success)">
+            <span className="flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5" /> Answer
+            </span>
+            <span onClick={(e) => e.stopPropagation()}>
+              <ReadAloudButton
+                text={answer + (explanation ? `. ${explanation}` : "")}
+                label="Read the answer"
+              />
+            </span>
           </div>
           <div className="flex-1 overflow-auto">
             <p className="font-display text-base leading-relaxed text-(--color-foreground)">
