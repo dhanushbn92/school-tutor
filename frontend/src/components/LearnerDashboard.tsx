@@ -74,24 +74,21 @@ export function LearnerDashboard() {
 
   // Whole-syllabus mastery (every subject in the class). Powers the
   // narrative tiles, the strongest + best-place picks, the syllabus
-  // map, AND the strengths/focus lists below — so a learner sees
-  // their entire syllabus on the dashboard, not just one subject.
+  // map, the strengths/focus lists, AND the topic mastery heatmap
+  // below — so a learner sees their entire syllabus on the
+  // dashboard, not just one default subject. The cognitive-bucket
+  // picker on the heatmap still works correctly across subjects
+  // (it filters by cognitive_level, not by subject).
   const masteryQ = useStudentMastery({
     student_id: myStudent?.id,
     class_level: section?.class_level ?? undefined,
     // No subject_id — get all subjects.
   });
-  // Subject-scoped mastery (one subject at a time) for the Topic
-  // mastery heatmap below; the cognitive-bucket picker on that
-  // widget only makes sense per-subject.
-  const subjectMasteryQ = useStudentMastery({
-    student_id: myStudent?.id,
-    class_level: section?.class_level ?? undefined,
-    subject_id: subject?.id,
-  });
+  // Score trend across all subjects (no subject_id) so the line
+  // chart reflects the learner's full practice history rather than
+  // just one default subject.
   const trendQ = useStudentTrend({
     student_id: myStudent?.id,
-    subject_id: subject?.id,
   });
   const assessmentsQ = useMyAssessments();
 
@@ -282,14 +279,10 @@ export function LearnerDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          {subjectMasteryQ.data ? (
+          {masteryQ.data ? (
             <MasteryHeatmap
-              title={
-                subject
-                  ? `Topic mastery map · ${subject.name}`
-                  : "Topic mastery map"
-              }
-              description="How much of the syllabus you've practised so far. Cells fill in as you submit quizzes."
+              title="Topic mastery map"
+              description="How much of your whole syllabus you've practised so far. Cells fill in as you submit quizzes."
               view={view}
               headerSlot={
                 <div className="w-48">
@@ -312,10 +305,17 @@ export function LearnerDashboard() {
                   </Select>
                 </div>
               }
-              chapters={subjectMasteryQ.data.chapters.map((ch) => ({
+              chapters={masteryQ.data.chapters.map((ch) => ({
                 chapter_id: ch.chapter_id,
                 chapter_number: ch.chapter_number,
-                chapter_title: ch.chapter_title,
+                // Prefix the chapter title with the subject name so a
+                // multi-subject heatmap row stays readable. Single-
+                // subject classes degrade gracefully — the prefix is
+                // omitted when there's no subject_name (the older
+                // single-subject API shape).
+                chapter_title: ch.subject_name
+                  ? `${ch.subject_name} · ${ch.chapter_title}`
+                  : ch.chapter_title,
                 outcomes: ch.outcomes.map((o) => ({
                   code: o.code,
                   description: o.description,

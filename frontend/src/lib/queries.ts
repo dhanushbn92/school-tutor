@@ -1377,11 +1377,16 @@ export function useStudentTrend(params: { student_id?: number; subject_id?: numb
     queryFn: async () => {
       const { data } = await api.get<StudentTrend>(
         `/analytics/students/${params.student_id}/trend`,
+        // subject_id is optional server-side now — omit it to get
+        // the cross-subject view. Axios drops `undefined` params.
         { params: { subject_id: params.subject_id } },
       );
       return data;
     },
-    enabled: params.student_id !== undefined && params.subject_id !== undefined,
+    // subject_id is no longer required — the dashboard's score-
+    // trend widget calls without one so a multi-subject learner
+    // sees their full quiz history.
+    enabled: params.student_id !== undefined,
   });
 }
 

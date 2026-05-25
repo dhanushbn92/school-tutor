@@ -138,7 +138,11 @@ def section_leaderboard(
 @router.get("/students/{student_id}/trend")
 def student_trend(
     student_id: int,
-    subject_id: int = Query(...),
+    # subject_id is optional — omit it to get the learner's full
+    # cross-subject quiz history. The dashboard score-trend widget
+    # passes no subject_id so a multi-subject learner sees their
+    # entire practice arc; per-subject deep-dives still pass it.
+    subject_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):

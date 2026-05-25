@@ -207,18 +207,26 @@ def section_weakest_topics(
     }
 
 
-def student_trend(db: Session, *, student_id: int, subject_id: int) -> dict:
-    """Time series of a student's evaluated scores for one subject."""
-    pairs = db.execute(
+def student_trend(
+    db: Session, *, student_id: int, subject_id: int | None = None
+) -> dict:
+    """Time series of a student's evaluated scores. When `subject_id`
+    is supplied, scopes to that subject; when omitted, returns the
+    learner's full quiz history across every subject (used by the
+    learner dashboard so the trend reflects all their practice, not
+    just one default subject)."""
+    stmt = (
         select(Submission, Assessment)
         .join(Assessment, Submission.assessment_id == Assessment.id)
         .where(
             Submission.student_id == student_id,
             Submission.status == SubmissionStatus.EVALUATED,
-            Assessment.subject_id == subject_id,
         )
         .order_by(Submission.evaluated_at)
-    ).all()
+    )
+    if subject_id is not None:
+        stmt = stmt.where(Assessment.subject_id == subject_id)
+    pairs = db.execute(stmt).all()
 
     series: list[dict] = []
     for sub, assessment in pairs:
