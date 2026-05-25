@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import (
     get_current_user,
     require_learner,
+    require_parent,
     require_teacher_or_school_admin,
 )
 from app.db.session import get_db
@@ -38,9 +39,13 @@ from app.services import (
     intervention_service,
     learner_mistake_service,
     learner_practice_service,
+    parent_encouragement_service,
+    parent_link_service,
     question_bank_service,
     school_service,
 )
+from app.services.parent_encouragement_service import EncouragementError
+from app.services.parent_link_service import ParentLinkError
 from app.services.question_bank_service import BankCoverageError
 
 
@@ -562,3 +567,247 @@ def update_my_mascot(
     db.commit()
     db.refresh(state)
     return _serialize_mascot(state)
+
+
+# ---------- Parent ↔ child links — Stage 6 of child-centric roadmap ----------
+#
+# Two surfaces:
+#   - Learner side: generate invite codes, list linked parents, revoke
+#     a link, read received encouragements, dismiss them.
+#   - Parent side: list children, read each child's weekly summary,
+#     send encouragement, audit what they've sent.
+#
+# The link itself is created during parent signup (POST /auth/signup-parent),
+# which atomically consumes the invite code + creates the User + the
+# link in one transaction. There's no separate "approve" step here.
+
+
+class EncouragementSendPayload(BaseModel):
+    message: str = Field(min_length=1, max_length=280)
+
+
+# ----- Learner-side -----
+
+
+@router.post("/parent-invite-codes", status_code=201)
+def create_parent_invite_code(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Generate a fresh single-use invite code for a parent. The
+    learner gives this code to whichever parent / guardian they want
+    to link. 7-day TTL."""
+    try:
+        invite = parent_link_service.generate_invite_code(
+            db, student_user_id=user.id
+        )
+    except ParentLinkError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return {
+        "code": invite.code,
+        "expires_at": invite.expires_at,
+    }
+
+
+@router.get("/parent-invite-codes")
+def list_my_parent_invite_codes(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Active (unused, unexpired) invite codes the learner has
+    generated. Used for the "show me the code I made earlier" UI."""
+    rows = parent_link_service.list_invite_codes(
+        db, student_user_id=user.id, only_active=True
+    )
+    return [
+        {
+            "code": r.code,
+            "expires_at": r.expires_at,
+            "created_at": r.created_at,
+        }
+        for r in rows
+    ]
+
+
+@router.get("/parents")
+def list_my_parents(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Currently-linked parent / guardian accounts."""
+    parents = parent_link_service.list_parents(db, student_user_id=user.id)
+    return [
+        {
+            "user_id": p.id,
+            "full_name": p.full_name,
+            "email": p.email,
+        }
+        for p in parents
+    ]
+
+
+@router.delete("/parents/{parent_user_id}", status_code=204)
+def revoke_my_parent(
+    parent_user_id: int,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Soft-delete the link. The parent loses access immediately."""
+    try:
+        parent_link_service.revoke_link(
+            db,
+            student_user_id=user.id,
+            parent_user_id=parent_user_id,
+        )
+    except ParentLinkError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/encouragements")
+def list_my_encouragements(
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Undismissed parent notes the learner sees on their dashboard."""
+    rows = parent_encouragement_service.list_for_learner(
+        db, student_user_id=user.id, only_undismissed=True, limit=10
+    )
+    return [parent_encouragement_service.to_dict(r) for r in rows]
+
+
+@router.post("/encouragements/{encouragement_id}/dismiss", status_code=204)
+def dismiss_my_encouragement(
+    encouragement_id: int,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    """Hide one note off the dashboard. The row stays in the DB so
+    the parent's audit view still shows it."""
+    try:
+        parent_encouragement_service.dismiss(
+            db, encouragement_id=encouragement_id, student_user_id=user.id
+        )
+    except EncouragementError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# ----- Parent-side -----
+
+
+@router.get("/children")
+def list_my_children(
+    user: User = Depends(require_parent),
+    db: Session = Depends(get_db),
+):
+    """Children the parent currently has an APPROVED link to."""
+    kids = parent_link_service.list_children(db, parent_user_id=user.id)
+    return [parent_link_service.child_to_dict(c) for c in kids]
+
+
+@router.get("/children/{child_user_id}/weekly-summary")
+def child_weekly_summary(
+    child_user_id: int,
+    user: User = Depends(require_parent),
+    db: Session = Depends(get_db),
+):
+    """Encouraging-view weekly summary of a single child.
+
+    Includes the same shape as the learner's own practice-summary —
+    deliberately. The Stage 6 design is "open the window to parents
+    but only the encouraging view, not surveillance": this endpoint
+    is gated so the parent sees PRACTICE rhythm + STAMPS + STREAK +
+    POINTS but never the mistake detail (which lives on a separate
+    endpoint that parents simply don't have access to)."""
+    try:
+        parent_link_service.assert_link_active(
+            db,
+            parent_user_id=user.id,
+            student_user_id=child_user_id,
+        )
+    except ParentLinkError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+    summary = learner_practice_service.practice_summary(
+        db, user_id=child_user_id
+    )
+    child = db.get(User, child_user_id)
+    return {
+        "child": {
+            "user_id": child.id if child else child_user_id,
+            "full_name": child.full_name if child else "",
+        },
+        "week_start": summary.week_start.isoformat(),
+        "week_end": summary.week_end.isoformat(),
+        "target_days": summary.target_days,
+        "practice_days_this_week": [
+            d.isoformat() for d in summary.practice_days_this_week
+        ],
+        "practice_days_count_this_week": summary.practice_days_count_this_week,
+        "practice_days_count_total": summary.practice_days_count_total,
+        "weekly_goal_met": summary.weekly_goal_met,
+        "streak": {
+            "current": summary.streak.current,
+            "longest": summary.streak.longest,
+        },
+        "points_total": summary.points_total,
+        "level": {
+            "name": summary.level.name,
+            "blurb": summary.level.blurb,
+        },
+        "weekly_goal_progress": {
+            "weeks_met_total": summary.weekly_goal_progress.weeks_met_total,
+            "weeks_met_run": summary.weekly_goal_progress.weeks_met_run,
+        },
+        "recent_stamps": [
+            learner_practice_service.stamp_to_dict(s)
+            for s in summary.recent_stamps[:6]
+        ],
+    }
+
+
+@router.post("/children/{child_user_id}/encouragement", status_code=201)
+def send_child_encouragement(
+    child_user_id: int,
+    payload: EncouragementSendPayload,
+    user: User = Depends(require_parent),
+    db: Session = Depends(get_db),
+):
+    """Send a short well-done note to a child. The note lands on the
+    child's dashboard until they dismiss it."""
+    try:
+        row = parent_encouragement_service.send(
+            db,
+            parent_user_id=user.id,
+            student_user_id=child_user_id,
+            message=payload.message,
+        )
+    except EncouragementError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return parent_encouragement_service.to_dict(row)
+
+
+@router.get("/children/{child_user_id}/encouragements")
+def list_sent_encouragements(
+    child_user_id: int,
+    user: User = Depends(require_parent),
+    db: Session = Depends(get_db),
+):
+    """What the parent has sent to one child — audit view."""
+    try:
+        parent_link_service.assert_link_active(
+            db,
+            parent_user_id=user.id,
+            student_user_id=child_user_id,
+        )
+    except ParentLinkError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    rows = parent_encouragement_service.list_sent_by_parent(
+        db,
+        parent_user_id=user.id,
+        child_user_id=child_user_id,
+        limit=50,
+    )
+    return [parent_encouragement_service.to_dict(r) for r in rows]
+
+
+# ---- end of Stage 6 endpoints ----

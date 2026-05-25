@@ -33,8 +33,8 @@ not the execution order.
 | 3 | "Why?" — tell-me-more chain on every explanation | 6 | ✅ Shipped 2026-05-25 |
 | 4 | Story-shaped progress for learners (replace bare numbers) | 2 | ✅ Shipped 2026-05-25 |
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | ✅ Shipped 2026-05-26 |
-| 6 | Parent / guardian view | 9 | **Up next** |
-| 7 | Practice variety — flashcards / speedrun / surprise me | 7 | Planned |
+| 6 | Parent / guardian view | 9 | ✅ Shipped 2026-05-26 |
+| 7 | Practice variety — flashcards / speedrun / surprise me | 7 | **Up next** |
 | 8 | Audio support — read-aloud everywhere | 5 | Planned |
 | 9 | Kinder UX for wrong answers ("Not yet", hint chain) | 8 | Planned |
 | 10 | UX polish — large targets, dyslexia font, take-a-break | 10 | Planned |
@@ -502,6 +502,38 @@ window to parents — but only the encouraging view, not surveillance.
 **Frontend**
 - New `/parent` route.
 - New "Notes from family" card on learner dashboard.
+
+### What shipped
+- Migration `20260526_0028` — three new tables:
+  - `parent_invite_codes(code PK, student_user_id, expires_at, consumed_at, consumed_by_user_id)` — 8-char single-use codes, 7-day TTL.
+  - `parent_child_link(parent_user_id, student_user_id, status, ...)` — UNIQUE pair; status APPROVED/REVOKED (PENDING reserved for future admin-mediated flow).
+  - `parent_encouragement(parent_user_id, student_user_id, message, sent_at, dismissed_at)` — append-only; learner dismiss is a timestamp, not a DELETE.
+- New `PARENT` value on `UserRole` (column is VARCHAR(18) with app-level validation; no ALTER TYPE needed).
+- `parent_link_service`: `generate_invite_code`, `consume_invite_code`, `list_children`, `list_parents`, `revoke_link`, `assert_link_active`.
+- `parent_encouragement_service`: `send`, `list_for_learner`, `list_sent_by_parent`, `dismiss`. 280-char cap; validates active link before accepting a send.
+- Endpoints (all role-gated; parents = `require_parent`, learners = `require_learner`):
+  - Auth: `POST /auth/signup-parent` (atomically creates User + consumes code + writes link; failures roll back the whole transaction).
+  - Learner-side: `POST/GET /me/parent-invite-codes`, `GET /me/parents`, `DELETE /me/parents/{id}`, `GET /me/encouragements`, `POST /me/encouragements/{id}/dismiss`.
+  - Parent-side: `GET /me/children`, `GET /me/children/{id}/weekly-summary` (NO mistake detail — the "encouraging view" promise enforced at the endpoint), `POST /me/children/{id}/encouragement`, `GET /me/children/{id}/encouragements`.
+- Frontend wired:
+  - `<SignupParentPage />` at `/signup-parent`. Accepts `?code=ABCD1234` as a query param for deep-link sharing.
+  - `<ParentDashboard />` — per-child card with streak / level / weekly-goal tiles + recent stamps + inline encouragement composer with 4 preset messages + 280-char free text. **No mistake detail visible.**
+  - `<ParentInviteCard />` on the learner dashboard — list linked parents (with revoke), list active codes (with copy-to-clipboard), button to mint a new code.
+  - `<FamilyNotesCard />` on the learner dashboard — renders only when there are undismissed encouragements; per-note × dismiss button.
+  - Login page footer link "Parent / guardian? Sign up with an invite code".
+
+**Out of scope for Stage 6 (deliberately deferred)**
+- **Weekly email summaries** — listed in the roadmap but require email infrastructure (SMTP / Mailgun / SES + scheduler + opt-in management) that isn't wired up in the codebase. Substantial separate piece of work; deferred to a follow-up.
+- Admin-mediated approval flow (the `PENDING` state on `parent_child_link` is reserved for it).
+- Multi-language preset encouragement messages.
+
+### Deployment note (Stage 6)
+Run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+No data backfill needed — existing learners just have empty parent /
+encouragement lists until they generate their first code.
 
 ---
 

@@ -25,6 +25,8 @@ import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { PracticeCard } from "@/components/PracticeCard";
 import { LearnerProgressNarrative } from "@/components/LearnerProgressNarrative";
 import { MascotToggleHint } from "@/components/MascotToggleHint";
+import { FamilyNotesCard } from "@/components/FamilyNotesCard";
+import { ParentInviteCard } from "@/components/ParentInviteCard";
 import { MasteryHeatmap } from "@/components/MasteryHeatmap";
 import type { HeatmapView } from "@/components/MasteryHeatmap";
 import {
@@ -116,6 +118,10 @@ export function LearnerDashboard() {
           the Vidyārthi mascot off. Gives them a one-click path back
           to enabling the companion so the off switch is reversible. */}
       <MascotToggleHint />
+      {/* Stage 6 — "Notes from family" card. Renders nothing if no
+          undismissed parent encouragements exist, so it stays
+          invisible for learners without a linked parent. */}
+      <FamilyNotesCard />
       <PageHeader
         title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
         description={
@@ -421,6 +427,14 @@ export function LearnerDashboard() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Stage 6 — invite a parent / guardian. Sits at the bottom of
+          the dashboard rather than competing with the practice
+          headline; it's a "configure once" affordance, not a
+          day-to-day widget. */}
+      <div className="mt-6">
+        <ParentInviteCard />
       </div>
     </ThemedPage>
   );

@@ -82,6 +82,10 @@ require_school_admin = _require_role(UserRole.SCHOOL_ADMIN)
 require_teacher = _require_role(UserRole.TEACHER)
 require_student = _require_role(UserRole.STUDENT)
 require_individual_learner = _require_role(UserRole.INDIVIDUAL_LEARNER)
+# Stage 6 — gates the /me/children / /me/encouragements endpoints
+# that parent users hit. A parent has no school_id (User.school_id
+# is NULL), so the existing school-scoped guards don't apply.
+require_parent = _require_role(UserRole.PARENT)
 
 
 # --- Role groups for school-side workflow ---

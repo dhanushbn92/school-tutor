@@ -36,6 +36,12 @@ from app.models.learner_practice import (
     StampKind,
 )
 from app.models.mastery import CognitiveBucket, SkillMastery
+from app.models.parent_link import (
+    ParentChildLink,
+    ParentEncouragement,
+    ParentInviteCode,
+    ParentLinkStatus,
+)
 from app.models.question import Question, QuestionDifficulty, QuestionStatus, QuestionType
 from app.models.school import (
     Enrollment,
@@ -78,6 +84,10 @@ __all__ = [
     "LearnerStamp",
     "LearnerWeeklyGoal",
     "LearningOutcome",
+    "ParentChildLink",
+    "ParentEncouragement",
+    "ParentInviteCode",
+    "ParentLinkStatus",
     "PointsSource",
     "Question",
     "QuestionDifficulty",

@@ -736,6 +736,174 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
   });
 }
 
+/* ---------- Parent / guardian (Stage 6 of child-centric roadmap) ---------- */
+
+export interface ParentInviteCode {
+  code: string;
+  expires_at: string;
+  created_at?: string;
+}
+
+export interface ParentSummary {
+  user_id: number;
+  full_name: string;
+  email: string;
+}
+
+export interface ChildSummary {
+  user_id: number;
+  full_name: string;
+  email: string;
+}
+
+export interface ChildWeeklySummary {
+  child: { user_id: number; full_name: string };
+  week_start: string;
+  week_end: string;
+  target_days: number;
+  practice_days_this_week: string[];
+  practice_days_count_this_week: number;
+  practice_days_count_total: number;
+  weekly_goal_met: boolean;
+  streak: { current: number; longest: number };
+  points_total: number;
+  level: { name: string; blurb: string };
+  weekly_goal_progress: { weeks_met_total: number; weeks_met_run: number };
+  recent_stamps: LearnerStamp[];
+}
+
+export interface FamilyEncouragement {
+  id: number;
+  parent_user_id: number;
+  message: string;
+  sent_at: string;
+  dismissed_at: string | null;
+}
+
+// --- Learner-side ---
+
+export function useMyParents() {
+  return useQuery({
+    queryKey: ["me", "parents"],
+    queryFn: async () => {
+      const { data } = await api.get<ParentSummary[]>("/me/parents");
+      return data;
+    },
+  });
+}
+
+export function useMyActiveInviteCodes() {
+  return useQuery({
+    queryKey: ["me", "parent-invite-codes"],
+    queryFn: async () => {
+      const { data } = await api.get<ParentInviteCode[]>(
+        "/me/parent-invite-codes",
+      );
+      return data;
+    },
+  });
+}
+
+export function useCreateParentInviteCode() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post<ParentInviteCode>(
+        "/me/parent-invite-codes",
+      );
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "parent-invite-codes"] });
+    },
+  });
+}
+
+export function useRevokeParent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (parent_user_id: number) => {
+      await api.delete(`/me/parents/${parent_user_id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "parents"] });
+    },
+  });
+}
+
+export function useMyEncouragements() {
+  return useQuery({
+    queryKey: ["me", "encouragements"],
+    queryFn: async () => {
+      const { data } = await api.get<FamilyEncouragement[]>(
+        "/me/encouragements",
+      );
+      return data;
+    },
+  });
+}
+
+export function useDismissEncouragement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await api.post(`/me/encouragements/${id}/dismiss`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["me", "encouragements"] });
+    },
+  });
+}
+
+// --- Parent-side ---
+
+export function useMyChildren() {
+  return useQuery({
+    queryKey: ["me", "children"],
+    queryFn: async () => {
+      const { data } = await api.get<ChildSummary[]>("/me/children");
+      return data;
+    },
+  });
+}
+
+export function useChildWeeklySummary(childUserId: number | undefined) {
+  return useQuery({
+    queryKey: ["me", "children", childUserId, "weekly-summary"],
+    enabled: childUserId !== undefined,
+    queryFn: async () => {
+      const { data } = await api.get<ChildWeeklySummary>(
+        `/me/children/${childUserId}/weekly-summary`,
+      );
+      return data;
+    },
+  });
+}
+
+export function useSendEncouragement() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      child_user_id,
+      message,
+    }: {
+      child_user_id: number;
+      message: string;
+    }) => {
+      const { data } = await api.post<FamilyEncouragement>(
+        `/me/children/${child_user_id}/encouragement`,
+        { message },
+      );
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({
+        queryKey: ["me", "children", vars.child_user_id, "encouragements"],
+      });
+    },
+  });
+}
+
 /* ---------- Vidyārthi mascot (Stage 5 of child-centric roadmap) ---------- */
 
 export interface MascotState {

@@ -6,7 +6,11 @@ export type UserRole =
   | "school_admin"
   | "teacher"
   | "student"
-  | "individual_learner";
+  | "individual_learner"
+  // Stage 6 of the child-centric roadmap — guardian linked to one or
+  // more learners via invite codes. Parent users have no school_id
+  // (they only see children they've been explicitly linked to).
+  | "parent";
 
 export interface User {
   id: number;

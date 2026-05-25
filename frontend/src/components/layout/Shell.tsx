@@ -39,10 +39,11 @@ const ROLE_LABEL: Record<UserRole, string> = {
   teacher: "Teacher",
   student: "Student",
   individual_learner: "Self-learner",
+  parent: "Parent / guardian",
 };
 
 const NAV: NavItem[] = [
-  { to: "/", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "student", "individual_learner"] },
+  { to: "/", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "student", "individual_learner", "parent"] },
   { to: "/learn", label: "Learn", icon: <BookOpenText className="h-4 w-4" />, roles: ["platform_admin", "student", "individual_learner", "teacher", "school_admin"] },
   { to: "/report-card", label: "Report card", icon: <ClipboardList className="h-4 w-4" />, roles: ["student", "individual_learner"] },
   { to: "/school-report", label: "School report", icon: <ClipboardList className="h-4 w-4" />, roles: ["school_admin"] },

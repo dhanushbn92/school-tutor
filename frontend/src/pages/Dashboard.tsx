@@ -36,6 +36,7 @@ import { Empty } from "@/components/ui/empty";
 import { DashboardHero } from "@/components/DashboardHero";
 import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { LearnerDashboard } from "@/components/LearnerDashboard";
+import { ParentDashboard } from "@/components/ParentDashboard";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import { useAuth } from "@/lib/auth";
 import {
@@ -53,6 +54,9 @@ export function DashboardPage() {
   const { user } = useAuth();
   if (user?.role === "student" || user?.role === "individual_learner") {
     return <LearnerDashboard />;
+  }
+  if (user?.role === "parent") {
+    return <ParentDashboard />;
   }
   const sectionsQ = useMySections();
   const firstSection = sectionsQ.data?.[0];

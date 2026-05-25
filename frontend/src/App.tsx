@@ -8,6 +8,7 @@ import { RequireRole } from "@/components/layout/RequireRole";
 import { LoginPage } from "@/pages/Login";
 import { SignupSchoolPage } from "@/pages/SignupSchool";
 import { SignupIndividualPage } from "@/pages/SignupIndividual";
+import { SignupParentPage } from "@/pages/SignupParent";
 import { ManageSchoolPage } from "@/pages/ManageSchool";
 import { DashboardPage } from "@/pages/Dashboard";
 import { TakeAssessmentPage } from "@/pages/TakeAssessment";
@@ -58,6 +59,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup-school" element={<SignupSchoolPage />} />
             <Route path="/signup-individual" element={<SignupIndividualPage />} />
+            <Route path="/signup-parent" element={<SignupParentPage />} />
             <Route
               path="/"
               element={

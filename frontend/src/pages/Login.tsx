@@ -113,6 +113,15 @@ export function LoginPage() {
                   Onboard your school
                 </a>
               </p>
+              <p>
+                Parent / guardian?{" "}
+                <a
+                  href="/signup-parent"
+                  className="text-(--color-primary) underline-offset-4 hover:underline"
+                >
+                  Sign up with an invite code
+                </a>
+              </p>
               <p>Trouble signing in? Contact your school administrator.</p>
             </div>
           </CardFooter>
