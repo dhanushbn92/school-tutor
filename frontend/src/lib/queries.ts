@@ -756,6 +756,16 @@ export interface ChildSummary {
   email: string;
 }
 
+export interface ChildOutcomeHighlight {
+  code: string;
+  description: string;
+  mastery: number; // 0..1
+  attempts: number;
+  chapter_id: number | null;
+  chapter_number: number | null;
+  chapter_title: string | null;
+}
+
 export interface ChildWeeklySummary {
   child: { user_id: number; full_name: string };
   week_start: string;
@@ -765,11 +775,36 @@ export interface ChildWeeklySummary {
   practice_days_count_this_week: number;
   practice_days_count_total: number;
   weekly_goal_met: boolean;
-  streak: { current: number; longest: number };
+  streak: {
+    current: number;
+    longest: number;
+    grace_used_this_week: number;
+    grace_allowed_per_week: number;
+  };
   points_total: number;
-  level: { name: string; blurb: string };
+  level: {
+    name: string;
+    blurb: string;
+    min_points: number;
+    next_name: string | null;
+    next_min_points: number | null;
+    points_into_level: number;
+    points_to_next: number | null;
+  };
   weekly_goal_progress: { weeks_met_total: number; weeks_met_run: number };
   recent_stamps: LearnerStamp[];
+  // Stage 6 enrichment fields:
+  heatmap: { day: string; practiced: boolean }[];
+  subject_name: string | null;
+  class_level: number | null;
+  chapter_rollup: {
+    mastered: number;
+    in_practice: number;
+    to_explore: number;
+  };
+  strengths: ChildOutcomeHighlight[];
+  growing_in: ChildOutcomeHighlight[];
+  stamps_by_kind: Record<string, number>;
 }
 
 export interface FamilyEncouragement {

@@ -257,5 +257,199 @@ def child_to_dict(child: User) -> dict:
     }
 
 
+# ---------------------------------------------------------------------------
+# Parent insights — Stage 6 enrichment
+# ---------------------------------------------------------------------------
+#
+# Encouraging-view summary helpers for the parent dashboard:
+#   - chapter_rollup    counts of mastered / in-practice / to-explore
+#   - top strengths     outcomes the child is consistently strong on
+#   - top "growing in"  outcomes still being worked on (NEVER framed
+#                       as failures)
+#   - stamps tally      total stamps grouped by kind
+#
+# Stays inside the parent_link_service module so the privacy invariant
+# is easier to audit: there is exactly ONE place where parent-facing
+# data is shaped, and it never touches `LearnerMistake`.
+
+
+# Same thresholds as the learner-side narrative tiles (Stage 4) — keeps
+# the parent's "Mastered" count consistent with what the child sees on
+# their own dashboard.
+_MASTERY_FLOOR = 0.75
+_CHAPTER_MASTERED_RATIO = 0.8
+_TOP_N = 3
+
+
+def compute_child_insights(db: Session, *, child_user_id: int) -> dict:
+    """Build the enriched parent-view payload for one child.
+
+    Resolves the child's primary class + subject from their active
+    enrollment, builds the mastery grid for that subject, and derives
+    the encouraging aggregates above. Returns {} when the child has
+    no mastery data yet — the frontend renders an empty-state in that
+    case rather than zeros.
+
+    Mistake detail is deliberately NOT included. The mastery grid we
+    consume has no per-mistake info — it's a snapshot of outcome
+    mastery levels. So even an audit of the response payload can't
+    accidentally surface a child's mistakes.
+    """
+    from app.models import (  # local import to dodge cycles
+        Enrollment,
+        EnrollmentStatus,
+        Section,
+        Student,
+        Subject,
+    )
+    from app.services import mastery_service
+
+    student = db.scalar(select(Student).where(Student.user_id == child_user_id))
+    if student is None:
+        return {}
+
+    # Pick the active enrollment to anchor class_level. Multi-section
+    # students just get the first active section's class — same as
+    # the learner's own dashboard does.
+    enrollment = db.scalar(
+        select(Enrollment).where(
+            Enrollment.student_id == student.id,
+            Enrollment.status == EnrollmentStatus.ACTIVE,
+        )
+    )
+    if enrollment is None:
+        return {}
+    section = db.get(Section, enrollment.section_id)
+    if section is None:
+        return {}
+
+    # Subject: prefer "Science" (matches the learner dashboard's
+    # default) so parent + learner views agree; fall back to any
+    # subject the section's class has.
+    subjects = list(
+        db.scalars(
+            select(Subject).where(Subject.class_id == section.class_id)
+        ).all()
+    )
+    if not subjects:
+        return {}
+    subject = next((s for s in subjects if s.name == "Science"), subjects[0])
+
+    class_level = _class_level_for(db, section)
+    if class_level is None:
+        return {}
+    grid = mastery_service.build_student_grid(
+        db,
+        student_id=student.id,
+        class_level=class_level,
+        subject_id=subject.id,
+    )
+
+    chapter_rollup, strengths, growing = _derive_outcome_aggregates(grid)
+    stamps_by_kind = _stamps_tally(db, user_id=child_user_id)
+
+    return {
+        "subject_name": subject.name,
+        "subject_id": subject.id,
+        "class_level": grid.get("class_level"),
+        "chapter_rollup": chapter_rollup,
+        "strengths": strengths,
+        "growing_in": growing,
+        "stamps_by_kind": stamps_by_kind,
+    }
+
+
+def _class_level_for(db: Session, section) -> int | None:  # type: ignore[no-untyped-def]
+    """Fallback class_level resolver for Section rows that don't
+    expose it directly. Section.class_id -> SchoolClass.level."""
+    from app.models import SchoolClass
+
+    cls = db.get(SchoolClass, section.class_id)
+    return cls.level if cls is not None else None
+
+
+def _derive_outcome_aggregates(
+    grid: dict,
+) -> tuple[dict, list[dict], list[dict]]:
+    """Pure transform: chapter rollup + top-N strengths + top-N
+    "growing in" lists. Mirrors the LearnerProgressNarrative logic
+    on the frontend so the parent sees the same counts as the child
+    sees on their own dashboard."""
+    mastered_chapters = 0
+    in_practice_chapters = 0
+    to_explore_chapters = 0
+
+    attempted: list[dict] = []
+    for ch in grid.get("chapters", []):
+        outcomes = ch.get("outcomes", [])
+        if not outcomes:
+            to_explore_chapters += 1
+            continue
+        n_total = len(outcomes)
+        n_mastered = 0
+        n_attempted = 0
+        for o in outcomes:
+            mastery = o.get("mastery")
+            attempts = o.get("attempts", 0)
+            if attempts > 0 and mastery is not None:
+                n_attempted += 1
+                attempted.append(
+                    {
+                        "code": o.get("code"),
+                        "description": o.get("description"),
+                        "mastery": mastery,
+                        "attempts": attempts,
+                        "chapter_id": ch.get("chapter_id"),
+                        "chapter_number": ch.get("chapter_number"),
+                        "chapter_title": ch.get("chapter_title"),
+                    }
+                )
+                if mastery >= _MASTERY_FLOOR:
+                    n_mastered += 1
+
+        if n_attempted == 0:
+            to_explore_chapters += 1
+        elif n_total > 0 and n_mastered / n_total >= _CHAPTER_MASTERED_RATIO:
+            mastered_chapters += 1
+        else:
+            in_practice_chapters += 1
+
+    strengths = sorted(
+        [o for o in attempted if o["mastery"] >= _MASTERY_FLOOR],
+        key=lambda o: (-o["mastery"], -o["attempts"]),
+    )[:_TOP_N]
+
+    growing = sorted(
+        [o for o in attempted if o["mastery"] < _MASTERY_FLOOR],
+        key=lambda o: (o["mastery"], -o["attempts"]),
+    )[:_TOP_N]
+
+    chapter_rollup = {
+        "mastered": mastered_chapters,
+        "in_practice": in_practice_chapters,
+        "to_explore": to_explore_chapters,
+    }
+    return chapter_rollup, strengths, growing
+
+
+def _stamps_tally(db: Session, *, user_id: int) -> dict[str, int]:
+    """Total stamp counts grouped by kind. Includes only the four
+    known kinds — anything unexpected falls through silently."""
+    from app.models import LearnerStamp, StampKind
+    from sqlalchemy import func as _f
+
+    rows = db.execute(
+        select(LearnerStamp.kind, _f.count(LearnerStamp.id))
+        .where(LearnerStamp.user_id == user_id)
+        .group_by(LearnerStamp.kind)
+    ).all()
+    by_kind: dict[str, int] = {k.value: 0 for k in StampKind}
+    for kind, count in rows:
+        # `kind` is a StampKind StrEnum value
+        key = kind.value if hasattr(kind, "value") else str(kind)
+        by_kind[key] = int(count)
+    return by_kind
+
+
 # Re-export for the auth router to use without importing the model.
 PARENT_ROLE = UserRole.PARENT

@@ -527,6 +527,51 @@ window to parents — but only the encouraging view, not surveillance.
 - Admin-mediated approval flow (the `PENDING` state on `parent_child_link` is reserved for it).
 - Multi-language preset encouragement messages.
 
+### Stage 6.1 — Deeper parent insights (extension)
+
+Follow-up extension to Stage 6, motivated by parent feedback wanting
+more meaningful detail than just "your child has a 3-day streak".
+The "encouraging view, not surveillance" principle still applies:
+the new payloads are aggregates, not per-mistake / per-quiz lists.
+
+**What shipped**
+- `parent_link_service.compute_child_insights(db, child_user_id)`
+  — resolves the child's primary subject (Science preferred,
+  fallback to first subject of their class) and derives:
+  - `chapter_rollup` — counts of mastered / in-practice /
+    to-explore chapters, using the same thresholds as the
+    learner's own narrative tiles (Stage 4).
+  - `strengths` — top 3 outcomes by mastery (≥75%, ≥1 attempt).
+  - `growing_in` — top 3 outcomes still being practised
+    (<75% mastery, ≥1 attempt). Framed as "growing in", never as
+    failures, per the encouraging-view principle.
+  - `stamps_by_kind` — total counts grouped by stamp kind.
+- `GET /me/children/{id}/weekly-summary` enriched with the
+  insights payload + full `heatmap` (12-week practice grid) + full
+  level info (`points_into_level`, `points_to_next`, `next_name`).
+  Empty/zero values for fresh accounts so the parent sees the
+  framing even before any practice.
+- `<ParentDashboard />` parent ChildCard restructured:
+  - Goal-met badge on the card header when the child has hit
+    this week's target.
+  - **Level progress bar** under the stat strip with
+    "X pts to <next tier>" caption.
+  - **Chapter rollup tiles** (mastered / in-practice / to-explore)
+    mirroring the learner's own narrative tiles.
+  - **"What they're doing well"** + **"Growing in"** lists with
+    chapter context per outcome.
+  - **12-week consistency heatmap** with hover tooltips per day.
+  - **Stamps tally** — four-tile grid (Quizzes done / Perfect
+    scores / Practice days / Weekly goals hit).
+
+**Privacy invariants (still enforced)**
+- Endpoint never returns mistake detail / per-quiz scores / the
+  full mastery grid. Only aggregates.
+- Parent hitting `/me/mistakes` still returns 403.
+- Service helper deliberately lives inside `parent_link_service`
+  so there's exactly one place where parent-facing data is shaped
+  — easier to audit.
+
 ### Deployment note (Stage 6)
 Run the migration:
 ```powershell

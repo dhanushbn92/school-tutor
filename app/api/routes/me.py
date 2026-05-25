@@ -731,6 +731,12 @@ def child_weekly_summary(
         db, user_id=child_user_id
     )
     child = db.get(User, child_user_id)
+    # Stage 6 enrichment — strengths / growing-in / chapter rollup /
+    # stamps tally. Empty dict when the child has no mastery data
+    # yet (the frontend renders an encouraging empty state).
+    insights = parent_link_service.compute_child_insights(
+        db, child_user_id=child_user_id
+    )
     return {
         "child": {
             "user_id": child.id if child else child_user_id,
@@ -748,11 +754,23 @@ def child_weekly_summary(
         "streak": {
             "current": summary.streak.current,
             "longest": summary.streak.longest,
+            # The grace counter helps a parent understand why a streak
+            # didn't break after a missed day — surfaces the kinder
+            # policy rather than hiding it.
+            "grace_used_this_week": summary.streak.grace_used_this_week,
+            "grace_allowed_per_week": learner_practice_service.STREAK_MISSES_ALLOWED_PER_WEEK,
         },
         "points_total": summary.points_total,
+        # Full level info (including progress toward the next tier)
+        # so the parent dashboard can render a progress bar.
         "level": {
             "name": summary.level.name,
             "blurb": summary.level.blurb,
+            "min_points": summary.level.min_points,
+            "next_name": summary.level.next_name,
+            "next_min_points": summary.level.next_min_points,
+            "points_into_level": summary.level.points_into_level,
+            "points_to_next": summary.level.points_to_next,
         },
         "weekly_goal_progress": {
             "weeks_met_total": summary.weekly_goal_progress.weeks_met_total,
@@ -762,6 +780,21 @@ def child_weekly_summary(
             learner_practice_service.stamp_to_dict(s)
             for s in summary.recent_stamps[:6]
         ],
+        # 12-week practice heatmap — same data the child sees on
+        # their own dashboard. Honest, encouraging, no surveillance.
+        "heatmap": [
+            {"day": cell.day.isoformat(), "practiced": cell.practiced}
+            for cell in summary.heatmap
+        ],
+        # Stage 6 enrichment payload (empty dict if no mastery yet).
+        "subject_name": insights.get("subject_name"),
+        "class_level": insights.get("class_level"),
+        "chapter_rollup": insights.get(
+            "chapter_rollup", {"mastered": 0, "in_practice": 0, "to_explore": 0}
+        ),
+        "strengths": insights.get("strengths", []),
+        "growing_in": insights.get("growing_in", []),
+        "stamps_by_kind": insights.get("stamps_by_kind", {}),
     }
 
 
