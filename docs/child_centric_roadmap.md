@@ -29,8 +29,8 @@ not the execution order.
 | # | Stage | Idea # | State |
 |---|---|---|---|
 | 1 | Streaks + small rewards, calibrated for kids | 3 | ✅ Shipped 2026-05-17 (d503ab0) |
-| 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | **Up next** |
-| 3 | "Why?" — tell-me-more chain on every explanation | 6 | Planned |
+| 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | ✅ Shipped 2026-05-25 |
+| 3 | "Why?" — tell-me-more chain on every explanation | 6 | **Up next** |
 | 4 | Story-shaped progress for learners (replace bare numbers) | 2 | Planned |
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | Planned |
 | 6 | Parent / guardian view | 9 | Planned |
@@ -127,6 +127,60 @@ Run the migration before deploying:
 The frontend gracefully no-ops if the endpoints return 404 — so a
 half-deployed state won't break the dashboard.
 
+### Stage 1.5 — Login streak + points + levels (extension)
+
+Follow-up extension to Stage 1, motivated by the need for stronger
+practice-encouragement signals than stamps alone provided. The
+original Stage 1 design deliberately avoided points; the trade-off
+was reconsidered with product ownership and points were added
+behind the rationale "we can disable points visibility later if it
+ever feels off-brand."
+
+**What shipped (migration `20260525_0025`)**
+- `learner_login_days(user_id, day)` — composite PK, written by the
+  auth dependency on every authenticated learner request. Streak
+  source-of-truth.
+- `learner_points_ledger(id, user_id, source_kind, source_id,
+  points, awarded_at, dedupe_key)` — append-only ledger with a
+  UNIQUE(user_id, dedupe_key) constraint so duplicate awards are
+  blocked at the DB.
+- `learner_practice_service` extensions:
+  - `record_login_day` — savepoint-guarded, never breaks auth.
+  - `compute_login_streak` — "kinder" grace policy: 1 missed day per
+    ISO week is forgiven (a second miss in the same week ends the
+    streak). Returns `current`, `longest`, `grace_used_this_week`.
+  - `award_points_for_submission` — post-commit hook awarding:
+    - **+1** per correct auto-graded answer
+    - **+5** perfect-score bonus
+    - **+2** practice-day bonus (first submission of the day)
+    - **+10** weekly-goal bonus (once per ISO week)
+    - Retry attempts (Stage 2) do NOT award points — anti-grinding.
+  - `compute_level` — 5 Sanskrit / age-of-Indian-archery tiers:
+    Shishya (0+), Vidyārthi (50+), Ārya (200+), Ācārya (500+),
+    Mahā-Ācārya (1000+). Returns name + progress-to-next.
+  - `compute_heatmap` — 12 weeks × 7 days; one cell per UTC date.
+  - `compute_weekly_goal_progress` — aggregates `WEEKLY_GOAL_MET`
+    stamps into all-time count + current consecutive run.
+- `GET /me/practice-summary` extended with `streak`, `points_total`,
+  `level`, `weekly_goal_progress`, `heatmap`.
+- `<PracticeCard />` gained a three-tile stats row (streak, level
+  with progress bar, weeks-goal-met) and a GitHub-style 12-week
+  consistency heatmap underneath.
+
+**Tunable later (no migration needed)**
+- Per-event point values (constants in `learner_practice_service.py`).
+- Level names + thresholds (`LEVEL_TIERS` constant).
+- Streak grace policy (`STREAK_MISSES_ALLOWED_PER_WEEK`).
+- Hide points visibility — future toggle on the PracticeCard.
+
+### Deployment note (Stage 1.5)
+Re-run the migration:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+Starts everyone at 0 points (no backfill). Streaks begin from the
+first authenticated request after the migration applies.
+
 ---
 
 ## Stage 2 — Mistake review (Idea #4)
@@ -164,6 +218,48 @@ becomes a future practice opportunity.
 **Out of scope for Stage 2**
 - AI-generated similar questions (Stage 7 territory).
 - Teacher-visible mistake patterns (a useful follow-up but separate).
+- "**Include questions I got wrong**" toggle on the Quick Quiz form —
+  deferred to a follow-up; the standalone review page already gives
+  learners the retry loop without taking on quick-quiz sampler
+  changes in the same stage.
+- Spaced-repetition mixing of 1/3/7-day-old mistakes — deferred with
+  the toggle.
+
+### What shipped
+- New `learner_mistakes` table (migration `20260517_0024`,
+  UNIQUE(user_id, question_id) + index on `last_attempted_at`).
+- `learner_mistake_service`:
+  - `upsert_for_submission` — runs post-commit in the submission
+    flow, in its own transaction so a bug here costs a mistake row
+    not a quiz attempt. Skips subjective answers entirely.
+  - `list_active` — bulk-fetches the question + chapter + subject
+    context in one round trip; resolved rows (consecutive_corrects
+    >= 2) are filtered out server-side.
+  - `record_retry_attempt` — single-question retry path; grades
+    via `auto_grade`, updates the row, never creates a Submission.
+- Two new endpoints on `/me`, both learner-role-gated:
+  - `GET /me/mistakes` with optional `chapter_id` / `subject_id`
+    filters and a `total_active` count alongside the items.
+  - `POST /me/mistakes/{question_id}/attempt` — returns verdict +
+    correct answer + explanation + new `consecutive_corrects` +
+    `resolved` flag.
+- `/me/mistakes` route + `MyMistakesPage` — card-per-mistake with
+  inline retry (MCQ / TRUE_FALSE render choice buttons; FILL_BLANK
+  uses a text input). Verdict panel reveals the correct answer
+  and explanation; "Have another go" resets the card for the next
+  attempt; "Cleared!" disables the button once the twice-right
+  rule retires the row.
+- Sidebar nav: "Review mistakes" link for `student` and
+  `individual_learner`.
+
+### Deployment note
+Run the new migration before deploying Stage 2:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+Until the migration runs the `/me/mistakes*` endpoints will 500 on
+the missing table; the sidebar link still routes safely (the page
+just shows the loader + an empty state once the query resolves).
 
 ---
 

@@ -846,4 +846,96 @@ export interface PracticeSummary {
   practice_days_count_total: number;
   weekly_goal_met: boolean;
   recent_stamps: LearnerStamp[];
+  /** Stage 1.5 — login streak (consecutive days the learner has
+   *  signed in, with one freebie miss per ISO week). */
+  streak: StreakInfo;
+  /** Stage 1.5 — total points across the ledger. */
+  points_total: number;
+  /** Stage 1.5 — current level + progress to the next tier. */
+  level: LevelInfo;
+  /** Stage 1.5 — WEEKLY_GOAL_MET aggregations: all-time count + the
+   *  current consecutive-week run. */
+  weekly_goal_progress: WeeklyGoalProgress;
+  /** Stage 1.5 — one cell per day for the last ~12 weeks (rendered
+   *  as a GitHub-style consistency heatmap). */
+  heatmap: HeatmapCell[];
+}
+
+export interface StreakInfo {
+  /** Days in a row ending today (or the last logged-in day). */
+  current: number;
+  /** All-time longest streak. */
+  longest: number;
+  /** Grace misses already consumed in the current ISO week. */
+  grace_used_this_week: number;
+  /** Grace misses permitted per ISO week (currently 1). */
+  grace_allowed_per_week: number;
+}
+
+export interface LevelInfo {
+  /** Sanskrit-themed level name (Shishya / Vidyārthi / Ārya / Ācārya / Mahā-Ācārya). */
+  name: string;
+  /** One-line vibe / what this level means. */
+  blurb: string;
+  /** Minimum points required to enter this tier. */
+  min_points: number;
+  /** Name of the next tier; null at the top tier. */
+  next_name: string | null;
+  /** Threshold of the next tier; null at the top tier. */
+  next_min_points: number | null;
+  /** Points earned within the current tier (i.e. total - min_points). */
+  points_into_level: number;
+  /** Points still needed to reach the next tier; null at the top. */
+  points_to_next: number | null;
+}
+
+export interface WeeklyGoalProgress {
+  weeks_met_total: number;
+  weeks_met_run: number;
+}
+
+export interface HeatmapCell {
+  /** ISO date string (YYYY-MM-DD). */
+  day: string;
+  practiced: boolean;
+}
+
+// ---------- Mistake review (Stage 2 of child-centric roadmap) ----------
+
+export interface LearnerMistakeEntry {
+  question_id: number;
+  question_text: string;
+  question_type: QuestionType | string;
+  /** MCQ choices, when question_type === "MCQ". Null otherwise. */
+  options: string[] | null;
+  marks: number;
+  difficulty: QuestionDifficulty | string;
+  outcome_code: string | null;
+  chapter_id: number | null;
+  chapter_title: string | null;
+  chapter_number: number | null;
+  subject_id: number | null;
+  subject_name: string | null;
+  /** ISO timestamp. */
+  first_wrong_at: string;
+  /** ISO timestamp. */
+  last_attempted_at: string;
+  /** 0 or 1 (>=2 is filtered out as resolved on the backend). */
+  consecutive_corrects: number;
+}
+
+export interface LearnerMistakesPage {
+  total_active: number;
+  items: LearnerMistakeEntry[];
+}
+
+export interface MistakeRetryResult {
+  correct: boolean;
+  correct_answer: string;
+  explanation: string | null;
+  consecutive_corrects: number;
+  /** True when consecutive_corrects has reached the resolution
+   *  threshold (twice-right rule) and the row will be filtered out of
+   *  the active mistake list on the next refresh. */
+  resolved: boolean;
 }

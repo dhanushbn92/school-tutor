@@ -21,7 +21,11 @@ from app.models.school import (
     User,
     UserRole,
 )
-from app.services import learner_practice_service, mastery_service
+from app.services import (
+    learner_mistake_service,
+    learner_practice_service,
+    mastery_service,
+)
 from app.services.grading import auto_grade
 
 
@@ -153,6 +157,25 @@ def create_submission(
     except Exception:  # pragma: no cover — best-effort
         db.rollback()
         # Intentionally swallowed. The submission is safe.
+
+    # Stage 1.5 — award points for this submission (per-correct-answer,
+    # perfect-score bonus, practice-day bonus, weekly-goal bonus). Same
+    # post-commit fire-and-forget pattern: a points bug costs at most a
+    # missing ledger row, never the quiz attempt itself.
+    try:
+        learner_practice_service.award_points_for_submission(db, submission)
+        db.commit()
+    except Exception:  # pragma: no cover — best-effort
+        db.rollback()
+
+    # Upsert "things I got wrong" rows (Stage 2). Same post-commit
+    # fire-and-forget pattern: a bug here costs a missing mistake row,
+    # never a quiz attempt.
+    try:
+        learner_mistake_service.upsert_for_submission(db, submission)
+        db.commit()
+    except Exception:  # pragma: no cover — best-effort
+        db.rollback()
 
     return submission
 

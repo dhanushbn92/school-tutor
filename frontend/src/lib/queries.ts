@@ -15,8 +15,10 @@ import type {
   GeneratedContentStatus,
   GeneratedContentType,
   InterventionNote,
+  LearnerMistakesPage,
   LearnerStamp,
   LearningOutcome,
+  MistakeRetryResult,
   PracticeSummary,
   Question,
   QuestionDifficulty,
@@ -701,6 +703,66 @@ export function useMyStamps(limit = 200) {
         params: { limit },
       });
       return data;
+    },
+  });
+}
+
+/* ---------- Mistake review (Stage 2 of child-centric roadmap) ---------- */
+
+export interface MistakesFilter {
+  chapter_id?: number;
+  subject_id?: number;
+  limit?: number;
+}
+
+/** Things I got wrong: active mistakes only — resolved rows
+ *  (consecutive_corrects >= 2 by the twice-right rule) are filtered
+ *  out server-side. */
+export function useMyMistakes(filter: MistakesFilter = {}) {
+  return useQuery({
+    queryKey: ["me", "mistakes", filter],
+    queryFn: async () => {
+      const { data } = await api.get<LearnerMistakesPage>("/me/mistakes", {
+        params: {
+          chapter_id: filter.chapter_id,
+          subject_id: filter.subject_id,
+          limit: filter.limit ?? 100,
+        },
+      });
+      return data;
+    },
+  });
+}
+
+/** Single-question retry. The backend grades the answer, updates the
+ *  LearnerMistake row, and returns the verdict + correct answer +
+ *  explanation. Does NOT create a Submission — retries are revision
+ *  practice, not fresh attempts. */
+export function useRetryMistake() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      question_id,
+      answer_text,
+    }: {
+      question_id: number;
+      answer_text: string | null;
+    }) => {
+      const { data } = await api.post<MistakeRetryResult>(
+        `/me/mistakes/${question_id}/attempt`,
+        { answer_text },
+      );
+      return data;
+    },
+    onSuccess: (result) => {
+      // Always invalidate the list — even a wrong retry bumps
+      // last_attempted_at, which re-orders the cards.
+      qc.invalidateQueries({ queryKey: ["me", "mistakes"] });
+      if (result.resolved) {
+        // A resolved row may have just disappeared from the active
+        // list; the count chip should refresh too.
+        qc.invalidateQueries({ queryKey: ["me", "mistakes"] });
+      }
     },
   });
 }

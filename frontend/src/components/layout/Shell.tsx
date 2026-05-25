@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   NotebookPen,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Users,
@@ -56,6 +57,8 @@ const NAV: NavItem[] = [
   { to: "/tenants", label: "Tenants", icon: <Building2 className="h-4 w-4" />, roles: ["platform_admin"] },
   { to: "/ai-chat-admin", label: "AI tutor", icon: <ShieldCheck className="h-4 w-4" />, roles: ["platform_admin"] },
   { to: "/quick-quiz", label: "Start a quiz", icon: <Sparkles className="h-4 w-4" />, roles: ["individual_learner", "student"] },
+  // Stage 2 of the child-centric roadmap — "things I got wrong" review surface.
+  { to: "/me/mistakes", label: "Review mistakes", icon: <RotateCcw className="h-4 w-4" />, roles: ["individual_learner", "student"] },
 ];
 
 export function Shell() {

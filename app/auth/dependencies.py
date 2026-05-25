@@ -47,6 +47,18 @@ def get_current_user(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Your school has been disabled by the platform team. Please contact support.",
             )
+
+    # Stage 1.5 — stamp today's login-day for learners on every
+    # authenticated request. Best-effort: failures here NEVER break
+    # auth (the service swallows them). Only learner roles get
+    # tracked — login streaks are a learner-only concept.
+    if user.role in (UserRole.STUDENT, UserRole.INDIVIDUAL_LEARNER):
+        # Local import to avoid pulling the service module into auth's
+        # dependency graph at module load time.
+        from app.services import learner_practice_service
+
+        learner_practice_service.record_login_day(db, user_id=user.id)
+
     return user
 
 

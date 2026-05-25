@@ -35,6 +35,7 @@ from app.services import (
     analytics_service,
     assessment_service,
     intervention_service,
+    learner_mistake_service,
     learner_practice_service,
     question_bank_service,
     school_service,
@@ -373,6 +374,31 @@ def get_practice_summary(
         "recent_stamps": [
             learner_practice_service.stamp_to_dict(s) for s in summary.recent_stamps
         ],
+        # Stage 1.5 additions
+        "streak": {
+            "current": summary.streak.current,
+            "longest": summary.streak.longest,
+            "grace_used_this_week": summary.streak.grace_used_this_week,
+            "grace_allowed_per_week": learner_practice_service.STREAK_MISSES_ALLOWED_PER_WEEK,
+        },
+        "points_total": summary.points_total,
+        "level": {
+            "name": summary.level.name,
+            "blurb": summary.level.blurb,
+            "min_points": summary.level.min_points,
+            "next_name": summary.level.next_name,
+            "next_min_points": summary.level.next_min_points,
+            "points_into_level": summary.level.points_into_level,
+            "points_to_next": summary.level.points_to_next,
+        },
+        "weekly_goal_progress": {
+            "weeks_met_total": summary.weekly_goal_progress.weeks_met_total,
+            "weeks_met_run": summary.weekly_goal_progress.weeks_met_run,
+        },
+        "heatmap": [
+            {"day": cell.day.isoformat(), "practiced": cell.practiced}
+            for cell in summary.heatmap
+        ],
     }
 
 
@@ -399,3 +425,61 @@ def list_my_stamps(
 ):
     stamps = learner_practice_service.list_stamps(db, user_id=user.id, limit=limit)
     return [learner_practice_service.stamp_to_dict(s) for s in stamps]
+
+
+# ---------- Mistake review — Stage 2 of the child-centric roadmap ----------
+#
+# Two endpoints feed the "Things I got wrong" page:
+#   GET  /me/mistakes                       — paginated active mistakes
+#   POST /me/mistakes/{question_id}/attempt — single-question retry
+# Resolved rows (consecutive_corrects >= 2) are filtered out server-side.
+
+
+class MistakeAttempt(BaseModel):
+    answer_text: str | None = Field(default=None, max_length=4000)
+
+
+@router.get("/mistakes")
+def list_my_mistakes(
+    chapter_id: int | None = Query(default=None),
+    subject_id: int | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=500),
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    entries = learner_mistake_service.list_active(
+        db,
+        user_id=user.id,
+        chapter_id=chapter_id,
+        subject_id=subject_id,
+        limit=limit,
+    )
+    return {
+        "total_active": learner_mistake_service.count_active(db, user_id=user.id),
+        "items": [learner_mistake_service.entry_to_dict(e) for e in entries],
+    }
+
+
+@router.post("/mistakes/{question_id}/attempt")
+def retry_my_mistake(
+    question_id: int,
+    payload: MistakeAttempt,
+    user: User = Depends(require_learner),
+    db: Session = Depends(get_db),
+):
+    try:
+        result = learner_mistake_service.record_retry_attempt(
+            db,
+            user_id=user.id,
+            question_id=question_id,
+            answer_text=payload.answer_text,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "correct": result.correct,
+        "correct_answer": result.correct_answer,
+        "explanation": result.explanation,
+        "consecutive_corrects": result.consecutive_corrects,
+        "resolved": result.resolved,
+    }

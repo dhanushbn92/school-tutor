@@ -1,5 +1,15 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, Loader2, Pencil, Sparkles, X } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  Flame,
+  Loader2,
+  Pencil,
+  Sparkles,
+  Star,
+  Target,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +18,15 @@ import { useMyStamps, usePracticeSummary, useSetWeeklyGoal } from "@/lib/queries
 import { BRAND_ARROW_COLORS } from "@/lib/brand";
 import { STAMP_PRESENTATION } from "@/lib/stamps";
 import { cn } from "@/lib/utils";
-import type { LearnerStamp, PracticeSummary, StampKind } from "@/lib/types";
+import type {
+  HeatmapCell,
+  LearnerStamp,
+  LevelInfo,
+  PracticeSummary,
+  StampKind,
+  StreakInfo,
+  WeeklyGoalProgress,
+} from "@/lib/types";
 
 /**
  * "Your practice" card — the headline child-centric dashboard widget
@@ -75,8 +93,187 @@ export function PracticeCard() {
           </div>
           <StampsStrip stamps={data.recent_stamps} />
         </div>
+
+        {/* Stage 1.5 — stats row: streak, points/level, weeks-goal-met. */}
+        <div className="mt-4 grid gap-3 border-t border-(--color-border) pt-4 sm:grid-cols-3">
+          <StreakTile streak={data.streak} />
+          <LevelTile level={data.level} points={data.points_total} />
+          <WeeklyGoalTile progress={data.weekly_goal_progress} />
+        </div>
+
+        {/* Stage 1.5 — 12-week consistency heatmap. */}
+        <ConsistencyHeatmap cells={data.heatmap} />
       </CardContent>
     </Card>
+  );
+}
+
+/* ----------------------------------------------------------------- */
+/* Stage 1.5 — streak / level / weekly-goal tiles                    */
+/* ----------------------------------------------------------------- */
+
+function StreakTile({ streak }: { streak: StreakInfo }) {
+  const used = streak.grace_used_this_week;
+  const allowed = streak.grace_allowed_per_week;
+  return (
+    <div className="rounded-md border border-(--color-border) p-3">
+      <div className="flex items-center gap-2 text-(--color-foreground)">
+        <Flame className="h-4 w-4 text-orange-500" />
+        <span className="font-display text-2xl font-semibold tabular-nums">
+          {streak.current}
+        </span>
+        <span className="text-xs text-(--color-muted-foreground)">
+          day{streak.current === 1 ? "" : "s"} in a row
+        </span>
+      </div>
+      <div className="mt-1 text-xs text-(--color-muted-foreground)">
+        Longest: {streak.longest}
+        {allowed > 0 && (
+          <>
+            {" · "}
+            <span title="One missed day per week is forgiven.">
+              freebie {used}/{allowed} used this week
+            </span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LevelTile({ level, points }: { level: LevelInfo; points: number }) {
+  const ratio =
+    level.next_min_points !== null && level.next_min_points > level.min_points
+      ? Math.min(
+          1,
+          Math.max(
+            0,
+            (points - level.min_points) /
+              (level.next_min_points - level.min_points),
+          ),
+        )
+      : 1;
+  return (
+    <div className="rounded-md border border-(--color-border) p-3">
+      <div className="flex items-center gap-2">
+        <Star className="h-4 w-4 text-amber-500" />
+        <span className="font-display text-base font-semibold">
+          {level.name}
+        </span>
+        <span className="ml-auto text-xs tabular-nums text-(--color-muted-foreground)">
+          {points} pts
+        </span>
+      </div>
+      <div
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-(--color-muted)"
+        aria-hidden="true"
+      >
+        <div
+          className="h-full rounded-full bg-amber-500 transition-[width]"
+          style={{ width: `${ratio * 100}%` }}
+        />
+      </div>
+      <div className="mt-1 text-xs text-(--color-muted-foreground)">
+        {level.points_to_next === null
+          ? `Top tier — ${level.blurb}`
+          : `${level.points_to_next} pts to ${level.next_name}`}
+      </div>
+    </div>
+  );
+}
+
+function WeeklyGoalTile({ progress }: { progress: WeeklyGoalProgress }) {
+  return (
+    <div className="rounded-md border border-(--color-border) p-3">
+      <div className="flex items-center gap-2">
+        <Target className="h-4 w-4 text-emerald-600" />
+        <span className="font-display text-2xl font-semibold tabular-nums">
+          {progress.weeks_met_total}
+        </span>
+        <span className="text-xs text-(--color-muted-foreground)">
+          week{progress.weeks_met_total === 1 ? "" : "s"} goal hit
+        </span>
+      </div>
+      <div className="mt-1 text-xs text-(--color-muted-foreground)">
+        {progress.weeks_met_run > 1
+          ? `🔥 ${progress.weeks_met_run} weeks in a row`
+          : progress.weeks_met_run === 1
+            ? "Hit it this week — keep going!"
+            : "Hit this week's goal to start a run."}
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------- */
+/* Stage 1.5 — 12-week consistency heatmap                           */
+/* ----------------------------------------------------------------- */
+
+/**
+ * GitHub-style activity grid: 7 rows (Mon→Sun) × N cols (weeks).
+ * Each cell is a small square: filled if there was at least one
+ * submission that day. Older weeks on the left, current week on
+ * the right. Hovering a cell shows the date in a native tooltip.
+ *
+ * Defensive: trims any cells past today so the future doesn't
+ * render as "missed".
+ */
+function ConsistencyHeatmap({ cells }: { cells: HeatmapCell[] }) {
+  if (cells.length === 0) return null;
+  // Group cells into weekday rows. Backend yields cells Mon-first
+  // for the earliest week, then continuing through; that means
+  // index % 7 maps to weekday-of-week-block, but we need rows by
+  // weekday across the whole grid. Convert via Date.getDay().
+  const today = new Date().toISOString().slice(0, 10);
+  const visible = cells.filter((c) => c.day <= today);
+  // Bucket by weekday (Mon=0, Sun=6) and by weekIndex.
+  const weeks: HeatmapCell[][] = [];
+  visible.forEach((c, idx) => {
+    const weekIndex = Math.floor(idx / 7);
+    if (!weeks[weekIndex]) weeks[weekIndex] = [];
+    weeks[weekIndex].push(c);
+  });
+
+  return (
+    <div className="mt-4 border-t border-(--color-border) pt-4">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="text-xs font-medium text-(--color-muted-foreground)">
+          Last {weeks.length} weeks
+        </div>
+        <div className="text-xs text-(--color-muted-foreground)">
+          <span className="mr-2 inline-flex items-center gap-1">
+            <span className="inline-block h-2.5 w-2.5 rounded-sm bg-(--color-muted)" />
+            quiet
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-sm"
+              style={{ backgroundColor: BRAND_ARROW_COLORS.green }}
+            />
+            practised
+          </span>
+        </div>
+      </div>
+      <div className="flex gap-1 overflow-x-auto">
+        {weeks.map((week, wi) => (
+          <div key={wi} className="flex flex-col gap-1">
+            {week.map((cell) => (
+              <span
+                key={cell.day}
+                title={`${cell.day} — ${cell.practiced ? "practised" : "no practice"}`}
+                className="h-3 w-3 rounded-sm"
+                style={{
+                  backgroundColor: cell.practiced
+                    ? BRAND_ARROW_COLORS.green
+                    : "color-mix(in srgb, currentColor 10%, transparent)",
+                }}
+                aria-label={`${cell.day} ${cell.practiced ? "practised" : "no practice"}`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

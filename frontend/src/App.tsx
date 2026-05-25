@@ -13,6 +13,7 @@ import { DashboardPage } from "@/pages/Dashboard";
 import { TakeAssessmentPage } from "@/pages/TakeAssessment";
 import { QuickQuizPage } from "@/pages/QuickQuiz";
 import { StampBookPage } from "@/pages/StampBook";
+import { MyMistakesPage } from "@/pages/MyMistakes";
 import { SectionsPage } from "@/pages/Sections";
 import { SectionDetailPage } from "@/pages/SectionDetail";
 import { StudentDetailPage } from "@/pages/StudentDetail";
@@ -100,6 +101,14 @@ export default function App() {
                 element={
                   <RequireRole allowed={["individual_learner", "student"]}>
                     <StampBookPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="me/mistakes"
+                element={
+                  <RequireRole allowed={["individual_learner", "student"]}>
+                    <MyMistakesPage />
                   </RequireRole>
                 }
               />
