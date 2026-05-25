@@ -31,8 +31,8 @@ not the execution order.
 | 1 | Streaks + small rewards, calibrated for kids | 3 | ✅ Shipped 2026-05-17 (d503ab0) |
 | 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | ✅ Shipped 2026-05-25 |
 | 3 | "Why?" — tell-me-more chain on every explanation | 6 | ✅ Shipped 2026-05-25 |
-| 4 | Story-shaped progress for learners (replace bare numbers) | 2 | **Up next** |
-| 5 | Vidyārthi mascot reactions throughout the app | 1 | Planned |
+| 4 | Story-shaped progress for learners (replace bare numbers) | 2 | ✅ Shipped 2026-05-25 |
+| 5 | Vidyārthi mascot reactions throughout the app | 1 | **Up next** |
 | 6 | Parent / guardian view | 9 | Planned |
 | 7 | Practice variety — flashcards / speedrun / surprise me | 7 | Planned |
 | 8 | Audio support — read-aloud everywhere | 5 | Planned |
@@ -363,6 +363,35 @@ reflect their journey in human terms — not just numbers.
 - New `LearnerProgressNarrative.tsx` component.
 - Used inside `LearnerDashboard`, REPLACING the four stat-card
   row (only for the learner; teachers keep their dashboard).
+
+### What shipped
+- New `LearnerProgressNarrative` component derives everything
+  client-side from the existing `StudentMasteryGrid` — no new
+  endpoints, no migration.
+- Three narrative tiles framed as a journey:
+  - Chapters mastered (≥80% of outcomes individually mastered)
+  - Chapters in practice (some attempts, not yet mastered)
+  - Chapters to explore (no attempts yet)
+- Two complementary tiles below the trio:
+  - "Strongest concept right now" — highest-mastery attempted
+    outcome (anchors the learner on a win)
+  - "Best place to practise next" — weakest attempted outcome,
+    falling back to an untouched outcome in an in-progress
+    chapter, falling back to the lowest-numbered fresh chapter
+- Topic-tree visual: one row per chapter with a dot per outcome
+  (green = mastered, amber = practising, faint = untouched).
+  Hover a dot for the outcome code + mastery %.
+- Retired the four-card `<StatCard />` row that read like a school
+  report. The lower per-outcome "Your strengths" / "Areas to focus"
+  lists stay — they show top-3 with more depth than the new
+  headline tiles.
+- Self-learners get a "Practise this" CTA on the best-place tile;
+  school students don't (their quizzes are teacher-assigned).
+
+### Tuning knobs (no migration / no API change needed)
+- `MASTERY_FLOOR` (0.75) — per-outcome mastered threshold.
+- `CHAPTER_MASTERED_RATIO` (0.8) — fraction of a chapter's outcomes
+  that must be individually mastered to call the chapter "mastered".
 
 ---
 
