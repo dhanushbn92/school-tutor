@@ -28,8 +28,8 @@ not the execution order.
 
 | # | Stage | Idea # | State |
 |---|---|---|---|
-| 1 | Streaks + small rewards, calibrated for kids | 3 | **Up next** |
-| 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | Planned |
+| 1 | Streaks + small rewards, calibrated for kids | 3 | ✅ Shipped 2026-05-17 (d503ab0) |
+| 2 | Mistake review — collect + spaced-revisit the things they got wrong | 4 | **Up next** |
 | 3 | "Why?" — tell-me-more chain on every explanation | 6 | Planned |
 | 4 | Story-shaped progress for learners (replace bare numbers) | 2 | Planned |
 | 5 | Vidyārthi mascot reactions throughout the app | 1 | Planned |
@@ -103,6 +103,29 @@ flight.
   inventing fake currency.
 - No part of this feels like a slot machine — celebrations are
   brief and tied to real completion, not clicks.
+
+### What shipped (commit d503ab0)
+- New `learner_weekly_goals` + `learner_stamps` tables (migration
+  `20260517_0023`).
+- `learner_practice_service` with read-time practice-day query
+  and a post-commit stamp awarder that never poisons a submission.
+- `/me/practice-summary`, `/me/practice-summary/goal`,
+  `/me/stamps` endpoints — all learner-role-gated.
+- `<PracticeCard />` on the learner dashboard: SVG ring, narrative
+  summary line, inline weekly-goal editor (2..7), recent-stamps
+  strip.
+- `/me/stamps` route + `StampBookPage` — per-kind tally cards on
+  top, chronological full list below.
+- All four initial stamp kinds wired: `QUIZ_COMPLETED`,
+  `PERFECT_SCORE`, `PRACTICE_DAY`, `WEEKLY_GOAL_MET`.
+
+### Deployment note
+Run the migration before deploying:
+```powershell
+.\.venv\Scripts\python.exe -m alembic upgrade head
+```
+The frontend gracefully no-ops if the endpoints return 404 — so a
+half-deployed state won't break the dashboard.
 
 ---
 
