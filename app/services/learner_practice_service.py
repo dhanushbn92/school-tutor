@@ -762,13 +762,25 @@ def award_stamps_for_submission(db: Session, submission: Submission) -> list[Lea
     # 4. WEEKLY_GOAL_MET — when the practice-day count reaches the
     # goal target for the current week. Awarded at most once per week.
     week_start = _week_start_for(today)
+    # Dedup via earned_at range. The original implementation tried
+    # `stamp_metadata["week_start"].astext` (JSONB syntax) on a column
+    # declared as plain `sa.JSON` — which raises AttributeError because
+    # `.astext` only exists on the JSONB comparator. That silent throw
+    # (caught by the outer try/except in submission_service) is what
+    # was emptying every stamp's transaction. Switching to an
+    # earned_at range check avoids JSON access entirely, uses the
+    # existing index on `earned_at`, and is semantically equivalent —
+    # WEEKLY_GOAL_MET is always awarded inside its own ISO week.
+    week_start_dt = datetime.combine(week_start, datetime.min.time()).replace(
+        tzinfo=timezone.utc
+    )
+    week_end_dt = week_start_dt + timedelta(days=7)
     week_already = db.scalar(
         select(func.count(LearnerStamp.id)).where(
             LearnerStamp.user_id == user_id,
             LearnerStamp.kind == StampKind.WEEKLY_GOAL_MET,
-            # Match on metadata's week_start string for portable JSON
-            # comparison. Counts are low; full-table scan is fine.
-            LearnerStamp.stamp_metadata["week_start"].astext == week_start.isoformat(),
+            LearnerStamp.earned_at >= week_start_dt,
+            LearnerStamp.earned_at < week_end_dt,
         )
     )
     if not week_already:
