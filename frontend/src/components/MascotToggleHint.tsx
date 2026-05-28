@@ -4,15 +4,18 @@ import { useMascotState, useUpdateMascot } from "@/lib/queries";
 
 /**
  * Stage 5 reversal affordance — a small dashboard hint that lets
- * a learner bring the Vidyārthi mascot back after they previously
- * disabled it via the off switch.
+ * a learner bring the Dhananjaya mascot back if it is currently disabled.
  *
  * Renders ONLY when the mascot is currently disabled, so once the
  * learner has re-enabled the companion this component disappears and
  * stops competing for dashboard real estate. The placement (just
  * below the practice card on the learner dashboard) was chosen
- * because that's where learners spend the most time and where they'll
- * naturally look if they remember "I turned that thing off".
+ * because that's where learners spend the most time.
+ *
+ * Note: the persistent off-switch was removed from MascotCompanion (it
+ * read as "turn off a person", which is wrong). This hint is kept for
+ * legacy users whose mascot is disabled from earlier — it gives them a
+ * one-click path to re-enable. New learners default to enabled.
  */
 export function MascotToggleHint() {
   const mascotQ = useMascotState();
@@ -31,7 +34,7 @@ export function MascotToggleHint() {
       <div className="flex items-center gap-2 text-(--color-muted-foreground)">
         <Sparkles className="h-4 w-4 text-(--color-primary)" />
         <span>
-          Vidyārthi is currently off. Want the mascot back as you practise?
+          Dhananjaya is currently hidden. Want the companion back as you practise?
         </span>
       </div>
       <Button
@@ -46,7 +49,7 @@ export function MascotToggleHint() {
             Bringing back…
           </>
         ) : (
-          "Bring Vidyārthi back"
+          "Bring Dhananjaya back"
         )}
       </Button>
     </div>

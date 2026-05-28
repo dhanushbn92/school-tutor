@@ -3,10 +3,10 @@ import { X } from "lucide-react";
 import { BRAND_ARROW_COLORS } from "@/lib/brand";
 import { useAuth } from "@/lib/auth";
 import { useMascot, type MascotMood } from "@/lib/mascotContext";
-import { useMascotState, useUpdateMascot } from "@/lib/queries";
+import { useMascotState } from "@/lib/queries";
 
 /**
- * Vidyārthi mascot — Stage 5 of the child-centric roadmap.
+ * Dhananjaya mascot — Stage 5 of the child-centric roadmap.
  *
  * A small archer figure pinned to the bottom-right of every learner
  * page. Reads mood + speech-bubble from the global MascotContext;
@@ -34,7 +34,6 @@ export function MascotCompanion() {
     user?.role === "student" || user?.role === "individual_learner";
 
   const mascotQ = useMascotState();
-  const updateMascot = useUpdateMascot();
   const { mood, message } = useMascot();
   const [hiddenThisSession, setHiddenThisSession] = useState(false);
 
@@ -55,27 +54,20 @@ export function MascotCompanion() {
         <MascotFigure mood={mood} />
         <button
           type="button"
-          aria-label="Hide mascot for now"
-          title="Hide mascot for now (will return on next visit)"
+          aria-label="Hide Dhananjaya for now"
+          title="Hide for now (Dhananjaya will return on next visit)"
           onClick={() => setHiddenThisSession(true)}
           className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-(--color-border) bg-(--color-card) text-(--color-muted-foreground) shadow-sm transition hover:text-(--color-foreground)"
         >
           <X className="h-3 w-3" />
         </button>
       </div>
-      {/* Tiny secondary action: permanently disable the mascot from
-          all devices. Only shown when the in-session hide is NOT
-          active (i.e. as part of the normal display), so the link
-          doesn't clutter the page after the user has hidden the
-          companion. */}
-      <button
-        type="button"
-        className="pointer-events-auto rounded-full bg-(--color-card)/90 px-2 py-0.5 text-[10px] text-(--color-muted-foreground) shadow-sm backdrop-blur-sm transition hover:text-(--color-foreground)"
-        onClick={() => updateMascot.mutate({ enabled: false })}
-        disabled={updateMascot.isPending}
-      >
-        Turn off Vidyārthi
-      </button>
+      {/* The persistent "Turn off Dhananjaya" affordance previously sat
+          here. Removed — "turn off" reads like switching off a person.
+          The session-hide × button above is the only off-switch the
+          learner needs for now; a future iteration may replace this
+          space with a richer interaction surface (an intro tour, live
+          tips, quick actions). */}
     </div>
   );
 }
@@ -349,15 +341,15 @@ function BowOverhead() {
 function moodAria(mood: MascotMood): string {
   switch (mood) {
     case "IDLE":
-      return "Vidyārthi — at rest";
+      return "Dhananjaya — at rest";
     case "DRAWN":
-      return "Vidyārthi — bow drawn, focused";
+      return "Dhananjaya — bow drawn, focused";
     case "FIRES":
-      return "Vidyārthi — arrow flies";
+      return "Dhananjaya — arrow flies";
     case "RESTRING":
-      return "Vidyārthi — restringing the bow";
+      return "Dhananjaya — restringing the bow";
     case "VICTORY":
-      return "Vidyārthi — victory pose";
+      return "Dhananjaya — victory pose";
   }
 }
 

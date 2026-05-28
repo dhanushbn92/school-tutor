@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
 /**
- * Vidyārthi mascot — Stage 5 of the child-centric roadmap.
+ * Dhananjaya mascot — Stage 5 of the child-centric roadmap.
  *
  * The mascot is a single component mounted once at the Shell level so
  * the same character figure follows the learner across pages. Pages

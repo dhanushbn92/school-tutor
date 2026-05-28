@@ -125,9 +125,10 @@ export function LearnerDashboard() {
       {/* "Your practice" card — weekly progress ring + stamp strip.
           Stage 1 of the child-centric roadmap. */}
       <PracticeCard />
-      {/* Stage 5 — only renders if the learner has previously turned
-          the Vidyārthi mascot off. Gives them a one-click path back
-          to enabling the companion so the off switch is reversible. */}
+      {/* Stage 5 — only renders if the Dhananjaya mascot is currently
+          disabled. Gives the learner a one-click path back to enabling
+          the companion. Legacy: the in-component off-switch was removed;
+          this hint stays for users whose mascot is disabled from earlier. */}
       <MascotToggleHint />
       {/* Stage 6 — "Notes from family" card. Renders nothing if no
           undismissed parent encouragements exist, so it stays
