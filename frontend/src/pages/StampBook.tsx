@@ -144,20 +144,30 @@ export function StampBookPage() {
           )}
 
           {/* ─── Full tally grid ─────────────────────────────────────
-              Every kind, ordered prestigious-first. Earned kinds show
-              a vivid badge + count; not-yet-earned slots show a
-              locked (muted) badge so the learner sees what's next. */}
+              Earned badges first (most prestigious among them at the
+              front), then locked / not-yet-earned slots in muted form.
+              This puts the learner's actual achievements at the top
+              of the grid; what's still ahead reads as a second-tier
+              "next up" section underneath. */}
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>All badges</CardTitle>
               <CardDescription>
-                Every stamp the platform awards. Greyed-out ones are still
+                Your earned badges first. Greyed-out ones below are still
                 ahead of you — keep practising to unlock them.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {STAMP_KIND_ORDER.map((kind) => {
+                {(() => {
+                  const earned = STAMP_KIND_ORDER.filter(
+                    (k) => (byKind.get(k)?.length ?? 0) > 0,
+                  );
+                  const locked = STAMP_KIND_ORDER.filter(
+                    (k) => (byKind.get(k)?.length ?? 0) === 0,
+                  );
+                  return [...earned, ...locked];
+                })().map((kind) => {
                   const meta = STAMP_PRESENTATION[kind];
                   const count = byKind.get(kind)?.length ?? 0;
                   const locked = count === 0;
