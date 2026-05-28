@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Award,
   Flame,
   Loader2,
   Pencil,
@@ -10,6 +9,7 @@ import {
   Target,
   X,
 } from "lucide-react";
+import { StampBadge } from "@/components/StampBadge";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -511,20 +511,9 @@ function StampChip({ stamp }: { stamp: LearnerStamp }) {
       </Badge>
     );
   }
-  return (
-    <span
-      className="inline-flex h-7 w-7 items-center justify-center rounded-full border text-base"
-      style={{
-        backgroundColor: `${meta.color}1a`, // hex + alpha
-        borderColor: meta.color,
-        color: meta.color,
-      }}
-      title={meta.label}
-      aria-label={meta.label}
-    >
-      <Award className="h-3.5 w-3.5" />
-    </span>
-  );
+  // Use the proper tier-aware StampBadge — gives the dashboard strip
+  // the same visual identity as the StampBook trophy showcase.
+  return <StampBadge kind={stamp.kind as StampKind} size="sm" />;
 }
 
 // STAMP_PRESENTATION lives in @/lib/stamps so both PracticeCard and

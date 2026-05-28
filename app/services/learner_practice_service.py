@@ -34,6 +34,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models import (
+    Assessment,
     LearnerLoginDay,
     LearnerPointsLedger,
     LearnerStamp,
@@ -684,6 +685,110 @@ def list_stamps(
 # Write-side: stamp awarding
 # ---------------------------------------------------------------------------
 
+# Thresholds for the tiered stamps. Tuned to feel earned, not
+# trivial: hitting 250 quizzes is a real milestone, hitting 30
+# consecutive practice days is genuinely impressive.
+STREAK_TIERS: list[tuple[int, "StampKind"]] = []  # populated lazily below
+VOLUME_TIERS: list[tuple[int, "StampKind"]] = []
+PERFECT_TIERS: list[tuple[int, "StampKind"]] = []
+MISTAKE_CLEARED_TIERS: list[tuple[int, "StampKind"]] = []
+DEEPER_LEARNER_THRESHOLD = 5
+
+
+def _tier_init() -> None:
+    """Populate the tier lists after StampKind import. Idempotent."""
+    global STREAK_TIERS, VOLUME_TIERS, PERFECT_TIERS, MISTAKE_CLEARED_TIERS
+    if STREAK_TIERS:
+        return
+    STREAK_TIERS = [
+        (3, StampKind.STREAK_3_DAYS),
+        (7, StampKind.STREAK_7_DAYS),
+        (14, StampKind.STREAK_14_DAYS),
+        (30, StampKind.STREAK_30_DAYS),
+    ]
+    VOLUME_TIERS = [
+        (1, StampKind.FIRST_QUIZ),
+        (10, StampKind.TEN_QUIZZES),
+        (50, StampKind.FIFTY_QUIZZES),
+        (100, StampKind.HUNDRED_QUIZZES),
+        (250, StampKind.TWO_FIFTY_QUIZZES),
+    ]
+    PERFECT_TIERS = [
+        (5, StampKind.FIVE_PERFECT_SCORES),
+        (10, StampKind.TEN_PERFECT_SCORES),
+    ]
+    MISTAKE_CLEARED_TIERS = [
+        (1, StampKind.MISTAKE_CLEARED),
+        (10, StampKind.TEN_MISTAKES_CLEARED),
+    ]
+
+
+def _award_one_shot(
+    db: Session,
+    *,
+    user_id: int,
+    kind: StampKind,
+    metadata: dict | None = None,
+) -> LearnerStamp | None:
+    """Award one stamp if the user doesn't already have one of this
+    kind. Returns the new stamp on insert, None when deduped.
+
+    Use this for stamps that fire once per learner (every milestone
+    + tier stamp). For per-(user, chapter) stamps like
+    CHAPTER_MASTERED, use _award_per_key below.
+    """
+    existing = db.scalar(
+        select(LearnerStamp.id)
+        .where(
+            LearnerStamp.user_id == user_id,
+            LearnerStamp.kind == kind,
+        )
+        .limit(1)
+    )
+    if existing is not None:
+        return None
+    stamp = LearnerStamp(user_id=user_id, kind=kind, stamp_metadata=metadata)
+    db.add(stamp)
+    return stamp
+
+
+def _award_per_chapter(
+    db: Session,
+    *,
+    user_id: int,
+    kind: StampKind,
+    chapter_id: int,
+    metadata: dict | None = None,
+) -> LearnerStamp | None:
+    """Award a per-(user, kind, chapter_id) stamp. Reads existing
+    stamps of this kind for the user and checks the chapter_id in
+    each one's metadata; awards only if none matches. Avoids any
+    JSONB-specific SQL access by doing the membership check in
+    Python — fine because the per-user count of these is small.
+    """
+    rows = db.scalars(
+        select(LearnerStamp).where(
+            LearnerStamp.user_id == user_id,
+            LearnerStamp.kind == kind,
+        )
+    ).all()
+    for row in rows:
+        meta = row.stamp_metadata or {}
+        if meta.get("chapter_id") == chapter_id:
+            return None
+    payload = {"chapter_id": chapter_id}
+    if metadata:
+        payload.update(metadata)
+    stamp = LearnerStamp(user_id=user_id, kind=kind, stamp_metadata=payload)
+    db.add(stamp)
+    return stamp
+
+
+# ---------------------------------------------------------------------------
+# Submission-triggered stamps (Stage 1 originals + tiered milestones)
+# ---------------------------------------------------------------------------
+
+
 def award_stamps_for_submission(db: Session, submission: Submission) -> list[LearnerStamp]:
     """Award the stamps unlocked by this submission. Idempotent for the
     natural-key stamps (PRACTICE_DAY, WEEKLY_GOAL_MET).
@@ -806,7 +911,309 @@ def award_stamps_for_submission(db: Session, submission: Submission) -> list[Lea
             db.add(week_stamp)
             awarded.append(week_stamp)
 
+    # --- Tiered + milestone stamps (added in the encouragement expansion) ---
+    _tier_init()
+
+    # 5. Volume milestones — count this user's total submissions and
+    # award FIRST_QUIZ / TEN / FIFTY / HUNDRED / TWO_FIFTY when each
+    # threshold is first crossed.
+    total_subs = db.scalar(
+        select(func.count(Submission.id)).where(
+            Submission.student_id == submission.student_id,
+        )
+    ) or 0
+    for threshold, kind in VOLUME_TIERS:
+        if total_subs >= threshold:
+            stamp = _award_one_shot(
+                db,
+                user_id=user_id,
+                kind=kind,
+                metadata={"submissions_total": total_subs},
+            )
+            if stamp is not None:
+                awarded.append(stamp)
+
+    # 6. Perfect-score tiers — count perfect submissions, award at 5
+    # and 10. We only count auto-graded perfect submissions
+    # (max_marks > 0 and total_awarded >= max_marks). Subjective
+    # submissions stay marks_awarded=None so they don't pollute.
+    perfect_total = db.scalar(
+        select(func.count(Submission.id)).where(
+            Submission.student_id == submission.student_id,
+            Submission.total_awarded.isnot(None),
+            Submission.max_marks > 0,
+            Submission.total_awarded >= Submission.max_marks,
+        )
+    ) or 0
+    for threshold, kind in PERFECT_TIERS:
+        if perfect_total >= threshold:
+            stamp = _award_one_shot(
+                db,
+                user_id=user_id,
+                kind=kind,
+                metadata={"perfect_total": perfect_total},
+            )
+            if stamp is not None:
+                awarded.append(stamp)
+
+    # 7. Streak milestones — read the current streak (after the
+    # auth-time login-day was already stamped) and award when it
+    # crosses each threshold for the first time.
+    streak = compute_login_streak(db, user_id=user_id)
+    for threshold, kind in STREAK_TIERS:
+        if streak.current >= threshold:
+            stamp = _award_one_shot(
+                db,
+                user_id=user_id,
+                kind=kind,
+                metadata={"streak": streak.current},
+            )
+            if stamp is not None:
+                awarded.append(stamp)
+
+    # 8. Speedrun marker — Stage 7's speedruns ride the quick-quiz
+    # pipeline so they land here as regular submissions. We detect
+    # them by the title prefix the launcher uses; if your speedrun
+    # naming changes, this needs to update.
+    assessment = db.get(Assessment, submission.assessment_id)
+    if assessment is not None and assessment.title and assessment.title.startswith("Speedrun"):
+        stamp = _award_one_shot(
+            db, user_id=user_id, kind=StampKind.TRIED_SPEEDRUN
+        )
+        if stamp is not None:
+            awarded.append(stamp)
+        # Maybe completes EXPLORER too.
+        explorer = _maybe_award_explorer(db, user_id=user_id)
+        if explorer is not None:
+            awarded.append(explorer)
+
+    # 9. Chapter mastery — for each chapter touched by this
+    # submission, recompute its mastery state. Awards CHAPTER_MASTERED
+    # once per (user, chapter) the first time a chapter crosses the
+    # 80% mastered threshold.
+    chapter_stamps = _award_chapter_mastered_stamps(
+        db, user_id=user_id, submission=submission
+    )
+    awarded.extend(chapter_stamps)
+
     db.flush()
+    return awarded
+
+
+def _maybe_award_explorer(
+    db: Session, *, user_id: int
+) -> LearnerStamp | None:
+    """Award EXPLORER if the learner has all three TRIED_* marker
+    stamps. Idempotent — no-op once EXPLORER is already earned."""
+    marker_kinds = (
+        StampKind.TRIED_SPEEDRUN,
+        StampKind.TRIED_SURPRISE,
+        StampKind.TRIED_FLASHCARDS,
+    )
+    have = set(
+        db.scalars(
+            select(LearnerStamp.kind).where(
+                LearnerStamp.user_id == user_id,
+                LearnerStamp.kind.in_(marker_kinds),
+            )
+        ).all()
+    )
+    if not all(k in have for k in marker_kinds):
+        return None
+    return _award_one_shot(db, user_id=user_id, kind=StampKind.EXPLORER)
+
+
+def _award_chapter_mastered_stamps(
+    db: Session, *, user_id: int, submission: Submission
+) -> list[LearnerStamp]:
+    """Recompute mastery state for each chapter touched by this
+    submission's answers and award CHAPTER_MASTERED for any chapter
+    that just crossed the threshold for the first time."""
+    from app.models import Question  # local to avoid cycles
+    from app.services import mastery_service
+
+    if not submission.answers:
+        return []
+
+    # Find distinct chapter_ids the submission's questions belong to.
+    question_ids = [sa.question_id for sa in submission.answers if sa.question_id]
+    if not question_ids:
+        return []
+    chapter_ids = list(
+        db.scalars(
+            select(Question.chapter_id).where(Question.id.in_(question_ids))
+        ).all()
+    )
+    chapter_ids = sorted({c for c in chapter_ids if c is not None})
+    if not chapter_ids:
+        return []
+
+    student = _student_from_user(db, user_id=user_id)
+    if student is None:
+        return []
+
+    awarded: list[LearnerStamp] = []
+    # Per Stage 4 narrative: a chapter is "mastered" when at least
+    # 80% of its outcomes are individually at >= 75% mastery.
+    MASTERY_FLOOR = 0.75
+    CHAPTER_MASTERED_RATIO = 0.8
+
+    for chapter_id in chapter_ids:
+        # We need the chapter's class + subject context to query its
+        # outcomes via the mastery grid. Skip if the chapter row is
+        # gone (defensive — questions FK ON DELETE SET NULL).
+        from app.models import Chapter, Book, SchoolClass, Subject
+
+        chapter = db.get(Chapter, chapter_id)
+        if chapter is None:
+            continue
+        book = db.get(Book, chapter.book_id) if chapter.book_id else None
+        subject = db.get(Subject, book.subject_id) if book else None
+        if subject is None:
+            continue
+        school_class = db.get(SchoolClass, subject.class_id)
+        if school_class is None:
+            continue
+        grid = mastery_service.build_student_grid(
+            db,
+            student_id=student.id,
+            class_level=school_class.level,
+            subject_id=subject.id,
+        )
+        # Find this chapter inside the grid (the grid returns every
+        # chapter of the subject; we only care about ours).
+        match = next(
+            (c for c in grid.get("chapters", []) if c.get("chapter_id") == chapter_id),
+            None,
+        )
+        if match is None:
+            continue
+        outcomes = match.get("outcomes", []) or []
+        if not outcomes:
+            continue
+        mastered_count = sum(
+            1
+            for o in outcomes
+            if isinstance(o.get("mastery"), (int, float))
+            and o.get("mastery", 0) >= MASTERY_FLOOR
+        )
+        if mastered_count / len(outcomes) < CHAPTER_MASTERED_RATIO:
+            continue
+        # Chapter qualifies — award if not already awarded for this
+        # (user, chapter).
+        stamp = _award_per_chapter(
+            db,
+            user_id=user_id,
+            kind=StampKind.CHAPTER_MASTERED,
+            chapter_id=chapter_id,
+            metadata={
+                "subject_id": subject.id,
+                "subject_name": subject.name,
+                "chapter_title": chapter.title,
+            },
+        )
+        if stamp is not None:
+            awarded.append(stamp)
+    return awarded
+
+
+def _student_from_user(db: Session, *, user_id: int):  # type: ignore[no-untyped-def]
+    from app.models import Student
+    return db.scalar(select(Student).where(Student.user_id == user_id))
+
+
+# ---------------------------------------------------------------------------
+# Stamps awarded outside the submission flow
+# ---------------------------------------------------------------------------
+
+
+def award_mistake_stamps(
+    db: Session, *, user_id: int, resolved: bool
+) -> list[LearnerStamp]:
+    """Award MISTAKE_CLEARED + TEN_MISTAKES_CLEARED tiers. Called
+    from the retry endpoint when a retry resolves a mistake (the
+    twice-right rule). Counting strategy: every time we land here
+    with resolved=True, count how many LearnerMistake rows currently
+    have consecutive_corrects >= the resolution threshold for this
+    user (i.e. the cleared count). Award at thresholds.
+    """
+    _tier_init()
+    if not resolved:
+        return []
+    from app.models import LearnerMistake  # local to avoid cycles
+
+    cleared_total = db.scalar(
+        select(func.count(LearnerMistake.id)).where(
+            LearnerMistake.user_id == user_id,
+            LearnerMistake.consecutive_corrects >= 2,
+        )
+    ) or 0
+
+    awarded: list[LearnerStamp] = []
+    for threshold, kind in MISTAKE_CLEARED_TIERS:
+        if cleared_total >= threshold:
+            stamp = _award_one_shot(
+                db,
+                user_id=user_id,
+                kind=kind,
+                metadata={"cleared_total": cleared_total},
+            )
+            if stamp is not None:
+                awarded.append(stamp)
+    if awarded:
+        db.flush()
+    return awarded
+
+
+def award_explain_stamp(db: Session, *, user_id: int) -> LearnerStamp | None:
+    """Award DEEPER_LEARNER after the 5th unique tier opened. Counts
+    rows in question_extended_explanation generated by this user;
+    each (question, tier) pair counts once because the table has a
+    UNIQUE(question_id, tier) constraint."""
+    from app.models import QuestionExtendedExplanation
+
+    opens = db.scalar(
+        select(func.count(QuestionExtendedExplanation.id)).where(
+            QuestionExtendedExplanation.generated_by_id == user_id,
+        )
+    ) or 0
+    if opens < DEEPER_LEARNER_THRESHOLD:
+        return None
+    stamp = _award_one_shot(
+        db,
+        user_id=user_id,
+        kind=StampKind.DEEPER_LEARNER,
+        metadata={"opens": opens},
+    )
+    if stamp is not None:
+        db.flush()
+    return stamp
+
+
+def award_practice_mode_stamp(
+    db: Session, *, user_id: int, mode: str
+) -> list[LearnerStamp]:
+    """Award TRIED_SURPRISE / TRIED_FLASHCARDS the first time a
+    learner uses each practice-variety mode. TRIED_SPEEDRUN is
+    handled inside award_stamps_for_submission (it rides the
+    quick-quiz pipeline). When all three TRIED_* markers exist, the
+    EXPLORER stamp is awarded too.
+    """
+    mode_to_kind = {
+        "surprise": StampKind.TRIED_SURPRISE,
+        "flashcards": StampKind.TRIED_FLASHCARDS,
+    }
+    kind = mode_to_kind.get(mode)
+    if kind is None:
+        return []
+    awarded: list[LearnerStamp] = []
+    stamp = _award_one_shot(db, user_id=user_id, kind=kind)
+    if stamp is not None:
+        awarded.append(stamp)
+        explorer = _maybe_award_explorer(db, user_id=user_id)
+        if explorer is not None:
+            awarded.append(explorer)
+        db.flush()
     return awarded
 
 

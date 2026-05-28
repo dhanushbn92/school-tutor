@@ -834,7 +834,32 @@ export type StampKind =
   | "QUIZ_COMPLETED"
   | "PERFECT_SCORE"
   | "PRACTICE_DAY"
-  | "WEEKLY_GOAL_MET";
+  | "WEEKLY_GOAL_MET"
+  // Streak milestones (one-shot at each threshold)
+  | "STREAK_3_DAYS"
+  | "STREAK_7_DAYS"
+  | "STREAK_14_DAYS"
+  | "STREAK_30_DAYS"
+  // Volume milestones
+  | "FIRST_QUIZ"
+  | "TEN_QUIZZES"
+  | "FIFTY_QUIZZES"
+  | "HUNDRED_QUIZZES"
+  | "TWO_FIFTY_QUIZZES"
+  // Perfect-score tiers
+  | "FIVE_PERFECT_SCORES"
+  | "TEN_PERFECT_SCORES"
+  // Mistake mastery (Stage 2 ties in)
+  | "MISTAKE_CLEARED"
+  | "TEN_MISTAKES_CLEARED"
+  // Chapter mastery (Stage 4 ties in)
+  | "CHAPTER_MASTERED"
+  // Learning exploration (Stage 3 + Stage 7 ties in)
+  | "DEEPER_LEARNER"
+  | "TRIED_SPEEDRUN"
+  | "TRIED_SURPRISE"
+  | "TRIED_FLASHCARDS"
+  | "EXPLORER";
 
 export interface LearnerStamp {
   id: number;

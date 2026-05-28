@@ -6,22 +6,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Empty } from "@/components/ui/empty";
 import { Badge } from "@/components/ui/badge";
-import { STAMP_PRESENTATION } from "@/lib/stamps";
+import { StampBadge } from "@/components/StampBadge";
+import {
+  STAMP_KIND_ORDER,
+  STAMP_PRESENTATION,
+  type StampTier,
+} from "@/lib/stamps";
 import { useMyStamps } from "@/lib/queries";
 import type { LearnerStamp, StampKind } from "@/lib/types";
 import { formatDateTime } from "@/lib/utils";
 
 /**
- * The learner's stamp collection — the more-detailed cousin of the
- * recent-stamps strip on the dashboard's "Your practice" card.
+ * The learner's stamp collection — designed as a SHOWCASE.
  *
- * Lays out every stamp the learner has earned, grouped by kind so
- * "I have N practice-day stamps" is readable at a glance. Each kind's
- * presentation (icon colour + label) comes from STAMP_PRESENTATION so
- * the dashboard chips and this page stay visually in sync.
+ * Three sections:
+ *   1. Trophy showcase — a hero strip featuring the learner's biggest
+ *      EARNED achievements (platinum + gold + silver tiers) with full
+ *      ribbon-decorated badges. This is the prideful 'these are mine'
+ *      moment up front.
+ *   2. Full tally grid — every kind, with a tier-aware badge plus a
+ *      count and label, including locked-but-not-yet-earned slots in
+ *      muted form so the learner sees what's still ahead.
+ *   3. Chronological feed — newest stamps first, small badge + metadata.
  *
- * Stamps are immutable; this page is read-only. No mutate / delete
- * affordances — earned is earned.
+ * Stamps are immutable; this page is read-only.
  */
 export function StampBookPage() {
   const stampsQ = useMyStamps(500);
@@ -37,21 +45,26 @@ export function StampBookPage() {
   }
   const stamps = stampsQ.data ?? [];
 
-  // Group by kind for the per-kind tally; the all-stamps section
-  // below renders them chronologically so a learner can see their
-  // most recent wins at the top.
-  const byKind = new Map<string, LearnerStamp[]>();
+  // Group by kind for tallies + first-earned lookup.
+  const byKind = new Map<StampKind, LearnerStamp[]>();
   for (const s of stamps) {
-    const key = s.kind;
+    const key = s.kind as StampKind;
     if (!byKind.has(key)) byKind.set(key, []);
     byKind.get(key)!.push(s);
   }
-  const kindOrder: StampKind[] = [
-    "WEEKLY_GOAL_MET",
-    "PERFECT_SCORE",
-    "PRACTICE_DAY",
-    "QUIZ_COMPLETED",
-  ];
+
+  // Tier-aware showcase: pick the learner's most prestigious earned
+  // kinds for the hero strip, capped at 5 so the layout stays balanced.
+  const tierOrder: StampTier[] = ["platinum", "gold", "silver"];
+  const showcaseKinds: StampKind[] = [];
+  for (const tier of tierOrder) {
+    for (const kind of STAMP_KIND_ORDER) {
+      if (showcaseKinds.length >= 5) break;
+      if ((byKind.get(kind)?.length ?? 0) === 0) continue;
+      if (STAMP_PRESENTATION[kind].tier !== tier) continue;
+      showcaseKinds.push(kind);
+    }
+  }
 
   return (
     <ThemedPage>
@@ -84,40 +97,101 @@ export function StampBookPage() {
         />
       ) : (
         <>
-          {/* Per-kind tally row — quick "how many of each have I earned?" */}
-          <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {kindOrder.map((kind) => {
-              const meta = STAMP_PRESENTATION[kind];
-              const count = byKind.get(kind)?.length ?? 0;
-              return (
-                <Card key={kind}>
-                  <CardContent className="flex items-center gap-3 py-4">
-                    <span
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border"
-                      style={{
-                        backgroundColor: `${meta.color}1a`,
-                        borderColor: meta.color,
-                        color: meta.color,
-                      }}
-                    >
-                      <Award className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0">
-                      <div className="font-display text-2xl font-semibold leading-none tabular-nums">
-                        {count}
+          {/* ─── Trophy showcase ─────────────────────────────────────
+              Hero strip of the learner's biggest wins. Each badge is
+              fully decorated (ribbon, big tier shape) — this is the
+              section that makes the learner feel proud. */}
+          {showcaseKinds.length > 0 && (
+            <Card className="mb-6 overflow-hidden border-(--color-primary)/30 bg-gradient-to-br from-(--color-primary)/5 via-transparent to-(--color-accent)/10">
+              <CardHeader>
+                <CardTitle className="font-display text-2xl">
+                  Trophy showcase
+                </CardTitle>
+                <CardDescription>
+                  Your biggest wins so far. Earned, not given.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap items-end justify-center gap-6 sm:gap-10 py-4">
+                  {showcaseKinds.map((kind) => {
+                    const meta = STAMP_PRESENTATION[kind];
+                    const count = byKind.get(kind)?.length ?? 0;
+                    return (
+                      <div
+                        key={kind}
+                        className="flex flex-col items-center gap-1.5 text-center"
+                      >
+                        <StampBadge kind={kind} size="lg" showRibbon />
+                        <div className="text-sm font-semibold">{meta.label}</div>
+                        {count > 1 && (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] uppercase tracking-wide"
+                            style={{
+                              borderColor: meta.color,
+                              color: meta.color,
+                            }}
+                          >
+                            ×{count} earned
+                          </Badge>
+                        )}
                       </div>
-                      <div className="mt-0.5 text-xs text-(--color-muted-foreground)">
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ─── Full tally grid ─────────────────────────────────────
+              Every kind, ordered prestigious-first. Earned kinds show
+              a vivid badge + count; not-yet-earned slots show a
+              locked (muted) badge so the learner sees what's next. */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>All badges</CardTitle>
+              <CardDescription>
+                Every stamp the platform awards. Greyed-out ones are still
+                ahead of you — keep practising to unlock them.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {STAMP_KIND_ORDER.map((kind) => {
+                  const meta = STAMP_PRESENTATION[kind];
+                  const count = byKind.get(kind)?.length ?? 0;
+                  const locked = count === 0;
+                  return (
+                    <div
+                      key={kind}
+                      className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-center transition-colors ${
+                        locked
+                          ? "border-dashed border-(--color-border) bg-(--color-muted)/20"
+                          : "border-(--color-border) bg-(--color-card)"
+                      }`}
+                    >
+                      <StampBadge kind={kind} size="md" locked={locked} />
+                      <div
+                        className={`text-sm font-medium ${locked ? "text-(--color-muted-foreground)" : ""}`}
+                      >
                         {meta.label}
                       </div>
+                      <div className="text-[10px] uppercase tracking-wide text-(--color-muted-foreground)">
+                        {meta.tier} · {meta.tagline}
+                      </div>
+                      {!locked && (
+                        <div className="font-display text-xl font-bold tabular-nums">
+                          ×{count}
+                        </div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Chronological full list — newest first. Each card shows
-              kind + when + a short metadata blurb. */}
+          {/* ─── Chronological feed — newest first ─────────────────── */}
           <Card>
             <CardHeader>
               <CardTitle>Every stamp, newest first</CardTitle>
@@ -131,28 +205,21 @@ export function StampBookPage() {
                   const meta = STAMP_PRESENTATION[s.kind as StampKind];
                   return (
                     <li key={s.id} className="flex items-start gap-3 py-3">
-                      <span
-                        className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border"
-                        style={
-                          meta
-                            ? {
-                                backgroundColor: `${meta.color}1a`,
-                                borderColor: meta.color,
-                                color: meta.color,
-                              }
-                            : undefined
-                        }
-                      >
-                        <Award className="h-4 w-4" />
-                      </span>
+                      <StampBadge kind={s.kind as StampKind} size="sm" />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2 text-sm">
                           <span className="font-medium">
                             {meta?.label ?? s.kind}
                           </span>
-                          <Badge variant="outline" className="text-[10px]">
-                            {s.kind}
-                          </Badge>
+                          {meta && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] uppercase tracking-wide"
+                              style={{ borderColor: meta.color, color: meta.color }}
+                            >
+                              {meta.tier} · {meta.tagline}
+                            </Badge>
+                          )}
                           <span className="text-xs text-(--color-muted-foreground)">
                             {formatDateTime(s.earned_at)}
                           </span>

@@ -172,6 +172,19 @@ def get_or_generate(
     try:
         db.commit()
         db.refresh(row)
+        # Encouragement: award DEEPER_LEARNER stamp once the learner
+        # has opened 5 unique (question, tier) pairs. Fire-and-forget
+        # — a stamp bug shouldn't poison the explanation reveal.
+        if user is not None:
+            try:
+                from app.services import learner_practice_service
+
+                learner_practice_service.award_explain_stamp(
+                    db, user_id=user.id
+                )
+                db.commit()
+            except Exception:  # pragma: no cover — best-effort
+                db.rollback()
         return row
     except IntegrityError:
         # Lost the race against a concurrent click. Roll back and

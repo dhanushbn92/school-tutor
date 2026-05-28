@@ -297,12 +297,27 @@ def record_retry_attempt(
         mistake.wrong_streak = prior_wrong_streak + 1
     db.commit()
 
+    # Stamp awarding (encouragement layer). Fire-and-forget: a stamp
+    # bug must never poison the retry. We award MISTAKE_CLEARED +
+    # TEN_MISTAKES_CLEARED in their own transaction.
+    resolved = mistake.consecutive_corrects >= RESOLVED_THRESHOLD
+    if resolved:
+        try:
+            from app.services import learner_practice_service
+
+            learner_practice_service.award_mistake_stamps(
+                db, user_id=user_id, resolved=True
+            )
+            db.commit()
+        except Exception:  # pragma: no cover — best-effort
+            db.rollback()
+
     return RetryResult(
         correct=is_correct,
         correct_answer=question.correct_answer,
         explanation=question.explanation,
         consecutive_corrects=mistake.consecutive_corrects,
-        resolved=mistake.consecutive_corrects >= RESOLVED_THRESHOLD,
+        resolved=resolved,
         wrong_streak=mistake.wrong_streak,
         hint_available=mistake.wrong_streak >= HINT_THRESHOLD,
         was_struggling=is_correct and prior_wrong_streak >= 2,

@@ -871,6 +871,16 @@ def get_practice_surprise(
         q = practice_variety_service.pick_surprise(db, user=user)
     except PracticeVarietyError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    # Encouragement: first surprise-me roll earns TRIED_SURPRISE
+    # (and EXPLORER once all three practice modes are tried).
+    # Fire-and-forget — stamp bugs must never break the endpoint.
+    try:
+        learner_practice_service.award_practice_mode_stamp(
+            db, user_id=user.id, mode="surprise"
+        )
+        db.commit()
+    except Exception:  # pragma: no cover — best-effort
+        db.rollback()
     return practice_variety_service.question_to_card_dict(q)
 
 
@@ -968,4 +978,13 @@ def get_practice_flashcards(
         )
     except PracticeVarietyError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    # Encouragement: first flashcards fetch earns TRIED_FLASHCARDS
+    # (and EXPLORER once all three practice modes are tried).
+    try:
+        learner_practice_service.award_practice_mode_stamp(
+            db, user_id=user.id, mode="flashcards"
+        )
+        db.commit()
+    except Exception:  # pragma: no cover — best-effort
+        db.rollback()
     return [practice_variety_service.question_to_card_dict(q) for q in qs]

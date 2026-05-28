@@ -42,8 +42,16 @@ from app.db.base import Base
 class StampKind(StrEnum):
     """What earned the stamp. New kinds may be added freely — UI does an
     exhaustive `switch` on these so a missing branch falls through to a
-    "generic stamp" rendering rather than crashing."""
+    "generic stamp" rendering rather than crashing.
 
+    The `kind` column is VARCHAR(32) so any new value fits without a
+    schema migration. STAMP_PRESENTATION on the frontend should grow
+    a matching entry per new kind (icon + colour + label) so the
+    stamp book renders it cleanly; missing presentation falls back to
+    a generic outline chip.
+    """
+
+    # --- Existing (Stage 1) — fire on every submission ---
     # Awarded once per submission that completes (any score).
     QUIZ_COMPLETED = "QUIZ_COMPLETED"
     # Awarded when the submission scores 100% of available marks.
@@ -55,6 +63,49 @@ class StampKind(StrEnum):
     # weekly goal for the ISO week the submission landed in. Awarded
     # at most once per (user, week_start).
     WEEKLY_GOAL_MET = "WEEKLY_GOAL_MET"
+
+    # --- Streak milestones — one-shot at each threshold ---
+    STREAK_3_DAYS = "STREAK_3_DAYS"
+    STREAK_7_DAYS = "STREAK_7_DAYS"
+    STREAK_14_DAYS = "STREAK_14_DAYS"
+    STREAK_30_DAYS = "STREAK_30_DAYS"
+
+    # --- Volume milestones — one-shot at each submission count ---
+    FIRST_QUIZ = "FIRST_QUIZ"
+    TEN_QUIZZES = "TEN_QUIZZES"
+    FIFTY_QUIZZES = "FIFTY_QUIZZES"
+    HUNDRED_QUIZZES = "HUNDRED_QUIZZES"
+    TWO_FIFTY_QUIZZES = "TWO_FIFTY_QUIZZES"
+
+    # --- Perfect-score tiers — one-shot at each perfect count ---
+    FIVE_PERFECT_SCORES = "FIVE_PERFECT_SCORES"
+    TEN_PERFECT_SCORES = "TEN_PERFECT_SCORES"
+
+    # --- Mistake mastery (Stage 2 ties in) ---
+    # First time a mistake row is resolved (twice-right rule).
+    MISTAKE_CLEARED = "MISTAKE_CLEARED"
+    # Tenth mistake row resolved.
+    TEN_MISTAKES_CLEARED = "TEN_MISTAKES_CLEARED"
+
+    # --- Mastery (Stage 4 ties in) ---
+    # First time any chapter crosses the "mastered" threshold (80% of
+    # outcomes at >= 75% mastery, per the Stage 4 narrative rule).
+    # Metadata: {"chapter_id": N} — awarded at most once per (user,
+    # chapter_id) so a learner who masters several chapters earns the
+    # stamp multiple times.
+    CHAPTER_MASTERED = "CHAPTER_MASTERED"
+
+    # --- Exploration (Stage 3 + Stage 7 ties in) ---
+    # Opened any "Tell me more" tier 5 times across the catalogue.
+    DEEPER_LEARNER = "DEEPER_LEARNER"
+    # First time a learner uses each practice-variety mode. These act
+    # as visible encouragement on their own AND combine to award
+    # EXPLORER below.
+    TRIED_SPEEDRUN = "TRIED_SPEEDRUN"
+    TRIED_SURPRISE = "TRIED_SURPRISE"
+    TRIED_FLASHCARDS = "TRIED_FLASHCARDS"
+    # Awarded when all three TRIED_* stamps exist for the learner.
+    EXPLORER = "EXPLORER"
 
 
 class LearnerWeeklyGoal(Base):
