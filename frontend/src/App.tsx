@@ -38,6 +38,7 @@ import { AiChatAdminPage } from "@/pages/AiChatAdmin";
 import { TenantsPage } from "@/pages/Tenants";
 import { TenantSchoolDetailPage } from "@/pages/TenantSchoolDetail";
 import { TenantLearnerDetailPage } from "@/pages/TenantLearnerDetail";
+import { ContentBundleUploadPage } from "@/pages/ContentBundleUpload";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -140,8 +141,22 @@ export default function App() {
                   </RequireRole>
                 }
               />
-              <Route path="content" element={<ContentLibraryPage />} />
-              <Route path="content/:contentId" element={<ContentDetailPage />} />
+              <Route
+                path="content"
+                element={
+                  <RequireRole allowed={["platform_admin", "school_admin", "teacher"]}>
+                    <ContentLibraryPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="content/:contentId"
+                element={
+                  <RequireRole allowed={["platform_admin", "school_admin", "teacher"]}>
+                    <ContentDetailPage />
+                  </RequireRole>
+                }
+              />
               <Route
                 path="generate"
                 element={
@@ -204,6 +219,14 @@ export default function App() {
                 element={
                   <RequireRole allowed={["platform_admin"]}>
                     <AiChatAdminPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="content-bundle-upload"
+                element={
+                  <RequireRole allowed={["platform_admin"]}>
+                    <ContentBundleUploadPage />
                   </RequireRole>
                 }
               />

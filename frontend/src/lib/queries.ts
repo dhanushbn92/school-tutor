@@ -1593,6 +1593,76 @@ export function useUploadExtraContent() {
   });
 }
 
+/**
+ * Platform-admin-only multipart upload of a content-bundle JSON. The
+ * server validates the schema, resolves the chapter, and either does a
+ * dry-run (returns what WOULD be loaded) or actually ingests.
+ *
+ * Backend route: POST /platform/content-bundle/ingest.
+ */
+export type BundleIngestReport = {
+  chapter_id: number;
+  chapter_text_replaced: boolean;
+  topics: { inserted: number; skipped: number };
+  outcomes: { inserted: number; skipped: number };
+  questions: { inserted: number; skipped: number };
+  content_blobs: { replaced: string[]; inserted: string[] };
+};
+
+export type BundleDryRunResult = {
+  dry_run: true;
+  curriculum: {
+    board: string;
+    class_level: number;
+    subject: string;
+    chapter_number: number;
+    chapter_title: string;
+    book_title?: string | null;
+    language?: string;
+    academic_year?: string;
+  };
+  would_load: {
+    chapter_text: boolean;
+    topics: number;
+    outcomes: number;
+    questions: number;
+    chapter_summary: boolean;
+    lesson_plan: boolean;
+    worksheet: boolean;
+    ppt: boolean;
+    diagram: boolean;
+    simulation: boolean;
+  };
+};
+
+export type BundleIngestResult = { dry_run: false; report: BundleIngestReport };
+
+export function useIngestContentBundle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { file: File; dry_run: boolean }) => {
+      const form = new FormData();
+      form.append("file", input.file);
+      form.append("dry_run", input.dry_run ? "true" : "false");
+      const { data } = await api.post<BundleDryRunResult | BundleIngestResult>(
+        "/platform/content-bundle/ingest",
+        form,
+        { headers: { "Content-Type": "multipart/form-data" } },
+      );
+      return data;
+    },
+    onSuccess: (data) => {
+      // After a real ingest, anything that lists generated content,
+      // chapters or questions may have changed.
+      if (!data.dry_run) {
+        qc.invalidateQueries({ queryKey: ["generated-content"] });
+        qc.invalidateQueries({ queryKey: ["chapter"] });
+        qc.invalidateQueries({ queryKey: ["question-bank"] });
+      }
+    },
+  });
+}
+
 // ---------- assessments + submissions ----------
 export function useAssessment(id?: number) {
   return useQuery({

@@ -6,12 +6,17 @@ toggle their access. *Edits* to school details intentionally are not
 exposed — that stays with the school admin. The only write here is the
 activation toggle.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
+import logging
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import require_platform_admin
 from app.db.session import get_db
 from app.models.school import User
+from app.schemas.content_bundle import ContentBundle
 from app.schemas.platform import (
     ActivationToggle,
     PlatformLearnerOverview,
@@ -20,6 +25,17 @@ from app.schemas.platform import (
     PlatformSchoolSummary,
 )
 from app.services import platform_service
+from app.services.content_bundle_service import (
+    ContentBundleError,
+    ingest_bundle,
+)
+
+
+logger = logging.getLogger(__name__)
+
+
+# Max bundle size — JSON is small, but cap to prevent abuse.
+_BUNDLE_MAX_BYTES = 5 * 1024 * 1024  # 5 MB
 
 
 router = APIRouter(prefix="/platform", tags=["platform"])
@@ -129,3 +145,106 @@ def toggle_learner_activation(
         if row["user_id"] == learner.id:
             return row
     raise HTTPException(status_code=500, detail="Learner row missing after toggle")
+
+
+# ---------- Content bundle upload ----------
+
+
+@router.post("/content-bundle/ingest")
+async def ingest_content_bundle(
+    file: UploadFile = File(..., description="A v1.0 content-bundle JSON file."),
+    dry_run: bool = Form(default=False, description="If true, validate and resolve the chapter without writing to the DB."),
+    db: Session = Depends(get_db),
+    user: User = Depends(require_platform_admin),
+):
+    """Upload a content-bundle JSON for a chapter.
+
+    See `app/schemas/content_bundle.py` for the format and
+    `scripts/content_bundle_examples/README.md` for an authoring guide.
+
+    Behaviour:
+      - Returns 200 + an `IngestReport`-shaped JSON on success.
+      - Returns 422 with a structured `{"detail": ..., "validation_errors": [...]}`
+        when the JSON doesn't match the bundle schema.
+      - Returns 400 when the curriculum coordinates don't resolve
+        (e.g. chapter not scaffolded yet).
+      - `dry_run=true` runs the schema validation and chapter lookup,
+        and reports what WOULD be loaded, without touching the DB.
+    """
+    # 1. Read and size-cap.
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty file.")
+    if len(raw) > _BUNDLE_MAX_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Bundle too large; limit is {_BUNDLE_MAX_BYTES // (1024 * 1024)} MB.",
+        )
+
+    # 2. Parse JSON.
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File is not valid UTF-8.")
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File is not valid JSON: line {exc.lineno} col {exc.colno}: {exc.msg}",
+        )
+
+    # 3. Validate against the bundle schema.
+    try:
+        bundle = ContentBundle.model_validate(payload)
+    except ValidationError as exc:
+        # Surface every field-level error so the UI can show them inline.
+        errors = []
+        for err in exc.errors():
+            errors.append({
+                "field": ".".join(str(p) for p in err.get("loc", [])),
+                "message": err.get("msg", "invalid"),
+                "type": err.get("type", "value_error"),
+            })
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "message": "Bundle failed schema validation.",
+                "errors": errors,
+            },
+        )
+
+    # 4. Dry-run path: don't touch the DB.
+    if dry_run:
+        return {
+            "dry_run": True,
+            "curriculum": bundle.curriculum.model_dump(),
+            "would_load": {
+                "chapter_text": bundle.chapter_text is not None,
+                "topics": len(bundle.topics),
+                "outcomes": len(bundle.learning_outcomes),
+                "questions": len(bundle.questions),
+                "chapter_summary": bundle.chapter_summary is not None,
+                "lesson_plan": bundle.lesson_plan is not None,
+                "worksheet": bundle.worksheet is not None,
+                "ppt": bundle.ppt is not None,
+                "diagram": bundle.diagram is not None,
+                "simulation": bundle.simulation is not None,
+            },
+        }
+
+    # 5. Real ingest.
+    try:
+        report = ingest_bundle(db, bundle, created_by_id=user.id)
+        db.commit()
+    except ContentBundleError as exc:
+        db.rollback()
+        # Domain error (chapter not found etc.) — 400 with the readable message.
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:  # pragma: no cover — defensive
+        db.rollback()
+        logger.exception("content-bundle ingest failed unexpectedly")
+        raise HTTPException(status_code=500, detail="Bundle ingest failed; see server logs.")
+
+    return {
+        "dry_run": False,
+        "report": report.as_dict(),
+    }

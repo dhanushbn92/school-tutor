@@ -13,6 +13,7 @@ import {
   RotateCcw,
   ShieldCheck,
   Sparkles,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -54,9 +55,16 @@ const NAV: NavItem[] = [
   // Internal curation surface for the platform team only — schools and
   // teachers consume questions indirectly via assessments, not the bank.
   { to: "/question-bank", label: "Question bank", icon: <NotebookPen className="h-4 w-4" />, roles: ["platform_admin"] },
-  { to: "/content", label: "Content library", icon: <FolderOpen className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "individual_learner"] },
+  // Content library is an authoring / curation surface. Learners reach the
+  // material through Learn → chapter → artefacts, scoped to their (board, class).
+  // Exposing the full library to learners leaked other classes and other
+  // boards into the picker, so it's restricted to admin/teacher roles only.
+  { to: "/content", label: "Content library", icon: <FolderOpen className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher"] },
   // Generation is a platform-team workflow; schools and individuals consume the catalog only.
   { to: "/generate", label: "Generate", icon: <Sparkles className="h-4 w-4" />, roles: ["platform_admin"] },
+  // Bulk content ingest via a JSON bundle — lets external content creators
+  // hand the platform team a single file per chapter.
+  { to: "/content-bundle-upload", label: "Upload content", icon: <Upload className="h-4 w-4" />, roles: ["platform_admin"] },
   { to: "/curriculum", label: "Curriculum", icon: <BookOpenText className="h-4 w-4" />, roles: ["platform_admin", "school_admin", "teacher", "individual_learner"] },
   { to: "/manage", label: "Manage school", icon: <Building2 className="h-4 w-4" />, roles: ["school_admin"] },
   { to: "/tenants", label: "Tenants", icon: <Building2 className="h-4 w-4" />, roles: ["platform_admin"] },
