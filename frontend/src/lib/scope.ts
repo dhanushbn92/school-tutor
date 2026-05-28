@@ -2,10 +2,36 @@ import { useMemo } from "react";
 import { useAuth } from "@/lib/auth";
 import {
   useClasses,
+  useMySections,
   useMyTeacherSubjects,
   useSubjects,
 } from "@/lib/queries";
 import type { SchoolClass, Subject } from "@/lib/types";
+
+
+/**
+ * For learner roles (student, individual_learner), returns the class level
+ * the learner is actually enrolled in. For other roles, returns undefined.
+ *
+ * Used to scope Curriculum / Learn / Content pickers so a Class 10 student
+ * doesn't see Class 12 material (or vice versa) in the dropdowns.
+ */
+export function useLearnerOwnClassLevel(): {
+  classLevel: number | undefined;
+  isLoading: boolean;
+} {
+  const { user } = useAuth();
+  const isLearner = user?.role === "student" || user?.role === "individual_learner";
+  const sectionsQ = useMySections();
+
+  const classLevel = useMemo<number | undefined>(() => {
+    if (!isLearner) return undefined;
+    const first = sectionsQ.data?.[0];
+    return first?.class_level ?? undefined;
+  }, [isLearner, sectionsQ.data]);
+
+  return { classLevel, isLoading: isLearner && sectionsQ.isLoading };
+}
 
 interface AvailableClasses {
   classes: SchoolClass[];
@@ -33,8 +59,13 @@ export function useAvailableClasses(): AvailableClasses {
   const { user } = useAuth();
   const allClassesQ = useClasses();
   const isTeacher = user?.role === "teacher";
+  const isLearner =
+    user?.role === "student" || user?.role === "individual_learner";
+
   // Don't fire the teacher-subjects query for non-teacher roles.
   const teacherSubjectsQ = useMyTeacherSubjects(isTeacher);
+  // Resolve learner's own enrolled class level so we can lock the picker.
+  const ownLevel = useLearnerOwnClassLevel();
 
   // Teachers need *all* subjects loaded so we can map their subject_ids
   // back to class_ids. We opt in to the cross-class fetch — by default
@@ -47,10 +78,17 @@ export function useAvailableClasses(): AvailableClasses {
   const isLoading =
     allClassesQ.isLoading ||
     (isTeacher &&
-      (teacherSubjectsQ.isLoading || allSubjectsQ.isLoading));
+      (teacherSubjectsQ.isLoading || allSubjectsQ.isLoading)) ||
+    (isLearner && ownLevel.isLoading);
 
   const classes = useMemo<SchoolClass[]>(() => {
     const all = allClassesQ.data ?? [];
+    if (isLearner) {
+      // Learners only ever see their own enrolled class — prevents a
+      // Class 10 student from poking into Class 12 material.
+      if (ownLevel.classLevel === undefined) return [];
+      return all.filter((c) => c.level === ownLevel.classLevel);
+    }
     if (!isTeacher) return all;
     const allowedSubjectIds = new Set(teacherSubjectsQ.data?.subject_ids ?? []);
     if (allowedSubjectIds.size === 0) return [];
@@ -65,9 +103,11 @@ export function useAvailableClasses(): AvailableClasses {
     teacherSubjectsQ.data,
     allSubjectsQ.data,
     isTeacher,
+    isLearner,
+    ownLevel.classLevel,
   ]);
 
-  return { classes, isLoading, isScoped: isTeacher };
+  return { classes, isLoading, isScoped: isTeacher || isLearner };
 }
 
 interface AvailableSubjects {

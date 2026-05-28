@@ -21,13 +21,18 @@ import { Empty } from "@/components/ui/empty";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import {
   useChapters,
-  useClasses,
   useCurriculumContext,
   useSubjects,
 } from "@/lib/queries";
+import { useAvailableClasses } from "@/lib/scope";
 
 export function CurriculumPage() {
-  const classesQ = useClasses();
+  // useAvailableClasses returns the scoped class list:
+  //  - learner roles see ONLY their own enrolled class
+  //  - teachers see only classes they're assigned subjects in
+  //  - admins see every class
+  // This is what stopped Class 10 NIOS students seeing Class 12 in the picker.
+  const { classes: availableClasses, isScoped } = useAvailableClasses();
   const [classLevel, setClassLevel] = useState<number | undefined>(undefined);
   const subjectsQ = useSubjects(classLevel);
   const [subjectId, setSubjectId] = useState<number | undefined>(undefined);
@@ -36,11 +41,15 @@ export function CurriculumPage() {
   const contextQ = useCurriculumContext(chapterId);
 
   useEffect(() => {
-    if (!classLevel && classesQ.data?.length) {
-      const six = classesQ.data.find((c) => c.level === 6) ?? classesQ.data[0];
-      setClassLevel(six.level);
+    if (classLevel === undefined && availableClasses.length) {
+      // For scoped roles (learner / teacher) just take the first allowed class.
+      // For admins keep the historical default of class 6.
+      const next = isScoped
+        ? availableClasses[0]
+        : availableClasses.find((c) => c.level === 6) ?? availableClasses[0];
+      setClassLevel(next.level);
     }
-  }, [classLevel, classesQ.data]);
+  }, [classLevel, availableClasses, isScoped]);
   useEffect(() => {
     // Reset / pick a subject from the *current* class's subjects only. Without
     // the second half of this guard, a subjectId picked from a stale fetch
@@ -80,7 +89,7 @@ export function CurriculumPage() {
                   <SelectValue placeholder="Class" />
                 </SelectTrigger>
                 <SelectContent>
-                  {classesQ.data?.map((c) => (
+                  {availableClasses.map((c) => (
                     <SelectItem key={c.id} value={String(c.level)}>
                       {c.display_name}
                     </SelectItem>
