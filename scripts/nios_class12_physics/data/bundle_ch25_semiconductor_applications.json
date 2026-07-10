@@ -1,0 +1,2264 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Physics",
+    "chapter_number": 25,
+    "chapter_title": "Applications of Semiconductor Devices",
+    "book_title": "NIOS Senior Secondary Physics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Physics (312)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 25 - APPLICATIONS OF SEMICONDUCTOR DEVICES\n\nIntroduction\n\nIn the previous chapters you learnt about semiconductors, the p-n junction diode and the bipolar junction transistor (BJT). A single transistor may look small, but it is the workhorse of modern electronics. Depending on how we bias it and what we connect to it, the SAME transistor can behave as an AMPLIFIER (making weak signals strong), as a SWITCH (turning currents ON and OFF), or as part of an OSCILLATOR (generating a signal all by itself). When many transistors are combined they build LOGIC GATES - the elementary decision-making blocks of every computer, calculator and digital watch. This chapter shows how these applications work, develops the truth tables of the logic gates, introduces Boolean algebra, and closes with the special semiconductor devices - the Zener diode, photodiode, LED, solar cell and photocell - and a brief look at the operational amplifier.\n\n25.1 THE TRANSISTOR AS AN AMPLIFIER\n\nAn AMPLIFIER increases the strength (amplitude) of a weak electrical signal without changing its shape. The most common arrangement is the COMMON-EMITTER (CE) amplifier, in which the emitter terminal is common to both the input and the output. The input signal is applied between base and emitter; the amplified output is taken between collector and emitter.\n\nFor an n-p-n transistor in the CE mode the emitter-base junction is FORWARD biased and the collector-base junction is REVERSE biased. A small change in the base current (I_B) produces a large change in the collector current (I_C), because I_C = beta * I_B, where beta (the common-emitter current gain) is typically 50 to 300. A load resistance R_L (or R_C) is placed in the collector circuit. When the collector current changes, the voltage dropped across R_L changes, and this changing voltage is the amplified output.\n\nHow it amplifies a signal: a small a.c. signal voltage is applied at the input (base-emitter). It rides on top of the steady d.c. bias, causing the base current to rise and fall in step with the signal. The collector current follows, magnified by beta. The changing collector current through R_L produces a large changing output voltage. Thus a weak input becomes a strong output.\n\nVoltage gain (A_v). The voltage gain is the ratio of the change in output voltage to the change in input voltage:\n   A_v = (change in output voltage) / (change in input voltage) = V_out / V_in.\nIt can also be written as A_v = beta * (R_L / R_in), where R_in is the input resistance of the transistor. The CURRENT gain is beta (or the a.c. value beta_ac = change in I_C / change in I_B). The POWER gain is the product of the current gain and the voltage gain.\n\nPHASE REVERSAL. An important property of the CE amplifier is that the output voltage is 180 degrees OUT OF PHASE with the input voltage. When the input rises, the base current rises, the collector current rises, so the drop across R_L rises, and the collector voltage (measured from the supply) FALLS. So as the input goes up the output goes down - a phase reversal of 180 degrees. The common-base and common-collector amplifiers do NOT show this phase reversal.\n\nWorked example. In a CE amplifier a change in base current of 20 microampere produces a change in collector current of 2 mA. Then beta = change in I_C / change in I_B = (2 x 10^-3) / (20 x 10^-6) = 100. If the input resistance is 1 kilo-ohm and the load resistance is 5 kilo-ohm, the voltage gain A_v = beta * R_L / R_in = 100 * (5000/1000) = 500. So a 10 mV input signal appears as a 5 V output signal (with a 180 degree phase reversal).\n\n25.2 THE TRANSISTOR AS A SWITCH\n\nA transistor can also work as an electronic SWITCH that has no moving parts. Here the transistor is operated in only two states: CUT-OFF and SATURATION.\n - CUT-OFF (OFF state): the base-emitter junction is not forward biased enough, so I_B is nearly zero, and hence I_C is nearly zero. Almost the full supply voltage appears across the transistor (collector-emitter). The switch is OPEN - it behaves like an open circuit.\n - SATURATION (ON state): a large base current drives the transistor fully on, I_C reaches its maximum value set by the load, and the collector-emitter voltage falls to nearly zero. The switch is CLOSED - it behaves like a closed circuit.\nBy applying a small voltage at the base we can switch a large collector current on or off. This is exactly what is needed inside digital circuits, where the two states OFF and ON represent the binary digits 0 and 1. The transistor switch is fast, silent, and can be operated millions of times per second.\n\n25.3 THE TRANSISTOR AS AN OSCILLATOR\n\nAn OSCILLATOR is a circuit that produces a continuous alternating (a.c.) output signal WITHOUT any a.c. input - it converts d.c. energy from the battery into an a.c. signal of a definite frequency. An oscillator is basically an amplifier with POSITIVE FEEDBACK: a fraction of the output is fed back to the input IN PHASE, so it reinforces the input and sustains the oscillation.\n\nA tuned (LC) oscillator uses a coil (inductance L) and capacitor (capacitance C) tank circuit, which sets the frequency of oscillation at approximately\n   f = 1 / (2 * pi * sqrt(L*C)).\nFor steady oscillations two conditions (together called the BARKHAUSEN CRITERION) must be met:\n (1) The total phase shift around the loop (amplifier plus feedback network) must be zero (or 360 degrees) - i.e. the feedback must be POSITIVE (in phase).\n (2) The loop gain (amplifier gain times feedback fraction) must be at least 1 (|A*beta_feedback| >= 1).\nIf these are satisfied, a tiny disturbance grows into a steady oscillation. Oscillators generate the carrier waves in radio and TV transmitters, the clock signals in computers, and the tones in electronic instruments.\n\n25.4 DIGITAL ELECTRONICS: BINARY NUMBERS\n\nAnalogue signals vary smoothly over a continuous range. DIGITAL signals take only two values, usually written 0 and 1. A single binary digit is called a BIT. In electronics 0 is represented by a LOW voltage (near 0 V) and 1 by a HIGH voltage (say +5 V). Because only two states are needed, digital circuits are built from transistor switches (OFF = 0, ON = 1) and are far less affected by noise than analogue circuits.\n\nBinary numbers use base 2. Counting in binary: 0, 1, 10, 11, 100, 101, 110, 111 for decimal 0,1,2,3,4,5,6,7. The place values are powers of two: 1, 2, 4, 8, 16, ... For example binary 1011 = 1*8 + 0*4 + 1*2 + 1*1 = 11 in decimal. Digital computers store and process all information - numbers, text, images, sound - as long strings of bits.\n\n25.5 LOGIC GATES: OR, AND, NOT\n\nA LOGIC GATE is a circuit that takes one or more binary inputs and gives a single binary output according to a fixed rule. The rule is displayed in a TRUTH TABLE, which lists the output for every possible combination of inputs. The three BASIC gates are OR, AND and NOT.\n\nOR gate. The output is 1 if ANY input is 1 (output is 0 only when all inputs are 0). Boolean expression: Y = A + B (the '+' means OR, not ordinary addition).\n   Truth table (OR):\n     A  B  | Y = A OR B\n     0  0  |    0\n     0  1  |    1\n     1  0  |    1\n     1  1  |    1\n\nAND gate. The output is 1 only if ALL inputs are 1 (otherwise 0). Boolean expression: Y = A . B (the '.' means AND).\n   Truth table (AND):\n     A  B  | Y = A AND B\n     0  0  |    0\n     0  1  |    0\n     1  0  |    0\n     1  1  |    1\n\nNOT gate (inverter). It has a SINGLE input and gives the opposite output: 0 becomes 1 and 1 becomes 0. Boolean expression: Y = NOT A (written as A with a bar over it; here we write NOT A).\n   Truth table (NOT):\n     A  | Y = NOT A\n     0  |   1\n     1  |   0\n\nThe circuit symbols: the OR gate has a curved back with a pointed nose; the AND gate has a flat back and a rounded nose (D-shape); the NOT gate is a triangle with a small circle (bubble) at its tip. The small bubble always means 'invert'.\n\n25.6 UNIVERSAL GATES: NAND AND NOR; THE XOR GATE\n\nNAND gate (NOT-AND). It is an AND gate followed by a NOT gate. The output is the inverse of AND: it is 0 only when all inputs are 1, and 1 otherwise. Boolean: Y = NOT (A . B).\n   Truth table (NAND):\n     A  B  | Y\n     0  0  | 1\n     0  1  | 1\n     1  0  | 1\n     1  1  | 0\n\nNOR gate (NOT-OR). It is an OR gate followed by a NOT gate. The output is 1 only when all inputs are 0, and 0 otherwise. Boolean: Y = NOT (A + B).\n   Truth table (NOR):\n     A  B  | Y\n     0  0  | 1\n     0  1  | 0\n     1  0  | 0\n     1  1  | 0\n\nNAND and NOR are called UNIVERSAL GATES because ANY logic function (OR, AND, NOT, and hence any circuit) can be built using only NAND gates, or using only NOR gates. For example, joining the two inputs of a NAND gate together makes a NOT gate; a NAND followed by another NAND used as an inverter gives AND; and so on. This universality makes manufacturing simpler - a chip can be built from just one kind of gate.\n\nXOR gate (Exclusive-OR). The output is 1 when the inputs are DIFFERENT, and 0 when they are the SAME. Boolean: Y = A XOR B (also written A (+) B). It is the basis of binary addition (the sum bit) and of parity checking.\n   Truth table (XOR):\n     A  B  | Y\n     0  0  | 0\n     0  1  | 1\n     1  0  | 1\n     1  1  | 0\n\n25.7 BOOLEAN ALGEBRA AND COMBINING GATES\n\nBOOLEAN ALGEBRA is the mathematics of logic variables that take only the values 0 and 1. Its operations are OR (+), AND (.) and NOT (bar). Some useful identities:\n   A + 0 = A;  A + 1 = 1;  A . 0 = 0;  A . 1 = A;  A + A = A;  A . A = A;\n   A + (NOT A) = 1;  A . (NOT A) = 0;  NOT(NOT A) = A.\nDe Morgan's theorems are especially important:\n   NOT (A . B) = (NOT A) + (NOT B),   and   NOT (A + B) = (NOT A) . (NOT B).\nThey tell us how to convert AND-based expressions into OR-based ones and explain why NAND and NOR are universal.\n\nCombining gates lets us build any logical function. For example, an XOR can be built from AND, OR and NOT gates using Y = (A . NOT B) + (NOT A . B). By wiring basic gates together in stages we make adders, comparators, encoders, decoders, flip-flops and memory cells - the building blocks of a computer.\n\n25.8 INTEGRATED CIRCUITS (ICs)\n\nAn INTEGRATED CIRCUIT is a complete electronic circuit - transistors, diodes, resistors and their connections - fabricated together on a single small chip of silicon. ICs are small, cheap, reliable and consume little power. Depending on the number of gates they are classified as SSI (small-scale), MSI, LSI and VLSI (very-large-scale, millions of components). A modern microprocessor is a VLSI chip carrying billions of transistors. ICs made computers, mobile phones and all modern electronics possible.\n\n25.9 APPLICATIONS OF SPECIAL SEMICONDUCTOR DEVICES\n\nZener diode as a voltage regulator. A ZENER DIODE is a specially made diode designed to work in REVERSE breakdown. Beyond its breakdown (Zener) voltage the voltage across it stays almost CONSTANT even though the current through it changes widely. Connected in reverse across a load (with a series resistor), it holds the load voltage steady against changes in supply or load - it is a simple voltage REGULATOR.\n\nPhotodiode. A PHOTODIODE is operated in reverse bias. When light falls on the junction it creates extra electron-hole pairs, so the reverse current INCREASES with the intensity of light. It is used as a light detector, in light meters, and in optical-fibre receivers.\n\nLight Emitting Diode (LED). An LED is a forward-biased junction diode that EMITS light when current passes through it: electrons and holes recombine at the junction and release energy as photons. The colour depends on the semiconductor material and its band gap. LEDs are used in indicator lamps, displays, remote controls and, increasingly, in energy-efficient lighting.\n\nSolar cell (photovoltaic cell). A SOLAR CELL is a p-n junction that converts light energy DIRECTLY into electrical energy. Light creates electron-hole pairs near the junction; the junction field separates them, producing a voltage across the cell (no external bias needed). Solar cells power calculators, satellites and solar panels.\n\nPhotocell. A PHOTOCELL (photoconductive or photoemissive) changes its electrical behaviour when light falls on it - for example its resistance drops. Photocells are used in automatic street lights, burglar alarms, and light-operated switches.\n\n25.10 THE OPERATIONAL AMPLIFIER (brief)\n\nAn OPERATIONAL AMPLIFIER (op-amp) is a high-gain d.c. amplifier built as an integrated circuit, with two inputs (an inverting input marked '-' and a non-inverting input marked '+') and one output. Its open-loop gain is very large (tens of thousands), so it is almost always used with feedback. With external resistors an op-amp can add, subtract, integrate, differentiate, compare and amplify signals. It is a versatile building block in analogue electronics and instrumentation.\n\nSUMMARY\n\n- The same transistor can act as an amplifier, a switch or an oscillator depending on biasing and circuitry.\n- In the common-emitter amplifier a small base current controls a large collector current (I_C = beta I_B); the voltage gain A_v = beta R_L / R_in, and the output is phase-reversed (180 degrees) with respect to the input.\n- As a switch, the transistor is used only at CUT-OFF (OFF = open) and SATURATION (ON = closed) - the basis of digital circuits.\n- An oscillator is an amplifier with positive feedback that satisfies the Barkhausen criterion (loop phase zero, loop gain >= 1); the LC frequency is f = 1/(2 pi sqrt(LC)).\n- Digital signals use bits 0 and 1; binary numbers use base 2.\n- Basic gates: OR (Y = A + B, 1 if any input 1); AND (Y = A.B, 1 only if all inputs 1); NOT (inverter).\n- Universal gates NAND (NOT AND) and NOR (NOT OR) can build any logic function; XOR gives 1 when inputs differ.\n- Boolean algebra (with De Morgan's theorems) describes and simplifies logic; gates combine to build adders, memory and whole computers, packed onto integrated circuits (ICs).\n- Special devices: Zener diode (voltage regulator), photodiode (light detector), LED (light emitter), solar cell (light-to-electricity), photocell (light-controlled switch); the op-amp is a versatile high-gain IC amplifier.\n",
+  "topics": [
+    {
+      "name": "Transistor as an Amplifier",
+      "description": "The common-emitter amplifier: forward/reverse biasing, how a small base current controls a large collector current, voltage gain A_v = beta R_L/R_in, current and power gain, and the 180-degree phase reversal between input and output."
+    },
+    {
+      "name": "Transistor as a Switch and Oscillator",
+      "description": "Using a transistor at cut-off (OFF/open) and saturation (ON/closed) as an electronic switch; the oscillator as an amplifier with positive feedback, the Barkhausen criterion and the LC frequency f = 1/(2 pi sqrt(LC))."
+    },
+    {
+      "name": "Binary Numbers and Logic Gates (OR, AND, NOT)",
+      "description": "Digital signals and bits (0 and 1), binary numbers in base 2, and the three basic logic gates OR, AND and NOT with their symbols, Boolean expressions and truth tables."
+    },
+    {
+      "name": "Universal Gates (NAND, NOR) and XOR",
+      "description": "The NAND and NOR gates and why they are called universal (any logic can be built from them); the exclusive-OR (XOR) gate whose output is 1 when the inputs differ, with truth tables."
+    },
+    {
+      "name": "Combining Gates and Boolean Logic",
+      "description": "Boolean algebra identities and De Morgan's theorems; combining basic gates to realise functions (e.g. XOR from AND/OR/NOT), building adders and memory, and integrated circuits (ICs)."
+    },
+    {
+      "name": "Applications of Special Semiconductor Devices",
+      "description": "Zener diode as voltage regulator, photodiode as light detector, LED as light emitter, solar cell (light to electricity), photocell as light-controlled switch, and a brief idea of the operational amplifier."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-PHY-ASD-01",
+      "topic_name": "Transistor as an Amplifier",
+      "bloom": "understand",
+      "description": "Explain how a transistor works as a common-emitter amplifier, including biasing, the role of the load resistance and the 180-degree phase reversal between input and output."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-02",
+      "topic_name": "Transistor as an Amplifier",
+      "bloom": "apply",
+      "description": "Calculate the current gain (beta) and voltage gain (A_v = beta R_L/R_in) of a common-emitter amplifier from given data."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-03",
+      "topic_name": "Transistor as a Switch and Oscillator",
+      "bloom": "understand",
+      "description": "Describe the transistor as a switch operating between cut-off and saturation, and the transistor oscillator as an amplifier with positive feedback satisfying the Barkhausen criterion."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-04",
+      "topic_name": "Binary Numbers and Logic Gates (OR, AND, NOT)",
+      "bloom": "understand",
+      "description": "Describe binary numbers and the OR, AND and NOT gates with their symbols and Boolean expressions."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-05",
+      "topic_name": "Binary Numbers and Logic Gates (OR, AND, NOT)",
+      "bloom": "apply",
+      "description": "Construct and use the truth tables of the OR, AND and NOT gates to determine the output for given inputs."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-06",
+      "topic_name": "Universal Gates (NAND, NOR) and XOR",
+      "bloom": "understand",
+      "description": "Explain why NAND and NOR are universal gates and give the truth tables of the NAND, NOR and XOR gates."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-07",
+      "topic_name": "Combining Gates and Boolean Logic",
+      "bloom": "apply",
+      "description": "Apply Boolean algebra and De Morgan's theorems to combine gates and analyse simple logic circuits."
+    },
+    {
+      "code": "12-NIOS-PHY-ASD-08",
+      "topic_name": "Applications of Special Semiconductor Devices",
+      "bloom": "understand",
+      "description": "State the working and uses of the Zener diode, photodiode, LED, solar cell, photocell and the operational amplifier."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Applications of Semiconductor Devices - Chapter Summary",
+    "intro": "This summary covers how a transistor is used as an amplifier, a switch and an oscillator, the binary logic gates (OR, AND, NOT, NAND, NOR, XOR) with their truth tables and Boolean algebra, integrated circuits, and the special devices - Zener diode, photodiode, LED, solar cell and photocell.",
+    "overview_diagram": {
+      "title": "Applications of Semiconductor Devices",
+      "central_term": "Semiconductor Devices",
+      "branches": [
+        {
+          "label": "Transistor uses",
+          "details": [
+            "Amplifier: I_C = beta I_B; A_v = beta R_L/R_in",
+            "Phase reversal 180 degrees in CE",
+            "Switch: cut-off (OFF) and saturation (ON)",
+            "Oscillator: amplifier + positive feedback"
+          ]
+        },
+        {
+          "label": "Digital basics",
+          "details": [
+            "Bit = 0 or 1 (LOW / HIGH)",
+            "Binary numbers use base 2",
+            "Truth table lists output for all inputs"
+          ]
+        },
+        {
+          "label": "Basic gates",
+          "details": [
+            "OR: Y = A + B (1 if any input 1)",
+            "AND: Y = A . B (1 only if all 1)",
+            "NOT: inverter (0 to 1, 1 to 0)"
+          ]
+        },
+        {
+          "label": "Universal & XOR",
+          "details": [
+            "NAND = NOT AND (universal)",
+            "NOR = NOT OR (universal)",
+            "XOR: 1 when inputs differ",
+            "De Morgan's theorems"
+          ]
+        },
+        {
+          "label": "Special devices",
+          "details": [
+            "Zener: voltage regulator",
+            "Photodiode: light detector",
+            "LED: emits light",
+            "Solar cell: light to electricity",
+            "Photocell / op-amp"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Transistor as an amplifier",
+        "bullets": [
+          "In the common-emitter amplifier the emitter-base junction is forward biased and the collector-base junction is reverse biased.",
+          "A small base current controls a large collector current: I_C = beta I_B, where beta (current gain) is typically 50 to 300.",
+          "The voltage gain is A_v = V_out/V_in = beta R_L/R_in; the power gain is the product of current gain and voltage gain.",
+          "The CE output is 180 degrees out of phase with the input (phase reversal): when the input rises the collector voltage falls."
+        ]
+      },
+      {
+        "heading": "Transistor as a switch and oscillator",
+        "bullets": [
+          "As a switch the transistor uses only two states: cut-off (I_C ~ 0, OFF, open) and saturation (I_C maximum, ON, closed).",
+          "OFF = binary 0 and ON = binary 1 - this is the basis of digital circuits; the switch is fast and has no moving parts.",
+          "An oscillator is an amplifier with positive (in-phase) feedback that converts d.c. into an a.c. signal without any a.c. input.",
+          "For steady oscillation the Barkhausen criterion must hold: loop phase = 0 (or 360 degrees) and loop gain >= 1; the LC frequency is f = 1/(2 pi sqrt(LC))."
+        ]
+      },
+      {
+        "heading": "Binary numbers and basic gates",
+        "bullets": [
+          "Digital signals take only two values: 0 (LOW) and 1 (HIGH); a single binary digit is a bit; binary numbers use base 2.",
+          "A logic gate gives a binary output from binary inputs according to a fixed rule shown in a truth table.",
+          "OR gate: Y = A + B, output 1 if any input is 1. AND gate: Y = A . B, output 1 only when all inputs are 1.",
+          "NOT gate (inverter): single input, output is the opposite of the input (0 to 1, 1 to 0)."
+        ]
+      },
+      {
+        "heading": "Universal gates and XOR",
+        "bullets": [
+          "NAND = NOT(A . B): output 0 only when all inputs are 1. NOR = NOT(A + B): output 1 only when all inputs are 0.",
+          "NAND and NOR are universal gates - any logic function (AND, OR, NOT, and any circuit) can be built from NAND alone or NOR alone.",
+          "XOR (exclusive-OR): output is 1 when the inputs are different and 0 when they are the same.",
+          "XOR is the basis of binary addition (sum bit) and parity checking."
+        ]
+      },
+      {
+        "heading": "Boolean logic, ICs and special devices",
+        "bullets": [
+          "Boolean algebra uses OR (+), AND (.) and NOT (bar); De Morgan: NOT(A.B) = NOTA + NOTB and NOT(A+B) = NOTA . NOTB.",
+          "Gates combine to build adders, comparators, flip-flops and memory; an integrated circuit (IC) packs a whole circuit on one silicon chip (SSI to VLSI).",
+          "Zener diode: works in reverse breakdown, keeps voltage constant - a voltage regulator. Photodiode: reverse-biased light detector.",
+          "LED: forward-biased diode that emits light; solar cell: converts light directly into electricity; photocell: light-controlled switch; op-amp: high-gain IC amplifier."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "One transistor can be an amplifier, a switch or an oscillator depending on biasing and the surrounding circuit.",
+      "Common-emitter amplifier: I_C = beta I_B; voltage gain A_v = beta R_L/R_in; output is phase-reversed by 180 degrees.",
+      "As a switch the transistor works between cut-off (OFF/0) and saturation (ON/1); an oscillator is an amplifier with positive feedback (Barkhausen criterion).",
+      "OR gives 1 if any input is 1; AND gives 1 only if all inputs are 1; NOT inverts the input.",
+      "NAND and NOR are universal gates; XOR gives 1 only when the inputs differ.",
+      "De Morgan's theorems: NOT(A.B) = NOTA + NOTB and NOT(A+B) = NOTA . NOTB.",
+      "Special devices: Zener (regulator), photodiode (detector), LED (emitter), solar cell (light to power), photocell and op-amp."
+    ],
+    "glossary": [
+      {
+        "term": "Amplifier",
+        "definition": "A circuit that increases the strength (amplitude) of a weak signal without changing its shape; a transistor amplifies because a small base current controls a large collector current."
+      },
+      {
+        "term": "Common-emitter (CE)",
+        "definition": "The transistor amplifier arrangement in which the emitter is common to input and output; it gives high gain and a 180-degree phase reversal."
+      },
+      {
+        "term": "Current gain (beta)",
+        "definition": "The ratio of collector current to base current in the common-emitter mode, I_C/I_B; typically 50 to 300."
+      },
+      {
+        "term": "Voltage gain (A_v)",
+        "definition": "The ratio of output voltage change to input voltage change; A_v = beta R_L/R_in for a CE amplifier."
+      },
+      {
+        "term": "Phase reversal",
+        "definition": "The 180-degree phase difference between the output and input of a common-emitter amplifier - as the input rises the output falls."
+      },
+      {
+        "term": "Transistor switch",
+        "definition": "A transistor used only at cut-off (OFF, open) and saturation (ON, closed) to turn a current on and off - the basis of digital circuits."
+      },
+      {
+        "term": "Oscillator",
+        "definition": "A circuit that produces a continuous a.c. output from a d.c. source; an amplifier with positive feedback satisfying the Barkhausen criterion."
+      },
+      {
+        "term": "Barkhausen criterion",
+        "definition": "Conditions for steady oscillation: the loop phase shift is zero (or 360 degrees) and the loop gain is at least 1."
+      },
+      {
+        "term": "Bit",
+        "definition": "A single binary digit, 0 or 1; in electronics 0 is a LOW voltage and 1 is a HIGH voltage."
+      },
+      {
+        "term": "Logic gate",
+        "definition": "A digital circuit that produces a binary output from binary inputs according to a fixed rule shown by a truth table."
+      },
+      {
+        "term": "Truth table",
+        "definition": "A table listing the output of a logic gate or circuit for every possible combination of its inputs."
+      },
+      {
+        "term": "Universal gate",
+        "definition": "A gate (NAND or NOR) from which any other logic function can be built using only that one kind of gate."
+      },
+      {
+        "term": "XOR gate",
+        "definition": "The exclusive-OR gate: its output is 1 when the inputs are different and 0 when they are the same."
+      },
+      {
+        "term": "Zener diode",
+        "definition": "A diode designed to work in reverse breakdown where the voltage stays almost constant; used as a voltage regulator."
+      },
+      {
+        "term": "Light Emitting Diode (LED)",
+        "definition": "A forward-biased junction diode that emits light when electrons and holes recombine at the junction."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Applications of Semiconductor Devices",
+    "instructions": "Attempt all questions. Draw truth tables neatly where asked and show all steps in the numerical problems. Marks are indicated against each question.",
+    "total_marks": 28,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Draw the truth table of a 2-input OR gate and a 2-input AND gate, and write the Boolean expression of each.",
+        "answer": "OR gate, Y = A + B (output 1 if any input is 1):\n A B | Y\n 0 0 | 0\n 0 1 | 1\n 1 0 | 1\n 1 1 | 1\n\nAND gate, Y = A . B (output 1 only when both inputs are 1):\n A B | Y\n 0 0 | 0\n 0 1 | 0\n 1 0 | 0\n 1 1 | 1",
+        "explanation": "OR is 1 unless all inputs are 0; AND is 1 only when all inputs are 1.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-PHY-ASD-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Write the truth table of the NAND gate and explain why NAND is called a universal gate.",
+        "answer": "NAND, Y = NOT(A . B):\n A B | Y\n 0 0 | 1\n 0 1 | 1\n 1 0 | 1\n 1 1 | 0\n\nNAND is universal because any logic function can be built using only NAND gates. For example, tying the two inputs of a NAND together gives a NOT gate; a NAND followed by such a NOT gives an AND gate; and by De Morgan's theorem OR can also be made from NANDs. So OR, AND and NOT - and hence any circuit - can be realised with NAND gates alone.",
+        "explanation": "NAND output is the inverse of AND; universality means all gates can be derived from it.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-PHY-ASD-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "In a common-emitter amplifier a change in base current of 25 microampere produces a change in collector current of 2.5 mA. Calculate the current gain (beta).",
+        "answer": "beta = (change in collector current)/(change in base current) = (2.5 x 10^-3 A)/(25 x 10^-6 A) = 2.5/0.025 = 100.\nSo the current gain beta = 100.",
+        "explanation": "beta = delta I_C / delta I_B.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-PHY-ASD-02"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "A common-emitter amplifier has beta = 120, input resistance R_in = 1 kilo-ohm and load resistance R_L = 4 kilo-ohm. Find (a) the voltage gain and (b) the output voltage for an input signal of 20 mV. Comment on the phase of the output.",
+        "answer": "(a) Voltage gain A_v = beta x R_L/R_in = 120 x (4000/1000) = 120 x 4 = 480.\n(b) Output voltage = A_v x input voltage = 480 x 20 mV = 9600 mV = 9.6 V.\nPhase: in a common-emitter amplifier the output is 180 degrees out of phase with the input (phase reversal) - as the input rises, the collector voltage falls.",
+        "explanation": "A_v = beta R_L/R_in; V_out = A_v x V_in; CE gives 180-degree phase reversal.",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-PHY-ASD-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Explain how a transistor works as a switch. What are the two states used?",
+        "answer": "A transistor switch uses only two states. In CUT-OFF the base current is nearly zero, so the collector current is nearly zero and almost the full supply voltage appears across the transistor - this is the OFF (open) state. In SATURATION a large base current drives the transistor fully on, the collector current is maximum and the collector-emitter voltage falls to nearly zero - this is the ON (closed) state. A small base voltage therefore switches a large collector current on or off. OFF represents binary 0 and ON represents binary 1, which is the basis of digital circuits.",
+        "explanation": "Cut-off = OFF/0, saturation = ON/1.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-PHY-ASD-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Write the truth table of a 2-input XOR gate and state one use of it.",
+        "answer": "XOR, Y = A XOR B (output 1 when inputs differ):\n A B | Y\n 0 0 | 0\n 0 1 | 1\n 1 0 | 1\n 1 1 | 0\nUse: XOR gives the SUM bit in binary addition (a half-adder); it is also used for parity checking.",
+        "explanation": "XOR output is 1 only when the two inputs are different.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-PHY-ASD-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State De Morgan's two theorems and explain their importance.",
+        "answer": "De Morgan's theorems:\n (1) NOT(A . B) = (NOT A) + (NOT B)\n (2) NOT(A + B) = (NOT A) . (NOT B)\nImportance: they let us convert AND-based expressions into OR-based ones (and vice versa), simplify Boolean expressions, and explain why NAND and NOR gates are universal - any function can be re-expressed and built from them.",
+        "explanation": "The theorems relate NOT of a product/sum to sum/product of NOTs.",
+        "marks": 2,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-PHY-ASD-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Explain how a Zener diode acts as a voltage regulator.",
+        "answer": "A Zener diode is connected in REVERSE bias across the load, in series with a resistor. When the reverse voltage reaches the Zener (breakdown) voltage, the diode conducts and the voltage across it stays almost CONSTANT even though the current through it changes. If the supply voltage or the load current changes, the Zener adjusts its current to keep its voltage - and hence the load voltage - steady. In this way it regulates (stabilises) the output voltage.",
+        "explanation": "In reverse breakdown the Zener voltage is nearly constant, holding the load voltage steady.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-PHY-ASD-08"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Convert the binary number 1101 to decimal, and construct the truth table of a NOR gate.",
+        "answer": "Binary 1101 = 1x8 + 1x4 + 0x2 + 1x1 = 8 + 4 + 0 + 1 = 13 in decimal.\n\nNOR gate, Y = NOT(A + B) (output 1 only when all inputs are 0):\n A B | Y\n 0 0 | 1\n 0 1 | 0\n 1 0 | 0\n 1 1 | 0",
+        "explanation": "Place values 8,4,2,1; NOR is the inverse of OR.",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-PHY-ASD-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the working and one use each of an LED and a solar cell.",
+        "answer": "LED (Light Emitting Diode): a forward-biased junction diode. When current flows, electrons and holes recombine at the junction and release energy as light (photons). Use: indicator lamps, displays and energy-efficient lighting.\nSolar cell: a p-n junction that converts light directly into electricity. Light creates electron-hole pairs near the junction and the junction field separates them, producing a voltage without any external bias. Use: powering calculators, satellites and solar panels.",
+        "explanation": "LED converts electricity to light; solar cell converts light to electricity.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-PHY-ASD-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the common-emitter amplifier, the terminal common to both input and output is the",
+      "options": [
+        "base",
+        "collector",
+        "emitter",
+        "substrate"
+      ],
+      "answer": "emitter",
+      "explanation": "Common-emitter: emitter is shared by input and output."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "An amplifier is a circuit that",
+      "options": [
+        "reduces the signal amplitude",
+        "increases the strength of a weak signal",
+        "generates a signal without input",
+        "converts a.c. to d.c."
+      ],
+      "answer": "increases the strength of a weak signal",
+      "explanation": "That is the definition of amplification."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In an n-p-n common-emitter amplifier, the emitter-base junction and collector-base junction are respectively",
+      "options": [
+        "reverse and forward biased",
+        "forward and reverse biased",
+        "both forward biased",
+        "both reverse biased"
+      ],
+      "answer": "forward and reverse biased",
+      "explanation": "EB forward, CB reverse for active-region amplification."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a CE amplifier the collector current is controlled by the",
+      "options": [
+        "collector voltage only",
+        "base current",
+        "emitter resistance only",
+        "load capacitance"
+      ],
+      "answer": "base current",
+      "explanation": "I_C = beta I_B; small base current controls large collector current."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The output of a common-emitter amplifier is",
+      "options": [
+        "in phase with the input",
+        "90 degrees out of phase",
+        "180 degrees out of phase with the input",
+        "always zero"
+      ],
+      "answer": "180 degrees out of phase with the input",
+      "explanation": "CE amplifier shows phase reversal."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "In a CE amplifier, when the input signal voltage increases, the collector (output) voltage",
+      "options": [
+        "increases",
+        "decreases",
+        "stays constant",
+        "becomes zero"
+      ],
+      "answer": "decreases",
+      "explanation": "Phase reversal: rising input, larger I_C, larger drop across R_L, so collector voltage falls."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The changing output voltage of a CE amplifier is developed across the",
+      "options": [
+        "input resistance",
+        "load (collector) resistance",
+        "emitter diode",
+        "base-emitter junction"
+      ],
+      "answer": "load (collector) resistance",
+      "explanation": "Changing I_C through R_L gives the amplified output voltage."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The power gain of an amplifier equals",
+      "options": [
+        "voltage gain minus current gain",
+        "voltage gain divided by current gain",
+        "the product of voltage gain and current gain",
+        "the current gain only"
+      ],
+      "answer": "the product of voltage gain and current gain",
+      "explanation": "Power gain = A_v x current gain."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which amplifier configuration does NOT produce phase reversal?",
+      "options": [
+        "common-emitter",
+        "common-base",
+        "common-emitter with load",
+        "none of these"
+      ],
+      "answer": "common-base",
+      "explanation": "Only the CE configuration inverts the signal; common-base does not."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In an amplifier the shape of the output signal, ideally, is",
+      "options": [
+        "distorted",
+        "the same as the input but larger",
+        "inverted in amplitude only",
+        "a square wave"
+      ],
+      "answer": "the same as the input but larger",
+      "explanation": "A good amplifier increases amplitude without changing shape."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If a base-current change of 10 microampere causes a collector-current change of 1 mA, beta is",
+      "options": [
+        "10",
+        "100",
+        "1000",
+        "0.01"
+      ],
+      "answer": "100",
+      "explanation": "beta = 1x10^-3 / 10x10^-6 = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If beta = 50 and the base current changes by 40 microampere, the collector current changes by",
+      "options": [
+        "0.8 mA",
+        "2 mA",
+        "20 mA",
+        "200 mA"
+      ],
+      "answer": "2 mA",
+      "explanation": "delta I_C = beta x delta I_B = 50 x 40 microA = 2000 microA = 2 mA."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A CE amplifier has beta = 100, R_in = 1 kilo-ohm, R_L = 2 kilo-ohm. The voltage gain is",
+      "options": [
+        "50",
+        "100",
+        "200",
+        "2000"
+      ],
+      "answer": "200",
+      "explanation": "A_v = beta R_L/R_in = 100 x 2 = 200."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A CE amplifier has beta = 80, R_in = 2 kilo-ohm, R_L = 8 kilo-ohm. The voltage gain is",
+      "options": [
+        "20",
+        "80",
+        "160",
+        "320"
+      ],
+      "answer": "320",
+      "explanation": "A_v = 80 x 8/2 = 80 x 4 = 320."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If a voltage gain of 250 amplifies a 10 mV input, the output voltage is",
+      "options": [
+        "0.25 V",
+        "2.5 V",
+        "25 V",
+        "250 V"
+      ],
+      "answer": "2.5 V",
+      "explanation": "V_out = 250 x 10 mV = 2500 mV = 2.5 V."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For beta = 200 and load-to-input resistance ratio of 3, the voltage gain is",
+      "options": [
+        "3",
+        "200",
+        "600",
+        "67"
+      ],
+      "answer": "600",
+      "explanation": "A_v = beta x (R_L/R_in) = 200 x 3 = 600."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A transistor has I_C = 4 mA when I_B = 40 microampere. Its beta is",
+      "options": [
+        "10",
+        "100",
+        "400",
+        "0.1"
+      ],
+      "answer": "100",
+      "explanation": "beta = 4 mA / 40 microA = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The a.c. current gain beta_ac is defined as",
+      "options": [
+        "I_C / I_B (d.c. values)",
+        "change in I_C / change in I_B",
+        "I_E / I_B",
+        "change in I_B / change in I_C"
+      ],
+      "answer": "change in I_C / change in I_B",
+      "explanation": "beta_ac uses the ratio of changes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A CE amplifier gives output 6 V for input 15 mV. Its voltage gain is",
+      "options": [
+        "40",
+        "400",
+        "0.4",
+        "4000"
+      ],
+      "answer": "400",
+      "explanation": "A_v = 6 V / 15 mV = 6000 mV/15 mV = 400."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If beta = 100 and R_L = R_in, the voltage gain is",
+      "options": [
+        "1",
+        "10",
+        "100",
+        "10000"
+      ],
+      "answer": "100",
+      "explanation": "A_v = beta x (R_L/R_in) = 100 x 1 = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "As a switch, the transistor is operated in the",
+      "options": [
+        "active region only",
+        "cut-off and saturation regions",
+        "breakdown region",
+        "reverse region"
+      ],
+      "answer": "cut-off and saturation regions",
+      "explanation": "Switching uses only the two extreme states."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the cut-off state, the transistor switch behaves like",
+      "options": [
+        "a closed switch",
+        "an open switch",
+        "a resistor",
+        "a capacitor"
+      ],
+      "answer": "an open switch",
+      "explanation": "Cut-off: I_C ~ 0, OFF/open."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the saturation state, the transistor switch behaves like",
+      "options": [
+        "an open switch",
+        "a closed switch",
+        "a battery",
+        "an amplifier"
+      ],
+      "answer": "a closed switch",
+      "explanation": "Saturation: I_C maximum, ON/closed."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In digital circuits, OFF and ON states of a transistor switch represent",
+      "options": [
+        "+ and - charges",
+        "binary 0 and 1",
+        "a.c. and d.c.",
+        "north and south poles"
+      ],
+      "answer": "binary 0 and 1",
+      "explanation": "OFF = 0, ON = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In saturation, the collector-emitter voltage of the transistor is",
+      "options": [
+        "equal to the supply voltage",
+        "nearly zero",
+        "negative and large",
+        "undefined"
+      ],
+      "answer": "nearly zero",
+      "explanation": "Fully ON: V_CE drops to nearly zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "An oscillator produces",
+      "options": [
+        "a d.c. output from an a.c. input",
+        "an a.c. output without an a.c. input",
+        "no output",
+        "only heat"
+      ],
+      "answer": "an a.c. output without an a.c. input",
+      "explanation": "It converts d.c. into a.c."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An oscillator is basically an amplifier with",
+      "options": [
+        "negative feedback",
+        "positive (in-phase) feedback",
+        "no feedback",
+        "only resistive load"
+      ],
+      "answer": "positive (in-phase) feedback",
+      "explanation": "Positive feedback sustains the oscillation."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Barkhausen criterion for sustained oscillation requires the loop gain to be",
+      "options": [
+        "exactly zero",
+        "less than 1",
+        "at least 1",
+        "infinite"
+      ],
+      "answer": "at least 1",
+      "explanation": "|A x beta_feedback| >= 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Barkhausen criterion also requires the total loop phase shift to be",
+      "options": [
+        "90 degrees",
+        "180 degrees",
+        "zero (or 360 degrees)",
+        "random"
+      ],
+      "answer": "zero (or 360 degrees)",
+      "explanation": "Feedback must be in phase (positive)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The frequency of an LC oscillator is given by",
+      "options": [
+        "f = 2 pi sqrt(LC)",
+        "f = 1/(2 pi sqrt(LC))",
+        "f = LC",
+        "f = 1/(LC)"
+      ],
+      "answer": "f = 1/(2 pi sqrt(LC))",
+      "explanation": "Standard tuned-circuit frequency."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If L and C are both increased, the frequency of an LC oscillator",
+      "options": [
+        "increases",
+        "decreases",
+        "stays the same",
+        "becomes zero"
+      ],
+      "answer": "decreases",
+      "explanation": "f is inversely proportional to sqrt(LC)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "One common use of an oscillator is to generate",
+      "options": [
+        "heat in a resistor",
+        "the carrier wave in a radio transmitter",
+        "d.c. from solar cells",
+        "mechanical motion"
+      ],
+      "answer": "the carrier wave in a radio transmitter",
+      "explanation": "Oscillators supply carrier/clock signals."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A transistor switch is preferred over a mechanical switch because it",
+      "options": [
+        "has moving parts",
+        "is slow",
+        "is fast and has no moving parts",
+        "cannot handle current"
+      ],
+      "answer": "is fast and has no moving parts",
+      "explanation": "Electronic switching is fast and reliable."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A single binary digit is called a",
+      "options": [
+        "byte",
+        "bit",
+        "word",
+        "nibble"
+      ],
+      "answer": "bit",
+      "explanation": "0 or 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In digital electronics, logic 1 is usually represented by a",
+      "options": [
+        "LOW voltage",
+        "HIGH voltage",
+        "negative voltage",
+        "zero current"
+      ],
+      "answer": "HIGH voltage",
+      "explanation": "1 = HIGH, 0 = LOW."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Binary numbers use the base",
+      "options": [
+        "2",
+        "8",
+        "10",
+        "16"
+      ],
+      "answer": "2",
+      "explanation": "Binary is base 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The binary number 101 in decimal is",
+      "options": [
+        "3",
+        "5",
+        "6",
+        "101"
+      ],
+      "answer": "5",
+      "explanation": "1x4 + 0x2 + 1x1 = 5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The decimal number 6 in binary is",
+      "options": [
+        "100",
+        "101",
+        "110",
+        "111"
+      ],
+      "answer": "110",
+      "explanation": "4 + 2 = 6 = 110."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Boolean expression for a 2-input OR gate is",
+      "options": [
+        "Y = A . B",
+        "Y = A + B",
+        "Y = NOT A",
+        "Y = A XOR B"
+      ],
+      "answer": "Y = A + B",
+      "explanation": "'+' denotes OR."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Boolean expression for a 2-input AND gate is",
+      "options": [
+        "Y = A + B",
+        "Y = A . B",
+        "Y = NOT A",
+        "Y = NOT(A + B)"
+      ],
+      "answer": "Y = A . B",
+      "explanation": "'.' denotes AND."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A NOT gate is also called an",
+      "options": [
+        "adder",
+        "inverter",
+        "oscillator",
+        "amplifier"
+      ],
+      "answer": "inverter",
+      "explanation": "It inverts the input."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The OR gate output is 0 only when",
+      "options": [
+        "any input is 1",
+        "all inputs are 0",
+        "all inputs are 1",
+        "one input is 1"
+      ],
+      "answer": "all inputs are 0",
+      "explanation": "OR is 0 only if every input is 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The AND gate output is 1 only when",
+      "options": [
+        "any input is 1",
+        "all inputs are 0",
+        "all inputs are 1",
+        "one input is 0"
+      ],
+      "answer": "all inputs are 1",
+      "explanation": "AND is 1 only if every input is 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "How many inputs does a basic NOT gate have?",
+      "options": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ],
+      "answer": "one",
+      "explanation": "An inverter has a single input."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The small circle (bubble) at a gate's output symbol indicates",
+      "options": [
+        "addition",
+        "inversion",
+        "amplification",
+        "feedback"
+      ],
+      "answer": "inversion",
+      "explanation": "A bubble always means invert."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A table that lists the output for every combination of inputs is called a",
+      "options": [
+        "log table",
+        "truth table",
+        "period table",
+        "data table"
+      ],
+      "answer": "truth table",
+      "explanation": "Defines a gate's behaviour."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The binary number 1011 equals which decimal value?",
+      "options": [
+        "9",
+        "11",
+        "13",
+        "23"
+      ],
+      "answer": "11",
+      "explanation": "8 + 0 + 2 + 1 = 11."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an OR gate, if A = 0 and B = 1, the output Y is",
+      "options": [
+        "0",
+        "1",
+        "undefined",
+        "2"
+      ],
+      "answer": "1",
+      "explanation": "OR is 1 if any input is 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an AND gate, if A = 1 and B = 0, the output Y is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "0",
+      "explanation": "AND needs all inputs 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a NOT gate, if A = 1, the output Y is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "A"
+      ],
+      "answer": "0",
+      "explanation": "Inverter: 1 becomes 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an AND gate, if A = 1 and B = 1, the output Y is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "1",
+      "explanation": "All inputs 1, so AND = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an OR gate, if A = 0 and B = 0, the output Y is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "0",
+      "explanation": "OR = 0 only when all inputs 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A 2-input AND gate has how many rows in its truth table?",
+      "options": [
+        "2",
+        "3",
+        "4",
+        "8"
+      ],
+      "answer": "4",
+      "explanation": "2 inputs give 2^2 = 4 combinations."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A 3-input OR gate output is 0 for how many of the 8 input combinations?",
+      "options": [
+        "0",
+        "1",
+        "4",
+        "8"
+      ],
+      "answer": "1",
+      "explanation": "Only when all three inputs are 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a 3-input AND gate, the output is 1 for how many input combinations?",
+      "options": [
+        "0",
+        "1",
+        "3",
+        "8"
+      ],
+      "answer": "1",
+      "explanation": "Only when all three inputs are 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The output of NOT(NOT A) is",
+      "options": [
+        "1",
+        "0",
+        "A",
+        "NOT A"
+      ],
+      "answer": "A",
+      "explanation": "Double inversion returns the original."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an OR gate with inputs A=1, B=1, the output is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "1",
+      "explanation": "Any input 1 gives OR = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In a two-input logic gate the output is 1 for inputs (0,1),(1,0),(1,1) and 0 for (0,0). This gate is",
+      "options": [
+        "AND",
+        "OR",
+        "NOR",
+        "NAND"
+      ],
+      "answer": "OR",
+      "explanation": "Matches the OR truth table."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In a two-input gate the output is 1 only for input (1,1). This gate is",
+      "options": [
+        "OR",
+        "AND",
+        "NAND",
+        "NOR"
+      ],
+      "answer": "AND",
+      "explanation": "Only (1,1) gives 1 - AND."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If both inputs of an OR gate are the same value x, the output is",
+      "options": [
+        "always 1",
+        "always 0",
+        "equal to x",
+        "NOT x"
+      ],
+      "answer": "equal to x",
+      "explanation": "A + A = A, so Y = x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If both inputs of an AND gate are the same value x, the output is",
+      "options": [
+        "always 1",
+        "always 0",
+        "equal to x",
+        "NOT x"
+      ],
+      "answer": "equal to x",
+      "explanation": "A . A = A, so Y = x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A NAND gate is equivalent to",
+      "options": [
+        "OR followed by NOT",
+        "AND followed by NOT",
+        "NOT followed by OR",
+        "AND only"
+      ],
+      "answer": "AND followed by NOT",
+      "explanation": "NAND = NOT(A.B)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A NOR gate is equivalent to",
+      "options": [
+        "AND followed by NOT",
+        "OR followed by NOT",
+        "NOT followed by AND",
+        "OR only"
+      ],
+      "answer": "OR followed by NOT",
+      "explanation": "NOR = NOT(A+B)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The NAND gate output is 0 only when",
+      "options": [
+        "all inputs are 0",
+        "any input is 0",
+        "all inputs are 1",
+        "any input is 1"
+      ],
+      "answer": "all inputs are 1",
+      "explanation": "NAND is inverse of AND."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The NOR gate output is 1 only when",
+      "options": [
+        "all inputs are 1",
+        "any input is 1",
+        "all inputs are 0",
+        "any input is 0"
+      ],
+      "answer": "all inputs are 0",
+      "explanation": "NOR is inverse of OR."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "NAND and NOR gates are called universal because",
+      "options": [
+        "they are the cheapest",
+        "any logic function can be built using only them",
+        "they need no power",
+        "they never fail"
+      ],
+      "answer": "any logic function can be built using only them",
+      "explanation": "Universality property."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The XOR gate gives output 1 when the inputs are",
+      "options": [
+        "the same",
+        "different",
+        "both 1",
+        "both 0"
+      ],
+      "answer": "different",
+      "explanation": "Exclusive-OR: 1 when inputs differ."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a NAND gate with A=1 and B=1, the output is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "0",
+      "explanation": "NAND(1,1)=0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a NOR gate with A=0 and B=0, the output is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "answer": "1",
+      "explanation": "NOR(0,0)=1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A single NAND gate with both inputs tied together acts as a",
+      "options": [
+        "OR gate",
+        "AND gate",
+        "NOT gate",
+        "XOR gate"
+      ],
+      "answer": "NOT gate",
+      "explanation": "NAND(A,A) = NOT A."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an XOR gate the output is 0 for the input combinations",
+      "options": [
+        "(0,1) and (1,0)",
+        "(0,0) and (1,1)",
+        "(1,1) only",
+        "(0,0) only"
+      ],
+      "answer": "(0,0) and (1,1)",
+      "explanation": "XOR is 0 when inputs are equal."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "De Morgan's theorem states that NOT(A . B) equals",
+      "options": [
+        "(NOT A) . (NOT B)",
+        "(NOT A) + (NOT B)",
+        "A + B",
+        "A . B"
+      ],
+      "answer": "(NOT A) + (NOT B)",
+      "explanation": "First De Morgan theorem."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "De Morgan's theorem states that NOT(A + B) equals",
+      "options": [
+        "(NOT A) + (NOT B)",
+        "(NOT A) . (NOT B)",
+        "A . B",
+        "A + B"
+      ],
+      "answer": "(NOT A) . (NOT B)",
+      "explanation": "Second De Morgan theorem."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In Boolean algebra, A + 1 equals",
+      "options": [
+        "A",
+        "0",
+        "1",
+        "NOT A"
+      ],
+      "answer": "1",
+      "explanation": "OR with 1 is always 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The Boolean expression for an XOR gate in terms of basic gates is",
+      "options": [
+        "A . B",
+        "A + B",
+        "(A . NOT B) + (NOT A . B)",
+        "NOT(A + B)"
+      ],
+      "answer": "(A . NOT B) + (NOT A . B)",
+      "explanation": "Standard XOR realisation."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a common-emitter amplifier the output is 180 degrees out of phase with the input.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "CE amplifiers show phase reversal."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The current gain beta of a transistor equals the collector current divided by the base current.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "beta = I_C/I_B in CE mode."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An oscillator needs an external a.c. input to produce its output.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "An oscillator produces a.c. output from d.c., without any a.c. input."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the cut-off state a transistor switch behaves like a closed switch.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Cut-off = OFF = open switch; saturation = closed."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In binary electronics, 0 is represented by a HIGH voltage.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "0 is LOW voltage; 1 is HIGH."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The output of an AND gate is 1 only when all its inputs are 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "AND requires every input to be 1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "NAND and NOR gates are universal gates.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Any logic can be built from NAND alone or NOR alone."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An XOR gate gives output 1 when its two inputs are equal.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "XOR gives 1 when the inputs are different."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "De Morgan's theorem gives NOT(A + B) = (NOT A) . (NOT B).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Second De Morgan theorem."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "An LED converts electrical energy into light.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "An LED emits light when forward biased."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In a CE amplifier a small ____ current controls a large collector current.",
+      "answer": "base",
+      "explanation": "I_C = beta I_B."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The output of a common-emitter amplifier is ____ degrees out of phase with the input.",
+      "answer": "180",
+      "explanation": "Phase reversal."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The common-emitter current gain is denoted by the Greek letter ____.",
+      "answer": "beta",
+      "explanation": "beta = I_C/I_B."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If beta = 100 and R_L/R_in = 4, the voltage gain A_v = ____.",
+      "answer": "400",
+      "explanation": "A_v = beta x R_L/R_in = 100 x 4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "As a switch, the transistor is used in the cut-off and ____ states.",
+      "answer": "saturation",
+      "explanation": "OFF and ON states."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An oscillator is an amplifier with ____ feedback.",
+      "answer": "positive",
+      "explanation": "In-phase feedback sustains oscillation."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The frequency of an LC oscillator is f = 1/(2 pi sqrt(____)).",
+      "answer": "LC",
+      "explanation": "Tuned-circuit frequency formula."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A single binary digit (0 or 1) is called a ____.",
+      "answer": "bit",
+      "explanation": "Bit = binary digit."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The binary number 100 equals the decimal number ____.",
+      "answer": "4",
+      "explanation": "1x4 + 0 + 0 = 4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Boolean symbol '+' in logic stands for the ____ operation.",
+      "answer": "OR",
+      "explanation": "'+' means OR."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a NOT gate, if the input is 0 the output is ____.",
+      "answer": "1",
+      "explanation": "Inverter: 0 becomes 1."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A NAND gate is an AND gate followed by a ____ gate.",
+      "answer": "NOT",
+      "explanation": "NAND = NOT(A.B)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The ____ gate gives output 1 only when its inputs are different.",
+      "answer": "XOR",
+      "explanation": "Exclusive-OR."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "By De Morgan's theorem, NOT(A . B) = (NOT A) ____ (NOT B).",
+      "answer": "+",
+      "explanation": "NOT of a product is the OR of NOTs."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A ____ diode operated in reverse breakdown is used as a voltage regulator.",
+      "answer": "Zener",
+      "explanation": "Zener holds voltage constant in breakdown."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Name the amplifier configuration that gives high gain and phase reversal, and state which terminal is common.",
+      "answer": "The COMMON-EMITTER (CE) configuration. The emitter terminal is common to both the input (base-emitter) and the output (collector-emitter). It gives high voltage gain and a 180-degree phase reversal between output and input.",
+      "explanation": "CE amplifier: emitter common, high gain, phase reversal."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain how a common-emitter transistor amplifies a weak signal.",
+      "answer": "In the CE amplifier the emitter-base junction is forward biased and the collector-base junction is reverse biased. A weak a.c. signal applied at the base makes the base current rise and fall. Because I_C = beta I_B, the collector current follows, magnified by beta (typically 50-300). This changing collector current flows through the load resistance R_L, producing a large changing voltage across it. This large output voltage is the amplified version of the small input signal.",
+      "explanation": "Small base current controls large collector current; drop across R_L is the amplified output."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 2,
+      "question": "Why does the output of a CE amplifier show a 180-degree phase reversal?",
+      "answer": "When the input voltage increases, the base current increases, so the collector current increases. This larger collector current produces a larger voltage drop across the load resistance R_L. Since the collector voltage equals (supply voltage minus drop across R_L), a larger drop means the collector (output) voltage FALLS. So as the input rises the output falls - a 180-degree phase reversal.",
+      "explanation": "Rising input, larger I_C, larger R_L drop, so collector voltage falls."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "A transistor has a change in collector current of 3 mA for a change in base current of 30 microampere. Find beta.",
+      "answer": "beta = (change in I_C)/(change in I_B) = (3 x 10^-3 A)/(30 x 10^-6 A) = 3000/30 = 100. So beta = 100.",
+      "explanation": "beta = delta I_C/delta I_B."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A CE amplifier has beta = 150, R_in = 1 kilo-ohm and R_L = 3 kilo-ohm. Find the voltage gain and the output for a 12 mV input.",
+      "answer": "Voltage gain A_v = beta x R_L/R_in = 150 x (3000/1000) = 150 x 3 = 450.\nOutput voltage = A_v x input = 450 x 12 mV = 5400 mV = 5.4 V (180 degrees out of phase with the input).",
+      "explanation": "A_v = beta R_L/R_in; V_out = A_v V_in."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Define voltage gain and write its formula for a CE amplifier.",
+      "answer": "Voltage gain (A_v) is the ratio of the change in output voltage to the change in input voltage: A_v = V_out/V_in. For a common-emitter amplifier it can also be written as A_v = beta x (R_L/R_in), where beta is the current gain, R_L the load resistance and R_in the input resistance.",
+      "explanation": "A_v = V_out/V_in = beta R_L/R_in."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the two states in which a transistor is operated as a switch and what each represents.",
+      "answer": "The two states are CUT-OFF and SATURATION. In cut-off the collector current is nearly zero - the switch is OFF (open), representing binary 0. In saturation the collector current is maximum and V_CE is nearly zero - the switch is ON (closed), representing binary 1.",
+      "explanation": "Cut-off = OFF/0, saturation = ON/1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "What is an oscillator? State the Barkhausen criterion for sustained oscillations.",
+      "answer": "An oscillator is a circuit that produces a continuous a.c. output signal from a d.c. source without any a.c. input - it is an amplifier with positive feedback. The Barkhausen criterion for steady oscillation requires: (1) the total phase shift around the loop is zero (or 360 degrees), i.e. the feedback is positive/in-phase; and (2) the loop gain (amplifier gain times feedback fraction) is at least 1.",
+      "explanation": "Oscillator = amplifier + positive feedback; Barkhausen: loop phase 0, loop gain >= 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Write the formula for the frequency of an LC oscillator and state how f changes if C is increased.",
+      "answer": "The frequency is f = 1/(2 pi sqrt(L C)). Since f is inversely proportional to sqrt(LC), increasing the capacitance C DECREASES the frequency of oscillation.",
+      "explanation": "f = 1/(2 pi sqrt(LC)); larger C gives lower f."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Convert the binary number 1010 to decimal.",
+      "answer": "Using place values 8, 4, 2, 1: binary 1010 = 1x8 + 0x4 + 1x2 + 0x1 = 8 + 2 = 10. So 1010 (binary) = 10 (decimal).",
+      "explanation": "Sum of place values where the bit is 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "What is a logic gate? Name the three basic gates.",
+      "answer": "A logic gate is a digital circuit that produces a single binary output from one or more binary inputs according to a fixed rule (shown by its truth table). The three basic gates are the OR gate, the AND gate and the NOT gate (inverter).",
+      "explanation": "Gate = binary decision circuit; basic gates OR, AND, NOT."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Distinguish between analogue and digital signals.",
+      "answer": "An ANALOGUE signal varies smoothly over a continuous range of values. A DIGITAL signal takes only two discrete values, written 0 and 1 (represented by LOW and HIGH voltages). Digital signals are less affected by noise and are handled by transistor switches, which is why computers are digital.",
+      "explanation": "Analogue = continuous; digital = two-level (0/1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Draw the truth table of the OR, AND and NOT gates.",
+      "answer": "OR (Y=A+B):\n A B | Y\n 0 0 | 0\n 0 1 | 1\n 1 0 | 1\n 1 1 | 1\nAND (Y=A.B):\n A B | Y\n 0 0 | 0\n 0 1 | 0\n 1 0 | 0\n 1 1 | 1\nNOT (Y=NOT A):\n A | Y\n 0 | 1\n 1 | 0",
+      "explanation": "OR: 1 if any input 1; AND: 1 only if all 1; NOT: inverts."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "For inputs A=1, B=0, C=1 applied to a 3-input AND gate and a 3-input OR gate, find the two outputs.",
+      "answer": "AND gate: output is 1 only if all inputs are 1. Here inputs are 1, 0, 1 (not all 1), so AND output = 0.\nOR gate: output is 1 if any input is 1. Here at least one input is 1, so OR output = 1.",
+      "explanation": "AND needs all 1; OR needs any 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Why are digital circuits built mainly from transistor switches?",
+      "answer": "Because a transistor switch has exactly two stable states - OFF (cut-off) and ON (saturation) - which map naturally onto the binary digits 0 and 1. The switching is fast, needs no moving parts and is highly reliable, so large numbers of such switches can be combined to make logic gates and hence digital circuits.",
+      "explanation": "Two stable states OFF/ON = 0/1; fast and reliable."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Draw the truth tables of the NAND and NOR gates.",
+      "answer": "NAND (Y = NOT(A.B)):\n A B | Y\n 0 0 | 1\n 0 1 | 1\n 1 0 | 1\n 1 1 | 0\nNOR (Y = NOT(A+B)):\n A B | Y\n 0 0 | 1\n 0 1 | 0\n 1 0 | 0\n 1 1 | 0",
+      "explanation": "NAND = inverse of AND; NOR = inverse of OR."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Why are NAND and NOR gates called universal gates? Give one example.",
+      "answer": "They are called universal because any logic function - AND, OR, NOT and hence any digital circuit - can be built using only NAND gates, or only NOR gates. Example: connecting the two inputs of a NAND gate together gives a NOT gate; that NOT gate placed after a NAND gate gives an AND gate; and OR can be obtained using De Morgan's theorem. So a whole circuit can be made from one type of gate, which simplifies manufacture.",
+      "explanation": "All gates derivable from NAND (or NOR) alone."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the rule and give the truth table for the XOR gate.",
+      "answer": "Rule: the XOR (exclusive-OR) gate output is 1 when the two inputs are DIFFERENT and 0 when they are the SAME.\n A B | Y\n 0 0 | 0\n 0 1 | 1\n 1 0 | 1\n 1 1 | 0",
+      "explanation": "XOR: 1 when inputs differ."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State De Morgan's two theorems.",
+      "answer": "De Morgan's theorems: (1) NOT(A . B) = (NOT A) + (NOT B); (2) NOT(A + B) = (NOT A) . (NOT B). They relate the NOT of a product/sum to the sum/product of the individual NOTs.",
+      "explanation": "NOT of product = OR of NOTs; NOT of sum = AND of NOTs."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Simplify the Boolean expression Y = A + A . B.",
+      "answer": "Using the absorption law: A + A.B = A(1 + B) = A x 1 = A. So Y = A. (Because 1 + B = 1 and A x 1 = A.)",
+      "explanation": "Absorption law: A + A.B = A."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the working of a photodiode and one use.",
+      "answer": "A photodiode is a junction diode operated in REVERSE bias. When light falls on the junction it creates extra electron-hole pairs, so the reverse current increases with the intensity of the light. Use: as a light detector - for example in light meters and optical-fibre receivers.",
+      "explanation": "Reverse-biased; reverse current rises with light intensity."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Differentiate between an LED and a solar cell.",
+      "answer": "An LED (Light Emitting Diode) is a FORWARD-biased junction diode that converts electrical energy into light - electrons and holes recombine at the junction and emit photons. A SOLAR CELL does the opposite: it is a p-n junction that converts LIGHT energy into electrical energy, generating a voltage when light falls on it (no external bias needed). So an LED is electricity-to-light while a solar cell is light-to-electricity.",
+      "explanation": "LED: electricity to light (forward biased); solar cell: light to electricity."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "With the help of biasing details, explain the working of a common-emitter transistor amplifier and the origin of phase reversal.",
+      "answer": "Circuit and biasing: In a common-emitter (CE) amplifier the emitter is common to input and output. For an n-p-n transistor the emitter-base junction is FORWARD biased and the collector-base junction is REVERSE biased. A load resistance R_L is placed in the collector circuit, and the output is taken across the collector and emitter.\n\nWorking: A weak a.c. signal applied between base and emitter makes the base current I_B rise and fall in step with the signal. Because the collector current I_C = beta I_B, the collector current follows the base current but magnified by beta (50-300). The changing collector current flows through R_L, producing a large changing voltage across it, which is the amplified output. The voltage gain is A_v = beta R_L/R_in.\n\nPhase reversal: The collector (output) voltage = supply voltage minus the drop across R_L. When the input rises, I_B and hence I_C rise, so the drop across R_L rises and the collector voltage FALLS. Thus the output is 180 degrees out of phase with the input - this is the characteristic phase reversal of the CE amplifier.",
+      "explanation": "Biasing, I_C = beta I_B through R_L gives amplified output; phase reversal from the R_L drop."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "A CE amplifier has beta = 100. Its input resistance is 2 kilo-ohm and its load resistance is 10 kilo-ohm. (a) Find the voltage gain. (b) Find the output voltage for an input of 5 mV. (c) Find the power gain given a current gain of 100.",
+      "answer": "(a) Voltage gain A_v = beta x R_L/R_in = 100 x (10000/2000) = 100 x 5 = 500.\n(b) Output voltage = A_v x input = 500 x 5 mV = 2500 mV = 2.5 V (180 degrees out of phase with input).\n(c) Power gain = voltage gain x current gain = 500 x 100 = 50000. So the amplifier gives a power gain of 5 x 10^4.",
+      "explanation": "A_v = beta R_L/R_in; V_out = A_v V_in; power gain = A_v x current gain."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Explain how a transistor can act (i) as a switch and (ii) as an oscillator.",
+      "answer": "(i) As a switch: the transistor is operated only at its two extreme states. In CUT-OFF the base current is nearly zero, so the collector current is nearly zero and the transistor behaves like an OPEN switch (OFF, binary 0). In SATURATION a large base current makes the collector current maximum and V_CE nearly zero, so the transistor behaves like a CLOSED switch (ON, binary 1). A small base voltage thus switches a large collector current on and off. This is fast, has no moving parts, and is the basis of digital circuits.\n\n(ii) As an oscillator: an oscillator is an amplifier with POSITIVE feedback. A fraction of the output is fed back to the input in phase, so it reinforces the input and keeps the signal going without any external a.c. input - converting d.c. from the battery into a continuous a.c. output. A tuned LC circuit sets the frequency f = 1/(2 pi sqrt(LC)). For steady oscillation the Barkhausen criterion must hold: loop phase shift zero (or 360 degrees) and loop gain at least 1.",
+      "explanation": "Switch: cut-off/saturation; oscillator: amplifier + positive feedback, Barkhausen criterion."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Draw the truth tables of the OR, AND, NOT, NAND and NOR gates and write the Boolean expression of each.",
+      "answer": "OR (Y = A + B):\n 0 0|0, 0 1|1, 1 0|1, 1 1|1\nAND (Y = A . B):\n 0 0|0, 0 1|0, 1 0|0, 1 1|1\nNOT (Y = NOT A):\n 0|1, 1|0\nNAND (Y = NOT(A . B)):\n 0 0|1, 0 1|1, 1 0|1, 1 1|0\nNOR (Y = NOT(A + B)):\n 0 0|1, 0 1|0, 1 0|0, 1 1|0\nEach entry is written as inputs | output. OR is 1 if any input is 1; AND is 1 only if all inputs are 1; NOT inverts; NAND is the inverse of AND; NOR is the inverse of OR.",
+      "explanation": "Five gates with Boolean expressions and truth tables."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Show that the NAND gate is a universal gate by realising NOT, AND and OR using only NAND gates.",
+      "answer": "NOT from NAND: tie both inputs together. NAND(A, A) = NOT(A . A) = NOT A. So a single NAND with joined inputs is an inverter.\n\nAND from NAND: NAND(A, B) = NOT(A.B). Passing this through a NAND inverter gives NOT(NOT(A.B)) = A.B. So two NANDs (one as gate, one as inverter) give AND.\n\nOR from NAND: First invert each input using NAND inverters to get NOT A and NOT B. Then feed them to a NAND: NAND(NOT A, NOT B) = NOT((NOT A).(NOT B)) = A + B (by De Morgan's theorem). So three NANDs give OR.\n\nSince NOT, AND and OR can all be built from NAND gates alone, any logic function can be built from NAND gates - hence NAND is a universal gate.",
+      "explanation": "NOT, AND, OR each realised with NAND only, using De Morgan for OR."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Using Boolean algebra and De Morgan's theorems, prove that NOT(A + B) = (NOT A) . (NOT B), and verify it with a truth table.",
+      "answer": "Statement (De Morgan's second theorem): NOT(A + B) = (NOT A) . (NOT B).\nVerification by truth table:\n A B | A+B | NOT(A+B) | NOT A | NOT B | (NOT A).(NOT B)\n 0 0 |  0  |    1     |   1   |   1   |       1\n 0 1 |  1  |    0     |   1   |   0   |       0\n 1 0 |  1  |    0     |   0   |   1   |       0\n 1 1 |  1  |    0     |   0   |   0   |       0\nThe column for NOT(A+B) matches the column for (NOT A).(NOT B) in every row, which proves the identity. It shows that the NOT of an OR equals the AND of the individual NOTs.",
+      "explanation": "Row-by-row truth table shows both sides are equal."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Describe the working and one use each of the Zener diode, photodiode, LED and solar cell.",
+      "answer": "Zener diode: works in REVERSE breakdown, where the voltage across it stays almost constant even as current varies. Use: voltage regulator (keeps the load voltage steady).\nPhotodiode: a reverse-biased junction whose reverse current increases when light falls on it (light creates electron-hole pairs). Use: light detector / light meter / optical receiver.\nLED (Light Emitting Diode): a forward-biased junction diode that emits light when electrons and holes recombine at the junction. Use: indicator lamps, displays, energy-efficient lighting.\nSolar cell: a p-n junction that converts light directly into electricity - light generates electron-hole pairs and the junction field separates them, producing a voltage with no external bias. Use: powering calculators, satellites and solar panels.",
+      "explanation": "Zener regulator, photodiode detector, LED emitter, solar cell light-to-power."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Explain what is meant by feedback in an oscillator, distinguish positive from negative feedback, and state why positive feedback is needed for oscillation.",
+      "answer": "Feedback means returning a fraction of the output of an amplifier back to its input. In NEGATIVE feedback the returned signal is out of phase with the input, so it opposes and reduces the effective input - this is used to stabilise amplifiers and reduce distortion, but it cannot sustain oscillation. In POSITIVE feedback the returned signal is in phase with the input, so it reinforces the input.\n\nAn oscillator needs positive feedback so that a tiny initial disturbance is fed back in phase, reinforced, amplified, fed back again, and so on, building up and then sustaining a steady a.c. output without any external a.c. input. For this to continue steadily the Barkhausen criterion must hold: the total loop phase shift is zero (or 360 degrees) and the loop gain is at least 1. The LC tank circuit fixes the frequency at f = 1/(2 pi sqrt(LC)).",
+      "explanation": "Positive (in-phase) feedback reinforces and sustains oscillation; Barkhausen conditions."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nIn a common-emitter amplifier an n-p-n transistor has its emitter-base junction forward biased and its collector-base junction reverse biased. A load resistance R_L is placed in the collector circuit. A weak a.c. signal is applied at the base.\n\n(i) Which terminal is common to input and output?\n(ii) Relate the collector current to the base current.\n(iii) Across which resistance does the amplified output voltage appear?\n(iv) What is the phase relation between the output and the input?",
+      "answer": "(i) The EMITTER is common to both input and output.\n(ii) I_C = beta I_B - the collector current is beta times the base current, so a small base-current change gives a large collector-current change.\n(iii) The amplified output voltage appears across the load (collector) resistance R_L.\n(iv) The output is 180 degrees out of phase with the input (phase reversal).",
+      "explanation": "CE amplifier essentials: emitter common, I_C = beta I_B, output across R_L, 180-degree phase reversal."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nA common-emitter amplifier has current gain beta = 100. Its input resistance is 1 kilo-ohm and its load resistance is 5 kilo-ohm. An input signal of 10 mV is applied.\n\n(i) Write the formula for the voltage gain.\n(ii) Calculate the voltage gain.\n(iii) Find the output voltage.\n(iv) State the phase of the output relative to the input.",
+      "answer": "(i) A_v = beta x R_L/R_in.\n(ii) A_v = 100 x (5000/1000) = 100 x 5 = 500.\n(iii) Output = A_v x input = 500 x 10 mV = 5000 mV = 5 V.\n(iv) The output is 180 degrees out of phase with the input (phase reversal).",
+      "explanation": "A_v = beta R_L/R_in = 500; V_out = 5 V; phase reversed."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nA transistor can be operated at cut-off or at saturation to act as a switch. In cut-off the collector current is almost zero; in saturation it is maximum and the collector-emitter voltage is nearly zero.\n\n(i) Which state corresponds to the switch being OFF (open)?\n(ii) Which state corresponds to the switch being ON (closed)?\n(iii) What binary digits do these two states represent?\n(iv) Give one advantage of a transistor switch over a mechanical switch.",
+      "answer": "(i) CUT-OFF corresponds to the switch being OFF (open), since the collector current is nearly zero.\n(ii) SATURATION corresponds to the switch being ON (closed), since the collector current is maximum and V_CE is nearly zero.\n(iii) OFF represents binary 0 and ON represents binary 1.\n(iv) It is fast, has no moving parts and can be switched millions of times per second reliably (any one).",
+      "explanation": "Cut-off = OFF/0, saturation = ON/1; transistor switch is fast and has no moving parts."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nAn oscillator is an amplifier with positive feedback. It converts d.c. power from the battery into a continuous a.c. signal. A tuned LC circuit fixes the frequency.\n\n(i) What kind of feedback does an oscillator use?\n(ii) State the two conditions of the Barkhausen criterion.\n(iii) Write the formula for the frequency of an LC oscillator.\n(iv) Give one practical use of an oscillator.",
+      "answer": "(i) Positive (in-phase) feedback.\n(ii) Barkhausen criterion: (1) total loop phase shift is zero (or 360 degrees); (2) loop gain is at least 1.\n(iii) f = 1/(2 pi sqrt(L C)).\n(iv) Generating the carrier wave in a radio/TV transmitter, or the clock signal in a computer (any one).",
+      "explanation": "Positive feedback; Barkhausen conditions; f = 1/(2 pi sqrt(LC)); used for carrier/clock signals."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nDigital circuits use only two values, 0 (LOW) and 1 (HIGH). Numbers are represented in binary (base 2), where place values are powers of two.\n\n(i) What name is given to a single binary digit?\n(ii) Convert binary 110 to decimal.\n(iii) Convert decimal 5 to binary.\n(iv) Why are digital signals less affected by noise than analogue signals?",
+      "answer": "(i) A bit.\n(ii) 110 = 1x4 + 1x2 + 0x1 = 6.\n(iii) 5 = 4 + 1 = 101 in binary.\n(iv) Because a digital signal has only two well-separated levels (LOW and HIGH); small noise voltages are not enough to change a 0 into a 1 or vice versa, so the information is preserved.",
+      "explanation": "Bit; 110=6; 5=101; two well-separated levels resist noise."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nThe OR gate gives output 1 if any input is 1; the AND gate gives output 1 only if all inputs are 1; the NOT gate inverts its single input.\n\n(i) For A=0, B=1, find the OR-gate output.\n(ii) For A=1, B=0, find the AND-gate output.\n(iii) For input 0, find the NOT-gate output.\n(iv) Write the Boolean expressions of the OR and AND gates.",
+      "answer": "(i) OR output = 1 (any input is 1).\n(ii) AND output = 0 (not all inputs are 1).\n(iii) NOT output = 1 (inverter turns 0 into 1).\n(iv) OR: Y = A + B; AND: Y = A . B.",
+      "explanation": "OR(0,1)=1; AND(1,0)=0; NOT(0)=1; Y=A+B and Y=A.B."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nA truth table lists the output of a gate for every combination of inputs. For two inputs there are four combinations.\n\n(i) How many rows does a 2-input truth table have?\n(ii) How many rows does a 3-input truth table have?\n(iii) For a 2-input AND gate, in how many rows is the output 1?\n(iv) For a 2-input OR gate, in how many rows is the output 0?",
+      "answer": "(i) 2^2 = 4 rows.\n(ii) 2^3 = 8 rows.\n(iii) For AND the output is 1 in only 1 row (when both inputs are 1).\n(iv) For OR the output is 0 in only 1 row (when both inputs are 0).",
+      "explanation": "n inputs give 2^n rows; AND is 1 once, OR is 0 once."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nThe NAND gate is an AND gate followed by a NOT gate, and the NOR gate is an OR gate followed by a NOT gate. Both are called universal gates. The XOR gate gives 1 when its inputs differ.\n\n(i) Write the Boolean expression for the NAND gate.\n(ii) For what input(s) is the NOR-gate output 1?\n(iii) Why are NAND and NOR called universal gates?\n(iv) Give the XOR output for inputs (1,1).",
+      "answer": "(i) Y = NOT(A . B).\n(ii) The NOR output is 1 only when all inputs are 0, i.e. for (0,0).\n(iii) Because any logic function (AND, OR, NOT and hence any circuit) can be built using only NAND gates, or only NOR gates.\n(iv) XOR(1,1) = 0 (inputs are the same).",
+      "explanation": "NAND = NOT(A.B); NOR is 1 for (0,0); universal; XOR(1,1)=0."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nDe Morgan's theorems state that NOT(A . B) = (NOT A) + (NOT B) and NOT(A + B) = (NOT A) . (NOT B). They are used to simplify logic and to convert between AND-based and OR-based circuits.\n\n(i) Write NOT(A . B) using De Morgan's theorem.\n(ii) Write NOT(A + B) using De Morgan's theorem.\n(iii) Simplify A . 1.\n(iv) Simplify A + A.",
+      "answer": "(i) NOT(A . B) = (NOT A) + (NOT B).\n(ii) NOT(A + B) = (NOT A) . (NOT B).\n(iii) A . 1 = A (AND with 1 leaves A unchanged).\n(iv) A + A = A (OR of a variable with itself is itself).",
+      "explanation": "De Morgan conversions; A.1 = A; A + A = A."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-PHY-ASD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\n\nSpecial semiconductor devices have specific uses: the Zener diode regulates voltage, the photodiode detects light, the LED emits light, and the solar cell converts light into electricity.\n\n(i) In which bias is a Zener diode operated as a regulator?\n(ii) In which bias is a photodiode operated?\n(iii) What energy conversion does an LED perform?\n(iv) What energy conversion does a solar cell perform?",
+      "answer": "(i) A Zener diode is operated in REVERSE bias (in its breakdown region).\n(ii) A photodiode is operated in REVERSE bias.\n(iii) An LED converts electrical energy into light energy (it is forward biased).\n(iv) A solar cell converts light (solar) energy into electrical energy.",
+      "explanation": "Zener: reverse breakdown; photodiode: reverse; LED: electricity to light; solar cell: light to electricity."
+    }
+  ]
+}
