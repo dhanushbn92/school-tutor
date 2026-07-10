@@ -1,0 +1,2259 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 10,
+    "chapter_title": "Principle of Mathematical Induction",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 10 - PRINCIPLE OF MATHEMATICAL INDUCTION\n\nIntroduction\n\nMany statements in mathematics are claimed to be true for EVERY natural number n: for example, '1 + 2 + 3 + ... + n = n(n+1)/2 for all n', or 'n^3 - n is divisible by 6 for all n', or '2^n > n for all n'. Such statements assert infinitely many facts at once - one fact for n = 1, one for n = 2, one for n = 3, and so on without end. We can never verify infinitely many cases one by one. How, then, can we PROVE such a statement for ALL natural numbers? The Principle of Mathematical Induction (PMI) is the powerful tool designed exactly for this purpose. It lets us establish an infinite chain of results using only TWO finite checks.\n\n10.1 THE PRINCIPLE OF MATHEMATICAL INDUCTION\n\nLet P(n) be a statement (a proposition) involving a natural number n. The Principle of Mathematical Induction states:\n If (i) P(1) is true [the BASE STEP], and\n    (ii) whenever P(k) is true for some natural number k, P(k+1) is also true [the INDUCTIVE STEP],\n then P(n) is true for EVERY natural number n.\n\nIn words: if a statement holds for the first natural number, and if its holding for any one number forces it to hold for the next number, then it holds for all natural numbers. The number k in the inductive step is arbitrary - we do not fix a particular value; we show the implication P(k) => P(k+1) for every k.\n\nTHE DOMINO ANALOGY. Imagine an infinite row of dominoes standing on end, numbered 1, 2, 3, ... . Suppose we know two things: (1) the FIRST domino falls, and (2) EACH domino, when it falls, knocks over the next one. Then clearly EVERY domino will fall. The first condition is the base step; the second is the inductive step. Knocking down domino 1 topples 2, which topples 3, and so on forever. Mathematical induction works in precisely this way. The base step lights the fuse; the inductive step guarantees the chain never breaks.\n\nWHY BOTH STEPS ARE NEEDED. Both conditions are essential; neither alone suffices. If only the base step holds, we know P(1) but nothing more. If only the inductive step holds but P(1) is false, the chain never starts - like a rule that says 'if a domino falls it topples the next', but no domino is ever pushed, so none fall. A famous illustration: the statement 'n^2 + n + 41 is prime' is true for n = 0, 1, 2, ..., 39, yet it FAILS at n = 40 (giving 41^2). Checking finitely many cases never proves a statement for all n; only a valid inductive step does.\n\n10.2 THE BASE STEP AND THE INDUCTIVE STEP\n\nA complete induction proof has a fixed skeleton. To prove that P(n) holds for all n >= 1:\n STEP 1 (Base step): Verify P(1) directly by substitution. Sometimes the statement is claimed only for n >= some starting value n0 (for instance n >= 5); then the base step checks P(n0) instead of P(1).\n STEP 2 (Inductive hypothesis): ASSUME that P(k) is true for an arbitrary but fixed natural number k. This assumption is called the INDUCTIVE HYPOTHESIS. We do not prove it - we suppose it and use it.\n STEP 3 (Inductive step): Using the inductive hypothesis, PROVE that P(k+1) is true. The heart of the work is to relate the (k+1) case to the k case, so the assumed truth of P(k) can be exploited.\n STEP 4 (Conclusion): Since P(1) holds and P(k) => P(k+1) for all k, by the Principle of Mathematical Induction P(n) is true for all natural numbers n.\n\nThe single most important idea is the LINK from k to k+1. In a summation, this usually means adding the (k+1)-th term to both sides of the assumed equation. In a divisibility proof, it means writing the (k+1) expression in terms of the k expression plus a term that is clearly divisible. Always state the inductive hypothesis explicitly and show clearly where you USE it - an argument that never uses P(k) is not an induction proof.\n\n10.3 PROVING SUMMATION FORMULAE BY INDUCTION\n\nInduction is ideally suited to proving formulae for sums.\n\nEXAMPLE 1 (sum of first n natural numbers). Prove P(n): 1 + 2 + 3 + ... + n = n(n+1)/2.\nBase step: P(1) says 1 = 1(2)/2 = 1. True.\nInductive hypothesis: assume 1 + 2 + ... + k = k(k+1)/2.\nInductive step: add (k+1) to both sides:\n  1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)[k/2 + 1] = (k+1)(k+2)/2.\nThis is exactly P(k+1) [replace n by k+1 in n(n+1)/2]. Hence by PMI the formula holds for all n.\n\nEXAMPLE 2 (sum of squares). Prove P(n): 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6.\nBase step: P(1): 1 = 1(2)(3)/6 = 1. True.\nAssume 1^2 + ... + k^2 = k(k+1)(2k+1)/6. Add (k+1)^2:\n  sum = k(k+1)(2k+1)/6 + (k+1)^2 = (k+1)[k(2k+1) + 6(k+1)]/6 = (k+1)(2k^2 + 7k + 6)/6\n      = (k+1)(k+2)(2k+3)/6,\nwhich is P(k+1). So the formula holds for all n.\n\nEXAMPLE 3 (sum of cubes). Prove P(n): 1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2.\nBase: P(1): 1 = [1(2)/2]^2 = 1. Assume the sum to k is [k(k+1)/2]^2. Add (k+1)^3:\n  [k(k+1)/2]^2 + (k+1)^3 = (k+1)^2 [k^2/4 + (k+1)] = (k+1)^2 (k^2 + 4k + 4)/4 = (k+1)^2 (k+2)^2 /4\n      = [(k+1)(k+2)/2]^2 = P(k+1). Note the neat fact that the sum of the first n cubes equals the SQUARE of the sum of the first n natural numbers.\n\nEXAMPLE 4 (geometric progression). Prove P(n): a + ar + ar^2 + ... + ar^(n-1) = a(r^n - 1)/(r - 1) for r not equal to 1.\nBase: P(1): a = a(r - 1)/(r - 1) = a. Assume the sum of k terms is a(r^k - 1)/(r - 1). Add the next term ar^k:\n  a(r^k - 1)/(r - 1) + ar^k = [a(r^k - 1) + ar^k (r - 1)]/(r - 1) = [a r^k - a + a r^(k+1) - a r^k]/(r - 1)\n      = a(r^(k+1) - 1)/(r - 1) = P(k+1). Hence the GP sum formula holds for all n.\n\nOther summation results provable the same way include 1 + 3 + 5 + ... + (2n - 1) = n^2 (sum of the first n odd numbers) and 2 + 4 + 6 + ... + 2n = n(n+1) (sum of the first n even numbers).\n\n10.4 PROVING DIVISIBILITY RESULTS BY INDUCTION\n\nTo prove that an expression f(n) is divisible by a fixed integer d for all n, we show f(1) is divisible by d, then write f(k+1) as [something clearly divisible by d] using the hypothesis that f(k) is divisible by d.\n\nEXAMPLE 5. Prove P(n): n^3 - n is divisible by 6 for all n >= 1.\nBase: P(1): 1 - 1 = 0, which is divisible by 6. Assume k^3 - k = 6m for some integer m. Consider\n  (k+1)^3 - (k+1) = k^3 + 3k^2 + 3k + 1 - k - 1 = (k^3 - k) + 3k^2 + 3k = (k^3 - k) + 3k(k+1).\nBy the hypothesis k^3 - k = 6m. Also k(k+1) is a product of two consecutive integers, so it is even, say k(k+1) = 2t; then 3k(k+1) = 6t. Hence (k+1)^3 - (k+1) = 6m + 6t = 6(m + t), divisible by 6. So P(k+1) holds and the result is true for all n.\n\nEXAMPLE 6. Prove P(n): 2^(2n) - 1 is divisible by 3 for all n >= 1.\nBase: P(1): 2^2 - 1 = 3, divisible by 3. Assume 2^(2k) - 1 = 3m. Now\n  2^(2(k+1)) - 1 = 2^(2k+2) - 1 = 4 . 2^(2k) - 1 = 4(2^(2k) - 1) + 4 - 1 = 4(3m) + 3 = 3(4m + 1),\nwhich is divisible by 3. Hence P(k+1) holds, and the statement is true for all n. (The same trick proves that 4^n - 1 is divisible by 3, since 2^(2n) = 4^n.)\n\nEXAMPLE 7. Prove P(n): 10^n + 3 . 4^(n+2) + 5 is divisible by 9, or simpler, that n(n+1)(n+2) is divisible by 6. For the latter: base n = 1 gives 6, divisible by 6. Assume k(k+1)(k+2) = 6m. Then (k+1)(k+2)(k+3) = (k+1)(k+2)k + 3(k+1)(k+2) = k(k+1)(k+2) + 3(k+1)(k+2). The first term is 6m; and (k+1)(k+2) is a product of two consecutive integers, hence even, so 3(k+1)(k+2) is a multiple of 6. The sum is therefore divisible by 6, proving P(k+1).\n\n10.5 PROVING INEQUALITIES BY INDUCTION\n\nInduction also proves inequalities, though the inductive step needs a little more care because we must strengthen an inequality rather than an equality.\n\nEXAMPLE 8. Prove P(n): 2^n > n for all n >= 1.\nBase: P(1): 2^1 = 2 > 1. True. Assume 2^k > k. Then\n  2^(k+1) = 2 . 2^k > 2k = k + k >= k + 1  (since k >= 1),\nso 2^(k+1) > k + 1, which is P(k+1). Hence 2^n > n for all n.\n\nEXAMPLE 9 (Bernoulli-type). Prove P(n): (1 + x)^n >= 1 + nx for all n >= 1 and x >= -1.\nBase: P(1): (1 + x)^1 = 1 + x >= 1 + x. True. Assume (1 + x)^k >= 1 + kx. Multiply both sides by (1 + x), which is >= 0 since x >= -1:\n  (1 + x)^(k+1) >= (1 + kx)(1 + x) = 1 + kx + x + kx^2 = 1 + (k+1)x + kx^2 >= 1 + (k+1)x,\nsince kx^2 >= 0. Thus P(k+1) holds.\n\nEXAMPLE 10. Prove P(n): n! >= 2^(n-1) for all n >= 1. Base: 1! = 1 = 2^0. Assume k! >= 2^(k-1). Then (k+1)! = (k+1) . k! >= (k+1) . 2^(k-1) >= 2 . 2^(k-1) = 2^k, since k + 1 >= 2. Hence n! >= 2^(n-1) for all n.\n\nWhen proving inequalities, always keep the DIRECTION of the inequality consistent and make sure every step used to strengthen it (dropping a positive term, using k >= 1, multiplying by a non-negative quantity) is valid.\n\n10.6 COMMON PITFALLS AND THE WELL-ORDERING PRINCIPLE\n\nCOMMON ERRORS in induction proofs:\n 1. Omitting the base step. Without checking P(1) (or P(n0)), the whole chain is unjustified even if the inductive step is correct - the dominoes are wired together but none is pushed.\n 2. Not actually using the inductive hypothesis. If your proof of P(k+1) never refers to P(k), you have not performed induction; you may simply have re-proved each case independently (or made an error).\n 3. Assuming what is to be proved. The hypothesis is P(k), NOT P(k+1). Writing the desired P(k+1) as if it were already known (circular reasoning) is invalid.\n 4. Wrong base value. If a statement is claimed only for n >= 5, verify P(5), not P(1); starting at the wrong place proves nothing about the intended range.\n 5. Careless algebra in the inductive step - failing to factor out (k+1), or mis-substituting n = k+1 into the formula. Always compare your simplified expression with the formula written for n = k+1.\n\nSTRONG INDUCTION. Sometimes proving P(k+1) needs not just P(k) but all of P(1), P(2), ..., P(k). This variant is called STRONG (or complete) induction. It is logically equivalent to ordinary induction and is used, for example, to prove that every integer greater than 1 has a prime factorisation.\n\nTHE WELL-ORDERING PRINCIPLE. Closely related to induction is the Well-Ordering Principle: EVERY non-empty set of natural numbers has a LEAST (smallest) element. This seemingly obvious fact is logically equivalent to the Principle of Mathematical Induction - each can be derived from the other. It underlies a common proof style: to show P(n) holds for all n, suppose not; then the set of counter-examples is a non-empty set of natural numbers, so it has a least element m. One then derives a contradiction (usually P(m-1) holds, forcing P(m) to hold too), proving no counter-example can exist. The well-ordering principle is why the natural numbers are especially suited to inductive reasoning: they are discrete, ordered, and every downward chain must stop.\n\nSUMMARY\n\n- The Principle of Mathematical Induction (PMI) proves a statement P(n) for ALL natural numbers using two steps: the base step P(1) and the inductive step P(k) => P(k+1).\n- Domino analogy: the first domino falls (base) and each falling domino topples the next (inductive), so all fall.\n- Both steps are essential; checking finitely many cases (e.g. n^2 + n + 41 prime up to n = 39) never proves a statement for all n.\n- Structure of a proof: verify P(1); assume P(k) (inductive hypothesis); prove P(k+1) using it; conclude by PMI.\n- Summation formulae proved by induction include 1 + 2 + ... + n = n(n+1)/2, 1^2 + ... + n^2 = n(n+1)(2n+1)/6, 1^3 + ... + n^3 = [n(n+1)/2]^2, and the GP sum a(r^n - 1)/(r - 1).\n- Divisibility results: n^3 - n divisible by 6, 2^(2n) - 1 divisible by 3, n(n+1)(n+2) divisible by 6, by writing f(k+1) as a multiple of d plus the hypothesis.\n- Inequalities such as 2^n > n, (1 + x)^n >= 1 + nx, and n! >= 2^(n-1) are proved by strengthening the inductive step.\n- Common pitfalls: skipping the base step, not using the hypothesis, assuming P(k+1), wrong base value, and algebra slips.\n- The Well-Ordering Principle (every non-empty set of natural numbers has a least element) is logically equivalent to PMI and supports proof by minimal counter-example.\n",
+  "topics": [
+    {
+      "name": "The Principle of Mathematical Induction",
+      "description": "The statement of PMI: if P(1) is true and P(k) true implies P(k+1) true, then P(n) is true for all natural numbers n. The domino analogy, the logic and motivation, and why induction proves infinitely many cases at once."
+    },
+    {
+      "name": "The Base and Inductive Steps",
+      "description": "The two-part structure of an induction proof: the base step verifying P(1) (or P(n0)); the inductive hypothesis assuming P(k); the inductive step deducing P(k+1); and why both steps are indispensable."
+    },
+    {
+      "name": "Proving Summation Formulae by Induction",
+      "description": "Using induction to prove closed forms for sums such as 1+2+...+n = n(n+1)/2, the sum of squares, the sum of cubes, the geometric progression sum, and sums of odd/even numbers, by adding the (k+1)-th term."
+    },
+    {
+      "name": "Proving Divisibility by Induction",
+      "description": "Proving that an expression f(n) is divisible by a fixed integer d for all n, for example n^3 - n divisible by 6 and 2^(2n) - 1 divisible by 3, by expressing f(k+1) as a multiple of d using the hypothesis."
+    },
+    {
+      "name": "Proving Inequalities by Induction",
+      "description": "Establishing inequalities such as 2^n > n, (1+x)^n >= 1+nx, and n! >= 2^(n-1) by carefully strengthening the inequality in the inductive step while keeping its direction consistent."
+    },
+    {
+      "name": "Common Pitfalls and the Well-Ordering Principle",
+      "description": "Frequent errors in induction proofs (skipping the base step, not using the hypothesis, circular reasoning, wrong base value), strong induction, and the Well-Ordering Principle and its equivalence to PMI."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-PMI-01",
+      "topic_name": "The Principle of Mathematical Induction",
+      "bloom": "understand",
+      "description": "State the Principle of Mathematical Induction, explain the domino analogy, and describe how it proves a statement P(n) for all natural numbers using two steps."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-02",
+      "topic_name": "The Base and Inductive Steps",
+      "bloom": "understand",
+      "description": "Identify the base step, the inductive hypothesis and the inductive step in an induction proof, and explain why both the base and inductive steps are indispensable."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-03",
+      "topic_name": "The Base and Inductive Steps",
+      "bloom": "apply",
+      "description": "Set up an induction proof correctly: verify the base case, state the inductive hypothesis P(k), and frame the goal P(k+1) for a given statement."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-04",
+      "topic_name": "Proving Summation Formulae by Induction",
+      "bloom": "apply",
+      "description": "Prove summation formulae such as 1+2+...+n = n(n+1)/2, the sum of squares, the sum of cubes and the GP sum by mathematical induction."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-05",
+      "topic_name": "Proving Divisibility by Induction",
+      "bloom": "apply",
+      "description": "Prove divisibility statements such as n^3 - n divisible by 6 and 2^(2n) - 1 divisible by 3 by mathematical induction."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-06",
+      "topic_name": "Proving Inequalities by Induction",
+      "bloom": "apply",
+      "description": "Prove inequalities such as 2^n > n and (1+x)^n >= 1+nx by mathematical induction, strengthening the inductive step correctly."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-07",
+      "topic_name": "Common Pitfalls and the Well-Ordering Principle",
+      "bloom": "understand",
+      "description": "Recognise and correct common errors in induction proofs, such as omitting the base step, not using the inductive hypothesis, and circular reasoning."
+    },
+    {
+      "code": "12-NIOS-MAT-PMI-08",
+      "topic_name": "Common Pitfalls and the Well-Ordering Principle",
+      "bloom": "analyze",
+      "description": "Analyse the Well-Ordering Principle, its equivalence to the Principle of Mathematical Induction, and the idea of strong induction and proof by minimal counter-example."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Principle of Mathematical Induction - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Principle of Mathematical Induction. It explains the two steps of induction (base and inductive), the domino analogy and motivation, and how induction proves summation formulae, divisibility results and inequalities, closing with common pitfalls, strong induction and the Well-Ordering Principle.",
+    "overview_diagram": {
+      "title": "Principle of Mathematical Induction",
+      "central_term": "Mathematical Induction",
+      "branches": [
+        {
+          "label": "The Principle (PMI)",
+          "details": [
+            "Proves P(n) for all natural n",
+            "Base P(1) + inductive P(k)=>P(k+1)",
+            "Domino analogy: all dominoes fall"
+          ]
+        },
+        {
+          "label": "The Two Steps",
+          "details": [
+            "Base step: verify P(1) or P(n0)",
+            "Inductive hypothesis: assume P(k)",
+            "Inductive step: prove P(k+1)"
+          ]
+        },
+        {
+          "label": "Summation & Divisibility",
+          "details": [
+            "1+2+...+n = n(n+1)/2",
+            "1^2+...+n^2 = n(n+1)(2n+1)/6",
+            "n^3 - n divisible by 6",
+            "2^(2n) - 1 divisible by 3"
+          ]
+        },
+        {
+          "label": "Inequalities",
+          "details": [
+            "2^n > n",
+            "(1+x)^n >= 1 + nx",
+            "n! >= 2^(n-1)",
+            "Strengthen the step carefully"
+          ]
+        },
+        {
+          "label": "Pitfalls & Well-Ordering",
+          "details": [
+            "Never skip the base step",
+            "Must use the hypothesis",
+            "Well-Ordering: least element exists",
+            "Equivalent to PMI"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "The Principle of Mathematical Induction",
+        "bullets": [
+          "PMI proves a statement P(n) for every natural number n using two finite checks instead of infinitely many.",
+          "If P(1) is true and P(k) true implies P(k+1) true for every k, then P(n) is true for all n.",
+          "Domino analogy: the first domino falls (base) and each falling domino topples the next (inductive), so all fall.",
+          "Checking finitely many cases is not a proof: n^2 + n + 41 is prime for n up to 39 but fails at n = 40."
+        ]
+      },
+      {
+        "heading": "The base and inductive steps",
+        "bullets": [
+          "Base step: verify P(1) directly (or P(n0) if the claim starts at n0).",
+          "Inductive hypothesis: assume P(k) is true for an arbitrary fixed natural number k.",
+          "Inductive step: using the hypothesis, prove P(k+1); the key is linking the (k+1) case to the k case.",
+          "Conclusion: by PMI, P(n) holds for all n. Both steps are indispensable."
+        ]
+      },
+      {
+        "heading": "Proving summation formulae",
+        "bullets": [
+          "Prove 1 + 2 + ... + n = n(n+1)/2 by adding (k+1) to both sides of the hypothesis.",
+          "1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6 and 1^3 + ... + n^3 = [n(n+1)/2]^2.",
+          "The GP sum a + ar + ... + ar^(n-1) = a(r^n - 1)/(r - 1) for r not equal to 1.",
+          "Sum of first n odd numbers = n^2; sum of first n even numbers = n(n+1)."
+        ]
+      },
+      {
+        "heading": "Proving divisibility and inequalities",
+        "bullets": [
+          "Divisibility: write f(k+1) as a multiple of d plus the hypothesis, e.g. n^3 - n divisible by 6.",
+          "2^(2n) - 1 is divisible by 3; n(n+1)(n+2) is divisible by 6.",
+          "Inequalities: 2^n > n, (1+x)^n >= 1+nx (x >= -1), and n! >= 2^(n-1).",
+          "Keep the inequality direction consistent and justify every strengthening step."
+        ]
+      },
+      {
+        "heading": "Common pitfalls and the Well-Ordering Principle",
+        "bullets": [
+          "Do not skip the base step and do not forget to actually use the inductive hypothesis.",
+          "The hypothesis is P(k), not P(k+1); assuming P(k+1) is circular reasoning.",
+          "Strong induction assumes P(1), ..., P(k) to prove P(k+1) and is equivalent to ordinary induction.",
+          "The Well-Ordering Principle (every non-empty set of naturals has a least element) is equivalent to PMI."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "The Principle of Mathematical Induction proves P(n) for all natural numbers using a base step P(1) and an inductive step P(k) => P(k+1).",
+      "The domino analogy captures induction: push the first domino and guarantee each topples the next.",
+      "Both steps are essential; verifying finitely many cases never establishes a statement for all n.",
+      "Summation formulae like 1+2+...+n = n(n+1)/2, sum of squares, sum of cubes and the GP sum are standard induction proofs.",
+      "Divisibility results (n^3 - n by 6, 2^(2n) - 1 by 3) follow by writing f(k+1) as a multiple of d using the hypothesis.",
+      "Inequalities such as 2^n > n and (1+x)^n >= 1+nx are proved by carefully strengthening the inductive step.",
+      "The Well-Ordering Principle is logically equivalent to PMI and underlies proof by minimal counter-example."
+    ],
+    "glossary": [
+      {
+        "term": "Principle of Mathematical Induction (PMI)",
+        "definition": "A method proving P(n) for all natural n: if P(1) holds and P(k) implies P(k+1), then P(n) holds for every n."
+      },
+      {
+        "term": "Statement P(n)",
+        "definition": "A proposition depending on a natural number n whose truth is to be established for all n."
+      },
+      {
+        "term": "Base step",
+        "definition": "The first part of an induction proof, verifying the statement for the smallest value, usually P(1) (or P(n0))."
+      },
+      {
+        "term": "Inductive hypothesis",
+        "definition": "The assumption that P(k) is true for an arbitrary fixed natural number k, used to prove P(k+1)."
+      },
+      {
+        "term": "Inductive step",
+        "definition": "The part of the proof that deduces P(k+1) from the inductive hypothesis P(k)."
+      },
+      {
+        "term": "Domino analogy",
+        "definition": "A picture of induction: the first domino falls and each falling domino knocks over the next, so all fall."
+      },
+      {
+        "term": "Sum of first n natural numbers",
+        "definition": "1 + 2 + ... + n = n(n+1)/2, a formula provable by induction."
+      },
+      {
+        "term": "Sum of squares",
+        "definition": "1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6."
+      },
+      {
+        "term": "Sum of cubes",
+        "definition": "1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2, the square of the sum of the first n natural numbers."
+      },
+      {
+        "term": "Geometric progression sum",
+        "definition": "a + ar + ... + ar^(n-1) = a(r^n - 1)/(r - 1) for r not equal to 1."
+      },
+      {
+        "term": "Divisibility proof",
+        "definition": "Showing f(n) is divisible by an integer d for all n by writing f(k+1) as a multiple of d using the hypothesis."
+      },
+      {
+        "term": "Strong induction",
+        "definition": "A variant assuming P(1), P(2), ..., P(k) to prove P(k+1); logically equivalent to ordinary induction."
+      },
+      {
+        "term": "Well-Ordering Principle",
+        "definition": "Every non-empty set of natural numbers has a least (smallest) element; equivalent to PMI."
+      },
+      {
+        "term": "Minimal counter-example",
+        "definition": "A proof technique using the Well-Ordering Principle: assume a least counter-example exists and derive a contradiction."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Principle of Mathematical Induction (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. For every proof, clearly show the base step, state the inductive hypothesis P(k), and complete the inductive step to reach P(k+1). Use plain notation (P(n), P(k+1), ^, sum).",
+    "total_marks": 35,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the Principle of Mathematical Induction and explain the domino analogy.",
+        "answer": "The Principle of Mathematical Induction states that if P(n) is a statement about a natural number n such that (i) P(1) is true (base step), and (ii) whenever P(k) is true, P(k+1) is also true (inductive step), then P(n) is true for every natural number n.\n\nDomino analogy: imagine an infinite line of dominoes numbered 1, 2, 3, ... . If the first domino is pushed over (base step) and every domino, when it falls, knocks over the next one (inductive step), then all the dominoes must fall. The base step starts the chain and the inductive step keeps it going forever.",
+        "explanation": "Statement of PMI plus the domino picture.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-PMI-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Explain why both the base step and the inductive step are needed in an induction proof, giving an example of what goes wrong if the base step is omitted.",
+        "answer": "Both steps are essential. The inductive step only guarantees P(k) => P(k+1); it never establishes any single case on its own. The base step supplies the one case (P(1)) that starts the chain. Without the base step the implications form a chain with nothing to set it off - like dominoes wired to topple each other but never pushed. For instance, the false statement 'n = n + 1' satisfies a fake inductive step (if k = k+1 then adding 1 gives k+1 = k+2) yet has no true base case, so it proves nothing. Conversely, only the base step tells us P(1) but nothing beyond it.",
+        "explanation": "Base starts the chain; inductive continues it; neither alone suffices.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-PMI-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "For the statement P(n): 1 + 2 + 3 + ... + n = n(n+1)/2, write P(1), P(k) and P(k+1) explicitly.",
+        "answer": "P(1): 1 = 1(1+1)/2 = 1.\nP(k): 1 + 2 + 3 + ... + k = k(k+1)/2.\nP(k+1): 1 + 2 + 3 + ... + k + (k+1) = (k+1)(k+2)/2, obtained by replacing n with (k+1) in n(n+1)/2.",
+        "explanation": "Substitute n = 1, k and k+1 into the formula.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-03"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Using the Principle of Mathematical Induction, prove that 1 + 2 + 3 + ... + n = n(n+1)/2 for all natural numbers n.",
+        "answer": "Let P(n): 1 + 2 + ... + n = n(n+1)/2.\n\nBase step: P(1) states 1 = 1(1+1)/2 = 1, which is true.\n\nInductive hypothesis: assume P(k) is true for some natural number k, i.e. 1 + 2 + ... + k = k(k+1)/2.\n\nInductive step: add (k+1) to both sides:\n  1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1)\n    = (k+1)[k/2 + 1]\n    = (k+1)(k+2)/2.\nThis is exactly P(k+1), the formula with n replaced by (k+1).\n\nConclusion: since P(1) is true and P(k) implies P(k+1), by the Principle of Mathematical Induction P(n) is true for all natural numbers n.",
+        "explanation": "Add (k+1) to the hypothesis and factor to reach P(k+1).",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Prove by induction that 1^2 + 2^2 + 3^2 + ... + n^2 = n(n+1)(2n+1)/6 for all n >= 1.",
+        "answer": "Let P(n): 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6.\n\nBase step: P(1): 1^2 = 1 and 1(2)(3)/6 = 1. True.\n\nInductive hypothesis: assume 1^2 + ... + k^2 = k(k+1)(2k+1)/6.\n\nInductive step: add (k+1)^2:\n  1^2 + ... + k^2 + (k+1)^2 = k(k+1)(2k+1)/6 + (k+1)^2\n    = (k+1)[k(2k+1) + 6(k+1)]/6\n    = (k+1)(2k^2 + 7k + 6)/6\n    = (k+1)(k+2)(2k+3)/6.\nThis equals (k+1)((k+1)+1)(2(k+1)+1)/6, which is P(k+1).\n\nConclusion: by the Principle of Mathematical Induction the formula holds for all n >= 1.",
+        "explanation": "Factor (k+1) and expand 2k^2+7k+6 = (k+2)(2k+3).",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Prove by mathematical induction that n^3 - n is divisible by 6 for every natural number n.",
+        "answer": "Let P(n): n^3 - n is divisible by 6.\n\nBase step: P(1): 1^3 - 1 = 0, which is divisible by 6. True.\n\nInductive hypothesis: assume k^3 - k = 6m for some integer m.\n\nInductive step: consider\n  (k+1)^3 - (k+1) = k^3 + 3k^2 + 3k + 1 - k - 1\n    = (k^3 - k) + 3k^2 + 3k\n    = (k^3 - k) + 3k(k+1).\nBy the hypothesis k^3 - k = 6m. Also k(k+1) is a product of two consecutive integers, so it is even; write k(k+1) = 2t. Then 3k(k+1) = 6t. Hence\n  (k+1)^3 - (k+1) = 6m + 6t = 6(m + t),\nwhich is divisible by 6, so P(k+1) holds.\n\nConclusion: by the Principle of Mathematical Induction, n^3 - n is divisible by 6 for all n.",
+        "explanation": "Expand, use hypothesis for k^3-k, note k(k+1) even makes 3k(k+1) a multiple of 6.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Prove by induction that 2^(2n) - 1 is divisible by 3 for all n >= 1.",
+        "answer": "Let P(n): 2^(2n) - 1 is divisible by 3.\n\nBase step: P(1): 2^2 - 1 = 3, divisible by 3. True.\n\nInductive hypothesis: assume 2^(2k) - 1 = 3m for some integer m, so 2^(2k) = 3m + 1.\n\nInductive step: 2^(2(k+1)) - 1 = 2^(2k+2) - 1 = 4 . 2^(2k) - 1 = 4(3m + 1) - 1 = 12m + 3 = 3(4m + 1), which is divisible by 3. Hence P(k+1) holds.\n\nConclusion: by the Principle of Mathematical Induction, 2^(2n) - 1 is divisible by 3 for all n.",
+        "explanation": "Write 2^(2k+2) = 4.2^(2k) and use the hypothesis.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Prove by induction that 2^n > n for all natural numbers n.",
+        "answer": "Let P(n): 2^n > n.\n\nBase step: P(1): 2^1 = 2 > 1. True.\n\nInductive hypothesis: assume 2^k > k.\n\nInductive step: 2^(k+1) = 2 . 2^k > 2k = k + k. Since k >= 1, we have k + k >= k + 1, so 2^(k+1) > k + 1, which is P(k+1).\n\nConclusion: by the Principle of Mathematical Induction, 2^n > n for all n.",
+        "explanation": "Double the hypothesis; use k >= 1 to get 2k >= k+1.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PMI-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A student proves an inductive step correctly but never checks the base case. Explain what is wrong and give a statement that would be 'proved' false by this omission.",
+        "answer": "Omitting the base step means the chain of implications P(k) => P(k+1) is never started, so nothing is actually proved. A correct inductive step alone shows only that IF some case holds THEN the next holds; it does not establish any case. For example, consider the false statement P(n): 'n = n + 1'. Its inductive step 'works': if k = k + 1, then adding 1 gives k + 1 = k + 2, i.e. P(k+1). But P(1) (1 = 2) is false, so the statement is false for all n. The missing (and unverifiable) base step is exactly what exposes the statement as false.",
+        "explanation": "Without the base case the implications have no starting truth; the n=n+1 example shows it.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-PMI-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the Well-Ordering Principle and explain its relationship to the Principle of Mathematical Induction.",
+        "answer": "The Well-Ordering Principle states that every non-empty set of natural numbers has a least (smallest) element. It is logically EQUIVALENT to the Principle of Mathematical Induction: each can be proved from the other. It supports proof by minimal counter-example: to show P(n) holds for all n, suppose it fails somewhere; then the set of natural numbers for which P is false is non-empty, so by well-ordering it has a least element m. One then derives a contradiction (typically P(m-1) holds, forcing P(m) to hold), proving that no counter-example can exist and hence P(n) holds for all n.",
+        "explanation": "Least-element property; equivalent to PMI; basis of minimal counter-example proofs.",
+        "marks": 4,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-PMI-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Principle of Mathematical Induction is used to prove a statement P(n) for",
+      "options": [
+        "a single value of n",
+        "all natural numbers n",
+        "only even n",
+        "only prime n"
+      ],
+      "answer": "all natural numbers n",
+      "explanation": "Induction establishes P(n) for every natural number."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the domino analogy, pushing the first domino corresponds to",
+      "options": [
+        "the base step",
+        "the inductive step",
+        "the conclusion",
+        "the hypothesis"
+      ],
+      "answer": "the base step",
+      "explanation": "The first domino falling is P(1), the base step."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the domino analogy, each domino knocking over the next corresponds to",
+      "options": [
+        "the base step",
+        "the inductive step P(k) => P(k+1)",
+        "checking P(1)",
+        "the well-ordering principle"
+      ],
+      "answer": "the inductive step P(k) => P(k+1)",
+      "explanation": "Each falling domino toppling the next is the inductive implication."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The two steps of a mathematical induction proof are",
+      "options": [
+        "base step and conclusion",
+        "base step and inductive step",
+        "hypothesis and contradiction",
+        "assumption and verification"
+      ],
+      "answer": "base step and inductive step",
+      "explanation": "PMI needs a base step and an inductive step."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Induction is powerful because it proves infinitely many cases using",
+      "options": [
+        "infinitely many checks",
+        "two finite steps",
+        "a single example",
+        "a table of values"
+      ],
+      "answer": "two finite steps",
+      "explanation": "Base plus inductive step cover all n with two finite checks."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In an induction proof P(n) denotes",
+      "options": [
+        "a number",
+        "a statement depending on n",
+        "the sum 1+...+n",
+        "a constant"
+      ],
+      "answer": "a statement depending on n",
+      "explanation": "P(n) is the proposition to be proved for each n."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If P(1) is true and P(k) => P(k+1) for all k, then we may conclude",
+      "options": [
+        "P(n) true for all n",
+        "P(n) true only for n=1",
+        "P(n) false for large n",
+        "nothing"
+      ],
+      "answer": "P(n) true for all n",
+      "explanation": "This is exactly the statement of PMI."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The statement 'n^2 + n + 41 is prime' is used to show that",
+      "options": [
+        "checking many cases proves a statement",
+        "checking finitely many cases does NOT prove a statement for all n",
+        "induction always fails",
+        "41 is composite"
+      ],
+      "answer": "checking finitely many cases does NOT prove a statement for all n",
+      "explanation": "It holds up to n=39 but fails at n=40."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The statement 'n^2 + n + 41 is prime' first fails at",
+      "options": [
+        "n = 10",
+        "n = 40",
+        "n = 41",
+        "n = 100"
+      ],
+      "answer": "n = 40",
+      "explanation": "At n=40 the value is 41^2, not prime."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Mathematical induction applies most directly to statements indexed by",
+      "options": [
+        "real numbers",
+        "natural numbers",
+        "complex numbers",
+        "irrational numbers"
+      ],
+      "answer": "natural numbers",
+      "explanation": "Induction is over the natural numbers."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If only the inductive step holds but P(1) is false, then",
+      "options": [
+        "P(n) is proved for all n",
+        "the chain never starts, so nothing is proved",
+        "P(2) is automatically true",
+        "P(n) is true for even n"
+      ],
+      "answer": "the chain never starts, so nothing is proved",
+      "explanation": "Without a true base case the implications establish nothing."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The final line of an induction proof concludes that P(n) holds for all n by",
+      "options": [
+        "the well-ordering principle only",
+        "the Principle of Mathematical Induction",
+        "direct substitution",
+        "contradiction"
+      ],
+      "answer": "the Principle of Mathematical Induction",
+      "explanation": "The conclusion invokes PMI."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The base step of an induction proof usually verifies",
+      "options": [
+        "P(k)",
+        "P(k+1)",
+        "P(1)",
+        "P(n)"
+      ],
+      "answer": "P(1)",
+      "explanation": "The base step checks the first case, P(1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The assumption that P(k) is true is called the",
+      "options": [
+        "conclusion",
+        "inductive hypothesis",
+        "base case",
+        "axiom"
+      ],
+      "answer": "inductive hypothesis",
+      "explanation": "Assuming P(k) is the inductive hypothesis."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the inductive step we must prove",
+      "options": [
+        "P(1)",
+        "P(k)",
+        "P(k+1) using P(k)",
+        "P(k-1)"
+      ],
+      "answer": "P(k+1) using P(k)",
+      "explanation": "The inductive step derives P(k+1) from P(k)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If a statement is claimed only for n >= 5, the base step should verify",
+      "options": [
+        "P(1)",
+        "P(5)",
+        "P(0)",
+        "P(4)"
+      ],
+      "answer": "P(5)",
+      "explanation": "The base case matches the starting value n0 = 5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An 'induction proof' that never uses the inductive hypothesis is",
+      "options": [
+        "still valid",
+        "not a valid induction proof",
+        "stronger than usual",
+        "the same as strong induction"
+      ],
+      "answer": "not a valid induction proof",
+      "explanation": "The hypothesis P(k) must be used to prove P(k+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the inductive step, k is",
+      "options": [
+        "a fixed specific number like 3",
+        "an arbitrary natural number",
+        "always equal to n",
+        "zero"
+      ],
+      "answer": "an arbitrary natural number",
+      "explanation": "k is arbitrary but fixed; the step holds for every k."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which is NOT part of a standard induction proof?",
+      "options": [
+        "base step",
+        "inductive hypothesis",
+        "inductive step",
+        "proof by picture"
+      ],
+      "answer": "proof by picture",
+      "explanation": "A picture is not a step of the formal proof."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Assuming P(k+1) (instead of P(k)) to prove P(k+1) is an example of",
+      "options": [
+        "a valid base step",
+        "circular reasoning",
+        "strong induction",
+        "the well-ordering principle"
+      ],
+      "answer": "circular reasoning",
+      "explanation": "Assuming what you must prove is circular."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The purpose of the base step is to",
+      "options": [
+        "prove the general case",
+        "start the chain of implications",
+        "assume P(k)",
+        "simplify algebra"
+      ],
+      "answer": "start the chain of implications",
+      "explanation": "The base case gives the first true statement."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The logical form of the inductive step is",
+      "options": [
+        "P(k) and P(k+1)",
+        "P(k) => P(k+1)",
+        "P(k+1) => P(k)",
+        "P(1) => P(n)"
+      ],
+      "answer": "P(k) => P(k+1)",
+      "explanation": "We prove the implication P(k) implies P(k+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 1+2+...+n = n(n+1)/2, P(1) states",
+      "options": [
+        "1 = 1",
+        "1 = 2",
+        "1 = 1(2)/2",
+        "0 = 0"
+      ],
+      "answer": "1 = 1(2)/2",
+      "explanation": "Substitute n=1: 1 = 1(1+1)/2 = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 1+2+...+n = n(n+1)/2, P(k+1) is",
+      "options": [
+        "1+...+k = k(k+1)/2",
+        "1+...+(k+1) = (k+1)(k+2)/2",
+        "1+...+(k+1) = k(k+1)/2",
+        "(k+1) = (k+2)/2"
+      ],
+      "answer": "1+...+(k+1) = (k+1)(k+2)/2",
+      "explanation": "Replace n by k+1 in n(n+1)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "To go from the k-sum to the (k+1)-sum in 1+2+...+n, you add",
+      "options": [
+        "k",
+        "(k+1)",
+        "(k+2)",
+        "1"
+      ],
+      "answer": "(k+1)",
+      "explanation": "The next term in the sum is (k+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 2^n > n, the base case P(1) is",
+      "options": [
+        "2 > 1",
+        "1 > 2",
+        "2 = 1",
+        "2^1 = 1"
+      ],
+      "answer": "2 > 1",
+      "explanation": "2^1 = 2 > 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): n^2 >= n, the statement P(k+1) is",
+      "options": [
+        "k^2 >= k",
+        "(k+1)^2 >= k+1",
+        "(k+1)^2 >= k",
+        "k^2 >= k+1"
+      ],
+      "answer": "(k+1)^2 >= k+1",
+      "explanation": "Replace n by k+1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 1^2+2^2+...+n^2 = n(n+1)(2n+1)/6, adding the next term to the k-sum means adding",
+      "options": [
+        "k^2",
+        "(k+1)^2",
+        "(k+1)",
+        "(2k+1)"
+      ],
+      "answer": "(k+1)^2",
+      "explanation": "The (k+1)-th term of the sum of squares is (k+1)^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 3^n > 2n, the base case (n=1) reads",
+      "options": [
+        "3 > 2",
+        "2 > 3",
+        "3 = 2",
+        "3 > 1"
+      ],
+      "answer": "3 > 2",
+      "explanation": "3^1 = 3 > 2(1) = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): sum of first n odd numbers = n^2, P(1) states",
+      "options": [
+        "1 = 1",
+        "3 = 4",
+        "1 = 2",
+        "0 = 1"
+      ],
+      "answer": "1 = 1",
+      "explanation": "First odd number is 1 and 1^2 = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the divisibility statement P(n): '5^n - 1 is divisible by 4', P(1) checks",
+      "options": [
+        "5^1 - 1 = 4 divisible by 4",
+        "5 - 1 = 4 not divisible",
+        "5 divisible by 4",
+        "1 divisible by 4"
+      ],
+      "answer": "5^1 - 1 = 4 divisible by 4",
+      "explanation": "5-1=4, divisible by 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In proving 1+2+...+n = n(n+1)/2, after adding (k+1) to k(k+1)/2 you factor out",
+      "options": [
+        "k",
+        "(k+1)",
+        "(k+2)",
+        "2"
+      ],
+      "answer": "(k+1)",
+      "explanation": "(k+1) is the common factor to reach (k+1)(k+2)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1 + 2 + 3 + ... + n equals",
+      "options": [
+        "n(n+1)/2",
+        "n^2",
+        "n(n+1)",
+        "n(n-1)/2"
+      ],
+      "answer": "n(n+1)/2",
+      "explanation": "Standard sum of first n natural numbers."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1^2 + 2^2 + ... + n^2 equals",
+      "options": [
+        "n(n+1)/2",
+        "n(n+1)(2n+1)/6",
+        "[n(n+1)/2]^2",
+        "n^3"
+      ],
+      "answer": "n(n+1)(2n+1)/6",
+      "explanation": "Sum of squares formula."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1^3 + 2^3 + ... + n^3 equals",
+      "options": [
+        "n(n+1)(2n+1)/6",
+        "[n(n+1)/2]^2",
+        "n^2(n+1)",
+        "n(n+1)/2"
+      ],
+      "answer": "[n(n+1)/2]^2",
+      "explanation": "Sum of cubes is the square of the sum of naturals."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using the formula, 1 + 2 + ... + 10 equals",
+      "options": [
+        "45",
+        "55",
+        "50",
+        "100"
+      ],
+      "answer": "55",
+      "explanation": "10(11)/2 = 55."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using the formula, 1^2 + 2^2 + ... + 5^2 equals",
+      "options": [
+        "55",
+        "30",
+        "25",
+        "50"
+      ],
+      "answer": "55",
+      "explanation": "5(6)(11)/6 = 55."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "1^3 + 2^3 + 3^3 + 4^3 equals",
+      "options": [
+        "100",
+        "64",
+        "36",
+        "91"
+      ],
+      "answer": "100",
+      "explanation": "[4(5)/2]^2 = 10^2 = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n odd numbers 1 + 3 + 5 + ... + (2n-1) equals",
+      "options": [
+        "n^2",
+        "n(n+1)",
+        "2n",
+        "n(n+1)/2"
+      ],
+      "answer": "n^2",
+      "explanation": "Sum of first n odd numbers is n^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n even numbers 2 + 4 + ... + 2n equals",
+      "options": [
+        "n^2",
+        "n(n+1)",
+        "2n",
+        "n(2n+1)"
+      ],
+      "answer": "n(n+1)",
+      "explanation": "Sum of first n even numbers is n(n+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The GP sum a + ar + ... + ar^(n-1) (r not 1) equals",
+      "options": [
+        "a(r^n - 1)/(r - 1)",
+        "a(1 - r)/(r - 1)",
+        "a r^n",
+        "a n r"
+      ],
+      "answer": "a(r^n - 1)/(r - 1)",
+      "explanation": "Standard geometric series sum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "When proving 1^2+...+n^2 formula, (2k^2 + 7k + 6) factors as",
+      "options": [
+        "(k+2)(2k+3)",
+        "(2k+2)(k+3)",
+        "(k+1)(2k+6)",
+        "(k+3)(2k+2)"
+      ],
+      "answer": "(k+2)(2k+3)",
+      "explanation": "2k^2+7k+6 = (k+2)(2k+3)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using the formula, 1 + 2 + ... + 100 equals",
+      "options": [
+        "5050",
+        "5000",
+        "10000",
+        "2550"
+      ],
+      "answer": "5050",
+      "explanation": "100(101)/2 = 5050."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "1 + 3 + 5 + ... + 19 (first 10 odd numbers) equals",
+      "options": [
+        "100",
+        "81",
+        "90",
+        "110"
+      ],
+      "answer": "100",
+      "explanation": "n^2 with n=10 gives 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "n^3 - n is always divisible by",
+      "options": [
+        "6",
+        "5",
+        "4",
+        "7"
+      ],
+      "answer": "6",
+      "explanation": "n^3 - n = (n-1)n(n+1), three consecutive integers, divisible by 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "2^(2n) - 1 is always divisible by",
+      "options": [
+        "3",
+        "5",
+        "7",
+        "9"
+      ],
+      "answer": "3",
+      "explanation": "2^(2n) = 4^n and 4^n - 1 is divisible by 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In proving n^3 - n divisible by 6, (k+1)^3 - (k+1) equals (k^3 - k) plus",
+      "options": [
+        "3k(k+1)",
+        "3k^2",
+        "6k",
+        "k(k-1)"
+      ],
+      "answer": "3k(k+1)",
+      "explanation": "(k+1)^3-(k+1) = (k^3-k) + 3k(k+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The term 3k(k+1) is divisible by 6 because",
+      "options": [
+        "k is even",
+        "k(k+1) is even, so 3k(k+1) is a multiple of 6",
+        "3 divides k",
+        "k+1 is prime"
+      ],
+      "answer": "k(k+1) is even, so 3k(k+1) is a multiple of 6",
+      "explanation": "Product of consecutive integers is even."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "n(n+1)(n+2), a product of three consecutive integers, is divisible by",
+      "options": [
+        "6",
+        "4",
+        "5",
+        "9"
+      ],
+      "answer": "6",
+      "explanation": "Any three consecutive integers include a multiple of 2 and of 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For 2^(2n) - 1, the step writes 2^(2k+2) as",
+      "options": [
+        "4 . 2^(2k)",
+        "2 . 2^(2k)",
+        "2^(2k) + 2",
+        "2^(2k)/4"
+      ],
+      "answer": "4 . 2^(2k)",
+      "explanation": "2^(2k+2) = 2^2 . 2^(2k) = 4.2^(2k)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "5^n - 1 is always divisible by",
+      "options": [
+        "4",
+        "6",
+        "3",
+        "7"
+      ],
+      "answer": "4",
+      "explanation": "5 ≡ 1 (mod 4), so 5^n - 1 ≡ 0 (mod 4)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Given 2^(2k) - 1 = 3m, the value 2^(2k+2) - 1 equals",
+      "options": [
+        "3(4m + 1)",
+        "3(m + 1)",
+        "4m + 1",
+        "12m"
+      ],
+      "answer": "3(4m + 1)",
+      "explanation": "4(3m+1) - 1 = 12m + 3 = 3(4m+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To prove f(n) divisible by d by induction, the inductive step writes f(k+1) as",
+      "options": [
+        "f(k) times d",
+        "a multiple of d using the hypothesis on f(k)",
+        "d divided by f(k)",
+        "f(k) + 1"
+      ],
+      "answer": "a multiple of d using the hypothesis on f(k)",
+      "explanation": "We express f(k+1) as multiple of d via the hypothesis."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The base case of 'n^3 - n divisible by 6' at n = 1 gives",
+      "options": [
+        "0, which is divisible by 6",
+        "1",
+        "6",
+        "3"
+      ],
+      "answer": "0, which is divisible by 6",
+      "explanation": "1^3-1=0 and 0 is divisible by 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The inequality proved by induction as a standard example is",
+      "options": [
+        "2^n > n",
+        "n > 2^n",
+        "n^2 < n",
+        "2^n = n"
+      ],
+      "answer": "2^n > n",
+      "explanation": "2^n > n for all natural n."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In proving 2^n > n, the inductive step uses 2^(k+1) = 2 . 2^k >",
+      "options": [
+        "2k",
+        "k",
+        "k/2",
+        "2^k"
+      ],
+      "answer": "2k",
+      "explanation": "2 . 2^k > 2k by the hypothesis 2^k > k."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the step 2k = k + k >= k + 1, we use the fact that",
+      "options": [
+        "k >= 1",
+        "k = 0",
+        "k < 1",
+        "k is even"
+      ],
+      "answer": "k >= 1",
+      "explanation": "Since k >= 1, k + k >= k + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Bernoulli's inequality states that for x >= -1, (1 + x)^n is",
+      "options": [
+        ">= 1 + nx",
+        "<= 1 + nx",
+        "= 1 + nx always",
+        "> n x"
+      ],
+      "answer": ">= 1 + nx",
+      "explanation": "(1+x)^n >= 1 + nx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In proving (1+x)^n >= 1+nx, multiplying the hypothesis by (1+x) is valid because",
+      "options": [
+        "1 + x >= 0 for x >= -1",
+        "x is positive",
+        "n is large",
+        "x = 0"
+      ],
+      "answer": "1 + x >= 0 for x >= -1",
+      "explanation": "Multiplying an inequality by a non-negative number preserves it."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The inductive proof of n! >= 2^(n-1) uses (k+1)! = (k+1) . k! >=",
+      "options": [
+        "(k+1) . 2^(k-1)",
+        "2^(k-1)",
+        "k . 2^k",
+        "2^k / (k+1)"
+      ],
+      "answer": "(k+1) . 2^(k-1)",
+      "explanation": "Substitute the hypothesis k! >= 2^(k-1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "When proving inequalities by induction, one must keep",
+      "options": [
+        "the inequality direction consistent",
+        "the base step optional",
+        "the hypothesis unused",
+        "n fixed"
+      ],
+      "answer": "the inequality direction consistent",
+      "explanation": "Direction must be preserved through each step."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The smallest n for which 2^n > n^2 fails to hold... actually 2^n > n holds for all n >= 1 because",
+      "options": [
+        "the base 2^1>1 and the step double the hypothesis",
+        "it fails at n=2",
+        "it is false",
+        "only even n"
+      ],
+      "answer": "the base 2^1>1 and the step double the hypothesis",
+      "explanation": "Base holds and doubling gives the step."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The most common fatal error in an induction proof is",
+      "options": [
+        "omitting the base step",
+        "writing too much",
+        "using algebra",
+        "stating P(n)"
+      ],
+      "answer": "omitting the base step",
+      "explanation": "Skipping the base step invalidates the proof."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If the inductive step never refers to P(k), the proof is",
+      "options": [
+        "valid",
+        "invalid as an induction proof",
+        "stronger",
+        "complete"
+      ],
+      "answer": "invalid as an induction proof",
+      "explanation": "The hypothesis must be used."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Assuming the very statement P(k+1) you want to prove is called",
+      "options": [
+        "circular reasoning",
+        "the base step",
+        "strong induction",
+        "valid deduction"
+      ],
+      "answer": "circular reasoning",
+      "explanation": "Assuming the conclusion is circular."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For a statement claimed for n >= 3, verifying P(1) instead of P(3) is",
+      "options": [
+        "correct",
+        "the wrong base value",
+        "strong induction",
+        "harmless"
+      ],
+      "answer": "the wrong base value",
+      "explanation": "Base must match the claimed starting value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A frequent algebra pitfall in the inductive step is failing to",
+      "options": [
+        "factor out (k+1)",
+        "write P(n)",
+        "state the conclusion",
+        "check n=1"
+      ],
+      "answer": "factor out (k+1)",
+      "explanation": "Factoring (k+1) is usually the key algebra move."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The variant that assumes P(1), P(2), ..., P(k) to prove P(k+1) is called",
+      "options": [
+        "strong induction",
+        "weak reasoning",
+        "the base step",
+        "contradiction"
+      ],
+      "answer": "strong induction",
+      "explanation": "Strong (complete) induction uses all previous cases."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Strong induction is",
+      "options": [
+        "weaker than ordinary induction",
+        "logically equivalent to ordinary induction",
+        "never valid",
+        "only for sums"
+      ],
+      "answer": "logically equivalent to ordinary induction",
+      "explanation": "Strong and ordinary induction are equivalent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Well-Ordering Principle states that every non-empty set of natural numbers has a",
+      "options": [
+        "greatest element",
+        "least element",
+        "prime element",
+        "even element"
+      ],
+      "answer": "least element",
+      "explanation": "Every non-empty subset of N has a smallest element."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Well-Ordering Principle is logically",
+      "options": [
+        "equivalent to the Principle of Mathematical Induction",
+        "stronger than all axioms",
+        "unrelated to induction",
+        "false"
+      ],
+      "answer": "equivalent to the Principle of Mathematical Induction",
+      "explanation": "Each can be derived from the other."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Proof by minimal counter-example assumes the set of counter-examples has a",
+      "options": [
+        "least element, then derives a contradiction",
+        "greatest element",
+        "limit",
+        "fixed point"
+      ],
+      "answer": "least element, then derives a contradiction",
+      "explanation": "Well-ordering gives a least counter-example to contradict."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Which property of the natural numbers makes them suited to induction?",
+      "options": [
+        "they are dense",
+        "they are discrete and every downward chain stops",
+        "they are unbounded above only",
+        "they include fractions"
+      ],
+      "answer": "they are discrete and every downward chain stops",
+      "explanation": "Discreteness/well-ordering underlies induction."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Well-Ordering Principle does NOT hold for",
+      "options": [
+        "the set of natural numbers",
+        "the set of all positive real numbers",
+        "a finite set of naturals",
+        "the naturals >= 5"
+      ],
+      "answer": "the set of all positive real numbers",
+      "explanation": "Positive reals have no least element (no smallest positive real)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Strong induction can be justified using",
+      "options": [
+        "the Well-Ordering Principle",
+        "only the base step",
+        "a single example",
+        "no principle"
+      ],
+      "answer": "the Well-Ordering Principle",
+      "explanation": "Strong induction follows from well-ordering."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Mathematical induction can prove a statement for all natural numbers.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "That is exactly what PMI does."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Verifying a statement for the first 100 values proves it for all natural numbers.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Finitely many checks never prove a statement for all n."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The base step of an induction proof usually verifies P(1).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "The base step checks the first case."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the inductive step we assume P(k) and prove P(k+1).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "That is the inductive step."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An induction proof is valid even if the inductive hypothesis is never used.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "The hypothesis P(k) must be used to prove P(k+1)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1 + 2 + 3 + ... + n = n(n+1)/2.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Standard summation formula."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the first n cubes equals the square of the sum of the first n natural numbers.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "1^3+...+n^3 = [n(n+1)/2]^2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "n^3 - n is divisible by 6 for every natural number n.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "It equals (n-1)n(n+1), three consecutive integers."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "2^n > n for every natural number n.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Provable by induction."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Well-Ordering Principle guarantees every non-empty set of natural numbers has a smallest element.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "That is the statement of the principle."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The two steps of mathematical induction are the base step and the ____ step.",
+      "answer": "inductive",
+      "explanation": "Base step and inductive step."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the domino analogy, the first domino falling represents the ____ step.",
+      "answer": "base",
+      "explanation": "P(1) is the base step."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The assumption that P(k) is true is called the inductive ____.",
+      "answer": "hypothesis",
+      "explanation": "The inductive hypothesis is the assumption P(k)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the inductive step we prove P(____) using the hypothesis.",
+      "answer": "k+1",
+      "explanation": "We deduce P(k+1) from P(k)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For P(n): 1+2+...+n = n(n+1)/2, P(k+1) has right side (k+1)(____)/2.",
+      "answer": "k+2",
+      "explanation": "Replace n by k+1: (k+1)(k+2)/2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1 + 2 + 3 + ... + n = ____ .",
+      "answer": "n(n+1)/2",
+      "explanation": "Sum of first n natural numbers."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "1^2 + 2^2 + ... + n^2 = ____ .",
+      "answer": "n(n+1)(2n+1)/6",
+      "explanation": "Sum of squares formula."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n odd numbers 1 + 3 + ... + (2n-1) equals ____ .",
+      "answer": "n^2",
+      "explanation": "Sum of first n odd numbers is n^2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The GP sum a + ar + ... + ar^(n-1) equals a(r^n - 1)/(____), for r not 1.",
+      "answer": "r - 1",
+      "explanation": "Geometric series sum denominator is r-1."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "n^3 - n is divisible by ____ for all natural n.",
+      "answer": "6",
+      "explanation": "Three consecutive integers give divisibility by 6."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "2^(2n) - 1 is divisible by ____ for all n.",
+      "answer": "3",
+      "explanation": "4^n - 1 is a multiple of 3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The standard inequality proved by induction is 2^n > ____ .",
+      "answer": "n",
+      "explanation": "2^n > n."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Bernoulli's inequality: (1 + x)^n >= 1 + ____ for x >= -1.",
+      "answer": "nx",
+      "explanation": "(1+x)^n >= 1 + nx."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Assuming P(1), P(2), ..., P(k) to prove P(k+1) is called ____ induction.",
+      "answer": "strong",
+      "explanation": "This variant is strong (complete) induction."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Well-Ordering Principle says every non-empty set of natural numbers has a ____ element.",
+      "answer": "least",
+      "explanation": "Least/smallest element exists."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the Principle of Mathematical Induction.",
+      "answer": "The Principle of Mathematical Induction states: if P(n) is a statement about a natural number n such that (i) P(1) is true, and (ii) whenever P(k) is true then P(k+1) is also true, then P(n) is true for all natural numbers n.",
+      "explanation": "The two-step statement of PMI."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain the domino analogy for mathematical induction.",
+      "answer": "Picture an infinite row of dominoes numbered 1, 2, 3, ... . Two facts guarantee all fall: (1) the first domino is pushed over - this is the base step P(1); (2) every domino, when it falls, knocks over the next - this is the inductive step P(k) => P(k+1). Together these ensure domino 1 topples 2, 2 topples 3, and so on forever, so every domino falls, just as PMI proves P(n) for every n.",
+      "explanation": "First falls (base) + each topples next (inductive) => all fall."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Why can we not prove a statement for all natural numbers just by checking many cases? Give the standard example.",
+      "answer": "Checking cases, however many, only confirms those particular values; it says nothing about the untested infinitely many. The statement 'n^2 + n + 41 is prime' is true for n = 0, 1, 2, ..., 39 but FAILS at n = 40 (giving 41^2, which is composite). So verification of finitely many cases is never a proof for all n; a valid inductive step is required.",
+      "explanation": "n^2+n+41 prime up to 39, fails at 40."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Name and describe the two steps of an induction proof.",
+      "answer": "Base step: verify that the statement is true for the first value, usually P(1). Inductive step: assume the statement P(k) is true for an arbitrary natural number k (the inductive hypothesis) and use this to prove P(k+1). If both succeed, PMI concludes P(n) holds for all n.",
+      "explanation": "Base step P(1); inductive step P(k)=>P(k+1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "What is the inductive hypothesis, and how is it used?",
+      "answer": "The inductive hypothesis is the assumption that P(k) is true for some arbitrary but fixed natural number k. It is not proved; it is supposed. In the inductive step we USE it - typically by substituting the assumed equality or divisibility - to establish P(k+1). A proof that never uses the hypothesis is not a genuine induction proof.",
+      "explanation": "Assumption P(k), used to derive P(k+1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "For P(n): 1 + 3 + 5 + ... + (2n - 1) = n^2, write P(1) and P(k+1).",
+      "answer": "P(1): the first odd number is 1 and 1^2 = 1, so P(1) says 1 = 1, true. P(k+1): 1 + 3 + 5 + ... + (2k - 1) + (2k + 1) = (k + 1)^2, obtained by replacing n with (k+1) in n^2 and adding the next odd term (2k+1).",
+      "explanation": "Substitute n=1 and n=k+1; next odd term is 2k+1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Set up (do not complete) the induction proof of 1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2: state the base case, the hypothesis and the goal.",
+      "answer": "Let P(n): 1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2.\nBase case P(1): 1^3 = 1 and [1(2)/2]^2 = 1, so P(1) holds.\nInductive hypothesis: assume 1^3 + ... + k^3 = [k(k+1)/2]^2.\nGoal P(k+1): show 1^3 + ... + k^3 + (k+1)^3 = [(k+1)(k+2)/2]^2, i.e. add (k+1)^3 to both sides of the hypothesis and simplify to the right-hand form.",
+      "explanation": "State P(1), hypothesis, and target P(k+1) with the added term (k+1)^3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 1 + 3 + 5 + ... + (2n - 1) = n^2 for all n.",
+      "answer": "Let P(n): 1 + 3 + ... + (2n - 1) = n^2.\nBase: P(1): 1 = 1^2. True.\nAssume P(k): 1 + 3 + ... + (2k - 1) = k^2.\nAdd the next odd term (2k + 1):\n  1 + 3 + ... + (2k - 1) + (2k + 1) = k^2 + 2k + 1 = (k + 1)^2,\nwhich is P(k+1). Hence by PMI the result holds for all n.",
+      "explanation": "Add (2k+1) to k^2 to get (k+1)^2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 2 + 4 + 6 + ... + 2n = n(n + 1) for all n.",
+      "answer": "Let P(n): 2 + 4 + ... + 2n = n(n + 1).\nBase: P(1): 2 = 1(2) = 2. True.\nAssume P(k): 2 + 4 + ... + 2k = k(k + 1).\nAdd the next even term 2(k + 1):\n  k(k + 1) + 2(k + 1) = (k + 1)(k + 2),\nwhich is P(k+1). Hence by PMI the formula holds for all n.",
+      "explanation": "Add 2(k+1) and factor to (k+1)(k+2)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2 for all n.",
+      "answer": "Let P(n): 1^3 + ... + n^3 = [n(n+1)/2]^2.\nBase: P(1): 1 = [1(2)/2]^2 = 1. True.\nAssume 1^3 + ... + k^3 = [k(k+1)/2]^2. Add (k+1)^3:\n  [k(k+1)/2]^2 + (k+1)^3 = (k+1)^2[k^2/4 + (k+1)]\n    = (k+1)^2 (k^2 + 4k + 4)/4 = (k+1)^2 (k+2)^2 /4 = [(k+1)(k+2)/2]^2,\nwhich is P(k+1). Hence by PMI the result holds for all n.",
+      "explanation": "Factor (k+1)^2, complete the square k^2+4k+4=(k+2)^2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 1 . 2 + 2 . 3 + 3 . 4 + ... + n(n+1) = n(n+1)(n+2)/3.",
+      "answer": "Let P(n): sum_{i=1}^{n} i(i+1) = n(n+1)(n+2)/3.\nBase: P(1): 1.2 = 2 and 1(2)(3)/3 = 2. True.\nAssume the sum to k is k(k+1)(k+2)/3. Add (k+1)(k+2):\n  k(k+1)(k+2)/3 + (k+1)(k+2) = (k+1)(k+2)[k/3 + 1] = (k+1)(k+2)(k+3)/3,\nwhich is P(k+1). Hence by PMI it holds for all n.",
+      "explanation": "Factor (k+1)(k+2), then [k/3+1]=(k+3)/3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Show that the base case of 'n^3 - n is divisible by 6' holds.",
+      "answer": "For n = 1, n^3 - n = 1^3 - 1 = 0. Since 0 = 6 . 0, it is divisible by 6. Hence the base case P(1) is true.",
+      "explanation": "1^3-1=0, divisible by 6."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 3^(2n) - 1 is divisible by 8 for all n >= 1.",
+      "answer": "Let P(n): 3^(2n) - 1 is divisible by 8.\nBase: P(1): 3^2 - 1 = 8, divisible by 8. True.\nAssume 3^(2k) - 1 = 8m, so 3^(2k) = 8m + 1.\nThen 3^(2(k+1)) - 1 = 9 . 3^(2k) - 1 = 9(8m + 1) - 1 = 72m + 8 = 8(9m + 1), divisible by 8. So P(k+1) holds.\nBy PMI, 3^(2n) - 1 is divisible by 8 for all n.",
+      "explanation": "3^(2k+2)=9.3^(2k); use hypothesis to get 8(9m+1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 5^n - 1 is divisible by 4 for all n >= 1.",
+      "answer": "Let P(n): 5^n - 1 is divisible by 4.\nBase: P(1): 5 - 1 = 4, divisible by 4. True.\nAssume 5^k - 1 = 4m, so 5^k = 4m + 1.\nThen 5^(k+1) - 1 = 5 . 5^k - 1 = 5(4m + 1) - 1 = 20m + 4 = 4(5m + 1), divisible by 4. So P(k+1) holds.\nBy PMI, 5^n - 1 is divisible by 4 for all n.",
+      "explanation": "5^(k+1)=5.5^k; use hypothesis to reach 4(5m+1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that n(n+1)(n+2) is divisible by 6 for all n >= 1.",
+      "answer": "Let P(n): n(n+1)(n+2) is divisible by 6.\nBase: P(1): 1.2.3 = 6, divisible by 6. True.\nAssume k(k+1)(k+2) = 6m.\nThen (k+1)(k+2)(k+3) = (k+1)(k+2)k + 3(k+1)(k+2) = k(k+1)(k+2) + 3(k+1)(k+2).\nThe first term is 6m by hypothesis. In the second, (k+1)(k+2) is a product of two consecutive integers, hence even, say 2t; then 3(k+1)(k+2) = 6t. So the total is 6m + 6t = 6(m + t), divisible by 6. Hence P(k+1) holds, and by PMI the result is true for all n.",
+      "explanation": "Split (k+1)(k+2)(k+3); consecutive product even => 3.even multiple of 6."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that 3^n > 2n for all n >= 1.",
+      "answer": "Let P(n): 3^n > 2n.\nBase: P(1): 3 > 2. True.\nAssume 3^k > 2k. Then 3^(k+1) = 3 . 3^k > 3(2k) = 6k. Since 6k = 2k + 4k >= 2k + 2 = 2(k+1) for k >= 1, we get 3^(k+1) > 2(k+1), which is P(k+1). Hence by PMI 3^n > 2n for all n.",
+      "explanation": "Triple the hypothesis; 6k >= 2(k+1) for k>=1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that n! >= 2^(n-1) for all n >= 1.",
+      "answer": "Let P(n): n! >= 2^(n-1).\nBase: P(1): 1! = 1 = 2^0. True (equality holds).\nAssume k! >= 2^(k-1). Then (k+1)! = (k+1) . k! >= (k+1) . 2^(k-1). Since k + 1 >= 2, this is >= 2 . 2^(k-1) = 2^k = 2^((k+1)-1). Hence P(k+1) holds, and by PMI n! >= 2^(n-1) for all n.",
+      "explanation": "Multiply hypothesis by (k+1)>=2 to reach 2^k."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove by induction that (1 + x)^n >= 1 + nx for all n >= 1 and x >= -1 (Bernoulli's inequality).",
+      "answer": "Let P(n): (1 + x)^n >= 1 + nx, with x >= -1.\nBase: P(1): (1 + x)^1 = 1 + x >= 1 + x. True.\nAssume (1 + x)^k >= 1 + kx. Since x >= -1, (1 + x) >= 0, so multiplying preserves the inequality:\n  (1 + x)^(k+1) >= (1 + kx)(1 + x) = 1 + (k+1)x + kx^2 >= 1 + (k+1)x,\nbecause kx^2 >= 0. Hence P(k+1) holds, and by PMI the inequality holds for all n.",
+      "explanation": "Multiply by (1+x)>=0; drop kx^2>=0."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "A 'proof' claims 'all horses are the same colour' by induction. Identify the type of flaw such fallacious induction proofs contain.",
+      "answer": "Such fallacies contain an error in the INDUCTIVE STEP: the argument that works for large k breaks down for a small case (typically the step from k = 1 to k = 2 fails, because the overlap it relies on is empty). The base case may be fine, but the inductive step P(k) => P(k+1) is not actually valid for every k. The lesson is that the inductive step must hold for ALL k without exception, including the smallest ones; a single k where it fails destroys the proof.",
+      "explanation": "The inductive step is invalid for a small k (k=1 to 2), breaking the chain."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Distinguish between ordinary (weak) induction and strong induction.",
+      "answer": "In ordinary (weak) induction, the inductive step proves P(k+1) using only the single previous case P(k). In strong induction, the inductive step may use ALL previous cases P(1), P(2), ..., P(k) to prove P(k+1). Strong induction is convenient when P(k+1) depends on several earlier cases (e.g. prime factorisation), but it is logically equivalent to ordinary induction.",
+      "explanation": "Weak uses P(k); strong uses all P(1..k); they are equivalent."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "For the statement P(n): '7^n - 1 is divisible by 6', write the base case P(1) and the inductive hypothesis P(k).",
+      "answer": "P(1): 7^1 - 1 = 6, which is divisible by 6, so the base case holds. P(k): assume 7^k - 1 is divisible by 6, i.e. 7^k - 1 = 6m for some integer m (equivalently 7^k = 6m + 1).",
+      "explanation": "Base: 7-1=6 divisible by 6; hypothesis 7^k-1=6m."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "State the Well-Ordering Principle and outline how a proof by minimal counter-example works.",
+      "answer": "Well-Ordering Principle: every non-empty set of natural numbers has a least element. Proof by minimal counter-example: to prove P(n) for all n, suppose it fails for some n. Then S = {n : P(n) is false} is a non-empty set of natural numbers, so by well-ordering it has a LEAST element m. Since m is least, P(m-1) (or all smaller cases) must hold; from this one derives that P(m) must also hold, contradicting m being in S. The contradiction shows S is empty, so P(n) holds for all n. This mirrors ordinary induction and shows the two principles are equivalent.",
+      "explanation": "Least element of counter-examples yields a contradiction."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Explain the Principle of Mathematical Induction fully: state it, describe the domino analogy, and explain why both steps are necessary.",
+      "answer": "Statement: If P(n) is a statement about natural numbers such that (i) P(1) is true (base step) and (ii) P(k) true implies P(k+1) true for every k (inductive step), then P(n) is true for all natural numbers n.\n\nDomino analogy: line up infinitely many dominoes. Push the first (base step); ensure each falling domino knocks over the next (inductive step). Then all fall - just as P(n) becomes true for all n.\n\nWhy both steps: The inductive step alone only chains implications; without a first true case there is nothing to set the chain going (dominoes wired together but never pushed). The base step alone gives only P(1) and no further cases. Only together do they cover every n: P(1) is true, so P(2) is true, so P(3) is true, and so on. A famous caution is 'n^2 + n + 41 is prime', true up to n = 39 but false at n = 40 - showing that verifying cases is not the same as a valid inductive step.",
+      "explanation": "State PMI; dominoes; base starts, inductive continues; both needed."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Prove by mathematical induction that 1 + 2 + 3 + ... + n = n(n+1)/2, and hence find 1 + 2 + ... + 50.",
+      "answer": "Let P(n): 1 + 2 + ... + n = n(n+1)/2.\nBase: P(1): 1 = 1(2)/2 = 1. True.\nInductive hypothesis: assume 1 + 2 + ... + k = k(k+1)/2.\nInductive step: add (k+1):\n  1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)(k/2 + 1) = (k+1)(k+2)/2,\nwhich is P(k+1). By PMI the formula holds for all n.\n\nApplication: 1 + 2 + ... + 50 = 50(51)/2 = 1275.",
+      "explanation": "Prove formula; substitute n=50 to get 1275."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Prove by induction that the sum of a geometric progression a + ar + ar^2 + ... + ar^(n-1) = a(r^n - 1)/(r - 1) for r not equal to 1.",
+      "answer": "Let P(n): a + ar + ... + ar^(n-1) = a(r^n - 1)/(r - 1), r not 1.\nBase: P(1): left side = a; right side = a(r - 1)/(r - 1) = a. True.\nInductive hypothesis: assume a + ar + ... + ar^(k-1) = a(r^k - 1)/(r - 1).\nInductive step: add the next term ar^k:\n  a(r^k - 1)/(r - 1) + ar^k = [a(r^k - 1) + ar^k(r - 1)]/(r - 1)\n    = [a r^k - a + a r^(k+1) - a r^k]/(r - 1)\n    = (a r^(k+1) - a)/(r - 1) = a(r^(k+1) - 1)/(r - 1),\nwhich is P(k+1). By PMI the GP sum formula holds for all n.",
+      "explanation": "Add ar^k, combine over (r-1), simplify to a(r^(k+1)-1)/(r-1)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Prove by induction that 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6, and use it to evaluate 1^2 + 2^2 + ... + 10^2.",
+      "answer": "Let P(n): 1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6.\nBase: P(1): 1 = 1(2)(3)/6 = 1. True.\nHypothesis: assume 1^2 + ... + k^2 = k(k+1)(2k+1)/6.\nStep: add (k+1)^2:\n  k(k+1)(2k+1)/6 + (k+1)^2 = (k+1)[k(2k+1) + 6(k+1)]/6\n    = (k+1)(2k^2 + 7k + 6)/6 = (k+1)(k+2)(2k+3)/6,\nwhich equals (k+1)((k+1)+1)(2(k+1)+1)/6 = P(k+1). By PMI the formula holds for all n.\n\nApplication: 1^2 + ... + 10^2 = 10(11)(21)/6 = 2310/6 = 385.",
+      "explanation": "Prove formula; n=10 gives 385."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Prove by mathematical induction that n^3 - n is divisible by 6 for all natural numbers n.",
+      "answer": "Let P(n): n^3 - n is divisible by 6.\nBase: P(1): 1 - 1 = 0, divisible by 6. True.\nInductive hypothesis: assume k^3 - k = 6m for some integer m.\nInductive step:\n  (k+1)^3 - (k+1) = k^3 + 3k^2 + 3k + 1 - k - 1 = (k^3 - k) + 3k^2 + 3k = (k^3 - k) + 3k(k+1).\nBy hypothesis k^3 - k = 6m. Since k(k+1) is a product of two consecutive integers it is even, say k(k+1) = 2t, so 3k(k+1) = 6t. Therefore\n  (k+1)^3 - (k+1) = 6m + 6t = 6(m + t),\ndivisible by 6. So P(k+1) holds, and by PMI n^3 - n is divisible by 6 for all n.",
+      "explanation": "Expand, use hypothesis and the fact k(k+1) is even."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Prove by induction that 2^n > n for all natural numbers n, and separately that 2^n >= n + 1 for all n >= 1.",
+      "answer": "Part 1 - P(n): 2^n > n.\nBase: 2^1 = 2 > 1. Assume 2^k > k. Then 2^(k+1) = 2 . 2^k > 2k = k + k >= k + 1 (as k >= 1). So 2^(k+1) > k + 1 = P(k+1). By PMI, 2^n > n for all n.\n\nPart 2 - Q(n): 2^n >= n + 1.\nBase: 2^1 = 2 >= 2. Assume 2^k >= k + 1. Then 2^(k+1) = 2 . 2^k >= 2(k + 1) = 2k + 2 = (k + 2) + k >= k + 2 (since k >= 0). So 2^(k+1) >= (k+1) + 1 = Q(k+1). By PMI, 2^n >= n + 1 for all n.\n\nBoth proofs strengthen the inductive step by doubling the hypothesis and using k >= 1.",
+      "explanation": "Two related inequalities, each by doubling the hypothesis."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "List and explain four common errors made in induction proofs, and state how each should be corrected.",
+      "answer": "1. Omitting the base step: the chain of implications is never started, so nothing is proved. Correction: always verify P(1) (or P(n0)).\n2. Not using the inductive hypothesis: if the proof of P(k+1) never refers to P(k), it is not an induction argument. Correction: explicitly substitute or invoke P(k).\n3. Circular reasoning: assuming P(k+1) (the goal) rather than P(k). Correction: assume only P(k) and derive P(k+1).\n4. Wrong base value: verifying P(1) when the claim is only for n >= n0. Correction: verify P(n0). (A fifth frequent slip is careless algebra, such as failing to factor out (k+1); always compare the simplified result with the formula written for n = k+1.)",
+      "explanation": "Base omitted, hypothesis unused, circular, wrong base value."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "State the Well-Ordering Principle, explain its equivalence to the Principle of Mathematical Induction, and illustrate proof by minimal counter-example.",
+      "answer": "Well-Ordering Principle (WOP): every non-empty set of natural numbers has a least element.\n\nEquivalence to PMI: WOP and PMI can each be proved from the other. From WOP to PMI: suppose P(1) holds and P(k) => P(k+1), but P(n) fails for some n. Then S = {n : P(n) false} is non-empty, so by WOP it has a least element m. Since P(1) is true, m > 1, so m - 1 is a natural number with P(m-1) true (as m is least in S). But P(m-1) => P(m), contradicting m in S. Hence S is empty and P(n) holds for all n. Conversely PMI implies WOP by an analogous argument. So the two principles are logically equivalent.\n\nProof by minimal counter-example (illustration): to prove a statement P(n) for all n, assume it fails somewhere; take the least counter-example m by WOP; show a smaller case forces P(m) to hold, a contradiction; conclude no counter-example exists. This technique is essentially induction phrased through the least element.",
+      "explanation": "State WOP; derive PMI from it via least counter-example; note equivalence."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nMathematical induction proves a statement P(n) for all natural numbers using two steps. It is often pictured as a row of dominoes: pushing the first and ensuring each topples the next makes all fall.\n(a) Name the two steps of an induction proof.\n(b) Which domino event corresponds to the base step?\n(c) Which event corresponds to the inductive step?\n(d) Why can a domino chain with a gap fail to topple all dominoes?",
+      "answer": "(a) The base step and the inductive step.\n(b) The first domino being pushed over corresponds to the base step, verifying P(1).\n(c) Each falling domino knocking over the next corresponds to the inductive step, the implication P(k) => P(k+1).\n(d) If there is a gap - i.e. some domino fails to topple the next - the chain breaks at that point, and dominoes beyond the gap never fall. In induction this is a failure of the inductive step for some k, so P(n) is not established for all n.",
+      "explanation": "Two steps; first push = base; each topples next = inductive; gap breaks chain."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA valid induction proof has a base step verifying P(1), an inductive hypothesis assuming P(k), and an inductive step proving P(k+1). Omitting or misusing any part invalidates the proof.\n(a) What does the base step verify?\n(b) What is assumed in the inductive hypothesis?\n(c) What must the inductive step prove?\n(d) Is a proof valid if the inductive step never uses P(k)? Why?",
+      "answer": "(a) The base step verifies the statement for the first value, usually P(1).\n(b) The inductive hypothesis assumes that P(k) is true for an arbitrary fixed natural number k.\n(c) The inductive step must prove P(k+1), using the hypothesis.\n(d) No. If the inductive step never uses P(k), it is not a genuine induction proof - the link from k to k+1 (which justifies the whole chain) is missing, so P(n) is not established for all n.",
+      "explanation": "Base P(1); hypothesis P(k); prove P(k+1); must use P(k)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nConsider the statement P(n): 1 + 2 + 3 + ... + n = n(n+1)/2.\n(a) Write P(1) and check it.\n(b) Write P(k).\n(c) Write P(k+1).\n(d) What term is added to the k-sum to reach the (k+1)-sum?",
+      "answer": "(a) P(1): 1 = 1(1+1)/2 = 1. It checks out.\n(b) P(k): 1 + 2 + ... + k = k(k+1)/2.\n(c) P(k+1): 1 + 2 + ... + k + (k+1) = (k+1)(k+2)/2.\n(d) The term (k+1) is added to the left side (and used on the right to factor (k+1)(k+2)/2).",
+      "explanation": "Substitute n=1,k,k+1; added term is (k+1)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nInduction proves summation formulae by adding the next term to the assumed k-sum. Recall 1+2+...+n = n(n+1)/2 and 1^2+2^2+...+n^2 = n(n+1)(2n+1)/6.\n(a) Evaluate 1 + 2 + ... + 20.\n(b) Evaluate 1^2 + 2^2 + ... + 6^2.\n(c) In the sum-of-squares proof, which term is added to go from k to k+1?\n(d) State the sum of the first n odd numbers.",
+      "answer": "(a) 1 + 2 + ... + 20 = 20(21)/2 = 210.\n(b) 1^2 + ... + 6^2 = 6(7)(13)/6 = 91.\n(c) The term (k+1)^2 is added to the k-sum.\n(d) The sum of the first n odd numbers is n^2.",
+      "explanation": "210; 91; add (k+1)^2; n^2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTo prove 1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2 by induction, one adds (k+1)^3 to the assumed k-sum.\n(a) State the base case and verify it.\n(b) Write the inductive hypothesis.\n(c) Complete the algebra: [k(k+1)/2]^2 + (k+1)^3 = ?\n(d) What remarkable relationship does this formula reveal?",
+      "answer": "(a) Base P(1): 1^3 = 1 and [1(2)/2]^2 = 1. True.\n(b) Hypothesis: 1^3 + ... + k^3 = [k(k+1)/2]^2.\n(c) [k(k+1)/2]^2 + (k+1)^3 = (k+1)^2[k^2/4 + (k+1)] = (k+1)^2(k^2 + 4k + 4)/4 = (k+1)^2(k+2)^2/4 = [(k+1)(k+2)/2]^2, which is P(k+1).\n(d) The sum of the first n cubes equals the SQUARE of the sum of the first n natural numbers: 1^3+...+n^3 = (1+2+...+n)^2.",
+      "explanation": "Base 1=1; factor to [(k+1)(k+2)/2]^2; cubes = (sum of naturals)^2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nDivisibility statements are proved by writing f(k+1) as a multiple of the divisor using the hypothesis. Consider P(n): 2^(2n) - 1 is divisible by 3.\n(a) Verify the base case.\n(b) State the inductive hypothesis.\n(c) Express 2^(2(k+1)) - 1 using the hypothesis and show it is divisible by 3.\n(d) Which equivalent statement about 4^n does this prove?",
+      "answer": "(a) Base P(1): 2^2 - 1 = 3, divisible by 3.\n(b) Hypothesis: 2^(2k) - 1 = 3m, i.e. 2^(2k) = 3m + 1.\n(c) 2^(2(k+1)) - 1 = 4 . 2^(2k) - 1 = 4(3m + 1) - 1 = 12m + 3 = 3(4m + 1), divisible by 3.\n(d) Since 2^(2n) = 4^n, it also proves that 4^n - 1 is divisible by 3 for all n.",
+      "explanation": "Base 3; hypothesis 3m; 3(4m+1); equivalent to 4^n-1 divisible by 3."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nConsider P(n): n^3 - n is divisible by 6.\n(a) Verify the base case.\n(b) Expand (k+1)^3 - (k+1) and separate the term (k^3 - k).\n(c) Why is the remaining part 3k(k+1) divisible by 6?\n(d) Complete the argument to show P(k+1) holds.",
+      "answer": "(a) Base P(1): 1^3 - 1 = 0, divisible by 6.\n(b) (k+1)^3 - (k+1) = k^3 + 3k^2 + 3k + 1 - k - 1 = (k^3 - k) + 3k(k+1).\n(c) k(k+1) is a product of two consecutive integers, so it is even; hence 3k(k+1) = 3 . (even) is a multiple of 6.\n(d) By hypothesis k^3 - k = 6m, and 3k(k+1) = 6t for some integer t. So (k+1)^3 - (k+1) = 6m + 6t = 6(m + t), divisible by 6. Thus P(k+1) holds and, with the base case, the result holds for all n by PMI.",
+      "explanation": "0 base; split into (k^3-k)+3k(k+1); even product; sum 6(m+t)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nInequalities are proved by carefully strengthening the inductive step. Consider P(n): 2^n > n.\n(a) Verify the base case.\n(b) State the inductive hypothesis.\n(c) Show 2^(k+1) > k + 1 using the hypothesis.\n(d) Which fact about k is used to conclude 2k >= k + 1?",
+      "answer": "(a) Base P(1): 2^1 = 2 > 1. True.\n(b) Hypothesis: 2^k > k.\n(c) 2^(k+1) = 2 . 2^k > 2k = k + k. Since k >= 1, k + k >= k + 1, so 2^(k+1) > k + 1, which is P(k+1).\n(d) We use k >= 1, which gives 2k = k + k >= k + 1.",
+      "explanation": "Base 2>1; double hypothesis; use k>=1 so 2k>=k+1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA student writes: 'Assume 1 + 2 + ... + (k+1) = (k+1)(k+2)/2. Then it is true, so the formula holds for all n.' \n(a) What error has the student made?\n(b) What should have been assumed instead?\n(c) Which essential step is missing entirely?\n(d) Rewrite the correct logical structure of the proof in brief.",
+      "answer": "(a) The student assumed P(k+1) - the very statement to be proved - which is circular reasoning.\n(b) The student should have assumed only P(k): 1 + 2 + ... + k = k(k+1)/2.\n(c) The base step (verifying P(1)) is missing entirely, and no valid inductive step P(k) => P(k+1) is carried out.\n(d) Correct structure: (i) verify P(1): 1 = 1(2)/2; (ii) assume P(k): sum to k = k(k+1)/2; (iii) add (k+1) to both sides and simplify to (k+1)(k+2)/2, obtaining P(k+1); (iv) conclude by PMI that P(n) holds for all n.",
+      "explanation": "Circular (assumed P(k+1)); should assume P(k); base missing; give correct skeleton."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PMI-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe Well-Ordering Principle states that every non-empty set of natural numbers has a least element. It is equivalent to the Principle of Mathematical Induction.\n(a) State the Well-Ordering Principle.\n(b) Does the set of positive real numbers satisfy it? Explain.\n(c) In a proof by minimal counter-example, what is assumed to have a least element?\n(d) What does deriving a contradiction from that least element establish?",
+      "answer": "(a) Every non-empty set of natural numbers has a least (smallest) element.\n(b) No. The positive real numbers have no least element - given any positive real, half of it is smaller and still positive - so well-ordering fails for them.\n(c) The (assumed non-empty) set of counter-examples - the natural numbers for which the statement P(n) is false - is assumed to have a least element m.\n(d) Deriving a contradiction from the least counter-example m shows the set of counter-examples must be empty, i.e. P(n) holds for all n. This is why the technique is equivalent to induction.",
+      "explanation": "WOP statement; fails for positive reals; least counter-example; contradiction => no counter-examples."
+    }
+  ]
+}
