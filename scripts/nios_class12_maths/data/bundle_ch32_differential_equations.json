@@ -1,0 +1,2256 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 32,
+    "chapter_title": "Differential Equations",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 32 - DIFFERENTIAL EQUATIONS\n\nIntroduction\n\nMany laws of science and everyday situations describe how a quantity CHANGES rather than the quantity itself. The rate at which a hot cup of tea cools, the rate at which a population grows, the rate at which a radioactive sample decays, the slope of a curve at each of its points - all of these are naturally written using derivatives. An equation that connects an unknown function with its derivatives is called a DIFFERENTIAL EQUATION. Solving such an equation means finding the function (or family of functions) that satisfies it. This chapter introduces the basic ideas: the order and degree of a differential equation, its general and particular solutions, how to form a differential equation from a family of curves, and three standard methods for solving first order first degree equations - the variable separable method, the homogeneous method and the linear (integrating factor) method - followed by a brief look at growth and decay applications.\n\n32.1 WHAT IS A DIFFERENTIAL EQUATION\n\nA DIFFERENTIAL EQUATION is an equation involving an independent variable (say x), a dependent variable (say y) and one or more derivatives of y with respect to x, such as dy/dx, d^2y/dx^2, and so on. Some examples are\n   dy/dx = 2x,\n   dy/dx + 3y = e^x,\n   d^2y/dx^2 + y = 0,\n   (dy/dx)^2 + y = x.\nBecause they involve derivatives with respect to a SINGLE independent variable, these are called ORDINARY differential equations - the only kind treated here. A differential equation states a relationship that the unknown function y = f(x) and its rates of change must obey.\n\n32.2 ORDER AND DEGREE OF A DIFFERENTIAL EQUATION\n\nThe ORDER of a differential equation is the order of the HIGHEST derivative appearing in it. Thus dy/dx = 2x is of order 1 (first order), while d^2y/dx^2 + y = 0 is of order 2 (second order).\n\nThe DEGREE of a differential equation is the power (exponent) of the HIGHEST order derivative, AFTER the equation has been made free from radicals and fractions in the derivatives, i.e. after it has been written as a polynomial in the derivatives. The degree is defined only when such a polynomial form exists.\n\nWorked examples.\n(i) (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0. Highest derivative d^2y/dx^2 has power 3, so order = 2 and degree = 3.\n(ii) dy/dx + y = sin x. Highest derivative dy/dx has power 1, so order = 1, degree = 1.\n(iii) sqrt(1 + (dy/dx)^2) = dy/dx. Squaring to remove the radical gives 1 + (dy/dx)^2 = (dy/dx)^2, but more usefully, consider sqrt(1 + (dy/dx)) = x; squaring gives 1 + dy/dx = x^2, order 1 degree 1. The rule is: first clear the radicals, THEN read off the degree.\n(iv) d^2y/dx^2 = [1 + (dy/dx)^2]^(3/2). Squaring both sides removes the fractional power: (d^2y/dx^2)^2 = [1 + (dy/dx)^2]^3. Now the highest derivative d^2y/dx^2 has power 2, so order = 2 and degree = 2.\n\n32.3 GENERAL AND PARTICULAR SOLUTIONS\n\nA SOLUTION (or integral) of a differential equation is a function y = f(x) which, when substituted into the equation, satisfies it identically. For example y = x^2 + C satisfies dy/dx = 2x for every value of the constant C, because differentiating gives dy/dx = 2x.\n\nThe GENERAL SOLUTION of a differential equation of order n contains exactly n ARBITRARY CONSTANTS. For a first order equation the general solution has one arbitrary constant; for a second order equation it has two. Thus the general solution of dy/dx = 2x is y = x^2 + C, and the general solution of d^2y/dx^2 + y = 0 is y = A cos x + B sin x.\n\nA PARTICULAR SOLUTION is obtained from the general solution by giving the arbitrary constants definite values, usually to satisfy given INITIAL or BOUNDARY conditions. For instance, if dy/dx = 2x with the condition y = 3 when x = 1, then from y = x^2 + C we get 3 = 1 + C, so C = 2 and the particular solution is y = x^2 + 2.\n\nTo VERIFY that a given function is a solution, substitute it and its derivatives into the equation and check that both sides agree. Example: verify y = e^(-x) is a solution of d^2y/dx^2 - y = 0. Here dy/dx = -e^(-x) and d^2y/dx^2 = e^(-x), so d^2y/dx^2 - y = e^(-x) - e^(-x) = 0. Hence y = e^(-x) is indeed a solution.\n\n32.4 FORMING A DIFFERENTIAL EQUATION FROM A FAMILY OF CURVES\n\nA family of curves that contains n arbitrary constants can be represented by a differential equation of order n. The method is to DIFFERENTIATE the given relation as many times as there are arbitrary constants, and then ELIMINATE the constants between the original relation and the derived equations. The resulting equation, free of the arbitrary constants, is the required differential equation.\n\nExample 1. Family of straight lines through the origin, y = m x (one constant m). Differentiate once: dy/dx = m. Eliminate m using m = y/x: dy/dx = y/x, i.e. x dy/dx = y. This first order equation represents the whole family.\n\nExample 2. Family y = A e^x (one constant A). Differentiate: dy/dx = A e^x = y. So dy/dx = y is the differential equation of this family.\n\nExample 3. Family of circles centred at the origin, x^2 + y^2 = a^2 (one constant a). Differentiate: 2x + 2y dy/dx = 0, i.e. x + y dy/dx = 0. The constant a has disappeared, so this is the required equation.\n\nExample 4. Family y = a cos x + b sin x (two constants). Differentiate twice: dy/dx = -a sin x + b cos x and d^2y/dx^2 = -a cos x - b sin x = -(a cos x + b sin x) = -y. Hence d^2y/dx^2 + y = 0, a second order equation, as expected for two arbitrary constants.\n\n32.5 SOLVING FIRST ORDER FIRST DEGREE EQUATIONS: VARIABLE SEPARABLE METHOD\n\nA first order first degree differential equation can be written as dy/dx = F(x, y). If F can be written so that the variables SEPARATE - that is, the equation takes the form\n   dy/dx = g(x) h(y),   or equivalently   dy / h(y) = g(x) dx,\nwith all the y terms on one side and all the x terms on the other - then it is called a VARIABLE SEPARABLE equation. We solve it by integrating both sides:\n   integral [ 1 / h(y) ] dy = integral g(x) dx + C.\n\nWorked example 1. Solve dy/dx = (1 + y^2) / (1 + x^2). Separating, dy/(1 + y^2) = dx/(1 + x^2). Integrating both sides, arctan y = arctan x + C. This is the general solution (an implicit relation between x and y).\n\nWorked example 2. Solve dy/dx = e^(x + y). Write e^(x + y) = e^x e^y, so dy/dx = e^x e^y, giving e^(-y) dy = e^x dx. Integrating, -e^(-y) = e^x + C, i.e. e^x + e^(-y) = -C = C1 (a new constant). Hence the general solution is e^x + e^(-y) = C1.\n\nWorked example 3 (with a condition). Solve x dy/dx = y given that y = 2 when x = 1. Separate: dy/y = dx/x. Integrate: ln|y| = ln|x| + ln C, so y = C x. Apply y = 2 at x = 1: 2 = C(1), so C = 2 and the particular solution is y = 2x.\n\n32.6 HOMOGENEOUS DIFFERENTIAL EQUATIONS\n\nA first order equation dy/dx = F(x, y) is called HOMOGENEOUS if F(x, y) can be expressed as a function of the ratio y/x alone, that is dy/dx = g(y/x). Equivalently, it can be written M(x, y) dx + N(x, y) dy = 0 where M and N are homogeneous functions of the SAME degree (each term has the same total power in x and y).\n\nSuch an equation is solved by the SUBSTITUTION y = v x, where v is a new function of x. Then, by the product rule,\n   dy/dx = v + x dv/dx.\nSubstituting turns the equation into one in v and x in which the variables SEPARATE, and it can then be integrated. Finally we replace v by y/x to return to the original variables.\n\nWorked example. Solve dy/dx = (x + y) / x. The right side = 1 + y/x, a function of y/x, so the equation is homogeneous. Put y = v x, dy/dx = v + x dv/dx. Then\n   v + x dv/dx = 1 + v,\nso x dv/dx = 1, giving dv = dx/x. Integrating, v = ln|x| + C. Replacing v = y/x, the general solution is y/x = ln|x| + C, i.e. y = x (ln|x| + C).\n\nWorked example 2. Solve (x^2 + y^2) dx - 2 x y dy = 0. Here M = x^2 + y^2 and N = -2xy are both homogeneous of degree 2, so the equation is homogeneous. Write dy/dx = (x^2 + y^2)/(2xy). Put y = v x: v + x dv/dx = (1 + v^2)/(2v). Then x dv/dx = (1 + v^2)/(2v) - v = (1 - v^2)/(2v). Separating, [2v/(1 - v^2)] dv = dx/x. Integrating the left side gives -ln|1 - v^2| = ln|x| + C, which after substituting v = y/x yields the general solution x^2 - y^2 = C1 x (a family of curves).\n\n32.7 LINEAR DIFFERENTIAL EQUATIONS AND THE INTEGRATING FACTOR\n\nA first order LINEAR differential equation is one that can be written in the standard form\n   dy/dx + P y = Q,\nwhere P and Q are functions of x only (or constants). It is called linear because y and dy/dx appear only to the first power and are not multiplied together.\n\nSuch an equation is solved using an INTEGRATING FACTOR (IF). The integrating factor is\n   IF = e^(integral P dx).\nMultiplying the whole equation by the IF makes the left side an exact derivative: the left side becomes d/dx ( y . IF ). The equation then integrates directly to give the SOLUTION\n   y . IF = integral ( Q . IF ) dx + C.\n\nSteps: (1) write the equation as dy/dx + P y = Q and identify P and Q; (2) compute IF = e^(integral P dx); (3) write y . IF = integral (Q . IF) dx + C and integrate.\n\nWorked example 1. Solve dy/dx + y = e^x. Here P = 1 and Q = e^x. Then integral P dx = x, so IF = e^x. Multiply: the solution is y e^x = integral (e^x . e^x) dx = integral e^(2x) dx = e^(2x)/2 + C. Therefore y = e^x/2 + C e^(-x).\n\nWorked example 2. Solve dy/dx + y/x = x^2 (x > 0). Here P = 1/x and Q = x^2. Then integral P dx = ln x, so IF = e^(ln x) = x. The solution is y . x = integral (x . x^2) dx = integral x^3 dx = x^4/4 + C. Dividing by x, y = x^3/4 + C/x.\n\nWorked example 3. Solve x dy/dx + 2y = x^2 (x > 0). Divide by x to reach standard form: dy/dx + (2/x) y = x. So P = 2/x, Q = x, integral P dx = 2 ln x = ln x^2, IF = x^2. Then y x^2 = integral (x . x^2) dx = integral x^3 dx = x^4/4 + C, so y = x^2/4 + C/x^2.\n\n32.8 APPLICATIONS: GROWTH AND DECAY\n\nMany natural processes obey the law that a quantity changes at a rate PROPORTIONAL to its current amount. If N(t) is the amount at time t, this law is the differential equation\n   dN/dt = k N,\nwhere k is a constant. This is variable separable: dN/N = k dt, so ln N = k t + C, giving\n   N = N0 e^(k t),\nwhere N0 is the amount at t = 0. If k > 0 the quantity GROWS exponentially (for example, a population or money at continuous interest); if k < 0 (write k = -lambda) it DECAYS exponentially, N = N0 e^(-lambda t), as in radioactive decay or the cooling of a body (Newton's law of cooling has the same exponential form). Thus a simple first order differential equation captures a very wide range of real phenomena.\n\nSUMMARY\n\n- A differential equation relates a function y = f(x) to its derivatives dy/dx, d^2y/dx^2, and so on.\n- ORDER = order of the highest derivative present. DEGREE = power of the highest order derivative after the equation is made free of radicals and fractions in the derivatives (a polynomial in the derivatives).\n- The general solution of an nth order equation has n arbitrary constants; a particular solution fixes those constants using initial or boundary conditions.\n- To FORM a differential equation from a family of curves with n arbitrary constants, differentiate n times and eliminate the constants (e.g. y = mx gives x dy/dx = y; x^2 + y^2 = a^2 gives x + y dy/dx = 0; y = a cos x + b sin x gives d^2y/dx^2 + y = 0).\n- VARIABLE SEPARABLE: write dy/dx = g(x) h(y), separate to dy/h(y) = g(x) dx, and integrate both sides.\n- HOMOGENEOUS: dy/dx = g(y/x); substitute y = v x so dy/dx = v + x dv/dx, separate variables in v and x, integrate, then replace v = y/x.\n- LINEAR: dy/dx + P y = Q; integrating factor IF = e^(integral P dx); solution y . IF = integral (Q . IF) dx + C.\n- GROWTH/DECAY: dN/dt = k N has solution N = N0 e^(k t); k > 0 growth, k < 0 decay.\n",
+  "topics": [
+    {
+      "name": "Differential Equations - Order and Degree",
+      "description": "Definition of an ordinary differential equation; the order (highest derivative present) and the degree (power of the highest order derivative once the equation is free of radicals and fractions in the derivatives), with worked identifications."
+    },
+    {
+      "name": "General and Particular Solutions",
+      "description": "Meaning of a solution of a differential equation; the general solution of an nth order equation containing n arbitrary constants; particular solutions obtained by applying initial or boundary conditions; verifying a given function is a solution."
+    },
+    {
+      "name": "Forming a Differential Equation",
+      "description": "Forming the differential equation of a family of curves containing n arbitrary constants by differentiating n times and eliminating the constants, e.g. y = mx, x^2 + y^2 = a^2, y = a cos x + b sin x."
+    },
+    {
+      "name": "Variable Separable Method",
+      "description": "Solving first order first degree equations of the form dy/dx = g(x) h(y) by separating variables to dy/h(y) = g(x) dx and integrating both sides, with worked numericals."
+    },
+    {
+      "name": "Homogeneous Differential Equations",
+      "description": "Recognising homogeneous equations dy/dx = g(y/x) and solving them by the substitution y = v x (so dy/dx = v + x dv/dx), separating variables in v and x, integrating, and back-substituting v = y/x."
+    },
+    {
+      "name": "Linear Differential Equations and Integrating Factor",
+      "description": "Solving linear equations dy/dx + P y = Q using the integrating factor IF = e^(integral P dx) and the solution y . IF = integral (Q . IF) dx + C; growth and decay applications dN/dt = k N."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-DEQ-01",
+      "topic_name": "Differential Equations - Order and Degree",
+      "bloom": "understand",
+      "description": "Define an ordinary differential equation and determine its order and degree, including cases needing removal of radicals or fractions in the derivatives."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-02",
+      "topic_name": "Differential Equations - Order and Degree",
+      "bloom": "apply",
+      "description": "Apply the definitions of order and degree to classify a variety of differential equations and identify equations whose degree is not defined."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-03",
+      "topic_name": "General and Particular Solutions",
+      "bloom": "understand",
+      "description": "Distinguish general and particular solutions, relate the number of arbitrary constants to the order, and verify that a given function satisfies a differential equation."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-04",
+      "topic_name": "Forming a Differential Equation",
+      "bloom": "apply",
+      "description": "Form the differential equation of a given family of curves by differentiating and eliminating the arbitrary constants."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-05",
+      "topic_name": "Variable Separable Method",
+      "bloom": "apply",
+      "description": "Solve first order first degree differential equations by the variable separable method, including problems with initial conditions."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-06",
+      "topic_name": "Homogeneous Differential Equations",
+      "bloom": "apply",
+      "description": "Recognise homogeneous differential equations and solve them using the substitution y = v x."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-07",
+      "topic_name": "Linear Differential Equations and Integrating Factor",
+      "bloom": "apply",
+      "description": "Solve linear differential equations dy/dx + P y = Q using the integrating factor IF = e^(integral P dx)."
+    },
+    {
+      "code": "12-NIOS-MAT-DEQ-08",
+      "topic_name": "Linear Differential Equations and Integrating Factor",
+      "bloom": "apply",
+      "description": "Model and solve simple growth and decay problems using dN/dt = k N and interpret the exponential solution N = N0 e^(k t)."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Differential Equations - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Differential Equations lesson. It defines a differential equation, explains order and degree, distinguishes general and particular solutions, shows how to form a differential equation from a family of curves, and develops three methods for first order first degree equations - variable separable, homogeneous (y = vx), and linear (integrating factor) - with a brief look at growth and decay.",
+    "overview_diagram": {
+      "title": "Differential Equations",
+      "central_term": "Differential Equations",
+      "branches": [
+        {
+          "label": "Order & Degree",
+          "details": [
+            "Order = highest derivative present",
+            "Degree = power of highest derivative (polynomial form)",
+            "Clear radicals/fractions before reading degree"
+          ]
+        },
+        {
+          "label": "Solutions",
+          "details": [
+            "General solution: n arbitrary constants (order n)",
+            "Particular solution: fix constants by conditions",
+            "Verify by substitution"
+          ]
+        },
+        {
+          "label": "Forming a DE",
+          "details": [
+            "n constants => differentiate n times",
+            "Eliminate the constants",
+            "y = mx gives x dy/dx = y"
+          ]
+        },
+        {
+          "label": "Solving methods",
+          "details": [
+            "Variable separable: dy/h(y) = g(x) dx",
+            "Homogeneous: y = vx, dy/dx = v + x dv/dx",
+            "Linear: IF = e^(integral P dx)"
+          ]
+        },
+        {
+          "label": "Applications",
+          "details": [
+            "Growth/decay: dN/dt = k N",
+            "Solution N = N0 e^(k t)",
+            "k > 0 growth, k < 0 decay"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Definition, order and degree",
+        "bullets": [
+          "A differential equation relates x, y and derivatives of y such as dy/dx and d^2y/dx^2.",
+          "Order is the order of the highest derivative; d^2y/dx^2 + y = 0 is second order.",
+          "Degree is the power of the highest order derivative after clearing radicals and fractions in the derivatives.",
+          "For (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0 the order is 2 and the degree is 3."
+        ]
+      },
+      {
+        "heading": "General and particular solutions",
+        "bullets": [
+          "A solution is a function that satisfies the equation identically when substituted.",
+          "The general solution of an nth order equation contains n arbitrary constants.",
+          "A particular solution fixes the constants using initial or boundary conditions.",
+          "y = x^2 + C is the general solution of dy/dx = 2x; y = 3 at x = 1 gives the particular solution y = x^2 + 2."
+        ]
+      },
+      {
+        "heading": "Forming a differential equation",
+        "bullets": [
+          "A family of curves with n arbitrary constants gives a differential equation of order n.",
+          "Differentiate the relation n times and eliminate the constants.",
+          "y = mx gives x dy/dx = y; x^2 + y^2 = a^2 gives x + y dy/dx = 0.",
+          "y = a cos x + b sin x (two constants) gives d^2y/dx^2 + y = 0."
+        ]
+      },
+      {
+        "heading": "Variable separable and homogeneous methods",
+        "bullets": [
+          "Variable separable: write dy/dx = g(x) h(y), separate to dy/h(y) = g(x) dx and integrate.",
+          "Example: dy/dx = (1 + y^2)/(1 + x^2) gives arctan y = arctan x + C.",
+          "Homogeneous: dy/dx = g(y/x); substitute y = vx so dy/dx = v + x dv/dx.",
+          "After substitution the variables separate; integrate and replace v = y/x."
+        ]
+      },
+      {
+        "heading": "Linear equations and applications",
+        "bullets": [
+          "Linear form: dy/dx + P y = Q with P, Q functions of x.",
+          "Integrating factor IF = e^(integral P dx); solution y . IF = integral (Q . IF) dx + C.",
+          "Example: dy/dx + y/x = x^2 has IF = x and solution y = x^3/4 + C/x.",
+          "Growth/decay dN/dt = k N solves to N = N0 e^(k t)."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "A differential equation links a function to its derivatives; the order is the highest derivative and the degree is its power once the equation is a polynomial in the derivatives.",
+      "The general solution of an nth order equation has n arbitrary constants; a particular solution fixes them using given conditions.",
+      "To form a differential equation from a family with n constants, differentiate n times and eliminate the constants (y = mx gives x dy/dx = y).",
+      "Variable separable equations are solved by writing dy/h(y) = g(x) dx and integrating both sides.",
+      "Homogeneous equations dy/dx = g(y/x) are solved by the substitution y = vx, giving dy/dx = v + x dv/dx.",
+      "Linear equations dy/dx + P y = Q are solved with IF = e^(integral P dx) and y . IF = integral (Q . IF) dx + C.",
+      "Growth and decay obey dN/dt = k N with solution N = N0 e^(k t); k > 0 gives growth and k < 0 gives decay."
+    ],
+    "glossary": [
+      {
+        "term": "Differential equation",
+        "definition": "An equation involving an independent variable, a dependent variable and one or more derivatives of the dependent variable, e.g. dy/dx + 3y = e^x."
+      },
+      {
+        "term": "Ordinary differential equation",
+        "definition": "A differential equation with derivatives taken with respect to a single independent variable."
+      },
+      {
+        "term": "Order",
+        "definition": "The order of the highest derivative that appears in the differential equation."
+      },
+      {
+        "term": "Degree",
+        "definition": "The power of the highest order derivative after the equation has been made free of radicals and fractions in the derivatives."
+      },
+      {
+        "term": "Solution (integral)",
+        "definition": "A function y = f(x) that satisfies the differential equation identically when substituted into it."
+      },
+      {
+        "term": "General solution",
+        "definition": "The solution of an nth order equation containing n arbitrary constants."
+      },
+      {
+        "term": "Particular solution",
+        "definition": "A solution obtained from the general solution by assigning definite values to the arbitrary constants using given conditions."
+      },
+      {
+        "term": "Family of curves",
+        "definition": "A set of curves described by one equation containing one or more arbitrary constants."
+      },
+      {
+        "term": "Variable separable equation",
+        "definition": "A first order equation that can be written dy/dx = g(x) h(y), solved by separating variables and integrating."
+      },
+      {
+        "term": "Homogeneous differential equation",
+        "definition": "A first order equation dy/dx = g(y/x), solved by the substitution y = v x."
+      },
+      {
+        "term": "Linear differential equation",
+        "definition": "An equation of the form dy/dx + P y = Q, where P and Q are functions of x, with y and dy/dx appearing to the first power."
+      },
+      {
+        "term": "Integrating factor",
+        "definition": "The factor IF = e^(integral P dx) that turns the left side of dy/dx + P y = Q into d/dx(y . IF)."
+      },
+      {
+        "term": "Initial condition",
+        "definition": "A given value of y (and possibly its derivatives) at a specific x, used to find a particular solution."
+      },
+      {
+        "term": "Growth/decay equation",
+        "definition": "The equation dN/dt = k N whose solution N = N0 e^(k t) models exponential growth (k > 0) or decay (k < 0)."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Differential Equations (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for each solution. State the order and degree where asked, and include the arbitrary constant of integration in general solutions.",
+    "total_marks": 36,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-01",
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "marks": 2,
+        "question": "Define the order and degree of a differential equation. State the order and degree of (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0.",
+        "answer": "The ORDER of a differential equation is the order of the highest derivative appearing in it. The DEGREE is the power (exponent) of that highest order derivative, after the equation has been written free of radicals and fractions in the derivatives.\n\nFor (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0, the highest derivative is d^2y/dx^2 (order 2) and it is raised to the power 3. Hence order = 2 and degree = 3.",
+        "explanation": "Definitions plus reading order 2 and degree 3."
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-03",
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "marks": 2,
+        "question": "Verify that y = e^(-x) is a solution of the differential equation d^2y/dx^2 - y = 0.",
+        "answer": "Given y = e^(-x). Then dy/dx = -e^(-x) and d^2y/dx^2 = e^(-x).\n\nSubstitute into the left side: d^2y/dx^2 - y = e^(-x) - e^(-x) = 0, which equals the right side. Hence y = e^(-x) satisfies the equation and is a solution.",
+        "explanation": "Differentiate twice and substitute; result is 0."
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-04",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 3,
+        "question": "Form the differential equation of the family of curves y = m x, where m is an arbitrary constant.",
+        "answer": "The family y = m x contains ONE arbitrary constant m, so we differentiate once.\n\n   dy/dx = m.\n\nFrom the given relation, m = y/x. Eliminating m:\n\n   dy/dx = y/x, i.e. x dy/dx = y.\n\nThis first order differential equation represents the whole family of lines through the origin.",
+        "explanation": "Differentiate once, replace m = y/x, get x dy/dx = y."
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-04",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 3,
+        "question": "Form the differential equation of the family of circles x^2 + y^2 = a^2, where a is an arbitrary constant.",
+        "answer": "The relation x^2 + y^2 = a^2 has one arbitrary constant a, so differentiate once with respect to x:\n\n   2x + 2y dy/dx = 0.\n\nDivide by 2: x + y dy/dx = 0. The constant a has been eliminated, so the required differential equation is\n\n   x + y dy/dx = 0.",
+        "explanation": "Differentiate x^2 + y^2 = a^2; a drops out giving x + y dy/dx = 0."
+      },
+      {
+        "type": "LONG_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-05",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 5,
+        "question": "Solve the differential equation dy/dx = (1 + y^2)/(1 + x^2). Hence find the particular solution for which y = 1 when x = 0.",
+        "answer": "The equation is variable separable. Separate the variables:\n\n   dy/(1 + y^2) = dx/(1 + x^2).\n\nIntegrate both sides:\n\n   integral dy/(1 + y^2) = integral dx/(1 + x^2)\n\n   arctan y = arctan x + C.\n\nThis is the general solution.\n\nApply y = 1 when x = 0: arctan 1 = arctan 0 + C, so pi/4 = 0 + C, i.e. C = pi/4.\n\nParticular solution: arctan y = arctan x + pi/4.",
+        "explanation": "Separate, integrate to arctan y = arctan x + C, then C = pi/4."
+      },
+      {
+        "type": "LONG_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-05",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 5,
+        "question": "Solve dy/dx = e^(x + y).",
+        "answer": "Write e^(x + y) = e^x . e^y. Then\n\n   dy/dx = e^x e^y.\n\nSeparate the variables (divide by e^y):\n\n   e^(-y) dy = e^x dx.\n\nIntegrate both sides:\n\n   integral e^(-y) dy = integral e^x dx\n\n   -e^(-y) = e^x + C.\n\nRearranging, e^x + e^(-y) = -C = C1 (a new arbitrary constant). Hence the general solution is\n\n   e^x + e^(-y) = C1.",
+        "explanation": "Split e^(x+y), separate, integrate to e^x + e^(-y) = C1."
+      },
+      {
+        "type": "LONG_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-06",
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "marks": 5,
+        "question": "Solve the homogeneous differential equation dy/dx = (x + y)/x.",
+        "answer": "The right side is (x + y)/x = 1 + y/x, a function of y/x, so the equation is homogeneous.\n\nSubstitute y = v x, so dy/dx = v + x dv/dx. Then\n\n   v + x dv/dx = 1 + v.\n\nCancel v: x dv/dx = 1, so dv = dx/x.\n\nIntegrate: v = ln|x| + C.\n\nReplace v = y/x: y/x = ln|x| + C, i.e.\n\n   y = x (ln|x| + C).",
+        "explanation": "Homogeneous; y = vx gives x dv/dx = 1; back-substitute."
+      },
+      {
+        "type": "LONG_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-07",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 5,
+        "question": "Solve the linear differential equation dy/dx + y/x = x^2 (x > 0) using an integrating factor.",
+        "answer": "The equation is in the standard linear form dy/dx + P y = Q with P = 1/x and Q = x^2.\n\nIntegrating factor: IF = e^(integral P dx) = e^(integral (1/x) dx) = e^(ln x) = x.\n\nSolution formula: y . IF = integral (Q . IF) dx + C.\n\n   y . x = integral (x^2 . x) dx = integral x^3 dx = x^4/4 + C.\n\nDivide by x:\n\n   y = x^3/4 + C/x.",
+        "explanation": "P=1/x, IF=x, y x = x^4/4 + C, so y = x^3/4 + C/x."
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-02",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 3,
+        "question": "Determine the order and degree of the differential equation d^2y/dx^2 = [1 + (dy/dx)^2]^(3/2).",
+        "answer": "The highest derivative is d^2y/dx^2, so the order is 2.\n\nTo find the degree the equation must be free of fractional powers of the derivatives. Square both sides:\n\n   (d^2y/dx^2)^2 = [1 + (dy/dx)^2]^3.\n\nNow the highest order derivative d^2y/dx^2 appears to the power 2. Hence order = 2 and degree = 2.",
+        "explanation": "Square to clear the 3/2 power; order 2, degree 2."
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "outcome_code": "12-NIOS-MAT-DEQ-08",
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "marks": 3,
+        "question": "A population grows so that dN/dt = k N, with N = N0 at t = 0. Solve for N(t) and state the effect of the sign of k.",
+        "answer": "The equation dN/dt = k N is variable separable:\n\n   dN/N = k dt.\n\nIntegrate: ln N = k t + C. At t = 0, N = N0, so ln N0 = C. Therefore\n\n   ln N - ln N0 = k t, i.e. ln(N/N0) = k t,\n\n   N = N0 e^(k t).\n\nIf k > 0 the population grows exponentially; if k < 0 it decays exponentially.",
+        "explanation": "Separate dN/N = k dt, integrate to N = N0 e^(kt); k sign sets growth/decay."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order of a differential equation is the order of the",
+      "options": [
+        "highest derivative present",
+        "lowest derivative present",
+        "dependent variable",
+        "arbitrary constant"
+      ],
+      "answer": "highest derivative present",
+      "explanation": "Order = order of the highest derivative."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The degree of a differential equation is the power of the highest order derivative, provided the equation is",
+      "options": [
+        "free of radicals and fractions in the derivatives",
+        "of first order",
+        "homogeneous",
+        "linear"
+      ],
+      "answer": "free of radicals and fractions in the derivatives",
+      "explanation": "Degree defined only in polynomial form of derivatives."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "An equation relating a function and its derivatives is called a",
+      "options": [
+        "differential equation",
+        "quadratic equation",
+        "linear equation only",
+        "polynomial equation"
+      ],
+      "answer": "differential equation",
+      "explanation": "By definition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The order of dy/dx + 3y = e^x is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "1",
+      "explanation": "Highest derivative is dy/dx, order 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The order of d^2y/dx^2 + y = 0 is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "answer": "2",
+      "explanation": "Highest derivative d^2y/dx^2, order 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The degree of dy/dx + y = sin x is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "1",
+      "explanation": "dy/dx appears to power 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A differential equation involving derivatives with respect to only one independent variable is called",
+      "options": [
+        "ordinary",
+        "partial",
+        "linear",
+        "exact"
+      ],
+      "answer": "ordinary",
+      "explanation": "Single independent variable => ordinary."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The general solution of an nth order differential equation contains",
+      "options": [
+        "n arbitrary constants",
+        "one arbitrary constant",
+        "2n arbitrary constants",
+        "no arbitrary constant"
+      ],
+      "answer": "n arbitrary constants",
+      "explanation": "Number of constants equals the order."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The order of (dy/dx)^4 + y = x is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "1",
+      "explanation": "Order is about the derivative present (dy/dx), not its power."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The degree of (d^2y/dx^2) + (dy/dx)^3 + y = 0 is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "not defined"
+      ],
+      "answer": "1",
+      "explanation": "Highest order derivative d^2y/dx^2 has power 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0, the order and degree are",
+      "options": [
+        "2 and 3",
+        "3 and 2",
+        "2 and 2",
+        "3 and 3"
+      ],
+      "answer": "2 and 3",
+      "explanation": "Highest derivative order 2, power 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For (d^3y/dx^3)^2 + (dy/dx)^5 = 0, the order and degree are",
+      "options": [
+        "3 and 2",
+        "5 and 2",
+        "3 and 5",
+        "2 and 3"
+      ],
+      "answer": "3 and 2",
+      "explanation": "Highest derivative d^3y/dx^3, power 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "After squaring, the degree of d^2y/dx^2 = [1 + (dy/dx)^2]^(3/2) is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "not defined"
+      ],
+      "answer": "2",
+      "explanation": "(d^2y/dx^2)^2 after squaring; power 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The order of the equation d^3y/dx^3 + x (dy/dx) = 0 is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "answer": "3",
+      "explanation": "Highest derivative is third order."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The degree of the equation dy/dx = sin(dy/dx) is",
+      "options": [
+        "1",
+        "2",
+        "0",
+        "not defined"
+      ],
+      "answer": "not defined",
+      "explanation": "It is not a polynomial in dy/dx, so degree is undefined."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For x (d^2y/dx^2) + (dy/dx)^2 + y^3 = 0, the degree is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "not defined"
+      ],
+      "answer": "1",
+      "explanation": "Highest order derivative d^2y/dx^2 has power 1 (y^3 does not count)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The order of (dy/dx)^2 + 2y (dy/dx) + y = 0 is",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "answer": "1",
+      "explanation": "Only dy/dx appears; order 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For sqrt(1 + dy/dx) = x, after removing the radical the order and degree are",
+      "options": [
+        "1 and 1",
+        "1 and 2",
+        "2 and 1",
+        "2 and 2"
+      ],
+      "answer": "1 and 1",
+      "explanation": "Square: 1 + dy/dx = x^2; dy/dx to power 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The degree of a differential equation is not defined when",
+      "options": [
+        "a derivative appears inside a transcendental function",
+        "the order is greater than 2",
+        "it is linear",
+        "it is homogeneous"
+      ],
+      "answer": "a derivative appears inside a transcendental function",
+      "explanation": "No polynomial form of the derivative exists."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For (d^2y/dx^2)^2 + (dy/dx)^3 + x = 0, the order and degree are",
+      "options": [
+        "2 and 2",
+        "2 and 3",
+        "3 and 2",
+        "2 and 1"
+      ],
+      "answer": "2 and 2",
+      "explanation": "Highest order derivative squared; degree 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function that satisfies a differential equation identically is called its",
+      "options": [
+        "solution",
+        "order",
+        "degree",
+        "constant"
+      ],
+      "answer": "solution",
+      "explanation": "Definition of a solution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The general solution of dy/dx = 2x is",
+      "options": [
+        "y = x^2 + C",
+        "y = 2x + C",
+        "y = x^2",
+        "y = 2 + C"
+      ],
+      "answer": "y = x^2 + C",
+      "explanation": "Integrate 2x to x^2 + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx = 2x with y = 3 at x = 1, the particular solution is",
+      "options": [
+        "y = x^2 + 2",
+        "y = x^2 + 3",
+        "y = x^2",
+        "y = x^2 + 1"
+      ],
+      "answer": "y = x^2 + 2",
+      "explanation": "3 = 1 + C => C = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A particular solution is obtained from the general solution by",
+      "options": [
+        "assigning definite values to the arbitrary constants",
+        "increasing the order",
+        "removing derivatives",
+        "squaring the equation"
+      ],
+      "answer": "assigning definite values to the arbitrary constants",
+      "explanation": "Conditions fix the constants."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The general solution of d^2y/dx^2 + y = 0 is",
+      "options": [
+        "y = A cos x + B sin x",
+        "y = A e^x",
+        "y = A x + B x^2",
+        "y = A cos x"
+      ],
+      "answer": "y = A cos x + B sin x",
+      "explanation": "Two arbitrary constants for a second order equation."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The number of arbitrary constants in the general solution of a first order equation is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "1",
+      "explanation": "Order 1 => one constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Which function is a solution of dy/dx = y?",
+      "options": [
+        "y = e^x",
+        "y = x^2",
+        "y = sin x",
+        "y = ln x"
+      ],
+      "answer": "y = e^x",
+      "explanation": "d/dx e^x = e^x = y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Which is a solution of d^2y/dx^2 - y = 0?",
+      "options": [
+        "y = e^x",
+        "y = sin x",
+        "y = x^2",
+        "y = cos x"
+      ],
+      "answer": "y = e^x",
+      "explanation": "d^2/dx^2 e^x = e^x = y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The general solution of dy/dx = 3 is",
+      "options": [
+        "y = 3x + C",
+        "y = 3 + C",
+        "y = x^3 + C",
+        "y = 3x"
+      ],
+      "answer": "y = 3x + C",
+      "explanation": "Integrate the constant 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If y = C e^(2x) is the general solution, the differential equation is",
+      "options": [
+        "dy/dx = 2y",
+        "dy/dx = y",
+        "dy/dx = 2x",
+        "dy/dx = y/2"
+      ],
+      "answer": "dy/dx = 2y",
+      "explanation": "dy/dx = 2C e^(2x) = 2y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of the family y = m x is",
+      "options": [
+        "x dy/dx = y",
+        "dy/dx = x",
+        "y dy/dx = x",
+        "dy/dx = xy"
+      ],
+      "answer": "x dy/dx = y",
+      "explanation": "dy/dx = m = y/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = A e^x is",
+      "options": [
+        "dy/dx = y",
+        "dy/dx = x",
+        "dy/dx = e^x",
+        "dy/dx = A"
+      ],
+      "answer": "dy/dx = y",
+      "explanation": "dy/dx = A e^x = y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of the family x^2 + y^2 = a^2 is",
+      "options": [
+        "x + y dy/dx = 0",
+        "x - y dy/dx = 0",
+        "y + x dy/dx = 0",
+        "x + y = 0"
+      ],
+      "answer": "x + y dy/dx = 0",
+      "explanation": "Differentiate: 2x + 2y dy/dx = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = a cos x + b sin x is",
+      "options": [
+        "d^2y/dx^2 + y = 0",
+        "d^2y/dx^2 - y = 0",
+        "dy/dx + y = 0",
+        "d^2y/dx^2 = 0"
+      ],
+      "answer": "d^2y/dx^2 + y = 0",
+      "explanation": "Two constants => second order; y'' = -y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A family of curves with two arbitrary constants gives a differential equation of order",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "answer": "2",
+      "explanation": "Order equals number of constants."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of the family of lines y = m x + c is",
+      "options": [
+        "d^2y/dx^2 = 0",
+        "dy/dx = 0",
+        "dy/dx = m",
+        "d^2y/dx^2 = 1"
+      ],
+      "answer": "d^2y/dx^2 = 0",
+      "explanation": "Two constants; differentiate twice."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = A e^(2x) + B e^(-2x) is",
+      "options": [
+        "d^2y/dx^2 - 4y = 0",
+        "d^2y/dx^2 + 4y = 0",
+        "dy/dx = 2y",
+        "d^2y/dx^2 - 2y = 0"
+      ],
+      "answer": "d^2y/dx^2 - 4y = 0",
+      "explanation": "y'' = 4(A e^2x + B e^-2x) = 4y."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Forming a differential equation from a family with n constants requires differentiating",
+      "options": [
+        "n times",
+        "once",
+        "twice",
+        "n+1 times"
+      ],
+      "answer": "n times",
+      "explanation": "Then eliminate the n constants."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = C x^2 is",
+      "options": [
+        "x dy/dx = 2y",
+        "dy/dx = 2y",
+        "x dy/dx = y",
+        "dy/dx = 2x"
+      ],
+      "answer": "x dy/dx = 2y",
+      "explanation": "dy/dx = 2Cx = 2y/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of the family y^2 = 4ax (a arbitrary) is",
+      "options": [
+        "2xy dy/dx = y^2",
+        "y dy/dx = 2x",
+        "x dy/dx = y",
+        "dy/dx = 2a"
+      ],
+      "answer": "2xy dy/dx = y^2",
+      "explanation": "2y y' = 4a = y^2/x => 2xy y' = y^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A variable separable equation can be written as",
+      "options": [
+        "dy/h(y) = g(x) dx",
+        "dy/dx + Py = Q",
+        "dy/dx = g(y/x)",
+        "d^2y/dx^2 = 0"
+      ],
+      "answer": "dy/h(y) = g(x) dx",
+      "explanation": "Variables separated on the two sides."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Separating dy/dx = x y gives",
+      "options": [
+        "dy/y = x dx",
+        "dy = x dx",
+        "dy/x = y dx",
+        "y dy = x dx"
+      ],
+      "answer": "dy/y = x dx",
+      "explanation": "Move y to the left, x to the right."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx = x y is",
+      "options": [
+        "ln|y| = x^2/2 + C",
+        "y = x^2/2 + C",
+        "ln|y| = x + C",
+        "y = e^x + C"
+      ],
+      "answer": "ln|y| = x^2/2 + C",
+      "explanation": "Integrate dy/y = x dx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of dy/dx = k y is",
+      "options": [
+        "y = C e^(k x)",
+        "y = k x + C",
+        "y = C x^k",
+        "y = e^x + k"
+      ],
+      "answer": "y = C e^(k x)",
+      "explanation": "Separable; ln y = kx + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx = (1 + y^2)/(1 + x^2) is",
+      "options": [
+        "arctan y = arctan x + C",
+        "y = x + C",
+        "arctan y = x + C",
+        "ln y = ln x + C"
+      ],
+      "answer": "arctan y = arctan x + C",
+      "explanation": "Integrate both inverse-tangent forms."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Separating dy/dx = e^(x - y) gives",
+      "options": [
+        "e^y dy = e^x dx",
+        "e^(-y) dy = e^x dx",
+        "e^y dy = e^(-x) dx",
+        "dy = e^x dx"
+      ],
+      "answer": "e^y dy = e^x dx",
+      "explanation": "e^(x-y) = e^x/e^y; move e^y across."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of dy/dx = y/x is",
+      "options": [
+        "y = C x",
+        "y = C/x",
+        "y = x + C",
+        "ln y = x + C"
+      ],
+      "answer": "y = C x",
+      "explanation": "dy/y = dx/x => ln y = ln x + ln C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of sec^2 x tan y dx + sec^2 y tan x dy = 0 is",
+      "options": [
+        "tan x tan y = C",
+        "tan x + tan y = C",
+        "sec x sec y = C",
+        "tan x - tan y = C"
+      ],
+      "answer": "tan x tan y = C",
+      "explanation": "Separable; integral of sec^2/tan is ln tan."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of dy/dx = (1 + y^2) with y = 0 at x = 0 is",
+      "options": [
+        "y = tan x",
+        "y = sin x",
+        "arctan y = x^2",
+        "y = e^x - 1"
+      ],
+      "answer": "y = tan x",
+      "explanation": "arctan y = x + C, C = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To solve a variable separable equation we finally",
+      "options": [
+        "integrate both sides",
+        "differentiate both sides",
+        "square both sides",
+        "factorise"
+      ],
+      "answer": "integrate both sides",
+      "explanation": "Integration gives the solution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A homogeneous first order equation can be written as",
+      "options": [
+        "dy/dx = g(y/x)",
+        "dy/dx + Py = Q",
+        "dy/dx = g(x)",
+        "d^2y/dx^2 = 0"
+      ],
+      "answer": "dy/dx = g(y/x)",
+      "explanation": "Right side a function of y/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "To solve a homogeneous equation we substitute",
+      "options": [
+        "y = v x",
+        "x = v y only",
+        "y = v + x",
+        "y = x/v"
+      ],
+      "answer": "y = v x",
+      "explanation": "Standard substitution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "With y = v x, dy/dx equals",
+      "options": [
+        "v + x dv/dx",
+        "x dv/dx",
+        "v dv/dx",
+        "v - x dv/dx"
+      ],
+      "answer": "v + x dv/dx",
+      "explanation": "Product rule on vx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx = (x + y)/x, putting y = vx gives",
+      "options": [
+        "x dv/dx = 1",
+        "x dv/dx = v",
+        "dv/dx = v",
+        "x dv/dx = 1 + 2v"
+      ],
+      "answer": "x dv/dx = 1",
+      "explanation": "v + x dv/dx = 1 + v => x dv/dx = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx = (x + y)/x is",
+      "options": [
+        "y = x(ln|x| + C)",
+        "y = x + C",
+        "y = C x",
+        "y = ln x + C"
+      ],
+      "answer": "y = x(ln|x| + C)",
+      "explanation": "v = ln|x| + C, then y = vx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In M dx + N dy = 0, the equation is homogeneous when M and N are homogeneous functions of the",
+      "options": [
+        "same degree",
+        "first degree only",
+        "second degree only",
+        "different degree"
+      ],
+      "answer": "same degree",
+      "explanation": "Each term has the same total power."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Which of these is a homogeneous differential equation?",
+      "options": [
+        "dy/dx = (x^2 + y^2)/(xy)",
+        "dy/dx = x + 1",
+        "dy/dx + y = e^x",
+        "dy/dx = sin x"
+      ],
+      "answer": "dy/dx = (x^2 + y^2)/(xy)",
+      "explanation": "Right side is a function of y/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "After substituting y = vx in a homogeneous equation, the resulting equation in v and x is",
+      "options": [
+        "variable separable",
+        "linear only",
+        "second order",
+        "not solvable"
+      ],
+      "answer": "variable separable",
+      "explanation": "The substitution separates the variables."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx = y/x + tan(y/x), putting y = vx gives",
+      "options": [
+        "x dv/dx = tan v",
+        "x dv/dx = v",
+        "dv/dx = tan v",
+        "x dv/dx = v tan v"
+      ],
+      "answer": "x dv/dx = tan v",
+      "explanation": "v + x dv/dx = v + tan v."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The equation dy/dx = (2xy)/(x^2 - y^2) is",
+      "options": [
+        "homogeneous",
+        "linear",
+        "variable separable directly",
+        "of second order"
+      ],
+      "answer": "homogeneous",
+      "explanation": "Right side depends only on y/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The standard form of a first order linear differential equation is",
+      "options": [
+        "dy/dx + Py = Q",
+        "dy/dx = g(y/x)",
+        "dy/dx = g(x)h(y)",
+        "d^2y/dx^2 + y = 0"
+      ],
+      "answer": "dy/dx + Py = Q",
+      "explanation": "P, Q functions of x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The integrating factor of dy/dx + Py = Q is",
+      "options": [
+        "e^(integral P dx)",
+        "e^(integral Q dx)",
+        "integral P dx",
+        "e^(P x)"
+      ],
+      "answer": "e^(integral P dx)",
+      "explanation": "IF = e^(integral P dx)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx + y = e^x, the integrating factor is",
+      "options": [
+        "e^x",
+        "e^(-x)",
+        "x",
+        "e^(2x)"
+      ],
+      "answer": "e^x",
+      "explanation": "P = 1, integral P dx = x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx + y/x = x^2, the integrating factor is",
+      "options": [
+        "x",
+        "1/x",
+        "e^x",
+        "x^2"
+      ],
+      "answer": "x",
+      "explanation": "integral (1/x) dx = ln x, IF = x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of a linear equation is",
+      "options": [
+        "y . IF = integral (Q . IF) dx + C",
+        "y = IF + C",
+        "y . IF = Q + C",
+        "y = integral Q dx"
+      ],
+      "answer": "y . IF = integral (Q . IF) dx + C",
+      "explanation": "Standard solution formula."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx + y = e^x is",
+      "options": [
+        "y = e^x/2 + C e^(-x)",
+        "y = e^x + C",
+        "y = e^(2x) + C",
+        "y = e^x/2 + C"
+      ],
+      "answer": "y = e^x/2 + C e^(-x)",
+      "explanation": "IF=e^x; y e^x = e^(2x)/2 + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx + y/x = x^2 is",
+      "options": [
+        "y = x^3/4 + C/x",
+        "y = x^4/4 + C",
+        "y = x^3/4 + C",
+        "y = x^2/4 + C/x"
+      ],
+      "answer": "y = x^3/4 + C/x",
+      "explanation": "IF=x; yx = x^4/4 + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For x dy/dx + 2y = x^2, the integrating factor (after standard form) is",
+      "options": [
+        "x^2",
+        "x",
+        "1/x^2",
+        "e^x"
+      ],
+      "answer": "x^2",
+      "explanation": "P = 2/x, integral = 2 ln x, IF = x^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Multiplying a linear equation by its integrating factor makes the left side equal to",
+      "options": [
+        "d/dx(y . IF)",
+        "y . IF",
+        "dy/dx",
+        "d/dx(Q)"
+      ],
+      "answer": "d/dx(y . IF)",
+      "explanation": "That is the point of the IF."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx + 2y = 6, the integrating factor is",
+      "options": [
+        "e^(2x)",
+        "e^x",
+        "2x",
+        "e^(-2x)"
+      ],
+      "answer": "e^(2x)",
+      "explanation": "P = 2, integral = 2x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The growth/decay law is written as the differential equation",
+      "options": [
+        "dN/dt = k N",
+        "dN/dt = k",
+        "dN/dt = N/k",
+        "d^2N/dt^2 = k N"
+      ],
+      "answer": "dN/dt = k N",
+      "explanation": "Rate proportional to amount."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of dN/dt = k N with N = N0 at t = 0 is",
+      "options": [
+        "N = N0 e^(k t)",
+        "N = N0 + k t",
+        "N = N0 k t",
+        "N = N0 e^(-k t) always"
+      ],
+      "answer": "N = N0 e^(k t)",
+      "explanation": "Separable exponential solution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In N = N0 e^(k t), exponential decay occurs when",
+      "options": [
+        "k < 0",
+        "k > 0",
+        "k = 0",
+        "k = 1"
+      ],
+      "answer": "k < 0",
+      "explanation": "Negative k gives decay."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Radioactive decay dN/dt = -lambda N gives",
+      "options": [
+        "N = N0 e^(-lambda t)",
+        "N = N0 e^(lambda t)",
+        "N = N0 - lambda t",
+        "N = lambda t"
+      ],
+      "answer": "N = N0 e^(-lambda t)",
+      "explanation": "Decay constant lambda > 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If a quantity doubles when e^(k t) = 2, then",
+      "options": [
+        "k t = ln 2",
+        "k t = 2",
+        "k t = e^2",
+        "k t = 1/2"
+      ],
+      "answer": "k t = ln 2",
+      "explanation": "Take natural log of both sides."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order of a differential equation is the order of its highest derivative.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "By definition."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The degree of a differential equation is always equal to its order.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Order and degree are independent quantities."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The degree of dy/dx = sin(dy/dx) is not defined.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "A derivative appears inside a transcendental function."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The general solution of a second order differential equation contains two arbitrary constants.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Number of constants equals the order."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A particular solution contains an arbitrary constant.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Its constants are fixed by given conditions."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = mx is x dy/dx = y.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "dy/dx = m = y/x."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In the variable separable method we integrate both sides after separating the variables.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "That yields the solution."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A homogeneous equation dy/dx = g(y/x) is solved by the substitution y = vx.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Standard substitution."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The integrating factor of dy/dx + Py = Q is e^(integral P dx).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Definition of IF."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The solution of dN/dt = kN with k > 0 represents exponential decay.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "k > 0 gives exponential growth."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The ____ of a differential equation is the order of its highest derivative.",
+      "answer": "order",
+      "explanation": "Definition of order."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The ____ of a differential equation is the power of the highest order derivative in polynomial form.",
+      "answer": "degree",
+      "explanation": "Definition of degree."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0, the degree is ____.",
+      "answer": "3",
+      "explanation": "Highest order derivative has power 3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The order of d^3y/dx^3 + x dy/dx = 0 is ____.",
+      "answer": "3",
+      "explanation": "Highest derivative is third order."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The general solution of dy/dx = 2x is y = ____.",
+      "answer": "x^2 + C",
+      "explanation": "Integrate 2x."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx = 2x with y = 3 at x = 1, the constant C = ____.",
+      "answer": "2",
+      "explanation": "3 = 1 + C."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of the family x^2 + y^2 = a^2 is x + y dy/dx = ____.",
+      "answer": "0",
+      "explanation": "Differentiate and divide by 2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The differential equation of y = a cos x + b sin x is d^2y/dx^2 + ____ = 0.",
+      "answer": "y",
+      "explanation": "y'' = -y."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Separating dy/dx = xy gives dy/y = ____ dx.",
+      "answer": "x",
+      "explanation": "Move x to the right side."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The general solution of dy/dx = (1 + y^2)/(1 + x^2) is arctan y = ____ + C.",
+      "answer": "arctan x",
+      "explanation": "Integrate both sides."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "To solve a homogeneous equation, substitute y = ____.",
+      "answer": "v x",
+      "explanation": "Standard substitution."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "With y = vx, dy/dx = v + x ____.",
+      "answer": "dv/dx",
+      "explanation": "Product rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The integrating factor of dy/dx + Py = Q is IF = ____.",
+      "answer": "e^(integral P dx)",
+      "explanation": "Definition."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For dy/dx + y/x = x^2, the integrating factor is ____.",
+      "answer": "x",
+      "explanation": "integral (1/x) dx = ln x, IF = x."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The solution of dN/dt = kN with N = N0 at t = 0 is N = ____.",
+      "answer": "N0 e^(k t)",
+      "explanation": "Exponential solution."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Define a differential equation and give one example.",
+      "answer": "A differential equation is an equation that involves an independent variable, a dependent variable, and one or more derivatives of the dependent variable with respect to the independent variable. Example: dy/dx + 3y = e^x (a first order equation).",
+      "explanation": "Definition plus a valid example."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the order and degree of dy/dx + y = sin x.",
+      "answer": "The highest derivative is dy/dx, so the order is 1. It appears to the first power and the equation is free of radicals/fractions in the derivative, so the degree is 1. Order = 1, degree = 1.",
+      "explanation": "First order, first degree."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find the order and degree of (d^2y/dx^2)^2 + (dy/dx)^3 + y = 0.",
+      "answer": "The highest derivative present is d^2y/dx^2, so the order is 2. Its power is 2 and the equation is a polynomial in the derivatives, so the degree is 2. Order = 2, degree = 2.",
+      "explanation": "Highest order derivative squared."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Explain why the degree of the differential equation dy/dx = sin(dy/dx) is not defined.",
+      "answer": "The degree of a differential equation is the power of the highest order derivative only when the equation can be written as a polynomial in the derivatives (free of radicals and transcendental functions of the derivatives). Here dy/dx appears as the argument of the sine function, sin(dy/dx). This cannot be reduced to a polynomial in dy/dx, so no unique power of the highest order derivative exists. Hence the degree is not defined.",
+      "explanation": "No polynomial form in the derivative => degree undefined."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Determine the order and degree of d^2y/dx^2 = [1 + (dy/dx)^2]^(3/2).",
+      "answer": "The highest derivative is d^2y/dx^2, so the order is 2. The equation contains a fractional power (3/2), so square both sides to remove it: (d^2y/dx^2)^2 = [1 + (dy/dx)^2]^3. Now the highest order derivative has power 2. Hence order = 2 and degree = 2.",
+      "explanation": "Square to clear the 3/2; degree 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "What is meant by the general solution and the particular solution of a differential equation?",
+      "answer": "The general solution of an nth order differential equation is a solution containing n arbitrary constants, so it represents a whole family of solutions. A particular solution is obtained from the general solution by assigning definite values to those arbitrary constants, usually so as to satisfy given initial or boundary conditions.",
+      "explanation": "General has n constants; particular fixes them."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Verify that y = A cos x + B sin x is a solution of d^2y/dx^2 + y = 0.",
+      "answer": "Given y = A cos x + B sin x. Then dy/dx = -A sin x + B cos x and d^2y/dx^2 = -A cos x - B sin x = -(A cos x + B sin x) = -y.\n\nSubstitute: d^2y/dx^2 + y = -y + y = 0, which is the given equation. Hence y = A cos x + B sin x is a solution (the general solution, with two arbitrary constants).",
+      "explanation": "Differentiate twice; y'' = -y."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the particular solution of dy/dx = 3x^2 for which y = 4 when x = 1.",
+      "answer": "Integrate: y = integral 3x^2 dx = x^3 + C (general solution).\n\nApply y = 4 at x = 1: 4 = 1^3 + C = 1 + C, so C = 3.\n\nParticular solution: y = x^3 + 3.",
+      "explanation": "Integrate then use the condition to get C = 3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Form the differential equation of the family y = A e^x, where A is arbitrary.",
+      "answer": "The family has one arbitrary constant A, so differentiate once:\n\n   dy/dx = A e^x.\n\nBut A e^x = y, so dy/dx = y. The differential equation is dy/dx = y (or dy/dx - y = 0).",
+      "explanation": "Differentiate once; A e^x = y."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Form the differential equation of the family y = a cos x + b sin x.",
+      "answer": "There are two arbitrary constants a and b, so differentiate twice.\n\n   dy/dx = -a sin x + b cos x,\n   d^2y/dx^2 = -a cos x - b sin x = -(a cos x + b sin x) = -y.\n\nHence d^2y/dx^2 + y = 0, a second order equation.",
+      "explanation": "Differentiate twice; y'' = -y."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Form the differential equation of the family of parabolas y^2 = 4ax.",
+      "answer": "Differentiate y^2 = 4ax with respect to x: 2y dy/dx = 4a. From the original relation, 4a = y^2/x. Substitute: 2y dy/dx = y^2/x, i.e. 2xy dy/dx = y^2, or 2x dy/dx = y.",
+      "explanation": "Differentiate and eliminate a."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Solve dy/dx = y/x.",
+      "answer": "Separate the variables: dy/y = dx/x. Integrate both sides: ln|y| = ln|x| + ln C, so y = C x (general solution).",
+      "explanation": "Separable; ln y = ln x + ln C."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve dy/dx = e^(x - y).",
+      "answer": "Write e^(x - y) = e^x / e^y, so dy/dx = e^x e^(-y). Separate: e^y dy = e^x dx. Integrate: e^y = e^x + C. Hence the general solution is e^y = e^x + C.",
+      "explanation": "Split exponent, separate, integrate."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve x dy/dx = y given that y = 2 when x = 1.",
+      "answer": "Separate: dy/y = dx/x. Integrate: ln|y| = ln|x| + ln C, so y = C x. Apply y = 2 at x = 1: 2 = C(1), so C = 2. Particular solution: y = 2x.",
+      "explanation": "Separable; use condition to get C = 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve (1 + x^2) dy/dx = 1.",
+      "answer": "Separate: dy = dx/(1 + x^2). Integrate: y = integral dx/(1 + x^2) = arctan x + C. Hence y = arctan x + C.",
+      "explanation": "Integrate 1/(1+x^2) to arctan x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Explain, with the substitution used, how a homogeneous differential equation dy/dx = g(y/x) is solved.",
+      "answer": "A homogeneous equation has the form dy/dx = g(y/x). Substitute y = v x, where v is a function of x. Then dy/dx = v + x dv/dx. The equation becomes v + x dv/dx = g(v), which rearranges to x dv/dx = g(v) - v. This is variable separable: dv/(g(v) - v) = dx/x. Integrate both sides, then replace v by y/x to get the solution in x and y.",
+      "explanation": "y = vx => v + x dv/dx = g(v); separate and integrate."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve the homogeneous equation dy/dx = (x + y)/x.",
+      "answer": "The right side is 1 + y/x, so the equation is homogeneous. Put y = vx, dy/dx = v + x dv/dx.\n\n   v + x dv/dx = 1 + v => x dv/dx = 1 => dv = dx/x.\n\nIntegrate: v = ln|x| + C. Replace v = y/x: y/x = ln|x| + C, so y = x(ln|x| + C).",
+      "explanation": "Homogeneous; x dv/dx = 1; back-substitute."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Write the standard form of a first order linear differential equation and its integrating factor.",
+      "answer": "The standard form is dy/dx + P y = Q, where P and Q are functions of x (or constants). Its integrating factor is IF = e^(integral P dx). The solution is y . IF = integral (Q . IF) dx + C.",
+      "explanation": "Standard form, IF, and solution formula."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve dy/dx + y = e^x using an integrating factor.",
+      "answer": "Here P = 1, Q = e^x. Integrating factor IF = e^(integral 1 dx) = e^x.\n\nSolution: y . e^x = integral (e^x . e^x) dx = integral e^(2x) dx = e^(2x)/2 + C.\n\nDivide by e^x: y = e^x/2 + C e^(-x).",
+      "explanation": "IF = e^x; y e^x = e^(2x)/2 + C."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve x dy/dx + 2y = x^2 (x > 0).",
+      "answer": "Divide by x to get standard form: dy/dx + (2/x) y = x. So P = 2/x, Q = x.\n\nIF = e^(integral (2/x) dx) = e^(2 ln x) = x^2.\n\nSolution: y . x^2 = integral (x . x^2) dx = integral x^3 dx = x^4/4 + C.\n\nDivide by x^2: y = x^2/4 + C/x^2.",
+      "explanation": "IF = x^2; y x^2 = x^4/4 + C."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "The rate of decay of a radioactive substance is dN/dt = -lambda N. Solve for N(t) and state the meaning of lambda.",
+      "answer": "The equation is variable separable: dN/N = -lambda dt. Integrate: ln N = -lambda t + C. At t = 0, N = N0, so C = ln N0. Hence ln(N/N0) = -lambda t, giving N = N0 e^(-lambda t). Here lambda (> 0) is the decay constant; a larger lambda means faster decay.",
+      "explanation": "Separate and integrate to N = N0 e^(-lambda t)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "A quantity satisfies dy/dx = k y. Write its general solution and state when it represents growth.",
+      "answer": "Separating, dy/y = k dx, so ln y = k x + C, giving y = C1 e^(k x). It represents exponential growth when k > 0 (y increases with x) and decay when k < 0.",
+      "explanation": "y = C1 e^(kx); growth for k > 0."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Explain the terms order and degree of a differential equation. Illustrate with two examples, including one where the degree is not defined.",
+      "answer": "The ORDER of a differential equation is the order of the highest derivative that occurs in it. The DEGREE is the power (exponent) of that highest order derivative, once the equation has been expressed as a polynomial in the derivatives (free of radicals and fractions in the derivatives). If no such polynomial form exists, the degree is not defined.\n\nExample 1: (d^2y/dx^2)^3 + (dy/dx)^2 + y = 0. The highest derivative is d^2y/dx^2 (order 2), raised to power 3. So order = 2, degree = 3.\n\nExample 2 (degree not defined): dy/dx = sin(dy/dx). The order is 1, but dy/dx appears inside the sine function, so the equation cannot be written as a polynomial in dy/dx. Hence the degree is not defined.",
+      "explanation": "Definitions plus two contrasting examples."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find the general solution of dy/dx = 2x, and then the particular solution passing through (1, 3). Also verify the particular solution by substitution.",
+      "answer": "Integrate: y = integral 2x dx = x^2 + C. This is the general solution (one arbitrary constant).\n\nParticular solution through (1, 3): put x = 1, y = 3: 3 = 1 + C, so C = 2. Hence y = x^2 + 2.\n\nVerification: y = x^2 + 2 gives dy/dx = 2x, which matches the differential equation, and at x = 1, y = 1 + 2 = 3, satisfying the given point. So the particular solution is correct.",
+      "explanation": "Integrate, apply point, verify by differentiating back."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Form the differential equation of the family y = A e^(2x) + B e^(-2x), where A and B are arbitrary constants.",
+      "answer": "There are two arbitrary constants, so differentiate twice.\n\n   y = A e^(2x) + B e^(-2x)\n   dy/dx = 2A e^(2x) - 2B e^(-2x)\n   d^2y/dx^2 = 4A e^(2x) + 4B e^(-2x) = 4(A e^(2x) + B e^(-2x)) = 4y.\n\nHence d^2y/dx^2 = 4y, i.e. d^2y/dx^2 - 4y = 0. This second order equation represents the family (order equals the number of arbitrary constants).",
+      "explanation": "Differentiate twice; y'' = 4y."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Solve the differential equation dy/dx = (1 + y^2)/(1 + x^2) and find the particular solution with y = 0 at x = 1.",
+      "answer": "Separate the variables: dy/(1 + y^2) = dx/(1 + x^2).\n\nIntegrate both sides: arctan y = arctan x + C (general solution).\n\nApply y = 0 at x = 1: arctan 0 = arctan 1 + C, so 0 = pi/4 + C, giving C = -pi/4.\n\nParticular solution: arctan y = arctan x - pi/4.",
+      "explanation": "Separable inverse tangents; C = -pi/4."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Solve the homogeneous differential equation (x^2 + y^2) dx - 2xy dy = 0.",
+      "answer": "Rewrite as dy/dx = (x^2 + y^2)/(2xy). Since M = x^2 + y^2 and N = 2xy are homogeneous of degree 2, the equation is homogeneous.\n\nPut y = vx, dy/dx = v + x dv/dx:\n\n   v + x dv/dx = (1 + v^2)/(2v).\n\n   x dv/dx = (1 + v^2)/(2v) - v = (1 + v^2 - 2v^2)/(2v) = (1 - v^2)/(2v).\n\nSeparate: [2v/(1 - v^2)] dv = dx/x.\n\nIntegrate: -ln|1 - v^2| = ln|x| + C1, so ln|1 - v^2| + ln|x| = -C1, i.e. x(1 - v^2) = C.\n\nReplace v = y/x: x(1 - y^2/x^2) = C => x - y^2/x = C, i.e. x^2 - y^2 = C x.",
+      "explanation": "Homogeneous; separate in v; solution x^2 - y^2 = Cx."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Solve the linear differential equation dy/dx + y/x = x^2 (x > 0), and find the particular solution with y = 0 at x = 1.",
+      "answer": "Standard form with P = 1/x, Q = x^2. Integrating factor IF = e^(integral (1/x) dx) = e^(ln x) = x.\n\nSolution: y . x = integral (x^2 . x) dx = integral x^3 dx = x^4/4 + C.\n\nDivide by x: y = x^3/4 + C/x (general solution).\n\nApply y = 0 at x = 1: 0 = 1/4 + C, so C = -1/4.\n\nParticular solution: y = x^3/4 - 1/(4x).",
+      "explanation": "IF = x; general then C = -1/4."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Solve the linear differential equation dy/dx + 2y = 6 and find the solution with y = 0 at x = 0.",
+      "answer": "Here P = 2, Q = 6. Integrating factor IF = e^(integral 2 dx) = e^(2x).\n\nSolution: y . e^(2x) = integral (6 . e^(2x)) dx = 6 . e^(2x)/2 + C = 3 e^(2x) + C.\n\nDivide by e^(2x): y = 3 + C e^(-2x) (general solution).\n\nApply y = 0 at x = 0: 0 = 3 + C, so C = -3.\n\nParticular solution: y = 3 - 3 e^(-2x) = 3(1 - e^(-2x)).",
+      "explanation": "IF = e^(2x); y = 3 + C e^(-2x); C = -3."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "The population of a colony grows at a rate proportional to its size: dP/dt = k P. If the population is P0 at t = 0 and doubles in time T, find P(t) and express k in terms of T.",
+      "answer": "Separate: dP/P = k dt. Integrate: ln P = k t + C. At t = 0, P = P0, so C = ln P0. Hence ln(P/P0) = k t, giving\n\n   P = P0 e^(k t).\n\nDoubling in time T means P = 2 P0 at t = T:\n\n   2 P0 = P0 e^(k T) => e^(k T) = 2 => k T = ln 2 => k = (ln 2)/T.\n\nSo P(t) = P0 e^(k t) with k = (ln 2)/T.",
+      "explanation": "Solve exponential; doubling gives k = (ln 2)/T."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe order of a differential equation is the order of its highest derivative, and the degree is the power of that highest order derivative once the equation is written free of radicals and fractions in the derivatives. Consider the equation (d^2y/dx^2)^2 + 3(dy/dx)^3 + y = 0.\n(a) State the order of the equation.\n(b) State its degree.\n(c) Is the equation linear? Give a reason.\n(d) Write one example of an equation whose degree is not defined.",
+      "answer": "(a) The highest derivative is d^2y/dx^2, so the order is 2.\n(b) The highest order derivative d^2y/dx^2 is raised to the power 2, so the degree is 2.\n(c) No. It is not linear because the derivatives appear to powers greater than one (squared and cubed); a linear equation has y and its derivatives only to the first power.\n(d) Example: dy/dx = sin(dy/dx), where the derivative appears inside a sine function, so the degree is not defined.",
+      "explanation": "Order 2, degree 2, nonlinear, plus an undefined-degree example."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTo find the degree of an equation containing radicals or fractional powers of derivatives, first remove them by raising to a suitable power, then read off the power of the highest order derivative. Consider d^2y/dx^2 = [1 + (dy/dx)^2]^(3/2).\n(a) What is the order of the equation?\n(b) Why can we not read the degree directly?\n(c) Remove the fractional power and write the resulting equation.\n(d) State the degree.",
+      "answer": "(a) The highest derivative is d^2y/dx^2, so the order is 2.\n(b) The right side has a fractional power (3/2), so the equation is not yet a polynomial in the derivatives; the degree is defined only in polynomial form.\n(c) Square both sides: (d^2y/dx^2)^2 = [1 + (dy/dx)^2]^3.\n(d) The highest order derivative now has power 2, so the degree is 2.",
+      "explanation": "Square to clear 3/2; order 2, degree 2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe general solution of a first order equation contains one arbitrary constant; a particular solution is obtained by using a given condition. Consider dy/dx = 3x^2.\n(a) Find the general solution.\n(b) How many arbitrary constants does it contain and why?\n(c) Find the particular solution with y = 5 when x = 1.\n(d) Verify your particular solution.",
+      "answer": "(a) Integrating, y = integral 3x^2 dx = x^3 + C.\n(b) It contains one arbitrary constant because the equation is first order (number of constants equals the order).\n(c) Apply y = 5 at x = 1: 5 = 1 + C, so C = 4, giving y = x^3 + 4.\n(d) For y = x^3 + 4, dy/dx = 3x^2 (matches the equation) and at x = 1, y = 1 + 4 = 5 (matches the condition). Hence it is correct.",
+      "explanation": "Integrate, one constant, C = 4, verify."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA family of curves with n arbitrary constants is represented by a differential equation of order n, obtained by differentiating n times and eliminating the constants. Consider the family y = mx (lines through the origin).\n(a) How many arbitrary constants are there?\n(b) Differentiate the relation.\n(c) Eliminate the constant to form the differential equation.\n(d) State the order of the resulting equation.",
+      "answer": "(a) There is one arbitrary constant, m.\n(b) Differentiating y = mx gives dy/dx = m.\n(c) From the family, m = y/x. Substituting, dy/dx = y/x, i.e. x dy/dx = y.\n(d) The resulting equation is of order 1 (one constant eliminated).",
+      "explanation": "One constant; x dy/dx = y; order 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nFor a family with two arbitrary constants, we differentiate twice and eliminate both constants. Consider the family y = A e^(2x) + B e^(-2x).\n(a) State the expected order of the differential equation.\n(b) Find dy/dx and d^2y/dx^2.\n(c) Form the differential equation.\n(d) Is the resulting equation linear?",
+      "answer": "(a) With two arbitrary constants, the expected order is 2.\n(b) dy/dx = 2A e^(2x) - 2B e^(-2x); d^2y/dx^2 = 4A e^(2x) + 4B e^(-2x).\n(c) Note d^2y/dx^2 = 4(A e^(2x) + B e^(-2x)) = 4y, so d^2y/dx^2 - 4y = 0.\n(d) Yes, it is linear: y and its derivatives appear only to the first power with no products.",
+      "explanation": "Order 2; y'' = 4y; linear."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA variable separable equation is one that can be written dy/dx = g(x) h(y); we separate to dy/h(y) = g(x) dx and integrate. Consider dy/dx = x y.\n(a) Separate the variables.\n(b) Integrate both sides.\n(c) Write the general solution for y.\n(d) Find the particular solution with y = 1 at x = 0.",
+      "answer": "(a) Separating: dy/y = x dx.\n(b) Integrating: ln|y| = x^2/2 + C.\n(c) Exponentiating, y = C1 e^(x^2/2), where C1 = e^C is an arbitrary constant.\n(d) At x = 0, y = 1: 1 = C1 e^0 = C1, so C1 = 1. Particular solution: y = e^(x^2/2).",
+      "explanation": "Separate, integrate, y = C1 e^(x^2/2), C1 = 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nSome equations become separable after algebraic rearrangement. Consider dy/dx = e^(x + y).\n(a) Rewrite the right side as a product.\n(b) Separate the variables.\n(c) Integrate both sides.\n(d) Write the general solution.",
+      "answer": "(a) e^(x + y) = e^x . e^y, so dy/dx = e^x e^y.\n(b) Divide by e^y: e^(-y) dy = e^x dx.\n(c) Integrate: -e^(-y) = e^x + C.\n(d) Rearranging, e^x + e^(-y) = C1 (writing C1 = -C), which is the general solution.",
+      "explanation": "Split exponent, separate, integrate to e^x + e^(-y) = C1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA homogeneous equation dy/dx = g(y/x) is solved by y = vx, giving dy/dx = v + x dv/dx, after which the variables separate. Consider dy/dx = (x + y)/x.\n(a) Show the equation is homogeneous.\n(b) Substitute y = vx and simplify.\n(c) Separate and integrate.\n(d) Write the general solution in terms of x and y.",
+      "answer": "(a) (x + y)/x = 1 + y/x, a function of y/x alone, so the equation is homogeneous.\n(b) Put y = vx, dy/dx = v + x dv/dx: v + x dv/dx = 1 + v, so x dv/dx = 1.\n(c) Separate: dv = dx/x; integrate: v = ln|x| + C.\n(d) Replace v = y/x: y/x = ln|x| + C, so y = x(ln|x| + C).",
+      "explanation": "Homogeneous; x dv/dx = 1; y = x(ln|x| + C)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA linear equation dy/dx + Py = Q is solved using IF = e^(integral P dx) and the solution y . IF = integral (Q . IF) dx + C. Consider dy/dx + y/x = x^2 for x > 0.\n(a) Identify P and Q.\n(b) Find the integrating factor.\n(c) Write and evaluate the solution integral.\n(d) State the general solution for y.",
+      "answer": "(a) P = 1/x and Q = x^2.\n(b) IF = e^(integral (1/x) dx) = e^(ln x) = x.\n(c) y . x = integral (x^2 . x) dx = integral x^3 dx = x^4/4 + C.\n(d) Dividing by x, y = x^3/4 + C/x.",
+      "explanation": "P=1/x, IF=x, y = x^3/4 + C/x."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DEQ-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nGrowth and decay obey dN/dt = k N, whose solution is N = N0 e^(k t), with N0 the amount at t = 0. A radioactive sample has decay equation dN/dt = -lambda N.\n(a) Solve dN/dt = -lambda N.\n(b) Does the amount increase or decrease with time? Why?\n(c) If the sample halves in time T, relate lambda and T.\n(d) Name one other phenomenon modelled by dN/dt = k N.",
+      "answer": "(a) Separating, dN/N = -lambda dt; integrating, ln N = -lambda t + C; using N = N0 at t = 0, N = N0 e^(-lambda t).\n(b) It decreases with time, because the exponent -lambda t is negative (lambda > 0), so e^(-lambda t) falls as t grows.\n(c) Halving: N0/2 = N0 e^(-lambda T), so e^(-lambda T) = 1/2, giving lambda T = ln 2, i.e. lambda = (ln 2)/T.\n(d) Examples: population growth, continuously compounded interest, or Newton's law of cooling (any one).",
+      "explanation": "N = N0 e^(-lambda t); decreasing; lambda = (ln 2)/T."
+    }
+  ]
+}

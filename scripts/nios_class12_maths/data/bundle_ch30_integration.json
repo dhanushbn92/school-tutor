@@ -1,0 +1,2257 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 30,
+    "chapter_title": "Integration",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 30 - INTEGRATION\n\nIntroduction\n\nDifferentiation answers the question: given a function, what is its rate of change? Integration answers the reverse question: given the rate of change (the derivative), what is the original function? For this reason integration is called the INVERSE operation of differentiation, and the result is called an ANTIDERIVATIVE or INDEFINITE INTEGRAL. Integration is one of the two central ideas of calculus. It lets us recover a function from its derivative, and it lets us add up (integrate) infinitely many small quantities to find areas, volumes, lengths and totals. This chapter builds the machinery of INDEFINITE integration: the meaning of the antiderivative and the constant of integration, a table of standard integrals, the algebraic properties of the integral, and the three great methods - substitution, integration by parts, and partial fractions - together with a set of special standard integrals and the integration of trigonometric functions. Worked examples run throughout.\n\n30.1 INTEGRATION AS THE INVERSE OF DIFFERENTIATION\n\nIf a function F(x) has derivative f(x), that is d/dx [F(x)] = f(x), then F(x) is called an ANTIDERIVATIVE (or primitive, or integral) of f(x). We write\n\n   integral f(x) dx = F(x) + C\n\nHere the symbol integral is the integral sign, f(x) is the INTEGRAND, dx shows that x is the variable of integration, and C is an arbitrary constant called the CONSTANT OF INTEGRATION. For example, since d/dx (x^2) = 2x, an antiderivative of 2x is x^2, so integral 2x dx = x^2 + C. Because d/dx (x^2 + 5) = 2x as well, and indeed d/dx (x^2 + C) = 2x for ANY constant C, the antiderivative is never unique: any two antiderivatives of the same function differ only by a constant. That is why we always add + C to an indefinite integral. Geometrically, integral f(x) dx represents a whole FAMILY of curves y = F(x) + C, one for each value of C, all having the same slope f(x) at every value of x - a family of parallel curves.\n\nThe indefinite integral is INDEFINITE precisely because of this unknown constant. (A DEFINITE integral, with limits, produces a definite number and the constant cancels.) To check any integration result, simply differentiate the answer: if you get back the integrand, the integration is correct.\n\n30.2 STANDARD INTEGRALS\n\nBy reversing the standard derivatives we obtain a table of standard integrals. The most important are:\n\n   integral x^n dx = x^(n+1)/(n+1) + C,   provided n is not equal to -1\n   integral (1/x) dx = log |x| + C\n   integral e^x dx = e^x + C\n   integral a^x dx = a^x / log a + C   (a > 0, a not equal to 1)\n   integral sin x dx = - cos x + C\n   integral cos x dx = sin x + C\n   integral sec^2 x dx = tan x + C\n   integral cosec^2 x dx = - cot x + C\n   integral sec x tan x dx = sec x + C\n   integral cosec x cot x dx = - cosec x + C\n   integral (1/sqrt(1 - x^2)) dx = sin^-1 x + C\n   integral (1/(1 + x^2)) dx = tan^-1 x + C\n\nThe power rule integral x^n dx = x^(n+1)/(n+1) + C is the workhorse. It fails only for n = -1 (division by zero); that single case is covered separately by integral (1/x) dx = log |x| + C. As a first worked example, integral x^3 dx = x^4/4 + C, and integral (1/x^2) dx = integral x^-2 dx = x^-1/(-1) + C = -1/x + C. Also integral sqrt(x) dx = integral x^(1/2) dx = x^(3/2)/(3/2) + C = (2/3) x^(3/2) + C, and integral 1 dx = x + C.\n\n30.3 PROPERTIES OF THE INDEFINITE INTEGRAL\n\nIntegration is linear. Two rules follow directly from the linearity of differentiation:\n\nProperty 1 (constant multiple): integral k f(x) dx = k integral f(x) dx, where k is a constant. A constant factor may be taken outside the integral sign.\n\nProperty 2 (sum and difference): integral [f(x) + g(x)] dx = integral f(x) dx + integral g(x) dx, and likewise for a difference. The integral of a sum is the sum of the integrals.\n\nThese let us integrate any polynomial term by term. For instance,\n\n   integral (3x^2 + 4x - 5) dx = 3 (x^3/3) + 4 (x^2/2) - 5x + C = x^3 + 2x^2 - 5x + C.\n\nNote that we write only ONE constant C for the whole expression. Also note that, unlike differentiation, there is NO simple product rule or quotient rule for integration - the integral of a product is NOT the product of the integrals. Products and quotients are handled by the special methods that follow.\n\n30.4 INTEGRATION BY SUBSTITUTION (CHANGE OF VARIABLE)\n\nMany integrals become standard once we change the variable. In the method of SUBSTITUTION we replace part of the integrand by a new variable t so that the integral turns into a standard form. If we put x = g(t), then dx = g'(t) dt, and\n\n   integral f(x) dx = integral f(g(t)) g'(t) dt.\n\nThe key idea: choose the substitution so that its derivative already appears (up to a constant) in the integrand. A very useful special case is\n\n   integral [f'(x) / f(x)] dx = log |f(x)| + C,\n\nbecause putting t = f(x) gives dt = f'(x) dx, and the integral becomes integral dt/t = log |t| + C.\n\nWorked example 1: integral (2x) / (x^2 + 1) dx. Put t = x^2 + 1, so dt = 2x dx. The integral becomes integral dt/t = log |t| + C = log (x^2 + 1) + C.\n\nWorked example 2: integral cos(3x) dx. Put t = 3x, dt = 3 dx, so dx = dt/3. Then integral cos t (dt/3) = (1/3) sin t + C = (1/3) sin 3x + C. In general integral cos(ax + b) dx = (1/a) sin(ax + b) + C.\n\nWorked example 3: integral sin^4 x cos x dx. Put t = sin x, dt = cos x dx. Then integral t^4 dt = t^5/5 + C = (sin^5 x)/5 + C.\n\nWorked example 4: integral tan x dx = integral (sin x / cos x) dx. Put t = cos x, dt = - sin x dx, so integral (-dt/t) = - log |t| + C = - log |cos x| + C = log |sec x| + C. Similarly integral cot x dx = log |sin x| + C.\n\n30.5 INTEGRATION BY PARTS\n\nWhen the integrand is a PRODUCT of two functions of different types, we use INTEGRATION BY PARTS, which comes from reversing the product rule of differentiation. The formula is\n\n   integral u dv = u v - integral v du,\n\nor, writing u = u(x) and dv = v'(x) dx,\n\n   integral u v' dx = u v - integral v u' dx.\n\nThe art lies in choosing which factor is u (to be differentiated) and which is dv (to be integrated). A helpful guide is the ILATE rule: choose u as the function that comes FIRST in the order\n\n   I - Inverse trigonometric\n   L - Logarithmic\n   A - Algebraic (powers of x)\n   T - Trigonometric\n   E - Exponential\n\nWhatever remains, together with dx, is dv.\n\nWorked example 1: integral x e^x dx. Take u = x (Algebraic, before Exponential) and dv = e^x dx, so du = dx and v = e^x. Then integral x e^x dx = x e^x - integral e^x dx = x e^x - e^x + C = e^x (x - 1) + C.\n\nWorked example 2: integral x cos x dx. Take u = x, dv = cos x dx, so du = dx, v = sin x. Then integral x cos x dx = x sin x - integral sin x dx = x sin x + cos x + C.\n\nWorked example 3: integral log x dx. Write it as integral (log x)(1) dx with u = log x (Logarithmic) and dv = dx, so du = (1/x) dx, v = x. Then integral log x dx = x log x - integral x (1/x) dx = x log x - integral 1 dx = x log x - x + C.\n\nA useful standard result that follows from integration by parts is\n\n   integral e^x [f(x) + f'(x)] dx = e^x f(x) + C.\n\n30.6 INTEGRATION BY PARTIAL FRACTIONS\n\nTo integrate a RATIONAL function P(x)/Q(x) (a ratio of polynomials) where the degree of the numerator is less than the degree of the denominator, we first split the fraction into a sum of simpler PARTIAL FRACTIONS, and then integrate each piece. (If the numerator's degree is not smaller, divide first.) The form of the partial fractions depends on the factors of the denominator:\n\n   px + q / [(x - a)(x - b)]  =  A/(x - a) + B/(x - b)     (distinct linear factors)\n   px + q / (x - a)^2         =  A/(x - a) + B/(x - a)^2    (repeated linear factor)\n   and an irreducible quadratic factor (x^2 + bx + c) contributes a term (Ax + B)/(x^2 + bx + c).\n\nWorked example: integral dx / (x^2 - 1) = integral dx / [(x - 1)(x + 1)]. Write\n\n   1 / [(x - 1)(x + 1)] = A/(x - 1) + B/(x + 1).\n\nMultiplying out: 1 = A(x + 1) + B(x - 1). Putting x = 1 gives 1 = 2A, so A = 1/2. Putting x = -1 gives 1 = -2B, so B = -1/2. Hence\n\n   integral dx/(x^2 - 1) = (1/2) integral dx/(x - 1) - (1/2) integral dx/(x + 1)\n        = (1/2) log |x - 1| - (1/2) log |x + 1| + C = (1/2) log |(x - 1)/(x + 1)| + C.\n\nThis is the general pattern: resolve, then integrate each simple fraction using integral dx/(x - a) = log |x - a| + C.\n\n30.7 SPECIAL INTEGRALS (STANDARD RESULTS)\n\nCertain integrals involving quadratics occur so often that their results are memorised as standard formulae:\n\n   integral dx / (x^2 + a^2) = (1/a) tan^-1 (x/a) + C\n   integral dx / (x^2 - a^2) = (1/2a) log |(x - a)/(x + a)| + C\n   integral dx / (a^2 - x^2) = (1/2a) log |(a + x)/(a - x)| + C\n   integral dx / sqrt(x^2 + a^2) = log |x + sqrt(x^2 + a^2)| + C\n   integral dx / sqrt(x^2 - a^2) = log |x + sqrt(x^2 - a^2)| + C\n   integral dx / sqrt(a^2 - x^2) = sin^-1 (x/a) + C\n\nWorked example 1: integral dx/(x^2 + 9). Here a^2 = 9, so a = 3, and the integral is (1/3) tan^-1 (x/3) + C.\n\nWorked example 2: integral dx/sqrt(4 - x^2). Here a^2 = 4, a = 2, giving sin^-1 (x/2) + C.\n\nTo use these forms when the quadratic is not already a pure sum of squares, we COMPLETE THE SQUARE. For example x^2 + 4x + 13 = (x + 2)^2 + 9, so integral dx/(x^2 + 4x + 13) = integral dx/[(x + 2)^2 + 3^2] = (1/3) tan^-1 [(x + 2)/3] + C.\n\n30.8 INTEGRATION OF TRIGONOMETRIC FUNCTIONS\n\nTrigonometric integrands are handled using identities that turn products and powers into sums, which are then integrated term by term.\n\n(a) Powers of sin and cos using half-angle identities:\n   sin^2 x = (1 - cos 2x)/2,   cos^2 x = (1 + cos 2x)/2.\nSo integral sin^2 x dx = integral (1 - cos 2x)/2 dx = (1/2)[x - (sin 2x)/2] + C = x/2 - (sin 2x)/4 + C. Similarly integral cos^2 x dx = x/2 + (sin 2x)/4 + C.\n\n(b) Products of sines and cosines using product-to-sum identities, for example\n   2 sin A cos B = sin(A + B) + sin(A - B).\nSo integral 2 sin 3x cos x dx = integral [sin 4x + sin 2x] dx = - (cos 4x)/4 - (cos 2x)/2 + C.\n\n(c) Odd powers by substitution: for integral sin^3 x dx write sin^3 x = sin x (1 - cos^2 x); put t = cos x to get integral -(1 - t^2) dt = - t + t^3/3 + C = - cos x + (cos^3 x)/3 + C.\n\nThese techniques, combined with the standard integrals and the three methods, let us integrate a very wide range of functions. The single most valuable habit is to VERIFY every answer by differentiating it: the derivative of a correct indefinite integral is exactly the original integrand.\n\nSUMMARY\n\n- Integration is the inverse of differentiation. If d/dx F(x) = f(x) then integral f(x) dx = F(x) + C, where C is the arbitrary constant of integration; antiderivatives of a function differ only by a constant, giving a family of parallel curves.\n- Standard integrals: integral x^n dx = x^(n+1)/(n+1) + C (n not -1); integral (1/x) dx = log |x| + C; integral e^x dx = e^x + C; integral a^x dx = a^x/log a + C; integral sin x dx = - cos x + C; integral cos x dx = sin x + C; integral sec^2 x dx = tan x + C.\n- Properties: integral k f dx = k integral f dx and integral (f +/- g) dx = integral f dx +/- integral g dx; there is no product or quotient rule for integration.\n- Substitution: put t = g(x) so that dt appears in the integrand; special case integral f'(x)/f(x) dx = log |f(x)| + C.\n- Integration by parts: integral u dv = uv - integral v du, choosing u by the ILATE order (Inverse trig, Log, Algebraic, Trig, Exponential); e.g. integral log x dx = x log x - x + C.\n- Partial fractions: split a proper rational function into simple fractions over its linear/quadratic factors, then integrate each using integral dx/(x - a) = log |x - a| + C.\n- Special integrals: integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C; integral dx/(x^2 - a^2) = (1/2a) log |(x - a)/(x + a)| + C; integral dx/sqrt(a^2 - x^2) = sin^-1(x/a) + C; integral dx/sqrt(x^2 + a^2) = log |x + sqrt(x^2 + a^2)| + C; complete the square first when needed.\n- Trigonometric integrals: use half-angle and product-to-sum identities and substitution to reduce powers and products; always check a result by differentiating it.\n",
+  "topics": [
+    {
+      "name": "Integration as Antiderivative",
+      "description": "Integration as the inverse of differentiation; the antiderivative F(x) with d/dx F(x) = f(x); the indefinite integral integral f(x) dx = F(x) + C and the arbitrary constant of integration; the family of curves interpretation and checking by differentiation."
+    },
+    {
+      "name": "Standard Integrals and Properties",
+      "description": "The table of standard integrals (x^n, 1/x, e^x, a^x, sin, cos, sec^2, etc.) obtained by reversing derivatives, and the linearity properties: constant multiple integral k f dx = k integral f dx and sum/difference integral (f +/- g) dx = integral f dx +/- integral g dx."
+    },
+    {
+      "name": "Integration by Substitution",
+      "description": "Change of variable: putting t = g(x) with dt = g'(x) dx to reduce an integral to a standard form; the special result integral f'(x)/f(x) dx = log |f(x)| + C; integrals of the form integral f(ax + b) dx."
+    },
+    {
+      "name": "Integration by Parts",
+      "description": "Integrating a product of functions using integral u dv = uv - integral v du, derived from the product rule; choosing u by the ILATE order; standard results such as integral log x dx = x log x - x + C and integral e^x[f + f'] dx = e^x f + C."
+    },
+    {
+      "name": "Integration by Partial Fractions",
+      "description": "Integrating a proper rational function P(x)/Q(x) by resolving it into partial fractions over distinct linear, repeated linear and irreducible quadratic factors, then integrating each simple fraction using integral dx/(x - a) = log |x - a| + C."
+    },
+    {
+      "name": "Special Integrals and Trigonometric Integration",
+      "description": "Standard results for integrals of the form 1/(x^2 + a^2), 1/(x^2 - a^2), 1/sqrt(x^2 +/- a^2), 1/sqrt(a^2 - x^2); completing the square; and integrating trigonometric functions using half-angle and product-to-sum identities and substitution."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-INT-01",
+      "topic_name": "Integration as Antiderivative",
+      "bloom": "understand",
+      "description": "Explain integration as the inverse of differentiation, define the antiderivative and indefinite integral integral f(x) dx = F(x) + C, and describe the role of the arbitrary constant of integration and the family of curves."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-02",
+      "topic_name": "Standard Integrals and Properties",
+      "bloom": "remember",
+      "description": "Recall the standard integrals of x^n, 1/x, e^x, a^x, sin x, cos x, sec^2 x and related functions obtained by reversing the standard derivatives."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-03",
+      "topic_name": "Standard Integrals and Properties",
+      "bloom": "apply",
+      "description": "Apply the linearity properties integral k f dx = k integral f dx and integral (f +/- g) dx = integral f dx +/- integral g dx to integrate polynomials and sums of standard functions term by term."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-04",
+      "topic_name": "Integration by Substitution",
+      "bloom": "apply",
+      "description": "Use the method of substitution (change of variable) to reduce integrals to standard forms, including integral f'(x)/f(x) dx = log |f(x)| + C and integrals of f(ax + b)."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-05",
+      "topic_name": "Integration by Parts",
+      "bloom": "apply",
+      "description": "Apply integration by parts integral u dv = uv - integral v du with the ILATE rule to integrate products such as x e^x, x cos x and log x."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-06",
+      "topic_name": "Integration by Partial Fractions",
+      "bloom": "apply",
+      "description": "Resolve a proper rational function into partial fractions and integrate each simple fraction to evaluate integrals of the form integral (px + q)/[(x - a)(x - b)] dx."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-07",
+      "topic_name": "Special Integrals and Trigonometric Integration",
+      "bloom": "apply",
+      "description": "Evaluate special integrals of the form 1/(x^2 + a^2), 1/sqrt(x^2 + a^2), 1/sqrt(a^2 - x^2) using standard results and completing the square, and integrate trigonometric functions using identities."
+    },
+    {
+      "code": "12-NIOS-MAT-INT-08",
+      "topic_name": "Special Integrals and Trigonometric Integration",
+      "bloom": "analyze",
+      "description": "Analyse a given integrand to select and combine the appropriate method (substitution, parts, partial fractions, standard results, trigonometric identity) and verify the result by differentiation."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Integration - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Integration lesson. It develops integration as the inverse of differentiation, the indefinite integral and the constant of integration, the table of standard integrals and the linearity properties, and the three main methods - substitution, integration by parts and partial fractions - along with special integrals of quadratic forms and the integration of trigonometric functions.",
+    "overview_diagram": {
+      "title": "Integration",
+      "central_term": "Integration (Indefinite Integral)",
+      "branches": [
+        {
+          "label": "Antiderivative",
+          "details": [
+            "Inverse of differentiation",
+            "integral f(x) dx = F(x) + C",
+            "C = constant of integration",
+            "Family of parallel curves"
+          ]
+        },
+        {
+          "label": "Standard integrals & properties",
+          "details": [
+            "integral x^n dx = x^(n+1)/(n+1) + C (n not -1)",
+            "integral (1/x) dx = log |x| + C; integral e^x dx = e^x + C",
+            "Linearity: integral k f = k integral f; integral (f +/- g)"
+          ]
+        },
+        {
+          "label": "Substitution & Parts",
+          "details": [
+            "Substitution: t = g(x), dt = g'(x) dx",
+            "integral f'(x)/f(x) dx = log |f(x)| + C",
+            "Parts: integral u dv = uv - integral v du (ILATE)"
+          ]
+        },
+        {
+          "label": "Partial fractions",
+          "details": [
+            "Split proper P(x)/Q(x) into simple fractions",
+            "Distinct/repeated linear and quadratic factors",
+            "integral dx/(x - a) = log |x - a| + C"
+          ]
+        },
+        {
+          "label": "Special & trig integrals",
+          "details": [
+            "integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C",
+            "integral dx/sqrt(a^2 - x^2) = sin^-1(x/a) + C",
+            "Complete the square; half-angle identities"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Integration as the inverse of differentiation",
+        "bullets": [
+          "If d/dx F(x) = f(x), then F(x) is an antiderivative and integral f(x) dx = F(x) + C.",
+          "Any two antiderivatives of the same function differ by a constant, so we always add the constant of integration C.",
+          "The indefinite integral represents a family of parallel curves y = F(x) + C with the same slope f(x) at each x.",
+          "Every integration can be checked by differentiating the answer to recover the integrand."
+        ]
+      },
+      {
+        "heading": "Standard integrals and properties",
+        "bullets": [
+          "integral x^n dx = x^(n+1)/(n+1) + C for n not equal to -1; the single exception integral (1/x) dx = log |x| + C.",
+          "integral e^x dx = e^x + C, integral a^x dx = a^x/log a + C, integral sin x dx = - cos x + C, integral cos x dx = sin x + C, integral sec^2 x dx = tan x + C.",
+          "Constant multiple rule: integral k f(x) dx = k integral f(x) dx.",
+          "Sum/difference rule: integral [f(x) +/- g(x)] dx = integral f(x) dx +/- integral g(x) dx; there is no product or quotient rule."
+        ]
+      },
+      {
+        "heading": "Substitution and integration by parts",
+        "bullets": [
+          "Substitution puts t = g(x) with dt = g'(x) dx to turn the integral into a standard form.",
+          "Special case: integral f'(x)/f(x) dx = log |f(x)| + C; and integral f(ax + b) dx uses t = ax + b.",
+          "Integration by parts: integral u dv = uv - integral v du, choosing u by the ILATE order (Inverse trig, Log, Algebraic, Trig, Exponential).",
+          "Examples: integral x e^x dx = e^x(x - 1) + C and integral log x dx = x log x - x + C."
+        ]
+      },
+      {
+        "heading": "Partial fractions",
+        "bullets": [
+          "Used for a proper rational function P(x)/Q(x) with deg P < deg Q (otherwise divide first).",
+          "Distinct linear factors give terms A/(x - a) + B/(x - b); a repeated factor gives A/(x - a) + B/(x - a)^2.",
+          "An irreducible quadratic factor contributes (Ax + B)/(x^2 + bx + c).",
+          "Each simple fraction is integrated using integral dx/(x - a) = log |x - a| + C; e.g. integral dx/(x^2 - 1) = (1/2) log |(x - 1)/(x + 1)| + C."
+        ]
+      },
+      {
+        "heading": "Special integrals and trigonometric integration",
+        "bullets": [
+          "integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C and integral dx/(x^2 - a^2) = (1/2a) log |(x - a)/(x + a)| + C.",
+          "integral dx/sqrt(a^2 - x^2) = sin^-1(x/a) + C and integral dx/sqrt(x^2 + a^2) = log |x + sqrt(x^2 + a^2)| + C.",
+          "Complete the square to bring a general quadratic to the form (x + p)^2 +/- k^2 before applying these results.",
+          "Trigonometric powers and products are integrated using sin^2 x = (1 - cos 2x)/2, cos^2 x = (1 + cos 2x)/2 and product-to-sum identities."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "Integration is the inverse of differentiation: integral f(x) dx = F(x) + C, and the constant C makes the antiderivative a family of parallel curves.",
+      "The power rule integral x^n dx = x^(n+1)/(n+1) + C holds for every n except n = -1, where integral (1/x) dx = log |x| + C.",
+      "Integration is linear: constants come out and sums split, but there is no product or quotient rule.",
+      "Substitution turns an integral into a standard form; a key case is integral f'(x)/f(x) dx = log |f(x)| + C.",
+      "Integration by parts integral u dv = uv - integral v du handles products; choose u by the ILATE order.",
+      "A proper rational function is integrated by resolving it into partial fractions and integrating each simple piece.",
+      "Special quadratic integrals such as integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C are applied after completing the square; always verify by differentiating."
+    ],
+    "glossary": [
+      {
+        "term": "Integration",
+        "definition": "The inverse operation of differentiation, which recovers a function from its derivative."
+      },
+      {
+        "term": "Antiderivative (primitive)",
+        "definition": "A function F(x) whose derivative is the given function f(x), so that d/dx F(x) = f(x)."
+      },
+      {
+        "term": "Indefinite integral",
+        "definition": "The general antiderivative integral f(x) dx = F(x) + C, including the arbitrary constant of integration."
+      },
+      {
+        "term": "Integrand",
+        "definition": "The function f(x) that is being integrated, appearing between the integral sign and dx."
+      },
+      {
+        "term": "Constant of integration (C)",
+        "definition": "The arbitrary constant added to an indefinite integral because antiderivatives are unique only up to a constant."
+      },
+      {
+        "term": "Standard integral",
+        "definition": "A basic integration result obtained by reversing a standard derivative, e.g. integral x^n dx = x^(n+1)/(n+1) + C."
+      },
+      {
+        "term": "Power rule for integration",
+        "definition": "integral x^n dx = x^(n+1)/(n+1) + C, valid for every n except n = -1."
+      },
+      {
+        "term": "Linearity of integration",
+        "definition": "The rules integral k f dx = k integral f dx and integral (f +/- g) dx = integral f dx +/- integral g dx."
+      },
+      {
+        "term": "Substitution",
+        "definition": "A method that changes the variable to t = g(x), with dt = g'(x) dx, to reduce an integral to a standard form."
+      },
+      {
+        "term": "Integration by parts",
+        "definition": "The rule integral u dv = uv - integral v du, used to integrate a product of two functions."
+      },
+      {
+        "term": "ILATE rule",
+        "definition": "A guide for choosing u in integration by parts: Inverse trig, Logarithmic, Algebraic, Trigonometric, Exponential."
+      },
+      {
+        "term": "Partial fractions",
+        "definition": "The decomposition of a proper rational function into a sum of simpler fractions over the factors of its denominator."
+      },
+      {
+        "term": "Special integral",
+        "definition": "A memorised standard result for a quadratic form, e.g. integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C."
+      },
+      {
+        "term": "Completing the square",
+        "definition": "Rewriting a quadratic ax^2 + bx + c as a perfect square plus a constant to apply a special integral."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Integration (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for each integration and remember to add the constant of integration C to every indefinite integral. Verify your answers by differentiation where possible.",
+    "total_marks": 34,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Define an antiderivative and explain, with the example integral 2x dx, why an arbitrary constant of integration must be added.",
+        "answer": "A function F(x) is an antiderivative of f(x) if d/dx F(x) = f(x). The indefinite integral integral f(x) dx = F(x) + C is the general antiderivative.\n\nFor f(x) = 2x: since d/dx (x^2) = 2x, one antiderivative is x^2. But d/dx (x^2 + C) = 2x for ANY constant C, so x^2 + 1, x^2 - 7 and so on are all antiderivatives of 2x. Any two antiderivatives differ only by a constant, so we write\n\n   integral 2x dx = x^2 + C.\n\nThe + C represents this whole family of curves; without it the answer would be incomplete.",
+        "explanation": "Definition + why C is needed (antiderivatives differ by a constant).",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-INT-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral (3x^2 + 4x - 5 + 1/x) dx.",
+        "answer": "Integrate term by term using linearity and the power rule:\n\n   integral 3x^2 dx = 3 (x^3/3) = x^3\n   integral 4x dx = 4 (x^2/2) = 2x^2\n   integral (-5) dx = -5x\n   integral (1/x) dx = log |x|\n\nAdding, integral (3x^2 + 4x - 5 + 1/x) dx = x^3 + 2x^2 - 5x + log |x| + C.",
+        "explanation": "Term-by-term power rule plus integral(1/x) = log|x|.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral 2x sqrt(x^2 + 1) dx by substitution.",
+        "answer": "Put t = x^2 + 1, so dt = 2x dx. The integral becomes\n\n   integral sqrt(t) dt = integral t^(1/2) dt = t^(3/2)/(3/2) + C = (2/3) t^(3/2) + C.\n\nReplacing t = x^2 + 1:\n\n   integral 2x sqrt(x^2 + 1) dx = (2/3) (x^2 + 1)^(3/2) + C.",
+        "explanation": "Substitution t = x^2 + 1 gives dt = 2x dx.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral tan x dx.",
+        "answer": "Write tan x = sin x / cos x. Put t = cos x, so dt = - sin x dx, i.e. sin x dx = - dt. Then\n\n   integral (sin x / cos x) dx = integral (-dt)/t = - log |t| + C = - log |cos x| + C.\n\nSince - log |cos x| = log |sec x|, we may also write integral tan x dx = log |sec x| + C.",
+        "explanation": "Substitution t = cos x; form integral f'/f.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Using integration by parts, evaluate integral x e^x dx and integral log x dx. State the ILATE rule you used.",
+        "answer": "ILATE rule: when integrating a product, choose u as the function that appears first in the order Inverse trig, Logarithmic, Algebraic, Trigonometric, Exponential.\n\n(i) integral x e^x dx: x is Algebraic, e^x is Exponential, so take u = x and dv = e^x dx. Then du = dx, v = e^x.\n   integral x e^x dx = u v - integral v du = x e^x - integral e^x dx = x e^x - e^x + C = e^x (x - 1) + C.\n\n(ii) integral log x dx: write it as integral (log x)(1) dx. Log is chosen as u, and dv = dx. Then du = (1/x) dx, v = x.\n   integral log x dx = x log x - integral x (1/x) dx = x log x - integral 1 dx = x log x - x + C.",
+        "explanation": "Parts with ILATE: u = x then u = log x.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-05"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Evaluate integral dx/(x^2 - 1) by the method of partial fractions, showing all steps.",
+        "answer": "Factor the denominator: x^2 - 1 = (x - 1)(x + 1). Write\n\n   1 / [(x - 1)(x + 1)] = A/(x - 1) + B/(x + 1).\n\nMultiply both sides by (x - 1)(x + 1):\n\n   1 = A(x + 1) + B(x - 1).\n\nPut x = 1: 1 = A(2), so A = 1/2. Put x = -1: 1 = B(-2), so B = -1/2. Therefore\n\n   integral dx/(x^2 - 1) = (1/2) integral dx/(x - 1) - (1/2) integral dx/(x + 1)\n        = (1/2) log |x - 1| - (1/2) log |x + 1| + C\n        = (1/2) log |(x - 1)/(x + 1)| + C.",
+        "explanation": "Resolve into A/(x-1) + B/(x+1); integrate each log.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral dx/(x^2 + 9).",
+        "answer": "This matches the standard form integral dx/(x^2 + a^2) = (1/a) tan^-1 (x/a) + C. Here a^2 = 9, so a = 3. Therefore\n\n   integral dx/(x^2 + 9) = (1/3) tan^-1 (x/3) + C.",
+        "explanation": "Standard integral with a = 3.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral dx/(x^2 + 4x + 13) by completing the square.",
+        "answer": "Complete the square in the denominator: x^2 + 4x + 13 = (x + 2)^2 + 9 = (x + 2)^2 + 3^2.\n\nWith u = x + 2 (du = dx) and a = 3 this is the standard form integral du/(u^2 + a^2) = (1/a) tan^-1(u/a) + C:\n\n   integral dx/(x^2 + 4x + 13) = (1/3) tan^-1 [(x + 2)/3] + C.",
+        "explanation": "Complete the square then apply 1/(u^2 + a^2).",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral sin^2 x dx.",
+        "answer": "Use the half-angle identity sin^2 x = (1 - cos 2x)/2:\n\n   integral sin^2 x dx = integral (1 - cos 2x)/2 dx = (1/2) integral 1 dx - (1/2) integral cos 2x dx\n        = (1/2) x - (1/2)(sin 2x / 2) + C = x/2 - (sin 2x)/4 + C.",
+        "explanation": "Half-angle identity then integrate term by term.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INT-07"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Evaluate integral (2x + 3)/(x^2 + 3x + 5) dx and explain which method you used and why.",
+        "answer": "Notice that the derivative of the denominator is d/dx (x^2 + 3x + 5) = 2x + 3, which is exactly the numerator. So the integrand has the form f'(x)/f(x), and we use the substitution t = f(x).\n\nPut t = x^2 + 3x + 5, so dt = (2x + 3) dx. Then\n\n   integral (2x + 3)/(x^2 + 3x + 5) dx = integral dt/t = log |t| + C = log |x^2 + 3x + 5| + C.\n\nMethod: substitution using the special case integral f'(x)/f(x) dx = log |f(x)| + C, chosen because the numerator is the exact derivative of the denominator.",
+        "explanation": "Recognise f'/f form; substitution gives log of denominator.",
+        "marks": 4,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-INT-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Integration is the inverse operation of",
+      "options": [
+        "addition",
+        "differentiation",
+        "multiplication",
+        "substitution"
+      ],
+      "answer": "differentiation",
+      "explanation": "Integration recovers a function from its derivative."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If d/dx F(x) = f(x), then F(x) is called a/an ____ of f(x)",
+      "options": [
+        "derivative",
+        "antiderivative",
+        "limit",
+        "tangent"
+      ],
+      "answer": "antiderivative",
+      "explanation": "F is an antiderivative (primitive) of f."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In integral f(x) dx, the constant C added is called the",
+      "options": [
+        "coefficient",
+        "constant of integration",
+        "integrand",
+        "limit"
+      ],
+      "answer": "constant of integration",
+      "explanation": "C is the arbitrary constant of integration."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The function f(x) inside integral f(x) dx is called the",
+      "options": [
+        "integral",
+        "integrand",
+        "antiderivative",
+        "variable"
+      ],
+      "answer": "integrand",
+      "explanation": "The integrand is what is being integrated."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Two antiderivatives of the same function differ by",
+      "options": [
+        "a variable",
+        "a constant",
+        "a factor of x",
+        "nothing"
+      ],
+      "answer": "a constant",
+      "explanation": "Antiderivatives are unique only up to a constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The indefinite integral integral f(x) dx geometrically represents",
+      "options": [
+        "a single curve",
+        "a family of parallel curves",
+        "a straight line only",
+        "a point"
+      ],
+      "answer": "a family of parallel curves",
+      "explanation": "One curve for each value of C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To check whether integral f(x) dx = F(x) + C is correct, we",
+      "options": [
+        "integrate F(x)",
+        "differentiate F(x)",
+        "square F(x)",
+        "add C again"
+      ],
+      "answer": "differentiate F(x)",
+      "explanation": "The derivative of a correct integral is the integrand."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Since d/dx (sin x) = cos x, an antiderivative of cos x is",
+      "options": [
+        "- sin x",
+        "sin x",
+        "- cos x",
+        "tan x"
+      ],
+      "answer": "sin x",
+      "explanation": "integral cos x dx = sin x + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 0 dx equals",
+      "options": [
+        "0",
+        "C",
+        "x",
+        "1"
+      ],
+      "answer": "C",
+      "explanation": "The integral of zero is an arbitrary constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If F'(x) = 3x^2 and F(1) = 5, then F(x) equals",
+      "options": [
+        "x^3 + 4",
+        "x^3 + 5",
+        "3x^3 + 2",
+        "x^3 + 2"
+      ],
+      "answer": "x^3 + 4",
+      "explanation": "F(x) = x^3 + C; F(1) = 1 + C = 5 gives C = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral x^n dx equals (n not equal to -1)",
+      "options": [
+        "x^(n+1)/(n+1) + C",
+        "n x^(n-1) + C",
+        "x^n/n + C",
+        "x^(n-1)/(n-1) + C"
+      ],
+      "answer": "x^(n+1)/(n+1) + C",
+      "explanation": "Power rule for integration."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral (1/x) dx equals",
+      "options": [
+        "log |x| + C",
+        "-1/x^2 + C",
+        "x + C",
+        "1/x + C"
+      ],
+      "answer": "log |x| + C",
+      "explanation": "The n = -1 case of the power rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral e^x dx equals",
+      "options": [
+        "e^x + C",
+        "x e^x + C",
+        "e^x/x + C",
+        "log x + C"
+      ],
+      "answer": "e^x + C",
+      "explanation": "The exponential is its own integral."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral sin x dx equals",
+      "options": [
+        "cos x + C",
+        "- cos x + C",
+        "sin x + C",
+        "- sin x + C"
+      ],
+      "answer": "- cos x + C",
+      "explanation": "Reverse of d/dx(-cos x) = sin x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral cos x dx equals",
+      "options": [
+        "- sin x + C",
+        "sin x + C",
+        "cos x + C",
+        "- cos x + C"
+      ],
+      "answer": "sin x + C",
+      "explanation": "Reverse of d/dx(sin x) = cos x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral sec^2 x dx equals",
+      "options": [
+        "tan x + C",
+        "- cot x + C",
+        "sec x + C",
+        "cos x + C"
+      ],
+      "answer": "tan x + C",
+      "explanation": "Reverse of d/dx(tan x) = sec^2 x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral a^x dx equals (a > 0, a not 1)",
+      "options": [
+        "a^x / log a + C",
+        "a^x log a + C",
+        "x a^(x-1) + C",
+        "a^x + C"
+      ],
+      "answer": "a^x / log a + C",
+      "explanation": "Reverse of d/dx(a^x) = a^x log a."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral 1/(1 + x^2) dx equals",
+      "options": [
+        "tan^-1 x + C",
+        "sin^-1 x + C",
+        "log(1 + x^2) + C",
+        "cot^-1 x + C"
+      ],
+      "answer": "tan^-1 x + C",
+      "explanation": "Standard inverse-tangent integral."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral 1/sqrt(1 - x^2) dx equals",
+      "options": [
+        "sin^-1 x + C",
+        "cos^-1 x + C",
+        "tan^-1 x + C",
+        "sec^-1 x + C"
+      ],
+      "answer": "sin^-1 x + C",
+      "explanation": "Standard inverse-sine integral."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral 1 dx equals",
+      "options": [
+        "x + C",
+        "1 + C",
+        "0 + C",
+        "C only"
+      ],
+      "answer": "x + C",
+      "explanation": "integral x^0 dx = x + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral k f(x) dx (k constant) equals",
+      "options": [
+        "k integral f(x) dx",
+        "integral f(x) dx / k",
+        "k + integral f(x) dx",
+        "f(x)/k"
+      ],
+      "answer": "k integral f(x) dx",
+      "explanation": "Constant multiple rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "integral [f(x) + g(x)] dx equals",
+      "options": [
+        "integral f dx + integral g dx",
+        "integral f dx times integral g dx",
+        "integral (f g) dx",
+        "f + g + C"
+      ],
+      "answer": "integral f dx + integral g dx",
+      "explanation": "Sum rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For integration there is",
+      "options": [
+        "a product rule like differentiation",
+        "no simple product rule",
+        "a quotient rule like differentiation",
+        "a chain rule identical to differentiation"
+      ],
+      "answer": "no simple product rule",
+      "explanation": "Products need special methods (parts, etc.)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x^3 dx equals",
+      "options": [
+        "x^4/4 + C",
+        "3x^2 + C",
+        "x^4 + C",
+        "x^3/3 + C"
+      ],
+      "answer": "x^4/4 + C",
+      "explanation": "Power rule with n = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 5 dx equals",
+      "options": [
+        "5x + C",
+        "5 + C",
+        "x/5 + C",
+        "5x^2 + C"
+      ],
+      "answer": "5x + C",
+      "explanation": "Integral of a constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral (2x + 3) dx equals",
+      "options": [
+        "x^2 + 3x + C",
+        "2x^2 + 3x + C",
+        "x^2 + 3 + C",
+        "2 + C"
+      ],
+      "answer": "x^2 + 3x + C",
+      "explanation": "Term by term: x^2 + 3x + C."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 1/x^2 dx equals",
+      "options": [
+        "-1/x + C",
+        "1/x + C",
+        "log x^2 + C",
+        "-2/x^3 + C"
+      ],
+      "answer": "-1/x + C",
+      "explanation": "integral x^-2 dx = x^-1/(-1) = -1/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral sqrt(x) dx equals",
+      "options": [
+        "(2/3) x^(3/2) + C",
+        "(3/2) x^(1/2) + C",
+        "x^(3/2) + C",
+        "(1/2) x^(-1/2) + C"
+      ],
+      "answer": "(2/3) x^(3/2) + C",
+      "explanation": "integral x^(1/2) dx = x^(3/2)/(3/2)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral (x^2 + 1/x) dx equals",
+      "options": [
+        "x^3/3 + log |x| + C",
+        "x^3/3 + 1/x^2 + C",
+        "2x - 1/x^2 + C",
+        "x^3 + log x + C"
+      ],
+      "answer": "x^3/3 + log |x| + C",
+      "explanation": "Term by term with integral(1/x)=log|x|."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral (3e^x - 2 sin x) dx equals",
+      "options": [
+        "3e^x + 2 cos x + C",
+        "3e^x - 2 cos x + C",
+        "3e^x - 2 cos x",
+        "e^x + cos x + C"
+      ],
+      "answer": "3e^x + 2 cos x + C",
+      "explanation": "integral sin x = -cos x, so -2 sin gives +2 cos."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral (x + 1)^2 dx equals",
+      "options": [
+        "x^3/3 + x^2 + x + C",
+        "(x + 1)^3 + C",
+        "2(x + 1) + C",
+        "x^3 + x^2 + C"
+      ],
+      "answer": "x^3/3 + x^2 + x + C",
+      "explanation": "Expand (x+1)^2 = x^2 + 2x + 1 and integrate."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In substitution, if t = g(x) then dt equals",
+      "options": [
+        "g'(x) dx",
+        "g(x) dx",
+        "dx",
+        "g''(x) dx"
+      ],
+      "answer": "g'(x) dx",
+      "explanation": "Differential of t = g(x)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral f'(x)/f(x) dx equals",
+      "options": [
+        "log |f(x)| + C",
+        "f(x)^2/2 + C",
+        "1/f(x) + C",
+        "f'(x) + C"
+      ],
+      "answer": "log |f(x)| + C",
+      "explanation": "Put t = f(x); integral dt/t."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 2x/(x^2 + 1) dx equals",
+      "options": [
+        "log (x^2 + 1) + C",
+        "2 tan^-1 x + C",
+        "1/(x^2 + 1) + C",
+        "(x^2 + 1)^2 + C"
+      ],
+      "answer": "log (x^2 + 1) + C",
+      "explanation": "f'/f with f = x^2 + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral cos 3x dx equals",
+      "options": [
+        "(1/3) sin 3x + C",
+        "3 sin 3x + C",
+        "- (1/3) sin 3x + C",
+        "sin 3x + C"
+      ],
+      "answer": "(1/3) sin 3x + C",
+      "explanation": "integral cos(ax) = (1/a) sin(ax)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral e^(5x) dx equals",
+      "options": [
+        "(1/5) e^(5x) + C",
+        "5 e^(5x) + C",
+        "e^(5x) + C",
+        "e^(5x)/x + C"
+      ],
+      "answer": "(1/5) e^(5x) + C",
+      "explanation": "integral e^(ax) = (1/a) e^(ax)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral (2x + 1)^5 dx equals",
+      "options": [
+        "(2x + 1)^6/12 + C",
+        "(2x + 1)^6/6 + C",
+        "6(2x + 1)^5 + C",
+        "(2x + 1)^6 + C"
+      ],
+      "answer": "(2x + 1)^6/12 + C",
+      "explanation": "t = 2x+1, dt = 2 dx; (1/2)(t^6/6)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral sin^2 x cos x dx equals",
+      "options": [
+        "(sin^3 x)/3 + C",
+        "(cos^3 x)/3 + C",
+        "sin^3 x + C",
+        "- (cos^3 x)/3 + C"
+      ],
+      "answer": "(sin^3 x)/3 + C",
+      "explanation": "t = sin x, dt = cos x dx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral cot x dx equals",
+      "options": [
+        "log |sin x| + C",
+        "log |cos x| + C",
+        "- log |sin x| + C",
+        "tan x + C"
+      ],
+      "answer": "log |sin x| + C",
+      "explanation": "t = sin x, f'/f form."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 1/(x log x) dx equals",
+      "options": [
+        "log |log x| + C",
+        "(log x)^2/2 + C",
+        "1/log x + C",
+        "x log x + C"
+      ],
+      "answer": "log |log x| + C",
+      "explanation": "t = log x, dt = dx/x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral e^x/(1 + e^x) dx equals",
+      "options": [
+        "log (1 + e^x) + C",
+        "e^x/(1 + e^x)^2 + C",
+        "1/(1 + e^x) + C",
+        "e^x + C"
+      ],
+      "answer": "log (1 + e^x) + C",
+      "explanation": "f'/f with f = 1 + e^x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The formula for integration by parts is",
+      "options": [
+        "integral u dv = uv - integral v du",
+        "integral u dv = uv + integral v du",
+        "integral u dv = u/v - integral v du",
+        "integral u dv = uv du"
+      ],
+      "answer": "integral u dv = uv - integral v du",
+      "explanation": "Standard parts formula."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the ILATE rule, the L stands for",
+      "options": [
+        "Linear",
+        "Logarithmic",
+        "Limit",
+        "Length"
+      ],
+      "answer": "Logarithmic",
+      "explanation": "I-L-A-T-E: Inverse trig, Log, Algebraic, Trig, Exponential."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For integral x e^x dx, by ILATE we choose u as",
+      "options": [
+        "e^x",
+        "x",
+        "1",
+        "x e^x"
+      ],
+      "answer": "x",
+      "explanation": "Algebraic before Exponential."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x e^x dx equals",
+      "options": [
+        "e^x (x - 1) + C",
+        "e^x (x + 1) + C",
+        "x^2 e^x/2 + C",
+        "x e^x + C"
+      ],
+      "answer": "e^x (x - 1) + C",
+      "explanation": "Parts: x e^x - e^x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x cos x dx equals",
+      "options": [
+        "x sin x + cos x + C",
+        "x sin x - cos x + C",
+        "- x sin x + cos x + C",
+        "x cos x + sin x + C"
+      ],
+      "answer": "x sin x + cos x + C",
+      "explanation": "Parts: x sin x - integral sin x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral log x dx equals",
+      "options": [
+        "x log x - x + C",
+        "x log x + x + C",
+        "1/x + C",
+        "log x - x + C"
+      ],
+      "answer": "x log x - x + C",
+      "explanation": "Parts with u = log x, dv = dx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x sin x dx equals",
+      "options": [
+        "- x cos x + sin x + C",
+        "x cos x - sin x + C",
+        "- x cos x - sin x + C",
+        "x sin x + C"
+      ],
+      "answer": "- x cos x + sin x + C",
+      "explanation": "Parts: -x cos x + integral cos x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral e^x (sin x + cos x) dx equals",
+      "options": [
+        "e^x sin x + C",
+        "e^x cos x + C",
+        "e^x (sin x - cos x) + C",
+        "e^x + C"
+      ],
+      "answer": "e^x sin x + C",
+      "explanation": "Form integral e^x[f + f'] with f = sin x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x log x dx equals",
+      "options": [
+        "(x^2/2) log x - x^2/4 + C",
+        "(x^2/2) log x + x^2/4 + C",
+        "x^2 log x - x^2 + C",
+        "(x^2/2) log x - x^2/2 + C"
+      ],
+      "answer": "(x^2/2) log x - x^2/4 + C",
+      "explanation": "u = log x, dv = x dx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral e^x [f(x) + f'(x)] dx equals",
+      "options": [
+        "e^x f(x) + C",
+        "e^x f'(x) + C",
+        "f(x) + C",
+        "e^x [f(x) - f'(x)] + C"
+      ],
+      "answer": "e^x f(x) + C",
+      "explanation": "Standard parts result."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Partial fractions are used to integrate",
+      "options": [
+        "a rational function P(x)/Q(x)",
+        "any trigonometric function",
+        "exponential functions",
+        "a product of two functions"
+      ],
+      "answer": "a rational function P(x)/Q(x)",
+      "explanation": "Rational functions split into simple fractions."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For 1/[(x-1)(x+2)] the partial-fraction form is",
+      "options": [
+        "A/(x-1) + B/(x+2)",
+        "A/(x-1) - B",
+        "(A+B)/(x-1)",
+        "A/(x-1)(x+2)"
+      ],
+      "answer": "A/(x-1) + B/(x+2)",
+      "explanation": "Distinct linear factors."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A repeated factor (x - a)^2 in the denominator gives terms",
+      "options": [
+        "A/(x-a) + B/(x-a)^2",
+        "A/(x-a)^2 only",
+        "A(x-a) + B",
+        "A/(x-a) + B/(x+a)"
+      ],
+      "answer": "A/(x-a) + B/(x-a)^2",
+      "explanation": "Repeated linear factor form."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral dx/(x^2 - 1) equals",
+      "options": [
+        "(1/2) log |(x - 1)/(x + 1)| + C",
+        "log |x^2 - 1| + C",
+        "tan^-1 x + C",
+        "(1/2) log |(x + 1)/(x - 1)| + C"
+      ],
+      "answer": "(1/2) log |(x - 1)/(x + 1)| + C",
+      "explanation": "A = 1/2, B = -1/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "In 1/[(x-1)(x+1)] = A/(x-1) + B/(x+1), the value of A is",
+      "options": [
+        "1/2",
+        "-1/2",
+        "1",
+        "2"
+      ],
+      "answer": "1/2",
+      "explanation": "Put x = 1: 1 = 2A."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral dx/[x(x + 1)] equals",
+      "options": [
+        "log |x/(x + 1)| + C",
+        "log |x(x + 1)| + C",
+        "log |(x + 1)/x| + C",
+        "1/[x(x+1)] + C"
+      ],
+      "answer": "log |x/(x + 1)| + C",
+      "explanation": "1/[x(x+1)] = 1/x - 1/(x+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Before using partial fractions, if deg P >= deg Q we must first",
+      "options": [
+        "divide P by Q",
+        "multiply by Q",
+        "differentiate",
+        "substitute"
+      ],
+      "answer": "divide P by Q",
+      "explanation": "Reduce to a proper fraction first."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "1/[(x - 2)(x - 3)] resolves with the (x - 3) coefficient equal to",
+      "options": [
+        "1",
+        "-1",
+        "1/5",
+        "-1/5"
+      ],
+      "answer": "1",
+      "explanation": "Put x = 3: 1 = B(1), so B = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/(x^2 + a^2) equals",
+      "options": [
+        "(1/a) tan^-1 (x/a) + C",
+        "tan^-1 (x/a) + C",
+        "(1/a) log(x^2+a^2) + C",
+        "a tan^-1 x + C"
+      ],
+      "answer": "(1/a) tan^-1 (x/a) + C",
+      "explanation": "Standard result."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/sqrt(a^2 - x^2) equals",
+      "options": [
+        "sin^-1 (x/a) + C",
+        "cos^-1 (x/a) + C",
+        "(1/a) sin^-1 x + C",
+        "tan^-1 (x/a) + C"
+      ],
+      "answer": "sin^-1 (x/a) + C",
+      "explanation": "Standard inverse-sine form."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/sqrt(x^2 + a^2) equals",
+      "options": [
+        "log |x + sqrt(x^2 + a^2)| + C",
+        "sin^-1(x/a) + C",
+        "(1/a) tan^-1(x/a) + C",
+        "sqrt(x^2 + a^2) + C"
+      ],
+      "answer": "log |x + sqrt(x^2 + a^2)| + C",
+      "explanation": "Standard result."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/(x^2 - a^2) equals",
+      "options": [
+        "(1/2a) log |(x - a)/(x + a)| + C",
+        "(1/a) tan^-1(x/a) + C",
+        "(1/2a) log |(x + a)/(x - a)| + C",
+        "log |x^2 - a^2| + C"
+      ],
+      "answer": "(1/2a) log |(x - a)/(x + a)| + C",
+      "explanation": "Standard result."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral dx/(x^2 + 9) equals",
+      "options": [
+        "(1/3) tan^-1 (x/3) + C",
+        "tan^-1 (x/3) + C",
+        "(1/9) tan^-1 x + C",
+        "3 tan^-1 (x/3) + C"
+      ],
+      "answer": "(1/3) tan^-1 (x/3) + C",
+      "explanation": "a = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral dx/sqrt(4 - x^2) equals",
+      "options": [
+        "sin^-1 (x/2) + C",
+        "sin^-1 (x/4) + C",
+        "(1/2) sin^-1 x + C",
+        "tan^-1 (x/2) + C"
+      ],
+      "answer": "sin^-1 (x/2) + C",
+      "explanation": "a = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "To integrate 1/(x^2 + 4x + 13) we first write the denominator as",
+      "options": [
+        "(x + 2)^2 + 9",
+        "(x + 2)^2 - 9",
+        "(x + 4)^2 + 13",
+        "(x - 2)^2 + 9"
+      ],
+      "answer": "(x + 2)^2 + 9",
+      "explanation": "Complete the square."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "sin^2 x in terms of cos 2x is",
+      "options": [
+        "(1 - cos 2x)/2",
+        "(1 + cos 2x)/2",
+        "(1 - sin 2x)/2",
+        "cos 2x - 1"
+      ],
+      "answer": "(1 - cos 2x)/2",
+      "explanation": "Half-angle identity."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral sin^2 x dx equals",
+      "options": [
+        "x/2 - (sin 2x)/4 + C",
+        "x/2 + (sin 2x)/4 + C",
+        "(sin^3 x)/3 + C",
+        "- (cos 2x)/2 + C"
+      ],
+      "answer": "x/2 - (sin 2x)/4 + C",
+      "explanation": "Use sin^2 x = (1 - cos 2x)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral cos^2 x dx equals",
+      "options": [
+        "x/2 + (sin 2x)/4 + C",
+        "x/2 - (sin 2x)/4 + C",
+        "(cos^3 x)/3 + C",
+        "sin 2x/2 + C"
+      ],
+      "answer": "x/2 + (sin 2x)/4 + C",
+      "explanation": "Use cos^2 x = (1 + cos 2x)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral 2 sin 3x cos x dx equals",
+      "options": [
+        "- (cos 4x)/4 - (cos 2x)/2 + C",
+        "(cos 4x)/4 + (cos 2x)/2 + C",
+        "sin 4x + sin 2x + C",
+        "- (cos 4x)/4 + (cos 2x)/2 + C"
+      ],
+      "answer": "- (cos 4x)/4 - (cos 2x)/2 + C",
+      "explanation": "2 sin3x cos x = sin4x + sin2x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral tan^2 x dx equals",
+      "options": [
+        "tan x - x + C",
+        "sec^2 x + C",
+        "tan x + x + C",
+        "(tan^3 x)/3 + C"
+      ],
+      "answer": "tan x - x + C",
+      "explanation": "tan^2 x = sec^2 x - 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The integral integral (2x + 3)/(x^2 + 3x + 5) dx is best done by",
+      "options": [
+        "substitution t = x^2 + 3x + 5",
+        "integration by parts",
+        "partial fractions",
+        "the power rule"
+      ],
+      "answer": "substitution t = x^2 + 3x + 5",
+      "explanation": "Numerator is the derivative of the denominator (f'/f)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "integral x sin x dx is best evaluated by",
+      "options": [
+        "integration by parts",
+        "partial fractions",
+        "direct power rule",
+        "the f'/f rule"
+      ],
+      "answer": "integration by parts",
+      "explanation": "Product of algebraic and trig functions."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "integral dx/(x^2 - 6x + 13) is handled by",
+      "options": [
+        "completing the square to (x - 3)^2 + 4",
+        "partial fractions",
+        "integration by parts",
+        "the power rule"
+      ],
+      "answer": "completing the square to (x - 3)^2 + 4",
+      "explanation": "Irreducible quadratic; complete the square."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "integral 3x^2 (x^3 + 1)^4 dx is best done by",
+      "options": [
+        "substitution t = x^3 + 1",
+        "integration by parts",
+        "partial fractions",
+        "expanding fully"
+      ],
+      "answer": "substitution t = x^3 + 1",
+      "explanation": "dt = 3x^2 dx appears in the integrand."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Integration is the inverse process of differentiation.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "By definition."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The constant of integration can be omitted from an indefinite integral.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It must always be written for an indefinite integral."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral (1/x) dx = log |x| + C.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "The n = -1 case."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The power rule integral x^n dx = x^(n+1)/(n+1) + C is valid for n = -1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It fails for n = -1; use integral(1/x) = log|x|."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The integral of a product equals the product of the integrals.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "There is no product rule for integration."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A constant factor can be taken outside the integral sign.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "integral k f dx = k integral f dx."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral f'(x)/f(x) dx = log |f(x)| + C.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Substitution t = f(x)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the ILATE rule, exponential functions are chosen as u before algebraic ones.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Algebraic (A) comes before Exponential (E)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Partial fractions can only be applied when the numerator degree is less than the denominator degree.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Otherwise divide first to get a proper fraction."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/(x^2 + a^2) = (1/a) tan^-1 (x/a) + C.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Standard special integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If d/dx F(x) = f(x), then integral f(x) dx = ____ .",
+      "answer": "F(x) + C",
+      "explanation": "General antiderivative."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The arbitrary constant added to an indefinite integral is called the constant of ____ .",
+      "answer": "integration",
+      "explanation": "Constant of integration."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral x^n dx = ____ , for n not equal to -1.",
+      "answer": "x^(n+1)/(n+1) + C",
+      "explanation": "Power rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral e^x dx = ____ .",
+      "answer": "e^x + C",
+      "explanation": "Exponential integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral cos x dx = ____ .",
+      "answer": "sin x + C",
+      "explanation": "Standard integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral sin x dx = ____ .",
+      "answer": "- cos x + C",
+      "explanation": "Standard integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral sec^2 x dx = ____ .",
+      "answer": "tan x + C",
+      "explanation": "Standard integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral k f(x) dx = ____ integral f(x) dx.",
+      "answer": "k",
+      "explanation": "Constant multiple rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral x^3 dx = ____ .",
+      "answer": "x^4/4 + C",
+      "explanation": "Power rule n = 3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral f'(x)/f(x) dx = ____ .",
+      "answer": "log |f(x)| + C",
+      "explanation": "f'/f rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral cos(ax + b) dx = ____ .",
+      "answer": "(1/a) sin(ax + b) + C",
+      "explanation": "Linear substitution."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The integration-by-parts formula is integral u dv = ____ .",
+      "answer": "uv - integral v du",
+      "explanation": "Parts formula."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral log x dx = ____ .",
+      "answer": "x log x - x + C",
+      "explanation": "By parts."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral dx/(x - a) = ____ .",
+      "answer": "log |x - a| + C",
+      "explanation": "Basic log integral."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral dx/sqrt(a^2 - x^2) = ____ .",
+      "answer": "sin^-1 (x/a) + C",
+      "explanation": "Inverse-sine special integral."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain why integral f(x) dx is called an indefinite integral and involves a constant C.",
+      "answer": "It is called indefinite because it is not a single function but a whole family of functions F(x) + C, one for each value of the arbitrary constant C. Since any two antiderivatives of f(x) differ only by a constant (because the derivative of a constant is zero), the general antiderivative must include + C. This constant is undetermined unless extra information (an initial condition) is given, which is why the integral is 'indefinite'.",
+      "explanation": "Antiderivatives differ by a constant; C undetermined."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the curve y = F(x) whose slope at every point is 2x and which passes through (1, 3).",
+      "answer": "The slope is dy/dx = 2x, so F(x) = integral 2x dx = x^2 + C.\n\nThe curve passes through (1, 3): 3 = 1^2 + C, so C = 2.\n\nTherefore y = x^2 + 2.",
+      "explanation": "Integrate 2x, then use the point to find C."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Write the standard integrals of x^n (n not -1), 1/x and e^x.",
+      "answer": "integral x^n dx = x^(n+1)/(n+1) + C (for n not equal to -1)\nintegral (1/x) dx = log |x| + C\nintegral e^x dx = e^x + C.",
+      "explanation": "Three standard results."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral (4x^3 - 2/x^2) dx.",
+      "answer": "integral 4x^3 dx = 4 (x^4/4) = x^4.\nintegral (-2/x^2) dx = -2 integral x^-2 dx = -2 (x^-1/(-1)) = 2/x.\n\nSo integral (4x^3 - 2/x^2) dx = x^4 + 2/x + C.",
+      "explanation": "Power rule term by term."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral (x^2 - 3x + 2) dx.",
+      "answer": "Integrate term by term:\n   integral x^2 dx = x^3/3\n   integral (-3x) dx = -3x^2/2\n   integral 2 dx = 2x\n\nHence integral (x^2 - 3x + 2) dx = x^3/3 - 3x^2/2 + 2x + C.",
+      "explanation": "Term-by-term power rule."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral (sqrt(x) + 1/sqrt(x)) dx.",
+      "answer": "Write in index form: sqrt(x) = x^(1/2), 1/sqrt(x) = x^(-1/2).\n\nintegral x^(1/2) dx = x^(3/2)/(3/2) = (2/3) x^(3/2).\nintegral x^(-1/2) dx = x^(1/2)/(1/2) = 2 x^(1/2) = 2 sqrt(x).\n\nSo the integral = (2/3) x^(3/2) + 2 sqrt(x) + C.",
+      "explanation": "Convert to indices, apply power rule."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral (2e^x + 3 cos x - 5/x) dx.",
+      "answer": "integral 2e^x dx = 2 e^x.\nintegral 3 cos x dx = 3 sin x.\nintegral (-5/x) dx = -5 log |x|.\n\nTherefore the integral = 2 e^x + 3 sin x - 5 log |x| + C.",
+      "explanation": "Linearity with standard integrals."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral (3x^2)/(x^3 + 1) dx by substitution.",
+      "answer": "Put t = x^3 + 1, so dt = 3x^2 dx. The integral becomes\n\n   integral dt/t = log |t| + C = log |x^3 + 1| + C.",
+      "explanation": "f'/f form with f = x^3 + 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral (log x)/x dx.",
+      "answer": "Put t = log x, so dt = (1/x) dx. Then\n\n   integral (log x)(1/x) dx = integral t dt = t^2/2 + C = (log x)^2 / 2 + C.",
+      "explanation": "Substitution t = log x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral e^(3x + 2) dx.",
+      "answer": "Put t = 3x + 2, so dt = 3 dx, dx = dt/3. Then\n\n   integral e^t (dt/3) = (1/3) e^t + C = (1/3) e^(3x + 2) + C.\n\n(In general integral e^(ax + b) dx = (1/a) e^(ax + b) + C.)",
+      "explanation": "Linear substitution."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral x/(x^2 + 4) dx.",
+      "answer": "Put t = x^2 + 4, so dt = 2x dx, i.e. x dx = dt/2. Then\n\n   integral x/(x^2 + 4) dx = integral (1/t)(dt/2) = (1/2) log |t| + C = (1/2) log (x^2 + 4) + C.",
+      "explanation": "Substitution t = x^2 + 4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral x sin x dx using integration by parts.",
+      "answer": "Take u = x (algebraic), dv = sin x dx. Then du = dx, v = - cos x. By parts:\n\n   integral x sin x dx = u v - integral v du = - x cos x - integral (- cos x) dx\n        = - x cos x + integral cos x dx = - x cos x + sin x + C.",
+      "explanation": "Parts with u = x, v = -cos x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral x^2 log x dx.",
+      "answer": "Take u = log x, dv = x^2 dx. Then du = (1/x) dx, v = x^3/3. By parts:\n\n   integral x^2 log x dx = (x^3/3) log x - integral (x^3/3)(1/x) dx\n        = (x^3/3) log x - (1/3) integral x^2 dx\n        = (x^3/3) log x - (1/3)(x^3/3) + C = (x^3/3) log x - x^3/9 + C.",
+      "explanation": "Parts with u = log x, dv = x^2 dx."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral tan^-1 x dx.",
+      "answer": "Take u = tan^-1 x (inverse trig, first in ILATE) and dv = dx. Then du = 1/(1 + x^2) dx, v = x. By parts:\n\n   integral tan^-1 x dx = x tan^-1 x - integral x/(1 + x^2) dx.\n\nFor the remaining integral put t = 1 + x^2, dt = 2x dx: integral x/(1 + x^2) dx = (1/2) log(1 + x^2). Hence\n\n   integral tan^-1 x dx = x tan^-1 x - (1/2) log (1 + x^2) + C.",
+      "explanation": "Parts with u = tan^-1 x, then substitution."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Resolve 1/[(x - 1)(x - 2)] into partial fractions.",
+      "answer": "Write 1/[(x - 1)(x - 2)] = A/(x - 1) + B/(x - 2), so 1 = A(x - 2) + B(x - 1).\n\nPut x = 1: 1 = A(-1), so A = -1.\nPut x = 2: 1 = B(1), so B = 1.\n\nTherefore 1/[(x - 1)(x - 2)] = -1/(x - 1) + 1/(x - 2).",
+      "explanation": "Cover-up method gives A = -1, B = 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral dx/[(x - 1)(x - 2)].",
+      "answer": "From partial fractions, 1/[(x - 1)(x - 2)] = -1/(x - 1) + 1/(x - 2). Integrate each:\n\n   integral dx/[(x - 1)(x - 2)] = - log |x - 1| + log |x - 2| + C = log |(x - 2)/(x - 1)| + C.",
+      "explanation": "Resolve then integrate the two logs."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral dx/(x^2 + 16).",
+      "answer": "This is integral dx/(x^2 + a^2) with a^2 = 16, a = 4. So\n\n   integral dx/(x^2 + 16) = (1/4) tan^-1 (x/4) + C.",
+      "explanation": "Standard result, a = 4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral dx/(x^2 - 9) using the standard result.",
+      "answer": "Here a^2 = 9, a = 3, and integral dx/(x^2 - a^2) = (1/2a) log |(x - a)/(x + a)| + C. So\n\n   integral dx/(x^2 - 9) = (1/6) log |(x - 3)/(x + 3)| + C.",
+      "explanation": "Standard result with a = 3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral dx/(x^2 + 2x + 5) by completing the square.",
+      "answer": "Complete the square: x^2 + 2x + 5 = (x + 1)^2 + 4 = (x + 1)^2 + 2^2.\n\nWith u = x + 1 and a = 2 this is integral du/(u^2 + a^2) = (1/a) tan^-1(u/a) + C:\n\n   integral dx/(x^2 + 2x + 5) = (1/2) tan^-1 [(x + 1)/2] + C.",
+      "explanation": "Complete the square; a = 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral cos^2 x dx.",
+      "answer": "Use cos^2 x = (1 + cos 2x)/2:\n\n   integral cos^2 x dx = integral (1 + cos 2x)/2 dx = (1/2) x + (1/2)(sin 2x / 2) + C\n        = x/2 + (sin 2x)/4 + C.",
+      "explanation": "Half-angle identity then integrate."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Identify the correct method and evaluate integral 2x cos(x^2) dx.",
+      "answer": "Method: substitution, because the derivative of x^2 (namely 2x) appears in the integrand.\n\nPut t = x^2, so dt = 2x dx. Then\n\n   integral 2x cos(x^2) dx = integral cos t dt = sin t + C = sin(x^2) + C.",
+      "explanation": "Substitution t = x^2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "State which method suits each integral: (i) integral x e^x dx, (ii) integral dx/(x^2 - 4), (iii) integral 2x/(1 + x^2) dx.",
+      "answer": "(i) integral x e^x dx: integration by PARTS (product of algebraic and exponential).\n(ii) integral dx/(x^2 - 4): a SPECIAL/standard integral (or partial fractions), giving (1/4) log |(x - 2)/(x + 2)| + C.\n(iii) integral 2x/(1 + x^2) dx: SUBSTITUTION t = 1 + x^2 (the f'/f form), giving log(1 + x^2) + C.",
+      "explanation": "Match integrand shape to method."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Explain integration as the inverse of differentiation. Define the antiderivative and the indefinite integral, and using integral 3x^2 dx illustrate the family of curves and the need for the constant of integration.",
+      "answer": "Differentiation gives the rate of change of a function; integration reverses this to recover the function from its derivative. If d/dx F(x) = f(x), then F(x) is called an antiderivative (or primitive) of f(x), and the indefinite integral is written integral f(x) dx = F(x) + C.\n\nFor f(x) = 3x^2: since d/dx (x^3) = 3x^2, an antiderivative is x^3. But d/dx (x^3 + C) = 3x^2 for every constant C, so\n\n   integral 3x^2 dx = x^3 + C.\n\nFamily of curves: the equation y = x^3 + C describes infinitely many curves, one for each value of C (for example x^3, x^3 + 1, x^3 - 4). They are vertical translates of one another and all have the same slope 3x^2 at each x, so they are 'parallel'. Because differentiation destroys the constant term, integration cannot recover it; the arbitrary constant C represents this lost information. To pin down a single curve we need an extra condition, e.g. a point the curve passes through. Any integration can be checked by differentiating the answer to recover the integrand.",
+      "explanation": "Inverse relation; antiderivative; integral 3x^2 = x^3 + C; parallel curves; role of C."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the two linearity properties of integration and use them to evaluate integral (x^3 - 6x^2 + 4x - 7 + 2/x) dx. Verify part of your answer by differentiation.",
+      "answer": "Linearity properties:\n1. Constant multiple: integral k f(x) dx = k integral f(x) dx.\n2. Sum/difference: integral [f(x) +/- g(x)] dx = integral f(x) dx +/- integral g(x) dx.\n\nApplying term by term:\n   integral x^3 dx = x^4/4\n   integral (-6x^2) dx = -6 (x^3/3) = -2x^3\n   integral 4x dx = 4 (x^2/2) = 2x^2\n   integral (-7) dx = -7x\n   integral (2/x) dx = 2 log |x|\n\nTherefore\n   integral (x^3 - 6x^2 + 4x - 7 + 2/x) dx = x^4/4 - 2x^3 + 2x^2 - 7x + 2 log |x| + C.\n\nVerification: differentiate x^4/4 - 2x^3 + 2x^2 - 7x + 2 log |x|:\n   d/dx = x^3 - 6x^2 + 4x - 7 + 2/x,\nwhich is the original integrand. Hence the result is correct.",
+      "explanation": "Linearity; integrate term by term; differentiate back to check."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Describe the method of integration by substitution. Use it to evaluate (a) integral 2x sqrt(x^2 + 1) dx and (b) integral tan x dx.",
+      "answer": "Method: if a part of the integrand and its derivative both appear, we substitute t for that part. Putting t = g(x) gives dt = g'(x) dx, and integral f(x) dx becomes an integral in t that is a standard form; after integrating we replace t by g(x).\n\n(a) integral 2x sqrt(x^2 + 1) dx. Put t = x^2 + 1, so dt = 2x dx. Then\n   integral sqrt(t) dt = integral t^(1/2) dt = t^(3/2)/(3/2) = (2/3) t^(3/2).\nReplacing t: integral 2x sqrt(x^2 + 1) dx = (2/3) (x^2 + 1)^(3/2) + C.\n\n(b) integral tan x dx = integral (sin x / cos x) dx. Put t = cos x, so dt = - sin x dx, i.e. sin x dx = - dt. Then\n   integral (sin x / cos x) dx = integral (- dt)/t = - log |t| + C = - log |cos x| + C = log |sec x| + C.",
+      "explanation": "Explain substitution; (a) t = x^2+1; (b) t = cos x."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the integration-by-parts formula and the ILATE rule. Use them to evaluate (a) integral x cos x dx and (b) integral x^2 e^x dx.",
+      "answer": "Formula: integral u dv = uv - integral v du. ILATE rule for choosing u: Inverse trig, Logarithmic, Algebraic, Trigonometric, Exponential (choose u as whichever type comes first).\n\n(a) integral x cos x dx. u = x (Algebraic before Trig), dv = cos x dx; du = dx, v = sin x.\n   integral x cos x dx = x sin x - integral sin x dx = x sin x + cos x + C.\n\n(b) integral x^2 e^x dx. u = x^2, dv = e^x dx; du = 2x dx, v = e^x.\n   integral x^2 e^x dx = x^2 e^x - integral 2x e^x dx.\nFor integral 2x e^x dx apply parts again (u = 2x, dv = e^x dx): 2x e^x - integral 2 e^x dx = 2x e^x - 2 e^x.\nSo integral x^2 e^x dx = x^2 e^x - (2x e^x - 2 e^x) + C = e^x (x^2 - 2x + 2) + C.",
+      "explanation": "Parts formula + ILATE; (a) once; (b) parts applied twice."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Explain the method of partial fractions and use it to evaluate integral (3x + 5)/[(x - 1)(x + 2)] dx.",
+      "answer": "Method: a proper rational function P(x)/Q(x) (deg P < deg Q) is written as a sum of simpler fractions determined by the factors of Q(x); distinct linear factors (x - a), (x - b) give terms A/(x - a) + B/(x - b). We find A, B and integrate each simple fraction using integral dx/(x - a) = log |x - a| + C.\n\nWrite (3x + 5)/[(x - 1)(x + 2)] = A/(x - 1) + B/(x + 2). Then\n   3x + 5 = A(x + 2) + B(x - 1).\nPut x = 1: 3(1) + 5 = A(3), so 8 = 3A, A = 8/3.\nPut x = -2: 3(-2) + 5 = B(-3), so -1 = -3B, B = 1/3.\n\nTherefore\n   integral (3x + 5)/[(x - 1)(x + 2)] dx = (8/3) integral dx/(x - 1) + (1/3) integral dx/(x + 2)\n        = (8/3) log |x - 1| + (1/3) log |x + 2| + C.",
+      "explanation": "Resolve; A = 8/3, B = 1/3; integrate the two logs."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate (a) integral dx/(x^2 + 4x + 8) and (b) integral dx/sqrt(x^2 + 4), stating the standard results used.",
+      "answer": "(a) Complete the square: x^2 + 4x + 8 = (x + 2)^2 + 4 = (x + 2)^2 + 2^2. Using integral du/(u^2 + a^2) = (1/a) tan^-1(u/a) + C with u = x + 2, a = 2:\n   integral dx/(x^2 + 4x + 8) = (1/2) tan^-1 [(x + 2)/2] + C.\n\n(b) Use the standard result integral dx/sqrt(x^2 + a^2) = log |x + sqrt(x^2 + a^2)| + C with a^2 = 4, a = 2:\n   integral dx/sqrt(x^2 + 4) = log |x + sqrt(x^2 + 4)| + C.",
+      "explanation": "(a) complete square + arctan; (b) standard log result."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Integrate the following trigonometric functions, showing the identities used: (a) integral sin^2 x dx, (b) integral 2 sin 3x cos x dx, (c) integral sin^3 x dx.",
+      "answer": "(a) sin^2 x = (1 - cos 2x)/2, so\n   integral sin^2 x dx = (1/2) integral (1 - cos 2x) dx = (1/2)[x - (sin 2x)/2] + C = x/2 - (sin 2x)/4 + C.\n\n(b) Use 2 sin A cos B = sin(A + B) + sin(A - B): 2 sin 3x cos x = sin 4x + sin 2x. So\n   integral 2 sin 3x cos x dx = integral (sin 4x + sin 2x) dx = - (cos 4x)/4 - (cos 2x)/2 + C.\n\n(c) sin^3 x = sin x (1 - cos^2 x). Put t = cos x, dt = - sin x dx:\n   integral sin^3 x dx = integral (1 - cos^2 x) sin x dx = integral (1 - t^2)(- dt) = - integral (1 - t^2) dt\n        = - (t - t^3/3) + C = - cos x + (cos^3 x)/3 + C.",
+      "explanation": "Half-angle, product-to-sum, and odd-power substitution."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "For each integral, identify the most suitable method and evaluate it: (a) integral x e^x dx, (b) integral (2x + 1)/(x^2 + x + 1) dx, (c) integral dx/(x^2 - 16).",
+      "answer": "(a) integral x e^x dx - integration by PARTS (algebraic times exponential). u = x, dv = e^x dx: = x e^x - integral e^x dx = x e^x - e^x + C = e^x (x - 1) + C.\n\n(b) integral (2x + 1)/(x^2 + x + 1) dx - SUBSTITUTION, since d/dx (x^2 + x + 1) = 2x + 1 (the f'/f form). Put t = x^2 + x + 1, dt = (2x + 1) dx: = integral dt/t = log |t| + C = log |x^2 + x + 1| + C.\n\n(c) integral dx/(x^2 - 16) - SPECIAL/standard integral with a = 4: integral dx/(x^2 - a^2) = (1/2a) log |(x - a)/(x + a)| + C, so = (1/8) log |(x - 4)/(x + 4)| + C.",
+      "explanation": "Choose parts / substitution / standard result respectively."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIntegration reverses differentiation: if d/dx F(x) = f(x) then integral f(x) dx = F(x) + C. Because the derivative of any constant is zero, an antiderivative is determined only up to a constant, and the general integral includes the constant of integration C.\n(a) What is meant by an antiderivative of f(x)?\n(b) Why must a constant C be included in an indefinite integral?\n(c) Find integral 4x^3 dx.\n(d) If the curve y = F(x) with F'(x) = 4x^3 passes through (0, 5), find F(x).",
+      "answer": "(a) An antiderivative of f(x) is a function F(x) whose derivative equals f(x), i.e. d/dx F(x) = f(x).\n(b) Because two antiderivatives of the same function differ only by a constant (the derivative of a constant is zero), so the general answer must carry an arbitrary constant C.\n(c) integral 4x^3 dx = 4 (x^4/4) + C = x^4 + C.\n(d) F(x) = x^4 + C; F(0) = 0 + C = 5, so C = 5 and F(x) = x^4 + 5.",
+      "explanation": "Antiderivative; role of C; x^4 + C; use point for C."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nStandard integrals are obtained by reversing standard derivatives: integral x^n dx = x^(n+1)/(n+1) + C for n not equal to -1, integral (1/x) dx = log |x| + C, integral e^x dx = e^x + C, integral sin x dx = - cos x + C.\n(a) Why is the power rule not valid for n = -1?\n(b) Evaluate integral x^5 dx.\n(c) Evaluate integral (1/x) dx.\n(d) Evaluate integral (e^x + sin x) dx.",
+      "answer": "(a) For n = -1 the formula would divide by n + 1 = 0, which is undefined; that case is covered separately by integral (1/x) dx = log |x| + C.\n(b) integral x^5 dx = x^6/6 + C.\n(c) integral (1/x) dx = log |x| + C.\n(d) integral (e^x + sin x) dx = e^x - cos x + C.",
+      "explanation": "n=-1 excluded; x^6/6; log|x|; e^x - cos x."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIntegration is linear: integral k f(x) dx = k integral f(x) dx and integral [f(x) +/- g(x)] dx = integral f(x) dx +/- integral g(x) dx. These allow polynomials to be integrated term by term. There is, however, no product rule for integration.\n(a) State the constant-multiple rule.\n(b) Evaluate integral (6x^2 - 4x + 3) dx.\n(c) Is integral (x cos x) dx equal to (integral x dx)(integral cos x dx)? Explain.\n(d) Verify your answer to (b) by differentiation.",
+      "answer": "(a) integral k f(x) dx = k integral f(x) dx: a constant factor may be moved outside the integral.\n(b) integral (6x^2 - 4x + 3) dx = 6(x^3/3) - 4(x^2/2) + 3x + C = 2x^3 - 2x^2 + 3x + C.\n(c) No. There is no product rule for integration, so the integral of a product is not the product of the integrals; integral x cos x dx must be found by parts (= x sin x + cos x + C).\n(d) d/dx (2x^3 - 2x^2 + 3x) = 6x^2 - 4x + 3, the original integrand, confirming (b).",
+      "explanation": "Constant rule; term-by-term; no product rule; check by differentiating."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIn substitution we set t = g(x) so that dt = g'(x) dx turns the integral into a standard form. A key special case is integral f'(x)/f(x) dx = log |f(x)| + C, used whenever the numerator is the derivative of the denominator.\n(a) State the substitution to evaluate integral 2x/(x^2 + 5) dx.\n(b) Evaluate that integral.\n(c) Evaluate integral cos 5x dx.\n(d) Evaluate integral sin^2 x cos x dx.",
+      "answer": "(a) Put t = x^2 + 5, since dt = 2x dx appears in the numerator.\n(b) integral 2x/(x^2 + 5) dx = integral dt/t = log |t| + C = log (x^2 + 5) + C.\n(c) integral cos 5x dx = (1/5) sin 5x + C (put t = 5x).\n(d) Put t = sin x, dt = cos x dx: integral t^2 dt = t^3/3 + C = (sin^3 x)/3 + C.",
+      "explanation": "t = x^2+5 gives log; cos5x -> (1/5)sin5x; t = sin x."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIntegration by parts, integral u dv = uv - integral v du, comes from reversing the product rule. The factor u is chosen by the ILATE order: Inverse trig, Logarithmic, Algebraic, Trigonometric, Exponential.\n(a) For integral x e^x dx, which factor is u and why?\n(b) Evaluate integral x e^x dx.\n(c) Evaluate integral log x dx.\n(d) Evaluate integral x sin x dx.",
+      "answer": "(a) u = x, because Algebraic (A) comes before Exponential (E) in ILATE; dv = e^x dx.\n(b) integral x e^x dx = x e^x - integral e^x dx = x e^x - e^x + C = e^x (x - 1) + C.\n(c) Write integral (log x)(1) dx; u = log x, dv = dx, v = x: = x log x - integral x(1/x) dx = x log x - x + C.\n(d) u = x, dv = sin x dx, v = - cos x: = - x cos x + integral cos x dx = - x cos x + sin x + C.",
+      "explanation": "ILATE choice; three worked parts integrals."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA proper rational function is integrated by resolving it into partial fractions. For distinct linear factors, 1/[(x - a)(x - b)] = A/(x - a) + B/(x - b); each simple fraction integrates to a logarithm.\n(a) Resolve 1/[(x - 2)(x + 1)] into partial fractions.\n(b) Hence evaluate integral dx/[(x - 2)(x + 1)].\n(c) What condition on the degrees must hold before this method is applied?\n(d) State the integral of 1/(x - a).",
+      "answer": "(a) 1/[(x - 2)(x + 1)] = A/(x - 2) + B/(x + 1); so 1 = A(x + 1) + B(x - 2). Put x = 2: 1 = 3A, A = 1/3. Put x = -1: 1 = -3B, B = -1/3. Thus = (1/3)/(x - 2) - (1/3)/(x + 1).\n(b) integral dx/[(x - 2)(x + 1)] = (1/3) log |x - 2| - (1/3) log |x + 1| + C = (1/3) log |(x - 2)/(x + 1)| + C.\n(c) The numerator's degree must be less than the denominator's (a proper fraction); otherwise divide first.\n(d) integral dx/(x - a) = log |x - a| + C.",
+      "explanation": "A = 1/3, B = -1/3; integrate to logs; proper-fraction condition."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nSpecial integrals include integral dx/(x^2 + a^2) = (1/a) tan^-1(x/a) + C and integral dx/sqrt(a^2 - x^2) = sin^-1(x/a) + C. When the quadratic is not a pure square-sum, we complete the square first.\n(a) Evaluate integral dx/(x^2 + 4).\n(b) Evaluate integral dx/sqrt(25 - x^2).\n(c) Write x^2 + 6x + 10 as a completed square.\n(d) Hence evaluate integral dx/(x^2 + 6x + 10).",
+      "answer": "(a) a = 2: integral dx/(x^2 + 4) = (1/2) tan^-1 (x/2) + C.\n(b) a = 5: integral dx/sqrt(25 - x^2) = sin^-1 (x/5) + C.\n(c) x^2 + 6x + 10 = (x + 3)^2 + 1.\n(d) With u = x + 3, a = 1: integral dx/(x^2 + 6x + 10) = tan^-1 (x + 3) + C.",
+      "explanation": "arctan and arcsin forms; complete square to (x+3)^2+1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTrigonometric integrands are simplified with identities: sin^2 x = (1 - cos 2x)/2, cos^2 x = (1 + cos 2x)/2, and 2 sin A cos B = sin(A + B) + sin(A - B).\n(a) Evaluate integral cos^2 x dx.\n(b) Evaluate integral sin^2 x dx.\n(c) Evaluate integral 2 cos 3x cos x dx (use 2 cos A cos B = cos(A+B) + cos(A-B)).\n(d) State the identity used in part (c).",
+      "answer": "(a) integral cos^2 x dx = integral (1 + cos 2x)/2 dx = x/2 + (sin 2x)/4 + C.\n(b) integral sin^2 x dx = integral (1 - cos 2x)/2 dx = x/2 - (sin 2x)/4 + C.\n(c) 2 cos 3x cos x = cos 4x + cos 2x, so integral 2 cos 3x cos x dx = (sin 4x)/4 + (sin 2x)/2 + C.\n(d) 2 cos A cos B = cos(A + B) + cos(A - B).",
+      "explanation": "Half-angle for (a),(b); product-to-sum for (c),(d)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nChoosing a method depends on the form of the integrand: a product of unlike functions suggests parts; a numerator that is the derivative of the denominator suggests substitution; a proper rational function suggests partial fractions; a quadratic form suggests a standard special integral.\n(a) Which method suits integral x log x dx, and what is its value?\n(b) Which method suits integral (2x)/(x^2 + 7) dx, and what is its value?\n(c) Which method suits integral dx/(x^2 + 9)?\n(d) Which method suits integral dx/[(x - 1)(x - 3)]?",
+      "answer": "(a) Integration by PARTS (algebraic times log). u = log x, dv = x dx: integral x log x dx = (x^2/2) log x - x^2/4 + C.\n(b) SUBSTITUTION t = x^2 + 7 (f'/f form): integral 2x/(x^2 + 7) dx = log (x^2 + 7) + C.\n(c) SPECIAL/standard integral: integral dx/(x^2 + 9) = (1/3) tan^-1 (x/3) + C.\n(d) PARTIAL FRACTIONS (distinct linear factors x - 1 and x - 3).",
+      "explanation": "Match each integrand to parts / substitution / standard / partial fractions."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-INT-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA student integrates several functions and must verify results by differentiation. Recall integral e^x dx = e^x + C, integral (1/x) dx = log |x| + C, and integral cos x dx = sin x + C.\n(a) Verify that integral 2x dx = x^2 + C by differentiation.\n(b) A student writes integral (1/x) dx = -1/x^2 + C. Is this correct? Explain.\n(c) Evaluate integral (e^x + 1/x) dx.\n(d) Why does differentiating any correct indefinite integral return the integrand?",
+      "answer": "(a) d/dx (x^2 + C) = 2x, which is the integrand, so integral 2x dx = x^2 + C is correct.\n(b) No. -1/x^2 is the derivative of 1/x, not its integral. The correct result is integral (1/x) dx = log |x| + C (check: d/dx log|x| = 1/x).\n(c) integral (e^x + 1/x) dx = e^x + log |x| + C.\n(d) Because integration is defined as the inverse of differentiation: if integral f dx = F + C with F' = f, then differentiating F + C gives back f, the integrand.",
+      "explanation": "Verify by differentiating; correct 1/x integral; inverse relationship."
+    }
+  ]
+}

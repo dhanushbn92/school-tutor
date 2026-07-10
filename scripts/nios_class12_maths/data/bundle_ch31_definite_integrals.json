@@ -1,0 +1,2263 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 31,
+    "chapter_title": "Definite Integrals",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 31 - DEFINITE INTEGRALS\n\nIntroduction\n\nIn the previous chapter we learnt indefinite integration - reversing the process of differentiation to obtain a family of antiderivatives F(x) + C. A DEFINITE INTEGRAL, written as integral from a to b of f(x) dx, attaches two numbers a and b (the limits of integration) to the integral sign and produces a single NUMBER rather than a family of functions. This number measures the net area between the curve y = f(x), the x-axis and the vertical lines x = a and x = b. In this chapter we build the definite integral first as the limit of a sum (a Riemann sum), then connect it to antiderivatives through the Fundamental Theorem of Calculus, study the many useful properties that shorten evaluation, learn substitution with changing limits, and finally use definite integrals to compute areas under curves and areas between two curves.\n\n31.1 THE DEFINITE INTEGRAL AS THE LIMIT OF A SUM\n\nConsider a continuous function f(x) that is non-negative on the interval [a, b]. We want the area A of the region bounded by y = f(x), the x-axis, and the lines x = a and x = b. Divide [a, b] into n equal sub-intervals, each of width h = (b - a)/n. The division points are a, a + h, a + 2h, ..., a + nh = b. On each strip we build a thin rectangle of width h whose height is the value of f at a sample point. Taking left end-points, the total area of the rectangles is\n\n   S_n = h [ f(a) + f(a + h) + f(a + 2h) + ... + f(a + (n-1)h) ]\n\nAs n increases the rectangles hug the curve more closely. The definite integral is defined as the limit of this sum as n tends to infinity (h tends to 0):\n\n   integral from a to b of f(x) dx = limit as n->infinity of h * sum from r=0 to n-1 of f(a + r h),   where h = (b - a)/n.\n\nThis limit is called a RIEMANN SUM. It exists for every function that is continuous on [a, b]. Here a is the lower limit and b is the upper limit of integration; f(x) is the integrand and x is the variable of integration (a dummy variable - it may be replaced by any letter).\n\nWorked example (first-principles). Evaluate integral from 0 to 1 of x dx as a limit of a sum. Here a = 0, b = 1, h = 1/n, and f(a + r h) = r h = r/n. So\n   S_n = h * sum from r=0 to n-1 of (r/n) = (1/n) * (1/n) * (0 + 1 + 2 + ... + (n-1)) = (1/n^2) * [ (n-1)n/2 ].\n   S_n = (n-1)/(2n) = (1/2)(1 - 1/n).\nAs n tends to infinity, S_n tends to 1/2. Hence integral from 0 to 1 of x dx = 1/2, which is exactly the area of the triangle under y = x from 0 to 1. This confirms the geometric meaning: the definite integral is the area under the curve.\n\nIf f(x) is negative on part of the interval, the corresponding area is counted as NEGATIVE, so the definite integral gives the NET (signed) area - areas below the x-axis subtract from areas above it.\n\n31.2 THE FUNDAMENTAL THEOREM OF CALCULUS\n\nEvaluating every integral from first principles would be tedious. The Fundamental Theorem of Calculus links definite integration with antidifferentiation and makes evaluation quick.\n\nStatement (evaluation form). If f(x) is continuous on [a, b] and F(x) is any antiderivative of f(x) (that is, F'(x) = f(x)), then\n\n   integral from a to b of f(x) dx = F(b) - F(a).\n\nThe right-hand side is written compactly as [ F(x) ] from a to b, read 'F(x) evaluated from a to b'. Notice that the constant of integration C cancels: (F(b) + C) - (F(a) + C) = F(b) - F(a), so we may drop C when working with definite integrals.\n\nThere is also a differentiation form: if we define G(x) = integral from a to x of f(t) dt, then G'(x) = f(x). In words, differentiating an integral with respect to its upper limit returns the integrand. This shows that integration and differentiation are inverse operations.\n\nWorked example. integral from 1 to 2 of x^2 dx. An antiderivative of x^2 is F(x) = x^3/3. Therefore\n   integral from 1 to 2 of x^2 dx = [ x^3/3 ] from 1 to 2 = (2^3/3) - (1^3/3) = 8/3 - 1/3 = 7/3.\n\n31.3 EVALUATING DEFINITE INTEGRALS\n\nThe recipe is: (1) find any antiderivative F(x) of the integrand, (2) substitute the upper limit b and the lower limit a, (3) subtract, F(b) - F(a). A few standard results are used constantly:\n   integral of x^n dx = x^(n+1)/(n+1) (for n not equal to -1),\n   integral of 1/x dx = ln|x|,\n   integral of e^x dx = e^x,\n   integral of sin x dx = -cos x,\n   integral of cos x dx = sin x,\n   integral of sec^2 x dx = tan x.\n\nWorked example 1. integral from 0 to pi/2 of sin x dx = [ -cos x ] from 0 to pi/2 = (-cos(pi/2)) - (-cos 0) = (0) - (-1) = 1.\nWorked example 2. integral from 1 to e of (1/x) dx = [ ln|x| ] from 1 to e = ln e - ln 1 = 1 - 0 = 1.\nWorked example 3. integral from 0 to 1 of e^x dx = [ e^x ] from 0 to 1 = e^1 - e^0 = e - 1.\nWorked example 4. integral from 0 to 2 of (3x^2 + 2x) dx = [ x^3 + x^2 ] from 0 to 2 = (8 + 4) - 0 = 12.\n\n31.4 PROPERTIES OF DEFINITE INTEGRALS\n\nThese properties often let us evaluate an integral with little or no calculation. Throughout, f and g are continuous on the interval concerned.\n\nP1 (Reversing the limits). integral from a to b of f(x) dx = - integral from b to a of f(x) dx. Swapping the upper and lower limits changes the sign. As a special case, integral from a to a of f(x) dx = 0.\n\nP2 (Additivity of the interval). integral from a to b of f(x) dx = integral from a to c of f(x) dx + integral from c to b of f(x) dx, for any point c. This lets us split an interval, which is essential when the integrand changes its formula (for example |x|) at an interior point.\n\nP3 (Dummy variable). integral from a to b of f(x) dx = integral from a to b of f(t) dt. The variable of integration is a dummy and may be renamed.\n\nP4 (The 'king' property, reflection about the midpoint). integral from a to b of f(x) dx = integral from a to b of f(a + b - x) dx. A very common special case is\n   integral from 0 to a of f(x) dx = integral from 0 to a of f(a - x) dx.\nWorked example (king property). Evaluate I = integral from 0 to pi/2 of sin x / (sin x + cos x) dx. Replacing x by (pi/2 - x) turns sin x into cos x and cos x into sin x, so I = integral from 0 to pi/2 of cos x / (cos x + sin x) dx. Adding the two forms, 2I = integral from 0 to pi/2 of (sin x + cos x)/(sin x + cos x) dx = integral from 0 to pi/2 of 1 dx = pi/2. Hence I = pi/4.\n\nP5 (Even and odd functions on a symmetric interval). For the interval [-a, a]:\n   if f is EVEN, f(-x) = f(x), then integral from -a to a of f(x) dx = 2 * integral from 0 to a of f(x) dx;\n   if f is ODD, f(-x) = -f(x), then integral from -a to a of f(x) dx = 0.\nWorked example. integral from -1 to 1 of x^3 dx = 0 because x^3 is odd; integral from -1 to 1 of x^2 dx = 2 * integral from 0 to 1 of x^2 dx = 2 * (1/3) = 2/3 because x^2 is even.\n\nP6 (Periodic functions). If f has period T (so f(x + T) = f(x)), then integral from 0 to nT of f(x) dx = n * integral from 0 to T of f(x) dx for any positive integer n. More generally integral from a to a+T of f(x) dx is the same for every a.\n\n31.5 DEFINITE INTEGRATION BY SUBSTITUTION\n\nWhen we substitute u = g(x) to simplify an integrand, the LIMITS OF INTEGRATION must also be changed to values of u. If u = g(x), then when x = a, u = g(a), and when x = b, u = g(b). We then integrate in u between these NEW limits and there is no need to return to the variable x.\n\n   integral from a to b of f(g(x)) g'(x) dx = integral from g(a) to g(b) of f(u) du.\n\nWorked example 1. Evaluate integral from 0 to 1 of x/(1 + x^2) dx. Let u = 1 + x^2, so du = 2x dx, i.e. x dx = du/2. When x = 0, u = 1; when x = 1, u = 2. Then\n   integral from 0 to 1 of x/(1 + x^2) dx = (1/2) integral from 1 to 2 of (1/u) du = (1/2)[ ln u ] from 1 to 2 = (1/2)(ln 2 - ln 1) = (1/2) ln 2.\n\nWorked example 2. Evaluate integral from 0 to pi/2 of cos x * (sin x)^2 dx. Let u = sin x, du = cos x dx. When x = 0, u = 0; when x = pi/2, u = 1. Then\n   integral from 0 to 1 of u^2 du = [ u^3/3 ] from 0 to 1 = 1/3.\n\nWorked example 3. Evaluate integral from 1 to 2 of (2x)(x^2 + 1)^3 dx. Let u = x^2 + 1, du = 2x dx. When x = 1, u = 2; when x = 2, u = 5. Then integral from 2 to 5 of u^3 du = [ u^4/4 ] from 2 to 5 = (625 - 16)/4 = 609/4.\n\n31.6 AREA UNDER AND BETWEEN CURVES\n\nAREA UNDER A CURVE. The area bounded by the curve y = f(x), the x-axis and the ordinates x = a and x = b (with f(x) >= 0) is\n   A = integral from a to b of f(x) dx = integral from a to b of y dx.\nIf the curve lies below the x-axis on part of the interval, that part gives a negative integral; to obtain the physical (unsigned) area we take the modulus of the integral over each such piece and add.\nFor a region bounded on the y-axis side by x = g(y), between y = c and y = d, the area is A = integral from c to d of x dy.\n\nWorked example (area under a parabola). Find the area bounded by y = x^2, the x-axis, x = 0 and x = 3.\n   A = integral from 0 to 3 of x^2 dx = [ x^3/3 ] from 0 to 3 = 27/3 = 9 square units.\n\nWorked example (area under a sine arch). The area under y = sin x from 0 to pi is integral from 0 to pi of sin x dx = [ -cos x ] from 0 to pi = (-cos pi) - (-cos 0) = 1 + 1 = 2 square units.\n\nAREA BETWEEN TWO CURVES. If two curves y = f(x) (upper) and y = g(x) (lower) satisfy f(x) >= g(x) on [a, b], the area of the region between them is\n   A = integral from a to b of [ f(x) - g(x) ] dx.\nThe limits a and b are usually the x-coordinates of the points where the curves intersect, found by solving f(x) = g(x).\n\nWorked example (area between a line and a parabola). Find the area enclosed between y = x and y = x^2. They meet where x = x^2, i.e. x = 0 and x = 1. Between 0 and 1 the line y = x lies above the parabola y = x^2, so\n   A = integral from 0 to 1 of (x - x^2) dx = [ x^2/2 - x^3/3 ] from 0 to 1 = (1/2 - 1/3) - 0 = 1/6 square unit.\n\nWorked example (area of a circle by integration). The area of the circle x^2 + y^2 = a^2 is four times the area of the quarter in the first quadrant: A = 4 * integral from 0 to a of sqrt(a^2 - x^2) dx = 4 * (pi a^2 / 4) = pi a^2, recovering the familiar formula.\n\nSUMMARY\n\n- The definite integral integral from a to b of f(x) dx is defined as the limit of a Riemann sum, limit as n->infinity of h * sum of f(a + r h) with h = (b - a)/n; it equals the net (signed) area under y = f(x) from a to b.\n- Fundamental Theorem of Calculus: if F'(x) = f(x), then integral from a to b of f(x) dx = F(b) - F(a); the constant of integration cancels. Also (d/dx) integral from a to x of f(t) dt = f(x).\n- To evaluate a definite integral, find an antiderivative F, then compute F(b) - F(a).\n- Properties: (P1) reversing limits changes the sign and integral from a to a = 0; (P2) integral a to b = integral a to c + integral c to b; (P4) king property integral 0 to a f(x) dx = integral 0 to a f(a - x) dx; (P5) even function gives 2 times integral 0 to a, odd function gives 0 on [-a, a]; (P6) periodic function integral 0 to nT = n times integral 0 to T.\n- Substitution: when u = g(x), change the limits to g(a) and g(b) and integrate in u; no need to revert to x.\n- Area under a curve A = integral from a to b of y dx; area between two curves A = integral from a to b of (upper - lower) dx, with a, b the intersection points.\n",
+  "topics": [
+    {
+      "name": "The Definite Integral as a Limit of a Sum",
+      "description": "The definite integral integral from a to b of f(x) dx defined as the limit of a Riemann sum, limit n->infinity of h*sum f(a+rh) with h=(b-a)/n; its meaning as the net (signed) area under y=f(x); evaluation from first principles for simple functions such as integral 0 to 1 of x dx = 1/2."
+    },
+    {
+      "name": "The Fundamental Theorem of Calculus",
+      "description": "The Fundamental Theorem linking definite integration and antidifferentiation: if F'(x)=f(x) then integral from a to b of f(x) dx = F(b) - F(a); cancellation of the constant of integration; the differentiation form (d/dx) integral a to x of f(t) dt = f(x)."
+    },
+    {
+      "name": "Evaluating Definite Integrals",
+      "description": "Using standard antiderivatives (x^n, 1/x, e^x, sin x, cos x, sec^2 x) to evaluate definite integrals by computing F(b) - F(a); worked evaluations such as integral 1 to 2 of x^2 dx = 7/3 and integral 0 to pi/2 of sin x dx = 1."
+    },
+    {
+      "name": "Properties of Definite Integrals",
+      "description": "Key properties: reversing limits changes the sign and integral a to a = 0; additivity integral a to b = integral a to c + integral c to b; the king property integral 0 to a f(x) = integral 0 to a f(a-x); even/odd function symmetry on [-a,a]; periodic-function property."
+    },
+    {
+      "name": "Definite Integration by Substitution",
+      "description": "Evaluating definite integrals by the substitution u=g(x) and CHANGING the limits to g(a) and g(b), integrating in u without reverting to x; worked examples such as integral 0 to 1 of x/(1+x^2) dx = (1/2) ln 2."
+    },
+    {
+      "name": "Area under and between Curves",
+      "description": "Computing areas with definite integrals: area under y=f(x) is integral a to b of y dx; area between curves is integral a to b of (upper - lower) dx with limits at the intersection points; examples include area under y=x^2 and area between y=x and y=x^2."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-DIN-01",
+      "topic_name": "The Definite Integral as a Limit of a Sum",
+      "bloom": "understand",
+      "description": "Define the definite integral as the limit of a Riemann sum, interpret it as the net area under a curve, and evaluate simple integrals such as integral 0 to 1 of x dx from first principles."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-02",
+      "topic_name": "The Fundamental Theorem of Calculus",
+      "bloom": "understand",
+      "description": "State the Fundamental Theorem of Calculus, explain that integral from a to b of f(x) dx = F(b) - F(a) when F'(x) = f(x), and why the constant of integration cancels."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-03",
+      "topic_name": "Evaluating Definite Integrals",
+      "bloom": "apply",
+      "description": "Evaluate definite integrals of standard functions by finding an antiderivative and computing F(b) - F(a)."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-04",
+      "topic_name": "Properties of Definite Integrals",
+      "bloom": "understand",
+      "description": "State the properties of definite integrals: reversal of limits, additivity over an interval, the king property, and even/odd and periodic-function properties."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-05",
+      "topic_name": "Properties of Definite Integrals",
+      "bloom": "apply",
+      "description": "Apply the properties of definite integrals - especially the king property and even/odd symmetry - to evaluate integrals with little computation."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-06",
+      "topic_name": "Definite Integration by Substitution",
+      "bloom": "apply",
+      "description": "Evaluate definite integrals using substitution u = g(x), correctly changing the limits of integration to g(a) and g(b)."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-07",
+      "topic_name": "Area under and between Curves",
+      "bloom": "apply",
+      "description": "Compute the area under a curve as integral from a to b of y dx using a definite integral."
+    },
+    {
+      "code": "12-NIOS-MAT-DIN-08",
+      "topic_name": "Area under and between Curves",
+      "bloom": "analyze",
+      "description": "Determine the area enclosed between two curves by finding intersection points and integrating the difference of the upper and lower functions."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Definite Integrals - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Definite Integrals lesson. It develops the definite integral as the limit of a sum and as area under a curve, the Fundamental Theorem of Calculus, evaluation of definite integrals, their properties, substitution with changing limits, and areas under and between curves.",
+    "overview_diagram": {
+      "title": "Definite Integrals",
+      "central_term": "Definite Integral",
+      "branches": [
+        {
+          "label": "Limit of a Sum",
+          "details": [
+            "integral a to b f(x) dx = lim h*sum f(a+rh)",
+            "h = (b-a)/n, Riemann sum",
+            "Net (signed) area under the curve",
+            "integral 0 to 1 of x dx = 1/2"
+          ]
+        },
+        {
+          "label": "Fundamental Theorem",
+          "details": [
+            "integral a to b f(x) dx = F(b) - F(a)",
+            "F'(x) = f(x)",
+            "Constant of integration cancels"
+          ]
+        },
+        {
+          "label": "Properties",
+          "details": [
+            "integral a to b = - integral b to a",
+            "integral a to b = integral a to c + integral c to b",
+            "King: integral 0 to a f(x) = integral 0 to a f(a-x)",
+            "Even -> 2 integral 0 to a; Odd -> 0"
+          ]
+        },
+        {
+          "label": "Substitution",
+          "details": [
+            "u = g(x), change the limits",
+            "New limits g(a), g(b)",
+            "integral 0 to 1 x/(1+x^2) dx = (1/2) ln 2"
+          ]
+        },
+        {
+          "label": "Area",
+          "details": [
+            "Under curve: A = integral a to b y dx",
+            "Between curves: integral (upper - lower) dx",
+            "Limits at intersection points",
+            "Area between y=x and y=x^2 is 1/6"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "The definite integral as a limit of a sum",
+        "bullets": [
+          "Divide [a, b] into n equal strips of width h = (b - a)/n and add the rectangle areas h*f(a + r h).",
+          "The definite integral is the limit of this Riemann sum as n -> infinity: integral a to b f(x) dx = lim h*sum from r=0 to n-1 of f(a + r h).",
+          "Geometrically it is the net (signed) area under y = f(x); area below the x-axis counts as negative.",
+          "First principles: integral 0 to 1 of x dx = 1/2, the area of the triangle under y = x."
+        ]
+      },
+      {
+        "heading": "The Fundamental Theorem of Calculus",
+        "bullets": [
+          "If F'(x) = f(x) then integral from a to b of f(x) dx = F(b) - F(a).",
+          "The constant of integration cancels, so it is dropped for definite integrals.",
+          "Differentiation form: (d/dx) integral from a to x of f(t) dt = f(x); integration and differentiation are inverse operations.",
+          "Example: integral 1 to 2 of x^2 dx = [x^3/3] from 1 to 2 = 7/3."
+        ]
+      },
+      {
+        "heading": "Properties of definite integrals",
+        "bullets": [
+          "Reversing the limits changes the sign; integral from a to a of f(x) dx = 0.",
+          "Additivity: integral a to b = integral a to c + integral c to b for any c.",
+          "King property: integral 0 to a of f(x) dx = integral 0 to a of f(a - x) dx.",
+          "On [-a, a]: even functions give 2 integral 0 to a, odd functions give 0; periodic f: integral 0 to nT = n integral 0 to T."
+        ]
+      },
+      {
+        "heading": "Definite integration by substitution",
+        "bullets": [
+          "With u = g(x), replace dx and also change the limits to g(a) and g(b).",
+          "integral a to b of f(g(x)) g'(x) dx = integral g(a) to g(b) of f(u) du.",
+          "No need to return to x once the limits are changed.",
+          "Example: integral 0 to 1 of x/(1 + x^2) dx = (1/2) ln 2."
+        ]
+      },
+      {
+        "heading": "Area under and between curves",
+        "bullets": [
+          "Area under y = f(x) between x = a and x = b is A = integral a to b of y dx.",
+          "For regions below the x-axis take the modulus of the integral to get physical area.",
+          "Area between curves y = f(x) (upper) and y = g(x) (lower) is integral a to b of (f - g) dx.",
+          "Limits a and b are the x-coordinates of the intersection points found by solving f(x) = g(x)."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "The definite integral integral a to b of f(x) dx is the limit of a Riemann sum and equals the net signed area under the curve.",
+      "Fundamental Theorem: if F'(x) = f(x) then integral a to b of f(x) dx = F(b) - F(a), and the constant C cancels.",
+      "Reversing the limits changes the sign and integral from a to a of f(x) dx = 0; the interval can be split at any point c.",
+      "King property: integral 0 to a of f(x) dx = integral 0 to a of f(a - x) dx; it evaluates many trigonometric integrals quickly.",
+      "On [-a, a] an even integrand gives 2 integral 0 to a and an odd integrand gives 0.",
+      "In substitution the limits must be changed to g(a) and g(b); then integrate in u.",
+      "Area under a curve is integral a to b of y dx and area between curves is integral a to b of (upper - lower) dx."
+    ],
+    "glossary": [
+      {
+        "term": "Definite integral",
+        "definition": "The number integral from a to b of f(x) dx, defined as the limit of a Riemann sum, equal to the net signed area under y = f(x) from a to b."
+      },
+      {
+        "term": "Riemann sum",
+        "definition": "The sum h*sum of f(a + r h) of rectangle areas over n strips of width h = (b - a)/n; its limit as n -> infinity is the definite integral."
+      },
+      {
+        "term": "Limits of integration",
+        "definition": "The numbers a (lower limit) and b (upper limit) attached to the integral sign that fix the interval [a, b]."
+      },
+      {
+        "term": "Integrand",
+        "definition": "The function f(x) being integrated in integral from a to b of f(x) dx."
+      },
+      {
+        "term": "Fundamental Theorem of Calculus",
+        "definition": "The theorem that integral from a to b of f(x) dx = F(b) - F(a) where F is any antiderivative of f, linking integration and differentiation."
+      },
+      {
+        "term": "Antiderivative",
+        "definition": "A function F such that F'(x) = f(x); used to evaluate the definite integral of f."
+      },
+      {
+        "term": "Reversal of limits",
+        "definition": "The property integral from a to b of f(x) dx = - integral from b to a of f(x) dx; swapping the limits changes the sign."
+      },
+      {
+        "term": "Additivity property",
+        "definition": "The property integral a to b = integral a to c + integral c to b for any interior point c."
+      },
+      {
+        "term": "King property",
+        "definition": "The property integral from 0 to a of f(x) dx = integral from 0 to a of f(a - x) dx (and its general form with a + b - x)."
+      },
+      {
+        "term": "Even function property",
+        "definition": "For an even f, integral from -a to a of f(x) dx = 2 integral from 0 to a of f(x) dx."
+      },
+      {
+        "term": "Odd function property",
+        "definition": "For an odd f, integral from -a to a of f(x) dx = 0."
+      },
+      {
+        "term": "Periodic function property",
+        "definition": "For f of period T, integral from 0 to nT of f(x) dx = n integral from 0 to T of f(x) dx."
+      },
+      {
+        "term": "Substitution (changing limits)",
+        "definition": "The method u = g(x) in which the limits a and b are replaced by g(a) and g(b) before integrating in u."
+      },
+      {
+        "term": "Area under a curve",
+        "definition": "The area A = integral from a to b of y dx bounded by y = f(x), the x-axis and x = a, x = b."
+      },
+      {
+        "term": "Area between curves",
+        "definition": "The area integral from a to b of (upper - lower) dx enclosed between two curves, with a and b the x-coordinates of their intersections."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Definite Integrals (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for every numerical problem. Use standard antiderivatives and quote any property of definite integrals that you use.",
+    "total_marks": 33,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Define the definite integral integral from a to b of f(x) dx as the limit of a sum, defining every symbol used.",
+        "answer": "Divide [a, b] into n equal sub-intervals each of width h = (b - a)/n, with division points a, a + h, ..., a + (n-1)h. Forming rectangles of width h and height f at the left end-points gives the Riemann sum S_n = h[f(a) + f(a + h) + ... + f(a + (n-1)h)] = h * sum from r=0 to n-1 of f(a + r h). The definite integral is the limit of this sum:\n   integral from a to b of f(x) dx = limit as n->infinity of h * sum from r=0 to n-1 of f(a + r h), h = (b - a)/n.\nHere a and b are the lower and upper limits, f(x) is the integrand and x is the (dummy) variable of integration. Geometrically the integral is the net area under y = f(x) between x = a and x = b.",
+        "explanation": "Definition of the definite integral as a Riemann-sum limit.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-DIN-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral from 1 to 2 of x^2 dx.",
+        "answer": "An antiderivative of x^2 is F(x) = x^3/3. By the Fundamental Theorem of Calculus,\n   integral from 1 to 2 of x^2 dx = [ x^3/3 ] from 1 to 2 = (2^3)/3 - (1^3)/3 = 8/3 - 1/3 = 7/3.",
+        "explanation": "Apply F(b) - F(a) with F(x) = x^3/3.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral from 0 to pi/2 of sin x dx.",
+        "answer": "An antiderivative of sin x is -cos x. Hence\n   integral from 0 to pi/2 of sin x dx = [ -cos x ] from 0 to pi/2 = (-cos(pi/2)) - (-cos 0) = (0) - (-1) = 1.",
+        "explanation": "F(x) = -cos x; evaluate between the limits.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-03"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Evaluate integral from 0 to 1 of x/(1 + x^2) dx by a suitable substitution, changing the limits.",
+        "answer": "Let u = 1 + x^2. Then du = 2x dx, so x dx = du/2. Change the limits: when x = 0, u = 1 + 0 = 1; when x = 1, u = 1 + 1 = 2. Therefore\n   integral from 0 to 1 of x/(1 + x^2) dx = (1/2) integral from 1 to 2 of (1/u) du = (1/2) [ ln u ] from 1 to 2 = (1/2)(ln 2 - ln 1) = (1/2) ln 2.\nSo the value is (1/2) ln 2 (about 0.3466).",
+        "explanation": "Substitution u = 1 + x^2 with limits 1 and 2; integral of 1/u is ln u.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using the king property, evaluate I = integral from 0 to pi/2 of sin x / (sin x + cos x) dx.",
+        "answer": "By the king property integral 0 to a f(x) dx = integral 0 to a f(a - x) dx with a = pi/2. Replacing x by (pi/2 - x) gives sin -> cos and cos -> sin, so\n   I = integral from 0 to pi/2 of cos x / (cos x + sin x) dx.\nAdding the two expressions for I:\n   2I = integral from 0 to pi/2 of (sin x + cos x)/(sin x + cos x) dx = integral from 0 to pi/2 of 1 dx = pi/2.\nTherefore I = pi/4.",
+        "explanation": "King property; add I to its reflected form.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-05"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find the area bounded by the parabola y = x^2, the x-axis and the lines x = 0 and x = 3.",
+        "answer": "Since y = x^2 >= 0 on [0, 3], the area is\n   A = integral from 0 to 3 of x^2 dx = [ x^3/3 ] from 0 to 3 = (3^3)/3 - 0 = 27/3 = 9.\nThe required area is 9 square units.",
+        "explanation": "Area under a curve A = integral a to b y dx.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the even-function and odd-function properties of definite integrals over [-a, a], and hence write down integral from -2 to 2 of x^3 dx.",
+        "answer": "If f is even (f(-x) = f(x)), then integral from -a to a of f(x) dx = 2 integral from 0 to a of f(x) dx. If f is odd (f(-x) = -f(x)), then integral from -a to a of f(x) dx = 0.\nSince x^3 is odd, integral from -2 to 2 of x^3 dx = 0.",
+        "explanation": "Odd function integrates to 0 over a symmetric interval.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-DIN-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find the area of the region enclosed between the line y = x and the parabola y = x^2.",
+        "answer": "First find the intersection points by solving x = x^2, i.e. x^2 - x = 0, x(x - 1) = 0, so x = 0 and x = 1. On [0, 1] the line y = x lies above the parabola y = x^2 (for example at x = 1/2, x = 0.5 > x^2 = 0.25). Hence\n   A = integral from 0 to 1 of (x - x^2) dx = [ x^2/2 - x^3/3 ] from 0 to 1 = (1/2 - 1/3) - 0 = 1/6.\nThe enclosed area is 1/6 square unit.",
+        "explanation": "Area between curves = integral (upper - lower) dx between intersection points.",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-DIN-08"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate integral from 1 to e of (1/x) dx.",
+        "answer": "An antiderivative of 1/x is ln|x|. Therefore\n   integral from 1 to e of (1/x) dx = [ ln|x| ] from 1 to e = ln e - ln 1 = 1 - 0 = 1.",
+        "explanation": "Antiderivative of 1/x is ln|x|; ln e = 1, ln 1 = 0.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DIN-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the Fundamental Theorem of Calculus (evaluation form) and explain why the constant of integration does not affect a definite integral.",
+        "answer": "If f is continuous on [a, b] and F is any antiderivative of f (F'(x) = f(x)), then integral from a to b of f(x) dx = F(b) - F(a). If we use F(x) + C instead of F(x), the result is (F(b) + C) - (F(a) + C) = F(b) - F(a); the constant C cancels. Hence the arbitrary constant has no effect on a definite integral and may be dropped.",
+        "explanation": "State FTC; the +C cancels in F(b) - F(a).",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-DIN-02"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The definite integral integral from a to b of f(x) dx is defined as the limit of a",
+      "options": [
+        "derivative",
+        "Riemann sum",
+        "product",
+        "difference"
+      ],
+      "answer": "Riemann sum",
+      "explanation": "Sum of rectangle areas as n -> infinity."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the limit-of-a-sum definition with n equal strips on [a, b], the width h equals",
+      "options": [
+        "(b - a)/n",
+        "(a - b)/n",
+        "n/(b - a)",
+        "(b - a) n"
+      ],
+      "answer": "(b - a)/n",
+      "explanation": "Interval length divided by the number of strips."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Geometrically, integral from a to b of f(x) dx represents the",
+      "options": [
+        "slope of the curve",
+        "net area under the curve",
+        "length of the curve",
+        "maximum of f"
+      ],
+      "answer": "net area under the curve",
+      "explanation": "Definite integral = signed area."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f(x) is negative on part of [a, b], the definite integral counts that area as",
+      "options": [
+        "zero",
+        "positive",
+        "negative",
+        "undefined"
+      ],
+      "answer": "negative",
+      "explanation": "Areas below the x-axis are subtracted."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In integral from a to b of f(x) dx, the number a is called the",
+      "options": [
+        "upper limit",
+        "lower limit",
+        "integrand",
+        "constant"
+      ],
+      "answer": "lower limit",
+      "explanation": "a is the lower limit of integration."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Evaluated as a limit of a sum, integral from 0 to 1 of x dx equals",
+      "options": [
+        "1",
+        "1/2",
+        "1/3",
+        "2"
+      ],
+      "answer": "1/2",
+      "explanation": "Area of the triangle under y = x on [0,1]."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The variable x in integral from a to b of f(x) dx is a",
+      "options": [
+        "fixed number",
+        "dummy variable",
+        "limit",
+        "constant of integration"
+      ],
+      "answer": "dummy variable",
+      "explanation": "It may be replaced by any letter."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using rectangles, integral from 0 to 2 of 3 dx (area of a rectangle) equals",
+      "options": [
+        "3",
+        "5",
+        "6",
+        "2"
+      ],
+      "answer": "6",
+      "explanation": "Constant height 3 over width 2 gives 3 x 2 = 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "As a limit of a sum, integral from 0 to 1 of x^2 dx equals",
+      "options": [
+        "1/2",
+        "1/3",
+        "1/4",
+        "1"
+      ],
+      "answer": "1/3",
+      "explanation": "The Riemann-sum limit gives 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For the sum h*sum from r=0 to n-1 of f(a + r h), taking the limit means letting",
+      "options": [
+        "h -> infinity",
+        "n -> 0",
+        "n -> infinity",
+        "a -> b"
+      ],
+      "answer": "n -> infinity",
+      "explanation": "More, thinner strips: n -> infinity, h -> 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Fundamental Theorem of Calculus states integral from a to b of f(x) dx equals",
+      "options": [
+        "F(a) - F(b)",
+        "F(b) - F(a)",
+        "F(b) + F(a)",
+        "F(b)/F(a)"
+      ],
+      "answer": "F(b) - F(a)",
+      "explanation": "F is any antiderivative of f."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the Fundamental Theorem, F(x) is a function such that",
+      "options": [
+        "F(x) = f(x)",
+        "F'(x) = f(x)",
+        "F'(x) = 0",
+        "F(x) = 1/f(x)"
+      ],
+      "answer": "F'(x) = f(x)",
+      "explanation": "F is an antiderivative of f."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a definite integral the constant of integration C",
+      "options": [
+        "doubles the answer",
+        "cancels out",
+        "must be added",
+        "becomes infinite"
+      ],
+      "answer": "cancels out",
+      "explanation": "(F(b)+C)-(F(a)+C)=F(b)-F(a)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(d/dx) integral from a to x of f(t) dt equals",
+      "options": [
+        "f(a)",
+        "f(x)",
+        "F(x)",
+        "0"
+      ],
+      "answer": "f(x)",
+      "explanation": "Differentiation form of the FTC."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[ F(x) ] from a to b is read as F(x) evaluated from a to b and equals",
+      "options": [
+        "F(a) - F(b)",
+        "F(b) - F(a)",
+        "F(b)",
+        "F(a)"
+      ],
+      "answer": "F(b) - F(a)",
+      "explanation": "Standard evaluation notation."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If F(x) = x^3/3 is an antiderivative of x^2, then integral from 0 to 3 of x^2 dx equals",
+      "options": [
+        "9",
+        "27",
+        "3",
+        "6"
+      ],
+      "answer": "9",
+      "explanation": "F(3)-F(0)=27/3-0=9."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Integration and differentiation are",
+      "options": [
+        "the same operation",
+        "inverse operations",
+        "unrelated",
+        "both derivatives"
+      ],
+      "answer": "inverse operations",
+      "explanation": "The FTC links them as inverses."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from a to a of f(x) dx equals",
+      "options": [
+        "f(a)",
+        "1",
+        "0",
+        "F(a)"
+      ],
+      "answer": "0",
+      "explanation": "Equal limits give F(a)-F(a)=0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If G(x) = integral from 1 to x of t^2 dt, then G'(x) equals",
+      "options": [
+        "x^3/3",
+        "x^2",
+        "2x",
+        "1"
+      ],
+      "answer": "x^2",
+      "explanation": "By the differentiation form, G'(x)=integrand at x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to 2 of x^2 dx equals",
+      "options": [
+        "7/3",
+        "3",
+        "8/3",
+        "1"
+      ],
+      "answer": "7/3",
+      "explanation": "[x^3/3] from 1 to 2 = 8/3 - 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of sin x dx equals",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "pi/2"
+      ],
+      "answer": "1",
+      "explanation": "[-cos x] from 0 to pi/2 = 0 -(-1)=1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of cos x dx equals",
+      "options": [
+        "0",
+        "1",
+        "-1",
+        "pi"
+      ],
+      "answer": "1",
+      "explanation": "[sin x] from 0 to pi/2 = 1 - 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to e of (1/x) dx equals",
+      "options": [
+        "e",
+        "1",
+        "0",
+        "ln 2"
+      ],
+      "answer": "1",
+      "explanation": "[ln x] from 1 to e = 1 - 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of e^x dx equals",
+      "options": [
+        "e",
+        "e - 1",
+        "1 - e",
+        "e + 1"
+      ],
+      "answer": "e - 1",
+      "explanation": "[e^x] from 0 to 1 = e - 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 2 of (3x^2 + 2x) dx equals",
+      "options": [
+        "12",
+        "8",
+        "10",
+        "14"
+      ],
+      "answer": "12",
+      "explanation": "[x^3 + x^2] from 0 to 2 = 8 + 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of x^3 dx equals",
+      "options": [
+        "1/2",
+        "1/3",
+        "1/4",
+        "1"
+      ],
+      "answer": "1/4",
+      "explanation": "[x^4/4] from 0 to 1 = 1/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to 3 of 2x dx equals",
+      "options": [
+        "8",
+        "6",
+        "9",
+        "4"
+      ],
+      "answer": "8",
+      "explanation": "[x^2] from 1 to 3 = 9 - 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 2 of 5 dx equals",
+      "options": [
+        "5",
+        "10",
+        "7",
+        "2"
+      ],
+      "answer": "10",
+      "explanation": "Constant 5 over width 2 = 10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi of sin x dx equals",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "pi"
+      ],
+      "answer": "2",
+      "explanation": "[-cos x] from 0 to pi = 1+1=2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of (2x + 1) dx equals",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "2",
+      "explanation": "[x^2 + x] from 0 to 1 = 1 + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to 4 of sqrt(x) dx equals",
+      "options": [
+        "14/3",
+        "7/3",
+        "8/3",
+        "16/3"
+      ],
+      "answer": "14/3",
+      "explanation": "[ (2/3) x^(3/2) ] from 1 to 4 = (2/3)(8 - 1)=14/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/4 of sec^2 x dx equals",
+      "options": [
+        "0",
+        "1",
+        "sqrt 2",
+        "pi/4"
+      ],
+      "answer": "1",
+      "explanation": "[tan x] from 0 to pi/4 = 1 - 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 2 to 4 of (1/x) dx equals",
+      "options": [
+        "ln 2",
+        "ln 4",
+        "ln 8",
+        "2"
+      ],
+      "answer": "ln 2",
+      "explanation": "[ln x] from 2 to 4 = ln 4 - ln 2 = ln 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of (x^2 + 1) dx equals",
+      "options": [
+        "4/3",
+        "1/3",
+        "2/3",
+        "5/3"
+      ],
+      "answer": "4/3",
+      "explanation": "[x^3/3 + x] from 0 to 1 = 1/3 + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of (4x^3) dx equals",
+      "options": [
+        "1",
+        "2",
+        "4",
+        "1/4"
+      ],
+      "answer": "1",
+      "explanation": "[x^4] from 0 to 1 = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 3 of x dx equals",
+      "options": [
+        "3",
+        "9/2",
+        "6",
+        "3/2"
+      ],
+      "answer": "9/2",
+      "explanation": "[x^2/2] from 0 to 3 = 9/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -1 to 1 of e^x dx equals",
+      "options": [
+        "e - 1/e",
+        "e + 1/e",
+        "2e",
+        "0"
+      ],
+      "answer": "e - 1/e",
+      "explanation": "[e^x] from -1 to 1 = e - e^-1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral from a to b of f(x) dx equals",
+      "options": [
+        "integral from b to a of f(x) dx",
+        "- integral from b to a of f(x) dx",
+        "2 integral from b to a",
+        "0"
+      ],
+      "answer": "- integral from b to a of f(x) dx",
+      "explanation": "Reversing limits changes the sign."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral from a to b of f(x) dx = integral from a to c of f(x) dx +",
+      "options": [
+        "integral from c to b of f(x) dx",
+        "integral from b to c of f(x) dx",
+        "integral from a to c of f(x) dx",
+        "0"
+      ],
+      "answer": "integral from c to b of f(x) dx",
+      "explanation": "Additivity of the interval."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The king property states integral from 0 to a of f(x) dx equals",
+      "options": [
+        "integral from 0 to a of f(a - x) dx",
+        "integral from 0 to a of f(x - a) dx",
+        "integral from 0 to a of f(-x) dx",
+        "integral from a to 0 of f(x) dx"
+      ],
+      "answer": "integral from 0 to a of f(a - x) dx",
+      "explanation": "Reflection x -> a - x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For an odd function f, integral from -a to a of f(x) dx equals",
+      "options": [
+        "2 integral 0 to a",
+        "0",
+        "integral 0 to a",
+        "- a"
+      ],
+      "answer": "0",
+      "explanation": "Odd function on a symmetric interval integrates to 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For an even function f, integral from -a to a of f(x) dx equals",
+      "options": [
+        "0",
+        "2 integral from 0 to a of f(x) dx",
+        "integral from 0 to a of f(x) dx",
+        "- integral from 0 to a"
+      ],
+      "answer": "2 integral from 0 to a of f(x) dx",
+      "explanation": "Even function doubles the half-interval integral."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For a function of period T, integral from 0 to nT of f(x) dx equals",
+      "options": [
+        "integral from 0 to T",
+        "n integral from 0 to T of f(x) dx",
+        "T integral from 0 to n",
+        "0"
+      ],
+      "answer": "n integral from 0 to T of f(x) dx",
+      "explanation": "Periodicity property."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "integral from a to a of f(x) dx equals",
+      "options": [
+        "f(a)",
+        "1",
+        "0",
+        "F(a)"
+      ],
+      "answer": "0",
+      "explanation": "Zero-width interval."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The additivity property is most useful when the integrand",
+      "options": [
+        "is constant",
+        "changes its formula at an interior point",
+        "is always positive",
+        "is a polynomial"
+      ],
+      "answer": "changes its formula at an interior point",
+      "explanation": "Split at the break point, e.g. for |x|."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The function f(x) = x^2 is",
+      "options": [
+        "odd",
+        "even",
+        "periodic",
+        "neither"
+      ],
+      "answer": "even",
+      "explanation": "f(-x) = (-x)^2 = x^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The function f(x) = sin x is",
+      "options": [
+        "even",
+        "odd",
+        "constant",
+        "non-periodic"
+      ],
+      "answer": "odd",
+      "explanation": "sin(-x) = -sin x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -1 to 1 of x^3 dx equals",
+      "options": [
+        "2/4",
+        "0",
+        "1/2",
+        "1"
+      ],
+      "answer": "0",
+      "explanation": "x^3 is odd, symmetric interval gives 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -1 to 1 of x^2 dx equals",
+      "options": [
+        "1/3",
+        "2/3",
+        "1",
+        "0"
+      ],
+      "answer": "2/3",
+      "explanation": "Even: 2 integral 0 to 1 of x^2 = 2/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using the king property, integral from 0 to pi/2 of cos x/(sin x + cos x) dx equals",
+      "options": [
+        "pi/2",
+        "pi/4",
+        "1",
+        "pi"
+      ],
+      "answer": "pi/4",
+      "explanation": "Symmetric with sin version; each is pi/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of sin x/(sin x + cos x) dx equals",
+      "options": [
+        "pi/2",
+        "pi/4",
+        "pi",
+        "1"
+      ],
+      "answer": "pi/4",
+      "explanation": "King property gives 2I = pi/2, so I = pi/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -2 to 2 of x^5 dx equals",
+      "options": [
+        "32",
+        "0",
+        "64",
+        "16"
+      ],
+      "answer": "0",
+      "explanation": "Odd function on symmetric interval."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -a to a of (odd + even) where only the odd part is present contributes",
+      "options": [
+        "twice the value",
+        "zero from the odd part",
+        "the full value",
+        "a"
+      ],
+      "answer": "zero from the odd part",
+      "explanation": "Odd part cancels over [-a, a]."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 2 of |x - 1| dx (split at x = 1) equals",
+      "options": [
+        "1",
+        "2",
+        "1/2",
+        "0"
+      ],
+      "answer": "1",
+      "explanation": "Two triangles each area 1/2 sum to 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Since cos x has period 2 pi, integral from 0 to 4 pi of cos x dx equals",
+      "options": [
+        "0",
+        "2",
+        "4 pi",
+        "2 pi"
+      ],
+      "answer": "0",
+      "explanation": "Each full period integrates to 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "When substituting u = g(x) in a definite integral, we must also",
+      "options": [
+        "keep the old limits",
+        "change the limits to g(a) and g(b)",
+        "drop the limits",
+        "square the limits"
+      ],
+      "answer": "change the limits to g(a) and g(b)",
+      "explanation": "New limits are the u-values."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For integral from 0 to 1 of x/(1 + x^2) dx with u = 1 + x^2, the new limits are",
+      "options": [
+        "0 and 1",
+        "1 and 2",
+        "0 and 2",
+        "1 and 4"
+      ],
+      "answer": "1 and 2",
+      "explanation": "u(0)=1, u(1)=2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of x/(1 + x^2) dx equals",
+      "options": [
+        "ln 2",
+        "(1/2) ln 2",
+        "2 ln 2",
+        "ln 3"
+      ],
+      "answer": "(1/2) ln 2",
+      "explanation": "= (1/2)[ln u] from 1 to 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of cos x (sin x)^2 dx (u = sin x) equals",
+      "options": [
+        "1/2",
+        "1/3",
+        "1",
+        "2/3"
+      ],
+      "answer": "1/3",
+      "explanation": "integral 0 to 1 of u^2 du = 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "With u = x^2 + 1, integral from 1 to 2 of 2x (x^2 + 1)^3 dx equals",
+      "options": [
+        "609/4",
+        "16",
+        "625/4",
+        "150"
+      ],
+      "answer": "609/4",
+      "explanation": "integral 2 to 5 of u^3 du = (625-16)/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For integral from 0 to pi/2 of cos x (sin x)^2 dx with u = sin x, the new limits are",
+      "options": [
+        "0 and pi/2",
+        "0 and 1",
+        "1 and 0",
+        "0 and 2"
+      ],
+      "answer": "0 and 1",
+      "explanation": "sin 0 = 0, sin(pi/2)=1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of 2x e^(x^2) dx (u = x^2) equals",
+      "options": [
+        "e - 1",
+        "e",
+        "e^2 - 1",
+        "1"
+      ],
+      "answer": "e - 1",
+      "explanation": "integral 0 to 1 of e^u du = e - 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to 2 of (2x)/(x^2) dx equals",
+      "options": [
+        "ln 2",
+        "2 ln 2",
+        "ln 4",
+        "2"
+      ],
+      "answer": "2 ln 2",
+      "explanation": "= 2[ln x] from 1 to 2 = 2 ln 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "After changing the limits during substitution, we",
+      "options": [
+        "must revert to x",
+        "need not revert to x",
+        "must add C",
+        "reverse the limits"
+      ],
+      "answer": "need not revert to x",
+      "explanation": "Integrate directly in u between new limits."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of (3x^2)(x^3 + 1)^2 dx (u = x^3 + 1) equals",
+      "options": [
+        "7/3",
+        "8/3",
+        "1",
+        "2"
+      ],
+      "answer": "7/3",
+      "explanation": "integral 1 to 2 of u^2 du = (8-1)/3 = 7/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The area under y = f(x) between x = a and x = b (f >= 0) is",
+      "options": [
+        "integral a to b of f(x) dx",
+        "f(b) - f(a)",
+        "(b - a) f(a)",
+        "integral a to b of f'(x) dx"
+      ],
+      "answer": "integral a to b of f(x) dx",
+      "explanation": "Area = integral of y dx."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area under y = x^2 from x = 0 to x = 3 is",
+      "options": [
+        "9",
+        "27",
+        "3",
+        "6"
+      ],
+      "answer": "9",
+      "explanation": "integral 0 to 3 of x^2 dx = 9."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area under y = sin x from 0 to pi is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "pi"
+      ],
+      "answer": "2",
+      "explanation": "integral 0 to pi of sin x dx = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area under y = x from x = 0 to x = 4 is",
+      "options": [
+        "4",
+        "8",
+        "16",
+        "2"
+      ],
+      "answer": "8",
+      "explanation": "integral 0 to 4 of x dx = 16/2 = 8."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area under y = 1/x from x = 1 to x = e is",
+      "options": [
+        "e",
+        "1",
+        "e - 1",
+        "0"
+      ],
+      "answer": "1",
+      "explanation": "integral 1 to e of (1/x) dx = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The area between y = f(x) (upper) and y = g(x) (lower) on [a, b] is",
+      "options": [
+        "integral a to b of (g - f) dx",
+        "integral a to b of (f - g) dx",
+        "integral a to b of f g dx",
+        "f(b) - g(a)"
+      ],
+      "answer": "integral a to b of (f - g) dx",
+      "explanation": "Upper minus lower."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The curves y = x and y = x^2 intersect at x =",
+      "options": [
+        "0 and 2",
+        "0 and 1",
+        "1 and 2",
+        "-1 and 1"
+      ],
+      "answer": "0 and 1",
+      "explanation": "Solve x = x^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The area enclosed between y = x and y = x^2 is",
+      "options": [
+        "1/2",
+        "1/3",
+        "1/6",
+        "1"
+      ],
+      "answer": "1/6",
+      "explanation": "integral 0 to 1 of (x - x^2) dx = 1/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "To find the limits for the area between two curves, one solves",
+      "options": [
+        "f(x) = 0",
+        "f(x) = g(x)",
+        "f'(x) = 0",
+        "f(x) = x"
+      ],
+      "answer": "f(x) = g(x)",
+      "explanation": "Intersections give the limits."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The area of the circle x^2 + y^2 = a^2 found by integration is",
+      "options": [
+        "pi a",
+        "2 pi a",
+        "pi a^2",
+        "4 a^2"
+      ],
+      "answer": "pi a^2",
+      "explanation": "4 times integral 0 to a of sqrt(a^2 - x^2) dx = pi a^2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A definite integral is a single number, not a family of functions.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "It has fixed limits and yields a number."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the limit-of-a-sum definition, the strip width h increases to infinity as n grows.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "h = (b - a)/n tends to 0 as n -> infinity."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If F'(x) = f(x), then integral from a to b of f(x) dx = F(b) - F(a).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "This is the Fundamental Theorem of Calculus."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The constant of integration must be kept when evaluating a definite integral.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It cancels in F(b) - F(a)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of cos x dx = 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "[sin x] from 0 to pi/2 = 1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral from a to b of f(x) dx = - integral from b to a of f(x) dx.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Reversing limits changes the sign."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For any odd function, integral from -a to a of f(x) dx = 0.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Odd symmetry cancels the two halves."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -1 to 1 of x^2 dx = 0.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "x^2 is even; the integral is 2/3, not 0."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "When using substitution in a definite integral, the limits stay unchanged.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Limits must be changed to the new variable's values."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The area between two curves uses the difference (upper - lower) of the functions.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "A = integral (upper - lower) dx."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the sum h*sum f(a + r h), the width h equals (b - a)/____.",
+      "answer": "n",
+      "explanation": "Number of equal strips."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Evaluated from first principles, integral from 0 to 1 of x dx = ____.",
+      "answer": "1/2",
+      "explanation": "Triangle area under y = x."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "By the Fundamental Theorem, integral from a to b of f(x) dx = F(b) - ____.",
+      "answer": "F(a)",
+      "explanation": "Evaluate the antiderivative at both limits."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(d/dx) integral from a to x of f(t) dt = ____.",
+      "answer": "f(x)",
+      "explanation": "Differentiation form of the FTC."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to 2 of x^2 dx = ____.",
+      "answer": "7/3",
+      "explanation": "8/3 - 1/3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 1 to e of (1/x) dx = ____.",
+      "answer": "1",
+      "explanation": "ln e - ln 1."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of e^x dx = ____.",
+      "answer": "e - 1",
+      "explanation": "[e^x] from 0 to 1."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi of sin x dx = ____.",
+      "answer": "2",
+      "explanation": "[-cos x] from 0 to pi."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "integral from a to a of f(x) dx = ____.",
+      "answer": "0",
+      "explanation": "Zero-width interval."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "King property: integral from 0 to a of f(x) dx = integral from 0 to a of f(____) dx.",
+      "answer": "a - x",
+      "explanation": "Reflection about the midpoint."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from -2 to 2 of x^3 dx = ____.",
+      "answer": "0",
+      "explanation": "Odd function on a symmetric interval."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to pi/2 of sin x/(sin x + cos x) dx = ____.",
+      "answer": "pi/4",
+      "explanation": "King property gives pi/4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "integral from 0 to 1 of x/(1 + x^2) dx = ____.",
+      "answer": "(1/2) ln 2",
+      "explanation": "Substitute u = 1 + x^2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area under y = x^2 from 0 to 3 is ____ square units.",
+      "answer": "9",
+      "explanation": "integral 0 to 3 of x^2 dx."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The area enclosed between y = x and y = x^2 is ____ square unit.",
+      "answer": "1/6",
+      "explanation": "integral 0 to 1 of (x - x^2) dx."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Write the definition of integral from a to b of f(x) dx as a limit of a sum.",
+      "answer": "integral from a to b of f(x) dx = limit as n -> infinity of h * sum from r=0 to n-1 of f(a + r h), where h = (b - a)/n. It is the limit of the Riemann sum of rectangle areas and equals the net area under y = f(x) from a to b.",
+      "explanation": "Riemann-sum definition."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 0 to 1 of x dx from first principles (as a limit of a sum).",
+      "answer": "Here a = 0, b = 1, h = 1/n and f(a + r h) = r/n. So S_n = h * sum from r=0 to n-1 of (r/n) = (1/n)(1/n)(0 + 1 + ... + (n-1)) = (1/n^2) * (n-1)n/2 = (n-1)/(2n) = (1/2)(1 - 1/n). As n -> infinity, S_n -> 1/2. Hence integral from 0 to 1 of x dx = 1/2.",
+      "explanation": "Sum of first (n-1) integers, then limit."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Explain what a definite integral represents when f(x) takes both positive and negative values on [a, b].",
+      "answer": "It represents the NET (signed) area: regions where f(x) > 0 (above the x-axis) count as positive area, while regions where f(x) < 0 (below the x-axis) count as negative area. The definite integral is the sum of these signed contributions, so parts below the axis subtract from parts above it.",
+      "explanation": "Signed area interpretation."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the Fundamental Theorem of Calculus (evaluation form).",
+      "answer": "If f is continuous on [a, b] and F is any antiderivative of f (that is, F'(x) = f(x)), then integral from a to b of f(x) dx = F(b) - F(a). This lets a definite integral be evaluated by antidifferentiation rather than from first principles.",
+      "explanation": "Statement of the FTC."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain why the constant of integration can be ignored in a definite integral.",
+      "answer": "Suppose F(x) + C is used as the antiderivative. Then integral from a to b of f(x) dx = (F(b) + C) - (F(a) + C) = F(b) - F(a). The constant C appears at both limits and cancels on subtraction, so the value of the definite integral is unaffected. Hence C is dropped.",
+      "explanation": "The +C cancels in the subtraction."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If G(x) = integral from 0 to x of cos t dt, find G'(x) and G(pi/2).",
+      "answer": "By the differentiation form of the FTC, G'(x) = cos x. Also G(x) = [sin t] from 0 to x = sin x - 0 = sin x, so G(pi/2) = sin(pi/2) = 1.",
+      "explanation": "Differentiate the integral; evaluate directly."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral from 0 to 2 of (3x^2 + 2x) dx.",
+      "answer": "An antiderivative is x^3 + x^2. So integral from 0 to 2 of (3x^2 + 2x) dx = [ x^3 + x^2 ] from 0 to 2 = (8 + 4) - (0) = 12.",
+      "explanation": "Antiderivative x^3 + x^2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 1 to 4 of sqrt(x) dx.",
+      "answer": "Write sqrt(x) = x^(1/2). Its antiderivative is (2/3) x^(3/2). Then integral from 1 to 4 of sqrt(x) dx = [ (2/3) x^(3/2) ] from 1 to 4 = (2/3)(4^(3/2) - 1^(3/2)) = (2/3)(8 - 1) = 14/3.",
+      "explanation": "Power rule with n = 1/2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral from 0 to 1 of e^x dx.",
+      "answer": "An antiderivative of e^x is e^x. So integral from 0 to 1 of e^x dx = [ e^x ] from 0 to 1 = e^1 - e^0 = e - 1 (about 1.718).",
+      "explanation": "Antiderivative of e^x is e^x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 0 to pi of (1 + cos x) dx.",
+      "answer": "An antiderivative of 1 + cos x is x + sin x. So integral from 0 to pi of (1 + cos x) dx = [ x + sin x ] from 0 to pi = (pi + sin pi) - (0 + sin 0) = (pi + 0) - 0 = pi.",
+      "explanation": "Integrate term by term."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 2 to 3 of (x^2 - 2x + 1) dx.",
+      "answer": "Note x^2 - 2x + 1 = (x - 1)^2. An antiderivative is x^3/3 - x^2 + x. Evaluate: at x = 3, 27/3 - 9 + 3 = 9 - 9 + 3 = 3; at x = 2, 8/3 - 4 + 2 = 8/3 - 2 = 2/3. So the integral = 3 - 2/3 = 7/3.",
+      "explanation": "Antiderivative x^3/3 - x^2 + x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral from 1 to 3 of 2x dx.",
+      "answer": "An antiderivative of 2x is x^2. So integral from 1 to 3 of 2x dx = [ x^2 ] from 1 to 3 = 9 - 1 = 8.",
+      "explanation": "Antiderivative x^2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the additivity property of definite integrals and give one situation where it is needed.",
+      "answer": "integral from a to b of f(x) dx = integral from a to c of f(x) dx + integral from c to b of f(x) dx for any point c. It is needed when the integrand changes its formula at an interior point, for example integrating |x| across x = 0 by splitting at 0.",
+      "explanation": "Additivity property with a use case."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the even and odd function properties for integral from -a to a of f(x) dx.",
+      "answer": "If f is even (f(-x) = f(x)), then integral from -a to a of f(x) dx = 2 integral from 0 to a of f(x) dx. If f is odd (f(-x) = -f(x)), then integral from -a to a of f(x) dx = 0.",
+      "explanation": "Symmetry properties over [-a, a]."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the king property of definite integrals and its common special case.",
+      "answer": "General form: integral from a to b of f(x) dx = integral from a to b of f(a + b - x) dx. Common special case: integral from 0 to a of f(x) dx = integral from 0 to a of f(a - x) dx. It is obtained by the substitution x -> a + b - x (or x -> a - x).",
+      "explanation": "King property."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Using symmetry, evaluate integral from -1 to 1 of (x^3 + x^2) dx.",
+      "answer": "Split by symmetry: integral from -1 to 1 of x^3 dx = 0 (odd), and integral from -1 to 1 of x^2 dx = 2 integral from 0 to 1 of x^2 dx = 2(1/3) = 2/3 (even). Adding, the value is 0 + 2/3 = 2/3.",
+      "explanation": "Odd part is 0; even part doubles the half-integral."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate I = integral from 0 to pi/2 of cos x/(sin x + cos x) dx using the king property.",
+      "answer": "By the king property (x -> pi/2 - x), I = integral from 0 to pi/2 of sin x/(cos x + sin x) dx. Adding, 2I = integral from 0 to pi/2 of (cos x + sin x)/(sin x + cos x) dx = integral from 0 to pi/2 of 1 dx = pi/2. Hence I = pi/4.",
+      "explanation": "Add I to its reflected form."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate integral from 0 to 2 of |x - 1| dx by splitting the interval.",
+      "answer": "Split at x = 1. For 0 <= x <= 1, |x - 1| = 1 - x; for 1 <= x <= 2, |x - 1| = x - 1. integral 0 to 1 of (1 - x) dx = [x - x^2/2] from 0 to 1 = 1 - 1/2 = 1/2. integral 1 to 2 of (x - 1) dx = [x^2/2 - x] from 1 to 2 = (2 - 2) - (1/2 - 1) = 0 + 1/2 = 1/2. Total = 1/2 + 1/2 = 1.",
+      "explanation": "Additivity property applied to |x - 1|."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 0 to pi/2 of cos x (sin x)^2 dx by substitution.",
+      "answer": "Let u = sin x, so du = cos x dx. Change limits: x = 0 gives u = 0; x = pi/2 gives u = 1. Then integral from 0 to pi/2 of cos x (sin x)^2 dx = integral from 0 to 1 of u^2 du = [ u^3/3 ] from 0 to 1 = 1/3.",
+      "explanation": "Substitution u = sin x with limits 0 and 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate integral from 1 to 2 of 2x (x^2 + 1)^3 dx by substitution.",
+      "answer": "Let u = x^2 + 1, so du = 2x dx. Change limits: x = 1 gives u = 2; x = 2 gives u = 5. Then integral from 2 to 5 of u^3 du = [ u^4/4 ] from 2 to 5 = (625 - 16)/4 = 609/4.",
+      "explanation": "Substitution u = x^2 + 1 with limits 2 and 5."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the area bounded by y = sin x, the x-axis, x = 0 and x = pi.",
+      "answer": "Since sin x >= 0 on [0, pi], the area is A = integral from 0 to pi of sin x dx = [ -cos x ] from 0 to pi = (-cos pi) - (-cos 0) = (1) - (-1) = 2 square units.",
+      "explanation": "Area under one arch of sine is 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Find the area enclosed between the parabola y = x^2 and the line y = 2x.",
+      "answer": "Find intersections: x^2 = 2x gives x^2 - 2x = 0, x(x - 2) = 0, so x = 0 and x = 2. On [0, 2] the line y = 2x is above y = x^2. So A = integral from 0 to 2 of (2x - x^2) dx = [ x^2 - x^3/3 ] from 0 to 2 = (4 - 8/3) - 0 = 4/3 square units.",
+      "explanation": "Upper (line) minus lower (parabola) between 0 and 2."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate integral from 0 to 2 of x^2 dx as the limit of a sum.",
+      "answer": "Here a = 0, b = 2, h = 2/n and f(a + r h) = (r h)^2 = (2r/n)^2 = 4 r^2/n^2. Then\nS_n = h * sum from r=0 to n-1 of f(a + r h) = (2/n) * sum from r=0 to n-1 of (4 r^2/n^2) = (8/n^3) * sum from r=0 to n-1 of r^2.\nUsing sum of squares of the first (n-1) integers = (n-1)n(2n-1)/6,\nS_n = (8/n^3) * (n-1)n(2n-1)/6 = (8/6) * (n-1)(2n-1)/n^2 = (4/3) * (2n^2 - 3n + 1)/n^2 = (4/3)(2 - 3/n + 1/n^2).\nAs n -> infinity, S_n -> (4/3)(2) = 8/3. Hence integral from 0 to 2 of x^2 dx = 8/3, which agrees with [x^3/3] from 0 to 2.",
+      "explanation": "Sum-of-squares formula, then take the limit."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Explain both forms of the Fundamental Theorem of Calculus and illustrate the evaluation form with integral from 1 to 3 of (2x + 1) dx.",
+      "answer": "Evaluation form: if F'(x) = f(x) then integral from a to b of f(x) dx = F(b) - F(a). Differentiation form: if G(x) = integral from a to x of f(t) dt, then G'(x) = f(x). Together they show integration and differentiation are inverse operations.\nIllustration: for f(x) = 2x + 1, an antiderivative is F(x) = x^2 + x. Then integral from 1 to 3 of (2x + 1) dx = [ x^2 + x ] from 1 to 3 = (9 + 3) - (1 + 1) = 12 - 2 = 10.",
+      "explanation": "Both forms stated; worked evaluation gives 10."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Evaluate integral from 0 to pi/2 of (sin x + cos x) dx and integral from 0 to 1 of (3x^2 + 4x + 1) dx.",
+      "answer": "First: an antiderivative of sin x + cos x is -cos x + sin x. So integral from 0 to pi/2 of (sin x + cos x) dx = [ sin x - cos x ] from 0 to pi/2 = (1 - 0) - (0 - 1) = 1 + 1 = 2.\nSecond: an antiderivative of 3x^2 + 4x + 1 is x^3 + 2x^2 + x. So integral from 0 to 1 of (3x^2 + 4x + 1) dx = [ x^3 + 2x^2 + x ] from 0 to 1 = (1 + 2 + 1) - 0 = 4.",
+      "explanation": "Two direct evaluations using standard antiderivatives."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "State any four properties of definite integrals and give a one-line justification or example for each.",
+      "answer": "1) Reversal: integral a to b f(x) dx = - integral b to a f(x) dx; swapping the limits negates F(b) - F(a). 2) Additivity: integral a to b = integral a to c + integral c to b; splitting the interval adds the areas. 3) King property: integral 0 to a f(x) dx = integral 0 to a f(a - x) dx; e.g. it gives integral 0 to pi/2 of sin x/(sin x + cos x) dx = pi/4. 4) Even/odd: for even f, integral -a to a = 2 integral 0 to a; for odd f it is 0, e.g. integral -1 to 1 of x^3 dx = 0.",
+      "explanation": "Four properties with justifications."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate I = integral from 0 to pi of x sin x dx using the king property together with integration.",
+      "answer": "By the king property (a = 0, b = pi, x -> pi - x): I = integral from 0 to pi of (pi - x) sin(pi - x) dx = integral from 0 to pi of (pi - x) sin x dx = pi integral from 0 to pi of sin x dx - I. Now integral from 0 to pi of sin x dx = [ -cos x ] from 0 to pi = 1 + 1 = 2. So I = pi(2) - I, giving 2I = 2 pi, hence I = pi.\nTherefore integral from 0 to pi of x sin x dx = pi.",
+      "explanation": "King property reduces the x-weight; solve for I."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate integral from 0 to 1 of x^2 (x^3 + 1)^4 dx by substitution, showing the change of limits.",
+      "answer": "Let u = x^3 + 1. Then du = 3x^2 dx, so x^2 dx = du/3. Change limits: x = 0 gives u = 0 + 1 = 1; x = 1 gives u = 1 + 1 = 2. Then\nintegral from 0 to 1 of x^2 (x^3 + 1)^4 dx = (1/3) integral from 1 to 2 of u^4 du = (1/3) [ u^5/5 ] from 1 to 2 = (1/15)(32 - 1) = 31/15.\nSo the value is 31/15.",
+      "explanation": "u = x^3 + 1, new limits 1 and 2."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Find the area bounded by the curve y = x^2 + 1, the x-axis and the lines x = 0 and x = 2.",
+      "answer": "Since y = x^2 + 1 > 0 on [0, 2], the area is A = integral from 0 to 2 of (x^2 + 1) dx. An antiderivative is x^3/3 + x. So A = [ x^3/3 + x ] from 0 to 2 = (8/3 + 2) - 0 = 8/3 + 6/3 = 14/3 square units.",
+      "explanation": "Area under y = x^2 + 1 over [0, 2]."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Find the area of the region enclosed between the parabola y^2 = 4x and the line y = 2x - 4. (You may integrate with respect to y.)",
+      "answer": "Solve for intersections. From the line, x = (y + 4)/2. From the parabola, x = y^2/4. Setting equal: y^2/4 = (y + 4)/2, so y^2 = 2y + 8, i.e. y^2 - 2y - 8 = 0, (y - 4)(y + 2) = 0, giving y = 4 and y = -2. Integrating with respect to y between -2 and 4, the right boundary is the line x = (y + 4)/2 and the left boundary is the parabola x = y^2/4:\nA = integral from -2 to 4 of [ (y + 4)/2 - y^2/4 ] dy = [ y^2/4 + 2y - y^3/12 ] from -2 to 4.\nAt y = 4: 4 + 8 - 64/12 = 12 - 16/3 = 20/3. At y = -2: 1 - 4 + 8/12 = -3 + 2/3 = -7/3. So A = 20/3 - (-7/3) = 27/3 = 9 square units.",
+      "explanation": "Integrate (right - left) in y between -2 and 4."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: A student is asked to build the definite integral of f(x) = x on [0, 1] from first principles. She divides the interval into n equal strips of width h = 1/n and uses left end-points as heights. (i) Write the width h and the sample height f(a + r h). (ii) Write the Riemann sum S_n. (iii) Simplify S_n. (iv) Take the limit to find the integral.",
+      "answer": "(i) h = (1 - 0)/n = 1/n; the r-th left end-point is a + r h = r/n, so f(a + r h) = r/n. (ii) S_n = h * sum from r=0 to n-1 of f(a + r h) = (1/n) * sum from r=0 to n-1 of (r/n) = (1/n^2) sum from r=0 to n-1 of r. (iii) Since sum from r=0 to n-1 of r = (n-1)n/2, S_n = (1/n^2)(n-1)n/2 = (n-1)/(2n) = (1/2)(1 - 1/n). (iv) As n -> infinity, S_n -> 1/2. Hence integral from 0 to 1 of x dx = 1/2.",
+      "explanation": "First-principles construction of integral 0 to 1 of x dx."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Case Study: A learner writes G(x) = integral from 0 to x of (2t) dt and claims integration undoes differentiation. (i) Evaluate G(x) explicitly. (ii) Find G'(x). (iii) What does G'(x) illustrate? (iv) Compute G(3).",
+      "answer": "(i) An antiderivative of 2t is t^2, so G(x) = [ t^2 ] from 0 to x = x^2 - 0 = x^2. (ii) G'(x) = 2x. (iii) It illustrates the differentiation form of the Fundamental Theorem of Calculus: differentiating an integral with respect to its upper limit returns the integrand, so integration and differentiation are inverse operations. (iv) G(3) = 3^2 = 9.",
+      "explanation": "Differentiation form of the FTC."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: Evaluate three definite integrals used in a mechanics problem. (i) integral from 0 to 2 of 3x^2 dx. (ii) integral from 0 to pi/2 of cos x dx. (iii) integral from 1 to e of (1/x) dx. (iv) State the standard antiderivative used in part (iii).",
+      "answer": "(i) Antiderivative x^3; [ x^3 ] from 0 to 2 = 8 - 0 = 8. (ii) Antiderivative sin x; [ sin x ] from 0 to pi/2 = 1 - 0 = 1. (iii) Antiderivative ln|x|; [ ln x ] from 1 to e = ln e - ln 1 = 1 - 0 = 1. (iv) The antiderivative of 1/x is ln|x|.",
+      "explanation": "Three direct evaluations plus a standard result."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Case Study: A table lists functions on symmetric intervals: (A) x^3 on [-2, 2], (B) x^2 on [-2, 2], (C) sin x on [-pi, pi], (D) cos x on [-pi, pi]. (i) Which are odd? (ii) Which are even? (iii) State the value of integral for the odd ones. (iv) Write integral from -2 to 2 of x^2 dx in terms of integral from 0 to 2.",
+      "answer": "(i) Odd: (A) x^3 and (C) sin x, since f(-x) = -f(x). (ii) Even: (B) x^2 and (D) cos x, since f(-x) = f(x). (iii) For the odd functions the integral over the symmetric interval is 0, so integral from -2 to 2 of x^3 dx = 0 and integral from -pi to pi of sin x dx = 0. (iv) integral from -2 to 2 of x^2 dx = 2 integral from 0 to 2 of x^2 dx.",
+      "explanation": "Odd/even classification and their integral properties."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: To evaluate I = integral from 0 to pi/2 of sin x/(sin x + cos x) dx a student uses the king property. (i) State the king property special case. (ii) Write I after replacing x by pi/2 - x. (iii) Add the two forms of I. (iv) Hence find I.",
+      "answer": "(i) integral from 0 to a of f(x) dx = integral from 0 to a of f(a - x) dx. (ii) With a = pi/2, sin x -> cos x and cos x -> sin x, so I = integral from 0 to pi/2 of cos x/(cos x + sin x) dx. (iii) Adding the original and this form: 2I = integral from 0 to pi/2 of (sin x + cos x)/(sin x + cos x) dx = integral from 0 to pi/2 of 1 dx = pi/2. (iv) Therefore I = pi/4.",
+      "explanation": "King property evaluation giving pi/4."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: A definite integral integral from 0 to 1 of x/(1 + x^2) dx is to be evaluated by substitution. (i) Choose a substitution u = g(x) and find du. (ii) Change the limits. (iii) Rewrite the integral in u. (iv) Evaluate it.",
+      "answer": "(i) Let u = 1 + x^2, so du = 2x dx, i.e. x dx = du/2. (ii) When x = 0, u = 1; when x = 1, u = 2. (iii) The integral becomes (1/2) integral from 1 to 2 of (1/u) du. (iv) = (1/2) [ ln u ] from 1 to 2 = (1/2)(ln 2 - ln 1) = (1/2) ln 2.",
+      "explanation": "Substitution u = 1 + x^2 with changed limits."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: Evaluate integral from 0 to pi/2 of sin x cos x dx by substitution. (i) Put u = sin x and find du. (ii) Change the limits. (iii) Write the integral in u. (iv) Evaluate.",
+      "answer": "(i) u = sin x, du = cos x dx. (ii) x = 0 gives u = 0; x = pi/2 gives u = 1. (iii) integral from 0 to pi/2 of sin x cos x dx = integral from 0 to 1 of u du. (iv) = [ u^2/2 ] from 0 to 1 = 1/2 - 0 = 1/2.",
+      "explanation": "Substitution u = sin x; value 1/2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Case Study: A gardener models a flower-bed border by the curve y = x^2 (in metres) between x = 0 and x = 2, with the x-axis as the lower edge. (i) Write the area as a definite integral. (ii) Give the antiderivative. (iii) Evaluate the area. (iv) State the units.",
+      "answer": "(i) A = integral from 0 to 2 of x^2 dx. (ii) An antiderivative of x^2 is x^3/3. (iii) A = [ x^3/3 ] from 0 to 2 = 8/3 - 0 = 8/3. (iv) The area is 8/3 square metres (about 2.67 m^2).",
+      "explanation": "Area under y = x^2 on [0, 2] is 8/3."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Case Study: A designer needs the area enclosed between the line y = x and the parabola y = x^2. (i) Find the points of intersection. (ii) Which curve is on top between them? (iii) Write the area integral. (iv) Evaluate it.",
+      "answer": "(i) Solve x = x^2: x^2 - x = 0, x(x - 1) = 0, so x = 0 and x = 1. (ii) Between 0 and 1 the line y = x is above the parabola y = x^2 (at x = 0.5, 0.5 > 0.25). (iii) A = integral from 0 to 1 of (x - x^2) dx. (iv) = [ x^2/2 - x^3/3 ] from 0 to 1 = (1/2 - 1/3) - 0 = 1/6 square unit.",
+      "explanation": "Area between line and parabola is 1/6."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DIN-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Case Study: Find the area between y = x^2 and y = 2x. (i) Find the intersection points. (ii) Identify the upper curve. (iii) Set up the definite integral. (iv) Evaluate the area.",
+      "answer": "(i) Solve x^2 = 2x: x^2 - 2x = 0, x(x - 2) = 0, so x = 0 and x = 2. (ii) Between 0 and 2 the line y = 2x is above the parabola y = x^2 (at x = 1, 2 > 1). (iii) A = integral from 0 to 2 of (2x - x^2) dx. (iv) = [ x^2 - x^3/3 ] from 0 to 2 = (4 - 8/3) - 0 = 12/3 - 8/3 = 4/3 square units.",
+      "explanation": "Area between line and parabola is 4/3."
+    }
+  ]
+}

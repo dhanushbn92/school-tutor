@@ -1,0 +1,2261 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 29,
+    "chapter_title": "Application of Derivatives",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 29 - APPLICATION OF DERIVATIVES\n\nIntroduction\n\nOnce we know how to differentiate a function, the derivative becomes a powerful tool for studying how quantities behave and change. The derivative f'(x) = dy/dx measures the INSTANTANEOUS RATE of change of y with respect to x. In this chapter we use this single idea in many practical ways: to find how fast one quantity changes when a related quantity changes (related rates), to draw tangents and normals to curves, to decide where a function is rising or falling, to locate the highest and lowest values a function can take (maxima and minima), to solve real-world optimization problems, to estimate small changes and errors using differentials, and finally to state two fundamental results - Rolle's theorem and the Mean Value Theorem - that underpin all of these applications.\n\n29.1 DERIVATIVE AS A RATE OF CHANGE\n\nIf a quantity y depends on x through y = f(x), then dy/dx gives the rate at which y changes per unit change in x. When the independent variable is time t, dy/dt is the rate of change with respect to time. For example, if s is the distance travelled, ds/dt is the velocity and d^2s/dt^2 is the acceleration.\n\nTwo rates are AVERAGE and INSTANTANEOUS. The average rate of change of y between x = a and x = b is [f(b) - f(a)] / (b - a); the instantaneous rate at x = a is f'(a), the limit of the average rate as b approaches a.\n\nWorked example: The area of a circle is A = pi r^2. Then dA/dr = 2 pi r, which is the rate at which the area grows per unit increase in radius - and this equals the circumference. If instead the radius grows with time, dA/dt = 2 pi r (dr/dt).\n\nRELATED RATES. Often two variables are connected by an equation and both change with time. Differentiating the connecting equation with respect to t links their rates.\n\nWorked example: A spherical balloon is inflated so that its volume increases at 100 cm^3/s. How fast is the radius increasing when r = 5 cm? Volume V = (4/3) pi r^3, so dV/dt = 4 pi r^2 (dr/dt). Putting dV/dt = 100 and r = 5: 100 = 4 pi (25) (dr/dt), giving dr/dt = 100 / (100 pi) = 1/pi cm/s, about 0.318 cm/s.\n\nWorked example: A ladder 5 m long leans against a wall. Its foot is pulled away at 2 m/s. How fast does the top slide down when the foot is 3 m from the wall? Here x^2 + y^2 = 25. Differentiating: 2x (dx/dt) + 2y (dy/dt) = 0. When x = 3, y = 4, and dx/dt = 2: 2(3)(2) + 2(4)(dy/dt) = 0, so dy/dt = -12/8 = -1.5 m/s. The negative sign means the top moves DOWN at 1.5 m/s.\n\n29.2 SLOPE OF TANGENT AND NORMAL\n\nThe geometric meaning of the derivative is the SLOPE of the tangent line. If y = f(x), the slope of the tangent to the curve at the point (x1, y1) is m = f'(x1) = (dy/dx) evaluated at that point.\n\nEQUATION OF THE TANGENT at (x1, y1):\n   y - y1 = f'(x1) (x - x1).\n\nThe NORMAL is the line through (x1, y1) perpendicular to the tangent. Since perpendicular slopes multiply to -1, the slope of the normal is -1/f'(x1) (provided f'(x1) is not zero).\n\nEQUATION OF THE NORMAL at (x1, y1):\n   y - y1 = [-1/f'(x1)] (x - x1).\n\nSpecial cases: if f'(x1) = 0 the tangent is HORIZONTAL (y = y1) and the normal is VERTICAL (x = x1). If f'(x1) is infinite (dy/dx -> infinity, i.e. dx/dy = 0), the tangent is VERTICAL and the normal is horizontal.\n\nWorked example: Find the tangent and normal to y = x^2 at (2, 4). Here dy/dx = 2x, so at x = 2 the slope is 4. Tangent: y - 4 = 4(x - 2), i.e. y = 4x - 4. Normal slope = -1/4, so normal: y - 4 = (-1/4)(x - 2), i.e. x + 4y = 18.\n\nWorked example: The tangent to y = x^3 - 3x at the point where x = 2. dy/dx = 3x^2 - 3 = 12 - 3 = 9 at x = 2; y = 8 - 6 = 2. Tangent: y - 2 = 9(x - 2), i.e. y = 9x - 16.\n\nThe ANGLE between two curves at a point of intersection is the angle between their tangents there: tan(theta) = |(m1 - m2)/(1 + m1 m2)|. Curves cut at right angles (orthogonally) when m1 m2 = -1, and touch when m1 = m2.\n\n29.3 INCREASING AND DECREASING FUNCTIONS\n\nA function f is INCREASING on an interval if x1 < x2 implies f(x1) <= f(x2), and strictly increasing if f(x1) < f(x2). It is DECREASING if x1 < x2 implies f(x1) >= f(x2). The sign of the derivative decides this:\n\n   If f'(x) > 0 for all x in an interval, f is (strictly) increasing there.\n   If f'(x) < 0 for all x in an interval, f is (strictly) decreasing there.\n   If f'(x) = 0 for all x in an interval, f is constant there.\n\nTo find the intervals of increase and decrease: compute f'(x), find where f'(x) = 0 (the critical points), and test the sign of f'(x) in each sub-interval.\n\nWorked example: f(x) = x^2 - 4x + 3. f'(x) = 2x - 4 = 2(x - 2). f'(x) < 0 for x < 2 (decreasing) and f'(x) > 0 for x > 2 (increasing). So f decreases on (-infinity, 2) and increases on (2, infinity), with a lowest point at x = 2.\n\nWorked example: f(x) = x^3 - 3x. f'(x) = 3x^2 - 3 = 3(x - 1)(x + 1). This is positive for x < -1 and x > 1 (increasing) and negative for -1 < x < 1 (decreasing).\n\n29.4 MAXIMA AND MINIMA\n\nA function has a LOCAL (relative) MAXIMUM at x = c if f(c) is greater than or equal to the values of f at all nearby points; a LOCAL MINIMUM if f(c) is less than or equal to nearby values. The ABSOLUTE (global) maximum and minimum are the largest and smallest values over the whole domain (or a given closed interval).\n\nCRITICAL POINTS. At an interior local extremum where f is differentiable, the tangent is horizontal, so f'(c) = 0. Points where f'(c) = 0 or f'(c) does not exist are called critical points (or stationary points when f'(c) = 0). They are the CANDIDATES for local extrema, but not every critical point is an extremum (e.g. y = x^3 has f'(0) = 0 yet no extremum there).\n\nFIRST DERIVATIVE TEST. Examine the sign of f'(x) as x increases through a critical point c:\n   - if f'(x) changes from + to -, f has a local MAXIMUM at c;\n   - if f'(x) changes from - to +, f has a local MINIMUM at c;\n   - if f'(x) does not change sign, c is neither (a point of inflection).\n\nSECOND DERIVATIVE TEST. Suppose f'(c) = 0.\n   - if f''(c) < 0, the curve is concave down and f has a local MAXIMUM at c;\n   - if f''(c) > 0, the curve is concave up and f has a local MINIMUM at c;\n   - if f''(c) = 0, the test FAILS and we fall back on the first derivative test.\n\nWorked example: f(x) = x^3 - 6x^2 + 9x + 1. f'(x) = 3x^2 - 12x + 9 = 3(x - 1)(x - 3). Critical points x = 1 and x = 3. f''(x) = 6x - 12. At x = 1, f''(1) = -6 < 0, so a local maximum, value f(1) = 1 - 6 + 9 + 1 = 5. At x = 3, f''(3) = 6 > 0, so a local minimum, value f(3) = 27 - 54 + 27 + 1 = 1.\n\nPOINTS OF INFLECTION. A point of inflection is where the CONCAVITY changes - the curve switches from concave up (f'' > 0) to concave down (f'' < 0) or vice versa. At such a point f''(x) = 0 (or is undefined) AND f'' changes sign. For f(x) = x^3, f''(x) = 6x is zero at x = 0 and changes sign there, so the origin is a point of inflection.\n\nABSOLUTE EXTREMA ON A CLOSED INTERVAL [a, b]. Evaluate f at all critical points inside (a, b) and at the two endpoints a and b; the largest of these values is the absolute maximum and the smallest is the absolute minimum. This is guaranteed to work because a continuous function on a closed bounded interval always attains its extreme values.\n\nWorked example: Find the absolute extrema of f(x) = x^3 - 3x on [0, 2]. f'(x) = 3x^2 - 3 = 0 at x = 1 (x = -1 is outside). Values: f(0) = 0, f(1) = 1 - 3 = -2, f(2) = 8 - 6 = 2. Absolute maximum 2 at x = 2; absolute minimum -2 at x = 1.\n\n29.5 OPTIMIZATION (MAXIMA-MINIMA WORD PROBLEMS)\n\nMany practical problems ask for a maximum or minimum: greatest volume, least cost, largest area, shortest distance. The method is:\n   1. Identify the quantity Q to be optimized and the variable(s).\n   2. Use the given conditions (constraints) to write Q as a function of ONE variable.\n   3. Differentiate, set dQ/dx = 0, and solve for the critical value.\n   4. Use the second derivative (or first derivative) test to confirm maximum or minimum.\n   5. Answer the question, including units, and check the domain.\n\nWorked example (maximum area): A farmer has 100 m of fencing to enclose a rectangular field against a straight river (no fence needed along the river). Maximize the area. Let the two sides perpendicular to the river be x and the side parallel be y. Then 2x + y = 100, so y = 100 - 2x. Area A = x y = x(100 - 2x) = 100x - 2x^2. dA/dx = 100 - 4x = 0 gives x = 25, and A'' = -4 < 0 (maximum). Then y = 50 and A = 25 x 50 = 1250 m^2.\n\nWorked example (minimum cost / dimensions): An open box is to be made from a square sheet of side 12 cm by cutting equal squares of side x from the corners and folding up the sides. Maximize the volume. V = x(12 - 2x)^2. dV/dx = (12 - 2x)^2 + x(2)(12 - 2x)(-2) = (12 - 2x)(12 - 2x - 4x) = (12 - 2x)(12 - 6x). Setting this to zero: x = 6 (rejected, gives zero volume) or x = 2. At x = 2, V = 2(8)^2 = 128 cm^3 is the maximum.\n\nWorked example (minimum surface for fixed volume): A closed cylinder has volume V fixed. Show the surface area is least when height equals diameter. S = 2 pi r^2 + 2 pi r h with V = pi r^2 h. Then h = V/(pi r^2), so S = 2 pi r^2 + 2V/r. dS/dr = 4 pi r - 2V/r^2 = 0 gives 4 pi r^3 = 2V = 2 pi r^2 h, so h = 2r: the height equals the diameter.\n\n29.6 APPROXIMATIONS AND ERRORS (DIFFERENTIALS)\n\nFor small changes, the derivative gives a quick linear estimate. If y = f(x) and x changes by a small amount dx (also written delta x), the change in y is approximately\n\n   dy = f'(x) dx.\n\nThen f(x + dx) is approximately f(x) + f'(x) dx. This is the basis of LINEAR APPROXIMATION.\n\nWorked example: Estimate sqrt(25.3). Let f(x) = sqrt(x), x = 25, dx = 0.3. f'(x) = 1/(2 sqrt(x)) = 1/10 at x = 25. So dy = (1/10)(0.3) = 0.03, and sqrt(25.3) is about 5 + 0.03 = 5.03. (The true value is 5.0299...)\n\nWorked example: Estimate (2.001)^3. f(x) = x^3, x = 2, dx = 0.001, f'(x) = 3x^2 = 12. dy = 12 (0.001) = 0.012, so (2.001)^3 is about 8.012.\n\nERRORS. If x is measured with a small error dx, the resulting error in y = f(x) is:\n   - absolute error: dy = f'(x) dx;\n   - relative error: dy/y;\n   - percentage error: (dy/y) x 100.\n\nWorked example: The radius of a sphere is measured as 9 cm with a possible error of 0.03 cm. Estimate the error in the volume. V = (4/3) pi r^3, dV = 4 pi r^2 dr = 4 pi (81)(0.03) = 9.72 pi, about 30.5 cm^3. The relative error dV/V = 3 dr/r = 3(0.03)/9 = 0.01, i.e. a 1% error in the volume.\n\n29.7 ROLLE'S THEOREM AND THE MEAN VALUE THEOREM\n\nROLLE'S THEOREM. If a function f is (i) continuous on the closed interval [a, b], (ii) differentiable on the open interval (a, b), and (iii) f(a) = f(b), then there is at least one point c in (a, b) where f'(c) = 0. Geometrically, if a smooth curve has equal heights at the two ends, it must have a horizontal tangent somewhere between them.\n\nExample: f(x) = x^2 - 4x + 3 on [1, 3]. f(1) = 0 = f(3), f is continuous and differentiable, so Rolle applies. f'(x) = 2x - 4 = 0 at x = 2, which lies in (1, 3).\n\nMEAN VALUE THEOREM (Lagrange's MVT). If f is continuous on [a, b] and differentiable on (a, b), then there is at least one c in (a, b) such that\n\n   f'(c) = [f(b) - f(a)] / (b - a).\n\nGeometrically, at some interior point the tangent is parallel to the chord joining the end points. Rolle's theorem is the special case where f(a) = f(b) (then the chord is horizontal and f'(c) = 0).\n\nExample: f(x) = x^2 on [1, 3]. [f(3) - f(1)]/(3 - 1) = (9 - 1)/2 = 4. f'(c) = 2c = 4 gives c = 2, which lies in (1, 3).\n\nSUMMARY\n\n- The derivative dy/dx is the instantaneous rate of change of y with respect to x. In related-rates problems, differentiate the connecting equation with respect to time to link the rates.\n- The slope of the tangent to y = f(x) at (x1, y1) is f'(x1). Tangent: y - y1 = f'(x1)(x - x1). Normal slope = -1/f'(x1); Normal: y - y1 = (-1/f'(x1))(x - x1).\n- f is increasing where f'(x) > 0 and decreasing where f'(x) < 0; f'(x) = 0 gives critical points.\n- Local extrema occur at critical points. First derivative test: f' changes + to - (maximum), - to + (minimum). Second derivative test: f'(c) = 0 with f''(c) < 0 (maximum), f''(c) > 0 (minimum).\n- A point of inflection is where concavity changes (f'' changes sign). On a closed interval, compare f at critical points and endpoints for absolute extrema.\n- Optimization: express the quantity in one variable using the constraint, set the derivative to zero, and confirm with the second derivative test.\n- Small-change approximation: dy = f'(x) dx, so f(x + dx) is about f(x) + f'(x) dx; percentage error = (dy/y) x 100.\n- Rolle's theorem: if f(a) = f(b) then f'(c) = 0 for some c in (a, b). Mean Value Theorem: f'(c) = [f(b) - f(a)]/(b - a) for some c in (a, b).\n",
+  "topics": [
+    {
+      "name": "Rate of Change and Related Rates",
+      "description": "The derivative dy/dx as the instantaneous rate of change of one quantity with respect to another; average versus instantaneous rate; related-rates problems where a connecting equation is differentiated with respect to time to link the rates of change of two variables."
+    },
+    {
+      "name": "Tangents and Normals",
+      "description": "The slope of the tangent to a curve y = f(x) at a point equals f'(x); equations of the tangent y - y1 = f'(x1)(x - x1) and the normal y - y1 = (-1/f'(x1))(x - x1); horizontal and vertical tangents; angle between two curves."
+    },
+    {
+      "name": "Increasing and Decreasing Functions",
+      "description": "Using the sign of f'(x) to decide where a function rises or falls: f'(x) > 0 means increasing, f'(x) < 0 means decreasing, f'(x) = 0 gives critical points; finding intervals of increase and decrease."
+    },
+    {
+      "name": "Maxima and Minima",
+      "description": "Local and absolute (global) extrema; critical/stationary points where f'(x) = 0; the first derivative test and the second derivative test; points of inflection; finding absolute extrema on a closed interval."
+    },
+    {
+      "name": "Optimization Problems",
+      "description": "Applied maxima-minima word problems: forming the objective as a function of one variable using constraints, differentiating, solving f'(x) = 0, and confirming a maximum or minimum for greatest volume, least cost, largest area and similar."
+    },
+    {
+      "name": "Approximations and Mean Value Theorems",
+      "description": "Estimating small changes and errors using differentials dy = f'(x) dx; absolute, relative and percentage error; Rolle's theorem and the Lagrange Mean Value Theorem and their geometric meaning."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-AOD-01",
+      "topic_name": "Rate of Change and Related Rates",
+      "bloom": "apply",
+      "description": "Interpret dy/dx as a rate of change and solve related-rates problems by differentiating a connecting equation with respect to time."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-02",
+      "topic_name": "Tangents and Normals",
+      "bloom": "apply",
+      "description": "Find the slope, and write the equations, of the tangent and normal to a curve y = f(x) at a given point, including horizontal and vertical tangents."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-03",
+      "topic_name": "Increasing and Decreasing Functions",
+      "bloom": "understand",
+      "description": "Use the sign of f'(x) to determine the intervals in which a function is increasing or decreasing and locate its critical points."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-04",
+      "topic_name": "Maxima and Minima",
+      "bloom": "apply",
+      "description": "Locate local maxima and minima using the first and second derivative tests and find absolute extrema of a function on a closed interval."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-05",
+      "topic_name": "Maxima and Minima",
+      "bloom": "analyze",
+      "description": "Analyse critical points and concavity, distinguish extrema from points of inflection, and justify conclusions using the second derivative and sign changes."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-06",
+      "topic_name": "Optimization Problems",
+      "bloom": "create",
+      "description": "Model and solve applied optimization problems by expressing a quantity in one variable, using calculus to find the optimal value, and confirming it is a maximum or minimum."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-07",
+      "topic_name": "Approximations and Mean Value Theorems",
+      "bloom": "apply",
+      "description": "Use differentials dy = f'(x) dx to approximate function values and estimate absolute, relative and percentage errors in measured quantities."
+    },
+    {
+      "code": "12-NIOS-MAT-AOD-08",
+      "topic_name": "Approximations and Mean Value Theorems",
+      "bloom": "understand",
+      "description": "State and apply Rolle's theorem and the Mean Value Theorem, explaining their geometric meaning and verifying their conditions on given functions."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Application of Derivatives - Chapter Summary",
+    "intro": "This NIOS Senior Secondary Mathematics (311) summary shows how the derivative is used in practice: as a rate of change, to draw tangents and normals, to find where functions rise and fall, to locate maxima and minima, to solve optimization problems, to approximate small changes, and to state Rolle's theorem and the Mean Value Theorem.",
+    "overview_diagram": {
+      "title": "Application of Derivatives",
+      "central_term": "f'(x) at work",
+      "branches": [
+        {
+          "label": "Rate of Change",
+          "details": [
+            "dy/dx = instantaneous rate",
+            "Related rates: differentiate w.r.t. time",
+            "ds/dt = velocity, dV/dt linked to dr/dt"
+          ]
+        },
+        {
+          "label": "Tangent & Normal",
+          "details": [
+            "Slope of tangent = f'(x1)",
+            "Tangent: y - y1 = f'(x1)(x - x1)",
+            "Normal slope = -1/f'(x1)"
+          ]
+        },
+        {
+          "label": "Increasing / Decreasing",
+          "details": [
+            "f'(x) > 0 => increasing",
+            "f'(x) < 0 => decreasing",
+            "f'(x) = 0 => critical point"
+          ]
+        },
+        {
+          "label": "Maxima & Minima",
+          "details": [
+            "Critical points f'(c) = 0",
+            "1st test: sign change of f'",
+            "2nd test: f''<0 max, f''>0 min",
+            "Inflection: f'' changes sign"
+          ]
+        },
+        {
+          "label": "Optimization & Errors",
+          "details": [
+            "Express in one variable, set dQ/dx = 0",
+            "dy = f'(x) dx approximation",
+            "Rolle & Mean Value Theorem"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Derivative as a rate of change",
+        "bullets": [
+          "dy/dx is the instantaneous rate of change of y with respect to x; with time, ds/dt is velocity and dv/dt is acceleration.",
+          "Average rate over [a, b] is [f(b) - f(a)]/(b - a); the instantaneous rate at a is f'(a).",
+          "Related rates: differentiate the equation connecting two variables with respect to t to link their rates.",
+          "Example: for V = (4/3) pi r^3, dV/dt = 4 pi r^2 (dr/dt)."
+        ]
+      },
+      {
+        "heading": "Tangents and normals",
+        "bullets": [
+          "The slope of the tangent to y = f(x) at (x1, y1) is m = f'(x1).",
+          "Tangent line: y - y1 = f'(x1)(x - x1).",
+          "Normal is perpendicular to the tangent, with slope -1/f'(x1): y - y1 = (-1/f'(x1))(x - x1).",
+          "If f'(x1) = 0 the tangent is horizontal and the normal vertical; the reverse when the slope is infinite."
+        ]
+      },
+      {
+        "heading": "Increasing, decreasing and extrema",
+        "bullets": [
+          "f'(x) > 0 on an interval means f is increasing there; f'(x) < 0 means decreasing.",
+          "Critical points occur where f'(x) = 0 or f'(x) does not exist.",
+          "First derivative test: f' changing + to - gives a local maximum, - to + a local minimum.",
+          "Second derivative test: with f'(c) = 0, f''(c) < 0 gives a maximum and f''(c) > 0 a minimum."
+        ]
+      },
+      {
+        "heading": "Absolute extrema and optimization",
+        "bullets": [
+          "On a closed interval [a, b], compare f at interior critical points and at the endpoints to find absolute extrema.",
+          "A point of inflection is where concavity changes (f'' changes sign).",
+          "Optimization: use the constraint to write the quantity in one variable, set the derivative to zero, and confirm max/min.",
+          "Typical results: maximum area of a rectangle with fixed perimeter is a square; least surface cylinder has height = diameter."
+        ]
+      },
+      {
+        "heading": "Approximations and mean value theorems",
+        "bullets": [
+          "Small-change formula: dy = f'(x) dx, so f(x + dx) is about f(x) + f'(x) dx.",
+          "Percentage error in y is (dy/y) x 100; for V = (4/3) pi r^3, dV/V = 3 dr/r.",
+          "Rolle's theorem: if f(a) = f(b) (with continuity and differentiability) then f'(c) = 0 for some c in (a, b).",
+          "Mean Value Theorem: f'(c) = [f(b) - f(a)]/(b - a) for some c in (a, b); a tangent is parallel to the chord."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "dy/dx is the instantaneous rate of change; in related-rates problems differentiate the connecting equation with respect to time.",
+      "The tangent to y = f(x) at (x1, y1) has slope f'(x1); the normal has slope -1/f'(x1).",
+      "f'(x) > 0 means increasing and f'(x) < 0 means decreasing; f'(x) = 0 gives critical points.",
+      "First derivative test uses the sign change of f'; second derivative test uses the sign of f''(c): f''<0 max, f''>0 min.",
+      "A point of inflection is where f'' changes sign; on a closed interval compare critical points and endpoints for absolute extrema.",
+      "Optimization: reduce to one variable using the constraint, set the derivative to zero, and confirm with the second derivative test.",
+      "dy = f'(x) dx gives quick approximations and error estimates; Rolle and the Mean Value Theorem guarantee special interior points."
+    ],
+    "glossary": [
+      {
+        "term": "Rate of change",
+        "definition": "The derivative dy/dx, giving how fast y changes per unit change in x; with time it is dy/dt."
+      },
+      {
+        "term": "Related rates",
+        "definition": "Rates of two variables linked by differentiating their connecting equation with respect to time."
+      },
+      {
+        "term": "Tangent to a curve",
+        "definition": "The line touching y = f(x) at a point with slope f'(x1): y - y1 = f'(x1)(x - x1)."
+      },
+      {
+        "term": "Normal to a curve",
+        "definition": "The line through the point perpendicular to the tangent, with slope -1/f'(x1)."
+      },
+      {
+        "term": "Increasing function",
+        "definition": "A function whose values rise as x rises; f'(x) > 0 on the interval."
+      },
+      {
+        "term": "Decreasing function",
+        "definition": "A function whose values fall as x rises; f'(x) < 0 on the interval."
+      },
+      {
+        "term": "Critical point",
+        "definition": "A value of x where f'(x) = 0 or f'(x) does not exist; a candidate for a local extremum."
+      },
+      {
+        "term": "Local maximum",
+        "definition": "A point where f(c) is greater than or equal to the values of f at all nearby points."
+      },
+      {
+        "term": "Local minimum",
+        "definition": "A point where f(c) is less than or equal to the values of f at all nearby points."
+      },
+      {
+        "term": "First derivative test",
+        "definition": "Using the sign change of f'(x) at a critical point: + to - gives a maximum, - to + a minimum."
+      },
+      {
+        "term": "Second derivative test",
+        "definition": "With f'(c) = 0, f''(c) < 0 gives a local maximum and f''(c) > 0 a local minimum."
+      },
+      {
+        "term": "Point of inflection",
+        "definition": "A point where the concavity of the curve changes, so f''(x) changes sign."
+      },
+      {
+        "term": "Absolute extremum",
+        "definition": "The greatest or least value of f over its whole domain or a given closed interval."
+      },
+      {
+        "term": "Differential",
+        "definition": "The small-change estimate dy = f'(x) dx used to approximate values and errors."
+      },
+      {
+        "term": "Mean Value Theorem",
+        "definition": "There is a c in (a, b) with f'(c) = [f(b) - f(a)]/(b - a); Rolle's theorem is the case f(a) = f(b)."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Application of Derivatives (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for every problem. Use exact values where possible and take pi = 3.14 when a decimal is needed.",
+    "total_marks": 35,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the slope of the tangent and the equation of the tangent to the curve y = x^2 - 3x + 2 at the point where x = 3.",
+        "answer": "y = x^2 - 3x + 2, so dy/dx = 2x - 3. At x = 3 the slope m = 2(3) - 3 = 3. The point is y = 9 - 9 + 2 = 2, i.e. (3, 2).\nTangent: y - 2 = 3(x - 3), i.e. y = 3x - 7.",
+        "explanation": "Differentiate, evaluate slope at x = 3, use point-slope form.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-AOD-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "The radius of a circle is increasing at 2 cm/s. Find the rate at which its area is increasing when the radius is 10 cm.",
+        "answer": "A = pi r^2, so dA/dt = 2 pi r (dr/dt). With dr/dt = 2 and r = 10:\ndA/dt = 2 pi (10)(2) = 40 pi cm^2/s, about 125.7 cm^2/s.",
+        "explanation": "Differentiate A = pi r^2 w.r.t. time; substitute r and dr/dt.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-AOD-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the intervals in which f(x) = x^2 - 4x + 5 is increasing and decreasing.",
+        "answer": "f'(x) = 2x - 4 = 2(x - 2). f'(x) < 0 for x < 2 (decreasing) and f'(x) > 0 for x > 2 (increasing).\nSo f decreases on (-infinity, 2) and increases on (2, infinity).",
+        "explanation": "Sign of f'(x) about the critical point x = 2.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-AOD-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using differentials, find the approximate value of sqrt(36.6).",
+        "answer": "Let f(x) = sqrt(x), x = 36, dx = 0.6. f'(x) = 1/(2 sqrt(x)) = 1/12 at x = 36.\ndy = (1/12)(0.6) = 0.05. So sqrt(36.6) is about 6 + 0.05 = 6.05.",
+        "explanation": "dy = f'(x) dx with x = 36, dx = 0.6.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-AOD-07"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find the local maximum and local minimum values of f(x) = x^3 - 6x^2 + 9x + 15 using the second derivative test.",
+        "answer": "f'(x) = 3x^2 - 12x + 9 = 3(x - 1)(x - 3). Critical points x = 1 and x = 3.\nf''(x) = 6x - 12.\nAt x = 1: f''(1) = -6 < 0, so a local maximum; f(1) = 1 - 6 + 9 + 15 = 19.\nAt x = 3: f''(3) = 6 > 0, so a local minimum; f(3) = 27 - 54 + 27 + 15 = 15.\nLocal maximum value 19 at x = 1; local minimum value 15 at x = 3.",
+        "explanation": "Critical points from f'=0; classify with f''.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-AOD-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "A wire of length 28 cm is bent into a rectangle. Find the dimensions that give the maximum area, and state that maximum area.",
+        "answer": "Let the sides be x and y. The perimeter is 2(x + y) = 28, so x + y = 14, giving y = 14 - x.\nArea A = x(14 - x) = 14x - x^2.\ndA/dx = 14 - 2x = 0 gives x = 7. A'' = -2 < 0, so this is a maximum.\nThen y = 14 - 7 = 7, so the rectangle is a square of side 7 cm.\nMaximum area = 7 x 7 = 49 cm^2.",
+        "explanation": "Constraint gives A(x); set A'=0; confirm max; square is optimal.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "CREATE",
+        "outcome_code": "12-NIOS-MAT-AOD-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the equation of the normal to the curve y = x^2 at the point (1, 1).",
+        "answer": "dy/dx = 2x, so at (1, 1) the tangent slope is 2. The normal slope is -1/2.\nNormal: y - 1 = (-1/2)(x - 1), i.e. x + 2y = 3.",
+        "explanation": "Normal slope = -1/f'(x1); point-slope form.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-AOD-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Verify Rolle's theorem for f(x) = x^2 - 5x + 6 on the interval [2, 3].",
+        "answer": "f is a polynomial, so continuous on [2, 3] and differentiable on (2, 3). f(2) = 4 - 10 + 6 = 0 and f(3) = 9 - 15 + 6 = 0, so f(2) = f(3). All conditions hold.\nf'(x) = 2x - 5 = 0 gives x = 2.5, which lies in (2, 3). Hence Rolle's theorem is verified with c = 2.5.",
+        "explanation": "Check the three conditions; solve f'(c) = 0.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-AOD-08"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "An open box with a square base is to have a volume of 108 cm^3. Find the dimensions that minimize the total surface area (base plus four sides).",
+        "answer": "Let the base side be x and the height h. Volume: x^2 h = 108, so h = 108/x^2.\nSurface (open top) S = x^2 + 4 x h = x^2 + 4x(108/x^2) = x^2 + 432/x.\ndS/dx = 2x - 432/x^2 = 0 gives 2x^3 = 432, so x^3 = 216, x = 6.\nS'' = 2 + 864/x^3 > 0, so this is a minimum.\nThen h = 108/36 = 3 cm. Dimensions: base 6 cm by 6 cm, height 3 cm.",
+        "explanation": "Express S(x) using the volume constraint; set S'=0; confirm minimum.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "CREATE",
+        "outcome_code": "12-NIOS-MAT-AOD-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the absolute maximum and minimum of f(x) = 2x^3 - 3x^2 - 12x on the closed interval [-2, 3].",
+        "answer": "f'(x) = 6x^2 - 6x - 12 = 6(x - 2)(x + 1). Critical points x = 2 and x = -1, both in [-2, 3].\nValues: f(-2) = -16 - 12 + 24 = -4; f(-1) = -2 - 3 + 12 = 7; f(2) = 16 - 12 - 24 = -20; f(3) = 54 - 27 - 36 = -9.\nAbsolute maximum 7 at x = -1; absolute minimum -20 at x = 2.",
+        "explanation": "Compare f at critical points and endpoints.",
+        "marks": 3,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-AOD-05"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The instantaneous rate of change of y with respect to x is given by",
+      "answer": "dy/dx",
+      "options": [
+        "y/x",
+        "dy/dx",
+        "x/y",
+        "integral of y"
+      ],
+      "explanation": "The derivative is the instantaneous rate of change."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If s is displacement and t is time, then ds/dt represents",
+      "answer": "velocity",
+      "options": [
+        "acceleration",
+        "velocity",
+        "distance",
+        "force"
+      ],
+      "explanation": "ds/dt is velocity."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For A = pi r^2, the rate of change of area with respect to the radius is",
+      "answer": "2 pi r",
+      "options": [
+        "pi r",
+        "2 pi r",
+        "pi r^2",
+        "r^2"
+      ],
+      "explanation": "dA/dr = 2 pi r."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The volume of a sphere is V = (4/3) pi r^3. Then dV/dr equals",
+      "answer": "4 pi r^2",
+      "options": [
+        "4 pi r^2",
+        "(4/3) pi r^2",
+        "2 pi r",
+        "3 pi r^2"
+      ],
+      "explanation": "Differentiate: dV/dr = 4 pi r^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a related-rates problem, the two rates are linked by",
+      "answer": "differentiating the connecting equation with respect to time",
+      "options": [
+        "adding the variables",
+        "differentiating the connecting equation with respect to time",
+        "integrating both variables",
+        "setting the derivative to zero"
+      ],
+      "explanation": "Differentiate the relation w.r.t. t."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The side of a square increases at 3 cm/s. When the side is 5 cm, the area increases at",
+      "answer": "30 cm^2/s",
+      "options": [
+        "15 cm^2/s",
+        "30 cm^2/s",
+        "25 cm^2/s",
+        "9 cm^2/s"
+      ],
+      "explanation": "A = x^2, dA/dt = 2x dx/dt = 2(5)(3) = 30."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A balloon's volume grows at 100 cm^3/s. When r = 5 cm the radius grows at (V = (4/3) pi r^3)",
+      "answer": "1/pi cm/s",
+      "options": [
+        "1/pi cm/s",
+        "pi cm/s",
+        "1 cm/s",
+        "100 pi cm/s"
+      ],
+      "explanation": "dV/dt = 4 pi r^2 dr/dt => 100 = 100 pi dr/dt => dr/dt = 1/pi."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The average rate of change of f over [a, b] is",
+      "answer": "[f(b) - f(a)]/(b - a)",
+      "options": [
+        "f'(a)",
+        "[f(b) - f(a)]/(b - a)",
+        "f(b) - f(a)",
+        "[f(a) + f(b)]/2"
+      ],
+      "explanation": "Definition of average rate."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If ds/dt is velocity, then d^2s/dt^2 is",
+      "answer": "acceleration",
+      "options": [
+        "displacement",
+        "acceleration",
+        "speed",
+        "distance"
+      ],
+      "explanation": "Second time-derivative of s."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A ladder 5 m long slides down a wall. When the foot is 3 m out moving at 2 m/s, the top moves at",
+      "answer": "1.5 m/s downward",
+      "options": [
+        "1.5 m/s downward",
+        "2 m/s upward",
+        "0.5 m/s downward",
+        "3 m/s downward"
+      ],
+      "explanation": "x^2+y^2=25 => x dx/dt + y dy/dt = 0 => 6 + 4 dy/dt = 0 => dy/dt = -1.5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The slope of the tangent to y = f(x) at (x1, y1) is",
+      "answer": "f'(x1)",
+      "options": [
+        "f(x1)",
+        "f'(x1)",
+        "1/f'(x1)",
+        "-f'(x1)"
+      ],
+      "explanation": "Slope of tangent = derivative at the point."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The slope of the normal to a curve where the tangent slope is m is",
+      "answer": "-1/m",
+      "options": [
+        "m",
+        "-m",
+        "1/m",
+        "-1/m"
+      ],
+      "explanation": "Normal is perpendicular to the tangent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The slope of the tangent to y = x^2 at (3, 9) is",
+      "answer": "6",
+      "options": [
+        "3",
+        "6",
+        "9",
+        "2"
+      ],
+      "explanation": "dy/dx = 2x = 6 at x = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The equation of the tangent to y = x^2 at (1, 1) is",
+      "answer": "y = 2x - 1",
+      "options": [
+        "y = 2x - 1",
+        "y = 2x + 1",
+        "y = x - 1",
+        "y = x + 1"
+      ],
+      "explanation": "Slope 2; y - 1 = 2(x - 1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f'(x1) = 0, the tangent to the curve at that point is",
+      "answer": "horizontal",
+      "options": [
+        "vertical",
+        "horizontal",
+        "at 45 degrees",
+        "undefined"
+      ],
+      "explanation": "Zero slope means a horizontal tangent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The slope of the tangent to y = x^3 at x = 1 is",
+      "answer": "3",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "explanation": "dy/dx = 3x^2 = 3 at x = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The slope of the normal to y = x^2 at (2, 4) is",
+      "answer": "-1/4",
+      "options": [
+        "4",
+        "-1/4",
+        "1/4",
+        "-4"
+      ],
+      "explanation": "Tangent slope 4; normal slope -1/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Two curves cut orthogonally at a point when the product of their tangent slopes is",
+      "answer": "-1",
+      "options": [
+        "0",
+        "1",
+        "-1",
+        "infinity"
+      ],
+      "explanation": "Perpendicular tangents: m1 m2 = -1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The point on y = x^2 where the tangent has slope 4 is",
+      "answer": "(2, 4)",
+      "options": [
+        "(1, 1)",
+        "(2, 4)",
+        "(4, 16)",
+        "(0, 0)"
+      ],
+      "explanation": "2x = 4 => x = 2, y = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The tangent to y = x^2 - 2x is horizontal at",
+      "answer": "x = 1",
+      "options": [
+        "x = 0",
+        "x = 1",
+        "x = 2",
+        "x = -1"
+      ],
+      "explanation": "dy/dx = 2x - 2 = 0 => x = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function f is increasing on an interval if, throughout it,",
+      "answer": "f'(x) > 0",
+      "options": [
+        "f'(x) < 0",
+        "f'(x) = 0",
+        "f'(x) > 0",
+        "f''(x) > 0"
+      ],
+      "explanation": "Positive derivative => increasing."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function f is decreasing on an interval if, throughout it,",
+      "answer": "f'(x) < 0",
+      "options": [
+        "f'(x) > 0",
+        "f'(x) < 0",
+        "f'(x) = 0",
+        "f(x) < 0"
+      ],
+      "explanation": "Negative derivative => decreasing."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The function f(x) = x^2 is decreasing on",
+      "answer": "(-infinity, 0)",
+      "options": [
+        "(0, infinity)",
+        "(-infinity, 0)",
+        "(-infinity, infinity)",
+        "nowhere"
+      ],
+      "explanation": "f'(x) = 2x < 0 for x < 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = x^3 - 3x is decreasing on the interval",
+      "answer": "(-1, 1)",
+      "options": [
+        "(-1, 1)",
+        "(1, infinity)",
+        "(-infinity, -1)",
+        "(0, infinity)"
+      ],
+      "explanation": "f'(x) = 3x^2 - 3 < 0 for -1 < x < 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "At a critical point of a differentiable function, f'(x) is",
+      "answer": "zero",
+      "options": [
+        "positive",
+        "negative",
+        "zero",
+        "infinite"
+      ],
+      "explanation": "f'(x) = 0 at a stationary point."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f'(x) > 0 for all x, the function is",
+      "answer": "strictly increasing everywhere",
+      "options": [
+        "constant",
+        "strictly increasing everywhere",
+        "strictly decreasing everywhere",
+        "periodic"
+      ],
+      "explanation": "Positive derivative throughout."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The function f(x) = e^x is",
+      "answer": "increasing for all x",
+      "options": [
+        "increasing for all x",
+        "decreasing for all x",
+        "increasing only for x > 0",
+        "constant"
+      ],
+      "explanation": "f'(x) = e^x > 0 always."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = x^2 - 6x + 8 is increasing on",
+      "answer": "(3, infinity)",
+      "options": [
+        "(-infinity, 3)",
+        "(3, infinity)",
+        "(-infinity, infinity)",
+        "(0, 3)"
+      ],
+      "explanation": "f'(x) = 2x - 6 > 0 for x > 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f'(x) = 0 throughout an interval, the function is",
+      "answer": "constant",
+      "options": [
+        "increasing",
+        "decreasing",
+        "constant",
+        "undefined"
+      ],
+      "explanation": "Zero derivative => constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = 2x^3 - 3x^2 - 12x + 5 is increasing on",
+      "answer": "(-infinity, -1) and (2, infinity)",
+      "options": [
+        "(-1, 2)",
+        "(-infinity, -1) and (2, infinity)",
+        "(2, infinity) only",
+        "(-infinity, 2)"
+      ],
+      "explanation": "f'(x) = 6(x-2)(x+1) > 0 outside [-1, 2]."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A necessary condition for a local extremum of a differentiable f at x = c is",
+      "answer": "f'(c) = 0",
+      "options": [
+        "f(c) = 0",
+        "f'(c) = 0",
+        "f''(c) = 0",
+        "f'(c) > 0"
+      ],
+      "explanation": "Stationary point condition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "By the first derivative test, if f'(x) changes from + to - at c, then c is a",
+      "answer": "local maximum",
+      "options": [
+        "local minimum",
+        "local maximum",
+        "point of inflection",
+        "critical endpoint"
+      ],
+      "explanation": "Rising then falling => maximum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "By the first derivative test, if f'(x) changes from - to + at c, then c is a",
+      "answer": "local minimum",
+      "options": [
+        "local maximum",
+        "local minimum",
+        "point of inflection",
+        "constant"
+      ],
+      "explanation": "Falling then rising => minimum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The critical points of f(x) = x^3 - 3x are",
+      "answer": "x = 1 and x = -1",
+      "options": [
+        "x = 0 only",
+        "x = 1 and x = -1",
+        "x = 3",
+        "x = 2 and x = -2"
+      ],
+      "explanation": "f'(x) = 3x^2 - 3 = 0 => x = +-1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The function f(x) = x^2 - 4x + 7 has a minimum at",
+      "answer": "x = 2",
+      "options": [
+        "x = 4",
+        "x = 2",
+        "x = -2",
+        "x = 0"
+      ],
+      "explanation": "f'(x) = 2x - 4 = 0 => x = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The absolute maximum of a continuous function on a closed interval",
+      "answer": "always exists",
+      "options": [
+        "never exists",
+        "always exists",
+        "exists only if f'=0 inside",
+        "equals the average"
+      ],
+      "explanation": "Extreme value theorem for closed intervals."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The minimum value of f(x) = x^2 - 4x + 7 is",
+      "answer": "3",
+      "options": [
+        "7",
+        "3",
+        "4",
+        "2"
+      ],
+      "explanation": "f(2) = 4 - 8 + 7 = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The maximum value of f(x) = 3 + 2x - x^2 is",
+      "answer": "4",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "explanation": "f'(x) = 2 - 2x = 0 => x = 1; f(1) = 3 + 2 - 1 = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "To find absolute extrema of f on [a, b], evaluate f at",
+      "answer": "critical points and endpoints",
+      "options": [
+        "only the endpoints",
+        "only the critical points",
+        "critical points and endpoints",
+        "the midpoint"
+      ],
+      "explanation": "Compare all candidate values."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The absolute maximum of f(x) = x^3 - 3x on [0, 2] is",
+      "answer": "2",
+      "options": [
+        "-2",
+        "0",
+        "2",
+        "6"
+      ],
+      "explanation": "f(0)=0, f(1)=-2, f(2)=2; max is 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "By the second derivative test, f'(c) = 0 and f''(c) < 0 indicate a",
+      "answer": "local maximum",
+      "options": [
+        "local minimum",
+        "local maximum",
+        "point of inflection",
+        "saddle"
+      ],
+      "explanation": "Concave down at a stationary point => maximum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "By the second derivative test, f'(c) = 0 and f''(c) > 0 indicate a",
+      "answer": "local minimum",
+      "options": [
+        "local maximum",
+        "local minimum",
+        "point of inflection",
+        "constant"
+      ],
+      "explanation": "Concave up at a stationary point => minimum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f'(c) = 0 and f''(c) = 0, the second derivative test",
+      "answer": "fails and needs the first derivative test",
+      "options": [
+        "gives a maximum",
+        "gives a minimum",
+        "fails and needs the first derivative test",
+        "is impossible"
+      ],
+      "explanation": "Inconclusive when f''(c) = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A point of inflection is a point where",
+      "answer": "the concavity changes",
+      "options": [
+        "f'(x) = 0",
+        "the concavity changes",
+        "f(x) = 0",
+        "the tangent is vertical"
+      ],
+      "explanation": "f'' changes sign at an inflection point."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = x^3, the point x = 0 is",
+      "answer": "a point of inflection",
+      "options": [
+        "a maximum",
+        "a minimum",
+        "a point of inflection",
+        "undefined"
+      ],
+      "explanation": "f'(0)=0 but f'' = 6x changes sign; no extremum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = x^3 - 6x^2 + 9x + 1, x = 3 is a local minimum because f''(3) equals",
+      "answer": "6",
+      "options": [
+        "-6",
+        "6",
+        "0",
+        "12"
+      ],
+      "explanation": "f''(x) = 6x - 12; f''(3) = 6 > 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The curve y = x^3 - 3x^2 + 2 has a point of inflection at",
+      "answer": "x = 1",
+      "options": [
+        "x = 0",
+        "x = 1",
+        "x = 2",
+        "x = 3"
+      ],
+      "explanation": "f''(x) = 6x - 6 = 0 at x = 1, sign changes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Every critical point where f'(c) = 0 is",
+      "answer": "not necessarily an extremum",
+      "options": [
+        "always a maximum",
+        "always a minimum",
+        "not necessarily an extremum",
+        "always an inflection"
+      ],
+      "explanation": "e.g. y = x^3 at x = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If f''(x) > 0 on an interval, the curve is",
+      "answer": "concave up",
+      "options": [
+        "concave down",
+        "concave up",
+        "a straight line",
+        "decreasing"
+      ],
+      "explanation": "Positive second derivative => concave up."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The first step in an optimization problem is usually to",
+      "answer": "express the quantity as a function of one variable",
+      "options": [
+        "differentiate twice",
+        "express the quantity as a function of one variable",
+        "guess the answer",
+        "integrate the quantity"
+      ],
+      "explanation": "Reduce to one variable using the constraint."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A rectangle with a fixed perimeter has maximum area when it is a",
+      "answer": "square",
+      "options": [
+        "long thin strip",
+        "square",
+        "triangle",
+        "circle"
+      ],
+      "explanation": "Equal sides maximize area."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "With 100 m of fencing along three sides of a rectangle (river on the fourth), the maximum area is",
+      "answer": "1250 m^2",
+      "options": [
+        "1000 m^2",
+        "1250 m^2",
+        "2500 m^2",
+        "625 m^2"
+      ],
+      "explanation": "A = x(100 - 2x), max at x = 25, A = 1250."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Squares of side x are cut from a 12 cm square sheet to make an open box. Volume is maximum at x =",
+      "answer": "2 cm",
+      "options": [
+        "1 cm",
+        "2 cm",
+        "3 cm",
+        "6 cm"
+      ],
+      "explanation": "V=x(12-2x)^2, V'=0 at x=2 (x=6 rejected)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two positive numbers have sum 10. Their product is greatest when the numbers are",
+      "answer": "5 and 5",
+      "options": [
+        "1 and 9",
+        "2 and 8",
+        "5 and 5",
+        "4 and 6"
+      ],
+      "explanation": "Product xy = x(10 - x) max at x = 5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "After solving f'(x) = 0 in an optimization problem, we confirm a maximum using",
+      "answer": "the second derivative test (f'' < 0)",
+      "options": [
+        "the value of f only",
+        "the second derivative test (f'' < 0)",
+        "the constraint",
+        "the domain length"
+      ],
+      "explanation": "f'' < 0 confirms a maximum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A closed cylinder of fixed volume has least surface area when its height equals its",
+      "answer": "diameter",
+      "options": [
+        "radius",
+        "diameter",
+        "circumference",
+        "half-radius"
+      ],
+      "explanation": "S least when h = 2r."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "CREATE",
+      "marks": 1,
+      "question": "The maximum area of a rectangle inscribed with base on the x-axis under y = 4 - x^2 is obtained near x =",
+      "answer": "x = 2/sqrt(3)",
+      "options": [
+        "x = 1",
+        "x = 2/sqrt(3)",
+        "x = 2",
+        "x = 4"
+      ],
+      "explanation": "A = 2x(4 - x^2), A'=0 => x = 2/sqrt(3)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Of all rectangles with area 36, the one with least perimeter is a square of side",
+      "answer": "6",
+      "options": [
+        "4",
+        "6",
+        "9",
+        "12"
+      ],
+      "explanation": "Least perimeter when sides equal; side = sqrt(36) = 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The differential approximation for a small change in y is",
+      "answer": "dy = f'(x) dx",
+      "options": [
+        "dy = f(x) dx",
+        "dy = f'(x) dx",
+        "dy = f''(x) dx",
+        "dy = dx/f'(x)"
+      ],
+      "explanation": "Small-change formula."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using differentials, sqrt(25.3) is approximately",
+      "answer": "5.03",
+      "options": [
+        "5.03",
+        "5.3",
+        "5.15",
+        "4.97"
+      ],
+      "explanation": "dy = (1/10)(0.3) = 0.03; 5 + 0.03."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using differentials, (2.001)^3 is approximately",
+      "answer": "8.012",
+      "options": [
+        "8.012",
+        "8.001",
+        "8.003",
+        "8.06"
+      ],
+      "explanation": "dy = 3(4)(0.001) = 0.012."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The percentage error in y is given by",
+      "answer": "(dy/y) x 100",
+      "options": [
+        "dy x 100",
+        "(dy/y) x 100",
+        "(y/dy) x 100",
+        "dx x 100"
+      ],
+      "explanation": "Relative error times 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For V = (4/3) pi r^3, the relative error dV/V in terms of dr/r is",
+      "answer": "3 dr/r",
+      "options": [
+        "dr/r",
+        "2 dr/r",
+        "3 dr/r",
+        "dr/(3r)"
+      ],
+      "explanation": "dV/V = 3 dr/r."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Using differentials, sqrt(0.037) with x = 0.04, dx = -0.003 is approximately",
+      "answer": "0.1925",
+      "options": [
+        "0.1925",
+        "0.2",
+        "0.185",
+        "0.19"
+      ],
+      "explanation": "dy = (1/(2*0.2))(-0.003) = -0.0075; 0.2 - 0.0075."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The approximate increase in the area of a circle of radius 5 cm when the radius grows by 0.02 cm is",
+      "answer": "0.2 pi cm^2",
+      "options": [
+        "0.1 pi cm^2",
+        "0.2 pi cm^2",
+        "0.5 pi cm^2",
+        "pi cm^2"
+      ],
+      "explanation": "dA = 2 pi r dr = 2 pi (5)(0.02) = 0.2 pi."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The side of a cube is measured with a 1% error. The approximate percentage error in its volume is",
+      "answer": "3%",
+      "options": [
+        "1%",
+        "2%",
+        "3%",
+        "0.5%"
+      ],
+      "explanation": "V = x^3 => dV/V = 3 dx/x = 3%."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In dy = f'(x) dx, the quantity dx is",
+      "answer": "a small change in x",
+      "options": [
+        "a large change in x",
+        "a small change in x",
+        "the derivative",
+        "always 1"
+      ],
+      "explanation": "dx is a small increment."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Rolle's theorem requires, besides continuity and differentiability, that",
+      "answer": "f(a) = f(b)",
+      "options": [
+        "f(a) > f(b)",
+        "f(a) = f(b)",
+        "f'(a) = f'(b)",
+        "f(a) = 0"
+      ],
+      "explanation": "Equal end values is the third condition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Mean Value Theorem guarantees a c in (a, b) with f'(c) equal to",
+      "answer": "[f(b) - f(a)]/(b - a)",
+      "options": [
+        "0",
+        "[f(b) - f(a)]/(b - a)",
+        "f(b) - f(a)",
+        "(a + b)/2"
+      ],
+      "explanation": "Slope of the chord."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Geometrically, the Mean Value Theorem says a tangent is parallel to the",
+      "answer": "chord joining the endpoints",
+      "options": [
+        "x-axis",
+        "y-axis",
+        "chord joining the endpoints",
+        "normal"
+      ],
+      "explanation": "Tangent slope equals chord slope."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Rolle's theorem is a special case of the Mean Value Theorem when",
+      "answer": "f(a) = f(b)",
+      "options": [
+        "f(a) = f(b)",
+        "a = b",
+        "f'(c) = 1",
+        "f is linear"
+      ],
+      "explanation": "Then the chord is horizontal and f'(c) = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = x^2 on [1, 3], the Mean Value Theorem gives c =",
+      "answer": "2",
+      "options": [
+        "1.5",
+        "2",
+        "2.5",
+        "3"
+      ],
+      "explanation": "f'(c) = 2c = 4 => c = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = x^2 - 4x + 3 on [1, 3], Rolle's theorem gives c =",
+      "answer": "2",
+      "options": [
+        "1",
+        "2",
+        "2.5",
+        "3"
+      ],
+      "explanation": "f'(x) = 2x - 4 = 0 => x = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "Rolle's theorem cannot be applied to f(x) = |x| on [-1, 1] because f is not",
+      "answer": "differentiable at x = 0",
+      "options": [
+        "continuous on [-1, 1]",
+        "differentiable at x = 0",
+        "equal at the ends",
+        "defined at 0"
+      ],
+      "explanation": "|x| has a corner at 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The Mean Value Theorem requires f to be",
+      "answer": "continuous on [a,b] and differentiable on (a,b)",
+      "options": [
+        "continuous on [a,b] and differentiable on (a,b)",
+        "only continuous",
+        "only differentiable",
+        "constant"
+      ],
+      "explanation": "Both hypotheses are needed."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The derivative dy/dx gives the instantaneous rate of change of y with respect to x.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "By definition."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The slope of the normal to a curve equals the slope of the tangent at that point.",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Normal slope is -1/(tangent slope)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If f'(x) < 0 on an interval, then f is decreasing on that interval.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Negative derivative => decreasing."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A function is constant on an interval if f'(x) = 0 throughout it.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Zero derivative => constant."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Every point where f'(x) = 0 is necessarily a local maximum or minimum.",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "e.g. y = x^3 at x = 0 is an inflection point."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f'(c) = 0 and f''(c) > 0, then f has a local minimum at c.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Concave up at a stationary point."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "At a point of inflection the concavity of the curve changes.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "f'' changes sign."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Among all rectangles of a given perimeter, the square has the greatest area.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Equal sides maximize area."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The differential approximation is dy = f'(x) dx.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Standard small-change formula."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Rolle's theorem is a special case of the Mean Value Theorem.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "The case f(a) = f(b)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The derivative dy/dx represents the instantaneous ____ of change of y with respect to x.",
+      "answer": "rate",
+      "explanation": "Rate of change."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For A = pi r^2, dA/dr = ____ .",
+      "answer": "2 pi r",
+      "explanation": "Differentiate the area."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The slope of the tangent to y = f(x) at (x1, y1) is ____ .",
+      "answer": "f'(x1)",
+      "explanation": "Derivative at the point."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If the tangent slope at a point is m, the slope of the normal there is ____ .",
+      "answer": "-1/m",
+      "explanation": "Perpendicular slope."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function is increasing on an interval where f'(x) is ____ .",
+      "answer": "positive",
+      "explanation": "f'(x) > 0."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Points where f'(x) = 0 or f'(x) does not exist are called ____ points.",
+      "answer": "critical",
+      "explanation": "Critical (stationary) points."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "By the first derivative test, if f'(x) changes from + to - at c, then c is a local ____ .",
+      "answer": "maximum",
+      "explanation": "Rising then falling."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The function f(x) = x^2 - 4x + 7 has a minimum at x = ____ .",
+      "answer": "2",
+      "explanation": "f'(x) = 2x - 4 = 0."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "By the second derivative test, f'(c) = 0 with f''(c) < 0 gives a local ____ .",
+      "answer": "maximum",
+      "explanation": "Concave down."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A point where the concavity of a curve changes is called a point of ____ .",
+      "answer": "inflection",
+      "explanation": "Concavity change."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In optimization, the quantity to be optimized is first written as a function of ____ variable.",
+      "answer": "one",
+      "explanation": "Reduce using the constraint."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "With 100 m of fencing on three sides of a rectangle by a river, the maximum area is ____ m^2.",
+      "answer": "1250",
+      "explanation": "A = x(100 - 2x), max 1250."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The small-change approximation is dy = ____ dx.",
+      "answer": "f'(x)",
+      "explanation": "Differential formula."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For V = (4/3) pi r^3, the relative error dV/V equals ____ times dr/r.",
+      "answer": "3",
+      "explanation": "dV/V = 3 dr/r."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Rolle's theorem needs f(a) = ____ .",
+      "answer": "f(b)",
+      "explanation": "Equal end values."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Explain what dy/dx means as a rate of change, giving one physical example.",
+      "answer": "dy/dx is the instantaneous rate of change of y with respect to x - how fast y changes per unit change in x at a particular instant. Physical example: if s is displacement and t is time, then ds/dt is the velocity, the rate at which displacement changes with time.",
+      "explanation": "Definition plus velocity example."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "The volume of a spherical balloon increases at 80 cm^3/s. Find the rate of increase of its radius when r = 4 cm.",
+      "answer": "V = (4/3) pi r^3, so dV/dt = 4 pi r^2 (dr/dt). With dV/dt = 80 and r = 4:\n80 = 4 pi (16)(dr/dt) = 64 pi (dr/dt).\ndr/dt = 80/(64 pi) = 5/(4 pi) cm/s, about 0.398 cm/s.",
+      "explanation": "Differentiate V; solve for dr/dt."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A man 2 m tall walks away from a lamp post 6 m high at 1.5 m/s. Find the rate at which the tip of his shadow moves.",
+      "answer": "Let x be the man's distance from the post and s the distance of the shadow tip from the post. By similar triangles 6/s = 2/(s - x), so 6(s - x) = 2s, giving 4s = 6x, s = 1.5x.\nThen ds/dt = 1.5 (dx/dt) = 1.5(1.5) = 2.25 m/s.\nThe tip of the shadow moves at 2.25 m/s.",
+      "explanation": "Similar triangles give s = 1.5x; differentiate."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find the slope of the tangent to y = x^3 - 2x at the point where x = 1.",
+      "answer": "dy/dx = 3x^2 - 2. At x = 1 the slope is 3(1) - 2 = 1.",
+      "explanation": "Evaluate derivative at x = 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the equations of the tangent and the normal to the curve y = x^2 - 2x + 3 at the point (2, 3).",
+      "answer": "dy/dx = 2x - 2 = 2 at x = 2, so the tangent slope is 2.\nTangent: y - 3 = 2(x - 2), i.e. y = 2x - 1.\nNormal slope = -1/2: y - 3 = (-1/2)(x - 2), i.e. x + 2y = 8.",
+      "explanation": "Slope 2; write tangent and normal."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the point(s) on the curve y = x^3 - 3x where the tangent is parallel to the x-axis.",
+      "answer": "A tangent parallel to the x-axis has zero slope, so dy/dx = 0.\ndy/dx = 3x^2 - 3 = 0 gives x^2 = 1, x = 1 or x = -1.\nAt x = 1, y = 1 - 3 = -2; at x = -1, y = -1 + 3 = 2.\nThe points are (1, -2) and (-1, 2).",
+      "explanation": "Set dy/dx = 0; find points."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the derivative test for a function to be increasing or decreasing on an interval.",
+      "answer": "On an interval, if f'(x) > 0 throughout, then f is (strictly) increasing there; if f'(x) < 0 throughout, then f is (strictly) decreasing there. If f'(x) = 0 throughout, f is constant.",
+      "explanation": "Sign of f'(x) decides monotonicity."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the intervals in which f(x) = x^3 - 3x^2 + 4 is increasing and decreasing.",
+      "answer": "f'(x) = 3x^2 - 6x = 3x(x - 2). Critical points x = 0 and x = 2.\nFor x < 0: f' > 0 (increasing). For 0 < x < 2: f' < 0 (decreasing). For x > 2: f' > 0 (increasing).\nSo f increases on (-infinity, 0) and (2, infinity), and decreases on (0, 2).",
+      "explanation": "Sign of f' in each sub-interval."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Show that f(x) = x + 1/x is decreasing on (0, 1).",
+      "answer": "f'(x) = 1 - 1/x^2. For 0 < x < 1, x^2 < 1 so 1/x^2 > 1, making f'(x) = 1 - 1/x^2 < 0. Hence f is decreasing on (0, 1).",
+      "explanation": "f'(x) < 0 on the interval."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the first derivative test for local maxima and minima.",
+      "answer": "Let c be a critical point of f (f'(c) = 0). Examine the sign of f'(x) as x increases through c: if f' changes from positive to negative, f has a local maximum at c; if it changes from negative to positive, a local minimum; if it does not change sign, c is neither (a point of inflection).",
+      "explanation": "Sign change of f' at a critical point."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the local maximum and minimum values of f(x) = x^3 - 3x + 2.",
+      "answer": "f'(x) = 3x^2 - 3 = 3(x - 1)(x + 1). Critical points x = 1, x = -1.\nf''(x) = 6x. At x = -1, f''(-1) = -6 < 0 => local maximum, f(-1) = -1 + 3 + 2 = 4. At x = 1, f''(1) = 6 > 0 => local minimum, f(1) = 1 - 3 + 2 = 0.\nLocal maximum value 4 at x = -1; local minimum value 0 at x = 1.",
+      "explanation": "Critical points, then second derivative test."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the absolute maximum and minimum of f(x) = x^3 - 12x on [0, 3].",
+      "answer": "f'(x) = 3x^2 - 12 = 3(x - 2)(x + 2). In [0, 3] the critical point is x = 2 (x = -2 is outside).\nValues: f(0) = 0, f(2) = 8 - 24 = -16, f(3) = 27 - 36 = -9.\nAbsolute maximum 0 at x = 0; absolute minimum -16 at x = 2.",
+      "explanation": "Compare critical point and endpoints."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the second derivative test for local extrema.",
+      "answer": "Suppose f'(c) = 0. If f''(c) < 0, the curve is concave down and f has a local maximum at c. If f''(c) > 0, the curve is concave up and f has a local minimum at c. If f''(c) = 0, the test is inconclusive and one uses the first derivative test.",
+      "explanation": "Sign of f''(c) classifies the stationary point."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Show that x = 0 is a point of inflection of f(x) = x^3 but not an extremum.",
+      "answer": "f'(x) = 3x^2, so f'(0) = 0 - a critical point. f''(x) = 6x, so f''(0) = 0 and the second derivative test fails.\nUsing the first derivative test: f'(x) = 3x^2 >= 0 for all x, so f' does not change sign at 0 - hence no maximum or minimum.\nBut f''(x) = 6x is negative for x < 0 (concave down) and positive for x > 0 (concave up); the concavity changes at 0, so x = 0 is a point of inflection.",
+      "explanation": "f' no sign change (no extremum); f'' sign change (inflection)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Find the point of inflection of the curve y = x^3 - 6x^2 + 9x.",
+      "answer": "y' = 3x^2 - 12x + 9 and y'' = 6x - 12. Setting y'' = 0 gives x = 2.\nFor x < 2, y'' < 0 (concave down); for x > 2, y'' > 0 (concave up), so the concavity changes at x = 2.\nAt x = 2, y = 8 - 24 + 18 = 2. The point of inflection is (2, 2).",
+      "explanation": "y'' = 0 with sign change at x = 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "CREATE",
+      "marks": 3,
+      "question": "Find two positive numbers whose sum is 16 and whose product is a maximum.",
+      "answer": "Let the numbers be x and 16 - x. Product P = x(16 - x) = 16x - x^2.\ndP/dx = 16 - 2x = 0 gives x = 8. P'' = -2 < 0, so a maximum.\nThe numbers are 8 and 8, with maximum product 64.",
+      "explanation": "P(x) = x(16-x); maximize."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "CREATE",
+      "marks": 3,
+      "question": "A rectangular sheet of tin 20 cm by 20 cm is used to make an open box by cutting equal squares of side x from the corners. Find x for maximum volume.",
+      "answer": "V = x(20 - 2x)^2. dV/dx = (20 - 2x)^2 + x*2(20 - 2x)(-2) = (20 - 2x)[(20 - 2x) - 4x] = (20 - 2x)(20 - 6x).\nSetting dV/dx = 0: x = 10 (rejected, zero volume) or x = 10/3.\nSince the second factor makes V'' < 0 there, x = 10/3 cm gives the maximum volume.",
+      "explanation": "V = x(20-2x)^2; solve V' = 0."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Using differentials, find the approximate value of (1.02)^4.",
+      "answer": "Let f(x) = x^4, x = 1, dx = 0.02. f'(x) = 4x^3 = 4 at x = 1.\ndy = 4(0.02) = 0.08. So (1.02)^4 is about 1 + 0.08 = 1.08.",
+      "explanation": "dy = f'(x) dx with x = 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "The radius of a sphere is measured as 9 cm with a possible error of 0.03 cm. Estimate the error and percentage error in the volume.",
+      "answer": "V = (4/3) pi r^3, so dV = 4 pi r^2 dr = 4 pi (81)(0.03) = 9.72 pi, about 30.5 cm^3.\nRelative error dV/V = 3 dr/r = 3(0.03)/9 = 0.01, so the percentage error is 1%.",
+      "explanation": "dV = 4 pi r^2 dr; dV/V = 3 dr/r."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State Rolle's theorem and its geometric meaning.",
+      "answer": "Rolle's theorem: if f is continuous on [a, b], differentiable on (a, b), and f(a) = f(b), then there is at least one c in (a, b) with f'(c) = 0.\nGeometric meaning: a smooth curve with equal heights at its two ends must have at least one point in between where the tangent is horizontal.",
+      "explanation": "Statement plus horizontal tangent picture."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Verify the Mean Value Theorem for f(x) = x^2 on [2, 4].",
+      "answer": "f is continuous on [2, 4] and differentiable on (2, 4). The chord slope is [f(4) - f(2)]/(4 - 2) = (16 - 4)/2 = 6.\nMVT requires f'(c) = 6. Here f'(x) = 2x = 6 gives c = 3, which lies in (2, 4). Hence the theorem is verified with c = 3.",
+      "explanation": "Chord slope 6; f'(c) = 2c = 6 => c = 3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find the maximum value of f(x) = 5 + 6x - 2x^2.",
+      "answer": "f'(x) = 6 - 4x = 0 gives x = 3/2. f''(x) = -4 < 0, so this is a maximum.\nMaximum value f(3/2) = 5 + 6(3/2) - 2(9/4) = 5 + 9 - 4.5 = 9.5.",
+      "explanation": "f'(x) = 0 at x = 3/2; f'' < 0."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Water is poured into an inverted right circular cone of semi-vertical angle 45 degrees at 5 cm^3/s. Find the rate at which the water level rises when the depth is 10 cm.",
+      "answer": "For a cone with semi-vertical angle 45 degrees, the radius equals the depth: r = h. The volume of water is\nV = (1/3) pi r^2 h = (1/3) pi h^3 (since r = h).\nDifferentiate with respect to time: dV/dt = (1/3) pi (3 h^2)(dh/dt) = pi h^2 (dh/dt).\nWith dV/dt = 5 and h = 10:\n5 = pi (100)(dh/dt), so dh/dt = 5/(100 pi) = 1/(20 pi) cm/s, about 0.0159 cm/s.\nThe water level rises at about 0.016 cm/s.",
+      "explanation": "r = h for 45 deg; V = (1/3) pi h^3; differentiate."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find the equations of the tangent and normal to the curve y = x^3 - 3x + 2 at the point where x = 2. Also find where this tangent meets the x-axis.",
+      "answer": "y = x^3 - 3x + 2. dy/dx = 3x^2 - 3. At x = 2, slope = 12 - 3 = 9 and y = 8 - 6 + 2 = 4, so the point is (2, 4).\nTangent: y - 4 = 9(x - 2), i.e. y = 9x - 14.\nNormal slope = -1/9: y - 4 = (-1/9)(x - 2), i.e. x + 9y = 38.\nThe tangent meets the x-axis where y = 0: 0 = 9x - 14, so x = 14/9. The point is (14/9, 0).",
+      "explanation": "Slope 9; tangent, normal; set y = 0."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Find the intervals of increase and decrease of f(x) = 2x^3 - 9x^2 + 12x - 3, and identify its local extrema.",
+      "answer": "f'(x) = 6x^2 - 18x + 12 = 6(x^2 - 3x + 2) = 6(x - 1)(x - 2). Critical points x = 1 and x = 2.\nFor x < 1: both factors negative, product positive => f' > 0 (increasing).\nFor 1 < x < 2: (x - 1) > 0, (x - 2) < 0 => f' < 0 (decreasing).\nFor x > 2: f' > 0 (increasing).\nSo f increases on (-infinity, 1), decreases on (1, 2), increases on (2, infinity). By the first derivative test, x = 1 is a local maximum (f(1) = 2) and x = 2 is a local minimum (f(2) = 1).",
+      "explanation": "Sign of f' in three intervals; classify extrema."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find all the local maxima, local minima and the absolute extrema of f(x) = x^4 - 8x^2 + 5 on [-3, 1].",
+      "answer": "f'(x) = 4x^3 - 16x = 4x(x^2 - 4) = 4x(x - 2)(x + 2). Critical points in [-3, 1]: x = -2 and x = 0 (x = 2 is outside).\nf''(x) = 12x^2 - 16. At x = -2, f''(-2) = 48 - 16 = 32 > 0 => local minimum, f(-2) = 16 - 32 + 5 = -11. At x = 0, f''(0) = -16 < 0 => local maximum, f(0) = 5.\nFor absolute extrema on [-3, 1], also test endpoints: f(-3) = 81 - 72 + 5 = 14; f(1) = 1 - 8 + 5 = -2.\nComparing -11, 5, 14, -2: absolute maximum 14 at x = -3; absolute minimum -11 at x = -2.",
+      "explanation": "Critical points, second derivative test, endpoints."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Discuss the concavity, points of inflection, and local extrema of f(x) = x^4 - 4x^3.",
+      "answer": "f'(x) = 4x^3 - 12x^2 = 4x^2(x - 3). Critical points x = 0 and x = 3.\nFirst derivative test at x = 3: f' changes from - to + => local minimum, f(3) = 81 - 108 = -27. At x = 0: f' = 4x^2(x-3) is negative on both sides (x^2 >= 0, (x - 3) < 0 near 0), so no sign change => not an extremum.\nConcavity: f''(x) = 12x^2 - 24x = 12x(x - 2). f'' = 0 at x = 0 and x = 2. Sign of f'': positive for x < 0, negative for 0 < x < 2, positive for x > 2. Concavity changes at both, so (0, 0) and (2, -16) are points of inflection.\nThus the only extremum is a local minimum -27 at x = 3; x = 0 and x = 2 are inflection points.",
+      "explanation": "f' for extrema, f'' for concavity/inflection."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "CREATE",
+      "marks": 5,
+      "question": "Show that the right circular cylinder of greatest volume that can be inscribed in a sphere of radius R has height 2R/sqrt(3).",
+      "answer": "Let the cylinder have radius r and height h, inscribed in a sphere of radius R. The half-height and radius satisfy r^2 + (h/2)^2 = R^2, so r^2 = R^2 - h^2/4.\nVolume V = pi r^2 h = pi (R^2 - h^2/4) h = pi (R^2 h - h^3/4).\ndV/dh = pi (R^2 - 3h^2/4) = 0 gives h^2 = 4R^2/3, so h = 2R/sqrt(3).\nd^2V/dh^2 = pi(-3h/2) < 0, confirming a maximum.\nHence the cylinder of greatest volume has height h = 2R/sqrt(3).",
+      "explanation": "Constraint r^2 = R^2 - h^2/4; maximize V(h)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Using differentials, find the approximate value of (26)^(1/3), and state the percentage error if 3 is used as a rough estimate.",
+      "answer": "Let f(x) = x^(1/3), x = 27, dx = -1. f'(x) = (1/3) x^(-2/3) = (1/3)(1/9) = 1/27 at x = 27.\ndy = (1/27)(-1) = -0.037. So (26)^(1/3) is about 3 - 0.037 = 2.963.\nIf 3 is used as a rough estimate, the error relative to 2.963 is (3 - 2.963)/2.963 = 0.0125, i.e. about 1.25%.",
+      "explanation": "dy = f'(x) dx at x = 27; then compare with 3."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "State the Mean Value Theorem. Verify it for f(x) = x^2 - 3x + 2 on [1, 4] and interpret the result geometrically.",
+      "answer": "Mean Value Theorem: if f is continuous on [a, b] and differentiable on (a, b), then there exists c in (a, b) with f'(c) = [f(b) - f(a)]/(b - a).\nHere f(x) = x^2 - 3x + 2 is a polynomial, so continuous and differentiable everywhere. f(1) = 1 - 3 + 2 = 0 and f(4) = 16 - 12 + 2 = 6.\nChord slope = (6 - 0)/(4 - 1) = 2. We need f'(c) = 2. Since f'(x) = 2x - 3, set 2x - 3 = 2, giving x = 2.5, which lies in (1, 4).\nGeometrically, at x = 2.5 the tangent to the curve is parallel to the chord joining (1, 0) and (4, 6).",
+      "explanation": "State MVT; chord slope 2; f'(c) = 2 => c = 2.5."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA stone dropped into a still pond creates circular ripples. The radius of the outer ripple increases at a constant rate of 4 cm/s. The area enclosed is A = pi r^2.\n(a) Write dA/dt in terms of r and dr/dt.\n(b) Find the rate of increase of area when r = 8 cm.\n(c) Is the area increasing at a constant rate as the ripple spreads?\n(d) What does dA/dr represent geometrically?",
+      "answer": "(a) A = pi r^2, so dA/dt = 2 pi r (dr/dt).\n(b) With dr/dt = 4 and r = 8: dA/dt = 2 pi (8)(4) = 64 pi cm^2/s, about 201 cm^2/s.\n(c) No. dA/dt = 2 pi r (dr/dt) grows with r, so even though dr/dt is constant, the area increases faster as the ripple gets bigger.\n(d) dA/dr = 2 pi r is the circumference - the rate at which area changes per unit change in radius.",
+      "explanation": "Chain rule; area rate grows with r; dA/dr = circumference."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA curve is given by y = x^2 - 4x + 5. A designer needs the tangent and normal at the point where x = 3.\n(a) Find the coordinates of the point.\n(b) Find the slope of the tangent there.\n(c) Write the equation of the tangent.\n(d) Write the equation of the normal.",
+      "answer": "(a) At x = 3, y = 9 - 12 + 5 = 2, so the point is (3, 2).\n(b) dy/dx = 2x - 4 = 2 at x = 3, so the tangent slope is 2.\n(c) Tangent: y - 2 = 2(x - 3), i.e. y = 2x - 4.\n(d) Normal slope = -1/2: y - 2 = (-1/2)(x - 3), i.e. x + 2y = 7.",
+      "explanation": "Point (3,2); slope 2; tangent and normal."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe profit (in thousand rupees) from selling x units is P(x) = -x^2 + 20x - 36.\n(a) Find P'(x).\n(b) For what values of x is the profit increasing?\n(c) At what output does the profit stop increasing?\n(d) What is the maximum profit?",
+      "answer": "(a) P'(x) = -2x + 20.\n(b) Profit increases where P'(x) > 0: -2x + 20 > 0 => x < 10. So profit rises for 0 <= x < 10.\n(c) Profit stops increasing at x = 10, where P'(x) = 0.\n(d) P''(x) = -2 < 0, so x = 10 is a maximum. P(10) = -100 + 200 - 36 = 64, i.e. 64 thousand rupees.",
+      "explanation": "Sign of P'; maximum at x = 10."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nConsider the function f(x) = x^3 - 3x^2 - 9x + 5.\n(a) Find the critical points.\n(b) Use the second derivative test to classify them.\n(c) Find the local maximum value.\n(d) Find the local minimum value.",
+      "answer": "(a) f'(x) = 3x^2 - 6x - 9 = 3(x - 3)(x + 1). Critical points x = 3 and x = -1.\n(b) f''(x) = 6x - 6. f''(-1) = -12 < 0 => local maximum at x = -1; f''(3) = 12 > 0 => local minimum at x = 3.\n(c) Local maximum value f(-1) = -1 - 3 + 9 + 5 = 10.\n(d) Local minimum value f(3) = 27 - 27 - 27 + 5 = -22.",
+      "explanation": "Critical points; classify; values 10 and -22."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA curve is y = x^3 - 6x^2 + 9x + 2.\n(a) Find the critical points.\n(b) Where is the curve concave up and concave down?\n(c) Find the point of inflection.\n(d) Which critical point is a maximum?",
+      "answer": "(a) y' = 3x^2 - 12x + 9 = 3(x - 1)(x - 3). Critical points x = 1 and x = 3.\n(b) y'' = 6x - 12. y'' < 0 for x < 2 (concave down); y'' > 0 for x > 2 (concave up).\n(c) y'' = 0 at x = 2 with a sign change; y(2) = 8 - 24 + 18 + 2 = 4, so the inflection point is (2, 4).\n(d) At x = 1, y''(1) = -6 < 0, so x = 1 is the local maximum.",
+      "explanation": "y' critical points; y'' concavity; inflection at (2,4)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "HARD",
+      "cognitive_level": "CREATE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA closed cylindrical can must hold a fixed volume V. Its surface area is S = 2 pi r^2 + 2 pi r h, with V = pi r^2 h.\n(a) Express h in terms of V and r.\n(b) Write S as a function of r only.\n(c) Find the r that minimizes S.\n(d) Show that at this r the height equals the diameter.",
+      "answer": "(a) From V = pi r^2 h, h = V/(pi r^2).\n(b) S = 2 pi r^2 + 2 pi r (V/(pi r^2)) = 2 pi r^2 + 2V/r.\n(c) dS/dr = 4 pi r - 2V/r^2 = 0 gives 4 pi r^3 = 2V, so r = (V/(2 pi))^(1/3). Since S'' = 4 pi + 4V/r^3 > 0, this is a minimum.\n(d) At the minimum 4 pi r^3 = 2V = 2 pi r^2 h, so 2r = h: the height equals the diameter.",
+      "explanation": "S(r); set S'=0; h = 2r."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA metal cube of side 10 cm is heated so that each side increases by 0.1 cm. Use differentials.\n(a) Write the volume V and its differential dV.\n(b) Find the approximate increase in volume.\n(c) Find the percentage error in the volume.\n(d) What is the approximate increase in surface area (S = 6x^2)?",
+      "answer": "(a) V = x^3, dV = 3x^2 dx.\n(b) dV = 3(10)^2 (0.1) = 3(100)(0.1) = 30 cm^3.\n(c) dV/V = 3 dx/x = 3(0.1)/10 = 0.03, i.e. 3%.\n(d) S = 6x^2, dS = 12x dx = 12(10)(0.1) = 12 cm^2.",
+      "explanation": "dV = 3x^2 dx = 30; 3%; dS = 12."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nRolle's theorem and the Mean Value Theorem both guarantee special interior points. Consider f(x) = x^2 - 6x + 8 on [2, 4].\n(a) Check f(2) and f(4).\n(b) Does Rolle's theorem apply? Find c.\n(c) State the Mean Value Theorem.\n(d) Why is Rolle a special case of the MVT?",
+      "answer": "(a) f(2) = 4 - 12 + 8 = 0 and f(4) = 16 - 24 + 8 = 0, so f(2) = f(4).\n(b) f is a polynomial (continuous and differentiable) with equal end values, so Rolle applies. f'(x) = 2x - 6 = 0 gives c = 3, which lies in (2, 4).\n(c) MVT: if f is continuous on [a, b] and differentiable on (a, b), there is a c in (a, b) with f'(c) = [f(b) - f(a)]/(b - a).\n(d) When f(a) = f(b) the chord slope is 0, so the MVT gives f'(c) = 0 - exactly Rolle's theorem.",
+      "explanation": "Equal ends; c = 3; MVT; Rolle is f(a)=f(b) case."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-01",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA point moves along the curve y = x^2 so that its x-coordinate increases at 3 units/s.\n(a) Write dy/dt in terms of x.\n(b) Find dy/dt when x = 2.\n(c) At which point do x and y change at the same rate?\n(d) Interpret your answer to (c).",
+      "answer": "(a) y = x^2, so dy/dt = 2x (dx/dt) = 2x(3) = 6x.\n(b) At x = 2, dy/dt = 6(2) = 12 units/s.\n(c) x and y change at the same rate when dy/dt = dx/dt, i.e. 6x = 3, so x = 1/2; then y = 1/4. The point is (1/2, 1/4).\n(d) At (1/2, 1/4) the slope dy/dx = 2x = 1, meaning the curve rises at 45 degrees, so equal horizontal and vertical rates.",
+      "explanation": "dy/dt = 6x; equal rates where slope = 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-AOD-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "CREATE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA farmer has 40 m of fencing to make a rectangular pen. Let one side be x metres.\n(a) Express the other side in terms of x.\n(b) Write the area as a function of x.\n(c) Find the value of x that maximizes the area.\n(d) State the maximum area and the shape of the pen.",
+      "answer": "(a) The perimeter is 2(x + other) = 40, so the other side is 20 - x.\n(b) Area A = x(20 - x) = 20x - x^2.\n(c) dA/dx = 20 - 2x = 0 gives x = 10; A'' = -2 < 0, a maximum.\n(d) The other side is 20 - 10 = 10, so the pen is a 10 m by 10 m square with maximum area 100 m^2.",
+      "explanation": "A = x(20 - x); max at x = 10; square 100 m^2."
+    }
+  ]
+}
