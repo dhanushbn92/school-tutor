@@ -1,0 +1,2260 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 19,
+    "chapter_title": "Probability",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 19 - PROBABILITY\n\nIntroduction\n\nLife is full of uncertainty. Will it rain tomorrow? Will a tossed coin show heads? Will a randomly drawn card be an ace? Probability is the branch of mathematics that measures how likely an uncertain event is to happen. It attaches to every event a number between 0 and 1: a probability of 0 means the event is impossible, a probability of 1 means it is certain, and values in between measure degrees of likelihood. This chapter develops the classical (mathematical) definition, the axiomatic approach, the addition and multiplication theorems, conditional probability, independence, and the powerful ideas of total probability and Bayes' theorem. Throughout we use counting tools - permutations and combinations - to compute probabilities for coins, dice, cards and balls.\n\n19.1 SOME BASIC TERMS\n\nA RANDOM EXPERIMENT is an experiment whose outcome cannot be predicted with certainty, though all possible outcomes are known - for example tossing a coin or rolling a die. Each possible result is an OUTCOME. The set of all outcomes is the SAMPLE SPACE, written S. Each element of S is a SAMPLE POINT. An EVENT is any subset of the sample space. When a coin is tossed, S = {H, T}. When a die is rolled, S = {1, 2, 3, 4, 5, 6}. The event 'an even number appears' is E = {2, 4, 6}.\n\nEQUALLY LIKELY outcomes are outcomes that have the same chance of occurring - a fair die is equally likely to show any of its six faces. Two events are MUTUALLY EXCLUSIVE (disjoint) if they cannot occur together, that is their intersection is empty: for one throw of a die, 'getting a 2' and 'getting a 5' are mutually exclusive. Events are EXHAUSTIVE if together they cover the whole sample space. The FAVOURABLE outcomes for an event are the sample points belonging to that event.\n\n19.2 CLASSICAL (MATHEMATICAL) DEFINITION OF PROBABILITY\n\nIf a random experiment has n equally likely, mutually exclusive and exhaustive outcomes, and m of them are favourable to an event E, then the probability of E is\n\n   P(E) = (number of favourable outcomes) / (total number of outcomes) = m / n\n\nExample: A die is rolled. The probability of an even number is P(E) = 3/6 = 1/2, because there are 3 favourable outcomes {2, 4, 6} out of 6. The probability of getting a number greater than 4 is P({5,6}) = 2/6 = 1/3.\n\nBecause 0 <= m <= n, every probability satisfies\n\n   0 <= P(E) <= 1\n\nAn IMPOSSIBLE event has probability 0 (m = 0); a CERTAIN (sure) event has probability 1 (m = n). If E' denotes 'E does not happen', then the number of outcomes NOT in E is n - m, so P(E') = (n - m)/n = 1 - P(E). This is the rule for complementary events, discussed in 19.5.\n\n19.3 AXIOMATIC APPROACH TO PROBABILITY\n\nThe classical definition needs equally likely outcomes, which is not always available. The modern AXIOMATIC approach, due to Kolmogorov, defines probability as a function P that assigns to each event of a sample space S a real number, subject to three axioms:\n\n   Axiom 1: P(E) >= 0 for every event E (probability is never negative).\n   Axiom 2: P(S) = 1 (the sure event has probability 1).\n   Axiom 3: If A and B are mutually exclusive, then P(A or B) = P(A) + P(B).\n\nFrom these axioms all the familiar results follow. For instance the probability of the impossible (empty) event is 0, and 0 <= P(E) <= 1 for every event. When outcomes are equally likely the axiomatic probability reduces to the classical m/n formula, so the two viewpoints agree.\n\n19.4 THE ADDITION THEOREM\n\nOften we need the probability that AT LEAST ONE of two events happens, written P(A or B) or P(A union B). The ADDITION THEOREM states\n\n   P(A or B) = P(A) + P(B) - P(A and B)\n\nThe term P(A and B) (the probability that BOTH happen) is subtracted because those outcomes are counted once in P(A) and again in P(B); subtracting removes the double count.\n\nExample: A card is drawn from a well-shuffled pack of 52. Let A = 'the card is a king' and B = 'the card is a heart'. Then P(A) = 4/52, P(B) = 13/52, and P(A and B) = P(king of hearts) = 1/52. So\n\n   P(king or heart) = 4/52 + 13/52 - 1/52 = 16/52 = 4/13.\n\nFor MUTUALLY EXCLUSIVE events A and B cannot occur together, so P(A and B) = 0 and the theorem simplifies to\n\n   P(A or B) = P(A) + P(B)\n\nExample: The probability of drawing a king or a queen in one draw is 4/52 + 4/52 = 8/52 = 2/13, since a card cannot be both. The addition theorem extends to three events: P(A or B or C) = P(A) + P(B) + P(C) - P(A and B) - P(B and C) - P(C and A) + P(A and B and C).\n\n19.5 COMPLEMENTARY EVENTS\n\nThe COMPLEMENT of an event A, written A' (or 'not A'), is the event that A does NOT occur. Since A and A' are mutually exclusive and together exhaustive (A or A' = S),\n\n   P(A) + P(A') = 1,   so   P(not A) = 1 - P(A)\n\nThis simple rule is enormously useful: sometimes it is far easier to find the probability that an event does NOT happen and subtract from 1.\n\nExample: A die is thrown twice. Find the probability of getting AT LEAST one six. The complement is 'no six in either throw'. P(no six on one throw) = 5/6, so P(no six twice) = (5/6)(5/6) = 25/36. Hence P(at least one six) = 1 - 25/36 = 11/36. Directly counting 'at least one six' would be more tedious.\n\n19.6 CONDITIONAL PROBABILITY\n\nSometimes we know that one event has already occurred and want the probability of another in that light. The CONDITIONAL PROBABILITY of A GIVEN that B has occurred is written P(A|B) and defined by\n\n   P(A|B) = P(A and B) / P(B),   provided P(B) > 0\n\nKnowing B has occurred restricts attention to the outcomes in B; among those we ask what fraction also lie in A.\n\nExample: A die is rolled. Let A = 'the number is a 2' and B = 'the number is even'. Given the number is even (B = {2,4,6}), the chance it is a 2 is P(A|B) = P(A and B)/P(B) = (1/6)/(3/6) = 1/3. Reasoning directly: among the 3 even faces, exactly one is a 2, so 1/3 - the two methods agree.\n\nExample: In a class 60% of students passed Mathematics and 20% passed both Mathematics and Physics. A student who passed Mathematics is chosen; the probability she also passed Physics is P(Phys|Math) = 0.20/0.60 = 1/3.\n\n19.7 THE MULTIPLICATION THEOREM\n\nRearranging the definition of conditional probability gives the MULTIPLICATION THEOREM for the probability that BOTH events occur:\n\n   P(A and B) = P(A) x P(B|A) = P(B) x P(A|B)\n\nIn words, the chance that both happen equals the chance of the first times the chance of the second GIVEN the first.\n\nExample (drawing WITHOUT replacement): A bag has 5 red and 3 black balls. Two balls are drawn one after another without replacement. Find the probability both are red. P(first red) = 5/8. After removing one red, 4 red remain out of 7, so P(second red | first red) = 4/7. Hence P(both red) = (5/8)(4/7) = 20/56 = 5/14.\n\n19.8 INDEPENDENT EVENTS\n\nTwo events are INDEPENDENT if the occurrence of one does not change the probability of the other, that is P(A|B) = P(A). For independent events the multiplication theorem becomes the simple product rule\n\n   P(A and B) = P(A) x P(B)\n\nExample: A coin is tossed and a die is rolled. The two are independent. P(head and a six) = P(head) x P(six) = (1/2)(1/6) = 1/12.\n\nExample (drawing WITH replacement): From a pack of 52 cards, a card is drawn, replaced, the pack reshuffled, and a second card drawn. P(both aces) = (4/52)(4/52) = (1/13)(1/13) = 1/169, because replacement makes the draws independent. Contrast this with drawing without replacement, where P(both aces) = (4/52)(3/51) = 1/221. Do not confuse INDEPENDENT events (product of individual probabilities) with MUTUALLY EXCLUSIVE events (which cannot happen together); mutually exclusive events with non-zero probabilities are in fact dependent.\n\n19.9 COMPUTING PROBABILITIES WITH PERMUTATIONS AND COMBINATIONS\n\nWhen outcomes are equally likely, probability reduces to counting, and combinations nCr = n! / (r!(n-r)!) are the natural tool for selecting groups where order does not matter.\n\nExample: From a pack of 52, four cards are drawn together. The probability all four are aces is (number of ways to choose 4 aces) / (ways to choose any 4) = C(4,4)/C(52,4) = 1/270725.\n\nExample: A committee of 3 is chosen from 5 men and 4 women. The probability all three are women is C(4,3)/C(9,3) = 4/84 = 1/21. The probability of exactly 2 men and 1 woman is [C(5,2) x C(4,1)] / C(9,3) = (10 x 4)/84 = 40/84 = 10/21.\n\nExample (balls): A box has 4 white and 6 red balls. Three are drawn at random. P(exactly 2 white) = [C(4,2) x C(6,1)] / C(10,3) = (6 x 6)/120 = 36/120 = 3/10.\n\nExample (dice): Two dice are thrown. The sample space has 6 x 6 = 36 equally likely outcomes. P(sum = 7) = 6/36 = 1/6 (the favourable pairs are (1,6),(2,5),(3,4),(4,3),(5,2),(6,1)). P(sum = 8) = 5/36. P(doublet) = 6/36 = 1/6.\n\n19.10 TOTAL PROBABILITY AND BAYES' THEOREM\n\nSuppose the sample space is partitioned into mutually exclusive and exhaustive events B1, B2, ..., Bn (one and only one of them must occur), and A is any event. The THEOREM OF TOTAL PROBABILITY gives P(A) by summing the ways A can arise through each Bi:\n\n   P(A) = P(B1) P(A|B1) + P(B2) P(A|B2) + ... + P(Bn) P(A|Bn)\n\nExample: Bag I has 3 red and 2 white balls; Bag II has 1 red and 4 white. A bag is chosen at random and a ball drawn. P(red) = P(Bag I) P(red|I) + P(Bag II) P(red|II) = (1/2)(3/5) + (1/2)(1/5) = 3/10 + 1/10 = 4/10 = 2/5.\n\nBAYES' THEOREM reverses the reasoning: given that A has occurred, what is the probability it came through a particular Bk? It states\n\n   P(Bk|A) = [P(Bk) P(A|Bk)] / [sum over i of P(Bi) P(A|Bi)]\n\nThe denominator is just P(A) from the total-probability formula. Bayes' theorem lets us update our belief about the 'cause' Bk once we observe the 'effect' A.\n\nExample (continuing): Given that the drawn ball is red, the probability it came from Bag I is P(I|red) = [P(I) P(red|I)] / P(red) = [(1/2)(3/5)] / (2/5) = (3/10)/(4/10) = 3/4. So a red ball makes Bag I the more likely source.\n\nExample (testing): A disease affects 1% of a population. A test is 99% accurate on both the sick and the healthy. If a person tests positive, P(disease | positive) = (0.01 x 0.99)/(0.01 x 0.99 + 0.99 x 0.01) = 0.0099/0.0198 = 1/2. Despite the accurate test, the low base rate makes the posterior only 1/2 - a famous, counter-intuitive result that Bayes' theorem makes precise.\n\nSUMMARY\n\n- Random experiment, sample space S, outcomes, events; equally likely, mutually exclusive and exhaustive events.\n- Classical definition: P(E) = m/n (favourable/total), with 0 <= P(E) <= 1; impossible event 0, certain event 1.\n- Axiomatic approach (Kolmogorov): P(E) >= 0, P(S) = 1, and P(A or B) = P(A) + P(B) for mutually exclusive A, B.\n- Addition theorem: P(A or B) = P(A) + P(B) - P(A and B); for mutually exclusive events P(A or B) = P(A) + P(B).\n- Complementary events: P(not A) = 1 - P(A); often easier to compute via the complement (e.g. 'at least one').\n- Conditional probability: P(A|B) = P(A and B)/P(B), P(B) > 0.\n- Multiplication theorem: P(A and B) = P(A) P(B|A); for independent events P(A and B) = P(A) P(B).\n- Independence versus mutual exclusivity: independent means P(A and B) = P(A)P(B); mutually exclusive means P(A and B) = 0.\n- Counting probabilities with permutations and combinations for cards, dice and balls.\n- Total probability: P(A) = sum of P(Bi) P(A|Bi) over a partition; Bayes' theorem: P(Bk|A) = P(Bk)P(A|Bk) / P(A).\n",
+  "topics": [
+    {
+      "name": "Definition and Axioms of Probability",
+      "description": "Random experiment, sample space, outcomes and events; the classical definition P(E) = m/n (favourable outcomes over total); the range 0 <= P(E) <= 1; impossible and certain events; the axiomatic approach of Kolmogorov (P(E) >= 0, P(S) = 1)."
+    },
+    {
+      "name": "The Addition Theorem",
+      "description": "The addition theorem P(A or B) = P(A) + P(B) - P(A and B), and its reduction P(A or B) = P(A) + P(B) for mutually exclusive events; applications to cards, dice and balls."
+    },
+    {
+      "name": "Complementary Events",
+      "description": "The complement A' of an event A and the rule P(not A) = 1 - P(A); using the complement to simplify 'at least one' type problems."
+    },
+    {
+      "name": "Conditional Probability",
+      "description": "Conditional probability P(A|B) = P(A and B)/P(B), P(B) > 0; interpreting it as restricting the sample space to B; worked examples with dice, cards and data."
+    },
+    {
+      "name": "The Multiplication Theorem and Independent Events",
+      "description": "The multiplication theorem P(A and B) = P(A) P(B|A); independent events with P(A and B) = P(A) P(B); drawing with and without replacement; distinguishing independence from mutual exclusivity."
+    },
+    {
+      "name": "Total Probability and Bayes' Theorem",
+      "description": "Partition of the sample space; the theorem of total probability P(A) = sum P(Bi) P(A|Bi); Bayes' theorem P(Bk|A) = P(Bk)P(A|Bk)/P(A) for updating probabilities of causes given an observed effect."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-PRB-01",
+      "topic_name": "Definition and Axioms of Probability",
+      "bloom": "understand",
+      "description": "Define random experiment, sample space and event, and state the classical definition P(E) = m/n with the range 0 <= P(E) <= 1 for impossible, certain and ordinary events."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-02",
+      "topic_name": "Definition and Axioms of Probability",
+      "bloom": "apply",
+      "description": "Apply the classical definition and the axiomatic approach, using permutations and combinations to compute probabilities for coins, dice, cards and balls."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-03",
+      "topic_name": "The Addition Theorem",
+      "bloom": "apply",
+      "description": "Apply the addition theorem P(A or B) = P(A) + P(B) - P(A and B), and its mutually-exclusive form, to compute the probability that at least one of two events occurs."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-04",
+      "topic_name": "Complementary Events",
+      "bloom": "understand",
+      "description": "Use complementary events and the rule P(not A) = 1 - P(A) to compute probabilities, especially in 'at least one' problems."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-05",
+      "topic_name": "Conditional Probability",
+      "bloom": "apply",
+      "description": "Compute conditional probability P(A|B) = P(A and B)/P(B) and interpret it as restricting the sample space to the given event B."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-06",
+      "topic_name": "The Multiplication Theorem and Independent Events",
+      "bloom": "understand",
+      "description": "State the multiplication theorem P(A and B) = P(A) P(B|A) and the condition P(A and B) = P(A) P(B) for independence, distinguishing independent from mutually exclusive events."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-07",
+      "topic_name": "The Multiplication Theorem and Independent Events",
+      "bloom": "apply",
+      "description": "Apply the multiplication theorem and the product rule for independent events to problems on drawing with and without replacement."
+    },
+    {
+      "code": "12-NIOS-MAT-PRB-08",
+      "topic_name": "Total Probability and Bayes' Theorem",
+      "bloom": "analyze",
+      "description": "Apply and analyse the theorem of total probability and Bayes' theorem to compute the probability of causes given an observed effect."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Probability - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Probability lesson. It develops the classical and axiomatic definitions of probability, the addition theorem, complementary events, conditional probability, the multiplication theorem and independence, and the theorems of total probability and Bayes.",
+    "overview_diagram": {
+      "title": "Probability",
+      "central_term": "Probability",
+      "branches": [
+        {
+          "label": "Definition & Axioms",
+          "details": [
+            "P(E) = m/n (favourable/total)",
+            "0 <= P(E) <= 1",
+            "Axioms: P(E)>=0, P(S)=1, P(A or B)=P(A)+P(B) if disjoint"
+          ]
+        },
+        {
+          "label": "Addition & Complement",
+          "details": [
+            "P(A or B) = P(A) + P(B) - P(A and B)",
+            "Mutually exclusive: P(A or B) = P(A) + P(B)",
+            "P(not A) = 1 - P(A)"
+          ]
+        },
+        {
+          "label": "Conditional Probability",
+          "details": [
+            "P(A|B) = P(A and B)/P(B)",
+            "Restrict sample space to B",
+            "P(B) > 0 required"
+          ]
+        },
+        {
+          "label": "Multiplication & Independence",
+          "details": [
+            "P(A and B) = P(A) P(B|A)",
+            "Independent: P(A and B) = P(A) P(B)",
+            "With vs without replacement"
+          ]
+        },
+        {
+          "label": "Total Prob. & Bayes",
+          "details": [
+            "P(A) = sum P(Bi) P(A|Bi)",
+            "P(Bk|A) = P(Bk)P(A|Bk)/P(A)",
+            "Updating causes from effects"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Definition and axioms of probability",
+        "bullets": [
+          "A random experiment has known but unpredictable outcomes; the set of all outcomes is the sample space S, and an event is any subset of S.",
+          "Classical definition: for n equally likely outcomes with m favourable, P(E) = m/n, so 0 <= P(E) <= 1.",
+          "An impossible event has probability 0 and a certain (sure) event has probability 1.",
+          "Axiomatic approach (Kolmogorov): P(E) >= 0, P(S) = 1, and P(A or B) = P(A) + P(B) for mutually exclusive A and B."
+        ]
+      },
+      {
+        "heading": "Addition theorem and complementary events",
+        "bullets": [
+          "Addition theorem: P(A or B) = P(A) + P(B) - P(A and B); the overlap is subtracted to avoid double counting.",
+          "For mutually exclusive events P(A and B) = 0, so P(A or B) = P(A) + P(B).",
+          "Complement: P(not A) = 1 - P(A), since A and A' are exclusive and exhaustive.",
+          "'At least one' problems are often easiest through the complement, e.g. P(at least one six) = 1 - P(no six)."
+        ]
+      },
+      {
+        "heading": "Conditional probability",
+        "bullets": [
+          "P(A|B) = P(A and B)/P(B), defined when P(B) > 0.",
+          "It restricts attention to the outcomes in B and asks what fraction also lie in A.",
+          "Example: for a die, P(the number is 2 | the number is even) = (1/6)/(3/6) = 1/3.",
+          "Conditional probability is the foundation of the multiplication theorem and of Bayes' theorem."
+        ]
+      },
+      {
+        "heading": "Multiplication theorem and independent events",
+        "bullets": [
+          "Multiplication theorem: P(A and B) = P(A) P(B|A) = P(B) P(A|B).",
+          "Events are independent when P(A|B) = P(A); then P(A and B) = P(A) P(B).",
+          "Drawing without replacement gives dependent draws; drawing with replacement gives independent draws.",
+          "Independence (product rule) is different from mutual exclusivity (P(A and B) = 0)."
+        ]
+      },
+      {
+        "heading": "Total probability and Bayes' theorem",
+        "bullets": [
+          "For a partition B1,...,Bn of S, total probability gives P(A) = sum of P(Bi) P(A|Bi).",
+          "Bayes' theorem: P(Bk|A) = P(Bk) P(A|Bk) / P(A), reversing cause and effect.",
+          "It updates the probability of a 'cause' Bk after observing the 'effect' A.",
+          "Counting tools (permutations and combinations) supply the individual probabilities in card, dice and ball problems."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "Classical definition: P(E) = m/n = favourable/total, with 0 <= P(E) <= 1; impossible event 0, certain event 1.",
+      "Axiomatic approach: P(E) >= 0, P(S) = 1, and P(A or B) = P(A) + P(B) for mutually exclusive events.",
+      "Addition theorem: P(A or B) = P(A) + P(B) - P(A and B).",
+      "Complementary events: P(not A) = 1 - P(A), a shortcut for 'at least one' problems.",
+      "Conditional probability: P(A|B) = P(A and B)/P(B); multiplication theorem P(A and B) = P(A) P(B|A).",
+      "Independent events satisfy P(A and B) = P(A) P(B); this differs from mutual exclusivity P(A and B) = 0.",
+      "Total probability P(A) = sum P(Bi) P(A|Bi) and Bayes' theorem P(Bk|A) = P(Bk)P(A|Bk)/P(A) update causes from effects."
+    ],
+    "glossary": [
+      {
+        "term": "Random experiment",
+        "definition": "An experiment whose outcome cannot be predicted with certainty though all possible outcomes are known, e.g. tossing a coin."
+      },
+      {
+        "term": "Sample space",
+        "definition": "The set S of all possible outcomes of a random experiment; each outcome is a sample point."
+      },
+      {
+        "term": "Event",
+        "definition": "Any subset of the sample space; it occurs when the observed outcome belongs to that subset."
+      },
+      {
+        "term": "Equally likely outcomes",
+        "definition": "Outcomes that have the same chance of occurring, such as the six faces of a fair die."
+      },
+      {
+        "term": "Mutually exclusive events",
+        "definition": "Events that cannot occur together; their intersection is empty, so P(A and B) = 0."
+      },
+      {
+        "term": "Exhaustive events",
+        "definition": "Events that together cover the whole sample space, so at least one of them must occur."
+      },
+      {
+        "term": "Classical probability",
+        "definition": "P(E) = m/n, the number of favourable outcomes divided by the total number of equally likely outcomes."
+      },
+      {
+        "term": "Axiomatic probability",
+        "definition": "Kolmogorov's definition by axioms: P(E) >= 0, P(S) = 1, and additivity for mutually exclusive events."
+      },
+      {
+        "term": "Addition theorem",
+        "definition": "P(A or B) = P(A) + P(B) - P(A and B); the probability that at least one of two events occurs."
+      },
+      {
+        "term": "Complementary event",
+        "definition": "The event 'not A', denoted A'; P(not A) = 1 - P(A)."
+      },
+      {
+        "term": "Conditional probability",
+        "definition": "P(A|B) = P(A and B)/P(B), the probability of A given that B has occurred (P(B) > 0)."
+      },
+      {
+        "term": "Multiplication theorem",
+        "definition": "P(A and B) = P(A) P(B|A) = P(B) P(A|B), the probability that both events occur."
+      },
+      {
+        "term": "Independent events",
+        "definition": "Events for which the occurrence of one does not affect the other: P(A and B) = P(A) P(B)."
+      },
+      {
+        "term": "Total probability",
+        "definition": "For a partition B1,...,Bn, P(A) = sum of P(Bi) P(A|Bi)."
+      },
+      {
+        "term": "Bayes' theorem",
+        "definition": "P(Bk|A) = P(Bk) P(A|Bk) / P(A); updates the probability of a cause Bk after observing effect A."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Probability (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for numerical problems. Leave answers as exact fractions in lowest terms where possible.",
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Define a random experiment, sample space and event. Write the sample space when two coins are tossed together.",
+        "answer": "A random experiment is an experiment whose outcome cannot be predicted with certainty although all possible outcomes are known (e.g. tossing a coin). The sample space S is the set of all possible outcomes of the experiment. An event is any subset of the sample space.\n\nWhen two coins are tossed together the sample space is\n\n   S = {HH, HT, TH, TT}\n\nwhich has 4 equally likely outcomes.",
+        "explanation": "Definitions plus the 4-outcome sample space for two coins.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-PRB-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A card is drawn from a well-shuffled pack of 52 cards. Find the probability that it is (a) a spade, (b) a face card (jack, queen or king).",
+        "answer": "Total outcomes n = 52.\n\n(a) There are 13 spades, so P(spade) = 13/52 = 1/4.\n\n(b) There are 3 face cards in each of the 4 suits, so 12 face cards. P(face card) = 12/52 = 3/13.",
+        "explanation": "Classical definition m/n for spades and face cards.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A card is drawn from a pack of 52. Using the addition theorem, find the probability that it is a king or a heart.",
+        "answer": "Let A = king and B = heart. P(A) = 4/52, P(B) = 13/52, and P(A and B) = P(king of hearts) = 1/52.\n\nBy the addition theorem:\n\n   P(king or heart) = P(A) + P(B) - P(A and B) = 4/52 + 13/52 - 1/52 = 16/52 = 4/13.",
+        "explanation": "Addition theorem with overlap = king of hearts.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Two dice are thrown together. Using complementary events, find the probability of getting at least one six.",
+        "answer": "The complement of 'at least one six' is 'no six on either die'.\n\nP(no six on one die) = 5/6, and the two throws are independent, so\n\n   P(no six on both) = (5/6)(5/6) = 25/36.\n\nHence\n\n   P(at least one six) = 1 - 25/36 = 11/36.",
+        "explanation": "Complement rule: 1 - P(no six twice).",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A die is rolled. Find the conditional probability that the number is a multiple of 3 given that it is even.",
+        "answer": "Let A = multiple of 3 = {3, 6} and B = even = {2, 4, 6}.\n\nA and B = {6}, so P(A and B) = 1/6 and P(B) = 3/6 = 1/2.\n\n   P(A|B) = P(A and B)/P(B) = (1/6)/(1/2) = 1/3.\n\nCheck: among the even faces {2,4,6}, only 6 is a multiple of 3, giving 1/3.",
+        "explanation": "Conditional probability restricts to even faces.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A bag contains 5 red and 3 black balls. Two balls are drawn without replacement. Find the probability that both are red.",
+        "answer": "P(first red) = 5/8. After one red is removed, 4 red remain out of 7 balls, so P(second red | first red) = 4/7.\n\nBy the multiplication theorem:\n\n   P(both red) = (5/8)(4/7) = 20/56 = 5/14.",
+        "explanation": "Multiplication theorem for dependent draws (without replacement).",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "A coin is tossed and a die is rolled. Are the two events independent? Find the probability of getting a head and a number greater than 4.",
+        "answer": "The coin and the die do not affect each other, so the events are independent.\n\nP(head) = 1/2. 'Number greater than 4' means {5, 6}, so P = 2/6 = 1/3.\n\nBy the product rule for independent events:\n\n   P(head and >4) = (1/2)(1/3) = 1/6.",
+        "explanation": "Independent events: multiply the individual probabilities.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-06"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "From a committee of 5 men and 4 women, 3 members are chosen at random. Find the probability that the committee has (a) all women, (b) exactly 2 men and 1 woman, (c) at least one woman.",
+        "answer": "Total ways to choose 3 from 9 = C(9,3) = 84.\n\n(a) All women: C(4,3)/C(9,3) = 4/84 = 1/21.\n\n(b) Exactly 2 men and 1 woman: [C(5,2) x C(4,1)]/C(9,3) = (10 x 4)/84 = 40/84 = 10/21.\n\n(c) At least one woman: use the complement 'all men'. P(all men) = C(5,3)/C(9,3) = 10/84 = 5/42. So P(at least one woman) = 1 - 5/42 = 37/42.",
+        "explanation": "Combinations for selection; complement for 'at least one'.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-PRB-02"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Bag I contains 3 red and 2 white balls; Bag II contains 1 red and 4 white balls. A bag is chosen at random and a ball is drawn. (a) Find the probability that the ball is red. (b) Given the ball is red, find the probability it came from Bag I.",
+        "answer": "Let B1 = Bag I and B2 = Bag II, with P(B1) = P(B2) = 1/2. P(red|B1) = 3/5 and P(red|B2) = 1/5.\n\n(a) Total probability:\n\n   P(red) = P(B1)P(red|B1) + P(B2)P(red|B2) = (1/2)(3/5) + (1/2)(1/5) = 3/10 + 1/10 = 4/10 = 2/5.\n\n(b) By Bayes' theorem:\n\n   P(B1|red) = [P(B1)P(red|B1)] / P(red) = (3/10)/(2/5) = (3/10)/(4/10) = 3/4.",
+        "explanation": "Total probability then Bayes' theorem for the reverse probability.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-PRB-08"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "The probability that a student passes Mathematics is 0.7 and passes English is 0.6; the probability of passing both is 0.5. Find the probability that the student passes at least one subject.",
+        "answer": "Let M = passes Mathematics, E = passes English. P(M) = 0.7, P(E) = 0.6, P(M and E) = 0.5.\n\nBy the addition theorem:\n\n   P(M or E) = P(M) + P(E) - P(M and E) = 0.7 + 0.6 - 0.5 = 0.8.\n\nSo the probability of passing at least one subject is 0.8.",
+        "explanation": "Addition theorem gives P(at least one) = 0.8.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-PRB-03"
+      }
+    ],
+    "total_marks": 32
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The probability of an event E always lies in the range",
+      "options": [
+        "-1 <= P(E) <= 1",
+        "0 <= P(E) <= 1",
+        "0 < P(E) < 1",
+        "P(E) >= 1"
+      ],
+      "answer": "0 <= P(E) <= 1",
+      "explanation": "Probability is between 0 (impossible) and 1 (certain)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The classical probability of an event E is defined as",
+      "options": [
+        "total/favourable",
+        "favourable/total",
+        "favourable x total",
+        "favourable - total"
+      ],
+      "answer": "favourable/total",
+      "explanation": "P(E) = m/n = number of favourable outcomes / total outcomes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The probability of a certain (sure) event is",
+      "options": [
+        "0",
+        "0.5",
+        "1",
+        "infinite"
+      ],
+      "answer": "1",
+      "explanation": "For a sure event m = n so P = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The probability of an impossible event is",
+      "options": [
+        "0",
+        "1",
+        "0.5",
+        "-1"
+      ],
+      "answer": "0",
+      "explanation": "No favourable outcome, so m = 0 and P = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The set of all possible outcomes of a random experiment is called the",
+      "options": [
+        "event",
+        "sample point",
+        "sample space",
+        "outcome set only"
+      ],
+      "answer": "sample space",
+      "explanation": "S is the set of all outcomes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An event is defined as a",
+      "options": [
+        "subset of the sample space",
+        "single outcome only",
+        "superset of the sample space",
+        "pair of experiments"
+      ],
+      "answer": "subset of the sample space",
+      "explanation": "Any subset of S is an event."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "When a single die is rolled, the number of outcomes in the sample space is",
+      "options": [
+        "4",
+        "6",
+        "12",
+        "36"
+      ],
+      "answer": "6",
+      "explanation": "S = {1,2,3,4,5,6}."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Two events that cannot occur together are called",
+      "options": [
+        "independent",
+        "exhaustive",
+        "mutually exclusive",
+        "equally likely"
+      ],
+      "answer": "mutually exclusive",
+      "explanation": "Mutually exclusive means intersection is empty."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Events that together cover the whole sample space are called",
+      "options": [
+        "mutually exclusive",
+        "exhaustive",
+        "independent",
+        "impossible"
+      ],
+      "answer": "exhaustive",
+      "explanation": "Exhaustive events cover all of S."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "According to the axioms of probability, P(S) equals",
+      "options": [
+        "0",
+        "0.5",
+        "1",
+        "the number of outcomes"
+      ],
+      "answer": "1",
+      "explanation": "Axiom 2: the sure event has probability 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The axiomatic definition of probability is credited to",
+      "options": [
+        "Newton",
+        "Kolmogorov",
+        "Pascal only",
+        "Euclid"
+      ],
+      "answer": "Kolmogorov",
+      "explanation": "Kolmogorov gave the axiomatic foundation."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A coin is tossed. The probability of getting a head is",
+      "options": [
+        "0",
+        "1/4",
+        "1/2",
+        "1"
+      ],
+      "answer": "1/2",
+      "explanation": "One favourable outcome out of two."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled. The probability of getting an even number is",
+      "options": [
+        "1/6",
+        "1/3",
+        "1/2",
+        "2/3"
+      ],
+      "answer": "1/2",
+      "explanation": "Even = {2,4,6}, 3/6 = 1/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card is drawn from a pack of 52. The probability it is an ace is",
+      "options": [
+        "1/13",
+        "1/52",
+        "4/13",
+        "1/4"
+      ],
+      "answer": "1/13",
+      "explanation": "4 aces out of 52 = 1/13."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two coins are tossed. The probability of getting exactly one head is",
+      "options": [
+        "1/4",
+        "1/2",
+        "3/4",
+        "1"
+      ],
+      "answer": "1/2",
+      "explanation": "Favourable {HT, TH} out of 4 = 1/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown. The probability that the sum is 7 is",
+      "options": [
+        "1/6",
+        "1/9",
+        "5/36",
+        "1/12"
+      ],
+      "answer": "1/6",
+      "explanation": "6 favourable pairs out of 36 = 1/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown. The probability of getting a doublet is",
+      "options": [
+        "1/36",
+        "1/12",
+        "1/6",
+        "1/3"
+      ],
+      "answer": "1/6",
+      "explanation": "6 doublets out of 36 = 1/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A bag has 4 white and 6 red balls. One ball is drawn. P(white) is",
+      "options": [
+        "2/5",
+        "3/5",
+        "1/2",
+        "1/5"
+      ],
+      "answer": "2/5",
+      "explanation": "4/10 = 2/5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "From a pack of 52, 4 cards are drawn together. P(all four aces) is",
+      "options": [
+        "1/270725",
+        "1/13",
+        "4/52",
+        "1/2704"
+      ],
+      "answer": "1/270725",
+      "explanation": "C(4,4)/C(52,4) = 1/270725."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A committee of 3 is chosen from 4 women and 5 men. P(all women) is",
+      "options": [
+        "1/21",
+        "1/7",
+        "4/9",
+        "1/3"
+      ],
+      "answer": "1/21",
+      "explanation": "C(4,3)/C(9,3) = 4/84 = 1/21."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The number of outcomes when two dice are thrown is",
+      "options": [
+        "6",
+        "12",
+        "36",
+        "18"
+      ],
+      "answer": "36",
+      "explanation": "6 x 6 = 36 outcomes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card is drawn from 52. The probability it is a red king is",
+      "options": [
+        "1/26",
+        "1/13",
+        "1/52",
+        "1/4"
+      ],
+      "answer": "1/26",
+      "explanation": "2 red kings out of 52 = 1/26."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The addition theorem states P(A or B) equals",
+      "options": [
+        "P(A) + P(B)",
+        "P(A) + P(B) - P(A and B)",
+        "P(A) P(B)",
+        "P(A) - P(B)"
+      ],
+      "answer": "P(A) + P(B) - P(A and B)",
+      "explanation": "General addition theorem."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For mutually exclusive events A and B, P(A or B) equals",
+      "options": [
+        "P(A) + P(B)",
+        "P(A) + P(B) - P(A and B)",
+        "P(A) P(B)",
+        "0"
+      ],
+      "answer": "P(A) + P(B)",
+      "explanation": "P(A and B) = 0 for mutually exclusive events."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card is drawn from 52. P(king or queen) is",
+      "options": [
+        "1/13",
+        "2/13",
+        "4/13",
+        "8/13"
+      ],
+      "answer": "2/13",
+      "explanation": "4/52 + 4/52 = 8/52 = 2/13; mutually exclusive."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled. P(a number less than 3 or an even number) is",
+      "options": [
+        "1/2",
+        "2/3",
+        "5/6",
+        "1/3"
+      ],
+      "answer": "2/3",
+      "explanation": "{1,2} or {2,4,6} = {1,2,4,6}, 4/6 = 2/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "P(A)=0.4, P(B)=0.5, P(A and B)=0.2. Then P(A or B) is",
+      "options": [
+        "0.9",
+        "0.7",
+        "0.5",
+        "0.1"
+      ],
+      "answer": "0.7",
+      "explanation": "0.4 + 0.5 - 0.2 = 0.7."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card is drawn from 52. P(spade or an ace) is",
+      "options": [
+        "1/4",
+        "4/13",
+        "17/52",
+        "16/52"
+      ],
+      "answer": "4/13",
+      "explanation": "13/52 + 4/52 - 1/52 = 16/52 = 4/13."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "P(A)=0.3, P(B)=0.4 and A, B are mutually exclusive. P(A or B) is",
+      "options": [
+        "0.12",
+        "0.7",
+        "0.1",
+        "1.0"
+      ],
+      "answer": "0.7",
+      "explanation": "0.3 + 0.4 = 0.7 (disjoint)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown. P(sum is 7 or 11) is",
+      "options": [
+        "1/6",
+        "2/9",
+        "1/9",
+        "8/36"
+      ],
+      "answer": "2/9",
+      "explanation": "6/36 + 2/36 = 8/36 = 2/9."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In P(A or B) = P(A) + P(B) - P(A and B), the last term is subtracted to",
+      "options": [
+        "add the overlap twice",
+        "avoid double counting the overlap",
+        "make it larger",
+        "remove event A"
+      ],
+      "answer": "avoid double counting the overlap",
+      "explanation": "The common outcomes are counted twice otherwise."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card is drawn from 52. P(face card or a heart) is",
+      "options": [
+        "12/52",
+        "13/52",
+        "22/52",
+        "25/52"
+      ],
+      "answer": "22/52",
+      "explanation": "12/52 + 13/52 - 3/52 = 22/52."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For any event A, P(not A) equals",
+      "options": [
+        "1 - P(A)",
+        "P(A) - 1",
+        "1 + P(A)",
+        "P(A)"
+      ],
+      "answer": "1 - P(A)",
+      "explanation": "Complement rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If P(A) = 0.35, then P(not A) is",
+      "options": [
+        "0.35",
+        "0.65",
+        "1.35",
+        "0.7"
+      ],
+      "answer": "0.65",
+      "explanation": "1 - 0.35 = 0.65."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An event and its complement are always",
+      "options": [
+        "independent",
+        "mutually exclusive and exhaustive",
+        "equally likely",
+        "impossible"
+      ],
+      "answer": "mutually exclusive and exhaustive",
+      "explanation": "A and A' cannot both occur and cover S."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled. P(not getting a 6) is",
+      "options": [
+        "1/6",
+        "5/6",
+        "1/2",
+        "1"
+      ],
+      "answer": "5/6",
+      "explanation": "1 - 1/6 = 5/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A coin is tossed 3 times. P(at least one head) is",
+      "options": [
+        "1/8",
+        "3/8",
+        "7/8",
+        "1/2"
+      ],
+      "answer": "7/8",
+      "explanation": "1 - P(no head) = 1 - 1/8 = 7/8."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown. P(at least one six) is",
+      "options": [
+        "1/6",
+        "11/36",
+        "25/36",
+        "1/3"
+      ],
+      "answer": "11/36",
+      "explanation": "1 - (5/6)^2 = 11/36."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If the odds in favour of an event are 2 to 3, its probability is",
+      "options": [
+        "2/3",
+        "3/5",
+        "2/5",
+        "3/2"
+      ],
+      "answer": "2/5",
+      "explanation": "P = 2/(2+3) = 2/5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum P(A) + P(not A) is always",
+      "options": [
+        "0",
+        "0.5",
+        "1",
+        "2"
+      ],
+      "answer": "1",
+      "explanation": "Complementary events sum to 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Conditional probability P(A|B) is defined as",
+      "options": [
+        "P(A and B)/P(B)",
+        "P(A)/P(B)",
+        "P(A and B)/P(A)",
+        "P(A) P(B)"
+      ],
+      "answer": "P(A and B)/P(B)",
+      "explanation": "Definition of conditional probability (P(B) > 0)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "P(A|B) is defined only when",
+      "options": [
+        "P(A) > 0",
+        "P(B) > 0",
+        "P(A) = P(B)",
+        "A = B"
+      ],
+      "answer": "P(B) > 0",
+      "explanation": "Division by P(B) requires P(B) > 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die shows an even number. The probability it is a 2 is",
+      "options": [
+        "1/6",
+        "1/2",
+        "1/3",
+        "2/3"
+      ],
+      "answer": "1/3",
+      "explanation": "Among {2,4,6}, one is a 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "P(A and B)=0.2, P(B)=0.5. Then P(A|B) is",
+      "options": [
+        "0.1",
+        "0.4",
+        "0.25",
+        "0.7"
+      ],
+      "answer": "0.4",
+      "explanation": "0.2/0.5 = 0.4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A family has two children. Given at least one is a boy, P(both boys) is",
+      "options": [
+        "1/2",
+        "1/3",
+        "1/4",
+        "2/3"
+      ],
+      "answer": "1/3",
+      "explanation": "Sample {BB,BG,GB}; one favourable = 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled. P(number > 3 | number is odd) is",
+      "options": [
+        "1/2",
+        "1/3",
+        "2/3",
+        "1/6"
+      ],
+      "answer": "1/3",
+      "explanation": "Odd = {1,3,5}; >3 among these = {5}, 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "60% pass Maths, 20% pass both Maths and Physics. P(Physics | Maths) is",
+      "options": [
+        "1/3",
+        "1/2",
+        "2/3",
+        "1/5"
+      ],
+      "answer": "1/3",
+      "explanation": "0.20/0.60 = 1/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Conditional probability P(A|B) effectively",
+      "options": [
+        "ignores B",
+        "restricts the sample space to B",
+        "restricts to A only",
+        "doubles P(A)"
+      ],
+      "answer": "restricts the sample space to B",
+      "explanation": "We consider only outcomes in B."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two cards are drawn without replacement. P(second is ace | first is ace) is",
+      "options": [
+        "4/52",
+        "3/51",
+        "4/51",
+        "3/52"
+      ],
+      "answer": "3/51",
+      "explanation": "After one ace, 3 aces left in 51 cards."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If P(A) = 0.5, P(B) = 0.4, P(A and B) = 0.2, then P(B|A) is",
+      "options": [
+        "0.5",
+        "0.4",
+        "0.2",
+        "0.8"
+      ],
+      "answer": "0.4",
+      "explanation": "0.2/0.5 = 0.4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The multiplication theorem gives P(A and B) equal to",
+      "options": [
+        "P(A) + P(B|A)",
+        "P(A) P(B|A)",
+        "P(A)/P(B)",
+        "P(A) - P(B)"
+      ],
+      "answer": "P(A) P(B|A)",
+      "explanation": "P(A and B) = P(A) P(B|A)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For independent events A and B, P(A and B) equals",
+      "options": [
+        "P(A) + P(B)",
+        "P(A) P(B)",
+        "P(A) - P(B)",
+        "0"
+      ],
+      "answer": "P(A) P(B)",
+      "explanation": "Product rule for independent events."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Events A and B are independent if",
+      "options": [
+        "P(A|B) = P(A)",
+        "P(A and B) = 0",
+        "A = B",
+        "P(A) = 0"
+      ],
+      "answer": "P(A|B) = P(A)",
+      "explanation": "Independence means B does not change P(A)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Mutually exclusive events (with non-zero probabilities) are",
+      "options": [
+        "always independent",
+        "always dependent",
+        "always equally likely",
+        "always exhaustive"
+      ],
+      "answer": "always dependent",
+      "explanation": "Disjoint events with P>0 are dependent, not independent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A coin and a die are tossed. P(head and a 6) is",
+      "options": [
+        "1/2",
+        "1/6",
+        "1/12",
+        "1/8"
+      ],
+      "answer": "1/12",
+      "explanation": "(1/2)(1/6) = 1/12; independent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If A, B independent with P(A)=0.3, P(B)=0.5, then P(A and B) is",
+      "options": [
+        "0.8",
+        "0.15",
+        "0.2",
+        "0.35"
+      ],
+      "answer": "0.15",
+      "explanation": "0.3 x 0.5 = 0.15."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "HARD",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If A and B are independent, then A' and B' are",
+      "options": [
+        "mutually exclusive",
+        "also independent",
+        "dependent",
+        "impossible"
+      ],
+      "answer": "also independent",
+      "explanation": "Complements of independent events are independent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If P(A)=0.6, P(B)=0.5 and independent, P(A or B) is",
+      "options": [
+        "1.1",
+        "0.8",
+        "0.3",
+        "0.9"
+      ],
+      "answer": "0.8",
+      "explanation": "0.6 + 0.5 - 0.30 = 0.80."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For independent events, P(A|B) equals",
+      "options": [
+        "P(B)",
+        "P(A)",
+        "P(A and B)",
+        "1"
+      ],
+      "answer": "P(A)",
+      "explanation": "By definition of independence."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two cards are drawn with replacement from 52. P(both aces) is",
+      "options": [
+        "1/169",
+        "1/221",
+        "1/13",
+        "1/52"
+      ],
+      "answer": "1/169",
+      "explanation": "(4/52)(4/52) = 1/169; independent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two cards are drawn without replacement. P(both aces) is",
+      "options": [
+        "1/169",
+        "1/221",
+        "1/13",
+        "1/26"
+      ],
+      "answer": "1/221",
+      "explanation": "(4/52)(3/51) = 1/221."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A bag has 5 red, 3 black. Two drawn without replacement. P(both red) is",
+      "options": [
+        "5/14",
+        "25/64",
+        "5/8",
+        "1/2"
+      ],
+      "answer": "5/14",
+      "explanation": "(5/8)(4/7) = 5/14."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A coin is tossed 4 times. P(all heads) is",
+      "options": [
+        "1/4",
+        "1/8",
+        "1/16",
+        "1/2"
+      ],
+      "answer": "1/16",
+      "explanation": "(1/2)^4 = 1/16."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "P(A)=1/2, P(B|A)=1/3. Then P(A and B) is",
+      "options": [
+        "1/6",
+        "5/6",
+        "1/5",
+        "2/3"
+      ],
+      "answer": "1/6",
+      "explanation": "(1/2)(1/3) = 1/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled twice. P(a 6 on both throws) is",
+      "options": [
+        "1/6",
+        "1/12",
+        "1/36",
+        "2/6"
+      ],
+      "answer": "1/36",
+      "explanation": "(1/6)(1/6) = 1/36; independent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A problem is solved independently by A (P=1/2) and B (P=1/3). P(both solve it) is",
+      "options": [
+        "5/6",
+        "1/6",
+        "2/3",
+        "1/5"
+      ],
+      "answer": "1/6",
+      "explanation": "(1/2)(1/3) = 1/6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A and B solve a problem independently with P(A)=1/2, P(B)=1/3. P(problem solved) is",
+      "options": [
+        "1/6",
+        "2/3",
+        "5/6",
+        "1/3"
+      ],
+      "answer": "2/3",
+      "explanation": "1 - (1/2)(2/3) = 1 - 1/3 = 2/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The theorem of total probability requires the events B1,...,Bn to be a",
+      "options": [
+        "single event",
+        "partition of the sample space",
+        "pair of independent events",
+        "complement only"
+      ],
+      "answer": "partition of the sample space",
+      "explanation": "They must be mutually exclusive and exhaustive."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Bayes' theorem is used to find",
+      "options": [
+        "P(A|Bk) from P(Bk)",
+        "P(Bk|A) from P(A|Bk)",
+        "only P(A)",
+        "P(A and B) only"
+      ],
+      "answer": "P(Bk|A) from P(A|Bk)",
+      "explanation": "Bayes reverses the conditioning."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In Bayes' theorem, the denominator P(A) is computed by",
+      "options": [
+        "the addition theorem",
+        "the total probability theorem",
+        "the complement rule",
+        "a single term"
+      ],
+      "answer": "the total probability theorem",
+      "explanation": "P(A) = sum P(Bi)P(A|Bi)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Bag I: 3 red, 2 white; Bag II: 1 red, 4 white; a bag chosen at random. P(red) is",
+      "options": [
+        "2/5",
+        "3/5",
+        "1/2",
+        "4/5"
+      ],
+      "answer": "2/5",
+      "explanation": "(1/2)(3/5)+(1/2)(1/5) = 2/5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the two bags above, given a red ball, P(from Bag I) is",
+      "options": [
+        "1/4",
+        "3/4",
+        "1/2",
+        "2/5"
+      ],
+      "answer": "3/4",
+      "explanation": "(3/10)/(4/10) = 3/4 by Bayes."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The probabilities P(Bi) before observing A are called",
+      "options": [
+        "posterior",
+        "prior",
+        "conditional",
+        "marginal likelihood only"
+      ],
+      "answer": "prior",
+      "explanation": "Prior probabilities are updated to posteriors."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two machines make 60% and 40% of items with 2% and 3% defective. P(defective) is",
+      "options": [
+        "0.024",
+        "0.025",
+        "0.05",
+        "0.012"
+      ],
+      "answer": "0.024",
+      "explanation": "0.6(0.02)+0.4(0.03)=0.012+0.012=0.024."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the two machines above, given an item is defective, P(from machine 1) is",
+      "options": [
+        "1/2",
+        "0.6",
+        "0.4",
+        "0.024"
+      ],
+      "answer": "1/2",
+      "explanation": "0.012/0.024 = 1/2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The probability of any event can be greater than 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Probability lies in [0,1]."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The probability of a sure event is 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "For a certain event m = n, so P = 1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For mutually exclusive events, P(A or B) = P(A) + P(B).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "P(A and B) = 0 for disjoint events."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "P(A) + P(not A) = 1 for any event A.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Complementary events sum to 1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Mutually exclusive events with non-zero probabilities are independent.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Such events are dependent, not independent."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For independent events, P(A and B) = P(A) P(B).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "This is the product rule for independence."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "P(A|B) is defined even when P(B) = 0.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "P(B) must be positive."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Drawing balls without replacement makes successive draws dependent.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "The composition changes after each draw."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "When two dice are thrown, the total number of outcomes is 36.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "6 x 6 = 36."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Bayes' theorem updates prior probabilities into posterior probabilities.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "It revises P(Bk) after observing A."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The classical probability of an event E equals number of favourable outcomes divided by the total number of ____ outcomes.",
+      "answer": "equally likely",
+      "explanation": "P(E) = m/n with equally likely outcomes."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The probability of an impossible event is ____.",
+      "answer": "0",
+      "explanation": "No favourable outcome."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The set of all outcomes of a random experiment is called the ____ ____.",
+      "answer": "sample space",
+      "explanation": "S is the sample space."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A die is rolled; the probability of getting a number greater than 4 is ____.",
+      "answer": "1/3",
+      "explanation": "{5,6}, 2/6 = 1/3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A card drawn from 52; the probability it is a heart is ____.",
+      "answer": "1/4",
+      "explanation": "13/52 = 1/4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The addition theorem: P(A or B) = P(A) + P(B) - P(____).",
+      "answer": "A and B",
+      "explanation": "The overlap term is subtracted."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If P(A)=0.5, P(B)=0.3, P(A and B)=0.1, then P(A or B) = ____.",
+      "answer": "0.7",
+      "explanation": "0.5 + 0.3 - 0.1 = 0.7."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For any event A, P(not A) = ____ - P(A).",
+      "answer": "1",
+      "explanation": "Complement rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown; the probability of at least one six is ____.",
+      "answer": "11/36",
+      "explanation": "1 - 25/36 = 11/36."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Conditional probability P(A|B) = P(A and B) / P(____).",
+      "answer": "B",
+      "explanation": "Definition of conditional probability."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If P(A and B)=0.24 and P(B)=0.6, then P(A|B) = ____.",
+      "answer": "0.4",
+      "explanation": "0.24/0.6 = 0.4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For independent events A and B, P(A and B) = P(A) x P(____).",
+      "answer": "B",
+      "explanation": "Product rule for independence."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "A coin is tossed three times; the probability of getting three heads is ____.",
+      "answer": "1/8",
+      "explanation": "(1/2)^3 = 1/8."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a partition B1,...,Bn, P(A) = sum of P(Bi) x P(A|____).",
+      "answer": "Bi",
+      "explanation": "Total probability theorem."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Two dice are thrown; the probability the sum is 8 is ____.",
+      "answer": "5/36",
+      "explanation": "5 favourable pairs out of 36."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the classical (mathematical) definition of probability.",
+      "answer": "If a random experiment has n equally likely, mutually exclusive and exhaustive outcomes, of which m are favourable to an event E, then the probability of E is\n\n   P(E) = m/n = number of favourable outcomes / total number of outcomes.\n\nIt satisfies 0 <= P(E) <= 1.",
+      "explanation": "Classical definition m/n."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 3,
+      "question": "State the three axioms of probability (axiomatic approach).",
+      "answer": "For a sample space S with events, a probability function P satisfies:\n\nAxiom 1: P(E) >= 0 for every event E.\nAxiom 2: P(S) = 1 (the sure event).\nAxiom 3: If A and B are mutually exclusive, then P(A or B) = P(A) + P(B).\n\nAll other results (such as 0 <= P(E) <= 1 and P(empty) = 0) follow from these.",
+      "explanation": "Kolmogorov's three axioms."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Distinguish between mutually exclusive events and exhaustive events, with an example of each for a single die.",
+      "answer": "Mutually exclusive events cannot occur together (their intersection is empty). For a die, 'getting a 2' and 'getting a 5' are mutually exclusive.\n\nExhaustive events together cover the whole sample space (at least one must occur). For a die, 'getting an even number' {2,4,6} and 'getting an odd number' {1,3,5} are exhaustive, since every outcome is either even or odd.",
+      "explanation": "Disjoint vs covering S, with die examples."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Two coins are tossed together. Write the sample space and find the probability of getting two heads.",
+      "answer": "Sample space S = {HH, HT, TH, TT}, so n = 4.\n\nFavourable to 'two heads' = {HH}, m = 1.\n\n   P(two heads) = 1/4.",
+      "explanation": "m/n = 1/4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A box contains 4 white and 6 red balls. Three balls are drawn at random. Find the probability that exactly two are white.",
+      "answer": "Total ways = C(10,3) = 120.\n\nFavourable: choose 2 white from 4 and 1 red from 6 = C(4,2) x C(6,1) = 6 x 6 = 36.\n\n   P(exactly 2 white) = 36/120 = 3/10.",
+      "explanation": "Combinations: C(4,2)C(6,1)/C(10,3)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Two dice are thrown. Find the probability that (a) the sum is 9, (b) the sum is at most 4.",
+      "answer": "Total outcomes = 36.\n\n(a) Sum 9: (3,6),(4,5),(5,4),(6,3) = 4 outcomes, so P = 4/36 = 1/9.\n\n(b) Sum at most 4 means sum 2, 3 or 4: (1,1);(1,2),(2,1);(1,3),(3,1),(2,2) = 1 + 2 + 3 = 6 outcomes, so P = 6/36 = 1/6.",
+      "explanation": "Count favourable pairs out of 36."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Four cards are drawn from a pack of 52. Find the probability that all four are of the same suit (all spades, say for one suit) - give the probability that all four are spades.",
+      "answer": "Total ways to draw 4 cards = C(52,4) = 270725.\n\nWays to choose 4 spades from the 13 spades = C(13,4) = 715.\n\n   P(all four spades) = 715/270725 = 11/4165.",
+      "explanation": "C(13,4)/C(52,4) = 11/4165."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A number is chosen from 1 to 20. Find the probability that it is divisible by 3 or by 5.",
+      "answer": "Let A = divisible by 3 = {3,6,9,12,15,18}, so P(A) = 6/20.\nLet B = divisible by 5 = {5,10,15,20}, so P(B) = 4/20.\nA and B = divisible by 15 = {15}, so P(A and B) = 1/20.\n\n   P(A or B) = 6/20 + 4/20 - 1/20 = 9/20.",
+      "explanation": "Addition theorem with overlap {15}."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "The probability that a person reads Hindi is 0.6, English is 0.4 and both is 0.2. Find the probability that the person reads at least one language.",
+      "answer": "Let H and E be the events. P(H) = 0.6, P(E) = 0.4, P(H and E) = 0.2.\n\n   P(H or E) = P(H) + P(E) - P(H and E) = 0.6 + 0.4 - 0.2 = 0.8.\n\nSo the probability of reading at least one language is 0.8.",
+      "explanation": "Addition theorem gives 0.8."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the complement rule and use it to find P(not getting a head) when a coin is tossed once.",
+      "answer": "The complement rule states P(not A) = 1 - P(A).\n\nFor a single toss, P(head) = 1/2, so\n\n   P(not a head) = 1 - 1/2 = 1/2.",
+      "explanation": "1 - P(A)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A coin is tossed 4 times. Using complementary events, find the probability of getting at least one tail.",
+      "answer": "The complement of 'at least one tail' is 'no tail', i.e. all four heads.\n\nP(all heads) = (1/2)^4 = 1/16.\n\n   P(at least one tail) = 1 - 1/16 = 15/16.",
+      "explanation": "Complement: 1 - (1/2)^4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "From a pack of 52, three cards are drawn together. Find the probability of getting at least one king.",
+      "answer": "Complement: 'no king'. There are 48 non-kings.\n\nP(no king) = C(48,3)/C(52,3) = 17296/22100 = 4324/5525.\n\n   P(at least one king) = 1 - 4324/5525 = 1201/5525.",
+      "explanation": "Complement of 'no king' using combinations."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "In a group, 40% like tea, 30% like coffee and 10% like both. If a person who likes tea is chosen, find the probability that the person also likes coffee.",
+      "answer": "Let T = likes tea, C = likes coffee. P(T) = 0.4, P(C) = 0.3, P(T and C) = 0.1.\n\n   P(C|T) = P(T and C)/P(T) = 0.1/0.4 = 1/4 = 0.25.",
+      "explanation": "Conditional probability 0.1/0.4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Two dice are thrown. Given that the sum is 8, find the probability that one die shows a 2.",
+      "answer": "Sum 8 outcomes: (2,6),(3,5),(4,4),(5,3),(6,2) = 5 outcomes, so P(sum 8) = 5/36.\n\nAmong these, 'one die shows a 2' occurs for (2,6) and (6,2) = 2 outcomes, so P(one 2 and sum 8) = 2/36.\n\n   P(one shows 2 | sum 8) = (2/36)/(5/36) = 2/5.",
+      "explanation": "Restrict to sum-8 outcomes; 2 of 5."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A die is rolled. A = 'the number is odd', B = 'the number is less than 4'. Find P(A|B) and P(B|A).",
+      "answer": "A = {1,3,5}, B = {1,2,3}. A and B = {1,3}, so P(A and B) = 2/6.\nP(A) = 3/6, P(B) = 3/6.\n\n   P(A|B) = P(A and B)/P(B) = (2/6)/(3/6) = 2/3.\n   P(B|A) = P(A and B)/P(A) = (2/6)/(3/6) = 2/3.",
+      "explanation": "Both conditionals equal 2/3 here."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the multiplication theorem of probability and its form for independent events.",
+      "answer": "Multiplication theorem: for any two events,\n\n   P(A and B) = P(A) P(B|A) = P(B) P(A|B).\n\nIf A and B are independent, then P(B|A) = P(B), so it simplifies to\n\n   P(A and B) = P(A) P(B).",
+      "explanation": "General and independent forms."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain the difference between mutually exclusive events and independent events with an example.",
+      "answer": "Mutually exclusive events cannot occur together: P(A and B) = 0 (e.g. getting a head and a tail on one toss). Independent events can occur together, but the occurrence of one does not affect the other: P(A and B) = P(A) P(B) (e.g. a head on a coin and a six on a die).\n\nTwo events with non-zero probabilities cannot be both mutually exclusive and independent, because mutual exclusivity forces P(A and B) = 0 while independence forces P(A and B) = P(A) P(B) > 0.",
+      "explanation": "Disjoint vs independent, cannot be both when P>0."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A bag has 4 red and 6 green balls. Two balls are drawn one after the other without replacement. Find the probability that the first is red and the second is green.",
+      "answer": "P(first red) = 4/10 = 2/5. After removing one red, 6 green remain out of 9 balls, so P(second green | first red) = 6/9 = 2/3.\n\n   P(red then green) = (2/5)(2/3) = 4/15.",
+      "explanation": "Multiplication theorem for dependent draws."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A and B try to solve a problem independently. P(A solves) = 1/3 and P(B solves) = 1/4. Find the probability that the problem is solved.",
+      "answer": "The problem is solved unless both fail. P(A fails) = 2/3, P(B fails) = 3/4.\n\nP(both fail) = (2/3)(3/4) = 6/12 = 1/2.\n\n   P(problem solved) = 1 - 1/2 = 1/2.",
+      "explanation": "1 - P(both fail)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "State the theorem of total probability for a partition B1, B2, ..., Bn of the sample space.",
+      "answer": "If B1, B2, ..., Bn are mutually exclusive and exhaustive events (a partition of S), each with positive probability, and A is any event, then\n\n   P(A) = P(B1) P(A|B1) + P(B2) P(A|B2) + ... + P(Bn) P(A|Bn)\n        = sum over i of P(Bi) P(A|Bi).\n\nThat is, P(A) is the weighted sum of the conditional probabilities of A through each part of the partition.",
+      "explanation": "Total probability formula."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "A factory has two machines producing 70% and 30% of the output, with defect rates 1% and 4%. Find the probability that a randomly chosen item is defective.",
+      "answer": "Let M1, M2 make 70% and 30% of items. P(M1) = 0.7, P(M2) = 0.3, P(def|M1) = 0.01, P(def|M2) = 0.04.\n\nBy total probability:\n\n   P(defective) = 0.7(0.01) + 0.3(0.04) = 0.007 + 0.012 = 0.019.\n\nSo about 1.9% of items are defective.",
+      "explanation": "Total probability = 0.019."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Explain, with an example, why the probability of any event must lie between 0 and 1.",
+      "answer": "For an event E with m favourable outcomes out of n equally likely outcomes, P(E) = m/n. Since 0 <= m <= n, dividing by n gives 0 <= m/n <= 1, so 0 <= P(E) <= 1. When m = 0 the event is impossible (P = 0); when m = n it is certain (P = 1).\n\nExample: for a die, P(getting 7) = 0/6 = 0 (impossible) and P(getting a number from 1 to 6) = 6/6 = 1 (certain).",
+      "explanation": "0 <= m <= n gives 0 <= P <= 1."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the addition theorem of probability. A card is drawn from a well-shuffled pack of 52 cards. Find the probability that it is (a) a king or a queen, (b) a heart or a face card.",
+      "answer": "Addition theorem: for any two events A and B,\n\n   P(A or B) = P(A) + P(B) - P(A and B).\n\nFor mutually exclusive events P(A and B) = 0, giving P(A or B) = P(A) + P(B).\n\n(a) King or queen: a card cannot be both, so they are mutually exclusive.\nP(king) = 4/52, P(queen) = 4/52.\n   P(king or queen) = 4/52 + 4/52 = 8/52 = 2/13.\n\n(b) Heart or face card: P(heart) = 13/52, P(face) = 12/52. The overlap (hearts that are face cards) is the jack, queen and king of hearts = 3 cards, so P(heart and face) = 3/52.\n   P(heart or face) = 13/52 + 12/52 - 3/52 = 22/52 = 11/26.",
+      "explanation": "Mutually exclusive (a); overlap of 3 for (b)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Explain complementary events. Three coins are tossed together. Find the probability of getting (a) at least one head, (b) at most one head.",
+      "answer": "Complementary events: A and its complement A' cannot both occur and together are exhaustive, so P(A) + P(A') = 1, i.e. P(not A) = 1 - P(A).\n\nThree coins: S has 2^3 = 8 equally likely outcomes.\n\n(a) At least one head = complement of 'no head' (all tails, TTT).\nP(TTT) = 1/8, so P(at least one head) = 1 - 1/8 = 7/8.\n\n(b) At most one head means 0 or 1 head. Zero heads: TTT (1 outcome). One head: HTT, THT, TTH (3 outcomes). Total 4.\n   P(at most one head) = 4/8 = 1/2.",
+      "explanation": "Complement for (a); direct count for (b)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Define conditional probability. In a school, 25% of students failed Mathematics, 15% failed English, and 10% failed both. A student is selected at random. (a) If the student failed English, find the probability she failed Mathematics. (b) If she failed Mathematics, find the probability she failed English.",
+      "answer": "Conditional probability of A given B is P(A|B) = P(A and B)/P(B), provided P(B) > 0; it is the probability of A when attention is restricted to the outcomes in B.\n\nLet M = failed Maths, E = failed English. P(M) = 0.25, P(E) = 0.15, P(M and E) = 0.10.\n\n(a) P(M|E) = P(M and E)/P(E) = 0.10/0.15 = 2/3.\n\n(b) P(E|M) = P(M and E)/P(M) = 0.10/0.25 = 2/5.\n\nThe two conditional probabilities differ because the conditioning events (E and M) have different probabilities.",
+      "explanation": "P(M|E)=2/3, P(E|M)=2/5."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "A bag contains 6 red and 4 white balls. Three balls are drawn one by one without replacement. Find the probability that (a) all three are red, (b) the first two are red and the third is white.",
+      "answer": "(a) All three red:\nP(1st red) = 6/10, P(2nd red|1st) = 5/9, P(3rd red|first two) = 4/8.\n   P(all red) = (6/10)(5/9)(4/8) = 120/720 = 1/6.\n\n(b) Red, red, then white:\nP(1st red) = 6/10, P(2nd red) = 5/9, P(3rd white) = 4/8.\n   P(R,R,W) = (6/10)(5/9)(4/8) = 120/720 = 1/6.\n\nBoth work out to 1/6 here because the numerators 6x5x4 and 6x5x4 coincide for this particular composition.",
+      "explanation": "Multiplication theorem for successive draws."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "State Bayes' theorem. In a bolt factory, machines A, B and C manufacture 25%, 35% and 40% of the bolts, of which 5%, 4% and 2% are defective. A bolt is drawn at random and found defective. Find the probability that it was made by machine A.",
+      "answer": "Bayes' theorem: for a partition B1,...,Bn and an event A,\n\n   P(Bk|A) = P(Bk) P(A|Bk) / [sum over i of P(Bi) P(A|Bi)].\n\nLet the priors be P(A)=0.25, P(B)=0.35, P(C)=0.40, and defect rates P(D|A)=0.05, P(D|B)=0.04, P(D|C)=0.02.\n\nTotal probability of a defective bolt:\n   P(D) = 0.25(0.05) + 0.35(0.04) + 0.40(0.02)\n        = 0.0125 + 0.0140 + 0.0080 = 0.0345.\n\nBy Bayes' theorem:\n   P(A|D) = 0.0125/0.0345 = 125/345 = 25/69 (about 0.362).\n\nSo there is about a 36.2% chance the defective bolt came from machine A.",
+      "explanation": "P(A|D) = 25/69."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "From a group of 6 boys and 4 girls, a team of 4 is chosen at random. Find the probability that the team has (a) exactly 2 boys and 2 girls, (b) at least 3 girls.",
+      "answer": "Total ways = C(10,4) = 210.\n\n(a) Exactly 2 boys and 2 girls: C(6,2) x C(4,2) = 15 x 6 = 90.\n   P = 90/210 = 3/7.\n\n(b) At least 3 girls = (3 girls, 1 boy) or (4 girls).\n3 girls, 1 boy: C(4,3) x C(6,1) = 4 x 6 = 24.\n4 girls: C(4,4) = 1.\nTotal favourable = 24 + 1 = 25.\n   P(at least 3 girls) = 25/210 = 5/42.",
+      "explanation": "Combinations for team selection."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Define independent events. Given P(A) = 1/2, P(B) = 1/3 and P(A and B) = 1/6, determine whether A and B are independent, and find P(A or B) and P(A|B).",
+      "answer": "Two events are independent if the occurrence of one does not change the probability of the other, equivalently P(A and B) = P(A) P(B).\n\nCheck: P(A) P(B) = (1/2)(1/3) = 1/6 = P(A and B). So A and B ARE independent.\n\nP(A or B) = P(A) + P(B) - P(A and B) = 1/2 + 1/3 - 1/6 = 3/6 + 2/6 - 1/6 = 4/6 = 2/3.\n\nP(A|B) = P(A and B)/P(B) = (1/6)/(1/3) = 1/2 = P(A), confirming independence.",
+      "explanation": "Independence verified; P(A or B)=2/3, P(A|B)=1/2."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-PRB-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Explain the terms random experiment, sample space, event and equally likely outcomes. Illustrate each using the experiment of throwing two dice, and hence find the probability that the sum of the numbers is a prime number.",
+      "answer": "Random experiment: an experiment with known possible results but an unpredictable outcome, e.g. throwing two dice. Sample space: the set of all outcomes; for two dice S = {(1,1),(1,2),...,(6,6)} with 36 outcomes. Event: any subset of S, e.g. 'sum is prime'. Equally likely outcomes: each of the 36 pairs is as likely as any other for fair dice.\n\nPrime sums possible are 2, 3, 5, 7, 11.\nSum 2: (1,1) = 1\nSum 3: (1,2),(2,1) = 2\nSum 5: (1,4),(4,1),(2,3),(3,2) = 4\nSum 7: (1,6),(6,1),(2,5),(5,2),(3,4),(4,3) = 6\nSum 11: (5,6),(6,5) = 2\nTotal favourable = 1 + 2 + 4 + 6 + 2 = 15.\n\n   P(sum is prime) = 15/36 = 5/12.",
+      "explanation": "Definitions plus P(prime sum) = 5/12."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A fair die is rolled once. Using the classical definition of probability, answer the following.\n(a) Write the sample space and state the total number of outcomes.\n(b) Find the probability of getting a number greater than 4.\n(c) Find the probability of getting a prime number.\n(d) Find the probability of getting a number that is a multiple of 3.",
+      "answer": "(a) S = {1,2,3,4,5,6}; total outcomes = 6.\n(b) Greater than 4 = {5,6}, so P = 2/6 = 1/3.\n(c) Prime numbers = {2,3,5}, so P = 3/6 = 1/2.\n(d) Multiples of 3 = {3,6}, so P = 2/6 = 1/3.",
+      "explanation": "Classical definition applied to a die."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A card is drawn at random from a well-shuffled pack of 52 playing cards.\n(a) Find the probability that the card is a red card.\n(b) Find the probability that it is a face card.\n(c) Find the probability that it is neither a king nor a queen.\n(d) Find the probability that it is the ace of spades.",
+      "answer": "(a) Red cards = 26, so P = 26/52 = 1/2.\n(b) Face cards = 12, so P = 12/52 = 3/13.\n(c) Kings and queens = 8, so non-(king or queen) = 44, P = 44/52 = 11/13.\n(d) One ace of spades, P = 1/52.",
+      "explanation": "Counting favourable cards out of 52."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "In a survey of a colony, P(a household reads newspaper A) = 0.5, P(reads B) = 0.4, and P(reads both A and B) = 0.2.\n(a) Find the probability that a household reads at least one of the two newspapers.\n(b) Find the probability that a household reads neither.\n(c) Find the probability that a household reads exactly one of the two.\n(d) Are the events 'reads A' and 'reads B' mutually exclusive? Justify.",
+      "answer": "(a) P(A or B) = 0.5 + 0.4 - 0.2 = 0.7.\n(b) P(neither) = 1 - P(A or B) = 1 - 0.7 = 0.3.\n(c) Exactly one = P(A or B) - P(both) = 0.7 - 0.2 = 0.5.\n(d) No. They are not mutually exclusive because P(A and B) = 0.2 which is not 0, so both can occur together.",
+      "explanation": "Addition theorem and mutual-exclusivity check."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Three fair coins are tossed together.\n(a) Write the number of outcomes in the sample space.\n(b) Find the probability of getting exactly two heads.\n(c) Find the probability of getting at least one head.\n(d) Find the probability of getting no head.",
+      "answer": "(a) 2^3 = 8 outcomes.\n(b) Exactly two heads: HHT, HTH, THH = 3 outcomes, so P = 3/8.\n(c) At least one head = 1 - P(no head) = 1 - 1/8 = 7/8.\n(d) No head = TTT, P = 1/8.",
+      "explanation": "Complement used for at-least-one head."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-05",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "In a class of 100 students, 60 play cricket, 40 play football and 25 play both.\n(a) Find the probability that a randomly chosen student plays at least one game.\n(b) Find P(plays football | plays cricket).\n(c) Find P(plays cricket | plays football).\n(d) Find the probability that a student plays neither game.",
+      "answer": "(a) P(cricket or football) = 60/100 + 40/100 - 25/100 = 75/100 = 3/4.\n(b) P(football|cricket) = P(both)/P(cricket) = (25/100)/(60/100) = 25/60 = 5/12.\n(c) P(cricket|football) = (25/100)/(40/100) = 25/40 = 5/8.\n(d) P(neither) = 1 - 3/4 = 1/4.",
+      "explanation": "Addition theorem and two conditional probabilities."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A bag contains 7 red and 5 blue balls. Two balls are drawn one after another without replacement.\n(a) Find the probability that both balls are red.\n(b) Find the probability that both balls are blue.\n(c) Find the probability that the first is red and the second is blue.\n(d) Find the probability that the two balls are of different colours.",
+      "answer": "Total balls = 12.\n(a) P(both red) = (7/12)(6/11) = 42/132 = 7/22.\n(b) P(both blue) = (5/12)(4/11) = 20/132 = 5/33.\n(c) P(red then blue) = (7/12)(5/11) = 35/132.\n(d) Different colours = P(RB) + P(BR) = 35/132 + (5/12)(7/11) = 35/132 + 35/132 = 70/132 = 35/66.",
+      "explanation": "Multiplication theorem, dependent draws."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Two cards are drawn from a pack of 52 with replacement (each card is returned and the pack reshuffled before the next draw).\n(a) Are the two draws independent? Justify.\n(b) Find the probability that both cards are kings.\n(c) Find the probability that both cards are hearts.\n(d) Find the probability that the first is a king and the second is a queen.",
+      "answer": "(a) Yes. Because each card is replaced, the pack is identical before each draw, so the outcome of the first does not affect the second - the draws are independent.\n(b) P(both kings) = (4/52)(4/52) = (1/13)(1/13) = 1/169.\n(c) P(both hearts) = (13/52)(13/52) = (1/4)(1/4) = 1/16.\n(d) P(king then queen) = (4/52)(4/52) = 1/169.",
+      "explanation": "Independence under replacement; product rule."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Bag A contains 4 red and 6 black balls; Bag B contains 7 red and 3 black balls. A bag is chosen at random and a ball is drawn from it.\n(a) Find the probability of choosing Bag A.\n(b) Find the probability that the drawn ball is red (total probability).\n(c) Given that the ball drawn is red, find the probability that it came from Bag A.\n(d) Given that the ball is red, find the probability it came from Bag B.",
+      "answer": "P(A) = P(B) = 1/2. P(red|A) = 4/10 = 2/5, P(red|B) = 7/10.\n(a) P(Bag A) = 1/2.\n(b) P(red) = (1/2)(2/5) + (1/2)(7/10) = 1/5 + 7/20 = 4/20 + 7/20 = 11/20.\n(c) P(A|red) = [(1/2)(2/5)] / (11/20) = (1/5)/(11/20) = (4/20)/(11/20) = 4/11.\n(d) P(B|red) = 1 - 4/11 = 7/11.",
+      "explanation": "Total probability then Bayes' theorem."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "A diagnostic test detects a disease that affects 2% of a population. The test gives a positive result for 95% of people who have the disease and for 5% of people who do not.\n(a) Find the probability that a randomly chosen person has the disease.\n(b) Find the probability that a randomly chosen person tests positive (total probability).\n(c) Given a positive test, find the probability the person actually has the disease.\n(d) Comment on why this probability is lower than one might expect.",
+      "answer": "Let D = has disease, P(D) = 0.02, P(not D) = 0.98. P(pos|D) = 0.95, P(pos|not D) = 0.05.\n(a) P(D) = 0.02.\n(b) P(pos) = 0.02(0.95) + 0.98(0.05) = 0.019 + 0.049 = 0.068.\n(c) P(D|pos) = 0.019/0.068 = 19/68 (about 0.279), i.e. about 27.9%.\n(d) Because the disease is rare (only 2%), the many false positives from the large healthy group outnumber the true positives, so a positive result still leaves under a one-third chance of actually being diseased.",
+      "explanation": "Bayes' theorem with a low base rate."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-PRB-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A coin is tossed and, independently, a die is rolled.\n(a) State how many outcomes are in the combined sample space.\n(b) Find the probability of getting a head and an even number.\n(c) Find the probability of getting a tail and a number greater than 4.\n(d) Are the coin result and the die result independent? Justify.",
+      "answer": "(a) 2 x 6 = 12 outcomes.\n(b) P(head) = 1/2, P(even) = 3/6 = 1/2, so P(head and even) = (1/2)(1/2) = 1/4.\n(c) P(tail) = 1/2, P(>4) = 2/6 = 1/3, so P = (1/2)(1/3) = 1/6.\n(d) Yes. The coin and die do not influence each other, so P(A and B) = P(A) P(B) holds - they are independent.",
+      "explanation": "Independent events; product rule."
+    }
+  ]
+}

@@ -1,0 +1,2256 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 20,
+    "chapter_title": "Matrices",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 20 - MATRICES\n\nIntroduction\n\nMany problems in mathematics, science, economics and computer science deal with information that is naturally arranged in a rectangular grid: the marks of students in several subjects, the coordinates of points, the coefficients of a system of linear equations, or the pixels of a digital image. A MATRIX is a compact way to store and work with such rectangular arrangements of numbers. In this chapter we learn what a matrix is, the different types of matrices, how to decide when two matrices are equal, and how to combine matrices using addition, subtraction, scalar multiplication and matrix multiplication. We then study the transpose of a matrix and use it to define symmetric and skew-symmetric matrices, and we take a brief look at elementary row and column operations.\n\n20.1 DEFINITION, ORDER, ELEMENTS AND NOTATION\n\nA MATRIX is a rectangular arrangement of numbers (or functions) arranged in horizontal rows and vertical columns, enclosed in brackets. Each number in the matrix is called an ELEMENT or an ENTRY of the matrix. For example,\n\n   A = [[2, 5, 1], [0, 3, 4]]\n\nis a matrix with 2 rows and 3 columns. We say its ORDER (or size) is 2 x 3, read as \"2 by 3\". In general a matrix with m rows and n columns is said to be of order m x n, and it has m x n elements in all. The number of rows is always written first.\n\nA matrix is usually denoted by a capital letter such as A, B, C. A general element is written a_ij, where i is the ROW number and j is the COLUMN number. Thus a_23 means the element in the 2nd row and 3rd column. A matrix of order m x n can be written compactly as A = [a_ij] where i runs from 1 to m and j runs from 1 to n. In the matrix A above, a_11 = 2, a_12 = 5, a_13 = 1, a_21 = 0, a_22 = 3 and a_23 = 4.\n\nNote that a matrix is only an ARRANGEMENT of numbers; unlike a determinant, it does NOT have a single numerical value.\n\n20.2 TYPES OF MATRICES\n\nROW MATRIX: a matrix with only ONE row, of order 1 x n. Example: [[3, -1, 7]].\n\nCOLUMN MATRIX: a matrix with only ONE column, of order m x 1. Example: [[2], [5], [9]].\n\nSQUARE MATRIX: a matrix in which the number of rows equals the number of columns (order n x n). Example: [[1, 2], [3, 4]] is a square matrix of order 2. In a square matrix A = [a_ij] of order n, the elements a_11, a_22, ..., a_nn form the PRINCIPAL DIAGONAL (or leading diagonal).\n\nDIAGONAL MATRIX: a square matrix in which every element OFF the principal diagonal is zero (the diagonal elements may be anything). Example: [[5, 0], [0, 2]].\n\nSCALAR MATRIX: a diagonal matrix in which all the diagonal elements are EQUAL. Example: [[3, 0], [0, 3]].\n\nIDENTITY (UNIT) MATRIX: a scalar matrix in which every diagonal element is 1. It is denoted by I (or I_n for order n). Example: I_2 = [[1, 0], [0, 1]]. The identity matrix behaves like the number 1 under matrix multiplication: A I = I A = A.\n\nZERO (NULL) MATRIX: a matrix in which every element is zero, denoted by O. Example: [[0, 0], [0, 0]]. It behaves like the number 0 under addition: A + O = A.\n\nUPPER TRIANGULAR MATRIX: a square matrix in which every element BELOW the principal diagonal is zero. Example: [[2, 3, 1], [0, 5, 4], [0, 0, 7]].\n\nLOWER TRIANGULAR MATRIX: a square matrix in which every element ABOVE the principal diagonal is zero. Example: [[2, 0, 0], [3, 5, 0], [1, 4, 7]].\n\nA matrix that is both upper and lower triangular is a diagonal matrix.\n\n20.3 EQUALITY OF MATRICES\n\nTwo matrices A = [a_ij] and B = [b_ij] are said to be EQUAL, written A = B, if and only if\n (i) they are of the SAME ORDER, and\n (ii) their CORRESPONDING elements are equal, that is a_ij = b_ij for every i and j.\n\nSo [[x, 2], [3, y]] = [[1, 2], [3, 4]] gives x = 1 and y = 4. If the orders differ, the matrices can never be equal, no matter what the elements are. Equality of matrices is often used to set up and solve equations for unknown entries.\n\n20.4 ADDITION AND SUBTRACTION OF MATRICES\n\nTwo matrices can be ADDED only if they are of the SAME ORDER (they are then called conformable for addition). The sum A + B is obtained by adding the corresponding elements:\n\n   if A = [a_ij] and B = [b_ij], then A + B = [a_ij + b_ij].\n\nFor example, [[1, 2], [3, 4]] + [[5, 0], [1, 6]] = [[6, 2], [4, 10]]. SUBTRACTION is defined similarly by subtracting corresponding elements: A - B = [a_ij - b_ij]. Matrices of different orders cannot be added or subtracted.\n\nPROPERTIES OF MATRIX ADDITION (for matrices of the same order):\n (1) Commutative: A + B = B + A.\n (2) Associative: (A + B) + C = A + (B + C).\n (3) Additive identity: A + O = O + A = A, where O is the zero matrix of the same order.\n (4) Additive inverse: A + (-A) = O, where -A = [-a_ij] is the negative of A.\n\n20.5 MULTIPLICATION OF A MATRIX BY A SCALAR\n\nIf A = [a_ij] is a matrix and k is any number (a SCALAR), then the scalar multiple kA is the matrix obtained by multiplying EVERY element of A by k:\n\n   kA = [k a_ij].\n\nFor example, 3 x [[1, -2], [0, 4]] = [[3, -6], [0, 12]]. Scalar multiplication satisfies, for scalars k and l and matrices A, B of the same order:\n (1) k(A + B) = kA + kB (distributive over matrix addition),\n (2) (k + l)A = kA + lA (distributive over scalar addition),\n (3) k(lA) = (kl)A (associative),\n (4) 1A = A and 0A = O.\n\nUsing addition and scalar multiplication together we can form linear combinations such as 2A - 3B.\n\n20.6 MULTIPLICATION OF MATRICES\n\nMatrix multiplication is more involved. The product AB of two matrices A and B is defined ONLY when the number of COLUMNS of A equals the number of ROWS of B. Such matrices are said to be CONFORMABLE for multiplication. If A is of order m x n and B is of order n x p, then the product AB exists and is of order m x p.\n\nThe element in the i-th row and j-th column of AB is obtained by taking the i-th ROW of A and the j-th COLUMN of B, multiplying corresponding entries and adding:\n\n   (AB)_ij = a_i1 b_1j + a_i2 b_2j + ... + a_in b_nj.\n\nThis is called the ROW-BY-COLUMN rule. For example, with A = [[1, 2], [3, 4]] and B = [[5, 6], [7, 8]]:\n\n   AB = [[1x5 + 2x7, 1x6 + 2x8], [3x5 + 4x7, 3x6 + 4x8]] = [[19, 22], [43, 50]].\n\nA worked 2x3 by 3x2 example: A = [[1, 0, 2], [-1, 3, 1]] (order 2 x 3) and B = [[3, 1], [2, 0], [1, 4]] (order 3 x 2). The product AB is of order 2 x 2:\n\n   AB = [[1x3 + 0x2 + 2x1, 1x1 + 0x0 + 2x4], [-1x3 + 3x2 + 1x1, -1x1 + 3x0 + 1x4]]\n      = [[5, 9], [4, 3]].\n\nIMPORTANT PROPERTIES OF MATRIX MULTIPLICATION:\n (1) NOT COMMUTATIVE: in general AB is NOT equal to BA. Sometimes BA may not even be defined; even when both exist they are usually different. For A = [[1, 1], [0, 1]] and B = [[1, 0], [1, 1]], AB = [[2, 1], [1, 1]] while BA = [[1, 1], [1, 2]], so AB is not BA.\n (2) Associative: (AB)C = A(BC) whenever the products are defined.\n (3) Distributive over addition: A(B + C) = AB + AC and (A + B)C = AC + BC.\n (4) Multiplicative identity: for a square matrix A of order n, A I = I A = A, where I is the identity matrix of order n.\n (5) The product of two non-zero matrices CAN be a zero matrix. For example [[1, 0], [0, 0]] x [[0, 0], [0, 1]] = [[0, 0], [0, 0]], although neither factor is the zero matrix. So AB = O does NOT imply A = O or B = O.\n\n20.7 TRANSPOSE OF A MATRIX\n\nThe TRANSPOSE of a matrix A, written A^T (or A'), is the matrix obtained by INTERCHANGING the rows and columns of A. If A is of order m x n, then A^T is of order n x m, and the (i, j) element of A^T equals the (j, i) element of A. For example, if\n\n   A = [[1, 2, 3], [4, 5, 6]]   (order 2 x 3),\n\nthen\n\n   A^T = [[1, 4], [2, 5], [3, 6]]   (order 3 x 2).\n\nThe first row of A becomes the first column of A^T, and so on.\n\nPROPERTIES OF THE TRANSPOSE (whenever the operations are defined):\n (1) (A^T)^T = A.\n (2) (A + B)^T = A^T + B^T.\n (3) (kA)^T = k A^T, where k is a scalar.\n (4) (AB)^T = B^T A^T. Note the REVERSAL of order - this is the reversal law.\n\n20.8 SYMMETRIC AND SKEW-SYMMETRIC MATRICES\n\nA square matrix A is called SYMMETRIC if A^T = A, that is a_ij = a_ji for all i and j. The matrix is unchanged by reflection about its principal diagonal. Example: [[1, 2, 3], [2, 5, 4], [3, 4, 6]] is symmetric.\n\nA square matrix A is called SKEW-SYMMETRIC (or anti-symmetric) if A^T = -A, that is a_ij = -a_ji for all i and j. Putting i = j gives a_ii = -a_ii, so 2 a_ii = 0, which means every DIAGONAL element of a skew-symmetric matrix is ZERO. Example: [[0, 2, -3], [-2, 0, 5], [3, -5, 0]] is skew-symmetric.\n\nA useful theorem: EVERY square matrix A can be written UNIQUELY as the sum of a symmetric matrix P and a skew-symmetric matrix Q, where\n\n   P = (1/2)(A + A^T)   is symmetric,   and   Q = (1/2)(A - A^T)   is skew-symmetric,\n\nand A = P + Q. This is because A + A^T is always symmetric and A - A^T is always skew-symmetric.\n\n20.9 ELEMENTARY OPERATIONS (a brief look)\n\nAn ELEMENTARY ROW (or COLUMN) OPERATION on a matrix is one of the following:\n (1) interchanging two rows (or two columns), written R_i <-> R_j;\n (2) multiplying a row (or column) by a non-zero scalar, written R_i -> k R_i;\n (3) adding to a row (or column) a scalar multiple of another row (or column), written R_i -> R_i + k R_j.\n\nThese operations do not change the essential information in the matrix and are the basis of the method of finding the INVERSE of a matrix and of solving systems of linear equations by reduction. They will be used in more detail in the study of determinants and inverses.\n\nSUMMARY\n\n- A matrix is a rectangular array of numbers in m rows and n columns; its order is m x n and its general element is a_ij (row i, column j).\n- Special types: row, column, square, diagonal, scalar, identity (I), zero/null (O), and upper/lower triangular matrices.\n- Two matrices are equal only if they have the same order and all corresponding elements are equal.\n- Addition and subtraction need the same order and act element by element; addition is commutative and associative, with O as identity and -A as inverse.\n- The scalar multiple kA multiplies every element by k and is distributive and associative with scalars.\n- The product AB is defined only when (columns of A) = (rows of B); it follows the row-by-column rule and gives an m x p matrix. Matrix multiplication is associative and distributive but NOT commutative, and AB = O does not force A or B to be zero.\n- The transpose A^T interchanges rows and columns; (A^T)^T = A, (A + B)^T = A^T + B^T, (kA)^T = k A^T, and (AB)^T = B^T A^T.\n- A is symmetric if A^T = A and skew-symmetric if A^T = -A; a skew-symmetric matrix has zero diagonal, and every square matrix is uniquely the sum of a symmetric and a skew-symmetric part.\n- Elementary row and column operations (interchange, scaling, adding a multiple of another line) underlie the computation of inverses and the solution of linear systems.\n",
+  "topics": [
+    {
+      "name": "Definition and Types of Matrices",
+      "description": "A matrix as a rectangular array of numbers; order m x n, elements a_ij, and notation; the standard types of matrices - row, column, square, diagonal, scalar, identity, zero/null, and upper/lower triangular matrices."
+    },
+    {
+      "name": "Equality and Matrix Addition",
+      "description": "Conditions for two matrices to be equal (same order and equal corresponding elements); addition and subtraction of matrices of the same order, and the properties of matrix addition (commutative, associative, identity O, inverse -A)."
+    },
+    {
+      "name": "Scalar Multiplication",
+      "description": "Multiplication of a matrix by a scalar k, kA = [k a_ij], forming linear combinations, and the distributive and associative properties of scalar multiplication."
+    },
+    {
+      "name": "Matrix Multiplication",
+      "description": "Conformability for multiplication (columns of A = rows of B); the row-by-column rule for AB; order of the product; and properties - associativity, distributivity, identity, non-commutativity, and zero-divisor behaviour."
+    },
+    {
+      "name": "Transpose of a Matrix",
+      "description": "The transpose A^T obtained by interchanging rows and columns; its order; and the properties (A^T)^T = A, (A+B)^T = A^T + B^T, (kA)^T = k A^T and the reversal law (AB)^T = B^T A^T."
+    },
+    {
+      "name": "Symmetric and Skew-Symmetric Matrices",
+      "description": "Symmetric matrices (A^T = A) and skew-symmetric matrices (A^T = -A); the zero diagonal of a skew-symmetric matrix; and the unique decomposition of any square matrix into symmetric and skew-symmetric parts."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-MTX-01",
+      "topic_name": "Definition and Types of Matrices",
+      "bloom": "understand",
+      "description": "Define a matrix, state its order and elements a_ij using the standard notation A = [a_ij], and count the number of elements in a matrix of given order."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-02",
+      "topic_name": "Definition and Types of Matrices",
+      "bloom": "understand",
+      "description": "Identify and give examples of the different types of matrices - row, column, square, diagonal, scalar, identity, zero/null, and upper and lower triangular matrices."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-03",
+      "topic_name": "Equality and Matrix Addition",
+      "bloom": "apply",
+      "description": "Apply the definition of equality of matrices to find unknown elements, and add or subtract matrices of the same order using the properties of matrix addition."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-04",
+      "topic_name": "Scalar Multiplication",
+      "bloom": "apply",
+      "description": "Multiply a matrix by a scalar, form linear combinations such as 2A - 3B, and use the distributive and associative properties of scalar multiplication."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-05",
+      "topic_name": "Matrix Multiplication",
+      "bloom": "apply",
+      "description": "Test two matrices for conformability and compute the product AB by the row-by-column rule, stating the order of the product."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-06",
+      "topic_name": "Matrix Multiplication",
+      "bloom": "analyze",
+      "description": "Analyse the properties of matrix multiplication - associativity, distributivity, the role of the identity, non-commutativity, and the fact that AB = O need not imply A = O or B = O."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-07",
+      "topic_name": "Transpose of a Matrix",
+      "bloom": "understand",
+      "description": "Form the transpose A^T of a matrix and use its properties, including (A^T)^T = A and the reversal law (AB)^T = B^T A^T."
+    },
+    {
+      "code": "12-NIOS-MAT-MTX-08",
+      "topic_name": "Symmetric and Skew-Symmetric Matrices",
+      "bloom": "analyze",
+      "description": "Determine whether a square matrix is symmetric or skew-symmetric and express any square matrix as the sum of a symmetric and a skew-symmetric matrix."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Matrices - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Matrices lesson. It explains what a matrix is, the standard types of matrices, equality, the algebra of matrices (addition, scalar multiplication and multiplication), the transpose, and symmetric and skew-symmetric matrices.",
+    "overview_diagram": {
+      "title": "Matrices",
+      "central_term": "Matrices",
+      "branches": [
+        {
+          "label": "Definition & Types",
+          "details": [
+            "Order m x n, element a_ij (row i, column j)",
+            "Row, column, square, diagonal, scalar",
+            "Identity I, zero O, upper/lower triangular"
+          ]
+        },
+        {
+          "label": "Equality & Addition",
+          "details": [
+            "Equal: same order and a_ij = b_ij",
+            "Add/subtract only if same order",
+            "Commutative, associative, identity O, inverse -A"
+          ]
+        },
+        {
+          "label": "Scalar & Product",
+          "details": [
+            "kA multiplies every element by k",
+            "AB needs cols of A = rows of B",
+            "Row-by-column rule, order m x p",
+            "AB not equal to BA in general"
+          ]
+        },
+        {
+          "label": "Transpose",
+          "details": [
+            "A^T interchanges rows and columns",
+            "(A^T)^T = A, (A+B)^T = A^T + B^T",
+            "(AB)^T = B^T A^T (reversal law)"
+          ]
+        },
+        {
+          "label": "Symmetric & Skew",
+          "details": [
+            "Symmetric: A^T = A",
+            "Skew-symmetric: A^T = -A, zero diagonal",
+            "A = (1/2)(A+A^T) + (1/2)(A-A^T)"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Definition, order and types",
+        "bullets": [
+          "A matrix is a rectangular array of numbers arranged in m rows and n columns; its order is m x n and it has mn elements.",
+          "The general element a_ij lies in row i and column j; a matrix is written compactly as A = [a_ij].",
+          "Types include row (1 x n), column (m x 1), square (n x n), diagonal, scalar, identity I, zero/null O, and upper/lower triangular matrices."
+        ]
+      },
+      {
+        "heading": "Equality, addition and subtraction",
+        "bullets": [
+          "Two matrices are equal only if they have the same order and all corresponding elements are equal.",
+          "Addition and subtraction are defined only for matrices of the same order and are done element by element.",
+          "Matrix addition is commutative and associative, with the zero matrix O as identity and -A as the additive inverse of A."
+        ]
+      },
+      {
+        "heading": "Scalar multiplication",
+        "bullets": [
+          "kA is obtained by multiplying every element of A by the scalar k.",
+          "Scalar multiplication is distributive: k(A + B) = kA + kB and (k + l)A = kA + lA.",
+          "It is associative with scalars: k(lA) = (kl)A, and 1A = A, 0A = O."
+        ]
+      },
+      {
+        "heading": "Matrix multiplication",
+        "bullets": [
+          "AB is defined only when the number of columns of A equals the number of rows of B; the product is of order m x p.",
+          "Each entry of AB is a row of A combined with a column of B by the row-by-column rule.",
+          "Multiplication is associative and distributive but NOT commutative, and AB = O does not imply A = O or B = O."
+        ]
+      },
+      {
+        "heading": "Transpose, symmetric and skew-symmetric",
+        "bullets": [
+          "The transpose A^T interchanges rows and columns; (A^T)^T = A and (AB)^T = B^T A^T.",
+          "A square matrix is symmetric if A^T = A and skew-symmetric if A^T = -A; a skew-symmetric matrix has all diagonal elements zero.",
+          "Every square matrix is uniquely the sum of a symmetric part (1/2)(A + A^T) and a skew-symmetric part (1/2)(A - A^T)."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "A matrix of order m x n has mn elements; a_ij denotes the element in row i and column j.",
+      "Special matrices include row, column, square, diagonal, scalar, identity (I) and zero (O), and upper/lower triangular matrices.",
+      "Matrices are equal only when they have the same order and equal corresponding elements; addition and subtraction need the same order.",
+      "Scalar multiplication kA multiplies every element by k and is distributive over addition.",
+      "AB exists only if columns of A = rows of B; multiplication is associative and distributive but not commutative.",
+      "The transpose satisfies (A^T)^T = A and the reversal law (AB)^T = B^T A^T.",
+      "A is symmetric if A^T = A and skew-symmetric if A^T = -A, and every square matrix splits uniquely into symmetric and skew-symmetric parts."
+    ],
+    "glossary": [
+      {
+        "term": "Matrix",
+        "definition": "A rectangular arrangement of numbers in rows and columns, enclosed in brackets, denoted by a capital letter."
+      },
+      {
+        "term": "Order of a matrix",
+        "definition": "The size m x n of a matrix, where m is the number of rows and n the number of columns; it has mn elements."
+      },
+      {
+        "term": "Element a_ij",
+        "definition": "The entry of a matrix in the i-th row and j-th column; a matrix is written compactly as A = [a_ij]."
+      },
+      {
+        "term": "Row matrix",
+        "definition": "A matrix with a single row, of order 1 x n."
+      },
+      {
+        "term": "Column matrix",
+        "definition": "A matrix with a single column, of order m x 1."
+      },
+      {
+        "term": "Square matrix",
+        "definition": "A matrix with equal numbers of rows and columns, of order n x n."
+      },
+      {
+        "term": "Diagonal matrix",
+        "definition": "A square matrix in which every element off the principal diagonal is zero."
+      },
+      {
+        "term": "Scalar matrix",
+        "definition": "A diagonal matrix in which all the diagonal elements are equal."
+      },
+      {
+        "term": "Identity matrix (I)",
+        "definition": "A scalar matrix with every diagonal element equal to 1; it satisfies A I = I A = A."
+      },
+      {
+        "term": "Zero (null) matrix (O)",
+        "definition": "A matrix whose every element is zero; it is the additive identity, A + O = A."
+      },
+      {
+        "term": "Transpose (A^T)",
+        "definition": "The matrix obtained by interchanging the rows and columns of A; if A is m x n then A^T is n x m."
+      },
+      {
+        "term": "Symmetric matrix",
+        "definition": "A square matrix for which A^T = A, i.e. a_ij = a_ji for all i, j."
+      },
+      {
+        "term": "Skew-symmetric matrix",
+        "definition": "A square matrix for which A^T = -A, i.e. a_ij = -a_ji; its diagonal elements are all zero."
+      },
+      {
+        "term": "Conformable for multiplication",
+        "definition": "Two matrices A and B for which the number of columns of A equals the number of rows of B, so AB is defined."
+      },
+      {
+        "term": "Elementary operation",
+        "definition": "A row/column interchange, scaling by a non-zero scalar, or adding a multiple of one line to another; used to find inverses and solve linear systems."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Matrices (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for numerical problems. Write matrices clearly and state the order of each answer where relevant.",
+    "total_marks": 30,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Define a matrix and its order. State the order and the number of elements of A = [[2, -1, 0, 5], [3, 7, 4, 1]].",
+        "answer": "A matrix is a rectangular arrangement of numbers in horizontal rows and vertical columns, enclosed in brackets. If it has m rows and n columns, its order is m x n and it has m x n elements.\n\nThe matrix A has 2 rows and 4 columns, so its order is 2 x 4 and it has 2 x 4 = 8 elements.",
+        "explanation": "Order is (rows) x (columns); number of elements is their product.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-MTX-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Name the type of each matrix: (a) [[0, 0], [0, 0]], (b) [[4, 0], [0, 4]], (c) [[1, 0, 0], [0, 1, 0], [0, 0, 1]], (d) [[3, -2, 1]].",
+        "answer": "(a) Zero (null) matrix - every element is zero.\n(b) Scalar matrix - a diagonal matrix with equal diagonal elements (both 4).\n(c) Identity (unit) matrix I_3 - a scalar matrix with all diagonal elements 1.\n(d) Row matrix - it has only one row (order 1 x 3).",
+        "explanation": "Classify by the defining property of each special matrix.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-MTX-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find x, y, z and w if [[x + y, 2], [5, z - w]] = [[6, 2], [5, 1]] and x - y = 2, z + w = 5.",
+        "answer": "Equality of matrices gives corresponding elements equal:\n x + y = 6 and z - w = 1.\nUsing the extra relations x - y = 2 and z + w = 5:\n From x + y = 6 and x - y = 2: adding, 2x = 8, so x = 4 and y = 2.\n From z - w = 1 and z + w = 5: adding, 2z = 6, so z = 3 and w = 2.\nHence x = 4, y = 2, z = 3, w = 2.",
+        "explanation": "Match corresponding entries, then solve the simultaneous equations.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-MTX-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "If A = [[1, 2], [3, 4]] and B = [[2, 0], [1, 3]], find 2A - 3B.",
+        "answer": "2A = [[2, 4], [6, 8]] and 3B = [[6, 0], [3, 9]].\n2A - 3B = [[2 - 6, 4 - 0], [6 - 3, 8 - 9]] = [[-4, 4], [3, -1]].",
+        "explanation": "Scale each matrix, then subtract element by element.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-MTX-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "For A = [[1, 0, 2], [-1, 3, 1]] and B = [[3, 1], [2, 0], [1, 4]], find AB. State the order of AB and explain why BA is also defined and give its order (do not compute BA).",
+        "answer": "A is of order 2 x 3 and B is of order 3 x 2. Since the number of columns of A (3) equals the number of rows of B (3), AB is defined and has order 2 x 2.\n\nAB = [[1x3 + 0x2 + 2x1, 1x1 + 0x0 + 2x4], [(-1)x3 + 3x2 + 1x1, (-1)x1 + 3x0 + 1x4]]\n   = [[3 + 0 + 2, 1 + 0 + 8], [-3 + 6 + 1, -1 + 0 + 4]]\n   = [[5, 9], [4, 3]].\n\nBA: B is 3 x 2 and A is 2 x 3. The columns of B (2) equal the rows of A (2), so BA is also defined, and its order is 3 x 3. (Note AB and BA have different orders here, so they cannot be equal - matrix multiplication is not commutative.)",
+        "explanation": "Check conformability, apply the row-by-column rule for AB, and reason about the order of BA.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-MTX-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Show, with A = [[1, 2], [3, 4]] and B = [[0, 1], [1, 0]], that AB is not equal to BA.",
+        "answer": "AB = [[1x0 + 2x1, 1x1 + 2x0], [3x0 + 4x1, 3x1 + 4x0]] = [[2, 1], [4, 3]].\nBA = [[0x1 + 1x3, 0x2 + 1x4], [1x1 + 0x3, 1x2 + 0x4]] = [[3, 4], [1, 2]].\nSince AB = [[2, 1], [4, 3]] and BA = [[3, 4], [1, 2]] are different, AB is not equal to BA. Matrix multiplication is not commutative.",
+        "explanation": "Compute both products and compare corresponding entries.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-MTX-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Write the transpose of A = [[2, -1, 4], [0, 3, 5]] and verify that (A^T)^T = A.",
+        "answer": "A is of order 2 x 3, so A^T is of order 3 x 2. Interchanging rows and columns:\nA^T = [[2, 0], [-1, 3], [4, 5]].\nTaking the transpose again interchanges rows and columns of A^T:\n(A^T)^T = [[2, -1, 4], [0, 3, 5]] = A.\nHence (A^T)^T = A.",
+        "explanation": "Rows of A become columns of A^T; transposing twice returns A.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-MTX-07"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Express A = [[2, 3], [1, 5]] as the sum of a symmetric matrix P and a skew-symmetric matrix Q.",
+        "answer": "First find A^T = [[2, 1], [3, 5]].\nSymmetric part P = (1/2)(A + A^T) = (1/2) x [[4, 4], [4, 10]] = [[2, 2], [2, 5]].\nSkew-symmetric part Q = (1/2)(A - A^T) = (1/2) x [[0, 2], [-2, 0]] = [[0, 1], [-1, 0]].\nCheck: P + Q = [[2 + 0, 2 + 1], [2 - 1, 5 + 0]] = [[2, 3], [1, 5]] = A.\nP^T = P (symmetric) and Q^T = -Q (skew-symmetric), as required.",
+        "explanation": "Use P = (1/2)(A + A^T) and Q = (1/2)(A - A^T); verify P + Q = A.",
+        "marks": 4,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-MTX-08"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "If A = [[3, -2], [4, 1]] and B = [[1, 0], [-2, 5]], find A + B and A - B.",
+        "answer": "A + B = [[3 + 1, -2 + 0], [4 + (-2), 1 + 5]] = [[4, -2], [2, 6]].\nA - B = [[3 - 1, -2 - 0], [4 - (-2), 1 - 5]] = [[2, -2], [6, -4]].",
+        "explanation": "Add and subtract corresponding elements.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-MTX-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "For A = [[1, 2], [3, 4]] and B = [[1, 0], [1, 1]], verify the reversal law (AB)^T = B^T A^T.",
+        "answer": "AB = [[1x1 + 2x1, 1x0 + 2x1], [3x1 + 4x1, 3x0 + 4x1]] = [[3, 2], [7, 4]].\n(AB)^T = [[3, 7], [2, 4]].\nNow A^T = [[1, 3], [2, 4]] and B^T = [[1, 1], [0, 1]].\nB^T A^T = [[1x1 + 1x2, 1x3 + 1x4], [0x1 + 1x2, 0x3 + 1x4]] = [[3, 7], [2, 4]].\nSince (AB)^T = [[3, 7], [2, 4]] = B^T A^T, the reversal law is verified.",
+        "explanation": "Compute (AB)^T and B^T A^T separately and compare.",
+        "marks": 4,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-MTX-07"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix of order 3 x 4 has how many elements?",
+      "options": [
+        "7",
+        "12",
+        "34",
+        "9"
+      ],
+      "answer": "12",
+      "explanation": "Number of elements = rows x columns = 3 x 4 = 12."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In a matrix A = [a_ij], the element a_23 lies in",
+      "options": [
+        "row 3, column 2",
+        "row 2, column 3",
+        "row 2, column 2",
+        "row 3, column 3"
+      ],
+      "answer": "row 2, column 3",
+      "explanation": "a_ij is in row i and column j."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order of the matrix [[5, -2, 7]] is",
+      "options": [
+        "3 x 1",
+        "1 x 3",
+        "3 x 3",
+        "1 x 1"
+      ],
+      "answer": "1 x 3",
+      "explanation": "One row, three columns."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order of a matrix is written as",
+      "options": [
+        "columns x rows",
+        "rows x columns",
+        "rows + columns",
+        "rows - columns"
+      ],
+      "answer": "rows x columns",
+      "explanation": "Rows first, then columns."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If a matrix has 15 elements, a possible order is",
+      "options": [
+        "2 x 7",
+        "3 x 5",
+        "4 x 4",
+        "2 x 8"
+      ],
+      "answer": "3 x 5",
+      "explanation": "3 x 5 = 15 elements."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A matrix does NOT have",
+      "options": [
+        "rows",
+        "columns",
+        "elements",
+        "a single numerical value"
+      ],
+      "answer": "a single numerical value",
+      "explanation": "A matrix is only an arrangement; unlike a determinant it has no single value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For A = [[2, 0], [1, 3]], the element a_21 is",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "1",
+      "explanation": "Row 2, column 1 is 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A matrix with m rows and n columns is denoted compactly as",
+      "options": [
+        "A = [a_mn]",
+        "A = [a_ij] with i=1..m, j=1..n",
+        "A = [a_ji]",
+        "A = (m, n)"
+      ],
+      "answer": "A = [a_ij] with i=1..m, j=1..n",
+      "explanation": "General element a_ij."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The number of elements in a square matrix of order n is",
+      "options": [
+        "n",
+        "2n",
+        "n^2",
+        "n + n"
+      ],
+      "answer": "n^2",
+      "explanation": "n rows x n columns = n^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If A is of order 5 x 2, then A has",
+      "options": [
+        "5 elements",
+        "2 elements",
+        "10 elements",
+        "7 elements"
+      ],
+      "answer": "10 elements",
+      "explanation": "5 x 2 = 10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the matrix [[8, 3], [6, 1], [0, 4]], the entry in the third row, first column is",
+      "options": [
+        "6",
+        "0",
+        "3",
+        "4"
+      ],
+      "answer": "0",
+      "explanation": "Third row is [0, 4]; first column entry is 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order of [[1], [2], [3], [4]] is",
+      "options": [
+        "1 x 4",
+        "4 x 1",
+        "4 x 4",
+        "2 x 2"
+      ],
+      "answer": "4 x 1",
+      "explanation": "Four rows, one column."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which statement about a_ij is correct?",
+      "options": [
+        "i is the column, j is the row",
+        "i is the row, j is the column",
+        "both i and j are rows",
+        "both i and j are columns"
+      ],
+      "answer": "i is the row, j is the column",
+      "explanation": "First subscript = row."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix that has 7 rows and 7 columns has order",
+      "options": [
+        "7 x 1",
+        "1 x 7",
+        "7 x 7",
+        "14"
+      ],
+      "answer": "7 x 7",
+      "explanation": "Rows x columns = 7 x 7."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A square matrix in which every off-diagonal element is zero is called a",
+      "options": [
+        "row matrix",
+        "diagonal matrix",
+        "column matrix",
+        "null matrix"
+      ],
+      "answer": "diagonal matrix",
+      "explanation": "Only diagonal entries may be non-zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A diagonal matrix whose diagonal elements are all equal is a",
+      "options": [
+        "identity matrix",
+        "scalar matrix",
+        "row matrix",
+        "triangular matrix"
+      ],
+      "answer": "scalar matrix",
+      "explanation": "Equal diagonal elements = scalar matrix."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The matrix [[1, 0, 0], [0, 1, 0], [0, 0, 1]] is a(n)",
+      "options": [
+        "zero matrix",
+        "identity matrix",
+        "row matrix",
+        "skew-symmetric matrix"
+      ],
+      "answer": "identity matrix",
+      "explanation": "Diagonal ones, rest zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "[[2, 5, 1], [0, 3, 4], [0, 0, 6]] is a",
+      "options": [
+        "lower triangular matrix",
+        "upper triangular matrix",
+        "diagonal matrix",
+        "scalar matrix"
+      ],
+      "answer": "upper triangular matrix",
+      "explanation": "All entries below the diagonal are zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix with only one column is called a",
+      "options": [
+        "row matrix",
+        "column matrix",
+        "square matrix",
+        "scalar matrix"
+      ],
+      "answer": "column matrix",
+      "explanation": "Single column = column matrix."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which of these is a scalar matrix?",
+      "options": [
+        "[[3, 0], [0, 5]]",
+        "[[3, 0], [0, 3]]",
+        "[[3, 1], [0, 3]]",
+        "[[0, 3], [3, 0]]"
+      ],
+      "answer": "[[3, 0], [0, 3]]",
+      "explanation": "Diagonal, with equal diagonal entries."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A matrix that is both upper and lower triangular is a",
+      "options": [
+        "row matrix",
+        "diagonal matrix",
+        "zero matrix only",
+        "column matrix"
+      ],
+      "answer": "diagonal matrix",
+      "explanation": "No off-diagonal entries above or below => diagonal."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The identity matrix I satisfies",
+      "options": [
+        "A I = O",
+        "A I = I A = A",
+        "A I = -A",
+        "A I = 2A"
+      ],
+      "answer": "A I = I A = A",
+      "explanation": "I is the multiplicative identity."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Two matrices are equal if and only if",
+      "options": [
+        "they have the same number of elements",
+        "they have the same order and equal corresponding elements",
+        "their sums are equal",
+        "they are both square"
+      ],
+      "answer": "they have the same order and equal corresponding elements",
+      "explanation": "Definition of matrix equality."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Matrices can be added only if they are of the",
+      "options": [
+        "same order",
+        "square type",
+        "same first element",
+        "row type"
+      ],
+      "answer": "same order",
+      "explanation": "Addition needs identical orders."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[1, 2], [3, 4]] + [[4, 0], [1, 2]] equals",
+      "options": [
+        "[[5, 2], [4, 6]]",
+        "[[4, 0], [3, 8]]",
+        "[[5, 2], [3, 6]]",
+        "[[3, 2], [2, 2]]"
+      ],
+      "answer": "[[5, 2], [4, 6]]",
+      "explanation": "Add corresponding elements."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If [[x, 3], [2, y]] = [[5, 3], [2, 7]], then x and y are",
+      "options": [
+        "x=5, y=7",
+        "x=3, y=2",
+        "x=7, y=5",
+        "x=2, y=3"
+      ],
+      "answer": "x=5, y=7",
+      "explanation": "Corresponding entries equal."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Matrix addition is",
+      "options": [
+        "not commutative",
+        "commutative and associative",
+        "only associative",
+        "neither"
+      ],
+      "answer": "commutative and associative",
+      "explanation": "A+B = B+A and (A+B)+C = A+(B+C)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The additive identity for matrices of a given order is the",
+      "options": [
+        "identity matrix I",
+        "zero matrix O",
+        "scalar matrix",
+        "negative matrix"
+      ],
+      "answer": "zero matrix O",
+      "explanation": "A + O = A."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The additive inverse of A = [[2, -3], [0, 5]] is",
+      "options": [
+        "[[-2, 3], [0, -5]]",
+        "[[2, 3], [0, 5]]",
+        "[[-2, -3], [0, -5]]",
+        "[[2, -3], [0, 5]]"
+      ],
+      "answer": "[[-2, 3], [0, -5]]",
+      "explanation": "-A negates every element."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[6, 5], [4, 3]] - [[1, 2], [3, 4]] equals",
+      "options": [
+        "[[5, 3], [1, -1]]",
+        "[[7, 7], [7, 7]]",
+        "[[5, 3], [-1, 1]]",
+        "[[6, 3], [1, 1]]"
+      ],
+      "answer": "[[5, 3], [1, -1]]",
+      "explanation": "Subtract corresponding elements."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[a, b], [c, d]] = [[1, 2], [3, 4]] requires",
+      "options": [
+        "a=1, b=2, c=3, d=4",
+        "a=4, b=3, c=2, d=1",
+        "a=2, b=1, c=4, d=3",
+        "a=1, b=3, c=2, d=4"
+      ],
+      "answer": "a=1, b=2, c=3, d=4",
+      "explanation": "Match each corresponding entry."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which pair of matrices CANNOT be added?",
+      "options": [
+        "two 2x2 matrices",
+        "a 2x3 and a 2x3",
+        "a 2x3 and a 3x2",
+        "two 3x3 matrices"
+      ],
+      "answer": "a 2x3 and a 3x2",
+      "explanation": "Different orders cannot be added."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The scalar multiple 3A of A = [[1, -2], [0, 4]] is",
+      "options": [
+        "[[3, -6], [0, 12]]",
+        "[[3, -2], [0, 4]]",
+        "[[1, -6], [0, 12]]",
+        "[[3, -5], [3, 7]]"
+      ],
+      "answer": "[[3, -6], [0, 12]]",
+      "explanation": "Multiply every element by 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For a scalar k, kA is obtained by",
+      "options": [
+        "adding k to each element",
+        "multiplying each element by k",
+        "multiplying only the diagonal by k",
+        "raising each element to power k"
+      ],
+      "answer": "multiplying each element by k",
+      "explanation": "Definition of scalar multiplication."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "0A, where 0 is the scalar zero, equals",
+      "options": [
+        "A",
+        "the identity matrix",
+        "the zero matrix O",
+        "-A"
+      ],
+      "answer": "the zero matrix O",
+      "explanation": "Every element becomes 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "k(A + B) equals",
+      "options": [
+        "kA + B",
+        "kA + kB",
+        "A + kB",
+        "k + A + B"
+      ],
+      "answer": "kA + kB",
+      "explanation": "Distributive over matrix addition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If A = [[2, 4], [6, 8]], then (1/2)A is",
+      "options": [
+        "[[1, 2], [3, 4]]",
+        "[[2, 4], [6, 8]]",
+        "[[4, 8], [12, 16]]",
+        "[[1, 2], [3, 8]]"
+      ],
+      "answer": "[[1, 2], [3, 4]]",
+      "explanation": "Halve every element."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(k + l)A equals",
+      "options": [
+        "kA + lA",
+        "klA",
+        "kA - lA",
+        "k(lA)"
+      ],
+      "answer": "kA + lA",
+      "explanation": "Distributive over scalar addition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If A = [[1, 1], [1, 1]] and B = [[2, 0], [0, 2]], then 2A + B is",
+      "options": [
+        "[[4, 2], [2, 4]]",
+        "[[3, 1], [1, 3]]",
+        "[[2, 2], [2, 2]]",
+        "[[4, 0], [0, 4]]"
+      ],
+      "answer": "[[4, 2], [2, 4]]",
+      "explanation": "2A = [[2,2],[2,2]]; add B."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "k(lA) is equal to",
+      "options": [
+        "(k + l)A",
+        "(kl)A",
+        "(k/l)A",
+        "(k - l)A"
+      ],
+      "answer": "(kl)A",
+      "explanation": "Associativity of scalar multiplication."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The product AB is defined only when",
+      "options": [
+        "A and B are of the same order",
+        "columns of A = rows of B",
+        "rows of A = columns of B",
+        "both are square"
+      ],
+      "answer": "columns of A = rows of B",
+      "explanation": "Conformability condition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If A is 2 x 3 and B is 3 x 4, then AB is of order",
+      "options": [
+        "2 x 4",
+        "3 x 3",
+        "4 x 2",
+        "2 x 3"
+      ],
+      "answer": "2 x 4",
+      "explanation": "m x p from m x n and n x p."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[1, 2], [3, 4]] x [[1, 0], [0, 1]] equals",
+      "options": [
+        "[[1, 2], [3, 4]]",
+        "[[0, 0], [0, 0]]",
+        "[[1, 0], [0, 1]]",
+        "[[2, 4], [6, 8]]"
+      ],
+      "answer": "[[1, 2], [3, 4]]",
+      "explanation": "Multiplying by I leaves A unchanged."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For A = [[1, 2], [3, 4]] and B = [[5, 6], [7, 8]], AB equals",
+      "options": [
+        "[[19, 22], [43, 50]]",
+        "[[5, 12], [21, 32]]",
+        "[[23, 34], [31, 46]]",
+        "[[6, 8], [10, 12]]"
+      ],
+      "answer": "[[19, 22], [43, 50]]",
+      "explanation": "Row-by-column rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If A is 3 x 2 and B is 2 x 3, the order of AB is",
+      "options": [
+        "2 x 2",
+        "3 x 3",
+        "2 x 3",
+        "3 x 2"
+      ],
+      "answer": "3 x 3",
+      "explanation": "3 x 2 times 2 x 3 = 3 x 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The (1,1) entry of the product of [[2, 1]] and [[3], [4]] is",
+      "options": [
+        "6",
+        "10",
+        "7",
+        "12"
+      ],
+      "answer": "10",
+      "explanation": "2x3 + 1x4 = 10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[1, 0], [0, 0]] x [[0, 0], [0, 1]] equals",
+      "options": [
+        "[[0, 0], [0, 0]]",
+        "[[1, 1], [0, 0]]",
+        "[[0, 1], [0, 0]]",
+        "[[1, 0], [0, 1]]"
+      ],
+      "answer": "[[0, 0], [0, 0]]",
+      "explanation": "Product is the zero matrix even though neither factor is zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The element (AB)_ij is obtained from",
+      "options": [
+        "column i of A and row j of B",
+        "row i of A and column j of B",
+        "row i of A and row j of B",
+        "column i of A and column j of B"
+      ],
+      "answer": "row i of A and column j of B",
+      "explanation": "Row-by-column rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If A is m x n, for A x A to be defined we need",
+      "options": [
+        "m = n",
+        "m > n",
+        "n = 1",
+        "no condition"
+      ],
+      "answer": "m = n",
+      "explanation": "A must be square."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[2, 0], [0, 3]] x [[1, 4], [5, 2]] equals",
+      "options": [
+        "[[2, 8], [15, 6]]",
+        "[[2, 4], [5, 6]]",
+        "[[3, 8], [15, 2]]",
+        "[[2, 8], [5, 6]]"
+      ],
+      "answer": "[[2, 8], [15, 6]]",
+      "explanation": "Row-by-column: row1=[2,8], row2=[15,6]."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The product of a 1 x 3 matrix and a 3 x 1 matrix is of order",
+      "options": [
+        "3 x 3",
+        "1 x 1",
+        "1 x 3",
+        "3 x 1"
+      ],
+      "answer": "1 x 1",
+      "explanation": "1 x 3 times 3 x 1 = 1 x 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[1, 1], [1, 1]] x [[1, 1], [1, 1]] equals",
+      "options": [
+        "[[2, 2], [2, 2]]",
+        "[[1, 1], [1, 1]]",
+        "[[4, 4], [4, 4]]",
+        "[[0, 0], [0, 0]]"
+      ],
+      "answer": "[[2, 2], [2, 2]]",
+      "explanation": "Each entry = 1x1 + 1x1 = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "HARD",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For A of order 4 x 5 and B of order 5 x 4, both AB and BA are defined with orders",
+      "options": [
+        "4x4 and 5x5",
+        "5x5 and 4x4",
+        "4x5 and 5x4",
+        "both 4x4"
+      ],
+      "answer": "4x4 and 5x5",
+      "explanation": "AB is 4x4, BA is 5x5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "[[3, 1], [2, 4]] x [[1], [2]] equals",
+      "options": [
+        "[[5], [10]]",
+        "[[4], [6]]",
+        "[[3], [8]]",
+        "[[5], [6]]"
+      ],
+      "answer": "[[5], [10]]",
+      "explanation": "3x1+1x2=5; 2x1+4x2=10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Matrix multiplication is",
+      "options": [
+        "always commutative",
+        "not commutative in general",
+        "never associative",
+        "always giving zero"
+      ],
+      "answer": "not commutative in general",
+      "explanation": "AB is generally not equal to BA."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "If AB = O (zero matrix), then",
+      "options": [
+        "A = O necessarily",
+        "B = O necessarily",
+        "A or B may still be non-zero",
+        "AB is undefined"
+      ],
+      "answer": "A or B may still be non-zero",
+      "explanation": "Matrices can be zero divisors."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which property does matrix multiplication satisfy?",
+      "options": [
+        "commutativity",
+        "associativity",
+        "AB = BA always",
+        "A^2 = O always"
+      ],
+      "answer": "associativity",
+      "explanation": "(AB)C = A(BC)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A(B + C) equals",
+      "options": [
+        "AB + AC",
+        "BA + CA",
+        "AB + C",
+        "A + BC"
+      ],
+      "answer": "AB + AC",
+      "explanation": "Left distributive law."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "For square matrices, AB and BA",
+      "options": [
+        "are always equal",
+        "may be different",
+        "are always zero",
+        "are always the identity"
+      ],
+      "answer": "may be different",
+      "explanation": "Non-commutativity."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "If A and B are such that AB is defined but BA is not, then",
+      "options": [
+        "A and B are square of the same order",
+        "A is m x n and B is n x p with m not equal to p",
+        "A = B",
+        "AB = BA"
+      ],
+      "answer": "A is m x n and B is n x p with m not equal to p",
+      "explanation": "BA needs p = m to exist."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(A + B)C equals",
+      "options": [
+        "AC + BC",
+        "CA + CB",
+        "A + BC",
+        "AC + B"
+      ],
+      "answer": "AC + BC",
+      "explanation": "Right distributive law."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For a square matrix A, A I = I A = A shows I is the",
+      "options": [
+        "additive identity",
+        "multiplicative identity",
+        "inverse of A",
+        "transpose of A"
+      ],
+      "answer": "multiplicative identity",
+      "explanation": "I plays the role of 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The transpose of a matrix is obtained by",
+      "options": [
+        "squaring each element",
+        "interchanging its rows and columns",
+        "adding the identity",
+        "changing signs"
+      ],
+      "answer": "interchanging its rows and columns",
+      "explanation": "Definition of transpose."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If A is of order 2 x 5, then A^T is of order",
+      "options": [
+        "2 x 5",
+        "5 x 2",
+        "2 x 2",
+        "5 x 5"
+      ],
+      "answer": "5 x 2",
+      "explanation": "Transpose swaps order."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "(A^T)^T equals",
+      "options": [
+        "A^T",
+        "A",
+        "-A",
+        "I"
+      ],
+      "answer": "A",
+      "explanation": "Transposing twice returns A."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The transpose of [[1, 2], [3, 4], [5, 6]] is",
+      "options": [
+        "[[1, 3, 5], [2, 4, 6]]",
+        "[[1, 2], [3, 4], [5, 6]]",
+        "[[6, 5], [4, 3], [2, 1]]",
+        "[[1, 2, 3], [4, 5, 6]]"
+      ],
+      "answer": "[[1, 3, 5], [2, 4, 6]]",
+      "explanation": "Rows become columns."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(AB)^T equals",
+      "options": [
+        "A^T B^T",
+        "B^T A^T",
+        "AB",
+        "B A"
+      ],
+      "answer": "B^T A^T",
+      "explanation": "Reversal law."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(kA)^T, where k is a scalar, equals",
+      "options": [
+        "k A^T",
+        "A^T / k",
+        "k^2 A^T",
+        "A^T"
+      ],
+      "answer": "k A^T",
+      "explanation": "Scalars pass through the transpose."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "(A + B)^T equals",
+      "options": [
+        "A^T + B^T",
+        "B^T A^T",
+        "A^T B^T",
+        "(A B)^T"
+      ],
+      "answer": "A^T + B^T",
+      "explanation": "Transpose distributes over addition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A square matrix A is symmetric if",
+      "options": [
+        "A^T = -A",
+        "A^T = A",
+        "A^T = I",
+        "A = O"
+      ],
+      "answer": "A^T = A",
+      "explanation": "Definition of symmetric matrix."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A square matrix A is skew-symmetric if",
+      "options": [
+        "A^T = A",
+        "A^T = -A",
+        "A^T = I",
+        "A^T = 2A"
+      ],
+      "answer": "A^T = -A",
+      "explanation": "Definition of skew-symmetric matrix."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Every diagonal element of a skew-symmetric matrix is",
+      "options": [
+        "1",
+        "equal to the trace",
+        "zero",
+        "negative"
+      ],
+      "answer": "zero",
+      "explanation": "a_ii = -a_ii forces a_ii = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Which matrix is symmetric?",
+      "options": [
+        "[[1, 2], [3, 4]]",
+        "[[1, 2], [2, 4]]",
+        "[[0, 2], [-2, 0]]",
+        "[[1, 2], [-2, 1]]"
+      ],
+      "answer": "[[1, 2], [2, 4]]",
+      "explanation": "a_12 = a_21 = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For any square matrix A, the matrix A + A^T is always",
+      "options": [
+        "skew-symmetric",
+        "symmetric",
+        "the identity",
+        "the zero matrix"
+      ],
+      "answer": "symmetric",
+      "explanation": "(A + A^T)^T = A^T + A."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Any square matrix can be written as the sum of a symmetric and a",
+      "options": [
+        "diagonal matrix",
+        "skew-symmetric matrix",
+        "scalar matrix",
+        "row matrix"
+      ],
+      "answer": "skew-symmetric matrix",
+      "explanation": "A = (1/2)(A+A^T) + (1/2)(A-A^T)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix of order 4 x 3 has 12 elements.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "4 x 3 = 12."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "An identity matrix is a scalar matrix with all diagonal elements equal to 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "By definition of identity matrix."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Two matrices of different orders can be equal if all their non-zero elements match.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Equality requires the same order."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Matrix addition is commutative: A + B = B + A.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Element-wise addition commutes."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For a scalar k, k(A + B) = kA + kB.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Distributive law for scalars."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The product AB is defined whenever A and B have the same number of rows.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "AB needs columns of A = rows of B."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Matrix multiplication is always commutative.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "AB is generally not equal to BA."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "If AB is the zero matrix, then at least one of A or B must be the zero matrix.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Non-zero matrices can multiply to O."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For any matrices, (AB)^T = A^T B^T.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Correct law is (AB)^T = B^T A^T."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Every diagonal entry of a skew-symmetric matrix is zero.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "a_ii = -a_ii implies a_ii = 0."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix of order m x n has ____ elements.",
+      "answer": "m x n (mn)",
+      "explanation": "Product of rows and columns."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In A = [a_ij], the subscript i denotes the ____ number.",
+      "answer": "row",
+      "explanation": "First subscript is the row."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A matrix with a single row is called a ____ matrix.",
+      "answer": "row",
+      "explanation": "Order 1 x n."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A diagonal matrix with all diagonal elements equal is called a ____ matrix.",
+      "answer": "scalar",
+      "explanation": "Definition of scalar matrix."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The matrix whose every element is zero is called the ____ matrix.",
+      "answer": "zero (null)",
+      "explanation": "Denoted O."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Two matrices are equal only if they have the same order and equal ____ elements.",
+      "answer": "corresponding",
+      "explanation": "Definition of equality."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The additive identity for matrices is the ____ matrix.",
+      "answer": "zero (null)",
+      "explanation": "A + O = A."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The scalar multiple kA is found by multiplying every ____ of A by k.",
+      "answer": "element",
+      "explanation": "Definition of scalar multiplication."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The product AB is defined only if the number of columns of A equals the number of ____ of B.",
+      "answer": "rows",
+      "explanation": "Conformability condition."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If A is 2 x 3 and B is 3 x 5, then AB has order ____.",
+      "answer": "2 x 5",
+      "explanation": "m x p = 2 x 5."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Matrix multiplication is associative but not ____.",
+      "answer": "commutative",
+      "explanation": "AB is generally not BA."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The transpose of a matrix is obtained by interchanging its rows and ____.",
+      "answer": "columns",
+      "explanation": "Definition of transpose."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "By the reversal law, (AB)^T = ____.",
+      "answer": "B^T A^T",
+      "explanation": "Order reverses."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A square matrix A is symmetric if A^T = ____.",
+      "answer": "A",
+      "explanation": "Definition of symmetric."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The symmetric part of a square matrix A is given by ____.",
+      "answer": "(1/2)(A + A^T)",
+      "explanation": "Decomposition formula."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Define the order of a matrix and give the order and number of elements of [[1, 2, 3], [4, 5, 6]].",
+      "answer": "The order of a matrix is m x n, where m is the number of rows and n the number of columns; it has mn elements. The given matrix has 2 rows and 3 columns, so its order is 2 x 3 and it has 2 x 3 = 6 elements.",
+      "explanation": "Order = rows x columns; elements = product."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Write a matrix of order 2 x 2 whose element a_ij = i + j.",
+      "answer": "a_11 = 1+1 = 2, a_12 = 1+2 = 3, a_21 = 2+1 = 3, a_22 = 2+2 = 4. So the matrix is [[2, 3], [3, 4]].",
+      "explanation": "Substitute i and j into i + j for each position."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Give one example each of a row matrix, a column matrix and a diagonal matrix.",
+      "answer": "Row matrix (order 1 x 3): [[2, -1, 5]].\nColumn matrix (order 3 x 1): [[1], [0], [4]].\nDiagonal matrix (order 2): [[3, 0], [0, 7]] (off-diagonal elements are zero).",
+      "explanation": "One valid example of each type."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Distinguish between a scalar matrix and an identity matrix.",
+      "answer": "Both are diagonal matrices (all off-diagonal elements zero). A scalar matrix has all its diagonal elements EQUAL to some number k, e.g. [[5, 0], [0, 5]]. An identity matrix is the special scalar matrix in which every diagonal element is 1, e.g. [[1, 0], [0, 1]], denoted I. So every identity matrix is a scalar matrix, but not every scalar matrix is an identity matrix.",
+      "explanation": "Scalar: equal diagonal; identity: diagonal all 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Write the upper triangular and lower triangular forms for order 3 and state their defining property.",
+      "answer": "An upper triangular matrix has all elements BELOW the principal diagonal equal to zero, e.g. [[1, 2, 3], [0, 4, 5], [0, 0, 6]].\nA lower triangular matrix has all elements ABOVE the principal diagonal equal to zero, e.g. [[1, 0, 0], [2, 4, 0], [3, 5, 6]].",
+      "explanation": "Upper: zeros below diagonal; lower: zeros above."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If [[2x, 3], [y + 1, 5]] = [[8, 3], [4, 5]], find x and y.",
+      "answer": "By equality of matrices, corresponding elements are equal:\n 2x = 8, so x = 4.\n y + 1 = 4, so y = 3.\nHence x = 4 and y = 3.",
+      "explanation": "Match entries and solve."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If A = [[1, 2], [3, 4]], B = [[2, 1], [0, 5]], find A + B and A - B.",
+      "answer": "A + B = [[1+2, 2+1], [3+0, 4+5]] = [[3, 3], [3, 9]].\nA - B = [[1-2, 2-1], [3-0, 4-5]] = [[-1, 1], [3, -1]].",
+      "explanation": "Add/subtract corresponding elements."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Verify that matrix addition is commutative for A = [[1, 0], [2, 3]] and B = [[4, 5], [1, 2]].",
+      "answer": "A + B = [[1+4, 0+5], [2+1, 3+2]] = [[5, 5], [3, 5]].\nB + A = [[4+1, 5+0], [1+2, 2+3]] = [[5, 5], [3, 5]].\nSince A + B = B + A = [[5, 5], [3, 5]], addition is commutative.",
+      "explanation": "Both sums are equal."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve for the matrix X: X + [[2, 3], [1, 4]] = [[5, 5], [6, 9]].",
+      "answer": "X = [[5, 5], [6, 9]] - [[2, 3], [1, 4]] = [[5-2, 5-3], [6-1, 9-4]] = [[3, 2], [5, 5]].",
+      "explanation": "Subtract the known matrix from both sides."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If A = [[2, -1], [3, 0]], find 3A and -2A.",
+      "answer": "3A = [[6, -3], [9, 0]] (multiply each element by 3).\n-2A = [[-4, 2], [-6, 0]] (multiply each element by -2).",
+      "explanation": "Scalar multiplies every element."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "If A = [[1, 2], [0, 1]] and B = [[3, 0], [1, 2]], compute 2A + 3B.",
+      "answer": "2A = [[2, 4], [0, 2]] and 3B = [[9, 0], [3, 6]].\n2A + 3B = [[2+9, 4+0], [0+3, 2+6]] = [[11, 4], [3, 8]].",
+      "explanation": "Scale each, then add."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Given A = [[4, 2], [6, 8]], find (1/2)A and verify that 2 x ((1/2)A) = A.",
+      "answer": "(1/2)A = [[2, 1], [3, 4]].\n2 x ((1/2)A) = 2 x [[2, 1], [3, 4]] = [[4, 2], [6, 8]] = A.\nThis illustrates k(lA) = (kl)A with k = 2, l = 1/2, giving (2 x 1/2)A = 1A = A.",
+      "explanation": "Halving then doubling returns A."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "For A = [[1, 2], [3, 4]] and B = [[2, 0], [1, 2]], find AB.",
+      "answer": "AB = [[1x2 + 2x1, 1x0 + 2x2], [3x2 + 4x1, 3x0 + 4x2]] = [[4, 4], [10, 8]].",
+      "explanation": "Row-by-column rule."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the condition for the product AB to exist and give the order of AB when A is 3 x 4 and B is 4 x 2.",
+      "answer": "AB exists only when the number of columns of A equals the number of rows of B. Here A has 4 columns and B has 4 rows, so AB exists and its order is (rows of A) x (columns of B) = 3 x 2.",
+      "explanation": "Conformability and resulting order."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Compute the product [[2, 3]] x [[4], [5]].",
+      "answer": "This is a 1 x 2 matrix times a 2 x 1 matrix, giving a 1 x 1 matrix:\n[[2x4 + 3x5]] = [[8 + 15]] = [[23]].",
+      "explanation": "Single entry 2x4 + 3x5 = 23."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "For A = [[1, -1], [2, 3]] and B = [[0, 2], [1, 1]], find AB and BA and comment.",
+      "answer": "AB = [[1x0 + (-1)x1, 1x2 + (-1)x1], [2x0 + 3x1, 2x2 + 3x1]] = [[-1, 1], [3, 7]].\nBA = [[0x1 + 2x2, 0x(-1) + 2x3], [1x1 + 1x2, 1x(-1) + 1x3]] = [[4, 6], [3, 2]].\nSince AB is not equal to BA, matrix multiplication is not commutative.",
+      "explanation": "Both products exist but differ."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Show that A = [[1, -1], [-1, 1]] and B = [[1, 1], [1, 1]] give AB = O, though neither is the zero matrix.",
+      "answer": "AB = [[1x1 + (-1)x1, 1x1 + (-1)x1], [(-1)x1 + 1x1, (-1)x1 + 1x1]] = [[0, 0], [0, 0]] = O.\nNeither A nor B is the zero matrix, yet their product is O. So AB = O does not imply A = O or B = O.",
+      "explanation": "Zero-divisor example."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Write the transpose of A = [[1, 4, -2], [3, 0, 5]] and state its order.",
+      "answer": "A is of order 2 x 3, so A^T is of order 3 x 2. Interchanging rows and columns:\nA^T = [[1, 3], [4, 0], [-2, 5]].",
+      "explanation": "Rows of A become columns of A^T."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "If A = [[2, 1], [0, 3]] and B = [[1, 4], [2, 0]], verify (A + B)^T = A^T + B^T.",
+      "answer": "A + B = [[3, 5], [2, 3]], so (A + B)^T = [[3, 2], [5, 3]].\nA^T = [[2, 0], [1, 3]], B^T = [[1, 2], [4, 0]], so A^T + B^T = [[3, 2], [5, 3]].\nBoth sides equal [[3, 2], [5, 3]], so the property holds.",
+      "explanation": "Transpose distributes over addition."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Show that A = [[3, -2, 4], [-2, 0, 1], [4, 1, 5]] is symmetric.",
+      "answer": "A is symmetric if A^T = A, i.e. a_ij = a_ji. Here a_12 = -2 = a_21, a_13 = 4 = a_31, and a_23 = 1 = a_32. All corresponding off-diagonal elements match, so A^T = A and A is symmetric.",
+      "explanation": "Check a_ij = a_ji for all i, j."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Show that A = [[0, 5, -3], [-5, 0, 2], [3, -2, 0]] is skew-symmetric.",
+      "answer": "A is skew-symmetric if A^T = -A, i.e. a_ij = -a_ji, and the diagonal elements are zero. Here the diagonal is all zeros; a_12 = 5 = -a_21, a_13 = -3 = -a_31, and a_23 = 2 = -a_32. Hence A^T = -A and A is skew-symmetric.",
+      "explanation": "Zero diagonal and a_ij = -a_ji."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Express A = [[1, 3], [5, 7]] as the sum of a symmetric and a skew-symmetric matrix.",
+      "answer": "A^T = [[1, 5], [3, 7]].\nSymmetric part P = (1/2)(A + A^T) = (1/2)[[2, 8], [8, 14]] = [[1, 4], [4, 7]].\nSkew-symmetric part Q = (1/2)(A - A^T) = (1/2)[[0, -2], [2, 0]] = [[0, -1], [1, 0]].\nP + Q = [[1, 3], [5, 7]] = A.",
+      "explanation": "Use P = (1/2)(A+A^T), Q = (1/2)(A-A^T)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Explain, with examples, what is meant by the order of a matrix and describe any four types of matrices.",
+      "answer": "The ORDER of a matrix is its size, written m x n, where m is the number of rows and n the number of columns; such a matrix has mn elements. For example, [[2, 5, 1], [0, 3, 4]] has 2 rows and 3 columns, so its order is 2 x 3 with 6 elements.\n\nFour types of matrices:\n1. Row matrix - a matrix with a single row (order 1 x n), e.g. [[3, -1, 7]].\n2. Column matrix - a matrix with a single column (order m x 1), e.g. [[2], [5], [9]].\n3. Square matrix - equal rows and columns (order n x n), e.g. [[1, 2], [3, 4]]; its elements a_11, a_22 form the principal diagonal.\n4. Diagonal matrix - a square matrix with every off-diagonal element zero, e.g. [[5, 0], [0, 2]]. (Special cases: a scalar matrix has equal diagonal entries, and the identity matrix has all diagonal entries 1.)",
+      "explanation": "Define order; describe and exemplify four types."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the properties of matrix addition and verify commutativity and the additive identity for A = [[2, 1], [3, 0]].",
+      "answer": "Properties of matrix addition (for matrices of the same order):\n1. Commutative: A + B = B + A.\n2. Associative: (A + B) + C = A + (B + C).\n3. Additive identity: A + O = A, where O is the zero matrix.\n4. Additive inverse: A + (-A) = O.\n\nVerification for A = [[2, 1], [3, 0]] with B = [[1, 4], [2, 5]]:\nA + B = [[3, 5], [5, 5]] and B + A = [[3, 5], [5, 5]], so A + B = B + A (commutative).\nAdditive identity: A + O = [[2, 1], [3, 0]] + [[0, 0], [0, 0]] = [[2, 1], [3, 0]] = A.",
+      "explanation": "List four properties and verify two."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Define scalar multiplication and prove, using A = [[1, 2], [3, 4]] and B = [[0, 1], [2, 1]], that k(A + B) = kA + kB for k = 3.",
+      "answer": "Scalar multiplication: for a scalar k and matrix A = [a_ij], kA = [k a_ij], i.e. every element is multiplied by k.\n\nWith k = 3:\nA + B = [[1, 3], [5, 5]], so k(A + B) = 3[[1, 3], [5, 5]] = [[3, 9], [15, 15]].\nkA = 3[[1, 2], [3, 4]] = [[3, 6], [9, 12]] and kB = 3[[0, 1], [2, 1]] = [[0, 3], [6, 3]].\nkA + kB = [[3+0, 6+3], [9+6, 12+3]] = [[3, 9], [15, 15]].\nSince k(A + B) = [[3, 9], [15, 15]] = kA + kB, the distributive property is verified.",
+      "explanation": "Definition plus numerical verification of distributivity."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Define matrix multiplication (conformability and the row-by-column rule) and compute AB for A = [[2, -1, 3], [0, 4, 1]] and B = [[1, 2], [0, -1], [3, 1]].",
+      "answer": "The product AB is defined only when the number of columns of A equals the number of rows of B (conformability). If A is m x n and B is n x p, then AB is m x p, and its (i, j) entry is the sum a_i1 b_1j + a_i2 b_2j + ... + a_in b_nj (row i of A combined with column j of B).\n\nHere A is 2 x 3 and B is 3 x 2, so AB is 2 x 2:\n(AB)_11 = 2x1 + (-1)x0 + 3x3 = 2 + 0 + 9 = 11.\n(AB)_12 = 2x2 + (-1)x(-1) + 3x1 = 4 + 1 + 3 = 8.\n(AB)_21 = 0x1 + 4x0 + 1x3 = 0 + 0 + 3 = 3.\n(AB)_22 = 0x2 + 4x(-1) + 1x1 = 0 - 4 + 1 = -3.\nSo AB = [[11, 8], [3, -3]].",
+      "explanation": "Rule plus a full 2x3 by 3x2 computation."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Show that matrix multiplication is not commutative and that AB = O need not imply A = O or B = O, using suitable 2 x 2 examples.",
+      "answer": "Non-commutativity: let A = [[1, 2], [3, 4]] and B = [[0, 1], [1, 0]].\nAB = [[1x0 + 2x1, 1x1 + 2x0], [3x0 + 4x1, 3x1 + 4x0]] = [[2, 1], [4, 3]].\nBA = [[0x1 + 1x3, 0x2 + 1x4], [1x1 + 0x3, 1x2 + 0x4]] = [[3, 4], [1, 2]].\nSince AB is not equal to BA, multiplication is not commutative.\n\nZero product of non-zero matrices: let C = [[1, 0], [0, 0]] and D = [[0, 0], [0, 1]].\nCD = [[1x0 + 0x0, 1x0 + 0x1], [0x0 + 0x0, 0x0 + 0x1]] = [[0, 0], [0, 0]] = O.\nNeither C nor D is the zero matrix, yet CD = O. Hence AB = O does not force A = O or B = O.",
+      "explanation": "Two counterexamples covering both properties."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Define the transpose of a matrix, list its four main properties, and verify the reversal law (AB)^T = B^T A^T for A = [[1, 2], [0, 1]] and B = [[3, 1], [2, 4]].",
+      "answer": "The transpose A^T is obtained by interchanging the rows and columns of A; if A is m x n then A^T is n x m, with (A^T)_ij = a_ji.\nProperties: (1) (A^T)^T = A; (2) (A + B)^T = A^T + B^T; (3) (kA)^T = k A^T; (4) (AB)^T = B^T A^T (reversal law).\n\nVerification:\nAB = [[1x3 + 2x2, 1x1 + 2x4], [0x3 + 1x2, 0x1 + 1x4]] = [[7, 9], [2, 4]].\n(AB)^T = [[7, 2], [9, 4]].\nA^T = [[1, 0], [2, 1]], B^T = [[3, 2], [1, 4]].\nB^T A^T = [[3x1 + 2x2, 3x0 + 2x1], [1x1 + 4x2, 1x0 + 4x1]] = [[7, 2], [9, 4]].\nSince (AB)^T = [[7, 2], [9, 4]] = B^T A^T, the reversal law holds.",
+      "explanation": "Definition, properties, and numerical check of reversal law."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "Prove that every square matrix A can be written uniquely as the sum of a symmetric and a skew-symmetric matrix, and illustrate with A = [[2, 4], [6, 8]].",
+      "answer": "Let A be any square matrix and consider P = (1/2)(A + A^T) and Q = (1/2)(A - A^T). Then A = P + Q.\nP is symmetric: P^T = (1/2)(A + A^T)^T = (1/2)(A^T + A) = P.\nQ is skew-symmetric: Q^T = (1/2)(A - A^T)^T = (1/2)(A^T - A) = -Q.\nSo A is the sum of a symmetric matrix P and a skew-symmetric matrix Q. Uniqueness follows because if A = P' + Q' with P' symmetric and Q' skew-symmetric, then A^T = P' - Q', giving P' = (1/2)(A + A^T) and Q' = (1/2)(A - A^T).\n\nIllustration: A = [[2, 4], [6, 8]], A^T = [[2, 6], [4, 8]].\nP = (1/2)(A + A^T) = (1/2)[[4, 10], [10, 16]] = [[2, 5], [5, 8]] (symmetric).\nQ = (1/2)(A - A^T) = (1/2)[[0, -2], [2, 0]] = [[0, -1], [1, 0]] (skew-symmetric).\nP + Q = [[2, 4], [6, 8]] = A.",
+      "explanation": "General proof plus a worked 2x2 illustration."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Given A = [[1, 2], [3, 4]], compute A^2 = A A and (A^T)^2, and check whether A^2 is symmetric.",
+      "answer": "A^2 = A A = [[1x1 + 2x3, 1x2 + 2x4], [3x1 + 4x3, 3x2 + 4x4]] = [[7, 10], [15, 22]].\nA^T = [[1, 3], [2, 4]], so (A^T)^2 = A^T A^T = [[1x1 + 3x2, 1x3 + 3x4], [2x1 + 4x2, 2x3 + 4x4]] = [[7, 15], [10, 22]].\nIs A^2 symmetric? Its transpose is [[7, 15], [10, 22]], which is not equal to A^2 = [[7, 10], [15, 22]] (since 10 is not 15). So A^2 is NOT symmetric. Note also that (A^2)^T = [[7, 15], [10, 22]] = (A^T)^2, illustrating (A A)^T = A^T A^T.",
+      "explanation": "Compute powers and test symmetry."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A school records the marks of two students in three subjects (Maths, Science, English) in a table. Student P scored 80, 75, 90 and student Q scored 70, 85, 60. This data is stored as a matrix M = [[80, 75, 90], [70, 85, 60]], where each row is a student and each column a subject.\n\n(a) What is the order of M? (b) What does the element M_13 represent and what is its value? (c) Which student scored higher in Science, and how do you read this from M?",
+      "answer": "(a) M has 2 rows and 3 columns, so its order is 2 x 3.\n(b) M_13 is the entry in row 1, column 3 - student P's marks in English - which is 90.\n(c) Science is the 2nd column: M_12 = 75 (P) and M_22 = 85 (Q). Student Q scored higher in Science (85 vs 75), read from the second column of M.",
+      "explanation": "Interpret order and elements in context."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A shop sells pens and notebooks at two branches. The morning sales are A = [[10, 5], [8, 6]] and the afternoon sales are B = [[7, 9], [4, 3]], where rows are branches and columns are the two items (pens, notebooks).\n\n(a) Find the total sales matrix for the day. (b) By how many units do the two branches differ in pen sales for the whole day? (c) What operation on matrices did you use in part (a) and what is its requirement?",
+      "answer": "(a) Total = A + B = [[10+7, 5+9], [8+4, 6+3]] = [[17, 14], [12, 9]].\n(b) Pens are column 1: branch 1 sold 17, branch 2 sold 12, a difference of 17 - 12 = 5 pens.\n(c) Matrix addition was used; it requires both matrices to be of the same order (here both are 2 x 2), and it is done element by element.",
+      "explanation": "Addition of same-order matrices in a real context."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A bakery's production of two cakes (rows) uses ingredients in the matrix A = [[2, 1], [1, 3]] (per unit). The bakery decides to triple production for a festival.\n\n(a) Write the matrix that gives the ingredients needed at tripled production. (b) Which matrix operation is this? (c) State one property this operation satisfies with respect to matrix addition.",
+      "answer": "(a) Tripling multiplies every element by 3: 3A = [[6, 3], [3, 9]].\n(b) This is scalar multiplication of a matrix (by the scalar k = 3).\n(c) Scalar multiplication is distributive over matrix addition: k(A + B) = kA + kB (also (k + l)A = kA + lA).",
+      "explanation": "Scalar multiplication in context and its property."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Two matrices A = [[1, 2], [3, 4]] (order 2 x 2) and B = [[5, 6, 7], [8, 9, 10]] (order 2 x 3) are given to a student, who is asked about forming products.\n\n(a) Is AB defined? If so, what is its order? (b) Is BA defined? Give a reason. (c) State the general rule that decides when a matrix product exists.",
+      "answer": "(a) A is 2 x 2 and B is 2 x 3. Columns of A (2) = rows of B (2), so AB is defined and has order 2 x 3.\n(b) BA would need columns of B (3) to equal rows of A (2). Since 3 is not 2, BA is NOT defined.\n(c) A product PQ exists only when the number of columns of P equals the number of rows of Q; the product then has order (rows of P) x (columns of Q).",
+      "explanation": "Conformability decisions and rule."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "A student computes AB and BA for A = [[1, 0], [1, 1]] and B = [[1, 2], [0, 1]] and is surprised the answers differ.\n\n(a) Compute AB. (b) Compute BA. (c) What important property of matrix multiplication does the comparison demonstrate?",
+      "answer": "(a) AB = [[1x1 + 0x0, 1x2 + 0x1], [1x1 + 1x0, 1x2 + 1x1]] = [[1, 2], [1, 3]].\n(b) BA = [[1x1 + 2x1, 1x0 + 2x1], [0x1 + 1x1, 0x0 + 1x1]] = [[3, 2], [1, 1]].\n(c) Since AB = [[1, 2], [1, 3]] is not equal to BA = [[3, 2], [1, 1]], matrix multiplication is NOT commutative in general.",
+      "explanation": "Demonstrates non-commutativity."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "A transformation in computer graphics is stored as a matrix A = [[0, 1], [-1, 0]] and applied to a point vector v = [[2], [3]] by computing Av.\n\n(a) Compute Av. (b) Find A^T. (c) Is A symmetric, skew-symmetric, or neither? Justify.",
+      "answer": "(a) Av = [[0x2 + 1x3], [(-1)x2 + 0x3]] = [[3], [-2]].\n(b) A^T = [[0, -1], [1, 0]].\n(c) A^T = [[0, -1], [1, 0]] = -A (since -A = [[0, -1], [1, 0]]). As A^T = -A, matrix A is skew-symmetric. Its diagonal entries are both zero, consistent with a skew-symmetric matrix.",
+      "explanation": "Product, transpose, and classification."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "A matrix A = [[3, 1], [2, 4]] represents a linear map. Its transpose arises when working with related maps.\n\n(a) Write A^T. (b) Verify (A^T)^T = A. (c) If B = [[1, 0], [5, 2]], state the order of (AB)^T and the rule you would use to compute it without multiplying out.",
+      "answer": "(a) A^T = [[3, 2], [1, 4]].\n(b) (A^T)^T interchanges rows and columns of A^T = [[3, 2], [1, 4]], giving [[3, 1], [2, 4]] = A. Verified.\n(c) AB is 2 x 2, so (AB)^T is also 2 x 2. By the reversal law, (AB)^T = B^T A^T, so one can transpose B and A and multiply in reversed order rather than transposing the product.",
+      "explanation": "Transpose properties and reversal law."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "A logistics company stores the distances (in km) between three depots as a matrix D, where D_ij is the distance from depot i to depot j. Since the distance from i to j equals the distance from j to i, and the distance from a depot to itself is 0, D = [[0, 12, 7], [12, 0, 9], [7, 9, 0]].\n\n(a) What is the order of D? (b) Is D symmetric? Justify using the definition. (c) Why must the diagonal of D be all zeros in this situation?",
+      "answer": "(a) D has 3 rows and 3 columns, so its order is 3 x 3.\n(b) D is symmetric because D^T = D: the off-diagonal entries satisfy D_12 = D_21 = 12, D_13 = D_31 = 7, D_23 = D_32 = 9. Since distance from i to j equals distance from j to i, D_ij = D_ji, which is the definition of a symmetric matrix.\n(c) The diagonal entry D_ii is the distance from a depot to itself, which is 0; hence every diagonal element is zero.",
+      "explanation": "Symmetry from a distance table."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A teacher writes A = [[x, 3], [4, y]] and B = [[2, 3], [4, 7]] on the board and tells the class that A = B.\n\n(a) Using equality of matrices, find x and y. (b) State the two conditions required for two matrices to be equal. (c) If instead B were of order 2 x 3, could A = B hold? Explain.",
+      "answer": "(a) Equality gives corresponding elements equal: x = 2 and y = 7 (the entries 3 and 4 already match).\n(b) Two matrices are equal if and only if (i) they have the same order, and (ii) their corresponding elements are equal.\n(c) No. If B were 2 x 3 and A is 2 x 2, their orders differ, so A = B can never hold regardless of the element values.",
+      "explanation": "Equality conditions and unknowns."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-MTX-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "A nutritionist arranges the protein and carbohydrate content of two foods as A = [[4, 20], [8, 15]] (rows: foods, columns: protein g, carbs g). A meal uses 2 units of food 1 and 3 units of food 2, stored as a row matrix q = [[2, 3]].\n\n(a) State the order of q and of A. (b) Compute the total nutrient row matrix qA. (c) Interpret the two entries of qA.",
+      "answer": "(a) q is of order 1 x 2 and A is of order 2 x 2.\n(b) qA is 1 x 2: qA = [[2x4 + 3x8, 2x20 + 3x15]] = [[8 + 24, 40 + 45]] = [[32, 85]].\n(c) The first entry 32 is the total protein (in grams) in the meal, and the second entry 85 is the total carbohydrate (in grams), obtained by combining the amounts of each food with their nutrient contents.",
+      "explanation": "Row matrix times matrix to combine quantities."
+    }
+  ]
+}
