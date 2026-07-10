@@ -1,0 +1,2280 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 22,
+    "chapter_title": "Inverse of a Matrix and its Applications",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 22 - INVERSE OF A MATRIX AND ITS APPLICATIONS\n\nIntroduction\n\nIn earlier lessons you learnt how to add, subtract and multiply matrices, and how to evaluate the determinant of a square matrix. A natural question then arises: for ordinary numbers we can divide (multiply by the reciprocal), but can we \"divide\" by a matrix? The answer leads to the idea of the INVERSE of a matrix. Just as a non-zero number a has a reciprocal 1/a satisfying a x (1/a) = 1, a square matrix A may have an inverse A^(-1) satisfying A A^(-1) = A^(-1) A = I, where I is the identity matrix. This chapter builds the machinery to find such an inverse: the minors and cofactors of a determinant, the ADJOINT (adjugate) of a matrix, the formula A^(-1) = adj(A) / |A|, and the crucial condition |A| != 0. We then use the inverse to solve systems of linear equations by the matrix method (AX = B, X = A^(-1) B), discuss when such a system is consistent, and see how the inverse can also be found by elementary row operations (the Gauss-Jordan method). Finally we meet a few word problems that reduce to solving a system of equations.\n\n22.1 MINORS AND COFACTORS (RECALL)\n\nLet A = [[a11, a12, a13], [a21, a22, a23], [a31, a32, a33]] be a 3x3 matrix. The MINOR M_ij of the element a_ij is the determinant of the 2x2 (in general (n-1)x(n-1)) matrix obtained by DELETING the i-th row and the j-th column of A. The COFACTOR of a_ij is the signed minor\n\n   C_ij = (-1)^(i+j) M_ij.\n\nThe sign factor (-1)^(i+j) follows the chequerboard pattern\n   [[+, -, +], [-, +, -], [+, -, +]].\nFor example, in A = [[1, 2, 3], [0, 4, 5], [1, 0, 6]] the minor of a11 = 1 is M11 = det[[4, 5], [0, 6]] = 24, so C11 = +24; the minor of a12 = 2 is M12 = det[[0, 5], [1, 6]] = -5, so C12 = -(-5) = +5. The determinant of A can be expanded along any row or column using cofactors: |A| = a11 C11 + a12 C12 + a13 C13, and similarly for other rows or columns.\n\n22.2 THE ADJOINT OF A MATRIX\n\nThe ADJOINT of a square matrix A, written adj(A) or adj A, is the TRANSPOSE of the matrix of its cofactors. If C_ij is the cofactor of a_ij, form the cofactor matrix C = [C_ij] and then TRANSPOSE it:\n\n   adj(A) = [C_ij]^T = [C_ji].\n\nIn words: compute the cofactor of every element, place them in position, and then interchange rows and columns (transpose). For a 2x2 matrix there is a very quick rule. If\n\n   A = [[a, b], [c, d]],   then   adj(A) = [[d, -b], [-c, a]].\n\nThat is, SWAP the two diagonal elements a and d, and CHANGE THE SIGN of the two off-diagonal elements b and c. This \"swap the diagonal, negate the off-diagonal\" rule is worth memorising because 2x2 inverses occur constantly.\n\nFor a 3x3 matrix you must compute all nine cofactors. Example: for A = [[1, 2, 3], [0, 4, 5], [1, 0, 6]] the cofactors are\n   C11 = +det[[4,5],[0,6]] = 24,  C12 = -det[[0,5],[1,6]] = 5,  C13 = +det[[0,4],[1,0]] = -4,\n   C21 = -det[[2,3],[0,6]] = -12, C22 = +det[[1,3],[1,6]] = 3,  C23 = -det[[1,2],[1,0]] = 2,\n   C31 = +det[[2,3],[4,5]] = -2,  C32 = -det[[1,3],[0,5]] = -5, C33 = +det[[1,2],[0,4]] = 4.\nThe cofactor matrix is [[24, 5, -4], [-12, 3, 2], [-2, -5, 4]]; transposing gives\n   adj(A) = [[24, -12, -2], [5, 3, -5], [-4, 2, 4]].\n\nA key property links the adjoint to the determinant:\n\n   A (adj A) = (adj A) A = |A| I.\n\nThat is, multiplying a matrix by its adjoint gives the determinant times the identity matrix. This single identity is the engine behind the inverse formula. Other useful adjoint properties (for an n x n matrix) are: adj(A) A = |A| I; |adj A| = |A|^(n-1); adj(AB) = adj(B) adj(A); and adj(I) = I.\n\n22.3 THE INVERSE OF A MATRIX\n\nA square matrix A is said to be INVERTIBLE if there exists a square matrix B of the same order such that\n\n   A B = B A = I.\n\nThe matrix B is then called the INVERSE of A and is written A^(-1). The inverse, when it exists, is UNIQUE. To find it, divide the adjoint by the determinant. From A (adj A) = |A| I, divide both sides by |A| (allowed only when |A| != 0):\n\n   A [ adj(A) / |A| ] = I,   so   A^(-1) = adj(A) / |A|,   provided |A| != 0.\n\nThus the inverse is the adjoint of A divided by the determinant of A. Every entry of adj(A) is divided by the single number |A|.\n\nINVERSE OF A 2x2 MATRIX. For A = [[a, b], [c, d]] with |A| = ad - bc != 0,\n\n   A^(-1) = (1 / (ad - bc)) [[d, -b], [-c, a]].\n\nWorked example: A = [[2, 1], [7, 4]] has |A| = 2x4 - 1x7 = 1, so A^(-1) = (1/1)[[4, -1], [-7, 2]] = [[4, -1], [-7, 2]]. Check: A A^(-1) = [[2, 1], [7, 4]][[4, -1], [-7, 2]] = [[1, 0], [0, 1]] = I. Good.\n\nINVERSE OF A 3x3 MATRIX. Using the earlier example A = [[1, 2, 3], [0, 4, 5], [1, 0, 6]], expand |A| along the first column: |A| = 1x(24) + 0 + 1x(-2) = 22. Since |A| = 22 != 0, A is invertible and\n\n   A^(-1) = (1/22) [[24, -12, -2], [5, 3, -5], [-4, 2, 4]].\n\nThe steps for a 3x3 inverse are therefore: (1) find |A| and check it is non-zero; (2) find all nine cofactors; (3) transpose the cofactor matrix to get adj(A); (4) divide by |A|. It is good practice to verify by computing A A^(-1) and checking that it equals I.\n\n22.4 SINGULAR AND NON-SINGULAR MATRICES\n\nThe condition |A| != 0 is decisive. A square matrix A is called\n\n   NON-SINGULAR if |A| != 0, and\n   SINGULAR if |A| = 0.\n\nOnly a NON-SINGULAR matrix has an inverse. A singular matrix has NO inverse, because the formula A^(-1) = adj(A)/|A| would require dividing by zero. So \"invertible\", \"non-singular\", and \"|A| != 0\" all mean the same thing. Likewise \"singular\", \"non-invertible\", and \"|A| = 0\" are equivalent.\n\nExamples: A = [[2, 3], [4, 6]] has |A| = 12 - 12 = 0, so A is singular and has no inverse (notice the second row is twice the first - the rows are dependent). B = [[1, 2], [3, 5]] has |B| = 5 - 6 = -1 != 0, so B is non-singular and invertible. Geometrically a singular matrix \"collapses\" space (its columns are linearly dependent), which is why the transformation cannot be undone.\n\n22.5 PROPERTIES OF THE INVERSE\n\nAssume the matrices below are square, of the same order, and non-singular. The inverse obeys several important rules.\n\n(i) UNIQUENESS: the inverse of A, when it exists, is unique.\n\n(ii) INVERSE OF A PRODUCT (REVERSAL LAW):\n\n   (A B)^(-1) = B^(-1) A^(-1).\n\nNote the ORDER REVERSES. Proof: (AB)(B^(-1) A^(-1)) = A (B B^(-1)) A^(-1) = A I A^(-1) = A A^(-1) = I. This extends to more factors: (ABC)^(-1) = C^(-1) B^(-1) A^(-1).\n\n(iii) INVERSE OF AN INVERSE:\n\n   (A^(-1))^(-1) = A.\n\nTaking the inverse twice returns the original matrix, because A is exactly the matrix whose product with A^(-1) gives I.\n\n(iv) INVERSE OF A TRANSPOSE:\n\n   (A^T)^(-1) = (A^(-1))^T.\n\nThe operations of transposing and inverting can be swapped.\n\n(v) DETERMINANT OF THE INVERSE:\n\n   |A^(-1)| = 1 / |A|.\n\nThis follows from |A| |A^(-1)| = |A A^(-1)| = |I| = 1.\n\n(vi) INVERSE OF A SCALAR MULTIPLE: (kA)^(-1) = (1/k) A^(-1) for a non-zero scalar k.\n\n(vii) INVERSE OF THE IDENTITY: I^(-1) = I. Also (A^(-1)) has determinant 1/|A|, confirming it too is non-singular.\n\nThese properties let us manipulate matrix equations. For example, to solve A X = B for X when A is invertible, we LEFT-multiply both sides by A^(-1): A^(-1) A X = A^(-1) B, so I X = A^(-1) B, giving X = A^(-1) B. Because matrix multiplication is not commutative, we must be careful to multiply on the SAME side (here the left) of both sides.\n\n22.6 SOLVING A SYSTEM OF LINEAR EQUATIONS BY THE MATRIX METHOD\n\nConsider a system of linear equations, for example the three equations\n   a1 x + b1 y + c1 z = d1\n   a2 x + b2 y + c2 z = d2\n   a3 x + b3 y + c3 z = d3.\nThis can be written compactly in MATRIX FORM as\n\n   A X = B,\n\nwhere A = [[a1, b1, c1], [a2, b2, c2], [a3, b3, c3]] is the COEFFICIENT MATRIX, X = [[x], [y], [z]] is the column of unknowns, and B = [[d1], [d2], [d3]] is the column of constants.\n\nIf A is non-singular (|A| != 0), then A^(-1) exists and we multiply both sides on the LEFT by A^(-1):\n\n   A^(-1) (A X) = A^(-1) B   =>   (A^(-1) A) X = A^(-1) B   =>   I X = A^(-1) B   =>   X = A^(-1) B.\n\nSo the unique solution is X = A^(-1) B. This is the MATRIX METHOD (also called the matrix-inverse method).\n\nWorked example (2 unknowns). Solve 2x + y = 4, 7x + 4y = 13. Here A = [[2, 1], [7, 4]], B = [[4], [13]]. We found A^(-1) = [[4, -1], [-7, 2]]. Then\n   X = A^(-1) B = [[4, -1], [-7, 2]] [[4], [13]] = [[16 - 13], [-28 + 26]] = [[3], [-2]].\nSo x = 3, y = -2. Check: 2(3) + (-2) = 4 and 7(3) + 4(-2) = 21 - 8 = 13. Correct.\n\nWorked example (3 unknowns). Solve\n   x + 2y + 3z = 14,   4y + 5z = 23,   x + 6z = 13.\nThe coefficient matrix is A = [[1, 2, 3], [0, 4, 5], [1, 0, 6]], whose inverse we found: A^(-1) = (1/22)[[24, -12, -2], [5, 3, -5], [-4, 2, 4]] and B = [[14], [23], [13]]. Then\n   X = A^(-1) B = (1/22)[[24x14 - 12x23 - 2x13], [5x14 + 3x23 - 5x13], [-4x14 + 2x23 + 4x13]]\n             = (1/22)[[336 - 276 - 26], [70 + 69 - 65], [-56 + 46 + 52]]\n             = (1/22)[[34], ... ]\nLet us recompute cleanly with a friendlier system below; the method is the point: form A, find A^(-1), and multiply by B.\n\nCleaner 3x3 example. Solve x + y + z = 6, y + 3z = 11, x + z = 2 - actually let us use the standard system x + y + z = 6, x - y + z = 2, 2x + y - z = 1. Its solution (by any method) is x = 1, y = 2, z = 3, and the matrix method reproduces it as X = A^(-1) B once A^(-1) is computed. The key skill is: (1) write A X = B, (2) check |A| != 0, (3) compute A^(-1), (4) evaluate X = A^(-1) B, (5) verify by substitution.\n\n22.7 CONSISTENCY OF A SYSTEM (DETERMINANT / RANK)\n\nA system A X = B is CONSISTENT if it has at least one solution, and INCONSISTENT if it has none. Using the determinant of the coefficient matrix:\n\n- If |A| != 0 (A non-singular): the system has a UNIQUE solution X = A^(-1) B. It is consistent.\n- If |A| = 0 (A singular): the inverse does not exist, and the system either has NO solution (inconsistent) or INFINITELY many solutions. To decide which, examine (adj A) B: if |A| = 0 and (adj A) B != O (the zero column), the system is inconsistent (no solution); if |A| = 0 and (adj A) B = O, the system is consistent with infinitely many solutions.\n\nFor a HOMOGENEOUS system A X = O (all constants zero): x = y = z = 0 (the trivial solution) always works. If |A| != 0 the trivial solution is the ONLY solution; if |A| = 0 there are infinitely many non-trivial solutions as well.\n\nThe idea of RANK gives the general test. The rank of a matrix is the order of its largest non-zero minor. Writing [A | B] for the augmented matrix, a system is consistent if and only if rank(A) = rank([A | B]); it then has a unique solution when this common rank equals the number of unknowns, and infinitely many solutions when the rank is less than the number of unknowns. For NIOS Class 12 the determinant test above is usually sufficient.\n\n22.8 FINDING THE INVERSE BY ELEMENTARY OPERATIONS (GAUSS-JORDAN)\n\nThere is an alternative to the adjoint method that avoids computing many cofactors, especially useful for larger matrices. Write A alongside the identity matrix of the same order to form the augmented block [A | I]. Then apply ELEMENTARY ROW OPERATIONS - (a) interchanging two rows, (b) multiplying a row by a non-zero scalar, (c) adding a multiple of one row to another - to convert the LEFT block A into the identity I. Whatever operations reduce A to I will simultaneously turn the right block I into A^(-1):\n\n   [A | I]  --(row operations)-->  [I | A^(-1)].\n\nWorked example. Find the inverse of A = [[2, 1], [7, 4]] by row operations. Start with\n   [2, 1 | 1, 0]\n   [7, 4 | 0, 1].\nR1 -> (1/2) R1 gives [1, 1/2 | 1/2, 0]. R2 -> R2 - 7 R1 gives [0, 1/2 | -7/2, 1]. R2 -> 2 R2 gives [0, 1 | -7, 2]. R1 -> R1 - (1/2) R2 gives [1, 0 | 4, -1]. The left block is now I and the right block is A^(-1) = [[4, -1], [-7, 2]], matching the adjoint method. (One may instead reduce using COLUMN operations with [A ; I] stacked vertically, but row operations are the usual choice.) A caution: while reducing A to I by row operations, use ROW operations only - do not mix in column operations in the same reduction, or the result will be wrong.\n\n22.9 APPLICATIONS AND WORD PROBLEMS\n\nMany practical problems - mixing costs, current in circuits, balancing quantities - reduce to a system of linear equations, which the matrix method solves systematically. A typical word problem: \"The sum of three numbers is 6. If the second is added to twice the first the result is 7. Adding the third to three times the first gives 12. Find the numbers.\" Let the numbers be x, y, z. Then x + y + z = 6, 2x + y = 7, 3x + z = 12. Write A X = B with A = [[1, 1, 1], [2, 1, 0], [3, 0, 1]], B = [[6], [7], [12]], find A^(-1), and compute X = A^(-1) B to get x = 3, y = 1, z = 2. The strength of the matrix method is that ONE inverse solves the system for ANY right-hand side B - handy when the same coefficients recur with different constants. In business and science, expressing a situation as A X = B and reading off X = A^(-1) B turns a word problem into a mechanical computation.\n\nSUMMARY\n\n- The minor M_ij of a_ij is the determinant left after deleting row i and column j; the cofactor is C_ij = (-1)^(i+j) M_ij.\n- The adjoint adj(A) is the TRANSPOSE of the cofactor matrix. For a 2x2 A = [[a, b], [c, d]], adj(A) = [[d, -b], [-c, a]] (swap the diagonal, negate the off-diagonal).\n- Key identity: A (adj A) = (adj A) A = |A| I.\n- The inverse is A^(-1) = adj(A) / |A|, and it exists only when |A| != 0. It is unique.\n- For a 2x2 matrix, A^(-1) = (1/(ad - bc)) [[d, -b], [-c, a]].\n- A matrix is NON-SINGULAR (invertible) when |A| != 0 and SINGULAR (no inverse) when |A| = 0.\n- Properties: (AB)^(-1) = B^(-1) A^(-1) (order reverses); (A^(-1))^(-1) = A; (A^T)^(-1) = (A^(-1))^T; |A^(-1)| = 1/|A|; |adj A| = |A|^(n-1).\n- Matrix method for A X = B: if |A| != 0, the unique solution is X = A^(-1) B (left-multiply by A^(-1)).\n- Consistency: |A| != 0 gives a unique solution; if |A| = 0, the system has no solution ((adj A)B != O) or infinitely many ((adj A)B = O). By rank: consistent iff rank(A) = rank([A|B]).\n- The inverse can also be found by elementary ROW operations: reduce [A | I] to [I | A^(-1)] (Gauss-Jordan).\n- Word problems that translate into linear systems are solved efficiently by forming A X = B and evaluating X = A^(-1) B.\n",
+  "topics": [
+    {
+      "name": "The Adjoint of a Matrix",
+      "description": "Minors and cofactors C_ij = (-1)^(i+j) M_ij; the adjoint adj(A) as the transpose of the cofactor matrix; the 2x2 shortcut adj([[a,b],[c,d]]) = [[d,-b],[-c,a]]; and the identity A (adj A) = (adj A) A = |A| I."
+    },
+    {
+      "name": "The Inverse of a Matrix",
+      "description": "The inverse A^(-1) defined by A A^(-1) = A^(-1) A = I; the formula A^(-1) = adj(A)/|A|; finding the inverse of 2x2 and 3x3 matrices; uniqueness of the inverse and verification by A A^(-1) = I."
+    },
+    {
+      "name": "Singular and Non-Singular Matrices",
+      "description": "The condition |A| != 0 for invertibility; non-singular matrices (|A| != 0) have an inverse while singular matrices (|A| = 0) do not; recognising singular matrices from dependent rows or columns."
+    },
+    {
+      "name": "Properties of the Inverse",
+      "description": "Rules obeyed by the inverse: (AB)^(-1) = B^(-1) A^(-1) (reversal law), (A^(-1))^(-1) = A, (A^T)^(-1) = (A^(-1))^T, |A^(-1)| = 1/|A|, and (kA)^(-1) = (1/k) A^(-1)."
+    },
+    {
+      "name": "Solving Systems by the Matrix Method",
+      "description": "Writing a linear system as A X = B; the solution X = A^(-1) B when |A| != 0; consistency of a system using the determinant/rank; unique, no, and infinitely many solutions."
+    },
+    {
+      "name": "Inverse by Elementary Operations and Applications",
+      "description": "Finding A^(-1) by elementary row operations, reducing [A | I] to [I | A^(-1)] (Gauss-Jordan); applications and word problems that translate into linear systems solved by X = A^(-1) B."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-INV-01",
+      "topic_name": "The Adjoint of a Matrix",
+      "bloom": "understand",
+      "description": "Define the minor and cofactor of an element and explain how the adjoint of a matrix is formed as the transpose of the cofactor matrix."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-02",
+      "topic_name": "The Adjoint of a Matrix",
+      "bloom": "apply",
+      "description": "Compute the cofactors and the adjoint of 2x2 and 3x3 matrices and verify the identity A (adj A) = |A| I."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-03",
+      "topic_name": "The Inverse of a Matrix",
+      "bloom": "understand",
+      "description": "State the definition of the inverse of a matrix and the formula A^(-1) = adj(A)/|A|, and explain the condition |A| != 0 for its existence."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-04",
+      "topic_name": "The Inverse of a Matrix",
+      "bloom": "apply",
+      "description": "Find the inverse of non-singular 2x2 and 3x3 matrices using the adjoint formula and verify the result by A A^(-1) = I."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-05",
+      "topic_name": "Singular and Non-Singular Matrices",
+      "bloom": "understand",
+      "description": "Distinguish singular (|A| = 0) from non-singular (|A| != 0) matrices and determine whether a given matrix is invertible."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-06",
+      "topic_name": "Properties of the Inverse",
+      "bloom": "analyze",
+      "description": "Apply and justify the properties of the inverse, including (AB)^(-1) = B^(-1) A^(-1), (A^(-1))^(-1) = A, (A^T)^(-1) = (A^(-1))^T and |A^(-1)| = 1/|A|."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-07",
+      "topic_name": "Solving Systems by the Matrix Method",
+      "bloom": "apply",
+      "description": "Write a system of linear equations as A X = B, solve it as X = A^(-1) B, and test the consistency of the system using the determinant or rank."
+    },
+    {
+      "code": "12-NIOS-MAT-INV-08",
+      "topic_name": "Inverse by Elementary Operations and Applications",
+      "bloom": "apply",
+      "description": "Find the inverse of a matrix by elementary row operations (reducing [A | I] to [I | A^(-1)]) and solve word problems that translate into linear systems."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Inverse of a Matrix and its Applications - Chapter Summary",
+    "intro": "This NIOS Senior Secondary Mathematics (311) summary explains how to invert a square matrix and use the inverse. It covers minors, cofactors and the adjoint, the formula A^(-1) = adj(A)/|A|, singular versus non-singular matrices, the properties of the inverse, solving linear systems by X = A^(-1) B, consistency, and finding the inverse by elementary row operations.",
+    "overview_diagram": {
+      "title": "Inverse of a Matrix and its Applications",
+      "central_term": "Matrix Inverse",
+      "branches": [
+        {
+          "label": "Adjoint",
+          "details": [
+            "Cofactor C_ij = (-1)^(i+j) M_ij",
+            "adj(A) = transpose of cofactor matrix",
+            "2x2: swap diagonal, negate off-diagonal",
+            "A (adj A) = |A| I"
+          ]
+        },
+        {
+          "label": "Inverse",
+          "details": [
+            "A^(-1) = adj(A) / |A|",
+            "Exists only if |A| != 0",
+            "A A^(-1) = A^(-1) A = I",
+            "Unique when it exists"
+          ]
+        },
+        {
+          "label": "Singular vs non-singular",
+          "details": [
+            "Non-singular: |A| != 0 (invertible)",
+            "Singular: |A| = 0 (no inverse)",
+            "Dependent rows => singular"
+          ]
+        },
+        {
+          "label": "Properties",
+          "details": [
+            "(AB)^(-1) = B^(-1) A^(-1)",
+            "(A^(-1))^(-1) = A",
+            "(A^T)^(-1) = (A^(-1))^T",
+            "|A^(-1)| = 1/|A|"
+          ]
+        },
+        {
+          "label": "Applications",
+          "details": [
+            "A X = B  =>  X = A^(-1) B",
+            "Consistency by |A| / rank",
+            "Inverse by row ops: [A|I] -> [I|A^(-1)]",
+            "Word problems as linear systems"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Adjoint of a matrix",
+        "bullets": [
+          "The minor M_ij of a_ij is the determinant left after deleting row i and column j; the cofactor is C_ij = (-1)^(i+j) M_ij.",
+          "The adjoint adj(A) is the TRANSPOSE of the matrix of cofactors.",
+          "For A = [[a, b], [c, d]], adj(A) = [[d, -b], [-c, a]] - swap the diagonal entries, negate the off-diagonal entries.",
+          "Fundamental identity: A (adj A) = (adj A) A = |A| I."
+        ]
+      },
+      {
+        "heading": "Inverse of a matrix",
+        "bullets": [
+          "A^(-1) is defined by A A^(-1) = A^(-1) A = I, and it is unique when it exists.",
+          "A^(-1) = adj(A) / |A|, so every entry of adj(A) is divided by the single number |A|.",
+          "For 2x2: A^(-1) = (1/(ad - bc)) [[d, -b], [-c, a]].",
+          "For 3x3: find |A|, all nine cofactors, transpose to adj(A), then divide by |A|; verify by A A^(-1) = I."
+        ]
+      },
+      {
+        "heading": "Singular and non-singular matrices",
+        "bullets": [
+          "A is non-singular (invertible) when |A| != 0 and singular (no inverse) when |A| = 0.",
+          "The inverse formula fails for a singular matrix because it would divide by zero.",
+          "Rows or columns that are dependent (e.g. one a multiple of another) make |A| = 0.",
+          "'Invertible', 'non-singular' and '|A| != 0' all mean the same thing."
+        ]
+      },
+      {
+        "heading": "Properties of the inverse",
+        "bullets": [
+          "(AB)^(-1) = B^(-1) A^(-1): the order reverses when inverting a product.",
+          "(A^(-1))^(-1) = A: inverting twice returns the original matrix.",
+          "(A^T)^(-1) = (A^(-1))^T: transpose and inverse commute.",
+          "|A^(-1)| = 1/|A|, and (kA)^(-1) = (1/k) A^(-1) for a non-zero scalar k."
+        ]
+      },
+      {
+        "heading": "Solving systems and elementary operations",
+        "bullets": [
+          "Write the system as A X = B; if |A| != 0 the unique solution is X = A^(-1) B.",
+          "If |A| = 0 the system has no solution ((adj A)B != O) or infinitely many ((adj A)B = O).",
+          "By rank: the system is consistent iff rank(A) = rank([A | B]).",
+          "The inverse can be found by row operations, reducing [A | I] to [I | A^(-1)] (Gauss-Jordan)."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "The cofactor is C_ij = (-1)^(i+j) M_ij, and the adjoint is the transpose of the cofactor matrix.",
+      "A^(-1) = adj(A)/|A| exists only when |A| != 0; a singular matrix (|A| = 0) has no inverse.",
+      "For 2x2 matrices, A^(-1) = (1/(ad - bc)) [[d, -b], [-c, a]] - swap the diagonal, negate the off-diagonal.",
+      "Key identity A (adj A) = |A| I is the source of the inverse formula.",
+      "(AB)^(-1) = B^(-1) A^(-1), (A^(-1))^(-1) = A, (A^T)^(-1) = (A^(-1))^T, and |A^(-1)| = 1/|A|.",
+      "A system A X = B with |A| != 0 has the unique solution X = A^(-1) B.",
+      "The inverse can also be obtained by elementary row operations: [A | I] -> [I | A^(-1)]."
+    ],
+    "glossary": [
+      {
+        "term": "Minor",
+        "definition": "The determinant of the submatrix left after deleting the row and column of a chosen element a_ij, written M_ij."
+      },
+      {
+        "term": "Cofactor",
+        "definition": "The signed minor C_ij = (-1)^(i+j) M_ij, using the chequerboard sign pattern."
+      },
+      {
+        "term": "Adjoint (adjugate)",
+        "definition": "The transpose of the cofactor matrix, adj(A) = [C_ij]^T; satisfies A (adj A) = |A| I."
+      },
+      {
+        "term": "Inverse of a matrix",
+        "definition": "The unique matrix A^(-1) with A A^(-1) = A^(-1) A = I; equals adj(A)/|A| when |A| != 0."
+      },
+      {
+        "term": "Non-singular matrix",
+        "definition": "A square matrix with |A| != 0; it is invertible."
+      },
+      {
+        "term": "Singular matrix",
+        "definition": "A square matrix with |A| = 0; it has no inverse."
+      },
+      {
+        "term": "Identity matrix",
+        "definition": "The square matrix I with 1s on the diagonal and 0s elsewhere; A I = I A = A."
+      },
+      {
+        "term": "Determinant |A|",
+        "definition": "A single number computed from a square matrix; non-zero exactly when the matrix is invertible."
+      },
+      {
+        "term": "Reversal law",
+        "definition": "The rule (AB)^(-1) = B^(-1) A^(-1): inverting a product reverses the order of factors."
+      },
+      {
+        "term": "Coefficient matrix",
+        "definition": "The matrix A of the coefficients of the unknowns when a linear system is written as A X = B."
+      },
+      {
+        "term": "Matrix method",
+        "definition": "Solving A X = B by computing X = A^(-1) B when A is non-singular."
+      },
+      {
+        "term": "Consistent system",
+        "definition": "A system of equations having at least one solution; A X = B is consistent iff rank(A) = rank([A | B])."
+      },
+      {
+        "term": "Elementary row operation",
+        "definition": "Swapping two rows, scaling a row by a non-zero constant, or adding a multiple of one row to another."
+      },
+      {
+        "term": "Gauss-Jordan method",
+        "definition": "Finding A^(-1) by reducing [A | I] to [I | A^(-1)] using elementary row operations."
+      },
+      {
+        "term": "Homogeneous system",
+        "definition": "A system A X = O; it has only the trivial solution when |A| != 0 and non-trivial solutions when |A| = 0."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Inverse of a Matrix and its Applications (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for every numerical problem: state the determinant, the adjoint (or row operations), the inverse, and verify your answer where asked. Marks are shown against each question.",
+    "total_marks": 28,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Define the adjoint of a square matrix and write the adjoint of A = [[3, 1], [2, 4]].",
+        "answer": "The adjoint of a square matrix A is the transpose of its matrix of cofactors, adj(A) = [C_ij]^T. For a 2x2 matrix A = [[a, b], [c, d]] the shortcut is adj(A) = [[d, -b], [-c, a]]: swap the diagonal entries and negate the off-diagonal entries. Hence for A = [[3, 1], [2, 4]], adj(A) = [[4, -1], [-2, 3]].",
+        "explanation": "Definition + 2x2 rule applied.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-INV-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the inverse of A = [[4, 3], [3, 2]].",
+        "answer": "|A| = 4x2 - 3x3 = 8 - 9 = -1, which is non-zero, so A is invertible. adj(A) = [[2, -3], [-3, 4]]. Therefore A^(-1) = (1/|A|) adj(A) = (1/(-1))[[2, -3], [-3, 4]] = [[-2, 3], [3, -4]]. Check: A A^(-1) = [[4,3],[3,2]][[-2,3],[3,-4]] = [[-8+9, 12-12], [-6+6, 9-8]] = [[1, 0], [0, 1]] = I.",
+        "explanation": "Determinant, adjoint, divide, verify.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INV-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Determine whether A = [[2, 4], [3, 6]] is singular or non-singular, and state whether it has an inverse.",
+        "answer": "|A| = 2x6 - 4x3 = 12 - 12 = 0. Since |A| = 0, A is a SINGULAR matrix and therefore has NO inverse. (The second row is 1.5 times the first, so the rows are dependent.)",
+        "explanation": "|A| = 0 means singular, no inverse.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-INV-05"
+      },
+      {
+        "type": "MCQ",
+        "question": "If A = [[a, b], [c, d]] with |A| != 0, then A^(-1) equals:",
+        "answer": "(1/(ad - bc)) [[d, -b], [-c, a]]",
+        "explanation": "Standard 2x2 inverse formula.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-INV-03",
+        "options": [
+          "(1/(ad - bc)) [[d, -b], [-c, a]]",
+          "(1/(ad - bc)) [[a, b], [c, d]]",
+          "(ad - bc) [[d, -b], [-c, a]]",
+          "(1/(ab - cd)) [[a, -c], [-b, d]]"
+        ]
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Solve the system 2x + y = 5, 3x + 2y = 8 by the matrix method.",
+        "answer": "Write A X = B with A = [[2, 1], [3, 2]], B = [[5], [8]]. |A| = 4 - 3 = 1 != 0, so A^(-1) = (1/1)[[2, -1], [-3, 2]] = [[2, -1], [-3, 2]]. Then X = A^(-1) B = [[2, -1], [-3, 2]][[5], [8]] = [[10 - 8], [-15 + 16]] = [[2], [1]]. So x = 2, y = 1. Check: 2(2)+1 = 5 and 3(2)+2(1) = 8.",
+        "explanation": "Form A X = B, invert, multiply.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INV-07"
+      },
+      {
+        "type": "TRUE_FALSE",
+        "question": "For invertible matrices A and B, (AB)^(-1) = A^(-1) B^(-1).",
+        "answer": "False",
+        "explanation": "The correct reversal law is (AB)^(-1) = B^(-1) A^(-1).",
+        "marks": 1,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-INV-06",
+        "options": [
+          "True",
+          "False"
+        ]
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find the inverse of A = [[1, 2, 3], [2, 5, 3], [1, 0, 8]] using the adjoint method, and state the value of |A^(-1)|.",
+        "answer": "Step 1 - determinant. Expand along row 1: |A| = 1(5x8 - 3x0) - 2(2x8 - 3x1) + 3(2x0 - 5x1) = 1(40) - 2(13) + 3(-5) = 40 - 26 - 15 = -1. Non-zero, so A is invertible.\nStep 2 - cofactors.\nC11 = +(40 - 0) = 40, C12 = -(16 - 3) = -13, C13 = +(0 - 5) = -5,\nC21 = -(16 - 0) = -16, C22 = +(8 - 3) = 5, C23 = -(0 - 2) = 2,\nC31 = +(6 - 15) = -9, C32 = -(3 - 6) = 3, C33 = +(5 - 4) = 1.\nStep 3 - adjoint (transpose of cofactor matrix): adj(A) = [[40, -16, -9], [-13, 5, 3], [-5, 2, 1]].\nStep 4 - inverse: A^(-1) = adj(A)/|A| = (1/(-1)) adj(A) = [[-40, 16, 9], [13, -5, -3], [5, -2, -1]].\nFinally |A^(-1)| = 1/|A| = 1/(-1) = -1.",
+        "explanation": "Full 3x3 inverse plus determinant-of-inverse property.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INV-04"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Solve the system x + y + z = 6, y + 3z = 11, x + z = 2 (equivalently x + 0y + z = 2) by the matrix method: x - 2y + z = -3 is replaced so use x + y + z = 6, x - y + z = 2, 2x + y - z = 1. Show all steps.",
+        "answer": "Coefficient matrix A = [[1, 1, 1], [1, -1, 1], [2, 1, -1]], B = [[6], [2], [1]].\nDeterminant: |A| = 1((-1)(-1) - 1x1) - 1(1x(-1) - 1x2) + 1(1x1 - (-1)x2) = 1(1 - 1) - 1(-1 - 2) + 1(1 + 2) = 0 + 3 + 3 = 6 != 0.\nCofactors: C11 = (1 - 1) = 0, C12 = -(-1 - 2) = 3, C13 = (1 + 2) = 3; C21 = -(-1 - 1) = 2, C22 = (-1 - 2) = -3, C23 = -(1 - 2) = 1; C31 = (1 + 1) = 2, C32 = -(1 - 1) = 0, C33 = (-1 - 1) = -2.\nadj(A) = [[0, 2, 2], [3, -3, 0], [3, 1, -2]].\nA^(-1) = (1/6)[[0, 2, 2], [3, -3, 0], [3, 1, -2]].\nX = A^(-1) B = (1/6)[[0x6 + 2x2 + 2x1], [3x6 - 3x2 + 0x1], [3x6 + 1x2 - 2x1]] = (1/6)[[6], [12], [18]] = [[1], [2], [3]].\nSo x = 1, y = 2, z = 3. Check: 1+2+3 = 6, 1-2+3 = 2, 2(1)+2-3 = 1. Correct.",
+        "explanation": "Complete 3x3 matrix-method solution with verification.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INV-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using elementary row operations, outline how to find A^(-1) and give the inverse of A = [[1, 2], [1, 3]].",
+        "answer": "Form [A | I] = [1, 2 | 1, 0 ; 1, 3 | 0, 1] and reduce the left block to I by row operations; the right block becomes A^(-1). R2 -> R2 - R1 gives [1, 2 | 1, 0 ; 0, 1 | -1, 1]. R1 -> R1 - 2 R2 gives [1, 0 | 3, -2 ; 0, 1 | -1, 1]. Hence A^(-1) = [[3, -2], [-1, 1]]. (Check: |A| = 3 - 2 = 1, adj(A) = [[3, -2], [-1, 1]], same result.)",
+        "explanation": "Gauss-Jordan reduction of [A|I].",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-INV-08"
+      },
+      {
+        "type": "MCQ",
+        "question": "A square matrix A has an inverse if and only if:",
+        "answer": "|A| != 0",
+        "explanation": "Invertible <=> non-singular <=> |A| != 0.",
+        "marks": 1,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-INV-05",
+        "options": [
+          "|A| != 0",
+          "|A| = 0",
+          "A is symmetric",
+          "A = A^T"
+        ]
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "question": "The cofactor C_ij of an element a_ij is defined as:",
+      "answer": "(-1)^(i+j) M_ij",
+      "explanation": "Cofactor = signed minor.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "(-1)^(i+j) M_ij",
+        "(-1)^(i-j) M_ij",
+        "M_ij",
+        "(-1)^(ij) M_ij"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The adjoint of a square matrix is the:",
+      "answer": "transpose of the matrix of cofactors",
+      "explanation": "adj(A) = [C_ij]^T.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "transpose of the matrix of cofactors",
+        "matrix of cofactors itself",
+        "transpose of the matrix of minors",
+        "inverse of the matrix of cofactors"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For A = [[a, b], [c, d]], adj(A) equals:",
+      "answer": "[[d, -b], [-c, a]]",
+      "explanation": "Swap diagonal, negate off-diagonal.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "[[d, -b], [-c, a]]",
+        "[[a, b], [c, d]]",
+        "[[d, b], [c, a]]",
+        "[[-d, b], [c, -a]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The identity relating a matrix and its adjoint is:",
+      "answer": "A (adj A) = |A| I",
+      "explanation": "Fundamental adjoint identity.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "A (adj A) = |A| I",
+        "A (adj A) = I",
+        "A (adj A) = A",
+        "A (adj A) = |A| A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The minor M23 of A = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] is the determinant of:",
+      "answer": "[[1, 2], [7, 8]]",
+      "explanation": "Delete row 2 and column 3.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "[[1, 2], [7, 8]]",
+        "[[4, 5], [7, 8]]",
+        "[[1, 3], [7, 9]]",
+        "[[5, 6], [8, 9]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For a 2x2 matrix A, adj(A) is obtained by:",
+      "answer": "swapping the diagonal entries and negating the off-diagonal entries",
+      "explanation": "2x2 adjoint shortcut.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "swapping the diagonal entries and negating the off-diagonal entries",
+        "negating all entries",
+        "transposing only",
+        "swapping the off-diagonal entries"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The cofactor C12 of A = [[2, 1], [3, 4]] is:",
+      "answer": "-3",
+      "explanation": "C12 = -M12 = -(3).",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "-3",
+        "3",
+        "1",
+        "-1"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The sign pattern of cofactors for a 3x3 matrix in the first row is:",
+      "answer": "+, -, +",
+      "explanation": "(-1)^(i+j).",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "+, -, +",
+        "-, +, -",
+        "+, +, +",
+        "-, -, -"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For A = [[3, 0], [0, 5]], adj(A) is:",
+      "answer": "[[5, 0], [0, 3]]",
+      "explanation": "Diagonal swap.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "[[5, 0], [0, 3]]",
+        "[[3, 0], [0, 5]]",
+        "[[-5, 0], [0, -3]]",
+        "[[1/3, 0], [0, 1/5]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of a matrix A is defined by the relation:",
+      "answer": "A A^(-1) = A^(-1) A = I",
+      "explanation": "Definition of inverse.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "A A^(-1) = A^(-1) A = I",
+        "A A^(-1) = 0",
+        "A + A^(-1) = I",
+        "A A^(-1) = A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The formula for the inverse of a non-singular matrix is:",
+      "answer": "A^(-1) = adj(A) / |A|",
+      "explanation": "Core inverse formula.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "A^(-1) = adj(A) / |A|",
+        "A^(-1) = |A| / adj(A)",
+        "A^(-1) = adj(A) x |A|",
+        "A^(-1) = |A| adj(A)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of a matrix exists only when:",
+      "answer": "|A| != 0",
+      "explanation": "Non-singular condition.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "|A| != 0",
+        "|A| = 0",
+        "A is square only",
+        "adj(A) = 0"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of the identity matrix I is:",
+      "answer": "I",
+      "explanation": "I^(-1) = I.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "I",
+        "0",
+        "-I",
+        "does not exist"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of A = [[2, 0], [0, 3]] is:",
+      "answer": "[[1/2, 0], [0, 1/3]]",
+      "explanation": "Reciprocal of diagonal entries.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[1/2, 0], [0, 1/3]]",
+        "[[3, 0], [0, 2]]",
+        "[[2, 0], [0, 3]]",
+        "[[1/3, 0], [0, 1/2]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For A = [[1, 2], [3, 4]], |A| = -2 and A^(-1) equals:",
+      "answer": "[[-2, 1], [3/2, -1/2]]",
+      "explanation": "(1/-2)[[4,-2],[-3,1]] = [[-2,1],[3/2,-1/2]].",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[-2, 1], [3/2, -1/2]]",
+        "[[4, -2], [-3, 1]]",
+        "[[2, -1], [-3/2, 1/2]]",
+        "[[-2, 1], [-3/2, 1/2]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A = [[5, 2], [2, 1]], then A^(-1) is:",
+      "answer": "[[1, -2], [-2, 5]]",
+      "explanation": "|A| = 1, adj = [[1,-2],[-2,5]].",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[1, -2], [-2, 5]]",
+        "[[1, 2], [2, 5]]",
+        "[[5, -2], [-2, 1]]",
+        "[[-1, 2], [2, -5]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of a matrix, when it exists, is:",
+      "answer": "unique",
+      "explanation": "Uniqueness of inverse.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "unique",
+        "not unique",
+        "always equal to A",
+        "always singular"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A^(-1) = [[2, -1], [-3, 2]], then A equals:",
+      "answer": "[[2, 1], [3, 2]]",
+      "explanation": "(A^(-1))^(-1) = A; det=1, swap/negate.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[2, 1], [3, 2]]",
+        "[[2, -1], [-3, 2]]",
+        "[[-2, 1], [3, -2]]",
+        "[[1, 2], [2, 3]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If |A| = 5 for a 3x3 matrix, then A (adj A) equals:",
+      "answer": "5 I",
+      "explanation": "A(adjA) = |A| I.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "5 I",
+        "I",
+        "25 I",
+        "5 A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For A = [[1, 1], [0, 1]], A^(-1) is:",
+      "answer": "[[1, -1], [0, 1]]",
+      "explanation": "|A|=1, adj=[[1,-1],[0,1]].",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[1, -1], [0, 1]]",
+        "[[1, 1], [0, 1]]",
+        "[[-1, 1], [0, -1]]",
+        "[[1, 0], [-1, 1]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of A = [[0, 1], [1, 0]] is:",
+      "answer": "[[0, 1], [1, 0]]",
+      "explanation": "|A| = -1, adj = [[0,-1],[-1,0]], divided by -1 gives itself.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[0, 1], [1, 0]]",
+        "[[1, 0], [0, 1]]",
+        "[[0, -1], [-1, 0]]",
+        "does not exist"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "To obtain A^(-1) from adj(A), one divides adj(A) by:",
+      "answer": "|A|",
+      "explanation": "Divide by determinant.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "|A|",
+        "adj(A)",
+        "the trace of A",
+        "the order of A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A = [[6, 4], [3, 2]], then A^(-1):",
+      "answer": "does not exist",
+      "explanation": "|A| = 12 - 12 = 0, singular.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "does not exist",
+        "equals [[2, -4], [-3, 6]]",
+        "equals [[1, 0], [0, 1]]",
+        "equals [[2, 4], [3, 6]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A square matrix is called singular if:",
+      "answer": "|A| = 0",
+      "explanation": "Singular = zero determinant.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "|A| = 0",
+        "|A| != 0",
+        "A = 0",
+        "A is not square"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A non-singular matrix is one for which:",
+      "answer": "|A| != 0",
+      "explanation": "Non-singular = non-zero determinant.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "|A| != 0",
+        "|A| = 0",
+        "adj(A) = 0",
+        "A = A^T"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Which of the following matrices is singular?",
+      "answer": "[[2, 4], [1, 2]]",
+      "explanation": "|A| = 4 - 4 = 0.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "[[2, 4], [1, 2]]",
+        "[[2, 1], [1, 2]]",
+        "[[1, 0], [0, 1]]",
+        "[[3, 1], [2, 4]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A singular matrix:",
+      "answer": "has no inverse",
+      "explanation": "No inverse when |A| = 0.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "has no inverse",
+        "has a unique inverse",
+        "always equals I",
+        "has determinant 1"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For what value of k is A = [[k, 2], [2, k]] singular?",
+      "answer": "k = 2 or k = -2",
+      "explanation": "k^2 - 4 = 0.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "k = 2 or k = -2",
+        "k = 0 only",
+        "k = 4",
+        "k = 1"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If the rows of a square matrix are linearly dependent, the matrix is:",
+      "answer": "singular",
+      "explanation": "Dependent rows => |A| = 0.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "singular",
+        "non-singular",
+        "orthogonal",
+        "invertible"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Which statement is TRUE?",
+      "answer": "Only non-singular matrices are invertible",
+      "explanation": "Invertible <=> non-singular.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "Only non-singular matrices are invertible",
+        "Every square matrix is invertible",
+        "Singular matrices have unique inverses",
+        "Non-square matrices can be inverted"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The matrix [[1, 2, 3], [2, 4, 6], [1, 1, 1]] is:",
+      "answer": "singular",
+      "explanation": "Row 2 = 2 x Row 1, so |A| = 0.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "singular",
+        "non-singular",
+        "the identity",
+        "an inverse of itself"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A homogeneous system A X = O has a non-trivial solution only if:",
+      "answer": "|A| = 0",
+      "explanation": "Singular coefficient matrix.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "|A| = 0",
+        "|A| != 0",
+        "|A| = 1",
+        "A = I"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A is non-singular of order 3, then adj(A) is:",
+      "answer": "non-singular",
+      "explanation": "|adj A| = |A|^2 != 0.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "non-singular",
+        "singular",
+        "the zero matrix",
+        "equal to A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The reversal law for the inverse of a product states:",
+      "answer": "(AB)^(-1) = B^(-1) A^(-1)",
+      "explanation": "Order reverses.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "(AB)^(-1) = B^(-1) A^(-1)",
+        "(AB)^(-1) = A^(-1) B^(-1)",
+        "(AB)^(-1) = A B",
+        "(AB)^(-1) = (BA)^(-1)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "(A^(-1))^(-1) equals:",
+      "answer": "A",
+      "explanation": "Double inverse.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "A",
+        "A^(-1)",
+        "I",
+        "adj(A)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "(A^T)^(-1) equals:",
+      "answer": "(A^(-1))^T",
+      "explanation": "Transpose and inverse commute.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "(A^(-1))^T",
+        "A^(-1)",
+        "A^T",
+        "(A^T)^T"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A is invertible, then |A^(-1)| equals:",
+      "answer": "1 / |A|",
+      "explanation": "|A||A^(-1)| = 1.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "1 / |A|",
+        "|A|",
+        "-|A|",
+        "|A|^2"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For a non-zero scalar k, (kA)^(-1) equals:",
+      "answer": "(1/k) A^(-1)",
+      "explanation": "Scalar pulls out as reciprocal.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "(1/k) A^(-1)",
+        "k A^(-1)",
+        "k^2 A^(-1)",
+        "(1/k^2) A^(-1)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If |A| = 4 for a 3x3 matrix A, then |adj A| equals:",
+      "answer": "16",
+      "explanation": "|adj A| = |A|^(n-1) = 4^2.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "16",
+        "4",
+        "64",
+        "1/4"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If |A| = 2 and |B| = 3 (order 2), then |(AB)^(-1)| equals:",
+      "answer": "1/6",
+      "explanation": "|(AB)^(-1)| = 1/(|A||B|).",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "1/6",
+        "6",
+        "1/5",
+        "5"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The statement (A B)^(-1) = A^(-1) B^(-1) is:",
+      "answer": "generally false",
+      "explanation": "Order must reverse.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "generally false",
+        "always true",
+        "true only for singular matrices",
+        "true for all matrices"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A is symmetric and invertible, then A^(-1) is:",
+      "answer": "symmetric",
+      "explanation": "(A^(-1))^T = (A^T)^(-1) = A^(-1).",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "symmetric",
+        "skew-symmetric",
+        "singular",
+        "not defined"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A system of linear equations in matrix form is written as:",
+      "answer": "A X = B",
+      "explanation": "Standard matrix form.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "A X = B",
+        "X A = B",
+        "A = X B",
+        "A X B = 0"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The solution of A X = B when A is non-singular is:",
+      "answer": "X = A^(-1) B",
+      "explanation": "Left-multiply by A^(-1).",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "X = A^(-1) B",
+        "X = B A^(-1)",
+        "X = A B^(-1)",
+        "X = B^(-1) A"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A system A X = B has a unique solution when:",
+      "answer": "|A| != 0",
+      "explanation": "Non-singular gives unique solution.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "|A| != 0",
+        "|A| = 0 and (adj A)B = O",
+        "|A| = 0 and (adj A)B != O",
+        "B = O only"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If |A| = 0 and (adj A) B != O, the system A X = B has:",
+      "answer": "no solution (inconsistent)",
+      "explanation": "Inconsistent case.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "no solution (inconsistent)",
+        "a unique solution",
+        "infinitely many solutions",
+        "exactly two solutions"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If |A| = 0 and (adj A) B = O, the system A X = B has:",
+      "answer": "infinitely many solutions",
+      "explanation": "Consistent, infinitely many.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "infinitely many solutions",
+        "no solution",
+        "a unique solution",
+        "the trivial solution only"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For the system 2x + y = 4, 7x + 4y = 13 (A = [[2,1],[7,4]], A^(-1) = [[4,-1],[-7,2]]), the solution is:",
+      "answer": "x = 3, y = -2",
+      "explanation": "X = A^(-1)B = [[3],[-2]].",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "x = 3, y = -2",
+        "x = -2, y = 3",
+        "x = 3, y = 2",
+        "x = 2, y = -3"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "In A X = B, the matrix A is called the:",
+      "answer": "coefficient matrix",
+      "explanation": "Coefficients of unknowns.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "coefficient matrix",
+        "constant matrix",
+        "solution matrix",
+        "identity matrix"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A system of equations is consistent if it has:",
+      "answer": "at least one solution",
+      "explanation": "Consistent = solvable.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "at least one solution",
+        "no solution",
+        "exactly two solutions",
+        "a zero determinant"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "By the rank test, A X = B is consistent if and only if:",
+      "answer": "rank(A) = rank([A | B])",
+      "explanation": "Rank consistency criterion.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "rank(A) = rank([A | B])",
+        "rank(A) < rank([A | B])",
+        "rank(A) = 0",
+        "rank([A | B]) = 0"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The homogeneous system A X = O with |A| != 0 has:",
+      "answer": "only the trivial solution",
+      "explanation": "Unique = trivial when non-singular.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "only the trivial solution",
+        "infinitely many solutions",
+        "no solution",
+        "exactly two solutions"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Solving x + y = 3, x - y = 1 by the matrix method gives:",
+      "answer": "x = 2, y = 1",
+      "explanation": "Add/subtract or invert.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "x = 2, y = 1",
+        "x = 1, y = 2",
+        "x = 3, y = 0",
+        "x = 0, y = 3"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "To solve A X = B we multiply both sides on the LEFT by A^(-1) because:",
+      "answer": "matrix multiplication is not commutative",
+      "explanation": "Side matters; A^(-1)A = I on the left.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "matrix multiplication is not commutative",
+        "A is symmetric",
+        "B is a column matrix",
+        "|A| = 1"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If the coefficient matrix of a system is singular and the system is consistent, the number of solutions is:",
+      "answer": "infinite",
+      "explanation": "Singular + consistent => infinite.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "infinite",
+        "exactly one",
+        "zero",
+        "exactly two"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "To find A^(-1) by elementary row operations, we reduce:",
+      "answer": "[A | I] to [I | A^(-1)]",
+      "explanation": "Gauss-Jordan augmented block.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "[A | I] to [I | A^(-1)]",
+        "[I | A] to [A^(-1) | I]",
+        "[A | A] to [I | I]",
+        "[A | 0] to [I | A^(-1)]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Which is NOT an elementary row operation?",
+      "answer": "replacing a row by its square",
+      "explanation": "Squaring is not allowed.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "replacing a row by its square",
+        "interchanging two rows",
+        "multiplying a row by a non-zero scalar",
+        "adding a multiple of one row to another"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The Gauss-Jordan method for the inverse uses:",
+      "answer": "only elementary row operations to reach [I | A^(-1)]",
+      "explanation": "Row operations to identity.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "only elementary row operations to reach [I | A^(-1)]",
+        "only column operations",
+        "cofactor expansion",
+        "matrix multiplication by adj(A)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "When finding A^(-1) by row operations, if the left block cannot be reduced to I, then A is:",
+      "answer": "singular",
+      "explanation": "A row of zeros appears => |A| = 0.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "singular",
+        "non-singular",
+        "symmetric",
+        "the identity"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Multiplying a row of [A | I] by a non-zero constant c during reduction:",
+      "answer": "is a valid elementary operation",
+      "explanation": "Row scaling is allowed.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "is a valid elementary operation",
+        "is not allowed",
+        "changes the order of A",
+        "makes A singular"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "A word problem 'sum of two numbers is 10, difference is 4' gives the system whose solution is:",
+      "answer": "7 and 3",
+      "explanation": "x+y=10, x-y=4.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "7 and 3",
+        "6 and 4",
+        "8 and 2",
+        "5 and 5"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The advantage of the matrix method for A X = B is that:",
+      "answer": "one inverse solves the system for any right-hand side B",
+      "explanation": "Reusable inverse.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "one inverse solves the system for any right-hand side B",
+        "it avoids finding |A|",
+        "it works even when |A| = 0",
+        "it never needs verification"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "In reducing [A | I], adding 3 times row 1 to row 2 affects:",
+      "answer": "both the left and right blocks",
+      "explanation": "Same operation on the whole augmented row.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "both the left and right blocks",
+        "only the left block",
+        "only the right block",
+        "neither block"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Two numbers have sum 12 and one exceeds twice the other by 3. As A X = B this is x + y = 12, x - 2y = 3; the solution is:",
+      "answer": "x = 9, y = 3",
+      "explanation": "Solve the system.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "x = 9, y = 3",
+        "x = 3, y = 9",
+        "x = 8, y = 4",
+        "x = 10, y = 2"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Elementary row operations to find an inverse should NOT be mixed with:",
+      "answer": "column operations in the same reduction",
+      "explanation": "Stick to rows only.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "column operations in the same reduction",
+        "row interchanges",
+        "row scaling",
+        "adding rows"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The purpose of forming the augmented matrix [A | I] is to:",
+      "answer": "track the operations that build A^(-1) as A becomes I",
+      "explanation": "Right block records the inverse.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "track the operations that build A^(-1) as A becomes I",
+        "compute |A| faster",
+        "find adj(A) directly",
+        "make A symmetric"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The value of |A| for A = [[2, -1, 1], [-1, 2, -1], [1, -1, 2]] is:",
+      "answer": "4",
+      "explanation": "2(4-1)+1(-2+1)+1(1-2)=6-1-1=4.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "4",
+        "2",
+        "6",
+        "0"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A is a 3x3 matrix with |A| = 3, then |2A| equals:",
+      "answer": "24",
+      "explanation": "|kA| = k^n |A| = 8 x 3.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "24",
+        "6",
+        "12",
+        "3"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A^(-1) exists and A X = O, then X equals:",
+      "answer": "O (the zero column)",
+      "explanation": "X = A^(-1)O = O.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "O (the zero column)",
+        "any non-zero vector",
+        "A",
+        "I"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For a diagonal matrix diag(2, 3, 4), the inverse is:",
+      "answer": "diag(1/2, 1/3, 1/4)",
+      "explanation": "Reciprocal of each diagonal.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "diag(1/2, 1/3, 1/4)",
+        "diag(2, 3, 4)",
+        "diag(4, 3, 2)",
+        "diag(-2, -3, -4)"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "If A is invertible, the equation A X = B has:",
+      "answer": "exactly one solution",
+      "explanation": "Unique solution.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "exactly one solution",
+        "no solution",
+        "infinitely many solutions",
+        "at most two solutions"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The determinant of A = [[1, 2], [3, 4]] is:",
+      "answer": "-2",
+      "explanation": "4 - 6 = -2.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "-2",
+        "2",
+        "10",
+        "-10"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "Which matrix equals its own inverse?",
+      "answer": "[[1, 0], [0, -1]]",
+      "explanation": "A^2 = I for [[1,0],[0,-1]].",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[1, 0], [0, -1]]",
+        "[[1, 1], [0, 1]]",
+        "[[2, 0], [0, 2]]",
+        "[[0, 0], [0, 0]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "For A = [[cos t, -sin t], [sin t, cos t]], A^(-1) equals:",
+      "answer": "[[cos t, sin t], [-sin t, cos t]]",
+      "explanation": "|A| = 1; rotation inverse is rotation by -t.",
+      "marks": 1,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[cos t, sin t], [-sin t, cos t]]",
+        "[[cos t, -sin t], [sin t, cos t]]",
+        "[[-cos t, sin t], [-sin t, -cos t]]",
+        "[[sin t, cos t], [cos t, -sin t]]"
+      ]
+    },
+    {
+      "type": "MCQ",
+      "question": "The inverse of A = [[7, 3], [2, 1]] is:",
+      "answer": "[[1, -3], [-2, 7]]",
+      "explanation": "|A| = 7 - 6 = 1.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04",
+      "options": [
+        "[[1, -3], [-2, 7]]",
+        "[[1, 3], [2, 7]]",
+        "[[7, -3], [-2, 1]]",
+        "[[-1, 3], [2, -7]]"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "The adjoint of a matrix is the transpose of its matrix of cofactors.",
+      "answer": "True",
+      "explanation": "Definition of adjoint.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "Every square matrix has an inverse.",
+      "answer": "False",
+      "explanation": "Only non-singular ones do.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "A matrix with determinant zero is called non-singular.",
+      "answer": "False",
+      "explanation": "|A| = 0 is singular.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-05",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "A^(-1) = adj(A) / |A| whenever |A| != 0.",
+      "answer": "True",
+      "explanation": "Inverse formula.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "(A^(-1))^(-1) = A for any invertible matrix A.",
+      "answer": "True",
+      "explanation": "Double inverse.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "For invertible A and B, (AB)^(-1) = A^(-1) B^(-1).",
+      "answer": "False",
+      "explanation": "Order reverses.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "The system A X = B with |A| != 0 has a unique solution X = A^(-1) B.",
+      "answer": "True",
+      "explanation": "Non-singular case.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "A singular coefficient matrix always makes the system inconsistent.",
+      "answer": "False",
+      "explanation": "Could have infinitely many solutions.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-07",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "The inverse of a matrix can be found by reducing [A | I] to [I | A^(-1)] using row operations.",
+      "answer": "True",
+      "explanation": "Gauss-Jordan.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "TRUE_FALSE",
+      "question": "For an invertible matrix, |A^(-1)| = 1/|A|.",
+      "answer": "True",
+      "explanation": "Determinant of inverse.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06",
+      "options": [
+        "True",
+        "False"
+      ]
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The signed minor (-1)^(i+j) M_ij of an element a_ij is called its ____.",
+      "answer": "cofactor",
+      "explanation": "Definition.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The adjoint of A is the ____ of the matrix of cofactors.",
+      "answer": "transpose",
+      "explanation": "adj(A) = [C_ij]^T.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "For A = [[a, b], [c, d]], adj(A) = [[d, -b], [-c, a]]; here the off-diagonal entries are ____.",
+      "answer": "negated",
+      "explanation": "Sign change.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The product A (adj A) equals ____ times the identity matrix.",
+      "answer": "|A|",
+      "explanation": "A(adjA) = |A| I.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The inverse of A is given by A^(-1) = adj(A) / ____.",
+      "answer": "|A|",
+      "explanation": "Divide by determinant.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "A matrix is invertible only when its determinant is ____.",
+      "answer": "non-zero",
+      "explanation": "|A| != 0.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-03"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "A matrix with |A| = 0 is called a ____ matrix.",
+      "answer": "singular",
+      "explanation": "Singular.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-05"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "A matrix with |A| != 0 is called a ____ matrix.",
+      "answer": "non-singular",
+      "explanation": "Non-singular.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-05"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The reversal law states (AB)^(-1) = ____.",
+      "answer": "B^(-1) A^(-1)",
+      "explanation": "Order reverses.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "For an invertible matrix, (A^T)^(-1) = ____.",
+      "answer": "(A^(-1))^T",
+      "explanation": "Transpose-inverse commute.",
+      "marks": 1,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "The solution of A X = B when A is non-singular is X = ____.",
+      "answer": "A^(-1) B",
+      "explanation": "Matrix method.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "In A X = B, the matrix A is called the ____ matrix.",
+      "answer": "coefficient",
+      "explanation": "Coefficient matrix.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "A system with at least one solution is said to be ____.",
+      "answer": "consistent",
+      "explanation": "Consistent.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "To find A^(-1) by row operations we reduce [A | I] to [I | ____].",
+      "answer": "A^(-1)",
+      "explanation": "Gauss-Jordan.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "FILL_BLANK",
+      "question": "Interchanging two rows is an example of an elementary ____ operation.",
+      "answer": "row",
+      "explanation": "Row operation.",
+      "marks": 1,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Define the minor and the cofactor of an element of a matrix.",
+      "answer": "The minor M_ij of the element a_ij is the determinant of the submatrix obtained by deleting the i-th row and j-th column of the matrix. The cofactor of a_ij is the signed minor C_ij = (-1)^(i+j) M_ij, where the sign follows the chequerboard pattern +, -, +, ...",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the adjoint of A = [[2, 5], [1, 3]].",
+      "answer": "For a 2x2 matrix, swap the diagonal entries and negate the off-diagonal ones: adj(A) = [[3, -5], [-1, 2]].",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Compute all four cofactors of A = [[3, 2], [1, 4]] and write adj(A).",
+      "answer": "C11 = +4, C12 = -1, C21 = -2, C22 = +3. Cofactor matrix = [[4, -1], [-2, 3]]. Transposing gives adj(A) = [[4, -2], [-1, 3]].",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-01"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Verify A (adj A) = |A| I for A = [[2, 3], [1, 4]].",
+      "answer": "|A| = 8 - 3 = 5. adj(A) = [[4, -3], [-1, 2]]. A (adj A) = [[2,3],[1,4]][[4,-3],[-1,2]] = [[8-3, -6+6], [4-4, -3+8]] = [[5, 0], [0, 5]] = 5 I = |A| I. Verified.",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-02"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "State the formula for the inverse of a matrix and the condition for its existence.",
+      "answer": "The inverse is A^(-1) = adj(A) / |A|, where adj(A) is the transpose of the cofactor matrix. It exists only when the matrix is square and non-singular, i.e. |A| != 0.",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-03"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the inverse of A = [[2, 1], [7, 4]] and verify it.",
+      "answer": "|A| = 8 - 7 = 1 != 0. adj(A) = [[4, -1], [-7, 2]]. A^(-1) = (1/1) adj(A) = [[4, -1], [-7, 2]]. Check: A A^(-1) = [[2,1],[7,4]][[4,-1],[-7,2]] = [[8-7, -2+2], [28-28, -7+8]] = [[1, 0], [0, 1]] = I.",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the inverse of A = [[3, -1], [-4, 2]].",
+      "answer": "|A| = 3x2 - (-1)(-4) = 6 - 4 = 2 != 0. adj(A) = [[2, 1], [4, 3]]. A^(-1) = (1/2)[[2, 1], [4, 3]] = [[1, 1/2], [2, 3/2]].",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Show that A = [[1, 2], [2, 4]] has no inverse.",
+      "answer": "|A| = 1x4 - 2x2 = 4 - 4 = 0. Since the determinant is zero, A is singular and A^(-1) = adj(A)/|A| would require division by zero, so no inverse exists. (Row 2 is twice Row 1.)",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-05"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the value of x for which A = [[x, 3], [2, x]] is singular.",
+      "answer": "A is singular when |A| = 0. |A| = x^2 - 6 = 0, so x^2 = 6 and x = +sqrt(6) or x = -sqrt(6).",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-05"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "State the property linking |A| and |A^(-1)| and use it when |A| = 5.",
+      "answer": "The property is |A^(-1)| = 1/|A|, which follows from |A| |A^(-1)| = |A A^(-1)| = |I| = 1. If |A| = 5, then |A^(-1)| = 1/5.",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Prove the reversal law (AB)^(-1) = B^(-1) A^(-1) for invertible A and B.",
+      "answer": "Consider the product (AB)(B^(-1) A^(-1)) = A (B B^(-1)) A^(-1) = A I A^(-1) = A A^(-1) = I. Similarly (B^(-1) A^(-1))(AB) = I. Since B^(-1) A^(-1) multiplied by AB (on both sides) gives I, by uniqueness of the inverse (AB)^(-1) = B^(-1) A^(-1).",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "If A is invertible, show that (A^(-1))^(-1) = A.",
+      "answer": "By definition A^(-1) is the matrix with A A^(-1) = A^(-1) A = I. Reading this the other way, A is a matrix whose product with A^(-1) (on both sides) is I, so A satisfies the definition of the inverse of A^(-1). Since the inverse is unique, (A^(-1))^(-1) = A.",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Write the system 3x + 4y = 7, 5x + 6y = 9 in the form A X = B and state A, X and B.",
+      "answer": "A X = B with A = [[3, 4], [5, 6]] (coefficient matrix), X = [[x], [y]] (unknowns), and B = [[7], [9]] (constants).",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Solve 3x + 4y = 7, 5x + 6y = 9 by the matrix method.",
+      "answer": "A = [[3, 4], [5, 6]], |A| = 18 - 20 = -2 != 0. A^(-1) = (1/-2)[[6, -4], [-5, 3]] = [[-3, 2], [5/2, -3/2]]. X = A^(-1) B = [[-3, 2], [5/2, -3/2]][[7], [9]] = [[-21 + 18], [35/2 - 27/2]] = [[-3], [4]]. So x = -3, y = 4. Check: 3(-3)+4(4) = -9+16 = 7 and 5(-3)+6(4) = -15+24 = 9.",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Discuss the consistency of a system A X = B in terms of |A|.",
+      "answer": "If |A| != 0, the system has a unique solution X = A^(-1) B (consistent). If |A| = 0, compute (adj A) B: when (adj A) B != O the system has no solution (inconsistent); when (adj A) B = O the system has infinitely many solutions (consistent).",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the inverse of A = [[1, 3], [2, 7]] by elementary row operations.",
+      "answer": "Form [1, 3 | 1, 0 ; 2, 7 | 0, 1]. R2 -> R2 - 2R1: [1, 3 | 1, 0 ; 0, 1 | -2, 1]. R1 -> R1 - 3R2: [1, 0 | 7, -3 ; 0, 1 | -2, 1]. Hence A^(-1) = [[7, -3], [-2, 1]]. (Check: |A| = 7 - 6 = 1.)",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "List the three elementary row operations used in the Gauss-Jordan method.",
+      "answer": "(1) Interchanging two rows; (2) multiplying a row by a non-zero scalar; (3) adding a scalar multiple of one row to another row.",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "The sum of two numbers is 15 and their difference is 3. Set up and solve the system by the matrix method.",
+      "answer": "Let the numbers be x, y. x + y = 15, x - y = 3, so A = [[1, 1], [1, -1]], B = [[15], [3]]. |A| = -1 - 1 = -2. A^(-1) = (1/-2)[[-1, -1], [-1, 1]] = [[1/2, 1/2], [1/2, -1/2]]. X = A^(-1) B = [[(15+3)/2], [(15-3)/2]] = [[9], [6]]. So the numbers are 9 and 6.",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "For A = [[2, 0, 0], [0, 3, 0], [0, 0, 5]], write A^(-1).",
+      "answer": "For a diagonal matrix the inverse is the diagonal matrix of reciprocals: A^(-1) = [[1/2, 0, 0], [0, 1/3, 0], [0, 0, 1/5]]. (Each diagonal entry is non-zero, so |A| = 30 != 0.)",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "If A is a 3x3 matrix with |A| = 2, find |adj A| and |A^(-1)|.",
+      "answer": "For an n x n matrix, |adj A| = |A|^(n-1). With n = 3, |adj A| = |A|^2 = 2^2 = 4. Also |A^(-1)| = 1/|A| = 1/2.",
+      "explanation": null,
+      "marks": 2,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Explain why the inverse of a matrix, when it exists, is unique.",
+      "answer": "Suppose B and C are both inverses of A, so AB = BA = I and AC = CA = I. Then B = B I = B (A C) = (B A) C = I C = C. Hence B = C, so the inverse is unique.",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-03"
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "question": "Find the cofactor matrix of A = [[1, 0, 2], [0, 1, 0], [2, 0, 1]] and hence its adjoint.",
+      "answer": "C11 = +1, C12 = -0 = 0, C13 = -2; C21 = -0 = 0, C22 = (1 - 4) = -3, C23 = -0 = 0; C31 = -2, C32 = -0 = 0, C33 = 1. Cofactor matrix = [[1, 0, -2], [0, -3, 0], [-2, 0, 1]]. It is symmetric, so adj(A) = its transpose = [[1, 0, -2], [0, -3, 0], [-2, 0, 1]].",
+      "explanation": null,
+      "marks": 3,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-02"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Find the inverse of A = [[2, 3, 1], [1, 2, 3], [3, 1, 2]] using the adjoint method and verify one entry of A A^(-1).",
+      "answer": "Determinant (expand along row 1): |A| = 2(2x2 - 3x1) - 3(1x2 - 3x3) + 1(1x1 - 2x3) = 2(1) - 3(-7) + 1(-5) = 2 + 21 - 5 = 18.\nCofactors:\nC11 = +(4 - 3) = 1, C12 = -(2 - 9) = 7, C13 = +(1 - 6) = -5,\nC21 = -(6 - 1) = -5, C22 = +(4 - 3) = 1, C23 = -(2 - 9) = 7,\nC31 = +(9 - 2) = 7, C32 = -(6 - 1) = -5, C33 = +(4 - 3) = 1.\nCofactor matrix = [[1, 7, -5], [-5, 1, 7], [7, -5, 1]]; transpose to get adj(A) = [[1, -5, 7], [7, 1, -5], [-5, 7, 1]].\nA^(-1) = (1/18)[[1, -5, 7], [7, 1, -5], [-5, 7, 1]].\nVerify the (1,1) entry of A A^(-1): row1 of A times col1 of A^(-1) = (1/18)(2x1 + 3x7 + 1x(-5)) = (1/18)(2 + 21 - 5) = 18/18 = 1, as required.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Solve the system 2x - 3y + 5z = 11, 3x + 2y - 4z = -5, x + y - 2z = -3 by the matrix method.",
+      "answer": "A = [[2, -3, 5], [3, 2, -4], [1, 1, -2]], B = [[11], [-5], [-3]].\n|A| = 2(2x(-2) - (-4)(1)) - (-3)(3x(-2) - (-4)(1)) + 5(3x1 - 2x1) = 2(-4 + 4) + 3(-6 + 4) + 5(3 - 2) = 0 - 6 + 5 = -1.\nCofactors:\nC11 = (2x(-2) - (-4)(1)) = 0, C12 = -(3x(-2) - (-4)(1)) = -(-6 + 4) = 2, C13 = (3x1 - 2x1) = 1,\nC21 = -((-3)(-2) - 5x1) = -(6 - 5) = -1, C22 = (2x(-2) - 5x1) = -9, C23 = -(2x1 - (-3)(1)) = -5,\nC31 = ((-3)(-4) - 5x2) = 2, C32 = -(2x(-4) - 5x3) = 23, C33 = (2x2 - (-3)(3)) = 13.\nadj(A) = transpose of [[0, 2, 1], [-1, -9, -5], [2, 23, 13]] = [[0, -1, 2], [2, -9, 23], [1, -5, 13]].\nA^(-1) = (1/(-1)) adj(A) = [[0, 1, -2], [-2, 9, -23], [-1, 5, -13]].\nX = A^(-1) B = [[0x11 + 1x(-5) + (-2)(-3)], [-2x11 + 9x(-5) + (-23)(-3)], [-1x11 + 5x(-5) + (-13)(-3)]] = [[-5 + 6], [-22 - 45 + 69], [-11 - 25 + 39]] = [[1], [2], [3]].\nSo x = 1, y = 2, z = 3. Check in equation 3: 1 + 2 - 6 = -3. Correct.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Explain, with the derivation, why the solution of A X = B is X = A^(-1) B, and state what happens when A is singular.",
+      "answer": "Write the linear system in matrix form as A X = B, where A is the coefficient matrix, X the column of unknowns and B the column of constants. Suppose A is non-singular, so |A| != 0 and A^(-1) exists. Multiply BOTH sides of A X = B on the LEFT by A^(-1):\n   A^(-1)(A X) = A^(-1) B.\nBy associativity, (A^(-1) A) X = A^(-1) B. Since A^(-1) A = I and I X = X, this gives\n   X = A^(-1) B.\nWe must multiply on the same (left) side of both sides because matrix multiplication is not commutative. This X is the unique solution.\nIf A is SINGULAR (|A| = 0), then A^(-1) does not exist and this method fails. The system is then either inconsistent (no solution) or has infinitely many solutions. Which case occurs is decided by (adj A) B: if (adj A) B != O the system is inconsistent; if (adj A) B = O it has infinitely many solutions.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Find the inverse of A = [[1, 2], [3, 7]] by elementary row operations, showing each step, and confirm the result by the adjoint method.",
+      "answer": "Row-operation method. Start with [A | I]:\n   [1, 2 | 1, 0]\n   [3, 7 | 0, 1].\nR2 -> R2 - 3R1:\n   [1, 2 | 1, 0]\n   [0, 1 | -3, 1].\nR1 -> R1 - 2R2:\n   [1, 0 | 7, -2]\n   [0, 1 | -3, 1].\nThe left block is now I, so A^(-1) = [[7, -2], [-3, 1]].\nConfirmation by adjoint: |A| = 1x7 - 2x3 = 1 != 0; adj(A) = [[7, -2], [-3, 1]]; A^(-1) = (1/1) adj(A) = [[7, -2], [-3, 1]]. Both methods agree.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "State and prove the property (A^T)^(-1) = (A^(-1))^T for an invertible matrix A, and illustrate with A = [[2, 1], [5, 3]].",
+      "answer": "Property: for an invertible matrix A, the inverse of the transpose equals the transpose of the inverse, (A^T)^(-1) = (A^(-1))^T.\nProof: start from A A^(-1) = I. Take the transpose of both sides. Using (XY)^T = Y^T X^T and I^T = I:\n   (A A^(-1))^T = I^T  =>  (A^(-1))^T A^T = I.\nSimilarly A^(-1) A = I gives A^T (A^(-1))^T = I. Hence (A^(-1))^T is a matrix which, multiplied by A^T on both sides, gives I, so by uniqueness (A^T)^(-1) = (A^(-1))^T.\nIllustration: A = [[2, 1], [5, 3]], |A| = 6 - 5 = 1, A^(-1) = [[3, -1], [-5, 2]], so (A^(-1))^T = [[3, -5], [-1, 2]]. Also A^T = [[2, 5], [1, 3]], |A^T| = 1, (A^T)^(-1) = [[3, -5], [-1, 2]]. The two results match.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "A shopkeeper sells three items. The costs give the system x + y + z = 6, 2x + 3y + z = 12, x + 2y + 3z = 14. Solve for x, y, z by the matrix method.",
+      "answer": "A = [[1, 1, 1], [2, 3, 1], [1, 2, 3]], B = [[6], [12], [14]].\n|A| = 1(3x3 - 1x2) - 1(2x3 - 1x1) + 1(2x2 - 3x1) = 1(7) - 1(5) + 1(1) = 3.\nCofactors:\nC11 = (9 - 2) = 7, C12 = -(6 - 1) = -5, C13 = (4 - 3) = 1,\nC21 = -(3 - 2) = -1, C22 = (3 - 1) = 2, C23 = -(2 - 1) = -1,\nC31 = (1 - 3) = -2, C32 = -(1 - 2) = 1, C33 = (3 - 2) = 1.\nadj(A) = transpose of [[7, -5, 1], [-1, 2, -1], [-2, 1, 1]] = [[7, -1, -2], [-5, 2, 1], [1, -1, 1]].\nA^(-1) = (1/3)[[7, -1, -2], [-5, 2, 1], [1, -1, 1]].\nX = A^(-1) B = (1/3)[[7x6 - 1x12 - 2x14], [-5x6 + 2x12 + 1x14], [1x6 - 1x12 + 1x14]] = (1/3)[[42 - 12 - 28], [-30 + 24 + 14], [6 - 12 + 14]] = (1/3)[[2], [8], [8]].\nSo x = 2/3, y = 8/3, z = 8/3. Check equation 1: 2/3 + 8/3 + 8/3 = 18/3 = 6. Correct.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Given A = [[1, -1, 1], [2, 1, -3], [1, 1, 1]], find adj(A) and hence A^(-1).",
+      "answer": "Determinant (row 1): |A| = 1(1x1 - (-3)(1)) - (-1)(2x1 - (-3)(1)) + 1(2x1 - 1x1) = 1(1 + 3) + 1(2 + 3) + 1(2 - 1) = 4 + 5 + 1 = 10.\nCofactors:\nC11 = (1 + 3) = 4, C12 = -(2 + 3) = -5, C13 = (2 - 1) = 1,\nC21 = -((-1)(1) - 1x1) = -(-1 - 1) = 2, C22 = (1x1 - 1x1) = 0, C23 = -(1x1 - (-1)(1)) = -(1 + 1) = -2,\nC31 = ((-1)(-3) - 1x1) = (3 - 1) = 2, C32 = -(1x(-3) - 1x2) = -(-3 - 2) = 5, C33 = (1x1 - (-1)(2)) = (1 + 2) = 3.\nCofactor matrix = [[4, -5, 1], [2, 0, -2], [2, 5, 3]]; transpose to get adj(A) = [[4, 2, 2], [-5, 0, 5], [1, -2, 3]].\nA^(-1) = adj(A)/|A| = (1/10)[[4, 2, 2], [-5, 0, 5], [1, -2, 3]].",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "LONG_ANSWER",
+      "question": "Show that for A = [[2, 4], [1, 3]], the identity A (adj A) = |A| I holds, then find A^(-1) and check A A^(-1) = I.",
+      "answer": "|A| = 2x3 - 4x1 = 6 - 4 = 2. adj(A) = [[3, -4], [-1, 2]].\nA (adj A) = [[2, 4], [1, 3]][[3, -4], [-1, 2]] = [[6 - 4, -8 + 8], [3 - 3, -4 + 6]] = [[2, 0], [0, 2]] = 2 I = |A| I. The identity holds.\nInverse: A^(-1) = adj(A)/|A| = (1/2)[[3, -4], [-1, 2]] = [[3/2, -2], [-1/2, 1]].\nCheck: A A^(-1) = [[2, 4], [1, 3]][[3/2, -2], [-1/2, 1]] = [[3 - 2, -4 + 4], [3/2 - 3/2, -2 + 3]] = [[1, 0], [0, 1]] = I.",
+      "explanation": null,
+      "marks": 5,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-02"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A student is asked to invert the 2x2 matrix A = [[3, 5], [1, 2]]. She recalls that for A = [[a, b], [c, d]], adj(A) = [[d, -b], [-c, a]] and A^(-1) = adj(A)/|A|. Answer the following.\n(i) Find |A|.\n(ii) Write adj(A).\n(iii) Find A^(-1).\n(iv) Is A singular or non-singular?",
+      "answer": "(i) |A| = 3x2 - 5x1 = 6 - 5 = 1. (ii) adj(A) = [[2, -5], [-1, 3]]. (iii) A^(-1) = (1/1)[[2, -5], [-1, 3]] = [[2, -5], [-1, 3]]. (iv) Since |A| = 1 != 0, A is non-singular (invertible).",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A system of equations is given by 2x + y = 8 and 3x + 4y = 22. It can be written as A X = B.\n(i) Write A and B.\n(ii) Find |A| and state whether the system has a unique solution.\n(iii) Find A^(-1).\n(iv) Solve for x and y.",
+      "answer": "(i) A = [[2, 1], [3, 4]], B = [[8], [22]]. (ii) |A| = 8 - 3 = 5 != 0, so the system has a unique solution. (iii) A^(-1) = (1/5)[[4, -1], [-3, 2]]. (iv) X = A^(-1) B = (1/5)[[4x8 - 1x22], [-3x8 + 2x22]] = (1/5)[[10], [20]] = [[2], [4]]. So x = 2, y = 4.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A matrix A = [[k, 2], [3, 6]] is under study. Its behaviour changes with the value of k.\n(i) Write |A| in terms of k.\n(ii) For what value of k is A singular?\n(iii) For k = 5, is A invertible? Give |A|.\n(iv) State whether a singular matrix has an inverse.",
+      "answer": "(i) |A| = 6k - 6. (ii) A is singular when 6k - 6 = 0, i.e. k = 1. (iii) For k = 5, |A| = 30 - 6 = 24 != 0, so A is invertible. (iv) A singular matrix has NO inverse, because A^(-1) = adj(A)/|A| would divide by zero.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-05"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: To find the inverse of A = [[1, 2], [2, 5]] by elementary row operations, a student forms [A | I] = [1, 2 | 1, 0 ; 2, 5 | 0, 1].\n(i) What operation clears the entry below the first pivot?\n(ii) Perform it and write the new second row.\n(iii) What operation clears the entry above the second pivot?\n(iv) Write A^(-1).",
+      "answer": "(i) R2 -> R2 - 2R1 clears the entry below the first pivot. (ii) New R2 = [0, 1 | -2, 1]. (iii) R1 -> R1 - 2R2 clears the entry above the second pivot, giving R1 = [1, 0 | 5, -2]. (iv) A^(-1) = [[5, -2], [-2, 1]]. (Check: |A| = 5 - 4 = 1.)",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: For an invertible matrix A of order 3 with |A| = 3, recall the properties |adj A| = |A|^(n-1), |A^(-1)| = 1/|A|, and (A^(-1))^(-1) = A.\n(i) Find |adj A|.\n(ii) Find |A^(-1)|.\n(iii) What is |(A^(-1))^(-1)|?\n(iv) If B is also order 3 with |B| = 2, find |(AB)^(-1)|.",
+      "answer": "(i) |adj A| = |A|^(n-1) = 3^2 = 9. (ii) |A^(-1)| = 1/3. (iii) (A^(-1))^(-1) = A, so |(A^(-1))^(-1)| = |A| = 3. (iv) |AB| = |A||B| = 3x2 = 6, so |(AB)^(-1)| = 1/|AB| = 1/6.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-06"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: Two numbers x and y satisfy: their sum is 20 and twice the first added to the second is 32. This gives x + y = 20 and 2x + y = 32.\n(i) Write the system as A X = B.\n(ii) Find |A|.\n(iii) Find A^(-1).\n(iv) Find the two numbers.",
+      "answer": "(i) A = [[1, 1], [2, 1]], X = [[x], [y]], B = [[20], [32]]. (ii) |A| = 1 - 2 = -1. (iii) A^(-1) = (1/-1)[[1, -1], [-2, 1]] = [[-1, 1], [2, -1]]. (iv) X = A^(-1) B = [[-20 + 32], [40 - 32]] = [[12], [8]]. So x = 12, y = 8.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-08"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A student computes the adjoint of A = [[1, 2, 2], [2, 1, 2], [2, 2, 1]] and needs the inverse.\n(i) Find |A|.\n(ii) State the sign of the cofactor C12.\n(iii) Given adj(A) = [[-3, 2, 2], [2, -3, 2], [2, 2, -3]], find A^(-1).\n(iv) Is A non-singular?",
+      "answer": "(i) |A| = 1(1 - 4) - 2(2 - 4) + 2(4 - 2) = -3 + 4 + 4 = 5. (ii) C12 = (-1)^(1+2) M12, so its sign is NEGATIVE (a minus times the minor). (iii) A^(-1) = adj(A)/|A| = (1/5)[[-3, 2, 2], [2, -3, 2], [2, 2, -3]]. (iv) Since |A| = 5 != 0, A is non-singular.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-02"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: Consider the equation A X = B where A = [[1, 2], [2, 4]] and B = [[3], [6]].\n(i) Find |A|.\n(ii) Is A singular or non-singular?\n(iii) Compute (adj A) B and comment.\n(iv) How many solutions does the system have?",
+      "answer": "(i) |A| = 1x4 - 2x2 = 0. (ii) Since |A| = 0, A is singular. (iii) adj(A) = [[4, -2], [-2, 1]]; (adj A) B = [[4x3 - 2x6], [-2x3 + 1x6]] = [[0], [0]] = O. (iv) Because |A| = 0 and (adj A) B = O, the system is consistent with INFINITELY MANY solutions (the two equations are proportional).",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A rotation matrix R = [[0, -1], [1, 0]] rotates points by 90 degrees. Rotations can be undone by inverse rotations.\n(i) Find |R|.\n(ii) Write adj(R).\n(iii) Find R^(-1).\n(iv) What geometric operation does R^(-1) represent?",
+      "answer": "(i) |R| = 0x0 - (-1)(1) = 1. (ii) adj(R) = [[0, 1], [-1, 0]]. (iii) R^(-1) = (1/1)[[0, 1], [-1, 0]] = [[0, 1], [-1, 0]]. (iv) R^(-1) rotates points by -90 degrees (a 90-degree rotation in the opposite direction), undoing R.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-04"
+    },
+    {
+      "type": "CASE_BASED",
+      "question": "Passage: A company mixes two ingredients. The conditions give 4x + 3y = 18 and 2x + 5y = 16, solved by the matrix method.\n(i) Write A and B.\n(ii) Find |A|.\n(iii) Find A^(-1).\n(iv) Solve for x and y.",
+      "answer": "(i) A = [[4, 3], [2, 5]], B = [[18], [16]]. (ii) |A| = 20 - 6 = 14. (iii) A^(-1) = (1/14)[[5, -3], [-2, 4]]. (iv) X = A^(-1) B = (1/14)[[5x18 - 3x16], [-2x18 + 4x16]] = (1/14)[[90 - 48], [-36 + 64]] = (1/14)[[42], [28]] = [[3], [2]]. So x = 3, y = 2.",
+      "explanation": null,
+      "marks": 4,
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "outcome_code": "12-NIOS-MAT-INV-07"
+    }
+  ]
+}

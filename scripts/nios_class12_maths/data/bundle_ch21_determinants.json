@@ -1,0 +1,2262 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 21,
+    "chapter_title": "Determinants",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 21 - DETERMINANTS\n\nIntroduction\n\nEvery square matrix of numbers can be assigned a single number called its DETERMINANT. This one number carries a surprising amount of information: it tells us whether a matrix has an inverse, whether a system of linear equations has a unique solution, whether three points lie on a straight line, and what the area of a triangle is. In this chapter we learn how to write and evaluate determinants of order 2 and order 3, how to expand them along any row or column using minors and cofactors, the powerful PROPERTIES that let us simplify a determinant before evaluating it, and two important applications - finding the area of a triangle and solving systems of linear equations by Cramer's rule. Throughout, we write the determinant of a square matrix A as det(A) or |A|.\n\n21.1 DETERMINANT OF A SQUARE MATRIX\n\nA determinant is defined ONLY for a SQUARE matrix (equal number of rows and columns). To every square matrix A we attach a number |A|. For a matrix of order n we speak of a determinant of order n. The determinant is written by enclosing the array of numbers between two vertical bars, not brackets. Thus if\n   A = [ a  b ]\n       [ c  d ]\nthen its determinant is written\n   |A| = | a  b |\n         | c  d |\nNote the difference: a MATRIX is an arrangement of numbers (written with square brackets), while a DETERMINANT is a single NUMBER computed from a square matrix (written with vertical bars). A determinant of order 1, that is |a|, is simply the number a itself (here the bars do NOT mean modulus).\n\n21.2 EVALUATING A 2x2 DETERMINANT\n\nFor a second-order (2x2) determinant the value is the product of the leading (principal) diagonal minus the product of the other diagonal:\n   | a  b |\n   | c  d |  =  a d - b c\nThe diagonal from top-left to bottom-right (a, d) is the leading diagonal; the diagonal from top-right to bottom-left (b, c) is the secondary diagonal. For example,\n   | 2  3 |\n   | 1  4 |  =  (2)(4) - (3)(1)  =  8 - 3  =  5.\nAnother: | 5  -2 ; 3  1 | = (5)(1) - (-2)(3) = 5 + 6 = 11.\n\n21.3 EVALUATING A 3x3 DETERMINANT (EXPANSION ALONG A ROW OR COLUMN)\n\nA third-order determinant is\n   | a1  b1  c1 |\n   | a2  b2  c2 |\n   | a3  b3  c3 |\nTo evaluate it we EXPAND along a row or a column. Expanding along the first row:\n   |A| = a1 (b2 c3 - b3 c2) - b1 (a2 c3 - a3 c2) + c1 (a2 b3 - a3 b2).\nEach element of the chosen row is multiplied by the 2x2 determinant left after deleting its own row and column, and the terms are combined with the fixed sign pattern\n   + - +\n   - + -\n   + - +\nWorked example:\n   | 1  0  2 |\n   | 3  1 -1 |\n   | 2  4  1 |\nExpanding along the first row:\n   = 1 * |1 -1 ; 4 1| - 0 * |3 -1 ; 2 1| + 2 * |3 1 ; 2 4|\n   = 1 * (1*1 - (-1)*4) - 0 + 2 * (3*4 - 1*2)\n   = 1 * (1 + 4) + 2 * (12 - 2)\n   = 5 + 20 = 25.\nThe value of a determinant does NOT depend on which row or column we expand along - every choice gives the same number. It is usually smart to expand along the row or column that contains the most zeros, because each zero kills a whole term.\n\n21.4 MINORS AND COFACTORS\n\nThe MINOR of an element is the determinant obtained by deleting the row and the column in which that element lies. In a 3x3 determinant the minor of any element is a 2x2 determinant. We write the minor of the element in row i and column j as M_ij.\n\nThe COFACTOR of an element is its minor multiplied by a sign (-1)^(i+j). We write the cofactor as A_ij:\n   A_ij = (-1)^(i+j) M_ij.\nThe sign factor (-1)^(i+j) follows the checkerboard pattern +, -, + along the first row, and so on.\n\nExample. For\n   A = | 1  2  3 |\n       | 4  5  6 |\n       | 7  8  9 |\nthe minor of the element 1 (row 1, col 1) is M_11 = |5 6 ; 8 9| = 45 - 48 = -3, and its cofactor is A_11 = (+1)(-3) = -3. The minor of 2 (row 1, col 2) is M_12 = |4 6 ; 7 9| = 36 - 42 = -6, and its cofactor is A_12 = (-1)(-6) = 6. The minor of 3 is M_13 = |4 5 ; 7 8| = 32 - 35 = -3, cofactor A_13 = (+1)(-3) = -3.\n\nA determinant equals the sum of the products of the elements of ANY row (or column) with their OWN cofactors:\n   |A| = a1 A_11 + b1 A_12 + c1 A_13   (expansion along row 1).\nThis is exactly the expansion of Section 21.3 written in cofactor language. A useful related fact: the sum of the products of the elements of one row with the cofactors of a DIFFERENT row is ZERO.\n\n21.5 PROPERTIES OF DETERMINANTS\n\nThese properties let us simplify a determinant, often reducing it to a triangular form or creating zeros before expanding.\n\nProperty 1 (Transpose). The value of a determinant is unchanged if its rows and columns are interchanged: |A| = |A^T|. Hence any statement true for rows is equally true for columns.\n\nProperty 2 (Interchange of two rows/columns). If any two rows (or two columns) of a determinant are interchanged, the value of the determinant changes SIGN (is multiplied by -1).\n\nProperty 3 (Identical rows/columns). If any two rows (or two columns) of a determinant are identical (or proportional), the value of the determinant is ZERO. This follows from Property 2: swapping the two equal rows leaves the determinant unchanged yet must change its sign, so |A| = -|A|, forcing |A| = 0.\n\nProperty 4 (Scalar multiple). If every element of one row (or one column) is multiplied by a constant k, the whole determinant is multiplied by k. Read the other way, a common factor of a row or column can be TAKEN OUT in front of the determinant. As a consequence, for an n x n matrix, det(kA) = k^n det(A), because a factor k comes out of each of the n rows.\n\nProperty 5 (Sum of determinants). If each element of a row (or column) is written as a sum of two terms, the determinant can be split into the sum of two determinants.\n\nProperty 6 (Row/column operation). If to the elements of any row (or column) we add k times the corresponding elements of another row (or column), the value of the determinant is UNCHANGED. In symbols R_i -> R_i + k R_j (i not equal to j) leaves |A| unaltered. This is the most useful property for creating zeros.\n\nProperty 7 (Zero row/column). If any row or column consists entirely of zeros, the determinant is ZERO.\n\nProperty 8 (Triangular determinant). If all the elements below (or all above) the leading diagonal are zero, the determinant equals the product of the diagonal elements.\n\nWorked example using properties: evaluate\n   | 1  1  1 |\n   | a  b  c |\n   | a^2 b^2 c^2 |\nApplying C2 -> C2 - C1 and C3 -> C3 - C1 (column operations) and taking out common factors gives (b - a)(c - a)(c - b). This is the well-known Vandermonde determinant; it is zero whenever any two of a, b, c are equal, as Property 3 predicts.\n\n21.6 AREA OF A TRIANGLE USING DETERMINANTS\n\nIf a triangle has vertices (x1, y1), (x2, y2) and (x3, y3), its area is\n   Area = (1/2) | x1 (y2 - y3) + x2 (y3 - y1) + x3 (y1 - y2) |,\nwhich can be written compactly as the modulus of a third-order determinant:\n   Area = (1/2) * abs of  | x1  y1  1 |\n                          | x2  y2  1 |\n                          | x3  y3  1 |\nBecause area is always positive we take the absolute value (modulus) of the determinant; the factor 1/2 and the modulus together give the geometric area.\n\nWorked example: vertices (0, 0), (4, 0), (0, 3).\n   Area = (1/2) | 0(0 - 3) + 4(3 - 0) + 0(0 - 0) | = (1/2) |0 + 12 + 0| = 6 square units.\n\nCONDITION FOR COLLINEAR POINTS. Three points are COLLINEAR (lie on one straight line) exactly when the triangle they form has zero area, that is when\n   | x1  y1  1 ; x2  y2  1 ; x3  y3  1 | = 0.\nThis determinant test is a quick way to check collinearity and to find the equation of a line through two points.\n\n21.7 SOLVING LINEAR SYSTEMS - CRAMER'S RULE\n\nDeterminants give a neat formula for the solution of a system of linear equations, known as CRAMER'S RULE.\n\nTWO VARIABLES. For\n   a1 x + b1 y = c1\n   a2 x + b2 y = c2\nlet\n   D  = | a1  b1 ; a2  b2 |   (determinant of the coefficients),\n   Dx = | c1  b1 ; c2  b2 |   (replace the x-column by the constants),\n   Dy = | a1  c1 ; a2  c2 |   (replace the y-column by the constants).\nIf D is not zero, the unique solution is\n   x = Dx / D,   y = Dy / D.\nWorked example:\n   2x + 3y = 8\n    x +  y = 3\n   D = |2 3 ; 1 1| = 2 - 3 = -1,  Dx = |8 3 ; 3 1| = 8 - 9 = -1,  Dy = |2 8 ; 1 3| = 6 - 8 = -2.\n   x = Dx/D = -1/-1 = 1,  y = Dy/D = -2/-1 = 2. So x = 1, y = 2.\n\nTHREE VARIABLES. For\n   a1 x + b1 y + c1 z = d1\n   a2 x + b2 y + c2 z = d2\n   a3 x + b3 y + c3 z = d3\nlet D be the 3x3 determinant of the coefficients, and let Dx, Dy, Dz be the determinants obtained by replacing the x-, y-, z-columns respectively by the column of constants d1, d2, d3. If D is not zero,\n   x = Dx / D,   y = Dy / D,   z = Dz / D.\nWorked example:\n   x + y + z = 6\n   x + 2y + 3z = 14\n   x + 4y + 9z = 36\n   D = |1 1 1 ; 1 2 3 ; 1 4 9| = 1(18-12) - 1(9-3) + 1(4-2) = 6 - 6 + 2 = 2.\n   Dx = |6 1 1 ; 14 2 3 ; 36 4 9| = 2, Dy = |1 6 1 ; 1 14 3 ; 1 36 9| = 4, Dz = |1 1 6 ; 1 2 14 ; 1 4 36| = 6.\n   x = 2/2 = 1, y = 4/2 = 2, z = 6/2 = 3.\n\n21.8 CONSISTENCY OF A SYSTEM\n\nA system is CONSISTENT if it has at least one solution and INCONSISTENT if it has none. Cramer's rule classifies the possibilities through the determinants:\n\n(1) If D is not zero: the system has a UNIQUE solution (it is consistent and independent).\n\n(2) If D = 0 and each of Dx, Dy, Dz is also zero: the system has INFINITELY MANY solutions (consistent and dependent) - provided the equations are genuinely proportional; the equations then represent the same line or plane.\n\n(3) If D = 0 but at least one of Dx, Dy, Dz is not zero: the system has NO solution (it is inconsistent) - for example two parallel lines.\n\nThus the single number D = 0 is the CONDITION at which a unique solution fails; whether we then get no solution or infinitely many depends on Dx, Dy, Dz. For a HOMOGENEOUS system (all constants zero: d1 = d2 = d3 = 0), x = y = z = 0 is always a solution (the trivial one); a NON-trivial solution exists only when D = 0.\n\nSUMMARY\n\n- A determinant is a single number |A| attached to a SQUARE matrix; order 1 gives |a| = a.\n- 2x2: |a b ; c d| = ad - bc (leading diagonal product minus secondary diagonal product).\n- 3x3: expand along any row or column; |A| = a1(b2c3 - b3c2) - b1(a2c3 - a3c2) + c1(a2b3 - a3b2). The answer is the same whichever row/column is chosen; pick the one with most zeros.\n- Minor M_ij = determinant left after deleting row i and column j; cofactor A_ij = (-1)^(i+j) M_ij. A determinant equals the sum of each row's (or column's) elements times their own cofactors.\n- Properties: |A| = |A^T|; swapping two rows/columns changes the sign; two identical or proportional rows/columns give 0; a common factor of a row/column comes out (det(kA) = k^n det(A)); R_i -> R_i + k R_j leaves the value unchanged; a zero row/column gives 0; a triangular determinant is the product of its diagonal.\n- Area of a triangle with vertices (x1,y1),(x2,y2),(x3,y3) is (1/2)|det of [x1 y1 1 ; x2 y2 1 ; x3 y3 1]|; the three points are collinear when this determinant is 0.\n- Cramer's rule: x = Dx/D, y = Dy/D (and z = Dz/D) when D is not zero, where Dx, Dy, Dz replace the relevant column by the constants.\n- Consistency: D not 0 gives a unique solution; D = 0 with all of Dx, Dy, Dz = 0 gives infinitely many solutions; D = 0 with some of them not 0 gives no solution.\n",
+  "topics": [
+    {
+      "name": "Determinant of a Matrix",
+      "description": "The determinant |A| or det(A) as a single number attached to a SQUARE matrix; the difference between a matrix (an array) and a determinant (a number); notation with vertical bars; order of a determinant and the order-1 case |a| = a."
+    },
+    {
+      "name": "Evaluating 2x2 and 3x3 Determinants",
+      "description": "Value of a 2x2 determinant as ad - bc; expansion of a 3x3 determinant along a row or column with the +,-,+ sign pattern; the value is independent of the row/column chosen, so expanding along the line with most zeros is easiest."
+    },
+    {
+      "name": "Minors and Cofactors",
+      "description": "The minor M_ij as the determinant left after deleting row i and column j; the cofactor A_ij = (-1)^(i+j) M_ij; expansion of a determinant as the sum of elements of a row/column times their own cofactors."
+    },
+    {
+      "name": "Properties of Determinants",
+      "description": "Transpose invariance |A| = |A^T|; sign change on interchanging two rows/columns; zero for identical or proportional rows/columns; scalar factor of a row (det(kA) = k^n det A); invariance under R_i -> R_i + k R_j; zero row/column; triangular determinant equals the diagonal product."
+    },
+    {
+      "name": "Area of a Triangle using Determinants",
+      "description": "Area = (1/2)|det of [x1 y1 1 ; x2 y2 1 ; x3 y3 1]| for a triangle with the given vertices; use of the modulus because area is positive; the collinearity condition that the determinant vanishes."
+    },
+    {
+      "name": "Cramer's Rule and Consistency of Systems",
+      "description": "Solving 2- and 3-variable linear systems by x = Dx/D, y = Dy/D, z = Dz/D; the coefficient determinant D and the replaced-column determinants Dx, Dy, Dz; the consistency conditions for a unique solution, no solution and infinitely many solutions."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-DET-01",
+      "topic_name": "Determinant of a Matrix",
+      "bloom": "understand",
+      "description": "Explain what a determinant is, distinguish a determinant from a matrix, write a determinant with vertical bars, and state that a determinant is defined only for a square matrix with |a| = a for order 1."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-02",
+      "topic_name": "Evaluating 2x2 and 3x3 Determinants",
+      "bloom": "apply",
+      "description": "Evaluate a 2x2 determinant using ad - bc and apply it to simple numerical and algebraic determinants."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-03",
+      "topic_name": "Evaluating 2x2 and 3x3 Determinants",
+      "bloom": "apply",
+      "description": "Expand and evaluate a 3x3 determinant along any row or column using the +,-,+ sign pattern, choosing the row/column with most zeros."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-04",
+      "topic_name": "Minors and Cofactors",
+      "bloom": "understand",
+      "description": "Find the minor and cofactor of any element of a determinant and expand a determinant as the sum of products of elements with their cofactors."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-05",
+      "topic_name": "Properties of Determinants",
+      "bloom": "understand",
+      "description": "State and use the properties of determinants (transpose, row/column interchange, identical rows, scalar multiple, row operations, zero row, triangular form) to simplify or evaluate a determinant."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-06",
+      "topic_name": "Properties of Determinants",
+      "bloom": "apply",
+      "description": "Apply row and column operations and factor-extraction to prove identities and evaluate higher determinants efficiently, including det(kA) = k^n det(A)."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-07",
+      "topic_name": "Area of a Triangle using Determinants",
+      "bloom": "apply",
+      "description": "Compute the area of a triangle from its vertices using a determinant and test three points for collinearity using the zero-area condition."
+    },
+    {
+      "code": "12-NIOS-MAT-DET-08",
+      "topic_name": "Cramer's Rule and Consistency of Systems",
+      "bloom": "apply",
+      "description": "Solve systems of two and three linear equations by Cramer's rule and classify a system as having a unique solution, no solution or infinitely many solutions using D, Dx, Dy, Dz."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Determinants - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Determinants lesson. It explains what the determinant of a square matrix is, how to evaluate 2x2 and 3x3 determinants by expansion, minors and cofactors, the properties that simplify determinants, and two applications - the area of a triangle and solving linear systems by Cramer's rule with the conditions for consistency.",
+    "overview_diagram": {
+      "title": "Determinants",
+      "central_term": "Determinants",
+      "branches": [
+        {
+          "label": "Meaning & Evaluation",
+          "details": [
+            "|A| is a number from a SQUARE matrix",
+            "2x2: |a b ; c d| = ad - bc",
+            "3x3: expand along a row/column with +,-,+ signs"
+          ]
+        },
+        {
+          "label": "Minors & Cofactors",
+          "details": [
+            "Minor M_ij: delete row i, column j",
+            "Cofactor A_ij = (-1)^(i+j) M_ij",
+            "|A| = sum of (element x its cofactor)"
+          ]
+        },
+        {
+          "label": "Properties",
+          "details": [
+            "|A| = |A^T|; swap two rows/cols -> sign changes",
+            "Two equal/proportional rows -> 0",
+            "Factor k out of a row; det(kA) = k^n det A",
+            "R_i -> R_i + k R_j leaves value unchanged"
+          ]
+        },
+        {
+          "label": "Area of Triangle",
+          "details": [
+            "Area = (1/2)|det [x1 y1 1 ; x2 y2 1 ; x3 y3 1]|",
+            "Take modulus (area is positive)",
+            "Determinant = 0 means points are collinear"
+          ]
+        },
+        {
+          "label": "Cramer's Rule & Consistency",
+          "details": [
+            "x = Dx/D, y = Dy/D, z = Dz/D (D not 0)",
+            "D not 0: unique solution",
+            "D = 0, all Dx=Dy=Dz=0: infinitely many",
+            "D = 0, some not 0: no solution"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Meaning and evaluation of a determinant",
+        "bullets": [
+          "A determinant |A| or det(A) is a single number attached to a SQUARE matrix; it is written with vertical bars, not brackets.",
+          "A 2x2 determinant equals the leading-diagonal product minus the secondary-diagonal product: |a b ; c d| = ad - bc.",
+          "A 3x3 determinant is evaluated by expanding along any row or column using the sign pattern +,-,+ on the elements.",
+          "The value is the same whichever row or column is used, so it is best to expand along the one containing the most zeros."
+        ]
+      },
+      {
+        "heading": "Minors and cofactors",
+        "bullets": [
+          "The minor M_ij of an element is the determinant left after deleting its row and column.",
+          "The cofactor is A_ij = (-1)^(i+j) M_ij, i.e. the minor with a checkerboard sign.",
+          "A determinant equals the sum of the products of the elements of any one row (or column) with their own cofactors.",
+          "The sum of the elements of one row times the cofactors of a different row is zero."
+        ]
+      },
+      {
+        "heading": "Properties of determinants",
+        "bullets": [
+          "Rows and columns may be interchanged without changing the value: |A| = |A^T|.",
+          "Interchanging two rows or two columns changes the sign; two identical or proportional rows/columns give 0.",
+          "A common factor of a row or column can be taken outside; for order n, det(kA) = k^n det(A).",
+          "Adding a multiple of one row/column to another (R_i -> R_i + k R_j) does not change the value; a zero row/column gives 0."
+        ]
+      },
+      {
+        "heading": "Area of a triangle and collinearity",
+        "bullets": [
+          "Area = (1/2) times the modulus of the determinant with rows (x1,y1,1), (x2,y2,1), (x3,y3,1).",
+          "The modulus is taken because area must be positive.",
+          "Equivalently Area = (1/2)|x1(y2-y3) + x2(y3-y1) + x3(y1-y2)|.",
+          "Three points are collinear exactly when this determinant equals zero (zero area)."
+        ]
+      },
+      {
+        "heading": "Cramer's rule and consistency",
+        "bullets": [
+          "For a system, D is the coefficient determinant and Dx, Dy, Dz replace the matching column by the constants.",
+          "When D is not zero the unique solution is x = Dx/D, y = Dy/D, z = Dz/D.",
+          "D = 0 with all of Dx, Dy, Dz zero gives infinitely many solutions (consistent, dependent).",
+          "D = 0 with some of Dx, Dy, Dz non-zero gives no solution (inconsistent)."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "A determinant is one number obtained from a square matrix; |a b ; c d| = ad - bc and 3x3 determinants are found by cofactor expansion.",
+      "Expand along the row or column with the most zeros; the answer is independent of the choice.",
+      "Minor M_ij deletes row i and column j; cofactor A_ij = (-1)^(i+j) M_ij; |A| = sum of element times its cofactor.",
+      "Key properties: |A| = |A^T|; swapping two rows/columns flips the sign; equal/proportional rows give 0; R_i -> R_i + k R_j is value-preserving; det(kA) = k^n det(A).",
+      "Area of a triangle = (1/2)|det [x1 y1 1 ; x2 y2 1 ; x3 y3 1]|, and the points are collinear when the determinant is 0.",
+      "Cramer's rule: x = Dx/D, y = Dy/D, z = Dz/D provided D is not zero.",
+      "Consistency: D not 0 => unique; D = 0 and all Dx=Dy=Dz=0 => infinitely many; D = 0 and some not 0 => no solution."
+    ],
+    "glossary": [
+      {
+        "term": "Determinant",
+        "definition": "A single number |A| or det(A) associated with a square matrix; written between vertical bars."
+      },
+      {
+        "term": "Order of a determinant",
+        "definition": "The number of rows (equal to the number of columns) of the square array; a 3x3 determinant has order 3."
+      },
+      {
+        "term": "Leading diagonal",
+        "definition": "The diagonal of a determinant running from the top-left element to the bottom-right element."
+      },
+      {
+        "term": "2x2 determinant",
+        "definition": "A second-order determinant whose value is ad - bc for the array with rows (a,b) and (c,d)."
+      },
+      {
+        "term": "Expansion (of a determinant)",
+        "definition": "Evaluating a determinant as a signed sum of elements of a row/column times their minors or cofactors."
+      },
+      {
+        "term": "Minor",
+        "definition": "The determinant M_ij obtained by deleting the row and column of an element from a determinant."
+      },
+      {
+        "term": "Cofactor",
+        "definition": "The signed minor A_ij = (-1)^(i+j) M_ij of an element of a determinant."
+      },
+      {
+        "term": "Transpose property",
+        "definition": "The rule that a determinant is unchanged when its rows and columns are interchanged: |A| = |A^T|."
+      },
+      {
+        "term": "Row/column operation",
+        "definition": "The step R_i -> R_i + k R_j (or on columns) that adds a multiple of one line to another without changing the value."
+      },
+      {
+        "term": "Triangular determinant",
+        "definition": "A determinant with all entries on one side of the leading diagonal zero; its value is the product of the diagonal entries."
+      },
+      {
+        "term": "Area by determinant",
+        "definition": "Area = (1/2)|det [x1 y1 1 ; x2 y2 1 ; x3 y3 1]| for a triangle with the given vertices."
+      },
+      {
+        "term": "Collinear points",
+        "definition": "Points lying on one straight line; they satisfy the determinant condition that the triangle's area is zero."
+      },
+      {
+        "term": "Cramer's rule",
+        "definition": "A method giving x = Dx/D, y = Dy/D, z = Dz/D for a linear system when the coefficient determinant D is not zero."
+      },
+      {
+        "term": "Coefficient determinant (D)",
+        "definition": "The determinant formed from the coefficients of the variables in a linear system."
+      },
+      {
+        "term": "Consistent system",
+        "definition": "A system of equations that has at least one solution; inconsistent systems have none."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Determinants (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for every numerical problem. A 2x2 determinant is ad - bc; expand a 3x3 along the row or column with most zeros.",
+    "total_marks": 33,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate the determinant | 4  3 ; 2  5 |.",
+        "answer": "For a 2x2 determinant |a b ; c d| = ad - bc.\n\n   | 4  3 ; 2  5 | = (4)(5) - (3)(2) = 20 - 6 = 14.",
+        "explanation": "ad - bc = 20 - 6 = 14.",
+        "marks": 2,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate | 1  2  3 ; 0  1  4 ; 5  6  0 | by expanding along the first row.",
+        "answer": "Expand along row 1 with signs +, -, +:\n\n   = 1 * |1 4 ; 6 0| - 2 * |0 4 ; 5 0| + 3 * |0 1 ; 5 6|\n   = 1 * (1*0 - 4*6) - 2 * (0*0 - 4*5) + 3 * (0*6 - 1*5)\n   = 1 * (-24) - 2 * (-20) + 3 * (-5)\n   = -24 + 40 - 15 = 1.",
+        "explanation": "Cofactor expansion along row 1 gives 1.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-03"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "For the determinant | 1  2  3 ; 4  5  6 ; 7  8  9 |, find the cofactors A_11, A_12 and A_13 of the first row.",
+        "answer": "The cofactor A_ij = (-1)^(i+j) M_ij.\n\nM_11 = |5 6 ; 8 9| = 45 - 48 = -3, so A_11 = (+1)(-3) = -3.\nM_12 = |4 6 ; 7 9| = 36 - 42 = -6, so A_12 = (-1)(-6) = 6.\nM_13 = |4 5 ; 7 8| = 32 - 35 = -3, so A_13 = (+1)(-3) = -3.\n\nSo A_11 = -3, A_12 = 6, A_13 = -3.",
+        "explanation": "Minors with checkerboard signs.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using a property of determinants, show that | 1  2  3 ; 2  4  6 ; 5  1  7 | = 0 without full expansion.",
+        "answer": "Look at the first two rows: R2 = (2, 4, 6) = 2 x (1, 2, 3) = 2 x R1. So R2 is proportional to R1.\n\nBy the property that a determinant with two proportional (or identical) rows is zero, the value of the determinant is 0.",
+        "explanation": "R2 = 2 R1, proportional rows give 0.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-DET-05"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Solve the following system by Cramer's rule:\n   x + y + z = 6\n   x + 2y + 3z = 14\n   x + 4y + 9z = 36.",
+        "answer": "Coefficient determinant:\n   D = |1 1 1 ; 1 2 3 ; 1 4 9| = 1(2*9 - 3*4) - 1(1*9 - 3*1) + 1(1*4 - 2*1) = 1(6) - 1(6) + 1(2) = 2.\n\nSince D = 2 (not zero), a unique solution exists.\n\nDx (replace column 1 by 6, 14, 36):\n   Dx = |6 1 1 ; 14 2 3 ; 36 4 9| = 6(18-12) - 1(126-108) + 1(56-72) = 36 - 18 - 16 = 2.\nDy (replace column 2):\n   Dy = |1 6 1 ; 1 14 3 ; 1 36 9| = 1(126-108) - 6(9-3) + 1(36-14) = 18 - 36 + 22 = 4.\nDz (replace column 3):\n   Dz = |1 1 6 ; 1 2 14 ; 1 4 36| = 1(72-56) - 1(36-14) + 6(4-2) = 16 - 22 + 12 = 6.\n\nx = Dx/D = 2/2 = 1, y = Dy/D = 4/2 = 2, z = Dz/D = 6/2 = 3.\n\nSo x = 1, y = 2, z = 3.",
+        "explanation": "D = 2; Dx=2, Dy=4, Dz=6 give (1,2,3).",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-08"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the area of the triangle whose vertices are (2, 3), (4, -1) and (6, 7).",
+        "answer": "Area = (1/2) | x1(y2 - y3) + x2(y3 - y1) + x3(y1 - y2) |.\n\n   = (1/2) | 2(-1 - 7) + 4(7 - 3) + 6(3 - (-1)) |\n   = (1/2) | 2(-8) + 4(4) + 6(4) |\n   = (1/2) | -16 + 16 + 24 |\n   = (1/2)(24) = 12 square units.",
+        "explanation": "Vertex-determinant formula gives 12.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Show that the points (1, 2), (2, 4) and (3, 6) are collinear using a determinant.",
+        "answer": "The points are collinear if | x1 y1 1 ; x2 y2 1 ; x3 y3 1 | = 0.\n\n   | 1 2 1 ; 2 4 1 ; 3 6 1 |\n   = 1(4 - 6) - 2(2 - 3) + 1(12 - 12)\n   = 1(-2) - 2(-1) + 1(0)\n   = -2 + 2 + 0 = 0.\n\nSince the determinant is 0, the three points are collinear.",
+        "explanation": "Zero determinant means collinear.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Solve by Cramer's rule: 3x + 2y = 7 and x - y = -1.",
+        "answer": "D = |3 2 ; 1 -1| = (3)(-1) - (2)(1) = -3 - 2 = -5.\nDx = |7 2 ; -1 -1| = (7)(-1) - (2)(-1) = -7 + 2 = -5.\nDy = |3 7 ; 1 -1| = (3)(-1) - (7)(1) = -3 - 7 = -10.\n\nx = Dx/D = -5/-5 = 1, y = Dy/D = -10/-5 = 2.\n\nSo x = 1, y = 2. (Check: 3(1)+2(2)=7 and 1-2=-1.)",
+        "explanation": "D=-5, Dx=-5, Dy=-10 give (1,2).",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-08"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Evaluate | 1  2  3 ; 2  3  1 ; 3  1  2 | using the row operation R1 -> R1 + R2 + R3 to take out a common factor, then check by direct expansion.",
+        "answer": "Add all three rows into R1 (R1 -> R1 + R2 + R3). Each column of the new R1 becomes 1+2+3 = 6, so R1 = (6, 6, 6):\n\n   | 6 6 6 ; 2 3 1 ; 3 1 2 |.\n\nTake the common factor 6 out of R1:\n\n   = 6 | 1 1 1 ; 2 3 1 ; 3 1 2 |.\n\nExpand along row 1:\n   = 6 [ 1(3*2 - 1*1) - 1(2*2 - 1*3) + 1(2*1 - 3*3) ]\n   = 6 [ 1(6-1) - 1(4-3) + 1(2-9) ]\n   = 6 [ 5 - 1 - 7 ] = 6(-3) = -18.\n\nCheck by direct expansion of the original along row 1:\n   1(3*2 - 1*1) - 2(2*2 - 1*3) + 3(2*1 - 3*3) = 1(5) - 2(1) + 3(-7) = 5 - 2 - 21 = -18. Same value.",
+        "explanation": "Common factor 6 out of R1; both methods give -18.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-DET-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Test whether the system x + y = 3 and 2x + 2y = 6 has a unique solution, no solution or infinitely many solutions.",
+        "answer": "D = |1 1 ; 2 2| = (1)(2) - (1)(2) = 2 - 2 = 0.\nDx = |3 1 ; 6 2| = (3)(2) - (1)(6) = 6 - 6 = 0.\nDy = |1 3 ; 2 6| = (1)(6) - (3)(2) = 6 - 6 = 0.\n\nSince D = 0 and Dx = Dy = 0, the system has INFINITELY MANY solutions (the second equation is just twice the first, so both represent the same line).",
+        "explanation": "D=0 with Dx=Dy=0 gives infinitely many solutions.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-DET-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A determinant is defined only for a matrix that is",
+      "options": [
+        "rectangular",
+        "square",
+        "a single row",
+        "a single column"
+      ],
+      "answer": "square",
+      "explanation": "A determinant needs equal rows and columns."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The determinant of a matrix is",
+      "options": [
+        "another matrix",
+        "a single number",
+        "a vector",
+        "a row of numbers"
+      ],
+      "answer": "a single number",
+      "explanation": "|A| is one number."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A determinant is written by enclosing the array between",
+      "options": [
+        "square brackets",
+        "curly braces",
+        "vertical bars",
+        "parentheses"
+      ],
+      "answer": "vertical bars",
+      "explanation": "Bars, not brackets, denote a determinant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The order-1 determinant | 7 | equals",
+      "options": [
+        "0",
+        "1",
+        "7",
+        "-7"
+      ],
+      "answer": "7",
+      "explanation": "|a| = a for order 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A determinant with 3 rows and 3 columns has order",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "9"
+      ],
+      "answer": "3",
+      "explanation": "Order equals the number of rows."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The number of elements in a 3x3 determinant is",
+      "options": [
+        "3",
+        "6",
+        "9",
+        "12"
+      ],
+      "answer": "9",
+      "explanation": "3 x 3 = 9 entries."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Which statement is correct?",
+      "options": [
+        "A matrix is a number and a determinant is an array",
+        "A determinant is a single number obtained from a square matrix",
+        "A determinant and a matrix are the same thing",
+        "A determinant exists for every rectangular matrix"
+      ],
+      "answer": "A determinant is a single number obtained from a square matrix",
+      "explanation": "Matrix = array; determinant = number."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The symbol |A| stands for",
+      "options": [
+        "the transpose of A",
+        "the inverse of A",
+        "the determinant of A",
+        "the modulus of every element"
+      ],
+      "answer": "the determinant of A",
+      "explanation": "|A| = det(A)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A determinant cannot be formed from a",
+      "options": [
+        "2x2 matrix",
+        "3x3 matrix",
+        "2x3 (rectangular) matrix",
+        "1x1 matrix"
+      ],
+      "answer": "2x3 (rectangular) matrix",
+      "explanation": "Only square matrices have determinants."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the order-1 determinant | -5 |, the vertical bars denote",
+      "options": [
+        "the modulus, giving 5",
+        "the determinant, equal to -5",
+        "the reciprocal",
+        "the square"
+      ],
+      "answer": "the determinant, equal to -5",
+      "explanation": "For order 1, |a| = a, not modulus."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value of | a b ; c d | is",
+      "options": [
+        "ab - cd",
+        "ad - bc",
+        "ad + bc",
+        "bc - ad"
+      ],
+      "answer": "ad - bc",
+      "explanation": "Leading diagonal product minus secondary."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 2 3 ; 1 4 | equals",
+      "options": [
+        "5",
+        "11",
+        "-5",
+        "8"
+      ],
+      "answer": "5",
+      "explanation": "8 - 3 = 5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 5 2 ; 3 1 | equals",
+      "options": [
+        "-1",
+        "1",
+        "13",
+        "11"
+      ],
+      "answer": "-1",
+      "explanation": "5 - 6 = -1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 3 -1 ; 2 4 | equals",
+      "options": [
+        "14",
+        "10",
+        "-14",
+        "12"
+      ],
+      "answer": "14",
+      "explanation": "12 - (-2) = 14."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 0 5 ; 2 3 | equals",
+      "options": [
+        "-10",
+        "10",
+        "6",
+        "15"
+      ],
+      "answer": "-10",
+      "explanation": "0 - 10 = -10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| x 2 ; 3 x | equals",
+      "options": [
+        "x^2 - 6",
+        "x^2 + 6",
+        "2x - 6",
+        "6 - x^2"
+      ],
+      "answer": "x^2 - 6",
+      "explanation": "x*x - 2*3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 0 ; 0 1 | equals",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "-1"
+      ],
+      "answer": "1",
+      "explanation": "1 - 0 = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 4 4 ; 2 2 | equals",
+      "options": [
+        "0",
+        "16",
+        "8",
+        "4"
+      ],
+      "answer": "0",
+      "explanation": "8 - 8 = 0 (proportional rows)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If | 2 x ; 3 4 | = 2, then x equals",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": "2",
+      "explanation": "8 - 3x = 2 gives x = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "| a 0 ; 0 b | equals",
+      "options": [
+        "a + b",
+        "ab",
+        "0",
+        "a - b"
+      ],
+      "answer": "ab",
+      "explanation": "Diagonal product; off-diagonal 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In | a b ; c d |, the leading diagonal consists of",
+      "options": [
+        "b and c",
+        "a and d",
+        "a and b",
+        "c and d"
+      ],
+      "answer": "a and d",
+      "explanation": "Top-left to bottom-right."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| cos x  -sin x ; sin x  cos x | equals",
+      "options": [
+        "0",
+        "1",
+        "-1",
+        "2"
+      ],
+      "answer": "1",
+      "explanation": "cos^2 x + sin^2 x = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A 3x3 determinant is evaluated by expanding along",
+      "options": [
+        "the leading diagonal only",
+        "any row or column",
+        "the first row only",
+        "its inverse"
+      ],
+      "answer": "any row or column",
+      "explanation": "Expansion works along any line."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sign pattern along the first row in cofactor expansion is",
+      "options": [
+        "+, +, +",
+        "+, -, +",
+        "-, +, -",
+        "-, -, -"
+      ],
+      "answer": "+, -, +",
+      "explanation": "(-1)^(1+j) gives +,-,+."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 0 0 ; 0 2 0 ; 0 0 3 | equals",
+      "options": [
+        "0",
+        "5",
+        "6",
+        "1"
+      ],
+      "answer": "6",
+      "explanation": "Diagonal product 1*2*3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To make expansion easiest, expand along the row or column with the most",
+      "options": [
+        "ones",
+        "zeros",
+        "large numbers",
+        "negative numbers"
+      ],
+      "answer": "zeros",
+      "explanation": "Each zero removes a term."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The value of a 3x3 determinant is independent of",
+      "options": [
+        "the numbers in it",
+        "the row or column chosen for expansion",
+        "the order of the matrix",
+        "the sign pattern"
+      ],
+      "answer": "the row or column chosen for expansion",
+      "explanation": "Every valid expansion gives the same value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 2 3 ; 4 5 6 ; 7 8 9 | equals",
+      "options": [
+        "0",
+        "1",
+        "-1",
+        "9"
+      ],
+      "answer": "0",
+      "explanation": "Rows in arithmetic progression give 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 2 0 0 ; 3 1 0 ; 4 5 6 | equals",
+      "options": [
+        "12",
+        "0",
+        "6",
+        "10"
+      ],
+      "answer": "12",
+      "explanation": "Lower-triangular: 2*1*6 = 12."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 0 2 ; 3 1 -1 ; 2 4 1 | equals",
+      "options": [
+        "25",
+        "20",
+        "5",
+        "0"
+      ],
+      "answer": "25",
+      "explanation": "Expansion gives 5 + 20 = 25."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 1 1 ; 0 1 1 ; 0 0 1 | equals",
+      "options": [
+        "1",
+        "0",
+        "3",
+        "2"
+      ],
+      "answer": "1",
+      "explanation": "Upper-triangular: 1*1*1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Expanding a 3x3 along a column that has two zeros results in",
+      "options": [
+        "a wrong value",
+        "fewer terms to compute",
+        "an undefined result",
+        "a different value"
+      ],
+      "answer": "fewer terms to compute",
+      "explanation": "Zeros drop terms but not the value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The minor of an element is found by deleting its",
+      "options": [
+        "row only",
+        "column only",
+        "row and column",
+        "leading diagonal"
+      ],
+      "answer": "row and column",
+      "explanation": "Delete the element's row and column."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The cofactor A_ij equals",
+      "options": [
+        "M_ij",
+        "(-1)^(i+j) M_ij",
+        "(-1)^(i*j) M_ij",
+        "(i+j) M_ij"
+      ],
+      "answer": "(-1)^(i+j) M_ij",
+      "explanation": "Signed minor."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a 3x3 determinant, the minor of any element is a determinant of order",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "2",
+      "explanation": "Deleting one row and column leaves 2x2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sign attached to the cofactor A_12 is",
+      "options": [
+        "+",
+        "-",
+        "0",
+        "cannot be decided"
+      ],
+      "answer": "-",
+      "explanation": "(-1)^(1+2) = -1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sign attached to the cofactor A_22 is",
+      "options": [
+        "+",
+        "-",
+        "0",
+        "depends on values"
+      ],
+      "answer": "+",
+      "explanation": "(-1)^(2+2) = +1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For | 1 2 3 ; 4 5 6 ; 7 8 9 |, the minor M_11 is",
+      "options": [
+        "-3",
+        "3",
+        "45",
+        "-6"
+      ],
+      "answer": "-3",
+      "explanation": "|5 6 ; 8 9| = 45 - 48 = -3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For | 1 2 3 ; 4 5 6 ; 7 8 9 |, the cofactor A_12 is",
+      "options": [
+        "-6",
+        "6",
+        "3",
+        "-3"
+      ],
+      "answer": "6",
+      "explanation": "M_12 = -6, A_12 = -(-6) = 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A determinant equals the sum of the elements of a row multiplied by their own",
+      "options": [
+        "minors",
+        "cofactors",
+        "transposes",
+        "reciprocals"
+      ],
+      "answer": "cofactors",
+      "explanation": "Cofactor expansion."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "HARD",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the elements of one row times the cofactors of a different row equals",
+      "options": [
+        "|A|",
+        "1",
+        "0",
+        "-|A|"
+      ],
+      "answer": "0",
+      "explanation": "Cross-row cofactor sums vanish."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The checkerboard sign pattern for cofactors begins at the top-left with",
+      "options": [
+        "-",
+        "+",
+        "0",
+        "x"
+      ],
+      "answer": "+",
+      "explanation": "(-1)^(1+1) = +1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value of |A| compared with |A^T| is",
+      "options": [
+        "equal",
+        "opposite in sign",
+        "always zero",
+        "doubled"
+      ],
+      "answer": "equal",
+      "explanation": "Determinant is transpose-invariant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Interchanging two rows of a determinant multiplies its value by",
+      "options": [
+        "-1",
+        "+1",
+        "0",
+        "2"
+      ],
+      "answer": "-1",
+      "explanation": "A swap changes the sign."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If two rows of a determinant are identical, its value is",
+      "options": [
+        "1",
+        "0",
+        "-1",
+        "undefined"
+      ],
+      "answer": "0",
+      "explanation": "Equal rows give 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If every element of one row is multiplied by k, the determinant is multiplied by",
+      "options": [
+        "k",
+        "k^2",
+        "1",
+        "k^3"
+      ],
+      "answer": "k",
+      "explanation": "One row factor multiplies the whole value by k."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For an n x n matrix, det(kA) equals",
+      "options": [
+        "k det(A)",
+        "k^n det(A)",
+        "n k det(A)",
+        "det(A)"
+      ],
+      "answer": "k^n det(A)",
+      "explanation": "A factor k out of each of n rows."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The operation R_i -> R_i + k R_j changes the value of the determinant by",
+      "options": [
+        "multiplying it by k",
+        "changing its sign",
+        "nothing; it is unchanged",
+        "making it zero"
+      ],
+      "answer": "nothing; it is unchanged",
+      "explanation": "Row-addition is value-preserving."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A determinant with a full row of zeros has value",
+      "options": [
+        "0",
+        "1",
+        "undefined",
+        "the diagonal product"
+      ],
+      "answer": "0",
+      "explanation": "A zero row gives 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If two columns of a determinant are proportional, its value is",
+      "options": [
+        "their product",
+        "0",
+        "1",
+        "the sum of the columns"
+      ],
+      "answer": "0",
+      "explanation": "Proportional columns give 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A triangular determinant (all entries on one side of the diagonal zero) equals",
+      "options": [
+        "the sum of the diagonal elements",
+        "the product of the diagonal elements",
+        "0",
+        "1"
+      ],
+      "answer": "the product of the diagonal elements",
+      "explanation": "Triangular determinant = diagonal product."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The operation most useful for creating zeros before expansion is",
+      "options": [
+        "swapping two rows",
+        "R_i -> R_i + k R_j",
+        "multiplying a row by 0",
+        "transposing"
+      ],
+      "answer": "R_i -> R_i + k R_j",
+      "explanation": "Row/column addition makes zeros without changing value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If |A| = 5 for a 3x3 matrix A, then |2A| equals",
+      "options": [
+        "10",
+        "20",
+        "40",
+        "5"
+      ],
+      "answer": "40",
+      "explanation": "2^3 * 5 = 40."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Because |A| = |A^T|, any property proved for rows also holds for",
+      "options": [
+        "diagonals",
+        "columns",
+        "minors",
+        "cofactors"
+      ],
+      "answer": "columns",
+      "explanation": "Rows and columns are interchangeable."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If |A| = 4 for a 3x3 matrix, then |3A| equals",
+      "options": [
+        "12",
+        "36",
+        "108",
+        "81"
+      ],
+      "answer": "108",
+      "explanation": "3^3 * 4 = 108."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 1 2 ; 2 4 | is zero because its rows are",
+      "options": [
+        "equal",
+        "proportional",
+        "zero",
+        "triangular"
+      ],
+      "answer": "proportional",
+      "explanation": "R2 = 2 R1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The value of | 1 1 1 ; a b c ; a^2 b^2 c^2 | is",
+      "options": [
+        "abc",
+        "0",
+        "1",
+        "(b - a)(c - a)(c - b)"
+      ],
+      "answer": "(b - a)(c - a)(c - b)",
+      "explanation": "Vandermonde determinant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If two columns of a determinant with value 7 are interchanged, the new value is",
+      "options": [
+        "7",
+        "-7",
+        "0",
+        "14"
+      ],
+      "answer": "-7",
+      "explanation": "A column swap flips the sign."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "Taking the common factor 3 out of one row of a 3x3 determinant gives an outside factor of",
+      "options": [
+        "3",
+        "9",
+        "27",
+        "1"
+      ],
+      "answer": "3",
+      "explanation": "One row contributes a single factor 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 5 10 15 ; 1 2 3 ; 2 1 4 | equals",
+      "options": [
+        "0",
+        "30",
+        "150",
+        "5"
+      ],
+      "answer": "0",
+      "explanation": "Row 1 = 5 x Row 2, so 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To evaluate a determinant quickly using properties, one usually reduces it to",
+      "options": [
+        "diagonal-only form",
+        "triangular form",
+        "a single row",
+        "its transpose"
+      ],
+      "answer": "triangular form",
+      "explanation": "Triangular form = diagonal product."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If every element of a 3x3 determinant is doubled, its value becomes",
+      "options": [
+        "2 times",
+        "4 times",
+        "6 times",
+        "8 times"
+      ],
+      "answer": "8 times",
+      "explanation": "2^3 = 8 times the original."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The area of a triangle with vertices (x1,y1),(x2,y2),(x3,y3) is",
+      "options": [
+        "| det [x1 y1 1 ; x2 y2 1 ; x3 y3 1] |",
+        "(1/2) | det [x1 y1 1 ; x2 y2 1 ; x3 y3 1] |",
+        "(1/2) det [x1 y1 1 ; x2 y2 1 ; x3 y3 1] with no modulus",
+        "det [x1 y1 ; x2 y2]"
+      ],
+      "answer": "(1/2) | det [x1 y1 1 ; x2 y2 1 ; x3 y3 1] |",
+      "explanation": "Half the modulus of the vertex determinant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The modulus (absolute value) is taken in the area formula because area is",
+      "options": [
+        "negative",
+        "always positive",
+        "zero",
+        "imaginary"
+      ],
+      "answer": "always positive",
+      "explanation": "Area cannot be negative."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Three points are collinear when the vertex determinant equals",
+      "options": [
+        "1",
+        "0",
+        "2",
+        "-1"
+      ],
+      "answer": "0",
+      "explanation": "Zero area means collinear."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area of the triangle with vertices (0,0),(4,0),(0,3) is",
+      "options": [
+        "6",
+        "12",
+        "7",
+        "24"
+      ],
+      "answer": "6",
+      "explanation": "(1/2)(4)(3) = 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If the vertex determinant of three points is 0, the points",
+      "options": [
+        "form a right triangle",
+        "are collinear",
+        "form an equilateral triangle",
+        "cannot be plotted"
+      ],
+      "answer": "are collinear",
+      "explanation": "Zero area = one straight line."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The area of the triangle with vertices (0,0),(2,0),(0,2) is",
+      "options": [
+        "1",
+        "2",
+        "4",
+        "8"
+      ],
+      "answer": "2",
+      "explanation": "(1/2)(2)(2) = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The points (1,2),(2,4),(3,6) are",
+      "options": [
+        "collinear",
+        "vertices of a right triangle",
+        "vertices of an equilateral triangle",
+        "not real"
+      ],
+      "answer": "collinear",
+      "explanation": "They lie on y = 2x; area 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In Cramer's rule the value of x is",
+      "options": [
+        "D / Dx",
+        "Dx / D",
+        "Dx * D",
+        "Dx - D"
+      ],
+      "answer": "Dx / D",
+      "explanation": "x = Dx/D."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Cramer's rule can be applied only when",
+      "options": [
+        "D = 0",
+        "D is not zero",
+        "Dx = 0",
+        "all constants are zero"
+      ],
+      "answer": "D is not zero",
+      "explanation": "A unique solution needs D not 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If D is not zero, the system has",
+      "options": [
+        "no solution",
+        "a unique solution",
+        "infinitely many solutions",
+        "two solutions"
+      ],
+      "answer": "a unique solution",
+      "explanation": "Non-zero D gives a unique solution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If D = 0 and at least one of Dx, Dy, Dz is not zero, the system has",
+      "options": [
+        "a unique solution",
+        "no solution",
+        "infinitely many solutions",
+        "exactly two solutions"
+      ],
+      "answer": "no solution",
+      "explanation": "Inconsistent case."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If D = 0 and Dx = Dy = Dz = 0, the system has",
+      "options": [
+        "a unique solution",
+        "no solution",
+        "infinitely many solutions",
+        "no real solution"
+      ],
+      "answer": "infinitely many solutions",
+      "explanation": "Consistent and dependent."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For 2x + 3y = 8 and x + y = 3, the coefficient determinant D is",
+      "options": [
+        "-1",
+        "1",
+        "5",
+        "-5"
+      ],
+      "answer": "-1",
+      "explanation": "|2 3 ; 1 1| = 2 - 3 = -1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A determinant is defined only for a square matrix.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Non-square matrices have no determinant."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The value of | a b ; c d | is ad + bc.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It is ad - bc."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The value of a 3x3 determinant depends on which row you expand along.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "All expansions give the same value."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The cofactor of an element is (-1)^(i+j) times its minor.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "A_ij = (-1)^(i+j) M_ij."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Interchanging two rows of a determinant changes its sign.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "A swap multiplies the value by -1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If two columns of a determinant are identical, its value is 1.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Identical columns give 0."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For a 3x3 matrix A, det(2A) = 8 det(A).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "det(kA) = k^n det(A) with n = 3."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Three points are collinear if the area determinant is zero.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Zero area means one straight line."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Cramer's rule can be used even when D = 0.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It requires D not equal to 0."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If D is not zero, the linear system has a unique solution.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Non-zero coefficient determinant gives uniqueness."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A determinant is a single ____ obtained from a square matrix.",
+      "answer": "number",
+      "explanation": "|A| is one number."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A determinant of order 1, | a |, equals ____.",
+      "answer": "a",
+      "explanation": "|a| = a."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "| a b ; c d | = ____ .",
+      "answer": "ad - bc",
+      "explanation": "Leading minus secondary diagonal product."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "| 3 2 ; 4 5 | = ____ .",
+      "answer": "7",
+      "explanation": "15 - 8 = 7."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A 3x3 determinant is evaluated by ____ along a row or column.",
+      "answer": "expansion",
+      "explanation": "Cofactor expansion."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sign pattern along the first row in expansion is +, -, ____ .",
+      "answer": "+",
+      "explanation": "(-1)^(1+3) = +."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The determinant left after deleting the row and column of an element is called its ____ .",
+      "answer": "minor",
+      "explanation": "M_ij."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The cofactor A_ij equals ____ times M_ij.",
+      "answer": "(-1)^(i+j)",
+      "explanation": "Signed minor."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If two rows of a determinant are identical, its value is ____ .",
+      "answer": "0",
+      "explanation": "Equal rows give 0."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value of a determinant is unchanged if its rows and columns are ____ .",
+      "answer": "interchanged",
+      "explanation": "|A| = |A^T|."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For an n x n matrix, det(kA) = ____ det(A).",
+      "answer": "k^n",
+      "explanation": "One factor k from each of n rows."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Area of a triangle = (1/2) times the ____ of the vertex determinant.",
+      "answer": "modulus",
+      "explanation": "Area is positive."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Three points are collinear when the area determinant equals ____ .",
+      "answer": "0",
+      "explanation": "Zero area."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In Cramer's rule, x = ____ / D.",
+      "answer": "Dx",
+      "explanation": "x = Dx/D."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A system has a unique solution when D is ____ .",
+      "answer": "not zero",
+      "explanation": "Non-zero D gives uniqueness."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "Define a determinant and state how it differs from a matrix.",
+      "answer": "A determinant is a single number |A| (or det(A)) that is assigned to a SQUARE matrix; it is written between two vertical bars. A matrix, on the other hand, is a rectangular ARRANGEMENT of numbers written with square brackets and is not itself a number. So a matrix is an array of entries, while its determinant is one number computed from those entries.",
+      "explanation": "Matrix = array; determinant = single number."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "What is meant by the order of a determinant? State the order of | a b ; c d | and of a 3x3 determinant.",
+      "answer": "The order of a determinant is the number of rows (which equals the number of columns) in its square array. The determinant | a b ; c d | has 2 rows and 2 columns, so its order is 2. A 3x3 determinant has 3 rows and 3 columns, so its order is 3.",
+      "explanation": "Order = number of rows/columns; 2 and 3 respectively."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate | 4 3 ; 2 5 |.",
+      "answer": "For a 2x2 determinant, |a b ; c d| = ad - bc.\n\n   | 4 3 ; 2 5 | = (4)(5) - (3)(2) = 20 - 6 = 14.",
+      "explanation": "ad - bc = 20 - 6 = 14."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate | 7 -2 ; 3 4 |.",
+      "answer": "| 7 -2 ; 3 4 | = (7)(4) - (-2)(3) = 28 + 6 = 34.",
+      "explanation": "28 - (-6) = 34."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find x if | x 3 ; 2 4 | = 10.",
+      "answer": "| x 3 ; 2 4 | = 4x - 6. Setting this equal to 10:\n\n   4x - 6 = 10\n   4x = 16\n   x = 4.",
+      "explanation": "4x - 6 = 10 gives x = 4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate | 1 2 3 ; 0 1 4 ; 5 6 0 | by expanding along the first row.",
+      "answer": "Expand along row 1 (signs +, -, +):\n\n   = 1 * |1 4 ; 6 0| - 2 * |0 4 ; 5 0| + 3 * |0 1 ; 5 6|\n   = 1(0 - 24) - 2(0 - 20) + 3(0 - 5)\n   = -24 + 40 - 15 = 1.",
+      "explanation": "Cofactor expansion gives 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate | 2 -3 5 ; 6 0 4 ; 1 5 -7 | by expanding along the first row.",
+      "answer": "Expand along row 1:\n\n   = 2 * |0 4 ; 5 -7| - (-3) * |6 4 ; 1 -7| + 5 * |6 0 ; 1 5|\n   = 2(0 - 20) + 3(-42 - 4) + 5(30 - 0)\n   = 2(-20) + 3(-46) + 5(30)\n   = -40 - 138 + 150 = -28.",
+      "explanation": "Row-1 expansion gives -28."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate | 1 0 2 ; 3 1 -1 ; 2 4 1 | by expanding along the first row.",
+      "answer": "Expand along row 1:\n\n   = 1 * |1 -1 ; 4 1| - 0 * |3 -1 ; 2 1| + 2 * |3 1 ; 2 4|\n   = 1(1 + 4) - 0 + 2(12 - 2)\n   = 5 + 20 = 25.",
+      "explanation": "5 + 20 = 25."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find the minor and cofactor of the element in row 1, column 2 of | 2 1 3 ; 1 0 2 ; 3 1 1 |.",
+      "answer": "The element in row 1, column 2 is 1. Delete row 1 and column 2:\n\n   M_12 = |1 2 ; 3 1| = (1)(1) - (2)(3) = 1 - 6 = -5.\n\nCofactor A_12 = (-1)^(1+2) M_12 = -(-5) = 5.",
+      "explanation": "M_12 = -5, A_12 = 5."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "For | 1 2 3 ; 4 5 6 ; 7 8 9 |, find the cofactors A_11, A_12 and A_13.",
+      "answer": "A_11 = +|5 6 ; 8 9| = 45 - 48 = -3.\nA_12 = -|4 6 ; 7 9| = -(36 - 42) = -(-6) = 6.\nA_13 = +|4 5 ; 7 8| = 32 - 35 = -3.\n\nSo A_11 = -3, A_12 = 6, A_13 = -3.",
+      "explanation": "Signed minors of the first row."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the difference between the minor and the cofactor of an element.",
+      "answer": "The minor M_ij of an element is the determinant obtained by deleting the row and column that contain that element. The cofactor A_ij is the minor multiplied by the sign (-1)^(i+j); that is, A_ij = (-1)^(i+j) M_ij. So the cofactor is just the minor with a plus or minus sign attached according to the position of the element.",
+      "explanation": "Cofactor = signed minor."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State any three properties of determinants.",
+      "answer": "(1) The value of a determinant is unchanged when rows and columns are interchanged: |A| = |A^T|.\n(2) Interchanging any two rows (or columns) changes the sign of the determinant.\n(3) If any two rows (or columns) are identical or proportional, the determinant is zero. (Other valid properties: a common factor of a row can be taken out; R_i -> R_i + k R_j leaves the value unchanged; a zero row gives 0.)",
+      "explanation": "Transpose, row-swap sign, identical rows -> 0."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Show, using a property of determinants, that | 1 2 3 ; 2 4 6 ; 5 1 7 | = 0.",
+      "answer": "Compare rows 1 and 2: R2 = (2, 4, 6) = 2 x (1, 2, 3) = 2 x R1. So the second row is proportional to the first row.\n\nBy the property that a determinant having two proportional (or identical) rows is zero, the value of this determinant is 0.",
+      "explanation": "R2 = 2 R1 (proportional rows)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If |A| = 6 for a 3x3 matrix A, find |2A|.",
+      "answer": "For an n x n matrix, det(kA) = k^n det(A). Here n = 3 and k = 2, so\n\n   |2A| = 2^3 |A| = 8 x 6 = 48.",
+      "explanation": "det(2A) = 2^3 x 6 = 48."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Prove that | 1 1 1 ; a b c ; a^2 b^2 c^2 | = (b - a)(c - a)(c - b).",
+      "answer": "Apply column operations C2 -> C2 - C1 and C3 -> C3 - C1:\n\n   | 1 0 0 ; a (b-a) (c-a) ; a^2 (b^2 - a^2) (c^2 - a^2) |.\n\nExpand along row 1 (only the first entry survives):\n\n   = 1 * | (b-a) (c-a) ; (b^2 - a^2) (c^2 - a^2) |.\n\nTake out (b - a) from column 1 and (c - a) from column 2, using b^2 - a^2 = (b-a)(b+a):\n\n   = (b - a)(c - a) * | 1 1 ; (b+a) (c+a) |\n   = (b - a)(c - a)[(c + a) - (b + a)]\n   = (b - a)(c - a)(c - b).",
+      "explanation": "Column operations then factor extraction (Vandermonde)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "If |A| = 5 for a 3x3 matrix A, find |3A|.",
+      "answer": "det(kA) = k^n det(A) with n = 3, k = 3:\n\n   |3A| = 3^3 |A| = 27 x 5 = 135.",
+      "explanation": "det(3A) = 27 x 5 = 135."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the area of the triangle with vertices (1, 1), (4, 2) and (2, 5).",
+      "answer": "Area = (1/2) | x1(y2 - y3) + x2(y3 - y1) + x3(y1 - y2) |\n\n   = (1/2) | 1(2 - 5) + 4(5 - 1) + 2(1 - 2) |\n   = (1/2) | 1(-3) + 4(4) + 2(-1) |\n   = (1/2) | -3 + 16 - 2 |\n   = (1/2)(11) = 5.5 square units.",
+      "explanation": "Vertex formula gives 5.5 sq units."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Show that the points (2, 3), (4, 7) and (6, 11) are collinear.",
+      "answer": "Evaluate the vertex determinant:\n\n   | 2 3 1 ; 4 7 1 ; 6 11 1 |\n   = 2(7 - 11) - 3(4 - 6) + 1(44 - 42)\n   = 2(-4) - 3(-2) + 1(2)\n   = -8 + 6 + 2 = 0.\n\nSince the determinant is 0 (zero area), the three points are collinear.",
+      "explanation": "Determinant 0 means collinear."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find k if the points (1, 2), (3, k) and (5, 8) are collinear.",
+      "answer": "Collinearity requires | 1 2 1 ; 3 k 1 ; 5 8 1 | = 0.\n\n   1(k - 8) - 2(3 - 5) + 1(24 - 5k) = 0\n   (k - 8) - 2(-2) + (24 - 5k) = 0\n   k - 8 + 4 + 24 - 5k = 0\n   -4k + 20 = 0\n   k = 5.",
+      "explanation": "Set determinant to 0; k = 5."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve by Cramer's rule: 3x + 2y = 7 and x - y = -1.",
+      "answer": "D = |3 2 ; 1 -1| = (3)(-1) - (2)(1) = -5.\nDx = |7 2 ; -1 -1| = (7)(-1) - (2)(-1) = -7 + 2 = -5.\nDy = |3 7 ; 1 -1| = (3)(-1) - (7)(1) = -3 - 7 = -10.\n\nx = Dx/D = -5/-5 = 1, y = Dy/D = -10/-5 = 2. So x = 1, y = 2.",
+      "explanation": "D=-5, Dx=-5, Dy=-10 give (1,2)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Solve by Cramer's rule: 2x + y = 5 and x + 3y = 10.",
+      "answer": "D = |2 1 ; 1 3| = 6 - 1 = 5.\nDx = |5 1 ; 10 3| = 15 - 10 = 5.\nDy = |2 5 ; 1 10| = 20 - 5 = 15.\n\nx = Dx/D = 5/5 = 1, y = Dy/D = 15/5 = 3. So x = 1, y = 3. (Check: 2(1)+3 = 5 and 1+3(3) = 10.)",
+      "explanation": "D=5, Dx=5, Dy=15 give (1,3)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Determine whether the system x + 2y = 3 and 2x + 4y = 6 is consistent and how many solutions it has.",
+      "answer": "D = |1 2 ; 2 4| = 4 - 4 = 0.\nDx = |3 2 ; 6 4| = 12 - 12 = 0.\nDy = |1 3 ; 2 6| = 6 - 6 = 0.\n\nSince D = 0 and Dx = Dy = 0, the system is CONSISTENT with INFINITELY MANY solutions (the second equation is twice the first, so both represent the same line).",
+      "explanation": "D=0, Dx=Dy=0: infinitely many."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Explain what a determinant is, how it differs from a matrix, and how it is written. Evaluate the order-1 determinant | -4 | and the order-2 determinant | 3 2 ; 1 5 |.",
+      "answer": "A determinant is a single NUMBER attached to a SQUARE matrix, written by placing the array between two vertical bars, for example |A|. A matrix is only an ARRANGEMENT of numbers (written with square brackets) and is not itself a number, whereas the determinant is the one number obtained from it. A determinant is defined only when the matrix is square (equal rows and columns).\n\nOrder-1: | -4 | = -4 (for order 1 the bars simply give the entry itself, not its modulus).\n\nOrder-2: | 3 2 ; 1 5 | = (3)(5) - (2)(1) = 15 - 2 = 13.",
+      "explanation": "Concept + notation + order-1 (-4) and order-2 (13)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Evaluate the determinants | 4 3 ; 2 5 | and | 7 -2 ; 3 4 |, and find x if | x 3 ; 2 4 | = 10.",
+      "answer": "(i) | 4 3 ; 2 5 | = (4)(5) - (3)(2) = 20 - 6 = 14.\n\n(ii) | 7 -2 ; 3 4 | = (7)(4) - (-2)(3) = 28 + 6 = 34.\n\n(iii) | x 3 ; 2 4 | = 4x - 6. Setting 4x - 6 = 10 gives 4x = 16, so x = 4.",
+      "explanation": "14; 34; and x = 4."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate | 1 0 2 ; 3 1 -1 ; 2 4 1 | by expanding along the first row, and verify the result by expanding along the second column.",
+      "answer": "Expansion along row 1 (signs +, -, +):\n   = 1 * |1 -1 ; 4 1| - 0 * |3 -1 ; 2 1| + 2 * |3 1 ; 2 4|\n   = 1(1 + 4) - 0 + 2(12 - 2)\n   = 5 + 20 = 25.\n\nVerification along column 2 (elements 0, 1, 4; signs -, +, -):\n   = -0 * |3 -1 ; 2 1| + 1 * |1 2 ; 2 1| - 4 * |1 2 ; 3 -1|\n   = 0 + 1(1 - 4) - 4(-1 - 6)\n   = (-3) - 4(-7) = -3 + 28 = 25.\n\nBoth expansions give 25, confirming that the value is independent of the row or column chosen.",
+      "explanation": "Row-1 and column-2 expansions both give 25."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "For the determinant | 1 2 3 ; 4 5 6 ; 7 8 9 |, find the minors and cofactors of every element of the first row, and use them to evaluate the determinant.",
+      "answer": "Minors of the first row:\n   M_11 = |5 6 ; 8 9| = 45 - 48 = -3.\n   M_12 = |4 6 ; 7 9| = 36 - 42 = -6.\n   M_13 = |4 5 ; 7 8| = 32 - 35 = -3.\n\nCofactors (A_ij = (-1)^(i+j) M_ij):\n   A_11 = +(-3) = -3, A_12 = -(-6) = 6, A_13 = +(-3) = -3.\n\nExpansion along row 1:\n   |A| = 1*A_11 + 2*A_12 + 3*A_13 = 1(-3) + 2(6) + 3(-3) = -3 + 12 - 9 = 0.\n\nSo the determinant equals 0.",
+      "explanation": "Minors/cofactors of row 1; determinant = 0."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "State the main properties of determinants used for simplification, and prove that a determinant with two identical rows is zero.",
+      "answer": "Main properties:\n1. |A| = |A^T| (rows and columns can be interchanged).\n2. Interchanging two rows or columns changes the sign of the determinant.\n3. If two rows/columns are identical or proportional, the determinant is 0.\n4. Multiplying one row/column by k multiplies the determinant by k; hence det(kA) = k^n det(A).\n5. Adding a multiple of one row/column to another (R_i -> R_i + k R_j) leaves the value unchanged.\n6. A row or column of zeros gives 0; a triangular determinant equals the product of its diagonal.\n\nProof that two identical rows give 0: Let |A| be the value, and suppose two rows are identical. By property 2, interchanging these two rows changes the sign, so the new determinant is -|A|. But the two rows are identical, so interchanging them leaves the determinant physically unchanged, equal to |A|. Therefore |A| = -|A|, which gives 2|A| = 0, so |A| = 0.",
+      "explanation": "List of properties + swap-sign proof that equal rows give 0."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Using row/column operations, prove that | 1 1 1 ; a b c ; a^2 b^2 c^2 | = (b - a)(c - a)(c - b).",
+      "answer": "Apply C2 -> C2 - C1 and C3 -> C3 - C1:\n\n   | 1 0 0 ; a (b - a) (c - a) ; a^2 (b^2 - a^2) (c^2 - a^2) |.\n\nExpand along the first row (only the leading 1 contributes):\n\n   = | (b - a) (c - a) ; (b^2 - a^2) (c^2 - a^2) |.\n\nSince b^2 - a^2 = (b - a)(b + a) and c^2 - a^2 = (c - a)(c + a), take (b - a) out of column 1 and (c - a) out of column 2:\n\n   = (b - a)(c - a) | 1 1 ; (b + a) (c + a) |\n   = (b - a)(c - a)[(c + a) - (b + a)]\n   = (b - a)(c - a)(c - b).\n\nThis is the Vandermonde result; it is zero whenever any two of a, b, c are equal, matching the identical-columns property.",
+      "explanation": "Column operations + factoring give the Vandermonde product."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find the area of the triangle with vertices (2, 3), (4, -1) and (6, 7). Then test whether the points (1, 4), (2, 7) and (3, 10) are collinear.",
+      "answer": "Area of triangle with (2,3), (4,-1), (6,7):\n   Area = (1/2) | 2(-1 - 7) + 4(7 - 3) + 6(3 - (-1)) |\n        = (1/2) | 2(-8) + 4(4) + 6(4) |\n        = (1/2) | -16 + 16 + 24 |\n        = (1/2)(24) = 12 square units.\n\nCollinearity of (1,4), (2,7), (3,10):\n   | 1 4 1 ; 2 7 1 ; 3 10 1 |\n   = 1(7 - 10) - 4(2 - 3) + 1(20 - 21)\n   = 1(-3) - 4(-1) + 1(-1)\n   = -3 + 4 - 1 = 0.\n\nSince the determinant is 0, the three points are collinear.",
+      "explanation": "Area = 12 sq units; second set collinear (determinant 0)."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Solve the system by Cramer's rule:\n   x + y + z = 6\n   x + 2y + 3z = 14\n   x + 4y + 9z = 36.",
+      "answer": "Coefficient determinant:\n   D = |1 1 1 ; 1 2 3 ; 1 4 9| = 1(18 - 12) - 1(9 - 3) + 1(4 - 2) = 6 - 6 + 2 = 2.\nD is not zero, so a unique solution exists.\n\nDx (replace column 1 by 6, 14, 36):\n   Dx = |6 1 1 ; 14 2 3 ; 36 4 9| = 6(18-12) - 1(126-108) + 1(56-72) = 36 - 18 - 16 = 2.\nDy (replace column 2):\n   Dy = |1 6 1 ; 1 14 3 ; 1 36 9| = 1(126-108) - 6(9-3) + 1(36-14) = 18 - 36 + 22 = 4.\nDz (replace column 3):\n   Dz = |1 1 6 ; 1 2 14 ; 1 4 36| = 1(72-56) - 1(36-14) + 6(4-2) = 16 - 22 + 12 = 6.\n\nx = Dx/D = 2/2 = 1, y = Dy/D = 4/2 = 2, z = Dz/D = 6/2 = 3.\nSo x = 1, y = 2, z = 3.",
+      "explanation": "D=2; Dx=2, Dy=4, Dz=6 give (1,2,3)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTo every SQUARE matrix A we attach a single number called its determinant, written |A| between vertical bars. A matrix is just an array of numbers, while its determinant is one number computed from it. For order 1, |a| = a.\n(a) For what type of matrix is a determinant defined?\n(b) Is |A| a number or a matrix?\n(c) Evaluate the order-1 determinant | 6 |.\n(d) Evaluate | 3 2 ; 1 4 |.",
+      "answer": "(a) A determinant is defined only for a SQUARE matrix (equal number of rows and columns).\n(b) |A| is a single NUMBER, not a matrix.\n(c) | 6 | = 6 (for order 1 the value is the entry itself).\n(d) | 3 2 ; 1 4 | = (3)(4) - (2)(1) = 12 - 2 = 10.",
+      "explanation": "Square matrix; number; 6; 10."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nFor a 2x2 determinant, | a b ; c d | = ad - bc, the product of the leading diagonal minus the product of the secondary diagonal.\n(a) Evaluate | 5 2 ; 3 4 |.\n(b) Evaluate | 2 -3 ; 1 6 |.\n(c) Find x if | x 4 ; 3 6 | = 6.\n(d) Why is | 2 6 ; 1 3 | equal to zero?",
+      "answer": "(a) | 5 2 ; 3 4 | = 20 - 6 = 14.\n(b) | 2 -3 ; 1 6 | = 12 - (-3) = 12 + 3 = 15.\n(c) 6x - 12 = 6, so 6x = 18, x = 3.\n(d) The rows are proportional: R1 = (2, 6) = 2 x (1, 3) = 2 x R2, so ad - bc = 6 - 6 = 0.",
+      "explanation": "14; 15; x=3; proportional rows give 0."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA 3x3 determinant is evaluated by expansion along a row or column; expanding along a line with many zeros saves work because each zero removes a term.\n(a) Which column of | 2 0 1 ; 1 3 2 ; 4 0 5 | is best to expand along?\n(b) Evaluate the determinant by expanding along that column.\n(c) Is the value the same if you expand along the first row?\n(d) State the sign of the cofactor of the element in row 2, column 2.",
+      "answer": "(a) Column 2 is best: it has two zeros (entries 0, 3, 0).\n(b) Only the middle entry survives: value = 3 * (+1) * |2 1 ; 4 5| = 3(10 - 4) = 3(6) = 18.\n(c) Yes. Row-1 check: 2(15 - 0) - 0 + 1(0 - 12) = 30 - 12 = 18. Same value.\n(d) The cofactor A_22 has sign (-1)^(2+2) = +.",
+      "explanation": "Column 2; value 18; same by row 1; A_22 sign +."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe minor M_ij of an element is the determinant left after deleting its row and column; the cofactor is A_ij = (-1)^(i+j) M_ij. A determinant equals the sum of the first-row elements times their cofactors.\nConsider A = | 2 1 3 ; 1 0 2 ; 3 1 1 |.\n(a) Find M_11 and A_11.\n(b) Find A_12.\n(c) Find A_13.\n(d) Evaluate |A| using the first-row cofactor expansion.",
+      "answer": "(a) M_11 = |0 2 ; 1 1| = 0 - 2 = -2; A_11 = +(-2) = -2.\n(b) M_12 = |1 2 ; 3 1| = 1 - 6 = -5; A_12 = -(-5) = 5.\n(c) M_13 = |1 0 ; 3 1| = 1 - 0 = 1; A_13 = +1 = 1.\n(d) |A| = 2*A_11 + 1*A_12 + 3*A_13 = 2(-2) + 1(5) + 3(1) = -4 + 5 + 3 = 4.",
+      "explanation": "A_11=-2, A_12=5, A_13=1; |A| = 4."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nProperties of determinants let us predict a value without full expansion: |A| = |A^T|; a row swap changes the sign; two identical or proportional rows give 0; a common factor of a row can be taken out; R_i -> R_i + k R_j leaves the value unchanged.\n(a) What is the value of | 3 5 ; 3 5 |?\n(b) If a determinant equals 8 and two of its rows are interchanged, what is the new value?\n(c) Why is | 1 2 3 ; 4 5 6 ; 2 4 6 | zero?\n(d) Does R2 -> R2 + 3 R1 change the value of a determinant?",
+      "answer": "(a) The two rows are identical, so | 3 5 ; 3 5 | = 0.\n(b) A single row swap changes the sign, so the new value is -8.\n(c) Row 3 = (2, 4, 6) = 2 x (1, 2, 3) = 2 x Row 1, so two rows are proportional and the determinant is 0.\n(d) No. Adding a multiple of one row to another (R2 -> R2 + 3 R1) leaves the value unchanged.",
+      "explanation": "0; -8; proportional rows; no change."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nFor an n x n matrix, multiplying one row by k multiplies the determinant by k, so det(kA) = k^n det(A). Proportional rows or columns make a determinant zero.\n(a) If |A| = 2 for a 3x3 matrix, find |2A|.\n(b) If |A| = 2 for a 3x3 matrix, find |5A|.\n(c) Evaluate | 4 8 12 ; 1 2 3 ; 5 1 2 |.\n(d) A 2x2 matrix B has |B| = 7. Find |3B|.",
+      "answer": "(a) |2A| = 2^3 |A| = 8 x 2 = 16.\n(b) |5A| = 5^3 |A| = 125 x 2 = 250.\n(c) Row 1 = (4, 8, 12) = 4 x (1, 2, 3) = 4 x Row 2, so the rows are proportional and the determinant is 0.\n(d) For a 2x2 matrix, |3B| = 3^2 |B| = 9 x 7 = 63.",
+      "explanation": "16; 250; 0; 63."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe area of a triangle with vertices (x1,y1),(x2,y2),(x3,y3) is (1/2)|det [x1 y1 1 ; x2 y2 1 ; x3 y3 1]|. If this determinant is zero the points are collinear.\n(a) Find the area of the triangle with vertices (0,0),(6,0),(0,4).\n(b) Why do we take the modulus?\n(c) Test whether (1,1),(2,3),(3,5) are collinear.\n(d) What does zero area tell you about three points?",
+      "answer": "(a) Area = (1/2)|0(0 - 4) + 6(4 - 0) + 0(0 - 0)| = (1/2)|24| = 12 square units.\n(b) Because area must be positive, we take the modulus of the (possibly negative) determinant.\n(c) | 1 1 1 ; 2 3 1 ; 3 5 1 | = 1(3 - 5) - 1(2 - 3) + 1(10 - 9) = -2 + 1 + 1 = 0, so the points are collinear.\n(d) Zero area means the three points lie on one straight line (they are collinear).",
+      "explanation": "Area 12; modulus for positivity; collinear; zero area = one line."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nBy Cramer's rule, for a 2-variable system a1 x + b1 y = c1, a2 x + b2 y = c2, we form D, Dx, Dy and get x = Dx/D, y = Dy/D provided D is not zero.\nConsider 2x + 3y = 8 and x + y = 3.\n(a) Write and evaluate D.\n(b) Evaluate Dx and Dy.\n(c) Find x and y.\n(d) What would it mean if D were zero?",
+      "answer": "(a) D = |2 3 ; 1 1| = 2 - 3 = -1.\n(b) Dx = |8 3 ; 3 1| = 8 - 9 = -1; Dy = |2 8 ; 1 3| = 6 - 8 = -2.\n(c) x = Dx/D = -1/-1 = 1, y = Dy/D = -2/-1 = 2.\n(d) If D were zero, Cramer's rule would not apply directly; the system would have either no solution or infinitely many solutions instead of a unique one.",
+      "explanation": "D=-1; Dx=-1, Dy=-2; (1,2); D=0 means no unique solution."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA 3x3 determinant can be expanded along any row or column with the sign pattern +,-,+ / -,+,- / +,-,+.\nConsider D = | 3 1 2 ; 2 0 -1 ; 1 4 5 |.\n(a) Expand along the first row to evaluate D.\n(b) Which row or column would have been easier and why?\n(c) State the cofactor sign for the element in row 2, column 3.\n(d) Is the answer affected by the choice of expansion line?",
+      "answer": "(a) D = 3 * |0 -1 ; 4 5| - 1 * |2 -1 ; 1 5| + 2 * |2 0 ; 1 4|\n     = 3(0 + 4) - 1(10 + 1) + 2(8 - 0)\n     = 12 - 11 + 16 = 17.\n(b) Row 2 (or column 2) contains a zero, so expanding there gives one fewer 2x2 determinant to compute.\n(c) The sign for row 2, column 3 is (-1)^(2+3) = -.\n(d) No. The value 17 is the same whichever row or column is used.",
+      "explanation": "D = 17; row/col with a zero is easier; sign -; value invariant."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-DET-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA linear system is classified by its determinants: D not 0 gives a unique solution; D = 0 with all of Dx, Dy, Dz zero gives infinitely many solutions; D = 0 with some non-zero gives no solution.\n(a) For x + y = 2 and x + y = 5, evaluate D and Dx and classify the system.\n(b) For 2x + 3y = 5 and 4x + 6y = 10, evaluate D, Dx, Dy and classify the system.\n(c) For x + y = 3 and x - y = 1, evaluate D and classify the system.\n(d) What single determinant decides whether a unique solution exists?",
+      "answer": "(a) D = |1 1 ; 1 1| = 0; Dx = |2 1 ; 5 1| = 2 - 5 = -3 (not zero). D = 0 with Dx not zero => NO solution (inconsistent; the lines are parallel).\n(b) D = |2 3 ; 4 6| = 12 - 12 = 0; Dx = |5 3 ; 10 6| = 30 - 30 = 0; Dy = |2 5 ; 4 10| = 20 - 20 = 0. D = 0 with Dx = Dy = 0 => INFINITELY MANY solutions (same line).\n(c) D = |1 1 ; 1 -1| = -1 - 1 = -2 (not zero) => UNIQUE solution.\n(d) The coefficient determinant D: a unique solution exists exactly when D is not zero.",
+      "explanation": "No solution; infinitely many; unique; D decides uniqueness."
+    }
+  ]
+}

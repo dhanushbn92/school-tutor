@@ -1,0 +1,2261 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 25,
+    "chapter_title": "Limits and Continuity",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 25 - LIMITS AND CONTINUITY\n\nIntroduction\n\nCalculus rests on one central idea: the LIMIT. Before we can differentiate or integrate, we must be able to say precisely what it means for a function f(x) to approach a definite value as x approaches some number a. The limit lets us talk about the behaviour of a function NEAR a point, even at points where the function is not defined. In this chapter we build the intuitive idea of a limit, distinguish left-hand and right-hand limits, learn the algebra of limits, master the standard techniques for evaluating limits (direct substitution, factorization, rationalization) and the important standard limits, and finally use limits to define CONTINUITY - what it means for a function to have no breaks, jumps or holes.\n\n25.1 THE INTUITIVE IDEA OF A LIMIT\n\nConsider f(x) = (x^2 - 1)/(x - 1). At x = 1 the formula gives 0/0, which is meaningless, so f is NOT defined at x = 1. But we may still ask: what happens to f(x) as x gets CLOSE to 1? For x not equal to 1 we can cancel: (x^2 - 1)/(x - 1) = (x - 1)(x + 1)/(x - 1) = x + 1. As x approaches 1, x + 1 approaches 2. Making a table: for x = 0.9, f = 1.9; x = 0.99, f = 1.99; x = 1.1, f = 2.1; x = 1.01, f = 2.01. The values crowd around 2. We write\n\n   lim (x -> 1) (x^2 - 1)/(x - 1) = 2\n\nand read it: the limit of f(x) as x tends to 1 is 2. Notice that the limit describes the value f(x) is HEADING towards, not the value AT x = 1 (which does not exist here). The limit exists at 1 even though the function does not.\n\nFormally, lim (x -> a) f(x) = L means: we can make f(x) as close to L as we please by taking x sufficiently close to a (but not equal to a). The phrase \"but not equal to a\" is essential - the limit ignores what happens AT a and looks only at nearby points.\n\n25.2 LEFT-HAND AND RIGHT-HAND LIMITS\n\nA point a can be approached from two sides. Approaching a through values SMALLER than a (from the left) gives the LEFT-HAND LIMIT, written\n\n   lim (x -> a-) f(x)   or   L(a-)\n\nApproaching a through values LARGER than a (from the right) gives the RIGHT-HAND LIMIT,\n\n   lim (x -> a+) f(x)   or   L(a+)\n\nEXISTENCE OF A LIMIT: The limit lim (x -> a) f(x) EXISTS if and only if both one-sided limits exist AND are equal:\n\n   lim (x -> a-) f(x) = lim (x -> a+) f(x) = L\n\nIf the left-hand and right-hand limits are different, the (two-sided) limit does NOT exist. Example: for f(x) = |x|/x, when x < 0, f = -1, so the left-hand limit at 0 is -1; when x > 0, f = +1, so the right-hand limit at 0 is +1. Since -1 is not equal to +1, lim (x -> 0) |x|/x does NOT exist. One-sided limits are especially useful for functions defined piecewise and for the greatest-integer (step) function.\n\n25.3 ALGEBRA OF LIMITS\n\nLimits combine in a very natural way. Suppose lim (x -> a) f(x) = L and lim (x -> a) g(x) = M (both existing and finite). Then\n\n - SUM:        lim [f(x) + g(x)] = L + M\n - DIFFERENCE: lim [f(x) - g(x)] = L - M\n - PRODUCT:    lim [f(x) g(x)]   = L M\n - CONSTANT:   lim [k f(x)]      = k L, for a constant k\n - QUOTIENT:   lim [f(x)/g(x)]   = L / M, provided M is not 0\n - POWER:      lim [f(x)]^n      = L^n\n\nThese rules let us break a complicated limit into simple pieces. For a polynomial p(x) the limit as x -> a is simply p(a), because sums and products of the limits lim (x -> a) x = a and lim (x -> a) c = c rebuild the polynomial. The quotient rule is the one that needs care: it holds only when the limit of the denominator is non-zero. When the denominator tends to 0 we get the indeterminate form 0/0 and must use special techniques (Section 25.5).\n\n25.4 EVALUATION BY DIRECT SUBSTITUTION\n\nIf f is built from polynomials, and from ratios whose denominator does not vanish, the limit is found by simply SUBSTITUTING x = a. For example\n\n   lim (x -> 2) (3x^2 - 5x + 4) = 3(4) - 10 + 4 = 6\n   lim (x -> 1) (x + 3)/(x + 2) = 4/3\n\nDirect substitution works whenever the function is continuous at a (Section 25.7). It FAILS when substitution gives an INDETERMINATE FORM such as 0/0 or infinity/infinity; then the algebra must be rearranged first.\n\n25.5 TECHNIQUES FOR INDETERMINATE FORMS\n\n(a) FACTORIZATION. When substitution gives 0/0 in a rational function, the numerator and denominator share a common factor (x - a). Cancel it, then substitute.\n\n   lim (x -> 3) (x^2 - 9)/(x - 3) = lim (x -> 3) (x - 3)(x + 3)/(x - 3) = lim (x -> 3) (x + 3) = 6.\n   lim (x -> 2) (x^2 - 5x + 6)/(x^2 - 4) = lim (x -> 2) (x - 2)(x - 3)/[(x - 2)(x + 2)] = (2 - 3)/(2 + 2) = -1/4.\n\n(b) RATIONALIZATION. When a square root produces 0/0, multiply numerator and denominator by the conjugate to remove the root.\n\n   lim (x -> 0) (sqrt(1 + x) - 1)/x. Multiply by (sqrt(1 + x) + 1):\n   = lim (x -> 0) [(1 + x) - 1]/[x(sqrt(1 + x) + 1)] = lim (x -> 0) x/[x(sqrt(1 + x) + 1)] = lim (x -> 0) 1/(sqrt(1 + x) + 1) = 1/2.\n\n25.6 STANDARD LIMITS\n\nCertain limits occur so often that they are memorised as STANDARD results.\n\n(1) ALGEBRAIC:  lim (x -> a) (x^n - a^n)/(x - a) = n a^(n-1), for any rational n. This is really the derivative of x^n at x = a. Example: lim (x -> 2) (x^5 - 32)/(x - 2) = 5 * 2^4 = 80.\n\n(2) TRIGONOMETRIC:  lim (x -> 0) sin x / x = 1 (x in radians). Also lim (x -> 0) tan x / x = 1 and lim (x -> 0) (1 - cos x)/x^2 = 1/2. Example: lim (x -> 0) sin 5x / x = lim (x -> 0) 5 * (sin 5x)/(5x) = 5.\n\n(3) EXPONENTIAL AND THE NUMBER e:  lim (n -> infinity) (1 + 1/n)^n = e = 2.718..., equivalently lim (x -> 0) (1 + x)^(1/x) = e. From this follow lim (x -> 0) (a^x - 1)/x = ln a (natural log of a), and in particular lim (x -> 0) (e^x - 1)/x = 1, and lim (x -> 0) log(1 + x)/x = 1 (natural log). Example: lim (x -> 0) (e^(3x) - 1)/x = 3.\n\n25.7 LIMITS AT INFINITY AND INFINITE LIMITS\n\nWe may let x grow without bound. For a rational function, divide numerator and denominator by the highest power of x. Example:\n\n   lim (x -> infinity) (2x^2 + 3x)/(5x^2 - 1) = lim (x -> infinity) (2 + 3/x)/(5 - 1/x^2) = 2/5,\n\nbecause terms like 3/x and 1/x^2 tend to 0 as x -> infinity. A key fact: lim (x -> infinity) 1/x = 0. An INFINITE LIMIT arises when the denominator tends to 0 while the numerator does not, e.g. lim (x -> 0+) 1/x = +infinity and lim (x -> 0-) 1/x = -infinity; here the two-sided limit does not exist (it is unbounded).\n\n25.8 CONTINUITY OF A FUNCTION AT A POINT\n\nIntuitively a function is CONTINUOUS if its graph can be drawn without lifting the pen - no breaks, holes or jumps. Precisely, a function f is CONTINUOUS at x = a if THREE conditions all hold:\n\n (i)   f(a) is DEFINED (a is in the domain);\n (ii)  lim (x -> a) f(x) EXISTS (left-hand limit = right-hand limit); and\n (iii) the limit equals the function value: lim (x -> a) f(x) = f(a).\n\nIf any one of these fails, f is DISCONTINUOUS at a. For example f(x) = x^2 is continuous everywhere because lim (x -> a) x^2 = a^2 = f(a) for every a. All polynomials are continuous everywhere; sin x and cos x are continuous everywhere; a rational function p(x)/q(x) is continuous wherever q(x) is not 0.\n\n25.9 CONTINUITY ON AN INTERVAL AND ALGEBRA OF CONTINUOUS FUNCTIONS\n\nA function is CONTINUOUS ON AN INTERVAL if it is continuous at every point of that interval. At the endpoints of a closed interval [a, b] we use one-sided continuity: continuous from the right at a, and from the left at b.\n\nALGEBRA OF CONTINUOUS FUNCTIONS: if f and g are continuous at a, then so are f + g, f - g, f g, k f (k constant), and f/g (provided g(a) is not 0). A composition of continuous functions is continuous. These rules let us declare, without effort, that functions such as 3x^2 - sin x, or (x + 1)/(x^2 + 1), are continuous everywhere they are defined.\n\n25.10 TYPES OF DISCONTINUITY\n\n(a) REMOVABLE DISCONTINUITY: the limit lim (x -> a) f(x) exists (both one-sided limits are equal) but either f(a) is not defined, or f(a) is not equal to the limit. The graph has a single \"hole\". It is called removable because redefining f(a) to be the limit makes the function continuous. Example: f(x) = (x^2 - 1)/(x - 1) has a removable discontinuity at x = 1; the hole is filled by setting f(1) = 2.\n\n(b) JUMP (NON-REMOVABLE) DISCONTINUITY: the left-hand and right-hand limits both exist but are NOT equal, so the limit does not exist and the graph jumps. The size of the jump is L(a+) - L(a-). Example: the greatest-integer function [x] jumps by 1 at every integer; f(x) = |x|/x jumps from -1 to +1 at x = 0.\n\n(c) INFINITE DISCONTINUITY: at least one one-sided limit is infinite, e.g. f(x) = 1/x at x = 0 or f(x) = tan x at x = pi/2. The graph shoots off to infinity (a vertical asymptote).\n\nWORKED EXAMPLE (checking continuity of a piecewise function): Let f(x) = x + 2 for x <= 1 and f(x) = 3x for x > 1. Test continuity at x = 1. Left-hand limit = 1 + 2 = 3; right-hand limit = 3(1) = 3; f(1) = 1 + 2 = 3. All three agree, so f is continuous at x = 1. If instead the second piece were 3x + 1, the right-hand limit would be 4, unequal to 3, giving a jump discontinuity of size 1.\n\nWORKED EXAMPLE (finding a constant for continuity): Let f(x) = (x^2 - 9)/(x - 3) for x not equal to 3 and f(3) = k. For continuity at 3 we need k = lim (x -> 3) (x^2 - 9)/(x - 3) = lim (x -> 3) (x + 3) = 6, so k = 6.\n\nSUMMARY\n\n- The limit lim (x -> a) f(x) = L describes the value f(x) approaches as x nears a, ignoring the value at a itself; the limit can exist even where f(a) does not.\n- Left-hand limit lim (x -> a-) and right-hand limit lim (x -> a+); the two-sided limit exists only when the two one-sided limits are equal.\n- Algebra of limits: the limit of a sum, difference, product, constant multiple, quotient (denominator limit not 0) and power is obtained by combining the individual limits.\n- Direct substitution evaluates the limit when the function is continuous there; the indeterminate form 0/0 is handled by factorization or rationalization.\n- Standard limits: lim (x -> a) (x^n - a^n)/(x - a) = n a^(n-1); lim (x -> 0) sin x / x = 1; lim (n -> infinity) (1 + 1/n)^n = e; lim (x -> 0) (a^x - 1)/x = ln a; lim (x -> 0) (e^x - 1)/x = 1.\n- Limits at infinity: divide by the highest power of x and use lim (x -> infinity) 1/x = 0; infinite limits give vertical asymptotes.\n- A function is continuous at a when f(a) is defined, the limit exists, and the limit equals f(a); polynomials, sin x and cos x are continuous everywhere.\n- Algebra of continuous functions: sums, differences, products, quotients (non-zero denominator) and compositions of continuous functions are continuous.\n- Discontinuities: removable (a fillable hole), jump (unequal one-sided limits) and infinite (a one-sided limit is infinite).\n",
+  "topics": [
+    {
+      "name": "The Concept of a Limit",
+      "description": "The intuitive idea of the limit lim (x -> a) f(x) = L as the value f(x) approaches when x nears a; the limit can exist even where f(a) is undefined, as in (x^2 - 1)/(x - 1) -> 2 at x = 1."
+    },
+    {
+      "name": "Left-Hand and Right-Hand Limits",
+      "description": "Approaching a from below (left-hand limit lim (x -> a-)) and from above (right-hand limit lim (x -> a+)); the two-sided limit exists only when the two one-sided limits are equal, as illustrated by |x|/x at x = 0."
+    },
+    {
+      "name": "Algebra of Limits",
+      "description": "The limit of a sum, difference, product, constant multiple, quotient (denominator limit not 0) and power equals the corresponding combination of the individual limits L and M."
+    },
+    {
+      "name": "Standard Limits and Evaluation Techniques",
+      "description": "Direct substitution, factorization and rationalization for 0/0 forms; standard limits (x^n - a^n)/(x - a) -> n a^(n-1), sin x / x -> 1, (1 + 1/n)^n -> e, (a^x - 1)/x -> ln a; limits at infinity."
+    },
+    {
+      "name": "Continuity at a Point",
+      "description": "A function f is continuous at x = a when f(a) is defined, lim (x -> a) f(x) exists and equals f(a); the three-part test and examples of continuous functions such as polynomials, sin x and cos x."
+    },
+    {
+      "name": "Types of Discontinuity and Continuity on an Interval",
+      "description": "Removable (fillable hole), jump (unequal one-sided limits) and infinite discontinuities; continuity on an interval, endpoint one-sided continuity and the algebra of continuous functions."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-LIM-01",
+      "topic_name": "The Concept of a Limit",
+      "bloom": "understand",
+      "description": "Explain the intuitive meaning of a limit, interpret lim (x -> a) f(x) = L from tables and graphs, and recognise that a limit can exist where f(a) is undefined."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-02",
+      "topic_name": "Left-Hand and Right-Hand Limits",
+      "bloom": "understand",
+      "description": "Compute left-hand and right-hand limits and use the equality of one-sided limits as the test for the existence of the two-sided limit."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-03",
+      "topic_name": "Algebra of Limits",
+      "bloom": "apply",
+      "description": "Apply the sum, difference, product, constant-multiple, quotient and power rules for limits to evaluate limits of combined functions."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-04",
+      "topic_name": "Standard Limits and Evaluation Techniques",
+      "bloom": "apply",
+      "description": "Evaluate limits by direct substitution, factorization and rationalization, handling the indeterminate form 0/0 in rational and surd expressions."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-05",
+      "topic_name": "Standard Limits and Evaluation Techniques",
+      "bloom": "apply",
+      "description": "Use the standard limits (x^n - a^n)/(x - a) -> n a^(n-1), sin x / x -> 1, (1 + 1/n)^n -> e and (a^x - 1)/x -> ln a, and evaluate limits at infinity."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-06",
+      "topic_name": "Continuity at a Point",
+      "bloom": "understand",
+      "description": "State the three conditions for continuity of a function at a point and test whether a given function is continuous at a specified point."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-07",
+      "topic_name": "Continuity at a Point",
+      "bloom": "apply",
+      "description": "Apply the definition of continuity to piecewise functions, finding constants that make a function continuous at a point."
+    },
+    {
+      "code": "12-NIOS-MAT-LIM-08",
+      "topic_name": "Types of Discontinuity and Continuity on an Interval",
+      "bloom": "analyze",
+      "description": "Classify discontinuities as removable, jump or infinite, and use the algebra of continuous functions to analyse continuity on an interval."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Limits and Continuity - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Limits and Continuity lesson. It develops the intuitive idea of a limit, left-hand and right-hand limits and the existence of a limit, the algebra of limits, evaluation by direct substitution, factorization and rationalization, the standard limits, limits at infinity, and the definition and types of continuity of a function.",
+    "overview_diagram": {
+      "title": "Limits and Continuity",
+      "central_term": "Limits and Continuity",
+      "branches": [
+        {
+          "label": "Idea of a Limit",
+          "details": [
+            "lim (x -> a) f(x) = L",
+            "Value f(x) heads towards near a",
+            "May exist where f(a) is undefined"
+          ]
+        },
+        {
+          "label": "One-sided Limits",
+          "details": [
+            "Left: lim (x -> a-) f(x)",
+            "Right: lim (x -> a+) f(x)",
+            "Limit exists iff L(a-) = L(a+)"
+          ]
+        },
+        {
+          "label": "Algebra & Evaluation",
+          "details": [
+            "Sum, product, quotient rules",
+            "Direct substitution",
+            "Factorization and rationalization for 0/0"
+          ]
+        },
+        {
+          "label": "Standard Limits",
+          "details": [
+            "(x^n - a^n)/(x - a) -> n a^(n-1)",
+            "sin x / x -> 1",
+            "(1 + 1/n)^n -> e",
+            "(a^x - 1)/x -> ln a"
+          ]
+        },
+        {
+          "label": "Continuity",
+          "details": [
+            "f(a) defined, limit exists, equal",
+            "Removable, jump, infinite",
+            "Algebra of continuous functions"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "The idea of a limit and one-sided limits",
+        "bullets": [
+          "lim (x -> a) f(x) = L means f(x) can be made as close to L as we like by taking x near a but not equal to a.",
+          "The limit describes what f(x) approaches, not f(a); it can exist even when f(a) is undefined, e.g. (x^2 - 1)/(x - 1) -> 2 at x = 1.",
+          "Left-hand limit lim (x -> a-) approaches through x < a; right-hand limit lim (x -> a+) approaches through x > a.",
+          "The two-sided limit exists if and only if the left-hand and right-hand limits both exist and are equal."
+        ]
+      },
+      {
+        "heading": "Algebra of limits and direct substitution",
+        "bullets": [
+          "Limit of a sum, difference, product and constant multiple is the same combination of the separate limits L and M.",
+          "Quotient rule: lim (f/g) = L/M provided M is not 0; the power rule gives lim [f]^n = L^n.",
+          "For polynomials and for rational functions with a non-zero denominator, the limit is found by direct substitution x = a.",
+          "Direct substitution fails when it gives an indeterminate form such as 0/0 or infinity/infinity."
+        ]
+      },
+      {
+        "heading": "Techniques and standard limits",
+        "bullets": [
+          "Factorization: cancel the common factor (x - a) in a 0/0 rational limit, then substitute.",
+          "Rationalization: multiply by the conjugate to remove a square root that causes 0/0.",
+          "Standard limits: (x^n - a^n)/(x - a) -> n a^(n-1); sin x / x -> 1; (1 - cos x)/x^2 -> 1/2.",
+          "Exponential limits: (1 + 1/n)^n -> e; (a^x - 1)/x -> ln a; (e^x - 1)/x -> 1; and lim (x -> infinity) 1/x = 0 for limits at infinity."
+        ]
+      },
+      {
+        "heading": "Continuity at a point",
+        "bullets": [
+          "f is continuous at a when three conditions hold: f(a) is defined, lim (x -> a) f(x) exists, and the limit equals f(a).",
+          "If any condition fails, f is discontinuous at a.",
+          "Polynomials, sin x and cos x are continuous everywhere; a rational function is continuous wherever its denominator is non-zero.",
+          "Direct substitution works precisely because such functions are continuous at the point."
+        ]
+      },
+      {
+        "heading": "Types of discontinuity and continuity on an interval",
+        "bullets": [
+          "Removable: the limit exists but f(a) is undefined or not equal to it - a hole that can be filled.",
+          "Jump: left-hand and right-hand limits exist but differ, so the graph jumps (e.g. the greatest-integer function).",
+          "Infinite: a one-sided limit is infinite, giving a vertical asymptote (e.g. 1/x at x = 0).",
+          "A function continuous at every point of an interval is continuous on it; sums, products, quotients (non-zero denominator) and compositions of continuous functions are continuous."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "lim (x -> a) f(x) = L is the value f(x) approaches as x nears a; it ignores f(a) and can exist where f(a) does not.",
+      "The two-sided limit exists if and only if the left-hand and right-hand limits are equal.",
+      "The algebra of limits lets a limit be split into sums, differences, products and quotients (denominator limit not 0).",
+      "The 0/0 indeterminate form is resolved by factorization or rationalization before substituting.",
+      "Key standard limits: (x^n - a^n)/(x - a) -> n a^(n-1), sin x / x -> 1, (1 + 1/n)^n -> e and (a^x - 1)/x -> ln a.",
+      "f is continuous at a when f(a) is defined, the limit exists, and the limit equals f(a); polynomials, sin x and cos x are continuous everywhere.",
+      "Discontinuities are removable (fillable hole), jump (unequal one-sided limits) or infinite (a vertical asymptote)."
+    ],
+    "glossary": [
+      {
+        "term": "Limit",
+        "definition": "The value L that f(x) approaches as x tends to a; written lim (x -> a) f(x) = L, ignoring the value at a itself."
+      },
+      {
+        "term": "Left-hand limit",
+        "definition": "The value f(x) approaches as x tends to a through values less than a, written lim (x -> a-) f(x)."
+      },
+      {
+        "term": "Right-hand limit",
+        "definition": "The value f(x) approaches as x tends to a through values greater than a, written lim (x -> a+) f(x)."
+      },
+      {
+        "term": "Existence of a limit",
+        "definition": "The two-sided limit exists if and only if the left-hand and right-hand limits both exist and are equal."
+      },
+      {
+        "term": "Algebra of limits",
+        "definition": "Rules by which limits of a sum, difference, product, constant multiple, quotient and power combine the individual limits."
+      },
+      {
+        "term": "Direct substitution",
+        "definition": "Evaluating a limit by putting x = a; valid whenever the function is continuous at a."
+      },
+      {
+        "term": "Indeterminate form",
+        "definition": "An expression such as 0/0 or infinity/infinity produced by substitution that gives no immediate value and needs rearrangement."
+      },
+      {
+        "term": "Factorization method",
+        "definition": "Cancelling a common factor (x - a) from numerator and denominator of a 0/0 rational limit before substituting."
+      },
+      {
+        "term": "Rationalization method",
+        "definition": "Multiplying by the conjugate to remove a square root that produces a 0/0 form in a limit."
+      },
+      {
+        "term": "Standard limit sin x / x",
+        "definition": "lim (x -> 0) sin x / x = 1 (x in radians), a basic trigonometric limit."
+      },
+      {
+        "term": "The number e",
+        "definition": "The limit lim (n -> infinity) (1 + 1/n)^n = 2.718..., the base of natural logarithms."
+      },
+      {
+        "term": "Continuity at a point",
+        "definition": "f is continuous at a when f(a) is defined, lim (x -> a) f(x) exists, and the limit equals f(a)."
+      },
+      {
+        "term": "Removable discontinuity",
+        "definition": "A point where the limit exists but f(a) is undefined or unequal to it - a hole that can be filled by redefining f(a)."
+      },
+      {
+        "term": "Jump discontinuity",
+        "definition": "A point where the left-hand and right-hand limits exist but differ, so the graph jumps."
+      },
+      {
+        "term": "Infinite discontinuity",
+        "definition": "A point where a one-sided limit is infinite, giving a vertical asymptote, e.g. 1/x at x = 0."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Limits and Continuity (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for the evaluation of each limit. All angles are in radians. State the technique (substitution, factorization, rationalization or a standard limit) you use.",
+    "total_marks": 35,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Explain what lim (x -> a) f(x) = L means and why the limit of (x^2 - 1)/(x - 1) as x -> 1 is 2 even though the function is undefined at x = 1.",
+        "answer": "lim (x -> a) f(x) = L means that f(x) can be made as close to L as we wish by taking x sufficiently close to a but not equal to a; the limit describes the value f(x) heads towards near a, not the value at a.\n\nFor f(x) = (x^2 - 1)/(x - 1), at x = 1 we get 0/0, so f(1) is undefined. But for x not equal to 1, (x^2 - 1)/(x - 1) = (x - 1)(x + 1)/(x - 1) = x + 1. As x -> 1, x + 1 -> 2. Hence lim (x -> 1) (x^2 - 1)/(x - 1) = 2. The limit exists (value 2) even though f(1) does not, because the limit ignores the single point x = 1.",
+        "explanation": "Definition of a limit plus a cancellation example.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-LIM-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "For f(x) = |x|/x, find the left-hand and right-hand limits at x = 0 and state whether lim (x -> 0) f(x) exists.",
+        "answer": "For x < 0, |x| = -x, so f(x) = -x/x = -1. Hence the left-hand limit is lim (x -> 0-) f(x) = -1.\nFor x > 0, |x| = x, so f(x) = x/x = +1. Hence the right-hand limit is lim (x -> 0+) f(x) = +1.\nSince the left-hand limit (-1) is not equal to the right-hand limit (+1), the two-sided limit lim (x -> 0) f(x) does NOT exist.",
+        "explanation": "One-sided limits differ, so the limit fails to exist.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate lim (x -> 3) (x^2 - 9)/(x - 3) by factorization.",
+        "answer": "Direct substitution gives (9 - 9)/(3 - 3) = 0/0, an indeterminate form, so factorize.\n\nx^2 - 9 = (x - 3)(x + 3). Therefore\n\n   (x^2 - 9)/(x - 3) = (x - 3)(x + 3)/(x - 3) = x + 3   (for x not equal to 3).\n\nHence lim (x -> 3) (x^2 - 9)/(x - 3) = lim (x -> 3) (x + 3) = 3 + 3 = 6.",
+        "explanation": "Cancel the common factor (x - 3), then substitute.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate lim (x -> 0) (sqrt(1 + x) - 1)/x by rationalization.",
+        "answer": "Substitution gives 0/0. Multiply numerator and denominator by the conjugate (sqrt(1 + x) + 1):\n\n   (sqrt(1 + x) - 1)/x * (sqrt(1 + x) + 1)/(sqrt(1 + x) + 1)\n   = [(1 + x) - 1]/[x(sqrt(1 + x) + 1)]\n   = x/[x(sqrt(1 + x) + 1)]\n   = 1/(sqrt(1 + x) + 1)   (for x not equal to 0).\n\nAs x -> 0 this tends to 1/(sqrt(1) + 1) = 1/2. Hence the limit is 1/2.",
+        "explanation": "Multiply by the conjugate to clear the surd, then substitute.",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using a standard limit, evaluate lim (x -> 2) (x^5 - 32)/(x - 2).",
+        "answer": "Note 32 = 2^5, so this is of the form lim (x -> a) (x^n - a^n)/(x - a) with n = 5 and a = 2.\n\nThe standard limit gives lim (x -> a) (x^n - a^n)/(x - a) = n a^(n-1).\n\nHence lim (x -> 2) (x^5 - 32)/(x - 2) = 5 * 2^(5-1) = 5 * 2^4 = 5 * 16 = 80.",
+        "explanation": "Apply (x^n - a^n)/(x - a) -> n a^(n-1) with n = 5, a = 2.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate lim (x -> 0) sin 5x / (3x).",
+        "answer": "Use the standard limit lim (t -> 0) sin t / t = 1. Rewrite so the angle inside sine matches the denominator factor:\n\n   sin 5x / (3x) = (5/3) * sin 5x / (5x).\n\nAs x -> 0, 5x -> 0, so sin 5x / (5x) -> 1. Therefore\n\n   lim (x -> 0) sin 5x / (3x) = (5/3) * 1 = 5/3.",
+        "explanation": "Rescale to sin(5x)/(5x) and use sin t / t -> 1.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Evaluate lim (x -> infinity) (2x^2 + 3x - 1)/(5x^2 + x + 4).",
+        "answer": "Divide numerator and denominator by x^2, the highest power present:\n\n   (2x^2 + 3x - 1)/(5x^2 + x + 4) = (2 + 3/x - 1/x^2)/(5 + 1/x + 4/x^2).\n\nAs x -> infinity, 3/x, 1/x^2, 1/x and 4/x^2 all tend to 0. Hence the limit is (2 + 0 - 0)/(5 + 0 + 0) = 2/5.",
+        "explanation": "Divide by the highest power of x; 1/x terms vanish.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-05"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "State the three conditions for a function to be continuous at a point. Hence test the continuity at x = 1 of f(x) = x + 2 for x <= 1 and f(x) = 3x for x > 1.",
+        "answer": "A function f is continuous at x = a if and only if all three conditions hold:\n(i) f(a) is defined;\n(ii) lim (x -> a) f(x) exists, i.e. the left-hand and right-hand limits are equal;\n(iii) lim (x -> a) f(x) = f(a).\n\nTest at x = 1 for the given piecewise f:\n- f(1): since 1 <= 1, use the first piece, f(1) = 1 + 2 = 3 (defined).\n- Left-hand limit: as x -> 1- (x <= 1) use x + 2, giving lim (x -> 1-) (x + 2) = 3.\n- Right-hand limit: as x -> 1+ (x > 1) use 3x, giving lim (x -> 1+) 3x = 3.\nThe one-sided limits are equal (both 3), so lim (x -> 1) f(x) = 3, which equals f(1) = 3.\n\nAll three conditions are satisfied, so f is CONTINUOUS at x = 1.",
+        "explanation": "State the test, then check the three conditions for the piecewise f.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the value of k for which f(x) = (x^2 - 4)/(x - 2) for x not equal to 2 and f(2) = k is continuous at x = 2.",
+        "answer": "For continuity at x = 2 we need f(2) = lim (x -> 2) f(x).\n\nCompute the limit: (x^2 - 4)/(x - 2) = (x - 2)(x + 2)/(x - 2) = x + 2 for x not equal to 2, so lim (x -> 2) (x^2 - 4)/(x - 2) = 2 + 2 = 4.\n\nHence continuity requires k = 4.",
+        "explanation": "Set f(2) equal to the limit obtained by factorization.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-LIM-07"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Classify the discontinuities of (a) f(x) = (x^2 - 1)/(x - 1) at x = 1 and (b) the greatest-integer function [x] at x = 2, explaining your reasoning.",
+        "answer": "(a) f(x) = (x^2 - 1)/(x - 1) at x = 1. For x not equal to 1, f(x) = x + 1, so both one-sided limits equal 2 and lim (x -> 1) f(x) = 2 exists. But f(1) is undefined (0/0). Since the limit exists yet the function value is missing, this is a REMOVABLE discontinuity - the hole can be filled by defining f(1) = 2, making f continuous.\n\n(b) The greatest-integer function [x] at x = 2. For x just below 2 (say 1.9), [x] = 1, so the left-hand limit is 1. For x just above 2 (say 2.1), [x] = 2, so the right-hand limit is 2. Both one-sided limits exist but are unequal (1 and 2), so the two-sided limit does not exist and the graph jumps by 1. This is a JUMP discontinuity.\n\nSummary: (a) removable (limit exists, value missing); (b) jump (one-sided limits differ).",
+        "explanation": "Removable when the limit exists but value missing; jump when one-sided limits differ.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-LIM-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The notation lim (x -> a) f(x) = L is read as",
+      "answer": "the limit of f(x) as x tends to a is L",
+      "options": [
+        "f(a) equals L",
+        "the limit of f(x) as x tends to a is L",
+        "f is continuous at a",
+        "f(x) is never L"
+      ],
+      "explanation": "It names the value f(x) approaches as x -> a."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The limit lim (x -> a) f(x) describes the behaviour of f(x)",
+      "answer": "for x near a but not equal to a",
+      "options": [
+        "exactly at x = a",
+        "for x near a but not equal to a",
+        "only for x = 0",
+        "only for large x"
+      ],
+      "explanation": "A limit ignores the point x = a itself."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A limit of f(x) at x = a can exist even if",
+      "answer": "f(a) is undefined",
+      "options": [
+        "f is a polynomial",
+        "f(a) is undefined",
+        "a = 0",
+        "f is constant"
+      ],
+      "explanation": "E.g. (x^2-1)/(x-1) has limit 2 at x=1 though undefined there."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> 2) 7 equals",
+      "answer": "7",
+      "options": [
+        "0",
+        "2",
+        "7",
+        "infinity"
+      ],
+      "explanation": "The limit of a constant is the constant."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 3) x equals",
+      "answer": "3",
+      "options": [
+        "0",
+        "1",
+        "3",
+        "9"
+      ],
+      "explanation": "lim (x -> a) x = a."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "From the table f(0.99)=1.99, f(1.01)=2.01, the value of lim (x -> 1) f(x) is",
+      "answer": "2",
+      "options": [
+        "1",
+        "1.5",
+        "2",
+        "undefined"
+      ],
+      "explanation": "Values crowd around 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For f(x) = (x^2 - 1)/(x - 1), simplifying for x not equal to 1 gives",
+      "answer": "x + 1",
+      "options": [
+        "x - 1",
+        "x + 1",
+        "x^2",
+        "1"
+      ],
+      "explanation": "(x-1)(x+1)/(x-1) = x+1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value a function is heading towards near a point is called its",
+      "answer": "limit",
+      "options": [
+        "derivative",
+        "integral",
+        "limit",
+        "domain"
+      ],
+      "explanation": "Definition of a limit."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f(1) = 5 but lim (x -> 1) f(x) = 3, then",
+      "answer": "the limit is 3",
+      "options": [
+        "the limit does not exist",
+        "the limit is 5",
+        "the limit is 3",
+        "f is continuous at 1"
+      ],
+      "explanation": "The limit depends on nearby values, not f(1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (5 - 2x) equals",
+      "answer": "5",
+      "options": [
+        "0",
+        "5",
+        "3",
+        "-2"
+      ],
+      "explanation": "Substitute x = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The symbol x -> a- denotes approaching a from the",
+      "answer": "left",
+      "options": [
+        "right",
+        "left",
+        "top",
+        "bottom"
+      ],
+      "explanation": "a- means through values smaller than a."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The symbol x -> a+ denotes approaching a from the",
+      "answer": "right",
+      "options": [
+        "left",
+        "right",
+        "centre",
+        "infinity"
+      ],
+      "explanation": "a+ means through values larger than a."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The two-sided limit at a exists if and only if",
+      "answer": "the left and right limits are equal",
+      "options": [
+        "f(a) is defined",
+        "the left and right limits are equal",
+        "f is a polynomial",
+        "a > 0"
+      ],
+      "explanation": "Existence requires L(a-) = L(a+)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = |x|/x, the right-hand limit at 0 is",
+      "answer": "1",
+      "options": [
+        "-1",
+        "0",
+        "1",
+        "undefined"
+      ],
+      "explanation": "For x > 0, |x|/x = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x) = |x|/x, the left-hand limit at 0 is",
+      "answer": "-1",
+      "options": [
+        "1",
+        "0",
+        "-1",
+        "2"
+      ],
+      "explanation": "For x < 0, |x|/x = -1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Because the one-sided limits of |x|/x at 0 differ, the limit at 0",
+      "answer": "does not exist",
+      "options": [
+        "is 0",
+        "is 1",
+        "does not exist",
+        "is -1"
+      ],
+      "explanation": "Unequal one-sided limits."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the greatest-integer function [x], the left-hand limit as x -> 2- is",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "explanation": "Just below 2, [x] = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the greatest-integer function [x], the right-hand limit as x -> 2+ is",
+      "answer": "2",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "explanation": "Just above 2, [x] = 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "If lim (x -> a-) f = 4 and lim (x -> a+) f = 4 but f(a) = 9, then lim (x -> a) f is",
+      "answer": "4",
+      "options": [
+        "9",
+        "does not exist",
+        "4",
+        "13"
+      ],
+      "explanation": "One-sided limits agree at 4; f(a) is irrelevant to the limit."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If lim f = L and lim g = M, then lim (f + g) equals",
+      "answer": "L + M",
+      "options": [
+        "L - M",
+        "L M",
+        "L + M",
+        "L / M"
+      ],
+      "explanation": "Sum rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If lim f = L and lim g = M, then lim (f g) equals",
+      "answer": "L M",
+      "options": [
+        "L + M",
+        "L M",
+        "L - M",
+        "L^M"
+      ],
+      "explanation": "Product rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The quotient rule lim (f/g) = L/M requires",
+      "answer": "M not 0",
+      "options": [
+        "L not 0",
+        "M not 0",
+        "L = M",
+        "M = 0"
+      ],
+      "explanation": "Denominator limit must be non-zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (3x) equals",
+      "answer": "6",
+      "options": [
+        "2",
+        "3",
+        "6",
+        "9"
+      ],
+      "explanation": "Constant-multiple rule: 3 * 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 1) (x^2 + 2x + 1) equals",
+      "answer": "4",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "explanation": "Substitute: 1 + 2 + 1 = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (x + 3)/(x + 1) equals",
+      "answer": "5/3",
+      "options": [
+        "5/3",
+        "3/5",
+        "1",
+        "2"
+      ],
+      "explanation": "Substitute: 5/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "lim (x -> a) [f(x)]^n equals",
+      "answer": "L^n",
+      "options": [
+        "n L",
+        "L^n",
+        "L/n",
+        "n^L"
+      ],
+      "explanation": "Power rule."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 3) (2x^2 - x) equals",
+      "answer": "15",
+      "options": [
+        "15",
+        "12",
+        "9",
+        "18"
+      ],
+      "explanation": "2*9 - 3 = 15."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If lim f = 3 and lim g = 6, then lim (2f - g) equals",
+      "answer": "0",
+      "options": [
+        "0",
+        "3",
+        "-3",
+        "12"
+      ],
+      "explanation": "2*3 - 6 = 0."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (3x^2 - 5x + 4) equals",
+      "answer": "6",
+      "options": [
+        "6",
+        "10",
+        "2",
+        "4"
+      ],
+      "explanation": "3*4 - 10 + 4 = 6."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Substituting x = a in a limit gives 0/0. This is called",
+      "answer": "an indeterminate form",
+      "options": [
+        "a defined value",
+        "an indeterminate form",
+        "infinity",
+        "a limit of 0"
+      ],
+      "explanation": "0/0 needs further work."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 3) (x^2 - 9)/(x - 3) equals",
+      "answer": "6",
+      "options": [
+        "0",
+        "3",
+        "6",
+        "9"
+      ],
+      "explanation": "Factorize to x + 3, then substitute."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (x^2 - 5x + 6)/(x^2 - 4) equals",
+      "answer": "-1/4",
+      "options": [
+        "-1/4",
+        "1/4",
+        "-1",
+        "0"
+      ],
+      "explanation": "(x-2)(x-3)/[(x-2)(x+2)] -> -1/4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 1) (x^2 - 1)/(x - 1) equals",
+      "answer": "2",
+      "options": [
+        "1",
+        "2",
+        "0",
+        "-1"
+      ],
+      "explanation": "Cancel (x-1); x+1 -> 2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (sqrt(1 + x) - 1)/x equals",
+      "answer": "1/2",
+      "options": [
+        "1",
+        "1/2",
+        "0",
+        "2"
+      ],
+      "explanation": "Rationalize by the conjugate."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To evaluate a 0/0 limit with a square root, we usually",
+      "answer": "multiply by the conjugate",
+      "options": [
+        "substitute directly",
+        "multiply by the conjugate",
+        "differentiate twice",
+        "take logs"
+      ],
+      "explanation": "Rationalization removes the surd."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 4) (x - 4)/(sqrt(x) - 2) equals",
+      "answer": "4",
+      "options": [
+        "2",
+        "4",
+        "0",
+        "1"
+      ],
+      "explanation": "(sqrt(x)-2)(sqrt(x)+2)/(sqrt(x)-2) -> sqrt(x)+2 = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 3) (x^2 - 2x - 3)/(x - 3) equals",
+      "answer": "4",
+      "options": [
+        "2",
+        "4",
+        "3",
+        "0"
+      ],
+      "explanation": "(x-3)(x+1)/(x-3) -> x+1 = 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 1) (x^3 - 1)/(x - 1) equals",
+      "answer": "3",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "explanation": "(x-1)(x^2+x+1)/(x-1) -> 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 1) (x + 3)/(x + 2) equals",
+      "answer": "4/3",
+      "options": [
+        "4/3",
+        "3/4",
+        "1",
+        "7"
+      ],
+      "explanation": "Direct substitution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (x^2 + 3x)/x equals",
+      "answer": "3",
+      "options": [
+        "0",
+        "3",
+        "1",
+        "infinity"
+      ],
+      "explanation": "Cancel x: x + 3 -> 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (x^3 - 8)/(x^2 - 4) equals",
+      "answer": "3",
+      "options": [
+        "3",
+        "2",
+        "4",
+        "3/2"
+      ],
+      "explanation": "(x-2)(x^2+2x+4)/[(x-2)(x+2)] -> 12/4 = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> 0) sin x / x equals",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "infinity",
+        "x"
+      ],
+      "explanation": "Fundamental trig limit (radians)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> a) (x^n - a^n)/(x - a) equals",
+      "answer": "n a^(n-1)",
+      "options": [
+        "a^n",
+        "n a^(n-1)",
+        "n a^n",
+        "(n-1) a^n"
+      ],
+      "explanation": "Standard algebraic limit."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (n -> infinity) (1 + 1/n)^n equals",
+      "answer": "e",
+      "options": [
+        "1",
+        "e",
+        "0",
+        "infinity"
+      ],
+      "explanation": "Definition of e = 2.718..."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> 0) (a^x - 1)/x equals",
+      "answer": "ln a",
+      "options": [
+        "a",
+        "ln a",
+        "1",
+        "0"
+      ],
+      "explanation": "Standard exponential limit."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (e^x - 1)/x equals",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "e",
+        "ln x"
+      ],
+      "explanation": "Special case ln e = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) sin 5x / x equals",
+      "answer": "5",
+      "options": [
+        "1",
+        "5",
+        "0",
+        "1/5"
+      ],
+      "explanation": "5 * sin 5x/(5x) -> 5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (x^5 - 32)/(x - 2) equals",
+      "answer": "80",
+      "options": [
+        "16",
+        "32",
+        "80",
+        "10"
+      ],
+      "explanation": "5 * 2^4 = 80."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) tan x / x equals",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "infinity",
+        "x"
+      ],
+      "explanation": "tan x/x -> 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> infinity) 1/x equals",
+      "answer": "0",
+      "options": [
+        "1",
+        "0",
+        "infinity",
+        "-1"
+      ],
+      "explanation": "Reciprocal of large x."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> infinity) (2x^2 + 3x)/(5x^2 - 1) equals",
+      "answer": "2/5",
+      "options": [
+        "2/5",
+        "5/2",
+        "0",
+        "infinity"
+      ],
+      "explanation": "Divide by x^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (1 - cos x)/x^2 equals",
+      "answer": "1/2",
+      "options": [
+        "0",
+        "1",
+        "1/2",
+        "2"
+      ],
+      "explanation": "Standard limit."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) sin 3x / sin 5x equals",
+      "answer": "3/5",
+      "options": [
+        "3/5",
+        "5/3",
+        "1",
+        "0"
+      ],
+      "explanation": "(sin3x/3x)(5x/sin5x)(3/5) -> 3/5."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function f is continuous at a if f(a) is defined, the limit exists and",
+      "answer": "lim (x -> a) f(x) = f(a)",
+      "options": [
+        "f(a) = 0",
+        "lim (x -> a) f(x) = f(a)",
+        "a = 0",
+        "f is linear"
+      ],
+      "explanation": "Third continuity condition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "How many conditions must hold for continuity at a point?",
+      "answer": "three",
+      "options": [
+        "one",
+        "two",
+        "three",
+        "four"
+      ],
+      "explanation": "Defined, limit exists, equal."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Every polynomial is continuous",
+      "answer": "everywhere",
+      "options": [
+        "nowhere",
+        "only at 0",
+        "everywhere",
+        "only for x > 0"
+      ],
+      "explanation": "Polynomials are continuous on all of R."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The function sin x is continuous",
+      "answer": "everywhere",
+      "options": [
+        "only at 0",
+        "everywhere",
+        "only on (0, pi)",
+        "nowhere"
+      ],
+      "explanation": "sin x is continuous on R."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = x^2 at x = 3: since lim = 9 and f(3) = 9, f is",
+      "answer": "continuous",
+      "options": [
+        "discontinuous",
+        "continuous",
+        "undefined",
+        "infinite"
+      ],
+      "explanation": "Limit equals value."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A rational function p(x)/q(x) is continuous wherever",
+      "answer": "q(x) is not 0",
+      "options": [
+        "p(x) = 0",
+        "q(x) = 0",
+        "q(x) is not 0",
+        "x > 0"
+      ],
+      "explanation": "Denominator must be non-zero."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Direct substitution evaluates a limit exactly when the function is",
+      "answer": "continuous there",
+      "options": [
+        "discontinuous there",
+        "continuous there",
+        "undefined there",
+        "infinite there"
+      ],
+      "explanation": "Continuity justifies substitution."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = 1/x at x = 0 is",
+      "answer": "discontinuous",
+      "options": [
+        "continuous",
+        "discontinuous",
+        "zero",
+        "equal to 1"
+      ],
+      "explanation": "f(0) undefined; limit infinite."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "If lim (x -> 2) f(x) = 5 but f(2) = 7, then at x = 2 the function is",
+      "answer": "discontinuous",
+      "options": [
+        "continuous",
+        "discontinuous",
+        "undefined",
+        "infinite"
+      ],
+      "explanation": "Limit not equal to f(2)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x)=x+2 (x<=1), 3x (x>1): the left-hand limit at 1 is",
+      "answer": "3",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "explanation": "1 + 2 = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For f(x)=x+2 (x<=1), 3x (x>1): the right-hand limit at 1 is",
+      "answer": "3",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "explanation": "3 * 1 = 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For the previous f, at x = 1 the function is",
+      "answer": "continuous",
+      "options": [
+        "discontinuous",
+        "continuous",
+        "undefined",
+        "infinite"
+      ],
+      "explanation": "Both limits and f(1) equal 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = (x^2 - 4)/(x - 2) for x != 2, f(2) = k is continuous at 2 when k =",
+      "answer": "4",
+      "options": [
+        "2",
+        "4",
+        "0",
+        "6"
+      ],
+      "explanation": "Limit is x+2 -> 4."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = kx for x < 1 and 3 for x >= 1 is continuous at 1 when k =",
+      "answer": "3",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "0"
+      ],
+      "explanation": "Left limit k must equal 3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = (sin x)/x for x != 0, f(0) = c is continuous at 0 when c =",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "infinity",
+        "-1"
+      ],
+      "explanation": "Limit is 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = x + 1 (x < 2), 2x (x >= 2): the jump at 2 is",
+      "answer": "1",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "explanation": "Right value 4, left limit 3; jump = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A discontinuity where the limit exists but f(a) is missing is called",
+      "answer": "removable",
+      "options": [
+        "jump",
+        "removable",
+        "infinite",
+        "oscillating"
+      ],
+      "explanation": "A fillable hole."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A discontinuity where the one-sided limits differ is a",
+      "answer": "jump discontinuity",
+      "options": [
+        "removable discontinuity",
+        "jump discontinuity",
+        "point of continuity",
+        "limit of 0"
+      ],
+      "explanation": "Unequal one-sided limits."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The greatest-integer function [x] at each integer has a",
+      "answer": "jump discontinuity",
+      "options": [
+        "removable discontinuity",
+        "jump discontinuity",
+        "infinite discontinuity",
+        "no discontinuity"
+      ],
+      "explanation": "It jumps by 1 at each integer."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "f(x) = 1/x at x = 0 has a(n)",
+      "answer": "infinite discontinuity",
+      "options": [
+        "removable discontinuity",
+        "jump discontinuity",
+        "infinite discontinuity",
+        "point of continuity"
+      ],
+      "explanation": "One-sided limits are infinite."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If f and g are continuous at a, then f g is",
+      "answer": "continuous at a",
+      "options": [
+        "always discontinuous",
+        "continuous at a",
+        "undefined",
+        "infinite"
+      ],
+      "explanation": "Algebra of continuous functions."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The removable discontinuity of (x^2 - 1)/(x - 1) at x = 1 is removed by setting f(1) =",
+      "answer": "2",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "undefined"
+      ],
+      "explanation": "Fill the hole with the limit 2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A limit of f at a can exist even when f(a) is undefined.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "E.g. (x^2-1)/(x-1) at x=1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The limit at a depends only on the value f(a).",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "It depends on nearby values, not f(a)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The two-sided limit exists only if the left and right limits are equal.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Existence condition."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) |x|/x exists.",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Left limit -1, right limit +1."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The quotient rule for limits holds even when the denominator limit is 0.",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "It requires the denominator limit not 0."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The form 0/0 obtained by substitution is an indeterminate form.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "It needs factorization or rationalization."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> 0) sin x / x = 1 when x is measured in radians.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Fundamental trig limit."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (n -> infinity) (1 + 1/n)^n = e.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Definition of e."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "All polynomials are continuous everywhere.",
+      "answer": "True",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "No breaks in a polynomial graph."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "A jump discontinuity can be removed by redefining the function at one point.",
+      "answer": "False",
+      "options": [
+        "True",
+        "False"
+      ],
+      "explanation": "Only removable discontinuities can be so removed."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value f(x) approaches as x tends to a is called the ____ of f at a.",
+      "answer": "limit",
+      "explanation": "Definition."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 1) (x^2 - 1)/(x - 1) = ____.",
+      "answer": "2",
+      "explanation": "x+1 -> 2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The limit obtained by approaching a from values less than a is the ____ limit.",
+      "answer": "left-hand",
+      "explanation": "x -> a-."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "For [x], the right-hand limit as x -> 3+ is ____.",
+      "answer": "3",
+      "explanation": "Just above 3, [x] = 3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "If lim f = L and lim g = M, then lim (f - g) = ____.",
+      "answer": "L - M",
+      "explanation": "Difference rule."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 2) (x^2 + 1) = ____.",
+      "answer": "5",
+      "explanation": "4 + 1 = 5."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "Removing a square root in a 0/0 limit by multiplying by the conjugate is called ____.",
+      "answer": "rationalization",
+      "explanation": "Conjugate method."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 3) (x^2 - 9)/(x - 3) = ____.",
+      "answer": "6",
+      "explanation": "x+3 -> 6."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> 0) (sqrt(1 + x) - 1)/x = ____.",
+      "answer": "1/2",
+      "explanation": "Rationalize."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "lim (x -> 0) sin x / x = ____.",
+      "answer": "1",
+      "explanation": "Standard limit."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> a) (x^n - a^n)/(x - a) = ____.",
+      "answer": "n a^(n-1)",
+      "explanation": "Standard algebraic limit."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "lim (x -> infinity) 1/x = ____.",
+      "answer": "0",
+      "explanation": "Reciprocal of large x."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "A function whose graph can be drawn without lifting the pen is called ____.",
+      "answer": "continuous",
+      "explanation": "Intuitive continuity."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "f(x) = (x^2 - 4)/(x - 2) for x != 2 and f(2) = k is continuous at 2 when k = ____.",
+      "answer": "4",
+      "explanation": "Limit x+2 -> 4."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "A discontinuity where the limit exists but the value is missing is a ____ discontinuity.",
+      "answer": "removable",
+      "explanation": "Fillable hole."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Explain, using a table of values, why lim (x -> 2) (x^2 - 4)/(x - 2) = 4.",
+      "answer": "For x not equal to 2, (x^2 - 4)/(x - 2) = (x - 2)(x + 2)/(x - 2) = x + 2. Tabulating: x = 1.9 gives 3.9; x = 1.99 gives 3.99; x = 2.1 gives 4.1; x = 2.01 gives 4.01. The values crowd around 4 from both sides, so lim (x -> 2) (x^2 - 4)/(x - 2) = 4. The function is undefined at x = 2 (0/0) but the limit still exists.",
+      "explanation": "Table shows values approaching 4; simplifies to x + 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 2,
+      "question": "State the meaning of lim (x -> a) f(x) = L in words.",
+      "answer": "lim (x -> a) f(x) = L means that we can make the value of f(x) as close to L as we please by choosing x sufficiently close to a, but not equal to a. In other words, as x approaches a from either side, f(x) approaches the single value L. The limit describes the behaviour of f near a and does not depend on the value (if any) of f at a itself.",
+      "explanation": "Definition of a limit in words."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "For f(x) = x - 1 for x < 2 and f(x) = 2x for x >= 2, find the left-hand and right-hand limits at x = 2 and state whether the limit exists.",
+      "answer": "Left-hand limit: as x -> 2- we use the first piece x - 1, so lim (x -> 2-) f(x) = 2 - 1 = 1.\nRight-hand limit: as x -> 2+ we use the second piece 2x, so lim (x -> 2+) f(x) = 2(2) = 4.\nSince the left-hand limit (1) is not equal to the right-hand limit (4), the two-sided limit lim (x -> 2) f(x) does NOT exist (there is a jump).",
+      "explanation": "Evaluate each piece; unequal limits => no limit."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "State the condition for the existence of lim (x -> a) f(x) in terms of one-sided limits.",
+      "answer": "The limit lim (x -> a) f(x) exists if and only if both one-sided limits exist and are equal, that is\n\n   lim (x -> a-) f(x) = lim (x -> a+) f(x).\n\nTheir common value is then the limit L. If the left-hand and right-hand limits are different, or if either one fails to exist, then the two-sided limit does not exist.",
+      "explanation": "Existence needs equal one-sided limits."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Given lim (x -> a) f(x) = 4 and lim (x -> a) g(x) = 2, evaluate lim (x -> a) [3 f(x) - g(x)^2] using the algebra of limits.",
+      "answer": "Apply the constant-multiple, difference and power rules:\n\n   lim [3 f - g^2] = 3 lim f - (lim g)^2\n                   = 3(4) - (2)^2\n                   = 12 - 4\n                   = 8.\n\nHence lim (x -> a) [3 f(x) - g(x)^2] = 8.",
+      "explanation": "Use constant-multiple, difference and power rules."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate lim (x -> 1) (2x^2 + 3x - 5)/(x + 4) by direct substitution.",
+      "answer": "The denominator at x = 1 is 1 + 4 = 5, which is non-zero, so direct substitution is valid.\n\nNumerator at x = 1: 2(1) + 3(1) - 5 = 2 + 3 - 5 = 0.\nDenominator at x = 1: 1 + 4 = 5.\n\nHence lim (x -> 1) (2x^2 + 3x - 5)/(x + 4) = 0/5 = 0.",
+      "explanation": "Denominator non-zero, so substitute directly."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> 2) (x^2 - 5x + 6)/(x^2 - 4) by factorization.",
+      "answer": "Substitution gives (4 - 10 + 6)/(4 - 4) = 0/0, so factorize.\n\nNumerator: x^2 - 5x + 6 = (x - 2)(x - 3).\nDenominator: x^2 - 4 = (x - 2)(x + 2).\n\nCancel (x - 2):\n   (x - 2)(x - 3)/[(x - 2)(x + 2)] = (x - 3)/(x + 2)   for x not equal to 2.\n\nSubstitute x = 2: (2 - 3)/(2 + 2) = -1/4.\n\nHence the limit is -1/4.",
+      "explanation": "Factor both, cancel (x - 2), substitute."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> 0) (sqrt(4 + x) - 2)/x by rationalization.",
+      "answer": "Substitution gives 0/0. Multiply by the conjugate (sqrt(4 + x) + 2):\n\n   (sqrt(4 + x) - 2)/x * (sqrt(4 + x) + 2)/(sqrt(4 + x) + 2)\n   = [(4 + x) - 4]/[x(sqrt(4 + x) + 2)]\n   = x/[x(sqrt(4 + x) + 2)]\n   = 1/(sqrt(4 + x) + 2)   for x not equal to 0.\n\nAs x -> 0 this tends to 1/(sqrt(4) + 2) = 1/(2 + 2) = 1/4.\n\nHence the limit is 1/4.",
+      "explanation": "Multiply by conjugate; limit is 1/4."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> 1) (x^3 - 1)/(x^2 - 1).",
+      "answer": "Substitution gives 0/0. Factorize using x^3 - 1 = (x - 1)(x^2 + x + 1) and x^2 - 1 = (x - 1)(x + 1):\n\n   (x^3 - 1)/(x^2 - 1) = (x - 1)(x^2 + x + 1)/[(x - 1)(x + 1)] = (x^2 + x + 1)/(x + 1)   for x not equal to 1.\n\nSubstitute x = 1: (1 + 1 + 1)/(1 + 1) = 3/2.\n\nHence the limit is 3/2.",
+      "explanation": "Factor cubes and difference of squares; cancel (x - 1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> 3) (x - 3)/(sqrt(x + 1) - 2).",
+      "answer": "Substitution gives 0/0. Rationalize the denominator by multiplying by (sqrt(x + 1) + 2):\n\n   (x - 3)/(sqrt(x + 1) - 2) * (sqrt(x + 1) + 2)/(sqrt(x + 1) + 2)\n   = (x - 3)(sqrt(x + 1) + 2)/[(x + 1) - 4]\n   = (x - 3)(sqrt(x + 1) + 2)/(x - 3)\n   = sqrt(x + 1) + 2   for x not equal to 3.\n\nSubstitute x = 3: sqrt(4) + 2 = 2 + 2 = 4.\n\nHence the limit is 4.",
+      "explanation": "Rationalize the denominator; cancel (x - 3)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> 0) (tan 3x)/(sin 4x).",
+      "answer": "Use tan t / t -> 1 and sin t / t -> 1. Write\n\n   (tan 3x)/(sin 4x) = [tan 3x / (3x)] * [(4x)/sin 4x] * (3x)/(4x)\n                     = [tan 3x / (3x)] * [(4x)/sin 4x] * (3/4).\n\nAs x -> 0, tan 3x/(3x) -> 1 and (4x)/sin 4x -> 1, so the limit is 1 * 1 * (3/4) = 3/4.",
+      "explanation": "Rescale each factor to standard trig limits."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate lim (x -> 0) (e^(2x) - 1)/x.",
+      "answer": "Use the standard limit lim (t -> 0) (e^t - 1)/t = 1. Write\n\n   (e^(2x) - 1)/x = 2 * (e^(2x) - 1)/(2x).\n\nAs x -> 0, 2x -> 0, so (e^(2x) - 1)/(2x) -> 1. Hence the limit is 2 * 1 = 2.",
+      "explanation": "Rescale to (e^t - 1)/t with t = 2x."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate lim (x -> infinity) (3x^3 - 2x + 1)/(6x^3 + x^2 - 5).",
+      "answer": "Divide numerator and denominator by x^3, the highest power:\n\n   (3 - 2/x^2 + 1/x^3)/(6 + 1/x - 5/x^3).\n\nAs x -> infinity, the terms 2/x^2, 1/x^3, 1/x and 5/x^3 all tend to 0. Hence the limit is 3/6 = 1/2.",
+      "explanation": "Divide by x^3; 1/x terms vanish."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate lim (x -> 3) (x^4 - 81)/(x - 3) using a standard limit.",
+      "answer": "Here 81 = 3^4, so this is lim (x -> a) (x^n - a^n)/(x - a) with n = 4, a = 3.\n\nThe standard result gives n a^(n-1) = 4 * 3^3 = 4 * 27 = 108.\n\nHence the limit is 108.",
+      "explanation": "Apply (x^n - a^n)/(x - a) -> n a^(n-1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 3,
+      "question": "State the three conditions for a function f to be continuous at x = a.",
+      "answer": "A function f is continuous at x = a if and only if all three of the following hold:\n(i) f(a) is defined, i.e. a lies in the domain of f;\n(ii) lim (x -> a) f(x) exists, i.e. the left-hand and right-hand limits are equal;\n(iii) the limit equals the function value: lim (x -> a) f(x) = f(a).\nIf any one condition fails, f is discontinuous at a.",
+      "explanation": "Defined, limit exists, limit equals value."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Test whether f(x) = (x^2 - 9)/(x - 3), x not equal to 3, with f(3) = 5, is continuous at x = 3.",
+      "answer": "Check the three conditions at x = 3.\n(i) f(3) = 5 is defined.\n(ii) lim (x -> 3) f(x): for x not equal to 3, (x^2 - 9)/(x - 3) = x + 3, so the limit is 3 + 3 = 6, which exists.\n(iii) Compare: lim (x -> 3) f(x) = 6, but f(3) = 5, so the limit is NOT equal to f(3).\n\nSince condition (iii) fails, f is DISCONTINUOUS at x = 3. (It would be continuous only if f(3) were 6.)",
+      "explanation": "Limit is 6 but f(3) = 5, so discontinuous."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Why is direct substitution valid for evaluating lim (x -> 2) (x^3 + 1)?",
+      "answer": "The function f(x) = x^3 + 1 is a polynomial, and every polynomial is continuous at every real number. By the definition of continuity, lim (x -> a) f(x) = f(a) for a continuous function. Therefore the limit can be found by direct substitution: lim (x -> 2) (x^3 + 1) = 2^3 + 1 = 9.",
+      "explanation": "Polynomials are continuous, so limit equals value."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the value of a so that f(x) = ax + 1 for x <= 2 and f(x) = 3x - 1 for x > 2 is continuous at x = 2.",
+      "answer": "For continuity at x = 2 the left-hand limit, right-hand limit and f(2) must agree.\nLeft-hand limit and f(2): using ax + 1, value = 2a + 1.\nRight-hand limit: using 3x - 1, value = 3(2) - 1 = 5.\nSet them equal: 2a + 1 = 5, so 2a = 4, giving a = 2.\n\nHence a = 2 makes f continuous at x = 2.",
+      "explanation": "Equate the two pieces at x = 2; a = 2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find k so that f(x) = (sin 3x)/x for x not equal to 0 and f(0) = k is continuous at x = 0.",
+      "answer": "For continuity at 0 we need k = f(0) = lim (x -> 0) (sin 3x)/x.\n\nCompute the limit: (sin 3x)/x = 3 * (sin 3x)/(3x). As x -> 0, (sin 3x)/(3x) -> 1, so the limit is 3 * 1 = 3.\n\nTherefore k = 3 makes f continuous at x = 0.",
+      "explanation": "Limit of (sin 3x)/x is 3, so k = 3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Classify the discontinuity of f(x) = (x^2 - 16)/(x - 4) at x = 4 and state how to remove it.",
+      "answer": "At x = 4, f gives 0/0, so f(4) is undefined. For x not equal to 4, (x^2 - 16)/(x - 4) = (x - 4)(x + 4)/(x - 4) = x + 4, so lim (x -> 4) f(x) = 4 + 4 = 8, which exists.\n\nBecause the limit exists (8) but f(4) is undefined, this is a REMOVABLE discontinuity. It is removed by defining f(4) = 8; the redefined function is then continuous at x = 4.",
+      "explanation": "Limit exists (8), value missing => removable; set f(4) = 8."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate lim (x -> 0) (log(1 + x))/x (natural logarithm).",
+      "answer": "Use the standard limit lim (x -> 0) log(1 + x)/x = 1, where log denotes the natural logarithm (base e). Directly, therefore,\n\n   lim (x -> 0) log(1 + x)/x = 1.\n\nThis is the companion of (e^x - 1)/x -> 1 and follows from the definition of e.",
+      "explanation": "Standard limit log(1 + x)/x -> 1."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Distinguish between a removable and a jump discontinuity.",
+      "answer": "Removable discontinuity: the two-sided limit lim (x -> a) f(x) exists (the left-hand and right-hand limits are equal) but f(a) is either undefined or not equal to the limit. The graph has a single hole that can be filled by redefining f(a), making the function continuous.\n\nJump discontinuity: the left-hand and right-hand limits both exist but are unequal, so the two-sided limit does not exist and the graph makes a jump of size L(a+) - L(a-). It cannot be removed by redefining a single value.",
+      "explanation": "Removable: limit exists, fillable hole; jump: unequal one-sided limits."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "For f(x) defined by f(x) = x^2 for x < 1, f(1) = 3, and f(x) = 2x for x > 1, find the left-hand limit, right-hand limit and f(1), and determine whether f is continuous at x = 1.",
+      "answer": "Left-hand limit: as x -> 1- we use x^2, so lim (x -> 1-) f(x) = 1^2 = 1.\nRight-hand limit: as x -> 1+ we use 2x, so lim (x -> 1+) f(x) = 2(1) = 2.\nFunction value: f(1) = 3 (given).\n\nExistence of the limit: the left-hand limit (1) and right-hand limit (2) are unequal, so lim (x -> 1) f(x) does NOT exist.\n\nContinuity: continuity at 1 requires the limit to exist and equal f(1). Since the two-sided limit does not even exist, f is DISCONTINUOUS at x = 1. Because the one-sided limits exist but differ (1 and 2), this is a jump discontinuity of size 2 - 1 = 1; the separate value f(1) = 3 does not affect this classification.",
+      "explanation": "Compute both one-sided limits and f(1); unequal limits => jump discontinuity."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate the following limits, showing full working: (a) lim (x -> 2) (x^3 - 8)/(x - 2); (b) lim (x -> 0) (sqrt(9 + x) - 3)/x.",
+      "answer": "(a) Substitution gives 0/0. Factor x^3 - 8 = (x - 2)(x^2 + 2x + 4):\n   (x^3 - 8)/(x - 2) = x^2 + 2x + 4   for x not equal to 2.\n   Substitute x = 2: 4 + 4 + 4 = 12. Hence the limit is 12.\n\n(b) Substitution gives 0/0. Multiply by the conjugate (sqrt(9 + x) + 3):\n   (sqrt(9 + x) - 3)/x * (sqrt(9 + x) + 3)/(sqrt(9 + x) + 3)\n   = [(9 + x) - 9]/[x(sqrt(9 + x) + 3)]\n   = x/[x(sqrt(9 + x) + 3)]\n   = 1/(sqrt(9 + x) + 3)   for x not equal to 0.\n   As x -> 0 this tends to 1/(3 + 3) = 1/6. Hence the limit is 1/6.",
+      "explanation": "Part (a) factorization gives 12; part (b) rationalization gives 1/6."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Evaluate: (a) lim (x -> 0) (1 - cos 2x)/x^2; (b) lim (x -> 0) (a^x - b^x)/x in terms of natural logarithms.",
+      "answer": "(a) Use 1 - cos 2x = 2 sin^2 x (double-angle identity). Then\n   (1 - cos 2x)/x^2 = 2 sin^2 x / x^2 = 2 (sin x / x)^2.\n   As x -> 0, sin x / x -> 1, so the limit is 2 (1)^2 = 2.\n\n(b) Write a^x - b^x = (a^x - 1) - (b^x - 1). Then\n   (a^x - b^x)/x = (a^x - 1)/x - (b^x - 1)/x.\n   Using the standard limit (c^x - 1)/x -> ln c as x -> 0,\n   lim (x -> 0) (a^x - b^x)/x = ln a - ln b = ln(a/b).",
+      "explanation": "(a) Use 1 - cos 2x = 2 sin^2 x -> 2; (b) split and use (c^x - 1)/x -> ln c."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the standard limit lim (x -> a) (x^n - a^n)/(x - a) and use it to evaluate (a) lim (x -> 2) (x^6 - 64)/(x - 2) and (b) lim (x -> 1) (x^15 - 1)/(x - 1).",
+      "answer": "Standard limit: lim (x -> a) (x^n - a^n)/(x - a) = n a^(n-1) for any rational n. It is the derivative of x^n at x = a.\n\n(a) Here 64 = 2^6, so n = 6, a = 2:\n   lim (x -> 2) (x^6 - 64)/(x - 2) = 6 * 2^(6-1) = 6 * 2^5 = 6 * 32 = 192.\n\n(b) Here 1 = 1^15, so n = 15, a = 1:\n   lim (x -> 1) (x^15 - 1)/(x - 1) = 15 * 1^(15-1) = 15 * 1 = 15.\n\nHence the limits are 192 and 15 respectively.",
+      "explanation": "Apply n a^(n-1): (a) 192; (b) 15."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 5,
+      "question": "Define continuity of a function at a point and use the definition to show that f(x) = x^2 is continuous at every point a, while f(x) = 1/x is discontinuous at x = 0.",
+      "answer": "Definition: f is continuous at a if (i) f(a) is defined, (ii) lim (x -> a) f(x) exists, and (iii) lim (x -> a) f(x) = f(a).\n\nf(x) = x^2 at any a: (i) f(a) = a^2 is defined for every real a. (ii) By the algebra of limits, lim (x -> a) x^2 = a^2 exists. (iii) The limit a^2 equals f(a) = a^2. All three conditions hold, so f(x) = x^2 is continuous at every point a, i.e. continuous on all of R.\n\nf(x) = 1/x at x = 0: condition (i) already fails because f(0) = 1/0 is undefined (0 is not in the domain). Moreover the one-sided limits are infinite: lim (x -> 0+) 1/x = +infinity and lim (x -> 0-) 1/x = -infinity, so the limit does not exist either. Hence f(x) = 1/x is discontinuous at x = 0 (an infinite discontinuity).",
+      "explanation": "Verify three conditions for x^2; f(0) undefined and infinite limits for 1/x."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find the values of a and b so that f(x) = x + a for x < 1, f(x) = 3 for x = 1, and f(x) = bx + 2 for x > 1 is continuous at x = 1.",
+      "answer": "For continuity at x = 1 the left-hand limit, f(1) and the right-hand limit must all be equal.\n\nf(1) = 3 (given).\nLeft-hand limit: using x + a, lim (x -> 1-) f(x) = 1 + a.\nRight-hand limit: using bx + 2, lim (x -> 1+) f(x) = b + 2.\n\nContinuity requires:\n   1 + a = 3   =>   a = 2,\n   b + 2 = 3   =>   b = 1.\n\nCheck: with a = 2 the left-hand limit is 3; with b = 1 the right-hand limit is 3; f(1) = 3. All three agree, so f is continuous at x = 1. Hence a = 2 and b = 1.",
+      "explanation": "Set both one-sided limits equal to f(1) = 3; a = 2, b = 1."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "For each function, classify the discontinuity at the stated point: (a) f(x) = (x^2 - 25)/(x - 5) at x = 5; (b) f(x) = |x - 2|/(x - 2) at x = 2; (c) f(x) = 1/(x - 3) at x = 3.",
+      "answer": "(a) At x = 5, f gives 0/0 (undefined). For x not equal to 5, (x^2 - 25)/(x - 5) = x + 5, so lim (x -> 5) f(x) = 10 exists. Limit exists but value missing => REMOVABLE discontinuity (fill by setting f(5) = 10).\n\n(b) At x = 2: for x > 2, |x - 2| = x - 2, so f = +1; for x < 2, |x - 2| = -(x - 2), so f = -1. Right-hand limit +1, left-hand limit -1: both exist but differ, so the limit does not exist => JUMP discontinuity (jump size 2).\n\n(c) At x = 3, f(3) is undefined and lim (x -> 3+) 1/(x - 3) = +infinity while lim (x -> 3-) 1/(x - 3) = -infinity. A one-sided limit is infinite => INFINITE discontinuity (vertical asymptote at x = 3).",
+      "explanation": "(a) removable; (b) jump; (c) infinite."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "State the sum, product and quotient rules for limits. Given lim (x -> a) f(x) = 5 and lim (x -> a) g(x) = -2, evaluate (a) lim (f + 3g), (b) lim (f g), and (c) lim (f/(g - 3)).",
+      "answer": "Rules (with lim f = L, lim g = M): sum lim (f + g) = L + M; product lim (f g) = L M; quotient lim (f/g) = L/M provided M is not 0. Constant-multiple: lim (k f) = k L.\n\nHere L = 5, M = -2.\n(a) lim (f + 3g) = L + 3M = 5 + 3(-2) = 5 - 6 = -1.\n(b) lim (f g) = L M = 5 * (-2) = -10.\n(c) lim (f/(g - 3)) = L/(M - 3) = 5/(-2 - 3) = 5/(-5) = -1. (The denominator limit -5 is non-zero, so the quotient rule applies.)",
+      "explanation": "Apply sum, product and quotient rules: -1, -10, -1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA student studies f(x) = (x^2 - 1)/(x - 1). At x = 1 the formula gives 0/0, so f is undefined there. The student makes a table: f(0.9) = 1.9, f(0.99) = 1.99, f(1.01) = 2.01, f(1.1) = 2.1.\n(a) Why is f(1) undefined?\n(b) Simplify f(x) for x not equal to 1.\n(c) What value do the table entries suggest for the limit at x = 1?\n(d) Does the limit at x = 1 exist even though f(1) does not? Explain.",
+      "answer": "(a) At x = 1 both numerator (x^2 - 1) and denominator (x - 1) are 0, giving 0/0, which is not a number, so f(1) is undefined.\n(b) For x not equal to 1, (x^2 - 1)/(x - 1) = (x - 1)(x + 1)/(x - 1) = x + 1.\n(c) The entries crowd around 2 from both sides, so the limit is 2.\n(d) Yes. A limit describes the value f(x) approaches as x nears 1, not the value at 1. Since x + 1 -> 2 as x -> 1, lim (x -> 1) f(x) = 2 exists even though f(1) is undefined.",
+      "explanation": "0/0 undefined; simplifies to x+1; limit 2; limit independent of f(1)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nConsider f(x) = x + 1 for x < 0 and f(x) = x + 3 for x >= 0.\n(a) Find the left-hand limit at x = 0.\n(b) Find the right-hand limit at x = 0.\n(c) Does lim (x -> 0) f(x) exist?\n(d) What is the size of the jump at x = 0?",
+      "answer": "(a) For x < 0 use x + 1, so lim (x -> 0-) f(x) = 0 + 1 = 1.\n(b) For x >= 0 use x + 3, so lim (x -> 0+) f(x) = 0 + 3 = 3.\n(c) The left-hand limit (1) and right-hand limit (3) are unequal, so lim (x -> 0) f(x) does NOT exist.\n(d) The jump is L(0+) - L(0-) = 3 - 1 = 2.",
+      "explanation": "One-sided limits 1 and 3; limit absent; jump 2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIt is given that lim (x -> a) f(x) = 6 and lim (x -> a) g(x) = 3.\n(a) State the quotient rule for limits and its condition.\n(b) Evaluate lim (f + g).\n(c) Evaluate lim (f g).\n(d) Evaluate lim (f/g).",
+      "answer": "(a) Quotient rule: lim (f/g) = (lim f)/(lim g) = L/M, valid provided M = lim g is not 0.\n(b) lim (f + g) = 6 + 3 = 9 (sum rule).\n(c) lim (f g) = 6 * 3 = 18 (product rule).\n(d) lim (f/g) = 6/3 = 2, valid since M = 3 is non-zero.",
+      "explanation": "Sum 9, product 18, quotient 2."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTo evaluate lim (x -> 2) (x^2 - 4)/(x - 2), substitution gives 0/0.\n(a) Name the indeterminate form obtained.\n(b) Which technique is appropriate here - factorization or rationalization?\n(c) Carry out the technique and simplify.\n(d) State the value of the limit.",
+      "answer": "(a) The indeterminate form is 0/0.\n(b) Factorization is appropriate, because the expression is a rational function with a polynomial numerator and denominator (no square roots).\n(c) x^2 - 4 = (x - 2)(x + 2), so (x^2 - 4)/(x - 2) = (x - 2)(x + 2)/(x - 2) = x + 2 for x not equal to 2.\n(d) Substitute x = 2: x + 2 = 4. Hence lim (x -> 2) (x^2 - 4)/(x - 2) = 4.",
+      "explanation": "0/0; factorize; simplify to x+2; limit 4."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-04",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nConsider lim (x -> 0) (sqrt(1 + x) - sqrt(1 - x))/x.\n(a) What form does substitution give?\n(b) By what factor should the expression be multiplied to rationalize?\n(c) Simplify the expression after rationalization.\n(d) State the value of the limit.",
+      "answer": "(a) Substitution gives (1 - 1)/0 = 0/0.\n(b) Multiply numerator and denominator by the conjugate (sqrt(1 + x) + sqrt(1 - x)).\n(c) Numerator becomes (1 + x) - (1 - x) = 2x, so the expression is 2x/[x(sqrt(1 + x) + sqrt(1 - x))] = 2/(sqrt(1 + x) + sqrt(1 - x)) for x not equal to 0.\n(d) As x -> 0 the denominator -> sqrt(1) + sqrt(1) = 2, so the limit is 2/2 = 1.",
+      "explanation": "0/0; conjugate; simplifies to 2/(...); limit 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe standard limits lim (x -> 0) sin x / x = 1 and lim (x -> 0) (e^x - 1)/x = 1 are widely used.\n(a) Evaluate lim (x -> 0) sin 7x / x.\n(b) Evaluate lim (x -> 0) sin 2x / sin 3x.\n(c) Evaluate lim (x -> 0) (e^(5x) - 1)/x.\n(d) State the value of lim (x -> 0) tan x / x.",
+      "answer": "(a) sin 7x / x = 7 * sin 7x/(7x) -> 7 * 1 = 7.\n(b) sin 2x / sin 3x = [sin 2x/(2x)] * [(3x)/sin 3x] * (2x)/(3x) = 1 * 1 * (2/3) = 2/3.\n(c) (e^(5x) - 1)/x = 5 * (e^(5x) - 1)/(5x) -> 5 * 1 = 5.\n(d) lim (x -> 0) tan x / x = 1.",
+      "explanation": "7; 2/3; 5; 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nFor rational functions as x -> infinity we divide by the highest power of x, using lim (x -> infinity) 1/x = 0.\n(a) Evaluate lim (x -> infinity) (4x + 5)/(2x - 1).\n(b) Evaluate lim (x -> infinity) (x^2 + 1)/(x^3 + x).\n(c) Evaluate lim (x -> infinity) (7x^2 - 3)/(2x^2 + x + 9).\n(d) In general, what determines the limit of a ratio of polynomials of equal degree?",
+      "answer": "(a) Divide by x: (4 + 5/x)/(2 - 1/x) -> 4/2 = 2.\n(b) Divide by x^3: (1/x + 1/x^3)/(1 + 1/x^2) -> 0/1 = 0.\n(c) Divide by x^2: (7 - 3/x^2)/(2 + 1/x + 9/x^2) -> 7/2.\n(d) When the numerator and denominator have equal degree, the limit is the ratio of their leading coefficients.",
+      "explanation": "2; 0; 7/2; ratio of leading coefficients."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nContinuity at a point a requires three conditions: f(a) defined, lim (x -> a) f(x) exists, and the limit equals f(a). Consider f(x) = x^2 + 1 at x = 2.\n(a) State the three conditions.\n(b) Find f(2).\n(c) Find lim (x -> 2) f(x).\n(d) Is f continuous at x = 2?",
+      "answer": "(a) (i) f(a) is defined; (ii) lim (x -> a) f(x) exists; (iii) lim (x -> a) f(x) = f(a).\n(b) f(2) = 2^2 + 1 = 5.\n(c) f is a polynomial, so lim (x -> 2) (x^2 + 1) = 5 by direct substitution.\n(d) Since f(2) = 5, the limit exists and equals 5, all three conditions hold, so f is continuous at x = 2.",
+      "explanation": "Conditions listed; f(2)=5; limit 5; continuous."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA function is defined by f(x) = (x^2 - a^2)/(x - a) for x not equal to a and f(a) = 10, with a = 5.\n(a) Simplify f(x) for x not equal to 5.\n(b) Find lim (x -> 5) f(x).\n(c) Is f continuous at x = 5 as defined?\n(d) What value of f(5) would make f continuous at x = 5?",
+      "answer": "(a) For x not equal to 5, (x^2 - 25)/(x - 5) = (x - 5)(x + 5)/(x - 5) = x + 5.\n(b) lim (x -> 5) f(x) = 5 + 5 = 10.\n(c) f(5) = 10 (given) and the limit is 10, so the limit equals f(5); hence f IS continuous at x = 5.\n(d) The value needed is f(5) = 10, which is exactly the value given, so no change is required.",
+      "explanation": "Simplifies to x+5; limit 10; f(5)=10 so continuous."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-LIM-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThree functions are given: p(x) = (x^2 - 9)/(x - 3), q(x) = [x] (greatest-integer function), and r(x) = 1/x.\n(a) Classify the discontinuity of p at x = 3.\n(b) Classify the discontinuity of q at x = 1.\n(c) Classify the discontinuity of r at x = 0.\n(d) Which of these discontinuities can be removed, and how?",
+      "answer": "(a) p(x) = x + 3 for x not equal to 3, so lim (x -> 3) p = 6 exists but p(3) is undefined (0/0): REMOVABLE discontinuity.\n(b) q(x) = [x] has left-hand limit 0 and right-hand limit 1 at x = 1; both exist but differ: JUMP discontinuity.\n(c) r(x) = 1/x has infinite one-sided limits at 0 (+infinity and -infinity): INFINITE discontinuity.\n(d) Only p's discontinuity is removable: define p(3) = 6 (the limit) to make p continuous. The jump of q and the infinite discontinuity of r cannot be removed by redefining a single value.",
+      "explanation": "Removable; jump; infinite; only p removable by p(3)=6."
+    }
+  ]
+}
