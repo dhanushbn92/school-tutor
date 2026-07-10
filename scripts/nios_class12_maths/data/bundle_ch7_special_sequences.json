@@ -1,0 +1,2258 @@
+{
+  "schema_version": "1.0",
+  "curriculum": {
+    "board": "NIOS",
+    "class_level": 12,
+    "subject": "Mathematics",
+    "chapter_number": 7,
+    "chapter_title": "Some Special Sequences",
+    "book_title": "NIOS Senior Secondary Mathematics",
+    "academic_year": "2026-27"
+  },
+  "meta": {
+    "source": "NIOS Senior Secondary Mathematics (311)",
+    "author": "Platform Team"
+  },
+  "chapter_text": "CHAPTER 7 - SOME SPECIAL SEQUENCES\n\nIntroduction\n\nA sequence is an ordered list of numbers, and a series is the sum of the terms of a sequence. In earlier lessons you learnt about arithmetic progressions (AP) and geometric progressions (GP). This chapter goes further and studies certain SPECIAL series that appear again and again in mathematics and its applications: the sum of the first n natural numbers, the sum of their squares, and the sum of their cubes. You will also learn a compact way of writing sums using the sigma (summation) notation, the rules that make sigma easy to manipulate, and two powerful techniques - the METHOD OF DIFFERENCES and TELESCOPING - for summing series whose general term is not immediately a standard one. These tools let us collapse a long addition into a single neat formula.\n\n7.1 SUM OF THE FIRST n NATURAL NUMBERS\n\nThe natural numbers are 1, 2, 3, 4, .... Their partial sums form the sequence 1, 3, 6, 10, 15, ... (the triangular numbers). We want a formula for\n\n   S = 1 + 2 + 3 + ... + n.\n\nA famous method, attributed to the young Gauss, is to write the sum forwards and backwards and add:\n\n   S = 1 + 2 + 3 + ... + n\n   S = n + (n-1) + ... + 2 + 1\n\nAdding the two lines term by term, every pair adds up to (n + 1), and there are n such pairs, so\n\n   2S = n(n + 1),   giving   sum k (k = 1 to n) = n(n + 1)/2.\n\nThis is one of the most useful results in all of mathematics. For example, 1 + 2 + ... + 100 = 100(101)/2 = 5050, and 1 + 2 + ... + 10 = 55. Notice the formula is QUADRATIC in n.\n\nTwo closely related results follow at once. The sum of the first n EVEN natural numbers is\n\n   2 + 4 + 6 + ... + 2n = 2(1 + 2 + ... + n) = n(n + 1).\n\nThe sum of the first n ODD natural numbers is\n\n   1 + 3 + 5 + ... + (2n - 1) = n^2,\n\na remarkably clean result: the odd numbers build up the perfect squares one layer at a time.\n\n7.2 SUM OF THE SQUARES OF THE FIRST n NATURAL NUMBERS\n\nNext we sum the squares 1^2, 2^2, 3^2, .... The standard result is\n\n   sum k^2 (k = 1 to n) = n(n + 1)(2n + 1)/6.\n\nOne way to obtain it uses the algebraic identity (k + 1)^3 - k^3 = 3k^2 + 3k + 1. Writing this for k = 1, 2, ..., n and adding, the left-hand side telescopes to (n + 1)^3 - 1, while the right-hand side becomes 3 sum k^2 + 3 sum k + n. Substituting sum k = n(n + 1)/2 and solving for sum k^2 gives the formula above. For example, 1^2 + 2^2 + ... + 10^2 = 10(11)(21)/6 = 385, and 1^2 + 2^2 + ... + 5^2 = 5(6)(11)/6 = 55. The sum of squares grows like n^3 (it is a cubic in n).\n\n7.3 SUM OF THE CUBES OF THE FIRST n NATURAL NUMBERS\n\nSumming the cubes 1^3, 2^3, 3^3, ... gives an especially beautiful pattern:\n\n   sum k^3 (k = 1 to n) = [n(n + 1)/2]^2.\n\nThe right-hand side is exactly the SQUARE of the sum of the first n natural numbers. In other words,\n\n   1^3 + 2^3 + ... + n^3 = (1 + 2 + ... + n)^2.\n\nThis identity can be proved using (k + 1)^4 - k^4 = 4k^3 + 6k^2 + 4k + 1 and telescoping, or by mathematical induction. For example, 1^3 + 2^3 + 3^3 + 4^3 = (10)^2 = 100, and 1^3 + ... + 10^3 = (55)^2 = 3025. The sum of cubes is a quartic (degree four) in n.\n\n7.4 THE SIGMA NOTATION\n\nWriting long sums in full is clumsy. The Greek capital letter SIGMA provides a compact shorthand. We write\n\n   sum a_k (k = 1 to n)\n\nto mean a_1 + a_2 + ... + a_n. Here k is the INDEX (or variable) of summation, 1 is the lower limit, and n is the upper limit. The index is a \"dummy\": we could equally use i or j. Thus sum k^2 (k = 1 to n) means 1^2 + 2^2 + ... + n^2.\n\nThree PROPERTIES make sigma easy to use:\n\n (i) Sum of a constant: sum c (k = 1 to n) = nc. Adding the constant c a total of n times gives nc.\n\n (ii) Constant multiple: sum (c a_k) = c sum a_k. A common factor can be taken outside the summation sign.\n\n (iii) Term-by-term addition: sum (a_k +/- b_k) = sum a_k +/- sum b_k. A sum (or difference) of two sequences may be summed separately.\n\nCombining these properties with the three standard results (sum k, sum k^2, sum k^3) lets us evaluate the sum of any polynomial in k. For instance,\n\n   sum (2k + 3) (k = 1 to n) = 2 sum k + sum 3 = 2 * n(n + 1)/2 + 3n = n(n + 1) + 3n = n^2 + 4n.\n\nSimilarly, sum (k^2 + k) = sum k^2 + sum k = n(n + 1)(2n + 1)/6 + n(n + 1)/2 = n(n + 1)(n + 2)/3, a tidy factored form. The strategy is always the same: break the general term into standard pieces, apply the constant-multiple and addition rules, and substitute the known formulas.\n\n7.5 THE METHOD OF DIFFERENCES\n\nSome series do not have a general term that is a simple polynomial, but the DIFFERENCES between consecutive terms follow a recognisable pattern (an AP or a GP). The method of differences finds the nth term first, and then the sum.\n\nConsider the series 2, 5, 10, 17, 26, .... The successive differences are 3, 5, 7, 9, ... - an arithmetic progression. Because the FIRST differences form an AP, the general term is a quadratic in n. Let the nth term be T_n. We build T_n from the differences:\n\n   T_n = T_1 + (sum of the first (n - 1) differences).\n\nFor 2, 5, 10, 17, 26 the differences are the odd numbers starting at 3, so T_n = 2 + [3 + 5 + ... + (2n - 1)] = 2 + (n^2 - 1) = n^2 + 1. Check: T_1 = 2, T_2 = 5, T_3 = 10 - correct. Once T_n is known, the sum follows from the standard formulas:\n\n   S_n = sum (k^2 + 1) = n(n + 1)(2n + 1)/6 + n.\n\nAs a rule of thumb, if the first differences form an AP, T_n is a quadratic; if the second differences form an AP, T_n is a cubic; and if the differences form a GP, T_n involves a geometric term.\n\n7.6 TELESCOPING SERIES\n\nA TELESCOPING (or \"collapsing\") series is one in which each term can be written as a difference of two parts, so that when the terms are added, almost everything cancels and only a few boundary terms survive. The classic example uses partial fractions:\n\n   1/(k(k + 1)) = 1/k - 1/(k + 1).\n\nTherefore\n\n   sum 1/(k(k + 1)) (k = 1 to n) = (1 - 1/2) + (1/2 - 1/3) + ... + (1/n - 1/(n + 1)) = 1 - 1/(n + 1) = n/(n + 1).\n\nEvery interior fraction cancels with the next, leaving only the first and last. For n = 10 the sum is 10/11. The same idea sums many series of the form sum [f(k) - f(k + 1)], the answer being simply f(1) - f(n + 1). Telescoping is really the method of differences read backwards.\n\n7.7 ARITHMETICO-GEOMETRIC SERIES (a brief look)\n\nAn ARITHMETICO-GEOMETRIC series has each term equal to the PRODUCT of the corresponding term of an AP and a GP. A standard form is\n\n   S = 1 + 2x + 3x^2 + 4x^3 + ... + n x^(n-1).\n\nTo sum it, multiply S by x, subtract, and use the GP formula. For the infinite case with |x| < 1 the neat result is 1 + 2x + 3x^2 + ... = 1/(1 - x)^2. Such series arise in probability and in the study of power series; for this course it is enough to recognise the AP x GP structure and the \"multiply-shift-subtract\" technique.\n\n7.8 APPLICATIONS AND WORKED PROBLEMS\n\nThe real power of these formulas shows when the general term of a series is first simplified into standard pieces.\n\nExample 1. Sum 1.2 + 2.3 + 3.4 + ... + n(n + 1).\nThe general term is k(k + 1) = k^2 + k. Hence the sum is sum k^2 + sum k = n(n + 1)(2n + 1)/6 + n(n + 1)/2 = n(n + 1)(n + 2)/3. For n = 5 this gives 5(6)(7)/3 = 70, which matches 2 + 6 + 12 + 20 + 30 = 70.\n\nExample 2. Sum of the squares of the first n even numbers, 2^2 + 4^2 + ... + (2n)^2.\nEach term is (2k)^2 = 4k^2, so the sum is 4 sum k^2 = 4 * n(n + 1)(2n + 1)/6 = 2n(n + 1)(2n + 1)/3.\n\nExample 3. Sum the series 3 + 7 + 13 + 21 + ... to n terms.\nThe differences 4, 6, 8, ... form an AP, so T_n is a quadratic; one finds T_n = n^2 + n + 1. Then S_n = sum k^2 + sum k + n = n(n + 1)(2n + 1)/6 + n(n + 1)/2 + n. For n = 5, S = 55 + 15 + 5 = 75, matching 3 + 7 + 13 + 21 + 31 = 75.\n\nThese examples illustrate the general strategy: identify the general term, express it using k, k^2 and k^3 (or as a telescoping difference), then apply sigma properties and the standard sums.\n\nSUMMARY\n\n- Sum of the first n natural numbers: sum k = n(n + 1)/2 (Gauss pairing). Odd: 1 + 3 + ... + (2n-1) = n^2; even: 2 + 4 + ... + 2n = n(n + 1).\n- Sum of squares: sum k^2 = n(n + 1)(2n + 1)/6.\n- Sum of cubes: sum k^3 = [n(n + 1)/2]^2 = (sum k)^2.\n- Sigma notation writes a_1 + ... + a_n as sum a_k; k is the index of summation.\n- Properties: sum c = nc; sum(c a_k) = c sum a_k; sum(a_k +/- b_k) = sum a_k +/- sum b_k.\n- Method of differences: if consecutive differences form an AP/GP, find the nth term T_n from T_1 plus the accumulated differences, then sum using the standard formulas.\n- Telescoping: write each term as f(k) - f(k+1); the sum collapses to f(1) - f(n+1). Example: sum 1/(k(k+1)) = n/(n+1).\n- Arithmetico-geometric series: each term is (AP term) x (GP term); summed by the multiply-shift-subtract method; 1 + 2x + 3x^2 + ... = 1/(1-x)^2 for |x| < 1.\n- General strategy: reduce the general term to standard sums, then apply sigma properties.\n",
+  "topics": [
+    {
+      "name": "Sum of Natural Numbers",
+      "description": "The sum of the first n natural numbers, sum k = n(n+1)/2, derived by Gauss pairing; the related sums of the first n odd numbers (n^2) and even numbers (n(n+1))."
+    },
+    {
+      "name": "Sum of Squares of Natural Numbers",
+      "description": "The sum of the squares of the first n natural numbers, sum k^2 = n(n+1)(2n+1)/6, and its derivation and use."
+    },
+    {
+      "name": "Sum of Cubes of Natural Numbers",
+      "description": "The sum of the cubes of the first n natural numbers, sum k^3 = [n(n+1)/2]^2, and the identity sum k^3 = (sum k)^2."
+    },
+    {
+      "name": "Sigma Notation and its Properties",
+      "description": "The summation (sigma) notation sum a_k, the index of summation, and the properties sum c = nc, sum(c a_k) = c sum a_k and sum(a_k +/- b_k) = sum a_k +/- sum b_k."
+    },
+    {
+      "name": "Method of Differences",
+      "description": "Finding the nth term and the sum of a series whose consecutive differences form an AP or GP, and telescoping series where terms cancel."
+    },
+    {
+      "name": "Summation of Special Series (Applications)",
+      "description": "Summing series such as 1.2 + 2.3 + ... + n(n+1), squares of even numbers, and arithmetico-geometric series by reducing the general term to standard sums."
+    }
+  ],
+  "learning_outcomes": [
+    {
+      "code": "12-NIOS-MAT-SSS-01",
+      "topic_name": "Sum of Natural Numbers",
+      "bloom": "understand",
+      "description": "Derive and use the formula sum k = n(n+1)/2 for the sum of the first n natural numbers, including the sums of the first n odd and even numbers."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-02",
+      "topic_name": "Sum of Squares of Natural Numbers",
+      "bloom": "apply",
+      "description": "State and apply the formula sum k^2 = n(n+1)(2n+1)/6 to compute the sum of squares of the first n natural numbers."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-03",
+      "topic_name": "Sum of Cubes of Natural Numbers",
+      "bloom": "apply",
+      "description": "State and apply sum k^3 = [n(n+1)/2]^2 and use the identity that the sum of cubes equals the square of the sum of the natural numbers."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-04",
+      "topic_name": "Sigma Notation and its Properties",
+      "bloom": "understand",
+      "description": "Interpret the sigma notation and use the properties sum c = nc, sum(c a_k) = c sum a_k and sum(a_k +/- b_k) = sum a_k +/- sum b_k."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-05",
+      "topic_name": "Sigma Notation and its Properties",
+      "bloom": "apply",
+      "description": "Apply sigma properties together with the standard sums to evaluate the sum of a polynomial expression in k."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-06",
+      "topic_name": "Method of Differences",
+      "bloom": "apply",
+      "description": "Use the method of differences to find the nth term and the sum of a series whose consecutive differences form an AP or GP, and sum telescoping series."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-07",
+      "topic_name": "Summation of Special Series (Applications)",
+      "bloom": "apply",
+      "description": "Sum special series such as 1.2 + 2.3 + ... + n(n+1) and squares of even numbers by reducing the general term to standard sums."
+    },
+    {
+      "code": "12-NIOS-MAT-SSS-08",
+      "topic_name": "Summation of Special Series (Applications)",
+      "bloom": "analyze",
+      "description": "Analyse composite and arithmetico-geometric series, identify the structure of the general term, and choose the appropriate summation technique."
+    }
+  ],
+  "chapter_summary": {
+    "title": "Some Special Sequences - Chapter Summary",
+    "intro": "This is the NIOS Senior Secondary Mathematics (311) summary for the Some Special Sequences lesson. It covers the sums of the first n natural numbers, their squares and cubes, the sigma notation and its properties, the method of differences and telescoping, and the summation of special and arithmetico-geometric series.",
+    "overview_diagram": {
+      "title": "Some Special Sequences",
+      "central_term": "Special Series",
+      "branches": [
+        {
+          "label": "Sum of n",
+          "details": [
+            "1 + 2 + ... + n = n(n+1)/2",
+            "Gauss pairing method",
+            "Odd: n^2, Even: n(n+1)"
+          ]
+        },
+        {
+          "label": "Squares & Cubes",
+          "details": [
+            "sum n^2 = n(n+1)(2n+1)/6",
+            "sum n^3 = [n(n+1)/2]^2",
+            "sum n^3 = (sum n)^2"
+          ]
+        },
+        {
+          "label": "Sigma notation",
+          "details": [
+            "sum c = nc",
+            "sum(c a_k) = c sum a_k",
+            "sum(a_k +/- b_k) = sum a_k +/- sum b_k",
+            "k is the index of summation"
+          ]
+        },
+        {
+          "label": "Method of differences",
+          "details": [
+            "Used when differences form AP/GP",
+            "Find nth term then the sum",
+            "Telescoping cancels middle terms",
+            "sum 1/(k(k+1)) = n/(n+1)"
+          ]
+        },
+        {
+          "label": "Applications",
+          "details": [
+            "1.2 + 2.3 + ... = n(n+1)(n+2)/3",
+            "Arithmetico-geometric series",
+            "Reduce general term to standard sums"
+          ]
+        }
+      ]
+    },
+    "sections": [
+      {
+        "heading": "Sum of the first n natural numbers",
+        "bullets": [
+          "Gauss pairing gives sum k = n(n+1)/2, a quadratic in n; e.g. 1 + ... + 100 = 5050.",
+          "Sum of the first n odd numbers is 1 + 3 + ... + (2n-1) = n^2.",
+          "Sum of the first n even numbers is 2 + 4 + ... + 2n = n(n+1).",
+          "These partial sums are the triangular numbers 1, 3, 6, 10, 15, ...."
+        ]
+      },
+      {
+        "heading": "Sums of squares and cubes",
+        "bullets": [
+          "sum k^2 = n(n+1)(2n+1)/6 (a cubic in n); e.g. 1^2 + ... + 10^2 = 385.",
+          "sum k^3 = [n(n+1)/2]^2 (a quartic in n); e.g. 1^3 + ... + 10^3 = 3025.",
+          "The sum of the cubes equals the square of the sum: sum k^3 = (sum k)^2.",
+          "Both formulas can be proved by telescoping cubes/fourth powers or by induction."
+        ]
+      },
+      {
+        "heading": "Sigma notation and its properties",
+        "bullets": [
+          "sum a_k (k = 1 to n) means a_1 + a_2 + ... + a_n; k is the index of summation.",
+          "Constant: sum c = nc; constant multiple: sum(c a_k) = c sum a_k.",
+          "Addition: sum(a_k +/- b_k) = sum a_k +/- sum b_k.",
+          "Any polynomial in k can be summed by splitting it into sum k, sum k^2 and sum k^3."
+        ]
+      },
+      {
+        "heading": "Method of differences and telescoping",
+        "bullets": [
+          "When consecutive differences form an AP, the nth term T_n is a quadratic in n.",
+          "Build T_n as T_1 plus the accumulated differences, then sum using standard formulas.",
+          "A telescoping series writes each term as f(k) - f(k+1), so the sum collapses to f(1) - f(n+1).",
+          "Example: sum 1/(k(k+1)) = 1 - 1/(n+1) = n/(n+1)."
+        ]
+      },
+      {
+        "heading": "Summation of special and A-G series",
+        "bullets": [
+          "1.2 + 2.3 + ... + n(n+1) = n(n+1)(n+2)/3 since k(k+1) = k^2 + k.",
+          "Sum of squares of the first n even numbers = 2n(n+1)(2n+1)/3.",
+          "An arithmetico-geometric series has each term (AP term) x (GP term).",
+          "It is summed by multiply-shift-subtract; 1 + 2x + 3x^2 + ... = 1/(1-x)^2 for |x| < 1."
+        ]
+      }
+    ],
+    "key_takeaways": [
+      "sum k = n(n+1)/2; the sum of the first n odd numbers is n^2 and of the first n even numbers is n(n+1).",
+      "sum k^2 = n(n+1)(2n+1)/6 and sum k^3 = [n(n+1)/2]^2 = (sum k)^2.",
+      "Sigma notation compresses long sums; sum c = nc, sum(c a_k) = c sum a_k, sum(a_k +/- b_k) = sum a_k +/- sum b_k.",
+      "Any polynomial general term is summed by reducing it to sum k, sum k^2 and sum k^3.",
+      "Method of differences: if the differences form an AP the nth term is quadratic; find T_n then sum it.",
+      "Telescoping collapses a series of the form sum [f(k) - f(k+1)] to f(1) - f(n+1); e.g. sum 1/(k(k+1)) = n/(n+1).",
+      "An arithmetico-geometric series has terms that are products of an AP and a GP and is summed by multiply-shift-subtract."
+    ],
+    "glossary": [
+      {
+        "term": "Natural numbers",
+        "definition": "The counting numbers 1, 2, 3, ...; their partial sums 1, 3, 6, 10, ... are the triangular numbers."
+      },
+      {
+        "term": "Sum of first n natural numbers",
+        "definition": "1 + 2 + ... + n = n(n+1)/2, obtained by Gauss pairing of the sum written forwards and backwards."
+      },
+      {
+        "term": "Sum of first n odd numbers",
+        "definition": "1 + 3 + 5 + ... + (2n-1) = n^2, the perfect squares built one layer at a time."
+      },
+      {
+        "term": "Sum of first n even numbers",
+        "definition": "2 + 4 + 6 + ... + 2n = n(n+1), twice the sum of the first n natural numbers."
+      },
+      {
+        "term": "Sum of squares",
+        "definition": "1^2 + 2^2 + ... + n^2 = n(n+1)(2n+1)/6, a cubic polynomial in n."
+      },
+      {
+        "term": "Sum of cubes",
+        "definition": "1^3 + 2^3 + ... + n^3 = [n(n+1)/2]^2, equal to the square of the sum of the first n natural numbers."
+      },
+      {
+        "term": "Sigma notation",
+        "definition": "A compact way of writing a sum: sum a_k (k = 1 to n) means a_1 + a_2 + ... + a_n."
+      },
+      {
+        "term": "Index of summation",
+        "definition": "The dummy variable (e.g. k) that runs from the lower to the upper limit in a sigma expression."
+      },
+      {
+        "term": "Constant-multiple property",
+        "definition": "A common factor can be taken outside a summation: sum(c a_k) = c sum a_k."
+      },
+      {
+        "term": "Method of differences",
+        "definition": "A technique for finding the nth term and sum of a series whose consecutive differences form an AP or GP."
+      },
+      {
+        "term": "Telescoping series",
+        "definition": "A series whose terms are written as f(k) - f(k+1) so that the sum collapses to f(1) - f(n+1)."
+      },
+      {
+        "term": "Partial fractions",
+        "definition": "Splitting a fraction such as 1/(k(k+1)) into 1/k - 1/(k+1) to make a series telescope."
+      },
+      {
+        "term": "Arithmetico-geometric series",
+        "definition": "A series each of whose terms is the product of a term of an AP and the corresponding term of a GP."
+      },
+      {
+        "term": "Triangular number",
+        "definition": "The nth partial sum of the natural numbers, n(n+1)/2, giving 1, 3, 6, 10, 15, ...."
+      }
+    ]
+  },
+  "worksheet": {
+    "title": "Worksheet - Some Special Sequences (NIOS Senior Secondary Mathematics)",
+    "instructions": "Attempt all questions. Show full working for numerical problems. You may use the standard results sum k = n(n+1)/2, sum k^2 = n(n+1)(2n+1)/6 and sum k^3 = [n(n+1)/2]^2.",
+    "total_marks": 37,
+    "questions": [
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the formula for the sum of the first n natural numbers and use it to find 1 + 2 + 3 + ... + 40.",
+        "answer": "The sum of the first n natural numbers is\n\n   sum k (k = 1 to n) = n(n + 1)/2.\n\nFor n = 40:\n\n   S = 40 x 41 / 2 = 1640 / 2 = 820.\n\nSo 1 + 2 + ... + 40 = 820.",
+        "explanation": "Apply n(n+1)/2 with n = 40.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-01"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the value of 1^2 + 2^2 + 3^2 + ... + 12^2.",
+        "answer": "Using sum k^2 = n(n + 1)(2n + 1)/6 with n = 12:\n\n   S = 12 x 13 x 25 / 6\n     = (12 x 13 x 25) / 6\n     = 3900 / 6\n     = 650.\n\nSo the sum of the squares of the first 12 natural numbers is 650.",
+        "explanation": "Substitute n = 12 into n(n+1)(2n+1)/6.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-02"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Find the value of 1^3 + 2^3 + 3^3 + ... + 8^3.",
+        "answer": "Using sum k^3 = [n(n + 1)/2]^2 with n = 8:\n\n   n(n + 1)/2 = 8 x 9 / 2 = 36.\n\n   S = 36^2 = 1296.\n\nSo the sum of the cubes of the first 8 natural numbers is 1296.",
+        "explanation": "sum k^3 = (sum k)^2 = 36^2.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-03"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Using the properties of the sigma notation, evaluate sum (k^2 + 3k + 2) for k = 1 to n, and hence find its value for n = 6.",
+        "answer": "Split the general term using the sigma properties:\n\n   sum (k^2 + 3k + 2) = sum k^2 + 3 sum k + sum 2\n     = n(n + 1)(2n + 1)/6 + 3 x n(n + 1)/2 + 2n.\n\nFor n = 6:\n\n   sum k^2 = 6 x 7 x 13 / 6 = 91\n   3 sum k = 3 x (6 x 7 / 2) = 3 x 21 = 63\n   sum 2 = 2 x 6 = 12\n\n   Total = 91 + 63 + 12 = 166.\n\nCheck: k^2 + 3k + 2 = (k + 1)(k + 2) gives terms 6, 12, 20, 30, 42, 56, which add to 166.",
+        "explanation": "Use sum(a+b) and constant-multiple rules; substitute n = 6.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-05"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Using the method of differences, find the nth term of the series 2, 5, 10, 17, 26, ....",
+        "answer": "The consecutive differences are 3, 5, 7, 9, ... which form an AP, so the nth term T_n is a quadratic in n.\n\n   T_n = T_1 + (sum of the first (n - 1) differences)\n       = 2 + [3 + 5 + ... + (2n - 1)].\n\nNow 3 + 5 + ... + (2n - 1) = [1 + 3 + ... + (2n - 1)] - 1 = n^2 - 1.\n\n   T_n = 2 + (n^2 - 1) = n^2 + 1.\n\nCheck: T_1 = 2, T_2 = 5, T_3 = 10 - correct.",
+        "explanation": "Differences form an AP => quadratic nth term n^2 + 1.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-06"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Sum the telescoping series 1/(1.2) + 1/(2.3) + 1/(3.4) + ... + 1/(9.10).",
+        "answer": "Use partial fractions: 1/(k(k + 1)) = 1/k - 1/(k + 1).\n\n   S = (1 - 1/2) + (1/2 - 1/3) + ... + (1/9 - 1/10).\n\nAll interior terms cancel, leaving\n\n   S = 1 - 1/10 = 9/10.\n\nSo the sum is 9/10 = 0.9.",
+        "explanation": "Telescoping: sum 1/(k(k+1)) from 1 to 9 = 1 - 1/10.",
+        "marks": 3,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-06"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find a formula for the sum 1.2 + 2.3 + 3.4 + ... + n(n+1), and use it to evaluate the sum for n = 6.",
+        "answer": "The general term is T_k = k(k + 1) = k^2 + k. Hence\n\n   S = sum (k^2 + k) = sum k^2 + sum k\n     = n(n + 1)(2n + 1)/6 + n(n + 1)/2.\n\nTaking n(n + 1)/6 common:\n\n   S = [n(n + 1)/6] [(2n + 1) + 3] = [n(n + 1)/6](2n + 4) = n(n + 1)(n + 2)/3.\n\nFor n = 6:\n\n   S = 6 x 7 x 8 / 3 = 336 / 3 = 112.\n\nCheck: 2 + 6 + 12 + 20 + 30 + 42 = 112.",
+        "explanation": "k(k+1) = k^2 + k; sum = n(n+1)(n+2)/3; n = 6 gives 112.",
+        "marks": 5,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "APPLY",
+        "outcome_code": "12-NIOS-MAT-SSS-07"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "State the three properties of the sigma (summation) notation.",
+        "answer": "For sequences a_k, b_k and a constant c:\n\n (i) Sum of a constant: sum c (k = 1 to n) = nc.\n\n (ii) Constant multiple: sum (c a_k) = c sum a_k (a common factor comes out of the summation).\n\n (iii) Term-by-term addition: sum (a_k +/- b_k) = sum a_k +/- sum b_k.\n\nThese let any polynomial in k be summed using the standard results for sum k, sum k^2 and sum k^3.",
+        "explanation": "The three sigma rules: constant, constant multiple, addition.",
+        "marks": 3,
+        "difficulty": "EASY",
+        "cognitive_level": "REMEMBER",
+        "outcome_code": "12-NIOS-MAT-SSS-04"
+      },
+      {
+        "type": "SHORT_ANSWER",
+        "question": "Show that the sum of the first n odd natural numbers is n^2, and hence find the sum of the first 20 odd numbers.",
+        "answer": "The first n odd numbers are 1, 3, 5, ..., (2n - 1). Their sum is\n\n   S = sum (2k - 1) = 2 sum k - sum 1 = 2 x n(n + 1)/2 - n = n(n + 1) - n = n^2.\n\nSo 1 + 3 + 5 + ... + (2n - 1) = n^2.\n\nFor the first 20 odd numbers, n = 20:\n\n   S = 20^2 = 400.",
+        "explanation": "sum(2k-1) = 2 sum k - n = n^2; n = 20 gives 400.",
+        "marks": 4,
+        "difficulty": "MEDIUM",
+        "cognitive_level": "UNDERSTAND",
+        "outcome_code": "12-NIOS-MAT-SSS-01"
+      },
+      {
+        "type": "LONG_ANSWER",
+        "question": "Find the sum of the series 3 + 7 + 13 + 21 + ... to n terms, and evaluate it for n = 5.",
+        "answer": "The differences 4, 6, 8, ... form an AP, so the nth term T_n is a quadratic. Building it from the differences:\n\n   T_n = 3 + [4 + 6 + ... to (n - 1) terms].\n\nThe (n-1) differences are 4, 6, ..., 2n, whose sum is (n - 1)(n + 2). So T_n = 3 + (n - 1)(n + 2) = n^2 + n + 1.\n\nCheck: T_1 = 3, T_2 = 7, T_3 = 13 - correct.\n\nSum to n terms:\n\n   S = sum (k^2 + k + 1) = n(n + 1)(2n + 1)/6 + n(n + 1)/2 + n.\n\nFor n = 5: sum k^2 = 55, sum k = 15, and the +1 contributes 5, so\n\n   S = 55 + 15 + 5 = 75.\n\nCheck: 3 + 7 + 13 + 21 + 31 = 75.",
+        "explanation": "Differences AP => T_n = n^2 + n + 1; sum via standard formulas; n = 5 gives 75.",
+        "marks": 5,
+        "difficulty": "HARD",
+        "cognitive_level": "ANALYZE",
+        "outcome_code": "12-NIOS-MAT-SSS-08"
+      }
+    ]
+  },
+  "questions": [
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n natural numbers is",
+      "options": [
+        "n(n+1)",
+        "n(n+1)/2",
+        "n(n-1)/2",
+        "n^2"
+      ],
+      "answer": "n(n+1)/2",
+      "explanation": "1 + 2 + ... + n = n(n+1)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1 + 2 + 3 + ... + 10 equals",
+      "options": [
+        "45",
+        "50",
+        "55",
+        "60"
+      ],
+      "answer": "55",
+      "explanation": "10 x 11 / 2 = 55."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the first 100 natural numbers is",
+      "options": [
+        "5000",
+        "5050",
+        "10000",
+        "5100"
+      ],
+      "answer": "5050",
+      "explanation": "100 x 101 / 2 = 5050."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If 1 + 2 + ... + n = 210, then n is",
+      "options": [
+        "18",
+        "19",
+        "20",
+        "21"
+      ],
+      "answer": "20",
+      "explanation": "20 x 21 / 2 = 210."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the first n even natural numbers is",
+      "options": [
+        "n^2",
+        "n(n+1)",
+        "n(n+1)/2",
+        "2n"
+      ],
+      "answer": "n(n+1)",
+      "explanation": "2 + 4 + ... + 2n = 2 sum k = n(n+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the first n odd natural numbers is",
+      "options": [
+        "n(n+1)",
+        "n^2",
+        "2n-1",
+        "n(n+1)/2"
+      ],
+      "answer": "n^2",
+      "explanation": "1 + 3 + ... + (2n-1) = n^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the first 20 natural numbers is",
+      "options": [
+        "200",
+        "210",
+        "220",
+        "190"
+      ],
+      "answer": "210",
+      "explanation": "20 x 21 / 2 = 210."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The series 1 + 2 + 3 + ... + n is an example of a(n)",
+      "options": [
+        "geometric progression",
+        "arithmetic progression",
+        "harmonic progression",
+        "constant series"
+      ],
+      "answer": "arithmetic progression",
+      "explanation": "Constant common difference 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the natural numbers from 11 to 20 is",
+      "options": [
+        "150",
+        "155",
+        "160",
+        "145"
+      ],
+      "answer": "155",
+      "explanation": "sum 1..20 - sum 1..10 = 210 - 55 = 155."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the first 50 natural numbers is",
+      "options": [
+        "1250",
+        "1275",
+        "1300",
+        "1225"
+      ],
+      "answer": "1275",
+      "explanation": "50 x 51 / 2 = 1275."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If the sum of the first n natural numbers is 5050, then n equals",
+      "options": [
+        "50",
+        "99",
+        "100",
+        "101"
+      ],
+      "answer": "100",
+      "explanation": "n(n+1)/2 = 5050 gives n = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Gauss added 1 + 2 + ... + n by pairing terms; each pair sums to",
+      "options": [
+        "n",
+        "n+1",
+        "2n",
+        "n-1"
+      ],
+      "answer": "n+1",
+      "explanation": "First + last = n+1, and there are n/2 such pairs."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the squares of the first n natural numbers is",
+      "options": [
+        "n(n+1)/2",
+        "n(n+1)(2n+1)/6",
+        "[n(n+1)/2]^2",
+        "n(2n+1)/6"
+      ],
+      "answer": "n(n+1)(2n+1)/6",
+      "explanation": "Standard result for sum k^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + 3^2 + 4^2 + 5^2 is",
+      "options": [
+        "50",
+        "55",
+        "60",
+        "45"
+      ],
+      "answer": "55",
+      "explanation": "5 x 6 x 11 / 6 = 55."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + ... + 10^2 is",
+      "options": [
+        "285",
+        "385",
+        "485",
+        "355"
+      ],
+      "answer": "385",
+      "explanation": "10 x 11 x 21 / 6 = 385."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + 3^2 is",
+      "options": [
+        "12",
+        "13",
+        "14",
+        "15"
+      ],
+      "answer": "14",
+      "explanation": "1 + 4 + 9 = 14."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "If 1^2 + 2^2 + ... + n^2 = 30, then n equals",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "answer": "4",
+      "explanation": "1 + 4 + 9 + 16 = 30."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + ... + 6^2 is",
+      "options": [
+        "81",
+        "91",
+        "101",
+        "86"
+      ],
+      "answer": "91",
+      "explanation": "6 x 7 x 13 / 6 = 91."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + ... + 20^2 is",
+      "options": [
+        "2870",
+        "2770",
+        "2970",
+        "2680"
+      ],
+      "answer": "2870",
+      "explanation": "20 x 21 x 41 / 6 = 2870."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^2 + 2^2 + ... + 7^2 is",
+      "options": [
+        "120",
+        "130",
+        "140",
+        "150"
+      ],
+      "answer": "140",
+      "explanation": "7 x 8 x 15 / 6 = 140."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For large n, the sum of squares n(n+1)(2n+1)/6 grows like",
+      "options": [
+        "n",
+        "n^2",
+        "n^3",
+        "n^4"
+      ],
+      "answer": "n^3",
+      "explanation": "Leading term is n^3/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For n = 1, the formula n(n+1)(2n+1)/6 gives",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "6"
+      ],
+      "answer": "1",
+      "explanation": "1 x 2 x 3 / 6 = 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the cubes of the first n natural numbers is",
+      "options": [
+        "n(n+1)(2n+1)/6",
+        "[n(n+1)/2]^2",
+        "n(n+1)/2",
+        "n^2(n+1)"
+      ],
+      "answer": "[n(n+1)/2]^2",
+      "explanation": "Standard result for sum k^3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the cubes of the first n natural numbers equals",
+      "options": [
+        "the sum of the squares",
+        "the square of the sum of the numbers",
+        "twice the sum",
+        "n^3"
+      ],
+      "answer": "the square of the sum of the numbers",
+      "explanation": "sum k^3 = (sum k)^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 + 3^3 + 4^3 is",
+      "options": [
+        "90",
+        "100",
+        "110",
+        "81"
+      ],
+      "answer": "100",
+      "explanation": "(4 x 5 / 2)^2 = 10^2 = 100."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 + ... + 5^3 is",
+      "options": [
+        "200",
+        "215",
+        "225",
+        "250"
+      ],
+      "answer": "225",
+      "explanation": "(15)^2 = 225."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 + ... + 10^3 is",
+      "options": [
+        "2025",
+        "3025",
+        "3055",
+        "5050"
+      ],
+      "answer": "3025",
+      "explanation": "(55)^2 = 3025."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 + 3^3 is",
+      "options": [
+        "27",
+        "36",
+        "45",
+        "30"
+      ],
+      "answer": "36",
+      "explanation": "(6)^2 = 36."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "If 1^3 + 2^3 + ... + n^3 = 225, then 1 + 2 + ... + n equals",
+      "options": [
+        "12",
+        "15",
+        "18",
+        "20"
+      ],
+      "answer": "15",
+      "explanation": "sqrt(225) = 15."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 + ... + 6^3 is",
+      "options": [
+        "361",
+        "400",
+        "441",
+        "484"
+      ],
+      "answer": "441",
+      "explanation": "(21)^2 = 441."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "1^3 + 2^3 + ... + n^3 is the square of",
+      "options": [
+        "n(2n+1)/6",
+        "n(n+1)/2",
+        "n(n+1)",
+        "n^2"
+      ],
+      "answer": "n(n+1)/2",
+      "explanation": "sum k^3 = [sum k]^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1^3 + 2^3 is",
+      "options": [
+        "8",
+        "9",
+        "10",
+        "12"
+      ],
+      "answer": "9",
+      "explanation": "(3)^2 = 9."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The value of sum c (k = 1 to n), where c is a constant, is",
+      "options": [
+        "c",
+        "nc",
+        "c/n",
+        "n+c"
+      ],
+      "answer": "nc",
+      "explanation": "Adding c a total of n times gives nc."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The expression sum (c a_k) equals",
+      "options": [
+        "sum a_k",
+        "c + sum a_k",
+        "c sum a_k",
+        "sum a_k / c"
+      ],
+      "answer": "c sum a_k",
+      "explanation": "A constant factor comes out of the summation."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The expression sum (a_k + b_k) equals",
+      "options": [
+        "sum a_k x sum b_k",
+        "sum a_k + sum b_k",
+        "sum a_k - sum b_k",
+        "a_k + b_k"
+      ],
+      "answer": "sum a_k + sum b_k",
+      "explanation": "Summation distributes over addition."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 3 (k = 1 to 5) is",
+      "options": [
+        "3",
+        "8",
+        "15",
+        "5"
+      ],
+      "answer": "15",
+      "explanation": "5 x 3 = 15."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Greek letter used to denote a summation is",
+      "options": [
+        "pi",
+        "sigma",
+        "delta",
+        "theta"
+      ],
+      "answer": "sigma",
+      "explanation": "Capital sigma denotes a sum."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 2k (k = 1 to n) is",
+      "options": [
+        "n^2",
+        "n(n+1)",
+        "2n",
+        "n(n+1)/2"
+      ],
+      "answer": "n(n+1)",
+      "explanation": "2 sum k = 2 x n(n+1)/2 = n(n+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum (2k - 1) (k = 1 to n) is",
+      "options": [
+        "n(n+1)",
+        "n^2",
+        "2n-1",
+        "n(n-1)"
+      ],
+      "answer": "n^2",
+      "explanation": "Sum of first n odd numbers = n^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In sum a_k (k = 1 to n), the letter k is called the",
+      "options": [
+        "limit",
+        "index of summation",
+        "coefficient",
+        "term"
+      ],
+      "answer": "index of summation",
+      "explanation": "k is the (dummy) summation variable."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum k^2 (k = 1 to 4) is",
+      "options": [
+        "20",
+        "25",
+        "30",
+        "36"
+      ],
+      "answer": "30",
+      "explanation": "1 + 4 + 9 + 16 = 30."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 5 (k = 1 to 8) is",
+      "options": [
+        "13",
+        "40",
+        "35",
+        "45"
+      ],
+      "answer": "40",
+      "explanation": "8 x 5 = 40."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum (k^2 + k) (k = 1 to n) simplifies to",
+      "options": [
+        "n(n+1)(n+2)/3",
+        "n(n+1)(2n+1)/6",
+        "n(n+1)/2",
+        "n(n+1)(n+2)/6"
+      ],
+      "answer": "n(n+1)(n+2)/3",
+      "explanation": "sum k^2 + sum k = n(n+1)(n+2)/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum (2k + 1) (k = 1 to 10) is",
+      "options": [
+        "110",
+        "120",
+        "121",
+        "100"
+      ],
+      "answer": "120",
+      "explanation": "2(55) + 10 = 120."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum k(k+1) (k = 1 to n) is",
+      "options": [
+        "n(n+1)(n+2)/3",
+        "n(n+1)/2",
+        "n(n+1)(2n+1)/6",
+        "[n(n+1)/2]^2"
+      ],
+      "answer": "n(n+1)(n+2)/3",
+      "explanation": "k(k+1) = k^2 + k."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum (k^2 - k) (k = 1 to 5) is",
+      "options": [
+        "30",
+        "35",
+        "40",
+        "45"
+      ],
+      "answer": "40",
+      "explanation": "55 - 15 = 40."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 4k (k = 1 to n) is",
+      "options": [
+        "2n(n+1)",
+        "4n",
+        "n(n+1)",
+        "4n(n+1)"
+      ],
+      "answer": "2n(n+1)",
+      "explanation": "4 sum k = 4 x n(n+1)/2 = 2n(n+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum k^2 (k = 1 to 6) is",
+      "options": [
+        "81",
+        "91",
+        "96",
+        "101"
+      ],
+      "answer": "91",
+      "explanation": "6 x 7 x 13 / 6 = 91."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum (3k + 2) (k = 1 to n) is",
+      "options": [
+        "(3n^2 + 7n)/2",
+        "3n^2 + 2n",
+        "(3n^2 + n)/2",
+        "3n(n+1)/2"
+      ],
+      "answer": "(3n^2 + 7n)/2",
+      "explanation": "3 x n(n+1)/2 + 2n = (3n^2 + 3n + 4n)/2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The value of [sum k for 1 to 100] - [sum k for 1 to 99] is",
+      "options": [
+        "99",
+        "100",
+        "1",
+        "199"
+      ],
+      "answer": "100",
+      "explanation": "The difference is just the 100th term."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "Using sigma properties, sum (2k - 1) (k = 1 to n) reduces to",
+      "options": [
+        "n(n+1)",
+        "n^2",
+        "2n^2",
+        "n(n-1)"
+      ],
+      "answer": "n^2",
+      "explanation": "2 sum k - n = n(n+1) - n = n^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The method of differences is used when the consecutive differences of the terms form",
+      "options": [
+        "a constant only",
+        "an AP or a GP",
+        "a random pattern",
+        "a harmonic progression"
+      ],
+      "answer": "an AP or a GP",
+      "explanation": "That is the condition for the method to apply."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The nth term of the series 1, 3, 6, 10, 15, ... is",
+      "options": [
+        "n^2",
+        "n(n+1)/2",
+        "n(n+1)",
+        "2n-1"
+      ],
+      "answer": "n(n+1)/2",
+      "explanation": "These are the triangular numbers."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The nth term of the series 2, 5, 10, 17, 26, ... is",
+      "options": [
+        "n^2",
+        "n^2 + 1",
+        "n^2 - 1",
+        "2n + 1"
+      ],
+      "answer": "n^2 + 1",
+      "explanation": "Differences 3,5,7,... give T_n = n^2 + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The nth term of the series 1, 4, 9, 16, 25, ... is",
+      "options": [
+        "2n-1",
+        "n^2",
+        "n(n+1)/2",
+        "n+3"
+      ],
+      "answer": "n^2",
+      "explanation": "These are the perfect squares."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The nth term of the series 3, 7, 13, 21, 31, ... is",
+      "options": [
+        "n^2 + n + 1",
+        "n^2 + 1",
+        "2n^2 - 1",
+        "n^2 + 2"
+      ],
+      "answer": "n^2 + n + 1",
+      "explanation": "Differences 4,6,8,... give a quadratic n^2 + n + 1."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "To make the series 1/(1.2) + 1/(2.3) + ... telescope, each term is split using",
+      "options": [
+        "logarithms",
+        "partial fractions",
+        "the binomial theorem",
+        "completing the square"
+      ],
+      "answer": "partial fractions",
+      "explanation": "1/(k(k+1)) = 1/k - 1/(k+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 1/(k(k+1)) (k = 1 to n) is",
+      "options": [
+        "1/(n+1)",
+        "n/(n+1)",
+        "1 - 1/n",
+        "(n+1)/n"
+      ],
+      "answer": "n/(n+1)",
+      "explanation": "Telescopes to 1 - 1/(n+1)."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1/(1.2) + 1/(2.3) + ... + 1/(10.11) is",
+      "options": [
+        "9/10",
+        "10/11",
+        "11/12",
+        "1"
+      ],
+      "answer": "10/11",
+      "explanation": "n/(n+1) with n = 10."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The 5th triangular number in the sequence 1, 3, 6, 10, ... is",
+      "options": [
+        "12",
+        "14",
+        "15",
+        "16"
+      ],
+      "answer": "15",
+      "explanation": "5 x 6 / 2 = 15."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1.2 + 2.3 + 3.4 + ... + n(n+1) equals",
+      "options": [
+        "n(n+1)(n+2)/3",
+        "n(n+1)/2",
+        "n(n+1)(2n+1)/6",
+        "n(n+1)(n+2)/6"
+      ],
+      "answer": "n(n+1)(n+2)/3",
+      "explanation": "k(k+1) = k^2 + k summed."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1.2 + 2.3 + 3.4 (first three terms) is",
+      "options": [
+        "18",
+        "20",
+        "22",
+        "24"
+      ],
+      "answer": "20",
+      "explanation": "2 + 6 + 12 = 20."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the squares of the first n even numbers, 2^2 + 4^2 + ... + (2n)^2, is",
+      "options": [
+        "2n(n+1)(2n+1)/3",
+        "n(n+1)(2n+1)/6",
+        "n(n+1)(2n+1)/3",
+        "4n(n+1)/2"
+      ],
+      "answer": "2n(n+1)(2n+1)/3",
+      "explanation": "4 sum k^2 = 2n(n+1)(2n+1)/3."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In an arithmetico-geometric series, each term is the product of a term of an AP and a term of a",
+      "options": [
+        "another AP",
+        "GP",
+        "HP",
+        "constant sequence"
+      ],
+      "answer": "GP",
+      "explanation": "AP term x GP term."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1 + 2 + 3 + ... + 15 is",
+      "options": [
+        "105",
+        "115",
+        "120",
+        "125"
+      ],
+      "answer": "120",
+      "explanation": "15 x 16 / 2 = 120."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the even numbers 2 + 4 + 6 + ... + 100 is",
+      "options": [
+        "2450",
+        "2500",
+        "2550",
+        "2600"
+      ],
+      "answer": "2550",
+      "explanation": "n = 50, sum = 50 x 51 = 2550."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the odd numbers 1 + 3 + 5 + ... + 99 is",
+      "options": [
+        "2400",
+        "2450",
+        "2500",
+        "2550"
+      ],
+      "answer": "2500",
+      "explanation": "n = 50 odd numbers, sum = 50^2 = 2500."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the first five triangular numbers 1 + 3 + 6 + 10 + 15 is",
+      "options": [
+        "30",
+        "35",
+        "40",
+        "45"
+      ],
+      "answer": "35",
+      "explanation": "5 x 6 x 7 / 6 = 35."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "EASY",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "The relation 1^3 + 2^3 + ... + n^3 = (1 + 2 + ... + n)^2 shows that the sum of cubes equals",
+      "options": [
+        "the sum of squares",
+        "the square of the sum",
+        "twice the sum",
+        "the cube of the sum"
+      ],
+      "answer": "the square of the sum",
+      "explanation": "sum k^3 = (sum k)^2."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "For the series 3, 7, 13, 21, ..., whose nth term is n^2 + n + 1, the sum to n terms uses",
+      "options": [
+        "only sum k",
+        "sum k^2 + sum k + n",
+        "sum k^3",
+        "only sum k^2"
+      ],
+      "answer": "sum k^2 + sum k + n",
+      "explanation": "Split n^2 + n + 1 into standard sums."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1.2.3 + 2.3.4 + ... + n(n+1)(n+2) equals",
+      "options": [
+        "n(n+1)(n+2)/3",
+        "n(n+1)(n+2)(n+3)/4",
+        "n(n+1)(n+2)(n+3)/3",
+        "[n(n+1)/2]^2"
+      ],
+      "answer": "n(n+1)(n+2)(n+3)/4",
+      "explanation": "Standard product-series result."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "As n increases, which grows fastest: sum k, sum k^2 or sum k^3?",
+      "options": [
+        "sum k",
+        "sum k^2",
+        "sum k^3",
+        "all grow equally"
+      ],
+      "answer": "sum k^3",
+      "explanation": "sum k^3 ~ n^4/4 dominates."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of 1.2 + 2.3 + 3.4 + 4.5 (first four terms) is",
+      "options": [
+        "36",
+        "40",
+        "44",
+        "48"
+      ],
+      "answer": "40",
+      "explanation": "4 x 5 x 6 / 3 = 40."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "That 1^3 + 2^3 + ... + 10^3 = 55^2 = 3025 confirms the identity",
+      "options": [
+        "sum k^2 = (sum k)",
+        "sum k^3 = (sum k)^2",
+        "sum k = (sum k^2)",
+        "sum k^3 = sum k^2"
+      ],
+      "answer": "sum k^3 = (sum k)^2",
+      "explanation": "Sum of cubes = square of sum of naturals."
+    },
+    {
+      "type": "MCQ",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In the series 1 + 2x + 3x^2 + 4x^3 + ..., each term is a product of an AP term and a",
+      "options": [
+        "GP term",
+        "constant",
+        "square number",
+        "factorial"
+      ],
+      "answer": "GP term",
+      "explanation": "It is an arithmetico-geometric series."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n natural numbers is n(n+1)/2.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Standard Gauss result."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the first n odd natural numbers is n(n+1).",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It is n^2; n(n+1) is the sum of the even numbers."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the squares of the first n natural numbers is n(n+1)(2n+1)/6.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Standard result for sum k^2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the cubes of the first n natural numbers equals the square of their sum.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "sum k^3 = (sum k)^2."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For a constant c, sum c (k = 1 to n) equals c and does not depend on n.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "It equals nc, which depends on n."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "For any two sequences, sum (a_k + b_k) = sum a_k + sum b_k.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Summation distributes over addition."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In the method of differences the successive differences must form an AP or a GP.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "That is the condition for the technique."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "In a telescoping series most of the middle terms cancel out.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "Each term is a difference f(k) - f(k+1)."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1.2 + 2.3 + ... + n(n+1) equals n(n+1)(n+2)/3.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "True",
+      "explanation": "k(k+1) = k^2 + k summed."
+    },
+    {
+      "type": "TRUE_FALSE",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "ANALYZE",
+      "marks": 1,
+      "question": "For large n, the sum of squares grows faster than the sum of cubes.",
+      "options": [
+        "True",
+        "False"
+      ],
+      "answer": "False",
+      "explanation": "Sum of cubes (~ n^4) grows faster than sum of squares (~ n^3)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n natural numbers is ____.",
+      "answer": "n(n+1)/2",
+      "explanation": "1 + 2 + ... + n = n(n+1)/2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum of the first 100 natural numbers is ____.",
+      "answer": "5050",
+      "explanation": "100 x 101 / 2 = 5050."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the squares of the first n natural numbers is ____.",
+      "answer": "n(n+1)(2n+1)/6",
+      "explanation": "Standard result for sum k^2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1^2 + 2^2 + ... + 10^2 equals ____.",
+      "answer": "385",
+      "explanation": "10 x 11 x 21 / 6 = 385."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the cubes of the first n natural numbers is ____.",
+      "answer": "[n(n+1)/2]^2",
+      "explanation": "Standard result for sum k^3."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1^3 + 2^3 + 3^3 + 4^3 equals ____.",
+      "answer": "100",
+      "explanation": "(10)^2 = 100."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The Greek letter used to write a summation is ____.",
+      "answer": "sigma",
+      "explanation": "Capital sigma denotes a sum."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "For a constant c, sum c (k = 1 to n) equals ____.",
+      "answer": "nc",
+      "explanation": "Adding c n times gives nc."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "In sum a_k (k = 1 to n), the letter k is called the ____ of summation.",
+      "answer": "index",
+      "explanation": "k is the dummy index variable."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 2k (k = 1 to n) is ____.",
+      "answer": "n(n+1)",
+      "explanation": "2 sum k = n(n+1)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The nth term of the series 1, 3, 6, 10, ... is ____.",
+      "answer": "n(n+1)/2",
+      "explanation": "The triangular numbers."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The value of sum 1/(k(k+1)) (k = 1 to n) is ____.",
+      "answer": "n/(n+1)",
+      "explanation": "Telescopes to 1 - 1/(n+1)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 1,
+      "question": "The sum of the first n odd natural numbers is ____.",
+      "answer": "n^2",
+      "explanation": "1 + 3 + ... + (2n-1) = n^2."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 1,
+      "question": "The sum of the first n even natural numbers is ____.",
+      "answer": "n(n+1)",
+      "explanation": "2 + 4 + ... + 2n = n(n+1)."
+    },
+    {
+      "type": "FILL_BLANK",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 1,
+      "question": "The sum 1.2 + 2.3 + ... + n(n+1) equals ____.",
+      "answer": "n(n+1)(n+2)/3",
+      "explanation": "k(k+1) = k^2 + k summed."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Derive the formula for the sum of the first n natural numbers by the Gauss pairing method.",
+      "answer": "Write the sum forwards and backwards:\n\n   S = 1 + 2 + ... + n\n   S = n + (n-1) + ... + 1\n\nAdd the two lines term by term. Each of the n columns sums to (n + 1), so\n\n   2S = n(n + 1),  giving  S = n(n + 1)/2.\n\nThus 1 + 2 + ... + n = n(n + 1)/2.",
+      "explanation": "Pair first with last: each pair = n+1, n pairs, 2S = n(n+1)."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Find the sum of the first 30 natural numbers.",
+      "answer": "Using S = n(n + 1)/2 with n = 30:\n\n   S = 30 x 31 / 2 = 930 / 2 = 465.\n\nSo 1 + 2 + ... + 30 = 465.",
+      "explanation": "n(n+1)/2 with n = 30."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the sum of all natural numbers from 21 to 40.",
+      "answer": "Sum from 21 to 40 = (sum 1 to 40) - (sum 1 to 20).\n\n   sum 1 to 40 = 40 x 41 / 2 = 820\n   sum 1 to 20 = 20 x 21 / 2 = 210\n\n   Required sum = 820 - 210 = 610.",
+      "explanation": "Difference of two triangular sums: 820 - 210 = 610."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "State the formula for the sum of the squares of the first n natural numbers and use it to find 1^2 + 2^2 + ... + 8^2.",
+      "answer": "The formula is sum k^2 = n(n + 1)(2n + 1)/6.\n\nFor n = 8:\n\n   S = 8 x 9 x 17 / 6 = 1224 / 6 = 204.\n\nSo 1^2 + 2^2 + ... + 8^2 = 204.",
+      "explanation": "n(n+1)(2n+1)/6 with n = 8 gives 204."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the value of 1^2 + 2^2 + ... + 15^2.",
+      "answer": "Using sum k^2 = n(n + 1)(2n + 1)/6 with n = 15:\n\n   S = 15 x 16 x 31 / 6 = 7440 / 6 = 1240.\n\nSo the required sum is 1240.",
+      "explanation": "15 x 16 x 31 / 6 = 1240."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "State the formula for the sum of the cubes of the first n natural numbers and use it to find 1^3 + 2^3 + ... + 6^3.",
+      "answer": "The formula is sum k^3 = [n(n + 1)/2]^2.\n\nFor n = 6: n(n + 1)/2 = 6 x 7 / 2 = 21, so\n\n   S = 21^2 = 441.\n\nSo 1^3 + 2^3 + ... + 6^3 = 441.",
+      "explanation": "(21)^2 = 441."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Verify for n = 5 that the sum of the cubes equals the square of the sum of the first n natural numbers.",
+      "answer": "Sum of the numbers: 1 + 2 + 3 + 4 + 5 = 15, and its square is 15^2 = 225.\n\nSum of the cubes: 1 + 8 + 27 + 64 + 125 = 225.\n\nBoth are 225, confirming 1^3 + 2^3 + ... + n^3 = (1 + 2 + ... + n)^2 for n = 5.",
+      "explanation": "Both sides equal 225."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "REMEMBER",
+      "marks": 3,
+      "question": "State the three properties of the sigma (summation) notation.",
+      "answer": "(i) sum c (k = 1 to n) = nc for a constant c.\n(ii) sum (c a_k) = c sum a_k (constant factor out).\n(iii) sum (a_k +/- b_k) = sum a_k +/- sum b_k (term-by-term addition).",
+      "explanation": "Constant, constant multiple, addition rules."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "APPLY",
+      "marks": 2,
+      "question": "Evaluate sum 7 (k = 1 to 20).",
+      "answer": "sum 7 (k = 1 to 20) = 20 x 7 = 140 (the constant 7 is added 20 times).",
+      "explanation": "sum c = nc = 20 x 7 = 140."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate sum (2k + 3) (k = 1 to n) in terms of n, and hence find its value for n = 10.",
+      "answer": "sum (2k + 3) = 2 sum k + sum 3 = 2 x n(n + 1)/2 + 3n = n(n + 1) + 3n = n^2 + 4n.\n\nFor n = 10: S = 100 + 40 = 140.",
+      "explanation": "n^2 + 4n; n = 10 gives 140."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate sum (k^2 + k) (k = 1 to 10).",
+      "answer": "sum (k^2 + k) = sum k^2 + sum k.\n\n   sum k^2 (1 to 10) = 10 x 11 x 21 / 6 = 385\n   sum k (1 to 10) = 10 x 11 / 2 = 55\n\n   Total = 385 + 55 = 440.",
+      "explanation": "385 + 55 = 440."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Using the method of differences, find the nth term of the series 3, 8, 15, 24, 35, ....",
+      "answer": "The differences are 5, 7, 9, 11, ... (an AP), so T_n is a quadratic.\n\n   T_n = 3 + [5 + 7 + ... to (n - 1) terms].\n\nThe (n-1) differences 5, 7, ..., (2n+1) sum to (n - 1)(n + 3). So T_n = 3 + (n - 1)(n + 3) = n^2 + 2n. Equivalently T_n = n(n + 2).\n\nCheck: T_1 = 3, T_2 = 8, T_3 = 15 - correct.",
+      "explanation": "Differences AP => T_n = n(n+2) = n^2 + 2n."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the nth term of the series 1, 3, 6, 10, 15, ... and hence the sum of its first n terms.",
+      "answer": "These are the triangular numbers with T_n = n(n + 1)/2.\n\nSum of the first n terms:\n\n   S = sum k(k + 1)/2 = (1/2)[sum k^2 + sum k]\n     = (1/2)[n(n + 1)(2n + 1)/6 + n(n + 1)/2]\n     = n(n + 1)(n + 2)/6.\n\nSo S_n = n(n + 1)(n + 2)/6.",
+      "explanation": "T_n = n(n+1)/2; sum = n(n+1)(n+2)/6."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Sum the telescoping series 1/(1.2) + 1/(2.3) + ... + 1/(9.10).",
+      "answer": "Split each term: 1/(k(k + 1)) = 1/k - 1/(k + 1).\n\n   S = (1 - 1/2) + (1/2 - 1/3) + ... + (1/9 - 1/10) = 1 - 1/10 = 9/10.\n\nSo the sum is 9/10.",
+      "explanation": "Telescoping to 1 - 1/10 = 9/10."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the sum 1.2 + 2.3 + ... + n(n+1) and evaluate it for n = 5.",
+      "answer": "The general term is k(k + 1) = k^2 + k, so\n\n   S = sum k^2 + sum k = n(n + 1)(2n + 1)/6 + n(n + 1)/2 = n(n + 1)(n + 2)/3.\n\nFor n = 5: S = 5 x 6 x 7 / 3 = 210 / 3 = 70.\n\nCheck: 2 + 6 + 12 + 20 + 30 = 70.",
+      "explanation": "n(n+1)(n+2)/3; n = 5 gives 70."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the formula for the sum of the squares of the first n even numbers and evaluate it for n = 5.",
+      "answer": "The even numbers are 2, 4, ..., 2n and (2k)^2 = 4k^2, so\n\n   S = 4 sum k^2 = 4 x n(n + 1)(2n + 1)/6 = 2n(n + 1)(2n + 1)/3.\n\nFor n = 5: S = 2 x 5 x 6 x 11 / 3 = 660 / 3 = 220.\n\nCheck: 4 + 16 + 36 + 64 + 100 = 220.",
+      "explanation": "2n(n+1)(2n+1)/3; n = 5 gives 220."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 3,
+      "question": "Find the sum to n terms of the series 3 + 7 + 13 + 21 + ..., whose nth term is n^2 + n + 1.",
+      "answer": "With T_k = k^2 + k + 1,\n\n   S = sum k^2 + sum k + sum 1\n     = n(n + 1)(2n + 1)/6 + n(n + 1)/2 + n.\n\nThe first two terms combine to n(n + 1)(n + 2)/3, so\n\n   S = n(n + 1)(n + 2)/3 + n = n[(n + 1)(n + 2) + 3]/3 = n(n^2 + 3n + 5)/3.",
+      "explanation": "Split n^2 + n + 1; S = n(n^2 + 3n + 5)/3."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 3,
+      "question": "Show that the sum of the first n even natural numbers is n(n+1), and hence find the sum of the first 25 even numbers.",
+      "answer": "The even numbers are 2, 4, ..., 2n, so\n\n   S = 2 + 4 + ... + 2n = 2(1 + 2 + ... + n) = 2 x n(n + 1)/2 = n(n + 1).\n\nFor n = 25: S = 25 x 26 = 650.",
+      "explanation": "2 sum k = n(n+1); n = 25 gives 650."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the value of 6^2 + 7^2 + 8^2 + 9^2 + 10^2.",
+      "answer": "This equals (1^2 + ... + 10^2) - (1^2 + ... + 5^2).\n\n   sum to 10 = 10 x 11 x 21 / 6 = 385\n   sum to 5 = 5 x 6 x 11 / 6 = 55\n\n   Required = 385 - 55 = 330.",
+      "explanation": "385 - 55 = 330."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Evaluate sum (3k^2 - 2k) (k = 1 to n) in terms of n.",
+      "answer": "sum (3k^2 - 2k) = 3 sum k^2 - 2 sum k.\n\n   = 3 x n(n + 1)(2n + 1)/6 - 2 x n(n + 1)/2\n   = n(n + 1)(2n + 1)/2 - n(n + 1)\n   = n(n + 1)[(2n + 1) - 2]/2\n   = n(n + 1)(2n - 1)/2.",
+      "explanation": "3 sum k^2 - 2 sum k = n(n+1)(2n-1)/2."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 2,
+      "question": "Describe the steps of the method of differences for finding the nth term of a series.",
+      "answer": "Step 1: Write down the successive differences of the terms and check whether they form an AP or a GP.\nStep 2: If the first differences form an AP, the nth term is a quadratic in n (if the second differences form an AP, it is a cubic).\nStep 3: Build T_n as T_1 plus the sum of the first (n - 1) differences, then simplify. The sum of the series can then be found using the standard formulas.",
+      "explanation": "Check differences, decide degree, build T_n from accumulated differences."
+    },
+    {
+      "type": "SHORT_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 3,
+      "question": "Find the value of 1.2.3 + 2.3.4 + 3.4.5 + 4.5.6.",
+      "answer": "Use S_n = sum k(k+1)(k+2) = n(n + 1)(n + 2)(n + 3)/4.\n\nFor n = 4:\n\n   S = 4 x 5 x 6 x 7 / 4 = 840 / 4 = 210.\n\nCheck: 6 + 24 + 60 + 120 = 210.",
+      "explanation": "n(n+1)(n+2)(n+3)/4 with n = 4 gives 210."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Derive the formula for the sum of the first n natural numbers, and use it to find 1 + 2 + ... + 1000.",
+      "answer": "Write S = 1 + 2 + ... + n forwards and S = n + (n-1) + ... + 1 backwards. Adding column by column, each of the n columns totals (n + 1), so 2S = n(n + 1) and\n\n   S = n(n + 1)/2.\n\nFor n = 1000:\n\n   S = 1000 x 1001 / 2 = 1001000 / 2 = 500500.\n\nSo 1 + 2 + ... + 1000 = 500500.",
+      "explanation": "Gauss derivation; n(n+1)/2 with n = 1000 gives 500500."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "State the formula for the sum of the squares of the first n natural numbers and use it to find 1^2 + 2^2 + ... + 20^2. Also identify how this sum grows with n.",
+      "answer": "The formula is sum k^2 = n(n + 1)(2n + 1)/6.\n\nFor n = 20:\n\n   S = 20 x 21 x 41 / 6 = 17220 / 6 = 2870.\n\nSo 1^2 + ... + 20^2 = 2870.\n\nGrowth: expanding, n(n + 1)(2n + 1)/6 = (2n^3 + 3n^2 + n)/6, whose leading term is n^3/3. Hence the sum of squares grows like n^3 (it is a cubic in n).",
+      "explanation": "2870; leading term n^3/3, so cubic growth."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "State and verify the identity sum k^3 = [n(n+1)/2]^2 for n = 4, and use it to find 1^3 + 2^3 + ... + 12^3.",
+      "answer": "The identity is 1^3 + 2^3 + ... + n^3 = [n(n + 1)/2]^2 = (1 + 2 + ... + n)^2.\n\nVerify for n = 4: LHS = 1 + 8 + 27 + 64 = 100; RHS = (4 x 5 / 2)^2 = 10^2 = 100. Both equal 100.\n\nFor n = 12: n(n + 1)/2 = 12 x 13 / 2 = 78, so\n\n   S = 78^2 = 6084.\n\nSo 1^3 + 2^3 + ... + 12^3 = 6084.",
+      "explanation": "Verify (100 = 100); n = 12 gives 78^2 = 6084."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Using the sigma properties, evaluate the sum of the squares of the first n odd numbers, 1^2 + 3^2 + 5^2 + ... + (2n-1)^2, and evaluate it for n = 5.",
+      "answer": "The kth odd number is (2k - 1), and (2k - 1)^2 = 4k^2 - 4k + 1. Hence\n\n   S = sum (4k^2 - 4k + 1) = 4 sum k^2 - 4 sum k + sum 1\n     = 4 x n(n + 1)(2n + 1)/6 - 4 x n(n + 1)/2 + n\n     = 2n(n + 1)(2n + 1)/3 - 2n(n + 1) + n.\n\nSimplifying gives S = n(2n - 1)(2n + 1)/3.\n\nFor n = 5: S = 5 x 9 x 11 / 3 = 495 / 3 = 165.\n\nCheck: 1 + 9 + 25 + 49 + 81 = 165.",
+      "explanation": "(2k-1)^2 expanded; S = n(2n-1)(2n+1)/3; n = 5 gives 165."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Using the method of differences, find the nth term and the sum of the first n terms of the series 1, 3, 7, 13, 21, ....",
+      "answer": "The differences are 2, 4, 6, 8, ... (an AP), so T_n is a quadratic.\n\n   T_n = 1 + [2 + 4 + ... to (n - 1) terms] = 1 + 2(1 + 2 + ... + (n - 1)) = 1 + 2 x (n - 1)n/2 = 1 + n(n - 1) = n^2 - n + 1.\n\nCheck: T_1 = 1, T_2 = 3, T_3 = 7 - correct.\n\nSum to n terms:\n\n   S = sum (k^2 - k + 1) = n(n + 1)(2n + 1)/6 - n(n + 1)/2 + n.\n\nThe first two terms combine to n(n^2 - 1)/3, so S = n(n^2 - 1)/3 + n = n(n^2 + 2)/3.",
+      "explanation": "T_n = n^2 - n + 1; S = n(n^2 + 2)/3."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 5,
+      "question": "Find the sum of the series 1.3 + 2.4 + 3.5 + ... + n(n+2), and evaluate it for n = 5.",
+      "answer": "The general term is k(k + 2) = k^2 + 2k, so\n\n   S = sum k^2 + 2 sum k = n(n + 1)(2n + 1)/6 + 2 x n(n + 1)/2 = n(n + 1)(2n + 1)/6 + n(n + 1).\n\nTaking n(n + 1)/6 common:\n\n   S = [n(n + 1)/6][(2n + 1) + 6] = n(n + 1)(2n + 7)/6.\n\nFor n = 5: S = 5 x 6 x 17 / 6 = 510 / 6 = 85.\n\nCheck: 3 + 8 + 15 + 24 + 35 = 85.",
+      "explanation": "k(k+2) = k^2 + 2k; S = n(n+1)(2n+7)/6; n = 5 gives 85."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 5,
+      "question": "For the series 4, 11, 22, 37, 56, ..., find the nth term by the method of differences and hence the sum to n terms.",
+      "answer": "First differences: 7, 11, 15, 19, ... which form an AP; second differences are constant (4). So T_n is a quadratic, T_n = an^2 + bn + c.\n\nUsing T_1 = 4, T_2 = 11, T_3 = 22:\n   a + b + c = 4\n   4a + 2b + c = 11\n   9a + 3b + c = 22\nSolving: a = 2, b = 1, c = 1, so T_n = 2n^2 + n + 1.\n\nCheck: T_4 = 32 + 4 + 1 = 37 - correct.\n\nSum to n terms:\n\n   S = 2 sum k^2 + sum k + n = 2 x n(n + 1)(2n + 1)/6 + n(n + 1)/2 + n\n     = n(n + 1)(2n + 1)/3 + n(n + 1)/2 + n.",
+      "explanation": "Second differences constant => quadratic T_n = 2n^2 + n + 1; sum via standard formulas."
+    },
+    {
+      "type": "LONG_ANSWER",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Sum the arithmetico-geometric series S = 1 + 2x + 3x^2 + ... + n x^(n-1) for x not equal to 1, using the multiply-shift-subtract method.",
+      "answer": "Write S and xS:\n\n   S  = 1 + 2x + 3x^2 + ... + n x^(n-1)\n   xS =      x + 2x^2 + ... + (n-1)x^(n-1) + n x^n\n\nSubtract:\n\n   S - xS = 1 + x + x^2 + ... + x^(n-1) - n x^n.\n\nThe first part is a GP with sum (1 - x^n)/(1 - x). Hence\n\n   S(1 - x) = (1 - x^n)/(1 - x) - n x^n,\n\n   S = (1 - x^n)/(1 - x)^2 - n x^n/(1 - x).\n\n(For |x| < 1 and n -> infinity this gives S = 1/(1 - x)^2.)",
+      "explanation": "Multiply by x, subtract, use GP sum; S = (1 - x^n)/(1-x)^2 - n x^n/(1-x)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe sum of the first n natural numbers is S = 1 + 2 + ... + n = n(n+1)/2, found by Gauss by pairing the first and last terms. The partial sums 1, 3, 6, 10, ... are called triangular numbers.\n(a) Write the formula for S.\n(b) Find the sum of the first 60 natural numbers.\n(c) The sum of the first n natural numbers is 465. Find n.\n(d) What are the sums of the first n odd and first n even numbers?",
+      "answer": "(a) S = n(n + 1)/2.\n(b) S = 60 x 61 / 2 = 1830.\n(c) n(n + 1)/2 = 465 => n(n + 1) = 930 => n = 30 (since 30 x 31 = 930).\n(d) Odd: 1 + 3 + ... + (2n - 1) = n^2. Even: 2 + 4 + ... + 2n = n(n + 1).",
+      "explanation": "Apply n(n+1)/2; solve for n; recall odd = n^2, even = n(n+1)."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-02",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe sum of the squares of the first n natural numbers is sum k^2 = n(n+1)(2n+1)/6. It can be derived by telescoping the identity (k+1)^3 - k^3 = 3k^2 + 3k + 1.\n(a) Write the formula for sum k^2.\n(b) Find 1^2 + 2^2 + ... + 9^2.\n(c) Find the sum of the squares from 1 to 12.\n(d) How does the sum grow with n for large n?",
+      "answer": "(a) sum k^2 = n(n + 1)(2n + 1)/6.\n(b) 9 x 10 x 19 / 6 = 1710 / 6 = 285.\n(c) 12 x 13 x 25 / 6 = 3900 / 6 = 650.\n(d) The leading term is n^3/3, so the sum grows like n^3 (it is a cubic in n).",
+      "explanation": "Apply the formula; n = 9 gives 285, n = 12 gives 650; cubic growth."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-03",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe sum of the cubes of the first n natural numbers is sum k^3 = [n(n+1)/2]^2, which is exactly the square of the sum of those numbers.\n(a) Write the formula for sum k^3.\n(b) Find 1^3 + 2^3 + ... + 7^3.\n(c) If the sum of the cubes is 1296, what is the sum of the numbers?\n(d) State the identity connecting sum k^3 and sum k.",
+      "answer": "(a) sum k^3 = [n(n + 1)/2]^2.\n(b) n(n + 1)/2 = 7 x 8 / 2 = 28, so S = 28^2 = 784.\n(c) The sum of the numbers is sqrt(1296) = 36.\n(d) 1^3 + 2^3 + ... + n^3 = (1 + 2 + ... + n)^2, i.e. sum k^3 = (sum k)^2.",
+      "explanation": "(28)^2 = 784; sqrt(1296) = 36; sum of cubes = square of sum."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-04",
+      "difficulty": "EASY",
+      "cognitive_level": "UNDERSTAND",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nThe sigma notation writes a_1 + a_2 + ... + a_n as sum a_k (k = 1 to n). Three properties help: sum c = nc, sum(c a_k) = c sum a_k, and sum(a_k +/- b_k) = sum a_k +/- sum b_k.\n(a) What does the index k represent?\n(b) Evaluate sum 4 (k = 1 to 9).\n(c) Write sum 5k in terms of sum k.\n(d) Rewrite sum(k^2 + k) as a sum of two standard sums.",
+      "answer": "(a) k is the index (dummy variable) of summation; it runs from the lower to the upper limit and can be renamed.\n(b) sum 4 (k = 1 to 9) = 9 x 4 = 36.\n(c) sum 5k = 5 sum k (the constant 5 comes out).\n(d) sum(k^2 + k) = sum k^2 + sum k = n(n + 1)(2n + 1)/6 + n(n + 1)/2.",
+      "explanation": "Index meaning; sum c = nc = 36; constant multiple; addition rule."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-05",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nTo sum a polynomial in k, split it into standard sums using the sigma properties and substitute sum k = n(n+1)/2, sum k^2 = n(n+1)(2n+1)/6.\n(a) Express sum(2k + 1) in terms of n.\n(b) Evaluate sum(2k + 1) for n = 10.\n(c) Express sum(k^2 - k) in factored form.\n(d) Evaluate sum(k^2 - k) for n = 5.",
+      "answer": "(a) sum(2k + 1) = 2 sum k + sum 1 = n(n + 1) + n = n^2 + 2n.\n(b) For n = 10: 100 + 20 = 120.\n(c) sum(k^2 - k) = sum k^2 - sum k = n(n + 1)(2n + 1)/6 - n(n + 1)/2 = n(n + 1)(n - 1)/3.\n(d) For n = 5: 5 x 6 x 4 / 3 = 40. (Check: 0 + 2 + 6 + 12 + 20 = 40.)",
+      "explanation": "Split into standard sums; n^2 + 2n; 120; n(n+1)(n-1)/3; 40."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nIn the method of differences, when the consecutive differences of a series form an AP the nth term is a quadratic. The series 2, 5, 10, 17, 26, ... has differences 3, 5, 7, 9, ....\n(a) What kind of sequence do the differences form?\n(b) Find the nth term of the series.\n(c) Find the 6th term.\n(d) Write the sum of the first n terms using standard formulas.",
+      "answer": "(a) The differences 3, 5, 7, 9, ... form an arithmetic progression.\n(b) T_n = 2 + [3 + 5 + ... + (2n - 1)] = 2 + (n^2 - 1) = n^2 + 1.\n(c) T_6 = 6^2 + 1 = 37.\n(d) S_n = sum(k^2 + 1) = n(n + 1)(2n + 1)/6 + n.",
+      "explanation": "Differences AP => T_n = n^2 + 1; T_6 = 37; sum = n(n+1)(2n+1)/6 + n."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-06",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nA telescoping series is one where each term is written as a difference so most terms cancel. Using 1/(k(k+1)) = 1/k - 1/(k+1), the series 1/(1.2) + 1/(2.3) + ... collapses neatly.\n(a) Split 1/(k(k+1)) into partial fractions.\n(b) Find the sum of the first n terms.\n(c) Evaluate the sum for n = 20.\n(d) What value does the sum approach as n becomes very large?",
+      "answer": "(a) 1/(k(k + 1)) = 1/k - 1/(k + 1).\n(b) S_n = (1 - 1/2) + (1/2 - 1/3) + ... + (1/n - 1/(n + 1)) = 1 - 1/(n + 1) = n/(n + 1).\n(c) For n = 20: S = 20/21.\n(d) As n -> infinity, 1/(n + 1) -> 0, so the sum approaches 1.",
+      "explanation": "Partial fractions; n/(n+1); 20/21; limit 1."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-07",
+      "difficulty": "HARD",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nMany special series are summed by reducing the general term to standard sums. For 1.2 + 2.3 + ... + n(n+1), the general term is k(k+1) = k^2 + k.\n(a) Write the general term as a sum of powers of k.\n(b) Find the sum to n terms in factored form.\n(c) Evaluate the sum for n = 6.\n(d) Find the sum of the squares of the first 4 even numbers.",
+      "answer": "(a) k(k + 1) = k^2 + k.\n(b) S = sum k^2 + sum k = n(n + 1)(2n + 1)/6 + n(n + 1)/2 = n(n + 1)(n + 2)/3.\n(c) For n = 6: S = 6 x 7 x 8 / 3 = 112.\n(d) 2^2 + 4^2 + 6^2 + 8^2 = 4(1 + 4 + 9 + 16) = 4 x 30 = 120.",
+      "explanation": "k^2 + k; n(n+1)(n+2)/3; 112; 4 sum k^2 = 120."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-08",
+      "difficulty": "HARD",
+      "cognitive_level": "ANALYZE",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nComposite series are analysed by identifying the structure of the general term. Consider 5, 12, 21, 32, 45, ... where the differences are 7, 9, 11, 13, ....\n(a) What do the first differences form, and hence what is the degree of the nth term?\n(b) Find the nth term.\n(c) Verify your nth term for n = 4.\n(d) Which standard sums are needed to add the series?",
+      "answer": "(a) The first differences 7, 9, 11, ... form an AP, so the nth term is a quadratic (degree 2) in n.\n(b) T_n = 5 + [7 + 9 + ... to (n - 1) terms] = 5 + (n - 1)(n + 5) = n^2 + 4n. Equivalently T_n = n(n + 4).\n(c) T_4 = 16 + 16 = 32 - matches the given 4th term.\n(d) Since T_n = n^2 + 4n, we need sum k^2 and sum k: S = n(n + 1)(2n + 1)/6 + 4 x n(n + 1)/2.",
+      "explanation": "Differences AP => quadratic; T_n = n^2 + 4n; T_4 = 32; needs sum k^2 and sum k."
+    },
+    {
+      "type": "CASE_BASED",
+      "outcome_code": "12-NIOS-MAT-SSS-01",
+      "difficulty": "MEDIUM",
+      "cognitive_level": "APPLY",
+      "marks": 4,
+      "question": "Read the passage and answer the questions.\nLogs are stacked so that the bottom row has 20 logs, the next row 19, then 18, and so on up to 1 log at the top. The number in each row forms the natural numbers.\n(a) Which formula gives the total number of logs?\n(b) Find the total number of logs in the stack.\n(c) If instead the bottom row had 50 logs (down to 1), how many logs in total?\n(d) A stack of this type has 210 logs. How many rows are there?",
+      "answer": "(a) The total is the sum of the first n natural numbers, S = n(n + 1)/2.\n(b) For n = 20: S = 20 x 21 / 2 = 210 logs.\n(c) For n = 50: S = 50 x 51 / 2 = 1275 logs.\n(d) n(n + 1)/2 = 210 => n(n + 1) = 420 => n = 20 rows (since 20 x 21 = 420).",
+      "explanation": "Sum of naturals models the stack; 210; 1275; n = 20."
+    }
+  ]
+}
