@@ -29,6 +29,7 @@ import {
   useAssessment,
   useMySubmissions,
   useQuestionsByIds,
+  useSubjects,
   useSubmission,
   useSubmitAssessment,
 } from "@/lib/queries";
@@ -42,6 +43,7 @@ import type {
 import { BLOOM_TO_BUCKET, BUCKET_LABEL } from "@/lib/types";
 import { cn, formatMarks } from "@/lib/utils";
 import { RichExplanationView } from "@/components/RichExplanation";
+import { DevanagariInput } from "@/components/DevanagariInput";
 import { TellMeMore } from "@/components/TellMeMore";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 import { useMascot } from "@/lib/mascotContext";
@@ -66,6 +68,16 @@ export function TakeAssessmentPage() {
   const { assessmentId } = useParams();
   const aid = assessmentId ? Number(assessmentId) : undefined;
   const assessmentQ = useAssessment(aid);
+
+  // Offer the in-app Devanagari typing aid only for scripts that need it
+  // (Sanskrit / Hindi), so English-medium quizzes stay uncluttered. Subjects
+  // are cached across the app, so this lookup is cheap.
+  const subjectsQ = useSubjects(undefined, { fetchAllWhenUndefined: true });
+  const allowDevanagari = useMemo(() => {
+    const name =
+      subjectsQ.data?.find((s) => s.id === assessmentQ.data?.subject_id)?.name ?? "";
+    return /sanskrit|hindi/i.test(name);
+  }, [subjectsQ.data, assessmentQ.data?.subject_id]);
 
   const questionIds = useMemo(
     () =>
@@ -467,6 +479,7 @@ export function TakeAssessmentPage() {
               index={idx + 1}
               question={q}
               value={answers[qid] ?? ""}
+              allowDevanagari={allowDevanagari}
               onChange={(v) => setAnswers((prev) => ({ ...prev, [qid]: v }))}
             />
           );
@@ -496,11 +509,13 @@ function QuestionInput({
   index,
   question,
   value,
+  allowDevanagari,
   onChange,
 }: {
   index: number;
   question: Question;
   value: string;
+  allowDevanagari: boolean;
   onChange: (v: string) => void;
 }) {
   const choices = question.options?.choices ?? [];
@@ -547,13 +562,30 @@ function QuestionInput({
             <Label htmlFor={`q-${question.id}`} className="sr-only">
               Your answer
             </Label>
-            <Input
-              id={`q-${question.id}`}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder="Fill in the blank…"
-            />
+            {allowDevanagari ? (
+              <DevanagariInput
+                id={`q-${question.id}`}
+                value={value}
+                onChange={onChange}
+                placeholder="Fill in the blank…"
+              />
+            ) : (
+              <Input
+                id={`q-${question.id}`}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder="Fill in the blank…"
+              />
+            )}
           </div>
+        ) : allowDevanagari ? (
+          <DevanagariInput
+            as="textarea"
+            value={value}
+            onChange={onChange}
+            rows={question.type === "LONG_ANSWER" ? 6 : 3}
+            placeholder="Your answer…"
+          />
         ) : (
           <textarea
             value={value}
@@ -638,7 +670,25 @@ function ResultCard({ q, sa }: { q: Question | undefined; sa: SubmissionAnswer &
           <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
             Your answer
           </span>
-          <div className="mt-1 rounded-md bg-(--color-muted) p-3 whitespace-pre-wrap">
+          {/* Colour the learner's answer box based on the verdict so
+              right vs. not-yet vs. partial reads at a glance:
+              - correct  → green-tinted, matches the "Correct answer" box
+              - wrong    → amber-tinted (Stage 9: friendlier than red)
+              - partial  → amber-tinted; the score badge above clarifies
+              - subjective / blank / unscored → neutral gray (no
+                automatic verdict to colour from). */}
+          <div
+            className={
+              "mt-1 rounded-md border p-3 whitespace-pre-wrap " +
+              (correct
+                ? "border-(--color-success) bg-[color-mix(in_oklab,var(--color-success)_8%,transparent)]"
+                : wrong
+                  ? "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_10%,transparent)]"
+                  : partial
+                    ? "border-(--color-warning) bg-[color-mix(in_oklab,var(--color-warning)_8%,transparent)]"
+                    : "border-(--color-border) bg-(--color-muted)")
+            }
+          >
             {sa.answer_text || <span className="italic text-(--color-muted-foreground)">(blank)</span>}
           </div>
         </div>

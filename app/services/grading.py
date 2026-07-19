@@ -16,6 +16,7 @@ output was unreliable; AI grading will replace it later):
   the answer key in the results view and self-evaluates:
     * SHORT_ANSWER, LONG_ANSWER, CASE_BASED → return `(None, False, None)`.
 """
+import unicodedata
 from typing import Any
 
 from app.models.question import Question, QuestionType
@@ -72,7 +73,14 @@ def auto_grade(
 
 
 def _normalise(text: str) -> str:
-    return " ".join(text.strip().lower().split())
+    # NFC first so that visually identical strings compare equal regardless of
+    # how the input method composed them. This matters for scripts like
+    # Devanagari, where the same grapheme can be encoded as a precomposed
+    # character or as a base + combining mark (e.g. क़ = U+0958 vs क + U+093C),
+    # and for accented Latin text. Without it, a correct typed answer can be
+    # marked wrong. .lower() is a harmless no-op for caseless scripts.
+    normalised = unicodedata.normalize("NFC", text)
+    return " ".join(normalised.strip().lower().split())
 
 
 def _truthy(value: str) -> bool | None:
