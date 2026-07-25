@@ -2,310 +2,196 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Build a Balanced Plate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Build a Balanced Plate — sort foods by nutrient</title>
 <style>
-  :root {
-    --bg: #fff8ef; --ink: #2c2418; --muted: #6f5f4c; --accent: #d97a30;
-    --good: #1faa6f; --warn: #e0a32a; --bad: #d04141; --card: #ffffff;
-    --shadow: 0 6px 22px rgba(120, 70, 20, 0.12);
-  }
+  :root { --bg:#f6f7fb; --card:#ffffff; --border:#e2e6ef; --ink:#0f172a; --muted:#64748b; --accent:#2563eb; --accent-soft:#eff6ff; --ok:#16a34a; --ok-soft:#ecfdf5; --err:#dc2626; --err-soft:#fef2f2; }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: linear-gradient(180deg, #fff8ef, #fff); color: var(--ink); min-height: 100vh; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 18px 80px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
-
-  .layout { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
-  @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
-
-  .plateCard, .sideCard { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; }
-
-  /* The plate is rendered as a centred SVG so we can position drop zones precisely. */
-  .plate-stage { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 520px; margin: 0 auto; }
-  svg.plate { width: 100%; height: 100%; display: block; }
-
-  .zone {
-    position: absolute; border-radius: 50%; border: 2px dashed transparent;
-    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px;
-    transition: background .15s, border-color .15s, transform .15s;
-  }
-  .zone.over { background: rgba(217,122,48,0.12); border-color: var(--accent); }
-  .zone .label {
-    position: absolute; top: -22px; left: 50%; transform: translateX(-50%);
-    background: white; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
-    color: var(--accent); border: 1px solid #f4d6b5; box-shadow: 0 2px 6px rgba(0,0,0,.05);
-  }
-  .placed-food {
-    background: white; border: 1px solid #f4dcc5; border-radius: 10px; padding: 4px 8px;
-    font-size: 12px; line-height: 1.1; cursor: grab; box-shadow: 0 2px 6px rgba(0,0,0,.05);
-    display: inline-flex; align-items: center; gap: 4px;
-  }
-
-  .pantry { display: flex; flex-wrap: wrap; gap: 8px; min-height: 120px; }
-  .food {
-    background: linear-gradient(135deg, #ffffff, #fff3e3); border: 1px solid #f4d6b5; border-radius: 12px;
-    padding: 8px 12px; cursor: grab; user-select: none; display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-  }
-  .food.dragging { opacity: .35; }
-  .food .emoji { font-size: 20px; }
-  .food .name { font-weight: 600; font-size: 13px; }
-
-  h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 0 0 12px; }
-
-  .meter { display: flex; flex-direction: column; gap: 8px; }
-  .row { display: flex; align-items: center; gap: 10px; }
-  .row .lbl { width: 84px; font-size: 12px; color: var(--ink); font-weight: 600; }
-  .bar { flex: 1; height: 12px; background: #f1e3d0; border-radius: 6px; overflow: hidden; position: relative; }
-  .bar > .fill { height: 100%; background: var(--accent); width: 0%; transition: width .25s; }
-  .bar > .target {
-    position: absolute; top: -2px; bottom: -2px; width: 2px; background: rgba(0,0,0,.3);
-  }
-  .scoreCard {
-    background: linear-gradient(135deg, #fff8ef, #ffe8d2); border-radius: 12px; padding: 12px 14px;
-    margin-top: 14px; text-align: center;
-  }
-  .scoreCard .face { font-size: 38px; line-height: 1; }
-  .scoreCard .verdict { font-size: 14px; font-weight: 700; margin-top: 6px; }
-  .scoreCard .hint { font-size: 12px; color: var(--muted); margin-top: 4px; min-height: 16px; }
-
-  button { padding: 8px 14px; border-radius: 10px; border: 0; font-weight: 600; cursor: pointer; background: var(--accent); color: white; }
-  button.secondary { background: #f0e1cf; color: var(--ink); }
-  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; min-height:100vh; padding:24px; }
+  header { max-width:1100px; margin:0 auto 20px; }
+  h1 { margin:0 0 4px; font-size:24px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:0; color:var(--muted); }
+  main { max-width:1100px; margin:0 auto; display:grid; grid-template-columns: 260px 1fr; gap:22px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; }
+  section h2 { margin:0 0 10px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
+  #pool { min-height:180px; }
+  #pool-items { display:flex; flex-wrap:wrap; gap:8px; }
+  .item { background:#f1f5f9; border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:14px; cursor:grab; user-select:none; transition: border-color .15s, transform .1s, box-shadow .15s; }
+  .item:hover { border-color:var(--accent); }
+  .item.dragging { opacity:0.5; cursor:grabbing; }
+  .item.ok { background:var(--ok-soft); border-color:var(--ok); color:#14532d; }
+  .item.err { background:var(--err-soft); border-color:var(--err); color:#7f1d1d; animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+  #bins { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px; }
+  .bin { background:#fafbff; border:2px dashed var(--border); border-radius:12px; padding:14px; min-height:170px; transition: border-color .15s, background .15s; }
+  .bin.drop { border-color:var(--accent); background:var(--accent-soft); }
+  .bin-name { font-weight:600; font-size:14px; margin-bottom:2px; }
+  .bin-desc { color:var(--muted); font-size:12px; margin-bottom:10px; line-height:1.4; }
+  .bin-items { display:flex; flex-wrap:wrap; gap:6px; min-height:32px; }
+  footer { max-width:1100px; margin:20px auto 0; display:flex; justify-content:space-between; align-items:center; color:var(--muted); }
+  .status { font-size:14px; }
+  .status .n-correct { color:var(--ok); font-weight:600; }
+  .status .n-remaining { font-weight:600; color:var(--ink); }
+  button { background:var(--accent); color:white; border:0; padding:8px 18px; border-radius:8px; font-size:14px; cursor:pointer; font-weight:500; }
+  button.ghost { background:transparent; color:var(--ink); border:1px solid var(--border); }
+  button:disabled { background:#94a3b8; cursor:not-allowed; }
+  .banner { display:none; margin-top:10px; padding:12px 14px; background:var(--ok-soft); border:1px solid var(--ok); border-radius:10px; color:#14532d; font-size:14px; }
+  .banner.show { display:block; animation: pop .3s ease-out; }
+  @keyframes pop { from{transform:scale(.96); opacity:0} to{transform:scale(1); opacity:1} }
+  .feedback-tip { font-size:12px; color:var(--muted); font-style:italic; margin-top:4px; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🍽️ Build a Balanced Plate</h1>
-  <p class="sub">Drag foods from the pantry on the right onto the right slice of the plate. Watch the nutrient meter fill up — try to balance every nutrient!</p>
+<header>
+  <h1>Build a Balanced Plate — sort foods by nutrient</h1>
+  <p class="sub">Each card shows a food. Drop it into the bin for its MAIN nutrient. A balanced plate has a bit of each — carbohydrates for energy, proteins to build the body, fats for stored energy, plus vitamins, minerals, and roughage to stay healthy.</p>
+</header>
 
-  <div class="layout">
-    <div class="plateCard">
-      <div class="plate-stage" id="stage">
-        <!-- Plate is a quartered circle. Pizza-slice colours come from the chapter's food groups. -->
-        <svg class="plate" viewBox="0 0 200 200" aria-hidden="true">
-          <circle cx="100" cy="100" r="98" fill="#ffffff" stroke="#e1c9aa" stroke-width="2"/>
-          <!-- 4 slices -->
-          <path d="M100,100 L100,3 A97 97 0 0 1 197,100 Z" fill="#fff1d6"/>
-          <path d="M100,100 L197,100 A97 97 0 0 1 100,197 Z" fill="#ffe8d2"/>
-          <path d="M100,100 L100,197 A97 97 0 0 1 3,100 Z" fill="#fff7e8"/>
-          <path d="M100,100 L3,100 A97 97 0 0 1 100,3 Z" fill="#fff3df"/>
-          <line x1="100" y1="3"  x2="100" y2="197" stroke="#f0d6b3" stroke-dasharray="4 4"/>
-          <line x1="3"   y1="100" x2="197" y2="100" stroke="#f0d6b3" stroke-dasharray="4 4"/>
-          <circle cx="100" cy="100" r="98" fill="none" stroke="#d8b88a" stroke-width="3"/>
-        </svg>
-        <!-- Drop zones positioned over the four quarters -->
-        <div class="zone" data-bin="Carbohydrates" style="top:8%;right:8%;width:40%;height:40%;">
-          <span class="label">Carbs</span>
-        </div>
-        <div class="zone" data-bin="Proteins" style="bottom:8%;right:8%;width:40%;height:40%;">
-          <span class="label">Proteins</span>
-        </div>
-        <div class="zone" data-bin="Fruits/Vegetables" style="bottom:8%;left:8%;width:40%;height:40%;">
-          <span class="label">Fruits / Veg</span>
-        </div>
-        <div class="zone" data-bin="Dairy/Fats" style="top:8%;left:8%;width:40%;height:40%;">
-          <span class="label">Dairy / Fats</span>
-        </div>
-      </div>
+<main>
+  <section id="pool" aria-label="Items to categorise">
+    <h2>Items</h2>
+    <div id="pool-items"></div>
+    <div class="feedback-tip" id="tip">Drag items into the correct bin on the right.</div>
+  </section>
 
-      <div class="actions">
-        <button id="checkBtn">Check balance</button>
-        <button id="resetBtn" class="secondary">Reset plate</button>
-      </div>
-      <div class="scoreCard" id="scoreCard">
-        <div class="face" id="face">😐</div>
-        <div class="verdict" id="verdict">Add a few foods and check your balance.</div>
-        <div class="hint" id="hint"></div>
-      </div>
+  <section aria-label="Categories">
+    <h2>Bins</h2>
+    <div id="bins"></div>
+    <div class="banner" id="done-banner">
+      Great job! You sorted everything correctly.
     </div>
+  </section>
+</main>
 
-    <div class="sideCard">
-      <h3>Pantry</h3>
-      <div class="pantry" id="pantry"></div>
-
-      <h3 style="margin-top:18px;">Nutrient meter</h3>
-      <div class="meter" id="meter"></div>
-    </div>
+<footer>
+  <div class="status">
+    <span class="n-correct" id="n-correct">0</span> of
+    <span class="n-remaining" id="n-total">0</span> sorted correctly.
   </div>
-</div>
+  <div style="display:flex; gap:8px;">
+    <button class="ghost" id="shuffle">Shuffle</button>
+    <button class="ghost" id="reset">Reset</button>
+  </div>
+</footer>
 
 <script>
-  // Each food maps to one plate slice + provides several nutrients (0-2 units).
-  const FOODS = [
-    { id: "rice",     emoji: "🍚", name: "Rice",     bin: "Carbohydrates",     n: { carb:2 } },
-    { id: "roti",     emoji: "🫓", name: "Roti",     bin: "Carbohydrates",     n: { carb:2, fibre:1 } },
-    { id: "potato",   emoji: "🥔", name: "Potato",   bin: "Carbohydrates",     n: { carb:2 } },
-    { id: "dal",      emoji: "🍲", name: "Dal",      bin: "Proteins",          n: { protein:2, fibre:1 } },
-    { id: "egg",      emoji: "🥚", name: "Egg",      bin: "Proteins",          n: { protein:2, fat:1 } },
-    { id: "paneer",   emoji: "🧀", name: "Paneer",   bin: "Proteins",          n: { protein:2, fat:1, calcium:1 } },
-    { id: "chicken",  emoji: "🍗", name: "Chicken",  bin: "Proteins",          n: { protein:2, fat:1 } },
-    { id: "spinach",  emoji: "🥬", name: "Spinach",  bin: "Fruits/Vegetables", n: { vitamin:2, iron:2, fibre:1 } },
-    { id: "carrot",   emoji: "🥕", name: "Carrot",   bin: "Fruits/Vegetables", n: { vitamin:2, fibre:1 } },
-    { id: "apple",    emoji: "🍎", name: "Apple",    bin: "Fruits/Vegetables", n: { vitamin:1, fibre:1 } },
-    { id: "banana",   emoji: "🍌", name: "Banana",   bin: "Fruits/Vegetables", n: { carb:1, vitamin:1, fibre:1 } },
-    { id: "milk",     emoji: "🥛", name: "Milk",     bin: "Dairy/Fats",        n: { protein:1, calcium:2, fat:1 } },
-    { id: "curd",     emoji: "🍶", name: "Curd",     bin: "Dairy/Fats",        n: { protein:1, calcium:1 } },
-    { id: "ghee",     emoji: "🫙", name: "Ghee",     bin: "Dairy/Fats",        n: { fat:2 } },
-    { id: "peanut",   emoji: "🥜", name: "Peanut",   bin: "Dairy/Fats",        n: { fat:2, protein:1 } },
-  ];
+const BINS  = [{"name": "Carbohydrates", "description": "Mainly for energy. Most of our daily food."}, {"name": "Proteins", "description": "For growth and repair of the body."}, {"name": "Fats", "description": "Stored energy plus help absorb some vitamins."}, {"name": "Vitamins", "description": "Tiny amounts needed to keep the body working \u2014 eyes, skin, immune system."}, {"name": "Minerals", "description": "Calcium for bones, iron for blood, etc."}, {"name": "Roughage", "description": "Plant fibre \u2014 keeps the digestive system moving."}];
+const ITEMS = [{"name": "Rice", "correct_bin": "Carbohydrates", "explanation": "A grain \u2014 mostly starch (carbohydrate)."}, {"name": "Chapati", "correct_bin": "Carbohydrates", "explanation": "Made from wheat \u2014 carbohydrate."}, {"name": "Potato", "correct_bin": "Carbohydrates", "explanation": "Mostly starch."}, {"name": "Banana", "correct_bin": "Carbohydrates", "explanation": "Fruit sugars + starch \u2014 carbohydrate."}, {"name": "Dal (lentils)", "correct_bin": "Proteins", "explanation": "Pulses are an excellent vegetarian protein source."}, {"name": "Egg", "correct_bin": "Proteins", "explanation": "Egg whites are nearly pure protein."}, {"name": "Paneer", "correct_bin": "Proteins", "explanation": "Indian cottage cheese \u2014 milk protein."}, {"name": "Fish", "correct_bin": "Proteins", "explanation": "Animal protein."}, {"name": "Ghee", "correct_bin": "Fats", "explanation": "Clarified butter \u2014 almost pure fat."}, {"name": "Mustard oil", "correct_bin": "Fats", "explanation": "Cooking oil \u2014 fat."}, {"name": "Carrot", "correct_bin": "Vitamins", "explanation": "Rich in Vitamin A (good for eyes)."}, {"name": "Lemon", "correct_bin": "Vitamins", "explanation": "Vitamin C \u2014 boosts immunity, prevents scurvy."}, {"name": "Spinach", "correct_bin": "Minerals", "explanation": "Rich in iron \u2014 important for blood."}, {"name": "Milk", "correct_bin": "Minerals", "explanation": "Strong source of calcium for bones (and protein too \u2014 but calcium is its standout)."}, {"name": "Whole-wheat bread", "correct_bin": "Roughage", "explanation": "The bran in whole-wheat is plant fibre \u2014 roughage."}, {"name": "Cabbage", "correct_bin": "Roughage", "explanation": "Leafy vegetable \u2014 high in fibre."}];
 
-  const NUTRIENTS = [
-    { key:"carb",    label:"Carbs",    target: 3 },
-    { key:"protein", label:"Protein",  target: 3 },
-    { key:"fat",     label:"Fat",      target: 2 },
-    { key:"vitamin", label:"Vitamin",  target: 2 },
-    { key:"calcium", label:"Calcium",  target: 1 },
-    { key:"iron",    label:"Iron",     target: 1 },
-    { key:"fibre",   label:"Fibre",    target: 2 },
-  ];
+const poolEl = document.getElementById("pool-items");
+const binsEl = document.getElementById("bins");
+const nCorrect = document.getElementById("n-correct");
+const nTotal = document.getElementById("n-total");
+const doneBanner = document.getElementById("done-banner");
+const tip = document.getElementById("tip");
 
-  const $ = (id) => document.getElementById(id);
-  const placed = []; // [{id, bin}]
+nTotal.textContent = ITEMS.length;
+let placements = {};   // itemName -> binName (or null for pool)
 
-  function buildFood(food, fromPlate = false) {
-    const el = document.createElement(fromPlate ? "div" : "div");
-    el.className = fromPlate ? "placed-food" : "food";
-    el.draggable = true;
-    el.dataset.id = food.id;
-    el.innerHTML = fromPlate
-      ? `${food.emoji}<span style="font-size:12px;">${food.name}</span>`
-      : `<span class="emoji">${food.emoji}</span><span class="name">${food.name}</span>`;
-    el.addEventListener("dragstart", (e) => {
-      el.classList.add("dragging");
-      e.dataTransfer.setData("text/plain", food.id);
-      e.dataTransfer.effectAllowed = "move";
-    });
-    el.addEventListener("dragend", () => el.classList.remove("dragging"));
-    return el;
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+  return arr;
+}
 
-  function renderPantry() {
-    const p = $("pantry"); p.innerHTML = "";
-    const onPlate = new Set(placed.map(x => x.id));
-    FOODS.filter((f) => !onPlate.has(f.id)).forEach((f) => p.appendChild(buildFood(f)));
-    // Pantry accepts drops too (to remove from plate).
-    p.ondragover = (e) => e.preventDefault();
-    p.ondrop = (e) => {
+function render() {
+  poolEl.innerHTML = "";
+  const itemsInPool = shuffleArray(ITEMS.filter(i => !placements[i.name] || placements[i.name] === "__pool__"));
+  itemsInPool.forEach(it => poolEl.appendChild(makeChip(it)));
+
+  binsEl.innerHTML = "";
+  BINS.forEach(bin => {
+    const wrap = document.createElement("div");
+    wrap.className = "bin";
+    wrap.dataset.bin = bin.name;
+    wrap.innerHTML = `
+      <div class="bin-name">${escapeHtml(bin.name)}</div>
+      ${bin.description ? `<div class="bin-desc">${escapeHtml(bin.description)}</div>` : ""}
+      <div class="bin-items" data-bin="${escapeHtml(bin.name)}"></div>
+    `;
+    binsEl.appendChild(wrap);
+
+    const inThisBin = ITEMS.filter(i => placements[i.name] === bin.name);
+    const itemsContainer = wrap.querySelector(".bin-items");
+    inThisBin.forEach(it => itemsContainer.appendChild(makeChip(it, true)));
+
+    // Drag targets
+    wrap.addEventListener("dragover", (e) => { e.preventDefault(); wrap.classList.add("drop"); });
+    wrap.addEventListener("dragleave", () => wrap.classList.remove("drop"));
+    wrap.addEventListener("drop", (e) => {
       e.preventDefault();
-      const id = e.dataTransfer.getData("text/plain");
-      const idx = placed.findIndex((x) => x.id === id);
-      if (idx >= 0) placed.splice(idx, 1);
-      renderPlate(); renderPantry(); renderMeter();
-    };
-  }
-
-  function renderPlate() {
-    document.querySelectorAll(".zone").forEach((z) => {
-      z.querySelectorAll(".placed-food").forEach((c) => c.remove());
+      wrap.classList.remove("drop");
+      const itemName = e.dataTransfer.getData("text/plain");
+      placeItem(itemName, bin.name);
     });
-    placed.forEach(({ id, bin }) => {
-      const food = FOODS.find((f) => f.id === id);
-      const z = document.querySelector(`.zone[data-bin="${bin}"]`);
-      if (z && food) z.appendChild(buildFood(food, true));
-    });
-  }
+  });
 
-  function totals() {
-    const totals = Object.fromEntries(NUTRIENTS.map((n) => [n.key, 0]));
-    placed.forEach(({ id }) => {
-      const f = FOODS.find((x) => x.id === id);
-      if (!f) return;
-      Object.entries(f.n).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; });
-    });
-    return totals;
-  }
+  updateStatus();
+}
 
-  function renderMeter() {
-    const m = $("meter"); m.innerHTML = "";
-    const t = totals();
-    NUTRIENTS.forEach((n) => {
-      const row = document.createElement("div");
-      row.className = "row";
-      const haveBars = t[n.key];
-      const targetBars = n.target;
-      const max = Math.max(targetBars * 2, 4);
-      const pct = Math.min(100, (haveBars / max) * 100);
-      const targetPct = Math.min(100, (targetBars / max) * 100);
-      row.innerHTML = `
-        <span class="lbl">${n.label}</span>
-        <div class="bar"><div class="fill" style="width:${pct}%"></div><div class="target" style="left:${targetPct}%"></div></div>
-        <span style="width: 56px; text-align: right; font-size: 12px;">${haveBars}/${targetBars}</span>
-      `;
-      m.appendChild(row);
-    });
-    updateScore(t);
-  }
-
-  function updateScore(t) {
-    const reached = NUTRIENTS.filter((n) => t[n.key] >= n.target).length;
-    const total = NUTRIENTS.length;
-    let face = "😐"; let verdict = "Add a few foods and check your balance."; let hint = "";
-    if (reached === 0 && placed.length === 0) {
-      face = "🍽️"; verdict = "Empty plate!"; hint = "Drag foods from the pantry.";
-    } else if (reached >= total) {
-      face = "🤩"; verdict = "Perfectly balanced plate!";
-      hint = "Every nutrient target met. Try a different combination.";
-    } else if (reached >= total - 2) {
-      face = "🙂"; verdict = "Almost balanced — just one or two nutrients to go.";
-      const missing = NUTRIENTS.filter((n) => t[n.key] < n.target).map((n) => n.label).slice(0, 3);
-      hint = `Try foods that add: ${missing.join(", ")}.`;
-    } else {
-      face = "😶"; verdict = "Plate is unbalanced.";
-      const missing = NUTRIENTS.filter((n) => t[n.key] < n.target).map((n) => n.label).slice(0, 3);
-      hint = missing.length ? `Missing: ${missing.join(", ")}.` : "";
+function makeChip(item, placed = false) {
+  const div = document.createElement("div");
+  div.className = "item";
+  div.draggable = true;
+  div.textContent = item.name;
+  div.dataset.name = item.name;
+  if (placed) {
+    const ok = placements[item.name] === item.correct_bin;
+    div.classList.add(ok ? "ok" : "err");
+    if (!ok && item.explanation) {
+      div.title = "Hint: " + item.explanation;
+    } else if (ok && item.explanation) {
+      div.title = item.explanation;
     }
-    $("face").textContent = face;
-    $("verdict").textContent = verdict;
-    $("hint").textContent = hint;
   }
-
-  function setupZones() {
-    document.querySelectorAll(".zone").forEach((zone) => {
-      zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("over"); });
-      zone.addEventListener("dragleave", () => zone.classList.remove("over"));
-      zone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        zone.classList.remove("over");
-        const id = e.dataTransfer.getData("text/plain");
-        const food = FOODS.find((f) => f.id === id);
-        if (!food) return;
-        const expected = food.bin;
-        const targetBin = zone.dataset.bin;
-        if (expected !== targetBin) {
-          // Bounce: brief shake then send back
-          zone.style.transform = "translateX(-6px)";
-          setTimeout(() => zone.style.transform = "translateX(6px)", 90);
-          setTimeout(() => zone.style.transform = "", 180);
-          flashHint(`${food.name} belongs in ${expected}.`);
-          return;
-        }
-        // Add to placed (replace if already present)
-        const idx = placed.findIndex((p) => p.id === id);
-        if (idx >= 0) placed.splice(idx, 1);
-        placed.push({ id, bin: targetBin });
-        renderPlate(); renderPantry(); renderMeter();
-      });
-    });
-  }
-
-  function flashHint(msg) {
-    $("hint").textContent = msg;
-    $("hint").style.color = "var(--accent)";
-    setTimeout(() => $("hint").style.color = "var(--muted)", 1200);
-  }
-
-  $("checkBtn").addEventListener("click", () => {
-    const t = totals(); updateScore(t);
+  div.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", item.name);
+    div.classList.add("dragging");
   });
-  $("resetBtn").addEventListener("click", () => {
-    placed.length = 0; renderPlate(); renderPantry(); renderMeter();
-  });
+  div.addEventListener("dragend", () => div.classList.remove("dragging"));
+  return div;
+}
 
-  setupZones();
-  renderPantry();
-  renderMeter();
+function placeItem(itemName, binName) {
+  const item = ITEMS.find(i => i.name === itemName);
+  if (!item) return;
+  placements[itemName] = binName;
+  render();
+  if (item.correct_bin !== binName && item.explanation) {
+    tip.textContent = `${item.name}: ${item.explanation}`;
+  } else if (item.correct_bin === binName) {
+    tip.textContent = item.explanation ? `Correct — ${item.explanation}` : "Correct!";
+  }
+}
+
+function updateStatus() {
+  const correct = ITEMS.filter(i => placements[i.name] === i.correct_bin).length;
+  nCorrect.textContent = correct;
+  nCorrect.style.color = correct === ITEMS.length ? "var(--ok)" : "";
+  if (correct === ITEMS.length) {
+    doneBanner.classList.add("show");
+  } else {
+    doneBanner.classList.remove("show");
+  }
+}
+
+document.getElementById("reset").addEventListener("click", () => {
+  placements = {};
+  tip.textContent = "Drag items into the correct bin on the right.";
+  render();
+});
+document.getElementById("shuffle").addEventListener("click", render);
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+render();
 </script>
 </body>
 </html>

@@ -2,227 +2,144 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Scientific Method Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scientific Method — put the steps in order</title>
 <style>
-  :root {
-    --bg: #f5f7fb; --ink: #1c1f3a; --muted: #5b6184; --accent: #4f6df5;
-    --good: #1faa6f; --warn: #d99f15; --bad: #d04141; --card: #fff; --shadow: 0 6px 20px rgba(40,46,90,0.10);
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--ink); }
-  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 18px 60px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
-  .scenario { background: var(--card); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); margin-bottom: 18px; }
-  .scenario h2 { font-size: 16px; margin: 0 0 8px; color: var(--accent); }
-  .scenario p { margin: 0; line-height: 1.5; }
-  .panel { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  @media (max-width: 720px) { .panel { grid-template-columns: 1fr; } }
-  .col { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
-  .col h3 { font-size: 14px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin: 0 0 12px; }
-  .step-bank, .step-track { display: flex; flex-direction: column; gap: 8px; min-height: 240px; }
-  .step {
-    background: linear-gradient(135deg, #eef1ff, #f6e9ff);
-    border: 1px solid #d2d7f7; border-radius: 10px; padding: 10px 12px; cursor: grab;
-    user-select: none; transition: transform .15s ease, box-shadow .15s;
-  }
-  .step.dragging { opacity: .4; }
-  .step:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.06); }
-  .step .name { font-weight: 600; font-size: 14px; }
-  .step .hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .slot {
-    background: #f1f3fb; border: 2px dashed #c4c9e6; border-radius: 10px; padding: 10px 12px;
-    min-height: 56px; display: flex; align-items: center; gap: 8px; transition: background .15s;
-  }
-  .slot.over { background: #e7ecff; border-color: var(--accent); }
-  .slot .num { font-weight: 700; color: var(--accent); width: 22px; text-align: center; }
-  .slot .placeholder { color: var(--muted); font-size: 13px; }
-  .slot.correct { background: #e3f7ee; border-color: var(--good); border-style: solid; }
-  .slot.wrong { background: #fde8e8; border-color: var(--bad); border-style: solid; }
-  .actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-  button {
-    padding: 10px 16px; border-radius: 10px; border: 0; font-weight: 600; cursor: pointer;
-    background: var(--accent); color: white; transition: filter .12s;
-  }
-  button.secondary { background: #e7eaf6; color: var(--ink); }
-  button:hover { filter: brightness(1.05); }
-  .result { margin-top: 16px; padding: 12px 14px; border-radius: 10px; display: none; }
-  .result.show { display: block; }
-  .result.good { background: #e3f7ee; color: #0f7a4a; }
-  .result.bad { background: #fde8e8; color: #952a2a; }
-  .scenarios-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .pill {
-    padding: 6px 12px; border-radius: 999px; background: #e7eaf6; cursor: pointer; font-size: 13px;
-    border: 1px solid transparent;
-  }
-  .pill.active { background: var(--accent); color: white; }
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; --ok:#22c55e; --bad:#ef4444; }
+  html,body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { padding:24px; box-sizing:border-box; }
+  header { max-width:780px; margin:0 auto 16px; }
+  h1 { margin:0; font-size:22px; font-weight:600; letter-spacing:-0.2px; }
+  p.sub { margin:6px 0 0; font-size:14px; color:var(--muted); }
+  #board { max-width:780px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:14px; cursor:grab; transition:transform 120ms ease, border-color 120ms ease; }
+  .card.dragging { opacity:0.5; cursor:grabbing; }
+  .card.drag-over { border-color:var(--accent); }
+  .card .num { width:30px; height:30px; flex:none; border-radius:50%; background:rgba(96,165,250,.15); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; }
+  .card .body { flex:1; min-width:0; }
+  .card .label { font-weight:500; font-size:15px; }
+  .card .desc { margin-top:4px; font-size:13px; color:var(--muted); line-height:1.5; }
+  .card .badge { font-size:18px; flex:none; }
+  .card.ok { border-color:var(--ok); }
+  .card.ok .badge { color:var(--ok); }
+  .card.bad { border-color:var(--bad); }
+  .card.bad .badge { color:var(--bad); }
+  #actions { max-width:780px; margin:18px auto 0; display:flex; align-items:center; gap:12px; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 18px; font-size:14px; cursor:pointer; }
+  button:hover { border-color:var(--accent); color:var(--accent); }
+  button.primary { background:var(--accent); color:#0b1020; border-color:var(--accent); font-weight:600; }
+  button.primary:hover { background:#3b82f6; }
+  #score { font-size:13px; color:var(--muted); }
+  #score.ok { color:var(--ok); }
+  #score.bad { color:var(--bad); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>🔬 Scientific Method Lab</h1>
-  <p class="sub">Pick an everyday mystery, then drag each step on the left into the correct slot on the right. The order matters!</p>
+<header>
+  <h1>Scientific Method — put the steps in order</h1>
+  <p class="sub">Drag the steps into the order a scientist would actually follow. When you&#x27;re done, hit &#x27;Check order&#x27; to see how you did.</p>
+</header>
 
-  <div class="scenarios-bar" id="scenariosBar"></div>
+<div id="board" aria-label="Drag to reorder"></div>
 
-  <div class="scenario" id="scenarioCard">
-    <h2 id="scTitle">Loading…</h2>
-    <p id="scText"></p>
-  </div>
-
-  <div class="panel">
-    <div class="col">
-      <h3>Steps to drag</h3>
-      <div class="step-bank" id="bank"></div>
-    </div>
-    <div class="col">
-      <h3>Your investigation order</h3>
-      <div class="step-track" id="track"></div>
-    </div>
-  </div>
-
-  <div class="actions">
-    <button id="checkBtn">Check my order</button>
-    <button id="resetBtn" class="secondary">Reset</button>
-  </div>
-
-  <div class="result" id="result"></div>
+<div id="actions">
+  <button class="primary" id="check">Check order</button>
+  <button id="reset">Shuffle again</button>
+  <span id="score"></span>
 </div>
 
 <script>
-  const SCENARIOS = [
-    {
-      key: "ice",
-      title: "Why does ice float on water?",
-      text: "You see ice cubes bobbing on top of cold water in your glass. Most solids sink — why does ice float?",
-    },
-    {
-      key: "drying",
-      title: "Why do clothes dry faster on a windy day?",
-      text: "The same clothes hung in still air take longer to dry than clothes hung outside on a windy day.",
-    },
-    {
-      key: "plant",
-      title: "Why does the plant in the corner grow slower?",
-      text: "Two identical plants are placed in the same room. The one near the window grows twice as tall as the one in the corner.",
-    },
-  ];
+  // Each event: { label, description, correct_position }
+  const EVENTS = [{"label": "Observe something interesting in the world", "description": "Notice a pattern, a surprise, or something that doesn't quite fit what you'd expect.", "correct_position": 1}, {"label": "Ask a clear, specific question about it", "description": "What exactly do you want to find out? A good question is narrow and answerable.", "correct_position": 2}, {"label": "Form a hypothesis \u2014 your best guess at the answer", "description": "A hypothesis is a testable prediction, not just a wish. It should be possible to prove it wrong.", "correct_position": 3}, {"label": "Design and perform an experiment", "description": "Decide what to measure, what to keep the same (controls), and what to change. Then do it carefully.", "correct_position": 4}, {"label": "Record observations and analyse the results", "description": "Write down what actually happened, then look for patterns. Did the data support your hypothesis?", "correct_position": 5}, {"label": "Draw a conclusion and share it with others", "description": "State what you learned. If others can repeat your work and get the same result, the finding becomes reliable.", "correct_position": 6}];
 
-  const ALL_STEPS = [
-    { id: "observe", name: "1. Observe", hint: "Notice and describe what is happening." },
-    { id: "question", name: "2. Question", hint: "Ask a focused 'why' or 'how' about it." },
-    { id: "hypothesis", name: "3. Hypothesis", hint: "A testable explanation for the observation." },
-    { id: "experiment", name: "4. Experiment", hint: "Design and run a fair test." },
-    { id: "record", name: "5. Record", hint: "Write down what you measured." },
-    { id: "conclude", name: "6. Conclude", hint: "Decide whether your idea is supported." },
-  ];
+  const board = document.getElementById("board");
+  const scoreEl = document.getElementById("score");
 
-  let currentScenario = SCENARIOS[0];
-  const bankEl = document.getElementById("bank");
-  const trackEl = document.getElementById("track");
-  const result = document.getElementById("result");
-
-  function renderScenarioPills() {
-    const bar = document.getElementById("scenariosBar");
-    bar.innerHTML = "";
-    SCENARIOS.forEach((s) => {
-      const p = document.createElement("div");
-      p.className = "pill" + (s.key === currentScenario.key ? " active" : "");
-      p.textContent = s.title;
-      p.onclick = () => { currentScenario = s; loadScenario(); };
-      bar.appendChild(p);
-    });
-  }
-
-  function loadScenario() {
-    document.getElementById("scTitle").textContent = currentScenario.title;
-    document.getElementById("scText").textContent = currentScenario.text;
-    renderScenarioPills();
-    reset();
-  }
-
-  function buildStepEl(step) {
-    const el = document.createElement("div");
-    el.className = "step";
-    el.draggable = true;
-    el.dataset.id = step.id;
-    el.innerHTML = `<div class="name">${step.name.replace(/^\d+\.\s*/, "")}</div><div class="hint">${step.hint}</div>`;
-    el.addEventListener("dragstart", (e) => {
-      el.classList.add("dragging");
-      e.dataTransfer.setData("text/plain", step.id);
-      e.dataTransfer.effectAllowed = "move";
-    });
-    el.addEventListener("dragend", () => el.classList.remove("dragging"));
-    return el;
-  }
-
-  function buildSlot(idx) {
-    const slot = document.createElement("div");
-    slot.className = "slot";
-    slot.dataset.idx = idx;
-    slot.innerHTML = `<span class="num">${idx + 1}</span><span class="placeholder">Drop a step here…</span>`;
-    slot.addEventListener("dragover", (e) => { e.preventDefault(); slot.classList.add("over"); });
-    slot.addEventListener("dragleave", () => slot.classList.remove("over"));
-    slot.addEventListener("drop", (e) => {
-      e.preventDefault();
-      slot.classList.remove("over");
-      const id = e.dataTransfer.getData("text/plain");
-      // Move the step element from wherever it is into this slot.
-      const moving = document.querySelector(`.step[data-id="${id}"]`);
-      if (!moving) return;
-      // If slot already has a step, swap it back to bank.
-      const existing = slot.querySelector(".step");
-      if (existing) bankEl.appendChild(existing);
-      slot.querySelector(".placeholder")?.remove();
-      slot.appendChild(moving);
-    });
-    return slot;
-  }
-
-  function reset() {
-    bankEl.innerHTML = "";
-    trackEl.innerHTML = "";
-    result.classList.remove("show", "good", "bad");
-    // Shuffle bank
-    const shuffled = ALL_STEPS.slice().sort(() => Math.random() - 0.5);
-    shuffled.forEach((s) => bankEl.appendChild(buildStepEl(s)));
-    // Empty slots
-    for (let i = 0; i < ALL_STEPS.length; i++) trackEl.appendChild(buildSlot(i));
-    // Bank also accepts drops (return).
-    bankEl.addEventListener("dragover", (e) => e.preventDefault());
-    bankEl.addEventListener("drop", (e) => {
-      e.preventDefault();
-      const id = e.dataTransfer.getData("text/plain");
-      const moving = document.querySelector(`.step[data-id="${id}"]`);
-      if (moving) bankEl.appendChild(moving);
-    });
-  }
-
-  function check() {
-    const slots = trackEl.querySelectorAll(".slot");
-    let allCorrect = true;
-    slots.forEach((slot, i) => {
-      const step = slot.querySelector(".step");
-      slot.classList.remove("correct", "wrong");
-      if (!step) { allCorrect = false; slot.classList.add("wrong"); return; }
-      if (step.dataset.id === ALL_STEPS[i].id) slot.classList.add("correct");
-      else { slot.classList.add("wrong"); allCorrect = false; }
-    });
-    result.classList.add("show");
-    if (allCorrect) {
-      result.classList.add("good"); result.classList.remove("bad");
-      result.innerHTML = "🎉 Correct order! That's the scientific method. Try another mystery from the top.";
-    } else {
-      result.classList.add("bad"); result.classList.remove("good");
-      result.innerHTML = "Not quite. Reflect: science <strong>begins</strong> with observation, then a focused question, then a testable hypothesis, then an experiment to test it, then recording, then concluding. Try again!";
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
   }
 
-  document.getElementById("checkBtn").addEventListener("click", check);
-  document.getElementById("resetBtn").addEventListener("click", reset);
+  // Render a fresh shuffled order of cards.
+  function render() {
+    board.innerHTML = "";
+    let order = shuffle(EVENTS.map((_, i) => i));
+    // Tiny safety: if we randomly happened on the correct order, swap two.
+    if (order.every((idx, slot) => EVENTS[idx].correct_position === slot + 1) && order.length >= 2) {
+      [order[0], order[1]] = [order[1], order[0]];
+    }
+    order.forEach((idx, slot) => {
+      const ev = EVENTS[idx];
+      const card = document.createElement("div");
+      card.className = "card";
+      card.draggable = true;
+      card.dataset.idx = String(idx);
+      card.innerHTML = `
+        <div class="num">${slot + 1}</div>
+        <div class="body">
+          <div class="label"></div>
+          <div class="desc"></div>
+        </div>
+        <div class="badge"></div>
+      `;
+      card.querySelector(".label").textContent = ev.label;
+      const descEl = card.querySelector(".desc");
+      if (ev.description) descEl.textContent = ev.description; else descEl.remove();
+      board.appendChild(card);
+    });
+    wireDragAndDrop();
+    scoreEl.textContent = "";
+    scoreEl.className = "";
+  }
 
-  loadScenario();
+  function refreshNumbers() {
+    Array.from(board.children).forEach((card, i) => {
+      card.querySelector(".num").textContent = String(i + 1);
+    });
+  }
+
+  let dragging = null;
+
+  function wireDragAndDrop() {
+    Array.from(board.children).forEach((card) => {
+      card.addEventListener("dragstart", () => { dragging = card; card.classList.add("dragging"); });
+      card.addEventListener("dragend", () => { dragging?.classList.remove("dragging"); dragging = null; refreshNumbers(); });
+      card.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        if (!dragging || dragging === card) return;
+        const rect = card.getBoundingClientRect();
+        const above = (e.clientY - rect.top) < rect.height / 2;
+        card.classList.add("drag-over");
+        if (above) board.insertBefore(dragging, card);
+        else board.insertBefore(dragging, card.nextSibling);
+      });
+      card.addEventListener("dragleave", () => card.classList.remove("drag-over"));
+      card.addEventListener("drop", (e) => { e.preventDefault(); card.classList.remove("drag-over"); });
+    });
+  }
+
+  document.getElementById("check").addEventListener("click", () => {
+    let correct = 0;
+    Array.from(board.children).forEach((card, i) => {
+      const idx = Number(card.dataset.idx);
+      const ok = EVENTS[idx].correct_position === i + 1;
+      card.classList.toggle("ok", ok);
+      card.classList.toggle("bad", !ok);
+      card.querySelector(".badge").textContent = ok ? "✓" : "✗";
+      if (ok) correct++;
+    });
+    const total = EVENTS.length;
+    scoreEl.textContent = `${correct} of ${total} in the right slot`;
+    scoreEl.className = correct === total ? "ok" : (correct > 0 ? "" : "bad");
+  });
+
+  document.getElementById("reset").addEventListener("click", render);
+
+  render();
 </script>
 </body>
 </html>

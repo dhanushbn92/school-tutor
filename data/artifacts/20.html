@@ -3,29 +3,28 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Exploring Magnets in the Solar System</title>
+<title>Magnetic field lines — bar magnet (N–S poles)</title>
 <style>
-  :root { --bg:#050711; --panel:rgba(15,20,35,0.82); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#60a5fa; }
+  :root { --bg:#0b1020; --panel:rgba(15,20,35,0.88); --border:rgba(255,255,255,0.12); --text:#e8ecf5; --muted:#9aa3b2; --accent:#a855f7; --pos:#ef4444; --neg:#3b82f6; }
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
   #scene { position:fixed; inset:0; }
-  .overlay { position:fixed; z-index:2; pointer-events:none; }
-  .overlay > * { pointer-events:auto; }
-  #header { top:16px; left:16px; right:16px; display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
-  .panel { background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; max-width:420px; }
-  h1 { margin:0; font-size:18px; font-weight:600; letter-spacing:-0.2px; }
+  .overlay { position:fixed; z-index:2; }
+  #header { top:16px; left:16px; max-width:430px; }
+  .panel { background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+  h1 { margin:0; font-size:17px; font-weight:600; }
   p.sub { margin:4px 0 0; font-size:13px; color:var(--muted); }
-  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
-  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  #legend { top:16px; right:16px; width:240px; }
+  #legend h2 { margin:0 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); }
+  .legend-row { display:flex; align-items:center; gap:10px; margin:6px 0; font-size:13px; }
+  .swatch { width:14px; height:14px; border-radius:50%; flex:none; }
+  #controls { bottom:20px; left:16px; right:16px; display:flex; gap:10px; justify-content:center; pointer-events:none; }
+  #controls > * { pointer-events:auto; }
+  button { background:transparent; color:var(--text); border:1px solid var(--border); border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; }
   button:hover { border-color:var(--accent); color:var(--accent); }
-  input[type=range] { width:120px; accent-color: var(--accent); }
-  #info { top:84px; right:16px; width:320px; max-height:calc(100vh - 200px); overflow:auto; display:none; }
-  #info.open { display:block; }
-  #info h2 { margin:0 0 4px; font-size:16px; }
-  #info .kind { display:inline-block; padding:2px 10px; font-size:11px; letter-spacing:.5px; text-transform:uppercase; background:rgba(96,165,250,.15); color:var(--accent); border-radius:999px; margin-bottom:8px; }
-  #info p { margin:8px 0; font-size:13px; line-height:1.5; color:#dbe1ec; }
-  #info .fact { margin-top:10px; padding:10px; background:rgba(96,165,250,.08); border-left:3px solid var(--accent); border-radius:6px; font-size:12px; color:var(--muted); font-style:italic; }
-  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; z-index:1; }
+  .pill { display:inline-flex; align-items:center; gap:10px; background:var(--panel); backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:999px; padding:8px 14px; font-size:13px; }
+  input[type=range] { width:130px; accent-color:var(--accent); }
+  .hint { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); color:var(--muted); font-size:12px; pointer-events:none; }
+  .node-label { color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; }
 </style>
 </head>
 <body>
@@ -33,262 +32,252 @@
 
 <div class="overlay" id="header">
   <div class="panel">
-    <h1>Exploring Magnets in the Solar System</h1>
-    <p class="sub">Explore how magnets work in our solar system by interacting with the celestial bodies.</p>
+    <h1>Magnetic field lines — bar magnet (N–S poles)</h1>
+    <p class="sub">Drag to rotate around the bar magnet. Yellow streamlines emerge from the North pole and curve back into the South pole — the same shape iron filings make on paper around a real magnet. Try the Density slider for more / fewer lines.</p>
   </div>
 </div>
 
-<div class="overlay panel" id="info" role="complementary" aria-live="polite">
-  <span class="kind" id="info-kind">Planet</span>
-  <h2 id="info-name">Name</h2>
-  <p id="info-desc"></p>
-  <div class="fact" id="info-fact"></div>
-  <button id="info-close" style="margin-top:10px">Close</button>
+<div class="overlay panel" id="legend">
+  <h2 id="legend-title">Legend</h2>
+  <div class="legend-row"><span class="swatch" style="background:#ef4444"></span><span>Positive source</span></div>
+  <div class="legend-row"><span class="swatch" style="background:#3b82f6"></span><span>Negative source</span></div>
+  <div class="legend-row"><span class="swatch" style="background:#fbbf24"></span><span>Field line</span></div>
 </div>
+
+<div class="hint">Drag to rotate · Scroll to zoom</div>
 
 <div class="overlay" id="controls">
-  <span class="pill">
-    Speed <input id="speed" type="range" min="0" max="3" step="0.05" value="1" />
-    <span id="speed-val">1.0x</span>
-  </span>
+  <span class="pill">Density <input id="density" type="range" min="6" max="48" step="1" /><span id="density-val"></span></span>
+  <span class="pill">Length <input id="length" type="range" min="2" max="30" step="0.5" /><span id="length-val"></span></span>
   <button id="reset-view">Reset view</button>
-  <button id="toggle-orbits">Toggle orbits</button>
-  <button id="toggle-labels">Toggle labels</button>
+  <button id="toggle-anim">Pause flow</button>
 </div>
 
-<div class="hint">Drag to rotate · Scroll to zoom · Click a body to learn more</div>
-
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://esm.sh/three@0.164.1",
-    "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/"
-  }
-}
+{ "imports": { "three": "https://esm.sh/three@0.164.1", "three/addons/": "https://esm.sh/three@0.164.1/examples/jsm/" } }
 </script>
 <script type="module">
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 
-// ---- LLM-provided data ----
-const BODIES = [{"name": "Sun", "kind": "STAR", "orbit_position": 0, "description": "The Sun is the center of our solar system and does not have a magnetic pole like Earth.", "fun_fact": "The Sun's magnetic field is much stronger than Earth's and plays a crucial role in the solar system."}, {"name": "Earth", "kind": "PLANET", "orbit_position": 1, "description": "Earth is a magnet with a North and South pole, and its magnetic field protects us from harm.", "fun_fact": "Earth's magnetic field is what makes compasses work, helping us navigate."}, {"name": "Magnetic Asteroid", "kind": "ASTEROID", "orbit_position": 2, "description": "Some asteroids are made of magnetic materials and can be attracted to magnets.", "fun_fact": "Asteroids with magnetic properties can provide valuable insights into the early formation of our solar system."}, {"name": "Jupiter's Magnetosphere", "kind": "PLANET", "orbit_position": 3, "description": "Jupiter has an incredibly strong magnetic field that traps charged particles from the solar wind.", "fun_fact": "Jupiter's magnetosphere is so strong that it can even trap and hold onto some of Saturn's moons."}];
+// CONFIG = { field_kind, sources: [...], line_density, line_length }
+const CONFIG = {"field_kind": "magnetic", "sources": [{"name": "north", "x": -3.0, "y": 0.0, "z": 0.0, "magnitude": 3.0, "label": "N"}, {"name": "south", "x": 3.0, "y": 0.0, "z": 0.0, "magnitude": -3.0, "label": "S"}], "line_density": 24, "line_length": 16.0};
+const FIELD_KIND = CONFIG.field_kind || "electric";
 
-// Known-body visual presets. Unknown names fall back to defaults.
-const PRESETS = {
-  sun:     { color:0xffc36b, emissive:0xffaa33, radius:2.6 },
-  mercury: { color:0xb1b1b1, radius:0.38 },
-  venus:   { color:0xe8c07d, radius:0.52 },
-  earth:   { color:0x3b82f6, radius:0.55 },
-  moon:    { color:0xcccccc, radius:0.18 },
-  mars:    { color:0xd1603c, radius:0.47 },
-  jupiter: { color:0xd5a878, radius:1.4 },
-  saturn:  { color:0xe0bd7b, radius:1.2, ring:true },
-  uranus:  { color:0x7dd3c0, radius:0.88 },
-  neptune: { color:0x4f7ff9, radius:0.86 },
-  pluto:   { color:0xc9b8a8, radius:0.22 },
-};
-function presetFor(name, kind) {
-  const key = (name || "").toLowerCase().trim();
-  if (PRESETS[key]) return PRESETS[key];
-  if (kind === "STAR")   return { color:0xffd6a5, emissive:0xffaa33, radius:2.4 };
-  if (kind === "MOON")   return { color:0xbfbfbf, radius:0.2 };
-  if (kind === "ASTEROID") return { color:0x999084, radius:0.18 };
-  if (kind === "DWARF_PLANET") return { color:0xc4a27a, radius:0.3 };
-  // Generic planet fallback.
-  return { color:0x8bb4f0, radius:0.6 };
-}
+document.getElementById("legend-title").textContent =
+  FIELD_KIND === "electric" ? "Electric field" :
+  FIELD_KIND === "gravitational" ? "Gravitational field" :
+  "Magnetic field";
 
-// ---- three.js scene ----
+// --- Scene boilerplate ----------------------------------------------
 const sceneEl = document.getElementById("scene");
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 2000);
-camera.position.set(0, 14, 28);
-
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b1020);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 5000);
+camera.position.set(20, 14, 26);
 const renderer = new THREE.WebGLRenderer({ antialias:true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 sceneEl.appendChild(renderer.domElement);
-
 const labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);
-labelRenderer.domElement.style.position = "absolute";
-labelRenderer.domElement.style.top = "0";
-labelRenderer.domElement.style.pointerEvents = "none";
+labelRenderer.domElement.style.position = "absolute"; labelRenderer.domElement.style.top = "0"; labelRenderer.domElement.style.pointerEvents = "none";
 sceneEl.appendChild(labelRenderer.domElement);
-
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.minDistance = 5;
-controls.maxDistance = 120;
+controls.enableDamping = true; controls.dampingFactor = 0.06;
+controls.minDistance = 4; controls.maxDistance = 200;
 
-// Starfield background.
-(function buildStars() {
-  const g = new THREE.BufferGeometry();
-  const count = 2500;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const r = 600;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos((Math.random() * 2) - 1);
-    positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-    positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-    positions[i*3+2] = r * Math.cos(phi);
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(10, 20, 8); scene.add(key);
+
+// --- Source spheres -------------------------------------------------
+const SOURCES = (CONFIG.sources || []);
+const sourceMeshes = [];
+SOURCES.forEach((s) => {
+  const isPositive = (s.magnitude ?? 0) >= 0;
+  const color = (FIELD_KIND === "gravitational")
+    ? 0x84cc16
+    : (FIELD_KIND === "magnetic")
+    ? (isPositive ? 0xef4444 : 0x3b82f6)
+    : (isPositive ? 0xef4444 : 0x3b82f6);
+  const r = 0.5 + Math.min(1.5, Math.abs(s.magnitude ?? 1) * 0.2);
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(r, 32, 24),
+    new THREE.MeshStandardMaterial({ color, emissive:color, emissiveIntensity:0.4, roughness:0.4 }),
+  );
+  mesh.position.set(s.x, s.y, s.z);
+  scene.add(mesh); sourceMeshes.push(mesh);
+  // Label
+  const div = document.createElement("div"); div.className = "node-label"; div.textContent = s.label || s.name;
+  const lab = new CSS2DObject(div); lab.position.set(0, r + 0.6, 0); mesh.add(lab);
+});
+
+// --- Field-line geometry --------------------------------------------
+// We compute streamlines numerically: start at evenly distributed
+// points on a small sphere around each source and integrate the field
+// outward (or inward, depending on the field kind and sign).
+const lineGroup = new THREE.Group(); scene.add(lineGroup);
+const linesData = [];   // { positions: Float32Array[], material }
+
+function fieldVectorAt(p) {
+  // Sum of contributions from all sources.
+  const f = new THREE.Vector3();
+  for (const s of SOURCES) {
+    const r = new THREE.Vector3(p.x - s.x, p.y - s.y, p.z - s.z);
+    const dist = Math.max(r.length(), 0.4);
+    r.divideScalar(dist);   // unit vector
+    const factor = (s.magnitude ?? 1) / (dist * dist);
+    f.addScaledVector(r, factor);
   }
-  g.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const m = new THREE.PointsMaterial({ size:0.5, color:0xffffff, sizeAttenuation:false, opacity:0.7, transparent:true });
-  scene.add(new THREE.Points(g, m));
-})();
+  // Gravitational fields always point INTO the source — flip.
+  if (FIELD_KIND === "gravitational") f.multiplyScalar(-1);
+  return f;
+}
 
-// Gentle ambient + point-at-star lighting set below once we know where the star is.
-scene.add(new THREE.AmbientLight(0x606070, 1.0));
+function buildFieldLines(density, maxLen) {
+  // Drop existing.
+  while (lineGroup.children.length) lineGroup.remove(lineGroup.children[0]);
+  linesData.length = 0;
 
-// Build the solar system from LLM data.
-const sorted = [...BODIES].sort((a, b) => a.orbit_position - b.orbit_position);
-const orbitCount = Math.max(1, sorted.filter(b => b.orbit_position > 0).length);
-const orbitStep = 3.0;       // distance between orbits (units)
-const orbitStart = 5.0;      // radius of innermost orbit
-const orbitEnd = orbitStart + orbitStep * (orbitCount - 1);
+  const STEP = 0.25;       // integration step in scene units
+  const STEPS = Math.max(20, Math.floor(maxLen / STEP));
+  const seedRadius = 0.7;  // start just outside the source sphere
 
-const bodyObjects = [];      // { body, mesh, orbit, radius, speed, phase }
-const orbitLines = [];
-const labels = [];
+  // Precompute source radii so we can stop a streamline cleanly when it
+  // re-enters any source's surface.
+  const sourceRadii = SOURCES.map(s => 0.5 + Math.min(1.5, Math.abs(s.magnitude ?? 1) * 0.2));
 
-sorted.forEach((body, index) => {
-  const preset = presetFor(body.name, body.kind);
-  if (body.kind === "STAR" || body.orbit_position === 0) {
-    const geom = new THREE.SphereGeometry(preset.radius, 48, 48);
-    const mat = new THREE.MeshStandardMaterial({
-      color: preset.color,
-      emissive: preset.emissive ?? 0xaa5500,
-      emissiveIntensity: 1.3,
-      roughness: 1,
-    });
-    const mesh = new THREE.Mesh(geom, mat);
-    mesh.userData.body = body;
-    scene.add(mesh);
+  SOURCES.forEach((src, srcIdx) => {
+    const sourceSign = Math.sign(src.magnitude ?? 1) || 1;
+    // Pick the integration direction so the line ALWAYS emanates from
+    // this source. Without this, gravitational lines (whose field
+    // points inward) collapse into the source and become invisible.
+    //   - gravitational: field points inward → step OUTWARD = -f
+    //   - electric/magnetic positive source: f points outward → step +f
+    //   - electric/magnetic negative source: f points inward (relative
+    //     to that source's contribution) → step against f, but f also
+    //     gets contributions from other sources, so we use sourceSign
+    //     as the per-source dir multiplier.
+    const dirSign = (FIELD_KIND === "gravitational") ? -1 : sourceSign;
 
-    const light = new THREE.PointLight(0xffddaa, 2.5, 0, 0.8);
-    light.position.set(0, 0, 0);
-    scene.add(light);
+    // Distribute seeds on a sphere using golden-spiral so they're
+    // evenly spread without clumping at the poles.
+    const N = density;
+    const phiStep = Math.PI * (3 - Math.sqrt(5));
+    for (let k = 0; k < N; k++) {
+      const y = 1 - (k / (N - 1)) * 2;          // y from 1 to -1
+      const r = Math.sqrt(Math.max(0, 1 - y*y));
+      const theta = phiStep * k;
+      const seedDir = new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r);
+      const seedR = sourceRadii[srcIdx] + 0.08;  // just outside the surface
+      const start = new THREE.Vector3(src.x, src.y, src.z).addScaledVector(seedDir, seedR);
 
-    attachLabel(mesh, body.name);
-    bodyObjects.push({ body, mesh, orbit:0, radius:preset.radius, speed:0, phase:0 });
-  } else {
-    const orbitIndex = body.orbit_position - 1;
-    const radius = orbitStart + orbitStep * orbitIndex;
+      // Walk the streamline. We track filledSteps separately so the
+      // BufferAttribute knows where the real data ends.
+      const positions = new Float32Array(STEPS * 3);
+      const p = start.clone();
+      let filled = 0;
+      for (let i = 0; i < STEPS; i++) {
+        positions[i*3] = p.x; positions[i*3+1] = p.y; positions[i*3+2] = p.z;
+        filled = i + 1;
+        const f = fieldVectorAt(p);
+        f.multiplyScalar(dirSign);
+        const len = f.length();
+        if (len < 1e-3) break;            // stagnation point
+        if (p.length() > 60) break;       // wandered off
+        f.divideScalar(len);              // unit-step direction
+        p.addScaledVector(f, STEP);
+        // Stop if the line has wandered into ANOTHER source — keeps
+        // the picture clean and prevents lines from passing through.
+        let hit = false;
+        for (let j = 0; j < SOURCES.length; j++) {
+          if (j === srcIdx) continue;
+          const o = SOURCES[j];
+          const dx = p.x - o.x, dy = p.y - o.y, dz = p.z - o.z;
+          if (dx*dx + dy*dy + dz*dz < (sourceRadii[j] + 0.05) ** 2) {
+            // Stamp a final point inside the other source so the line
+            // visibly terminates there (rather than ending in midair).
+            positions[filled*3]   = p.x;
+            positions[filled*3+1] = p.y;
+            positions[filled*3+2] = p.z;
+            filled = filled + 1;
+            hit = true; break;
+          }
+        }
+        if (hit) break;
+      }
+      // Need at least 2 vertices for a line to be visible.
+      if (filled < 2) continue;
 
-    const geom = new THREE.SphereGeometry(preset.radius, 32, 32);
-    const mat = new THREE.MeshStandardMaterial({
-      color: preset.color,
-      roughness: 0.75,
-      metalness: 0.05,
-    });
-    const mesh = new THREE.Mesh(geom, mat);
-    const phase = Math.random() * Math.PI * 2;
-    mesh.position.set(radius * Math.cos(phase), 0, radius * Math.sin(phase));
-    mesh.userData.body = body;
-    scene.add(mesh);
-
-    // Optional Saturn-style ring for Saturn or any explicit ring preset.
-    if (preset.ring) {
-      const ring = new THREE.Mesh(
-        new THREE.RingGeometry(preset.radius * 1.4, preset.radius * 2.2, 48),
-        new THREE.MeshBasicMaterial({ color: 0xe5d7b3, side: THREE.DoubleSide, transparent:true, opacity:0.6 }),
-      );
-      ring.rotation.x = -Math.PI / 2.5;
-      mesh.add(ring);
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      // Critical: only draw the actually-filled portion. Without this,
+      // the trailing zero-vertices in `positions` collapse to the
+      // origin and produce phantom lines pointing at (0,0,0).
+      geom.setDrawRange(0, filled);
+      const mat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent:true, opacity:0.7 });
+      const line = new THREE.Line(geom, mat);
+      lineGroup.add(line);
+      linesData.push({ positions, total: filled });
     }
+  });
+}
 
-    // Circular orbit path.
-    const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, Math.PI * 2, false, 0);
-    const points = curve.getPoints(128).map(p => new THREE.Vector3(p.x, 0, p.y));
-    const orbitLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(points),
-      new THREE.LineBasicMaterial({ color: 0x314060, transparent:true, opacity:0.35 }),
-    );
-    scene.add(orbitLine);
-    orbitLines.push(orbitLine);
+// --- Animated "flow" along the lines: bright dashes that march. ----
+// Implemented by cycling each line's draw range. The window size is
+// adapted to each line's total length so SHORT lines still pulse
+// instead of going dark.
+let flowOffset = 0; let flowing = true;
+function tickFlow(dt) {
+  if (!flowing) return;
+  flowOffset = (flowOffset + dt * 30) % 1000;
+  lineGroup.children.forEach((line, i) => {
+    const total = linesData[i]?.total ?? 0;
+    if (total < 2) return;
+    // Window covers ~40% of the line's length, with a sane minimum.
+    const win = Math.max(4, Math.min(total, Math.floor(total * 0.4)));
+    if (total <= win) {
+      // Line is shorter than the window — just show all of it.
+      line.geometry.setDrawRange(0, total);
+      return;
+    }
+    const cycle = total;        // how far the window travels per loop
+    const start = Math.floor(flowOffset) % cycle;
+    const end = Math.min(total, start + win);
+    line.geometry.setDrawRange(start, end - start);
+  });
+}
 
-    attachLabel(mesh, body.name);
-
-    // Outer bodies orbit slower (rough Keplerian flavour).
-    const baseSpeed = 0.35 / Math.sqrt(radius / orbitStart);
-    bodyObjects.push({ body, mesh, orbit:radius, radius:preset.radius, speed:baseSpeed, phase });
+// --- Controls --------------------------------------------------------
+let density = CONFIG.line_density ?? 18;
+let length = CONFIG.line_length ?? 12;
+const densityEl = document.getElementById("density");
+const lengthEl = document.getElementById("length");
+densityEl.value = density; lengthEl.value = length;
+function updateLabels() {
+  document.getElementById("density-val").textContent = `${density}`;
+  document.getElementById("length-val").textContent = `${length}`;
+}
+// Slider values update live (`input`) so the student sees the picture
+// change while dragging — `change` only fires on release, which makes
+// the controls feel dead. Throttling-style debouncing isn't needed:
+// rebuilding 18-line scenes is cheap.
+densityEl.addEventListener("input", () => { density = +densityEl.value; updateLabels(); buildFieldLines(density, length); });
+lengthEl.addEventListener("input", () => { length = +lengthEl.value; updateLabels(); buildFieldLines(density, length); });
+document.getElementById("reset-view").addEventListener("click", () => { controls.reset(); camera.position.set(20, 14, 26); });
+document.getElementById("toggle-anim").addEventListener("click", (e) => {
+  flowing = !flowing;
+  e.target.textContent = flowing ? "Pause flow" : "Resume flow";
+  // When paused, restore each line to its actual filled length (not
+  // Infinity, which would over-draw into the trailing zero-vertices).
+  if (!flowing) {
+    lineGroup.children.forEach((l, i) => {
+      const total = linesData[i]?.total ?? 0;
+      l.geometry.setDrawRange(0, total);
+    });
   }
-
-  void orbitEnd;
-  void index;
 });
 
-function attachLabel(mesh, name) {
-  const div = document.createElement("div");
-  div.textContent = name;
-  div.style.cssText = "color:#e8ecf5; font-size:12px; padding:2px 8px; background:rgba(10,14,25,0.6); border:1px solid rgba(255,255,255,0.15); border-radius:999px; letter-spacing:.2px; white-space:nowrap;";
-  const label = new CSS2DObject(div);
-  label.position.set(0, mesh.geometry.parameters.radius * 1.6 + 0.5, 0);
-  mesh.add(label);
-  labels.push(label);
-}
-
-// ---- Interactivity: click to open info panel ----
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-const infoPanel = document.getElementById("info");
-const infoName = document.getElementById("info-name");
-const infoDesc = document.getElementById("info-desc");
-const infoFact = document.getElementById("info-fact");
-const infoKind = document.getElementById("info-kind");
-document.getElementById("info-close").addEventListener("click", () => infoPanel.classList.remove("open"));
-
-renderer.domElement.addEventListener("click", (event) => {
-  const rect = renderer.domElement.getBoundingClientRect();
-  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  const meshes = bodyObjects.map(b => b.mesh);
-  const hits = raycaster.intersectObjects(meshes, false);
-  if (hits.length === 0) return;
-  const body = hits[0].object.userData.body;
-  openInfo(body);
-});
-
-function openInfo(body) {
-  infoName.textContent = body.name;
-  infoDesc.textContent = body.description;
-  infoFact.textContent = body.fun_fact ? "Did you know? " + body.fun_fact : "";
-  infoKind.textContent = (body.kind || "planet").toLowerCase().replace("_", " ");
-  infoPanel.classList.add("open");
-}
-
-// ---- Controls ----
-let speedMultiplier = 1;
-const speedSlider = document.getElementById("speed");
-const speedVal = document.getElementById("speed-val");
-speedSlider.addEventListener("input", (e) => {
-  speedMultiplier = parseFloat(e.target.value);
-  speedVal.textContent = speedMultiplier.toFixed(2) + "x";
-});
-
-let orbitsVisible = true;
-document.getElementById("toggle-orbits").addEventListener("click", () => {
-  orbitsVisible = !orbitsVisible;
-  orbitLines.forEach(l => (l.visible = orbitsVisible));
-});
-
-let labelsVisible = true;
-document.getElementById("toggle-labels").addEventListener("click", () => {
-  labelsVisible = !labelsVisible;
-  labels.forEach(l => (l.visible = labelsVisible));
-});
-
-document.getElementById("reset-view").addEventListener("click", () => {
-  camera.position.set(0, 14, 28);
-  controls.target.set(0, 0, 0);
-});
-
-// ---- Resize + animate ----
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -296,24 +285,19 @@ window.addEventListener("resize", () => {
   labelRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-const clock = new THREE.Clock();
-function animate() {
-  const dt = clock.getDelta();
-  bodyObjects.forEach(b => {
-    if (b.orbit === 0) {
-      b.mesh.rotation.y += dt * 0.2 * speedMultiplier;
-      return;
-    }
-    b.phase += b.speed * dt * speedMultiplier;
-    b.mesh.position.set(b.orbit * Math.cos(b.phase), 0, b.orbit * Math.sin(b.phase));
-    b.mesh.rotation.y += dt * 0.8 * speedMultiplier;
-  });
+let lastTime = performance.now();
+function loop() {
+  const now = performance.now(); const dt = (now - lastTime) / 1000; lastTime = now;
+  tickFlow(dt);
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
-  requestAnimationFrame(animate);
+  requestAnimationFrame(loop);
 }
-animate();
+
+updateLabels();
+buildFieldLines(density, length);
+loop();
 </script>
 </body>
 </html>
