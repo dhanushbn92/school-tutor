@@ -1,6 +1,6 @@
 # Deploy: GCP Cloud Run + Firebase Hosting
 
-This walks through deploying School Tuter end-to-end on the GCP free tier.
+This walks through deploying School Tutor end-to-end on the GCP free tier.
 
 ```
                       ┌────────────────────────┐
@@ -45,7 +45,7 @@ firebase login
 
 ```bash
 # Pick a unique project ID.
-gcloud projects create school-tuter-prod --name="School Tuter"
+gcloud projects create school-tuter-prod --name="School Tutor"
 gcloud config set project school-tuter-prod
 gcloud config set run/region asia-south1   # or your closest region
 
@@ -69,7 +69,7 @@ gcloud services enable \
 gcloud artifacts repositories create school-tuter \
     --repository-format=docker \
     --location=asia-south1 \
-    --description="School Tuter container images"
+    --description="School Tutor container images"
 
 # Allow `docker push` from your machine (only needed if you build locally).
 gcloud auth configure-docker asia-south1-docker.pkg.dev
@@ -208,7 +208,7 @@ update `scripts/deploy.env` so it includes them, then re-run
 `scripts/deploy_cloud_run.sh`:
 
 ```
-ALLOWED_ORIGINS=https://school-tuter.web.app,https://school-tuter.firebaseapp.com
+ALLOWED_ORIGINS=https://school-tuter.web.app,https://school-tuter.firebaseapp.com,https://school-tutor-hub.web.app,https://school-tutor-hub.firebaseapp.com
 ```
 
 > If you bind a custom domain (e.g. `app.example.com`), add it to

@@ -1,2 +1,2 @@
-"""School Tuter backend package."""
+"""School Tutor backend package."""
 

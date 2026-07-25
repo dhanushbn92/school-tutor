@@ -1,4 +1,4 @@
-# School Tuter — Product Blueprint
+# School Tutor — Product Blueprint
 
 **Status:** active source of truth.
 **Last updated:** 2026-04-25.

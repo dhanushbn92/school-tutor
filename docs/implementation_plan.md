@@ -1,4 +1,4 @@
-# School Tuter — MVP Implementation Plan
+# School Tutor — MVP Implementation Plan
 
 Target: CBSE/NCERT Classes 6–10 tutoring + school-management backend.
 Last updated: 2026-04-23.

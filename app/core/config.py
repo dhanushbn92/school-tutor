@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "School Tuter"
+    app_name: str = "School Tutor"
     environment: str = "local"
     database_url: str = "sqlite:///./school_tuter.db"
     auto_create_tables: bool = True

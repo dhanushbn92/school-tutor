@@ -1,4 +1,4 @@
-# School Tuter — Frontend
+# School Tutor — Frontend
 
 React + TypeScript SPA for teachers, principals, and administrators.
 Consumes the FastAPI backend at the repository root.

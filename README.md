@@ -1,4 +1,4 @@
-# School Tuter Backend
+# School Tutor Backend
 
 FastAPI backend for a CBSE/NCERT school tutor and school-management platform.
 

@@ -37,7 +37,7 @@ def render_worksheet_pdf(
         topMargin=2 * cm,
         bottomMargin=2 * cm,
         title=worksheet.title,
-        author="School Tuter",
+        author="School Tutor",
     )
 
     styles = _build_styles()

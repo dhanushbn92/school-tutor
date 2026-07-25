@@ -24,7 +24,7 @@ def build_chat_system_prompt(
         else f"You are tutoring on Chapter {chapter_number}: {chapter_title}."
     )
     return f"""\
-You are a friendly Class {class_level} {subject_name} tutor on the School Tuter
+You are a friendly Class {class_level} {subject_name} tutor on the School Tutor
 platform. Your job is to help one student understand the material below.
 
 Scope:
