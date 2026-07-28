@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Potential &amp; Capacitance Lab — NIOS Physics Ch14</title>
+<style>
+  :root{
+    --bg:#0e141b; --panel:#161f2a; --panel2:#1d2836; --line:#28374a;
+    --txt:#e7eef6; --muted:#9fb2c6; --accent:#f5a623; --accentdim:#7a5a1f;
+    --pos:#ff6b6b; --neg:#4d9dff; --good:#3ecf8e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:15px; line-height:1.45; -webkit-text-size-adjust:100%;
+  }
+  header{padding:16px 18px 6px;}
+  h1{font-size:1.25rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem}
+  .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;text-align:center;min-width:120px;
+  }
+  .tab.active{background:var(--accent);color:#14202c;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+  .mode{display:none}
+  .mode.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:760px){.grid.two{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:manipulation}
+  .ctrl{margin:10px 0}
+  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .val{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .readout{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}
+  .readout b{color:var(--accent)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>div{flex:1 1 120px}
+  .btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:9px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;
+  }
+  .btn.on{background:var(--accent);color:#14202c;border-color:var(--accent);font-weight:600}
+  .formulas{font-size:.9rem}
+  .formulas div{padding:6px 0;border-bottom:1px dashed var(--line)}
+  .formulas div:last-child{border:none}
+  code{background:var(--panel2);padding:1px 6px;border-radius:6px;color:var(--accent);font-size:.9em}
+  .quiz .q{margin:12px 0;padding:12px;background:var(--panel2);border-radius:12px;border:1px solid var(--line)}
+  .quiz .opts button{display:block;width:100%;text-align:left;margin:5px 0}
+  .quiz .exp{display:none;margin-top:8px;padding:8px 10px;border-radius:8px;background:#12303a;border:1px solid #1c4a5a;font-size:.85rem;color:#cfe9f3}
+  .quiz .exp.show{display:block}
+  .opts button.correct{background:#12402c;border-color:var(--good);color:#c7f2dd}
+  .opts button.wrong{background:#3a1616;border-color:var(--pos);color:#f6cccc}
+  .hint{font-size:.78rem;color:var(--muted);margin-top:6px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+</style>
+</head>
+<body>
+<header>
+  <h1>Potential &amp; Capacitance Lab</h1>
+  <div class="sub">NIOS Class 12 Physics · Ch14 — Electric Potential and Capacitance</div>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-mode="pot">1 · Potential &amp; Equipotentials</div>
+    <div class="tab" data-mode="cap">2 · Parallel-Plate Capacitor</div>
+    <div class="tab" data-mode="net">3 · Series / Parallel</div>
+  </div>
+
+  <!-- MODE 1 -->
+  <section class="mode active" id="mode-pot">
+    <div class="grid two">
+      <div class="panel">
+        <canvas id="cv1" width="560" height="420"></canvas>
+        <div class="legend">
+          <span class="chip"><span class="dot" style="background:var(--pos)"></span>+ charge</span>
+          <span class="chip"><span class="dot" style="background:var(--neg)"></span>− charge</span>
+          <span class="chip"><span class="dot" style="background:#fff"></span>probe</span>
+          <span class="chip">grey rings = equipotentials</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ctrl">
+          <label>Charge Q1 = <span class="val" id="q1v">+5 nC</span></label>
+          <input type="range" id="q1" min="-10" max="10" step="0.5" value="5">
+        </div>
+        <div class="ctrl">
+          <label>Charge Q2 = <span class="val" id="q2v">−5 nC</span></label>
+          <input type="range" id="q2" min="-10" max="10" step="0.5" value="-5">
+        </div>
+        <div class="ctrl">
+          <button class="btn on" id="twoCh">Two charges</button>
+          <button class="btn" id="showField">Field arrows: off</button>
+        </div>
+        <div class="readout">Probe potential <b id="probeV">— V</b><br>
+          <span class="hint">Drag the white probe on the canvas. V = Σ kQ/r.</span></div>
+        <div class="readout hint">Colour map: warm = high (+) potential, cool = low (−). Grey rings are equipotential lines (⊥ to field).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE 2 -->
+  <section class="mode" id="mode-cap">
+    <div class="grid two">
+      <div class="panel"><canvas id="cv2" width="560" height="360"></canvas>
+        <div class="legend"><span class="chip">+Q top plate</span><span class="chip">−Q bottom plate</span><span class="chip">blue = dielectric</span></div>
+      </div>
+      <div class="panel">
+        <div class="ctrl"><label>Plate area A = <span class="val" id="Av">100 cm²</span></label>
+          <input type="range" id="A" min="10" max="400" step="5" value="100"></div>
+        <div class="ctrl"><label>Separation d = <span class="val" id="dv">2.0 mm</span></label>
+          <input type="range" id="d" min="0.5" max="10" step="0.1" value="2"></div>
+        <div class="ctrl"><label>Dielectric constant κ = <span class="val" id="kv">1.0</span></label>
+          <input type="range" id="k" min="1" max="10" step="0.1" value="1"></div>
+        <div class="ctrl"><label>Battery voltage V = <span class="val" id="Vv">12 V</span></label>
+          <input type="range" id="V" min="0" max="50" step="1" value="12"></div>
+        <div class="readout">Capacitance <b id="Cout">— pF</b> &nbsp; (C = κε₀A/d)</div>
+        <div class="readout">Charge <b id="Qout">— nC</b> &nbsp; (Q = CV)</div>
+        <div class="readout">Energy stored <b id="Uout">— J</b> &nbsp; (U = ½CV²)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE 3 -->
+  <section class="mode" id="mode-net">
+    <div class="grid two">
+      <div class="panel"><canvas id="cv3" width="560" height="300"></canvas></div>
+      <div class="panel">
+        <div class="ctrl">
+          <button class="btn on" id="cfgS">Series</button>
+          <button class="btn" id="cfgP">Parallel</button>
+        </div>
+        <div class="ctrl"><label>C₁ = <span class="val" id="c1v">4 pF</span></label>
+          <input type="range" id="c1" min="1" max="20" step="0.5" value="4"></div>
+        <div class="ctrl"><label>C₂ = <span class="val" id="c2v">6 pF</span></label>
+          <input type="range" id="c2" min="1" max="20" step="0.5" value="6"></div>
+        <div class="readout" id="netFormula">—</div>
+        <div class="readout">Equivalent capacitance <b id="ceq">— pF</b></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="panel formulas">
+    <h3 style="margin:0 0 6px">Formulas</h3>
+    <div>Potential of point charge: <code>V = kQ/r</code>, with k = 1/4πε₀ ≈ 9×10⁹ N·m²/C²</div>
+    <div>Capacitance definition: <code>C = Q/V</code></div>
+    <div>Parallel-plate: <code>C = κε₀A/d</code>, ε₀ = 8.854×10⁻¹² F/m</div>
+    <div>Energy stored: <code>U = ½CV² = ½QV = Q²/2C</code></div>
+    <div>Series: <code>1/C = 1/C₁ + 1/C₂</code> &nbsp;·&nbsp; Parallel: <code>C = C₁ + C₂</code></div>
+  </div>
+
+  <div class="panel quiz" id="quiz">
+    <h3 style="margin:0 0 6px">Quick Quiz</h3>
+  </div>
+</div>
+
+<script>
+"use strict";
+const k = 9e9, eps0 = 8.854e-12;
+
+/* ---------- Tabs ---------- */
+const tabs=[...document.querySelectorAll('.tab')];
+const modes={pot:document.getElementById('mode-pot'),cap:document.getElementById('mode-cap'),net:document.getElementById('mode-net')};
+let current='pot';
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  Object.values(modes).forEach(m=>m.classList.remove('active'));
+  current=t.dataset.mode; modes[current].classList.add('active');
+  if(current==='pot') drawPot();
+  if(current==='cap') drawCap();
+  if(current==='net') drawNet();
+}));
+
+/* ---------- Helpers ---------- */
+function fitCanvas(cv){
+  const w=cv.clientWidth||560;
+  const ratio=cv.height/cv.width;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.width=Math.round(w*dpr);
+  cv.height=Math.round(w*ratio*dpr);
+  const ctx=cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,W:w,H:w*ratio};
+}
+function fmt(x){
+  const a=Math.abs(x);
+  if(a===0) return '0';
+  if(a>=1e3||a<1e-2) return x.toExponential(2);
+  return x.toPrecision(3);
+}
+
+/* =========================================================
+   MODE 1 : Potential & equipotentials
+========================================================= */
+const cv1=document.getElementById('cv1');
+const q1s=document.getElementById('q1'), q2s=document.getElementById('q2');
+const twoBtn=document.getElementById('twoCh'), fieldBtn=document.getElementById('showField');
+let twoCharges=true, showField=false;
+// probe position in normalized [0,1] coords
+let probe={x:0.5,y:0.25};
+// scene scale: canvas spans 0.5 m across
+const SCENE_M=0.5;
+
+function charges(){
+  const q1=parseFloat(q1s.value)*1e-9;
+  const q2=parseFloat(q2s.value)*1e-9;
+  const list=[{x:0.34,y:0.55,q:q1}];
+  if(twoCharges) list.push({x:0.66,y:0.55,q:q2});
+  return list;
+}
+function potentialAt(nx,ny,list,W,H){
+  // convert normalized to meters
+  let V=0;
+  for(const c of list){
+    const dx=(nx-c.x)*SCENE_M, dy=(ny-c.y)*(SCENE_M*H/W);
+    const r=Math.max(Math.sqrt(dx*dx+dy*dy),0.012);
+    V+=k*c.q/r;
+  }
+  return V;
+}
+function drawPot(){
+  if(current!=='pot')return;
+  const {ctx,W,H}=fitCanvas(cv1);
+  const list=charges();
+  // color map (coarse grid for speed)
+  const step=6;
+  const img=ctx.createImageData(Math.ceil(W),Math.ceil(H));
+  // find max abs for scaling using samples
+  let maxV=1;
+  for(let sy=0;sy<H;sy+=12)for(let sx=0;sx<W;sx+=12){
+    const v=Math.abs(potentialAt(sx/W,sy/H,list,W,H));
+    if(v>maxV&&v<1e6) maxV=Math.min(v,1e5);
+  }
+  for(let y=0;y<H;y+=step){
+    for(let x=0;x<W;x+=step){
+      const v=potentialAt(x/W,y/H,list,W,H);
+      const t=Math.max(-1,Math.min(1,v/maxV));
+      let r,g,b;
+      if(t>=0){ r=40+t*200; g=30+t*90; b=40; }
+      else { const a=-t; r=30; g=40+a*70; b=60+a*180; }
+      for(let dy=0;dy<step&&y+dy<H;dy++){
+        for(let dx=0;dx<step&&x+dx<W;dx++){
+          const i=((y+dy)*Math.ceil(W)+(x+dx))*4;
+          img.data[i]=r;img.data[i+1]=g;img.data[i+2]=b;img.data[i+3]=255;
+        }
+      }
+    }
+  }
+  ctx.putImageData(img,0,0);
+
+  // equipotential contours (marching over grid, threshold crossing)
+  ctx.strokeStyle='rgba(200,210,220,0.55)';
+  ctx.lineWidth=1;
+  const levels=[];
+  for(let n=1;n<=6;n++){ levels.push(maxV*n/7); levels.push(-maxV*n/7); }
+  const gs=5;
+  const cols=Math.ceil(W/gs), rows=Math.ceil(H/gs);
+  const grid=[];
+  for(let j=0;j<=rows;j++){grid[j]=[];for(let i=0;i<=cols;i++){grid[j][i]=potentialAt((i*gs)/W,(j*gs)/H,list,W,H);}}
+  for(const lv of levels){
+    ctx.beginPath();
+    for(let j=0;j<rows;j++){
+      for(let i=0;i<cols;i++){
+        const a=grid[j][i],b=grid[j][i+1],c=grid[j+1][i];
+        // horizontal crossing
+        if((a-lv)*(b-lv)<0){const f=(lv-a)/(b-a);ctx.moveTo((i+f)*gs,j*gs);ctx.lineTo((i+f)*gs,j*gs+0.5);}
+        // vertical crossing
+        if((a-lv)*(c-lv)<0){const f=(lv-a)/(c-a);ctx.rect(i*gs, (j+f)*gs, 1,1);}
+      }
+    }
+    ctx.stroke();
+  }
+
+  // field arrows
+  if(showField){
+    ctx.strokeStyle='rgba(245,166,35,0.8)';ctx.fillStyle='rgba(245,166,35,0.8)';ctx.lineWidth=1.4;
+    const N=9;
+    for(let iy=1;iy<N;iy++)for(let ix=1;ix<N;ix++){
+      const nx=ix/N, ny=iy/N;
+      let Ex=0,Ey=0;
+      for(const c of list){
+        const dx=(nx-c.x)*SCENE_M, dy=(ny-c.y)*(SCENE_M*H/W);
+        const r=Math.max(Math.sqrt(dx*dx+dy*dy),0.02);
+        const e=k*c.q/(r*r*r);
+        Ex+=e*dx;Ey+=e*dy;
+      }
+      const mag=Math.sqrt(Ex*Ex+Ey*Ey)||1;
+      const ux=Ex/mag,uy=Ey/mag,L=13;
+      const px=nx*W,py=ny*H;
+      ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+ux*L,py+uy*L);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px+ux*L,py+uy*L);
+      ctx.lineTo(px+ux*L-ux*5-uy*3,py+uy*L-uy*5+ux*3);
+      ctx.lineTo(px+ux*L-ux*5+uy*3,py+uy*L-uy*5-ux*3);ctx.closePath();ctx.fill();
+    }
+  }
+
+  // charges
+  for(const c of list){
+    ctx.beginPath();ctx.arc(c.x*W,c.y*H,13,0,7);
+    ctx.fillStyle=c.q>=0?'#ff6b6b':'#4d9dff';ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(c.q>=0?'+':'−',c.x*W,c.y*H);
+  }
+  // probe
+  const px=probe.x*W,py=probe.y*H;
+  ctx.beginPath();ctx.arc(px,py,8,0,7);ctx.fillStyle='#fff';ctx.fill();
+  ctx.strokeStyle='#14202c';ctx.lineWidth=2;ctx.stroke();
+
+  const V=potentialAt(probe.x,probe.y,list,W,H);
+  document.getElementById('probeV').textContent=fmt(V)+' V';
+}
+function updQlabels(){
+  document.getElementById('q1v').textContent=(parseFloat(q1s.value)>=0?'+':'')+q1s.value+' nC';
+  document.getElementById('q2v').textContent=(parseFloat(q2s.value)>=0?'+':'')+q2s.value+' nC';
+}
+q1s.addEventListener('input',()=>{updQlabels();drawPot();});
+q2s.addEventListener('input',()=>{updQlabels();drawPot();});
+twoBtn.addEventListener('click',()=>{twoCharges=!twoCharges;twoBtn.classList.toggle('on',twoCharges);twoBtn.textContent=twoCharges?'Two charges':'One charge';q2s.disabled=!twoCharges;drawPot();});
+fieldBtn.addEventListener('click',()=>{showField=!showField;fieldBtn.classList.toggle('on',showField);fieldBtn.textContent='Field arrows: '+(showField?'on':'off');drawPot();});
+
+// probe dragging
+function ptFromEvent(e,cv){
+  const r=cv.getBoundingClientRect();
+  const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+  const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+  return {x:Math.max(0,Math.min(1,cx/r.width)),y:Math.max(0,Math.min(1,cy/r.height))};
+}
+let dragging=false;
+function startDrag(e){dragging=true;probe=ptFromEvent(e,cv1);drawPot();e.preventDefault();}
+function moveDrag(e){if(!dragging)return;probe=ptFromEvent(e,cv1);drawPot();e.preventDefault();}
+function endDrag(){dragging=false;}
+cv1.addEventListener('mousedown',startDrag);window.addEventListener('mousemove',moveDrag);window.addEventListener('mouseup',endDrag);
+cv1.addEventListener('touchstart',startDrag,{passive:false});cv1.addEventListener('touchmove',moveDrag,{passive:false});cv1.addEventListener('touchend',endDrag);
+
+/* =========================================================
+   MODE 2 : Parallel-plate capacitor
+========================================================= */
+const cv2=document.getElementById('cv2');
+const As=document.getElementById('A'),ds=document.getElementById('d'),ks=document.getElementById('k'),Vs=document.getElementById('V');
+function computeCap(){
+  const A=parseFloat(As.value)*1e-4;      // cm^2 -> m^2
+  const d=parseFloat(ds.value)*1e-3;      // mm -> m
+  const kap=parseFloat(ks.value);
+  const V=parseFloat(Vs.value);
+  const C=kap*eps0*A/d;                    // farads
+  const Q=C*V;                             // coulombs
+  const U=0.5*C*V*V;                       // joules
+  return {A,d,kap,V,C,Q,U};
+}
+function drawCap(){
+  if(current!=='cap')return;
+  const {ctx,W,H}=fitCanvas(cv2);
+  const s=computeCap();
+  ctx.clearRect(0,0,W,H);
+  const cx=W*0.5, plateW=Math.min(W*0.6, 120+parseFloat(As.value)*0.55);
+  const gap=Math.max(14, parseFloat(ds.value)*11);
+  const topY=H/2-gap/2, botY=H/2+gap/2;
+  const x0=cx-plateW/2, x1=cx+plateW/2;
+  // dielectric fill
+  if(s.kap>1.01){
+    ctx.fillStyle='rgba(77,157,255,'+(0.10+0.05*Math.min(s.kap,10))+')';
+    ctx.fillRect(x0,topY,plateW,botY-topY);
+  }
+  // field lines between plates (only if charged)
+  if(s.V>0){
+    ctx.strokeStyle='rgba(245,166,35,0.6)';ctx.lineWidth=1.2;
+    const n=Math.max(3,Math.floor(plateW/26));
+    for(let i=0;i<n;i++){
+      const x=x0+plateW*(i+0.5)/n;
+      ctx.beginPath();ctx.moveTo(x,topY+3);ctx.lineTo(x,botY-3);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x,botY-3);ctx.lineTo(x-4,botY-9);ctx.lineTo(x+4,botY-9);ctx.closePath();
+      ctx.fillStyle='rgba(245,166,35,0.6)';ctx.fill();
+    }
+  }
+  // plates
+  ctx.fillStyle='#ff6b6b';ctx.fillRect(x0,topY-6,plateW,6);
+  ctx.fillStyle='#4d9dff';ctx.fillRect(x0,botY,plateW,6);
+  ctx.fillStyle='#e7eef6';ctx.font='13px system-ui';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  ctx.fillText('+Q',x1+18,topY);
+  ctx.fillText('−Q',x1+18,botY+8);
+  // separation marker
+  ctx.strokeStyle='#9fb2c6';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x0-16,topY);ctx.lineTo(x0-16,botY);ctx.stroke();
+  ctx.fillStyle='#9fb2c6';ctx.textAlign='right';
+  ctx.fillText('d',x0-20,H/2+4);
+  // battery symbol
+  ctx.strokeStyle='#e7eef6';ctx.lineWidth=1.5;
+  const by=H-30;
+  ctx.beginPath();ctx.moveTo(x0+plateW*0.5,topY-6);ctx.lineTo(x0+plateW*0.5,20);ctx.stroke();
+  ctx.fillStyle='#9fb2c6';ctx.textAlign='center';
+  ctx.fillText(s.V.toFixed(0)+' V battery',cx,14);
+
+  // readouts (SI-friendly units)
+  document.getElementById('Av').textContent=As.value+' cm²';
+  document.getElementById('dv').textContent=parseFloat(ds.value).toFixed(1)+' mm';
+  document.getElementById('kv').textContent=parseFloat(ks.value).toFixed(1);
+  document.getElementById('Vv').textContent=s.V.toFixed(0)+' V';
+  document.getElementById('Cout').textContent=(s.C*1e12).toPrecision(3)+' pF';
+  document.getElementById('Qout').textContent=(s.Q*1e9).toPrecision(3)+' nC';
+  document.getElementById('Uout').textContent=fmt(s.U)+' J';
+}
+[As,ds,ks,Vs].forEach(el=>el.addEventListener('input',drawCap));
+
+/* =========================================================
+   MODE 3 : Series / Parallel
+========================================================= */
+const cv3=document.getElementById('cv3');
+const c1s=document.getElementById('c1'),c2s=document.getElementById('c2');
+const cfgS=document.getElementById('cfgS'),cfgP=document.getElementById('cfgP');
+let series=true;
+function capSym(ctx,x,y,label,color){
+  ctx.strokeStyle=color;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(x-8,y-14);ctx.lineTo(x-8,y+14);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+8,y-14);ctx.lineTo(x+8,y+14);ctx.stroke();
+  ctx.fillStyle='#e7eef6';ctx.font='12px system-ui';ctx.textAlign='center';
+  ctx.fillText(label,x,y-22);
+}
+function drawNet(){
+  if(current!=='net')return;
+  const {ctx,W,H}=fitCanvas(cv3);
+  ctx.clearRect(0,0,W,H);
+  const c1=parseFloat(c1s.value),c2=parseFloat(c2s.value);
+  ctx.strokeStyle='#9fb2c6';ctx.lineWidth=2;
+  if(series){
+    const y=H/2;
+    ctx.beginPath();ctx.moveTo(W*0.1,y);ctx.lineTo(W*0.32,y);ctx.stroke();
+    capSym(ctx,W*0.36,y,'C₁='+c1+' pF','#f5a623');
+    ctx.beginPath();ctx.moveTo(W*0.40,y);ctx.lineTo(W*0.60,y);ctx.stroke();
+    capSym(ctx,W*0.64,y,'C₂='+c2+' pF','#3ecf8e');
+    ctx.beginPath();ctx.moveTo(W*0.68,y);ctx.lineTo(W*0.9,y);ctx.stroke();
+    // terminals
+    ctx.fillStyle='#e7eef6';ctx.beginPath();ctx.arc(W*0.1,y,4,0,7);ctx.arc(W*0.9,y,4,0,7);ctx.fill();
+  } else {
+    const y1=H*0.32,y2=H*0.68,xL=W*0.18,xR=W*0.82;
+    ctx.beginPath();ctx.moveTo(xL,H/2);ctx.lineTo(xL,y1);ctx.lineTo(W*0.42,y1);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*0.5,y1);ctx.lineTo(xR,y1);ctx.lineTo(xR,H/2);ctx.stroke();
+    capSym(ctx,W*0.46,y1,'C₁='+c1+' pF','#f5a623');
+    ctx.beginPath();ctx.moveTo(xL,H/2);ctx.lineTo(xL,y2);ctx.lineTo(W*0.42,y2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*0.5,y2);ctx.lineTo(xR,y2);ctx.lineTo(xR,H/2);ctx.stroke();
+    capSym(ctx,W*0.46,y2,'C₂='+c2+' pF','#3ecf8e');
+    ctx.beginPath();ctx.moveTo(W*0.08,H/2);ctx.lineTo(xL,H/2);ctx.moveTo(xR,H/2);ctx.lineTo(W*0.92,H/2);ctx.stroke();
+    ctx.fillStyle='#e7eef6';ctx.beginPath();ctx.arc(W*0.08,H/2,4,0,7);ctx.arc(W*0.92,H/2,4,0,7);ctx.fill();
+  }
+  let ceq,txt;
+  if(series){ceq=1/(1/c1+1/c2);txt='1/C = 1/C₁ + 1/C₂ = 1/'+c1+' + 1/'+c2;}
+  else {ceq=c1+c2;txt='C = C₁ + C₂ = '+c1+' + '+c2;}
+  document.getElementById('c1v').textContent=c1+' pF';
+  document.getElementById('c2v').textContent=c2+' pF';
+  document.getElementById('netFormula').textContent=txt;
+  document.getElementById('ceq').textContent=ceq.toPrecision(3)+' pF';
+}
+[c1s,c2s].forEach(el=>el.addEventListener('input',drawNet));
+cfgS.addEventListener('click',()=>{series=true;cfgS.classList.add('on');cfgP.classList.remove('on');drawNet();});
+cfgP.addEventListener('click',()=>{series=false;cfgP.classList.add('on');cfgS.classList.remove('on');drawNet();});
+
+/* =========================================================
+   Quiz
+========================================================= */
+const QUIZ=[
+  {q:"Two identical parallel-plate capacitors, one with air and one filled with a dielectric κ=4, have the same A, d and V. Which stores more charge?",
+   opts:["The air one","The dielectric one","Both store equal charge","Neither stores charge"],
+   ans:1, exp:"C = κε₀A/d, so κ=4 gives 4× the capacitance and Q = CV is 4× larger."},
+  {q:"Two capacitors 3 pF and 6 pF are connected in series. The equivalent capacitance is:",
+   opts:["9 pF","2 pF","4.5 pF","18 pF"],
+   ans:1, exp:"1/C = 1/3 + 1/6 = 1/2, so C = 2 pF. Series capacitance is always less than the smallest."},
+  {q:"If the voltage across a fixed capacitor is doubled, the energy stored U = ½CV² becomes:",
+   opts:["Doubled","Halved","Four times larger","Unchanged"],
+   ans:2, exp:"U ∝ V², so doubling V multiplies the energy by 2² = 4."}
+];
+const quizBox=document.getElementById('quiz');
+QUIZ.forEach((item,qi)=>{
+  const d=document.createElement('div');d.className='q';
+  d.innerHTML='<div><b>Q'+(qi+1)+'.</b> '+item.q+'</div>';
+  const opts=document.createElement('div');opts.className='opts';
+  item.opts.forEach((o,oi)=>{
+    const b=document.createElement('button');b.className='btn';b.textContent=String.fromCharCode(65+oi)+'. '+o;
+    b.addEventListener('click',()=>{
+      [...opts.children].forEach(c=>{c.disabled=true;});
+      [...opts.children].forEach((c,ci)=>{if(ci===item.ans)c.classList.add('correct');});
+      if(oi!==item.ans) b.classList.add('wrong');
+      exp.classList.add('show');
+    });
+    opts.appendChild(b);
+  });
+  d.appendChild(opts);
+  const exp=document.createElement('div');exp.className='exp';exp.textContent='Answer: '+String.fromCharCode(65+item.ans)+'. '+item.exp;
+  d.appendChild(exp);
+  quizBox.appendChild(d);
+});
+
+/* ---------- init / lifecycle ---------- */
+function redrawCurrent(){
+  if(document.hidden)return;
+  if(current==='pot')drawPot();
+  else if(current==='cap')drawCap();
+  else drawNet();
+}
+window.addEventListener('resize',redrawCurrent);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)redrawCurrent();});
+updQlabels();
+drawPot();
+</script>
+</body>
+</html>

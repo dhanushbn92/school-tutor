@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waves Lab — NIOS Class 12 Physics (Ch 12)</title>
+<style>
+  :root{
+    --bg:#0e1622;
+    --panel:#152233;
+    --panel2:#1b2c42;
+    --edge:#263a54;
+    --ink:#e7eefa;
+    --muted:#93a6c0;
+    --accent:#5eb3ff;
+    --accent-dim:#2f6ea8;
+    --warn:#f6ad55;
+    --good:#68d391;
+    --bad:#fc8181;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 6px;max-width:1080px;margin:0 auto}
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 8px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px}
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent-dim)}
+  .tab.active{background:var(--accent);color:#04213f;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--edge);border-radius:16px;padding:16px;margin-bottom:16px}
+  .view{display:none}
+  .view.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+  canvas{
+    width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--edge);border-radius:12px;touch-action:manipulation;
+  }
+  .controls label{display:block;font-size:.82rem;color:var(--muted);margin:12px 0 4px}
+  .controls label b{color:var(--ink);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px;margin-top:14px}
+  .stat{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:10px}
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--accent)}
+  .stat .u{font-size:.72rem;color:var(--muted)}
+  .btn{
+    background:var(--panel2);border:1px solid var(--edge);color:var(--ink);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:.85rem;margin:8px 6px 0 0;
+  }
+  .btn:hover{border-color:var(--accent-dim)}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .seg .btn.on{background:var(--accent);color:#04213f;border-color:var(--accent);font-weight:600}
+  .formulas{font-size:.9rem}
+  .formulas .row{background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:10px 12px;margin:8px 0}
+  .formulas code{color:var(--accent);font-size:1rem;font-family:"Cambria Math",Georgia,serif}
+  .formulas .d{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .quiz .q{margin:16px 0;border-top:1px solid var(--edge);padding-top:14px}
+  .quiz .q:first-child{border-top:0;padding-top:0}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;background:var(--panel2);
+    border:1px solid var(--edge);color:var(--ink);padding:9px 12px;border-radius:10px;
+    margin:6px 0;cursor:pointer;font-size:.88rem;transition:.12s;
+  }
+  .quiz .opt:hover{border-color:var(--accent-dim)}
+  .quiz .opt.correct{border-color:var(--good);background:#173225}
+  .quiz .opt.wrong{border-color:var(--bad);background:#331a1a}
+  .quiz .exp{
+    display:none;margin-top:8px;font-size:.85rem;color:var(--muted);
+    background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;padding:8px 12px;
+  }
+  .quiz .exp.show{display:block}
+  .note{color:var(--muted);font-size:.82rem;margin-top:6px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Waves Lab</h1>
+  <p class="sub">NIOS Class 12 Physics · Chapter 12 — Wave Phenomena</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="trav">1 · Travelling Wave</button>
+    <button class="tab" data-view="super">2 · Superposition &amp; Standing</button>
+    <button class="tab" data-view="beats">3 · Beats</button>
+    <button class="tab" data-view="learn">Formulas &amp; Quiz</button>
+  </div>
+
+  <!-- VIEW 1: TRAVELLING WAVE -->
+  <section class="view active" id="view-trav">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="travCanvas" width="640" height="380" aria-label="Animated travelling wave"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>wave / medium particles</span>
+          <span><i style="background:var(--warn)"></i>tracked particle (oscillates in place)</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <label>Amplitude A: <b><span id="tA">40</span> px</b></label>
+        <input id="tAr" type="range" min="10" max="70" step="1" value="40">
+        <label>Frequency f: <b><span id="tF">1.0</span> Hz</b></label>
+        <input id="tFr" type="range" min="0.2" max="3" step="0.1" value="1">
+        <label>Wavelength λ: <b><span id="tW">160</span> px</b></label>
+        <input id="tWr" type="range" min="60" max="320" step="5" value="160">
+        <div class="seg" role="group" aria-label="Wave type">
+          <button class="btn on" id="tTrans">Transverse</button>
+          <button class="btn" id="tLong">Longitudinal</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">Frequency f</div><div class="v"><span id="tF2">1.0</span></div><div class="u">Hz</div></div>
+          <div class="stat"><div class="k">Wavelength λ</div><div class="v"><span id="tW2">160</span></div><div class="u">px</div></div>
+          <div class="stat"><div class="k">Speed v = fλ</div><div class="v"><span id="tV">160</span></div><div class="u">px/s</div></div>
+          <div class="stat"><div class="k">Period T = 1/f</div><div class="v"><span id="tT">1.00</span></div><div class="u">s</div></div>
+        </div>
+        <button class="btn" id="tPause">Pause</button>
+        <p class="note">A transverse wave (like a string) has particle motion perpendicular to travel. A longitudinal wave (like sound) moves particles along the direction of travel, forming <b>compressions</b> and <b>rarefactions</b>. In both, energy travels but each particle just oscillates about its rest position. Note v = fλ holds live.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: SUPERPOSITION & STANDING -->
+  <section class="view" id="view-super">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="supCanvas" width="640" height="420" aria-label="Superposition and standing waves"></canvas>
+        <div class="legend">
+          <span><i style="background:#7c8db0"></i>wave 1</span>
+          <span><i style="background:var(--warn)"></i>wave 2</span>
+          <span><i style="background:var(--accent)"></i>resultant (sum)</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <div class="seg" role="group" aria-label="Mode">
+          <button class="btn on" id="sInterf">Two-wave interference</button>
+          <button class="btn" id="sStand">Standing wave on string</button>
+        </div>
+
+        <div id="interfCtl">
+          <label>Phase difference Δφ: <b><span id="sPhi">0</span>°</b></label>
+          <input id="sPhir" type="range" min="0" max="360" step="5" value="0">
+          <label>Wavelength λ: <b><span id="sW">160</span> px</b></label>
+          <input id="sWr" type="range" min="80" max="300" step="5" value="160">
+          <div class="readout">
+            <div class="stat"><div class="k">Δφ</div><div class="v"><span id="sPhi2">0</span></div><div class="u">deg</div></div>
+            <div class="stat"><div class="k">Result</div><div class="v" style="font-size:.95rem"><span id="sType">Constructive</span></div><div class="u">interference</div></div>
+          </div>
+          <p class="note">Two identical waves add by the <b>principle of superposition</b>. In phase (Δφ = 0°) → constructive, amplitude doubles. Out of phase (Δφ = 180°) → destructive, they cancel.</p>
+        </div>
+
+        <div id="standCtl" style="display:none">
+          <label>Harmonic n:</label>
+          <div class="seg" role="group" aria-label="Harmonic">
+            <button class="btn on" data-n="1">n = 1 (fundamental)</button>
+            <button class="btn" data-n="2">n = 2</button>
+            <button class="btn" data-n="3">n = 3</button>
+          </div>
+          <div class="readout">
+            <div class="stat"><div class="k">Harmonic</div><div class="v"><span id="sn">1</span></div><div class="u">n</div></div>
+            <div class="stat"><div class="k">Nodes</div><div class="v"><span id="snodes">2</span></div><div class="u">count</div></div>
+            <div class="stat"><div class="k">Antinodes</div><div class="v"><span id="santi">1</span></div><div class="u">count</div></div>
+            <div class="stat"><div class="k">Freq f_n = nv/2L</div><div class="v"><span id="sfn">1</span></div><div class="u">×f₁</div></div>
+          </div>
+          <p class="note">A standing wave forms when a wave reflects and superposes with itself. <b>Nodes</b> (○) never move; <b>antinodes</b> swing most. String fixed at both ends of length L: fₙ = nv/2L, so overtones are integer multiples of the fundamental f₁.</p>
+        </div>
+        <button class="btn" id="sPause">Pause</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: BEATS -->
+  <section class="view" id="view-beats">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="beatCanvas" width="640" height="420" aria-label="Beats from two close frequencies"></canvas>
+        <div class="legend">
+          <span><i style="background:#7c8db0"></i>tone f₁</span>
+          <span><i style="background:var(--warn)"></i>tone f₂</span>
+          <span><i style="background:var(--accent)"></i>sum</span>
+          <span><i style="background:var(--good)"></i>beat envelope</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <label>Frequency f₁: <b><span id="bF1">10.0</span> Hz</b></label>
+        <input id="bF1r" type="range" min="6" max="14" step="0.1" value="10">
+        <label>Frequency f₂: <b><span id="bF2">11.0</span> Hz</b></label>
+        <input id="bF2r" type="range" min="6" max="14" step="0.1" value="11">
+        <div class="readout">
+          <div class="stat"><div class="k">f₁</div><div class="v"><span id="bF1v">10.0</span></div><div class="u">Hz</div></div>
+          <div class="stat"><div class="k">f₂</div><div class="v"><span id="bF2v">11.0</span></div><div class="u">Hz</div></div>
+          <div class="stat"><div class="k">Beat freq |f₁−f₂|</div><div class="v"><span id="bBeat">1.0</span></div><div class="u">Hz</div></div>
+          <div class="stat"><div class="k">Beat period</div><div class="v"><span id="bTb">1.00</span></div><div class="u">s</div></div>
+        </div>
+        <button class="btn" id="bPause">Pause</button>
+        <p class="note">Two tones of nearly equal frequency superpose. Their amplitude slowly rises and falls — the loud–soft–loud cycle is a <b>beat</b>. You hear one beat each time the envelope peaks, at rate f_beat = |f₁ − f₂|. Set f₁ = f₂ and the beats vanish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: FORMULAS & QUIZ -->
+  <section class="view" id="view-learn">
+    <div class="grid">
+      <div class="panel formulas">
+        <h2 style="margin:0 0 6px;font-size:1.05rem">Key formulas</h2>
+        <div class="row"><code>v = f λ</code><div class="d">Wave speed = frequency × wavelength. Also v = λ/T, since T = 1/f.</div></div>
+        <div class="row"><code>y = A sin(kx − ωt)</code><div class="d">Travelling wave; k = 2π/λ (wave number), ω = 2πf (angular frequency).</div></div>
+        <div class="row"><code>fₙ = n v / 2L</code><div class="d">Harmonics of a string fixed at both ends (n = 1, 2, 3…). n = 1 is the fundamental; L = length.</div></div>
+        <div class="row"><code>nodes = n + 1,&nbsp; antinodes = n</code><div class="d">For the nth harmonic on a string fixed at both ends. Adjacent node–node spacing = λ/2.</div></div>
+        <div class="row"><code>f_beat = | f₁ − f₂ |</code><div class="d">Number of beats heard per second when two close frequencies superpose.</div></div>
+      </div>
+      <div class="panel quiz" id="quiz">
+        <h2 style="margin:0 0 6px;font-size:1.05rem">Quick quiz</h2>
+        <p class="note">Tap an answer to check it and reveal the explanation.</p>
+
+        <div class="q" data-correct="1">
+          <p><b>1.</b> A wave has frequency 2 Hz and wavelength 3 m. Its speed is:</p>
+          <button class="opt">1.5 m/s</button>
+          <button class="opt">6 m/s</button>
+          <button class="opt">0.67 m/s</button>
+          <div class="exp">v = fλ = 2 × 3 = 6 m/s.</div>
+        </div>
+
+        <div class="q" data-correct="2">
+          <p><b>2.</b> Two identical waves meet exactly out of phase (Δφ = 180°). The result is:</p>
+          <button class="opt">Amplitude doubles (constructive)</button>
+          <button class="opt">Frequency doubles</button>
+          <button class="opt">They cancel (destructive)</button>
+          <div class="exp">Crest meets trough, so displacements cancel — destructive interference.</div>
+        </div>
+
+        <div class="q" data-correct="0">
+          <p><b>3.</b> A tuning fork of 256 Hz sounds with another and 4 beats/s are heard. The other fork's frequency could be:</p>
+          <button class="opt">252 Hz or 260 Hz</button>
+          <button class="opt">256 Hz only</button>
+          <button class="opt">512 Hz</button>
+          <div class="exp">f_beat = |f₁ − f₂| = 4, so the other fork is 256 ± 4 = 252 Hz or 260 Hz.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TAU = Math.PI * 2;
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll('.tab');
+  var views = document.querySelectorAll('.view');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('active'); });
+      views.forEach(function(v){ v.classList.remove('active'); });
+      t.classList.add('active');
+      document.getElementById('view-' + t.dataset.view).classList.add('active');
+    });
+  });
+
+  function $(id){ return document.getElementById(id); }
+
+  /* ---------- shared timing ---------- */
+  var running = !document.hidden;
+  var last = performance.now();
+  var t = 0; // seconds of animation
+
+  /* =========================================================
+     VIEW 1 — TRAVELLING WAVE
+  ========================================================= */
+  var tc = $('travCanvas'), tx = tc.getContext('2d');
+  var tState = { A:40, f:1, w:160, longitudinal:false, paused:false };
+  function tBind(id, key, spanId, fmt){
+    var el = $(id);
+    el.addEventListener('input', function(){
+      tState[key] = parseFloat(el.value);
+      $(spanId).textContent = fmt(tState[key]);
+      tUpdateStats();
+    });
+  }
+  tBind('tAr','A','tA',function(v){return v.toFixed(0);});
+  tBind('tFr','f','tF',function(v){return v.toFixed(1);});
+  tBind('tWr','w','tW',function(v){return v.toFixed(0);});
+  function tUpdateStats(){
+    $('tF2').textContent = tState.f.toFixed(1);
+    $('tW2').textContent = tState.w.toFixed(0);
+    $('tV').textContent = (tState.f * tState.w).toFixed(0);
+    $('tT').textContent = (1/tState.f).toFixed(2);
+  }
+  tUpdateStats();
+  $('tTrans').addEventListener('click', function(){
+    tState.longitudinal=false; $('tTrans').classList.add('on'); $('tLong').classList.remove('on');
+  });
+  $('tLong').addEventListener('click', function(){
+    tState.longitudinal=true; $('tLong').classList.add('on'); $('tTrans').classList.remove('on');
+  });
+  $('tPause').addEventListener('click', function(){
+    tState.paused = !tState.paused; $('tPause').textContent = tState.paused ? 'Play' : 'Pause';
+  });
+
+  function drawTrav(){
+    var W = tc.width, H = tc.height, mid = H/2;
+    tx.clearRect(0,0,W,H);
+    var k = TAU / tState.w, w = TAU * tState.f;
+    // axis
+    tx.strokeStyle = '#2a405c'; tx.lineWidth = 1;
+    tx.beginPath(); tx.moveTo(0,mid); tx.lineTo(W,mid); tx.stroke();
+
+    if(!tState.longitudinal){
+      // transverse: continuous curve
+      tx.strokeStyle = getCSS('--accent'); tx.lineWidth = 3;
+      tx.beginPath();
+      for(var x=0; x<=W; x+=2){
+        var y = mid - tState.A * Math.sin(k*x - w*t);
+        if(x===0) tx.moveTo(x,y); else tx.lineTo(x,y);
+      }
+      tx.stroke();
+      // tracked particle at x = trackX
+      var trackX = W*0.5;
+      var ty = mid - tState.A * Math.sin(k*trackX - w*t);
+      tx.strokeStyle = 'rgba(246,173,85,.35)'; tx.setLineDash([4,4]);
+      tx.beginPath(); tx.moveTo(trackX, mid-tState.A-8); tx.lineTo(trackX, mid+tState.A+8); tx.stroke();
+      tx.setLineDash([]);
+      dot(tx, trackX, ty, getCSS('--warn'), 7);
+    } else {
+      // longitudinal: rows of particles displaced along x (compressions/rarefactions)
+      var rows = 5, cols = 90;
+      var spacing = W/cols;
+      for(var r=0;r<rows;r++){
+        var yy = mid + (r-(rows-1)/2) * 26;
+        for(var c=0;c<cols;c++){
+          var x0 = c*spacing + spacing/2;
+          var disp = (tState.A*0.7) * Math.sin(k*x0 - w*t);
+          var px = x0 + disp;
+          var track = (r===2 && c===Math.round(cols*0.5));
+          dot(tx, px, yy, track?getCSS('--warn'):getCSS('--accent'), track?5.5:3);
+        }
+      }
+      // label a compression
+      tx.fillStyle = getCSS('--muted'); tx.font = '12px system-ui';
+      tx.fillText('compressions & rarefactions →', 10, 20);
+    }
+  }
+
+  /* =========================================================
+     VIEW 2 — SUPERPOSITION & STANDING WAVES
+  ========================================================= */
+  var sc = $('supCanvas'), sx = sc.getContext('2d');
+  var sState = { mode:'interf', phi:0, w:160, n:1, paused:false };
+  $('sPhir').addEventListener('input', function(){
+    sState.phi = parseFloat(this.value);
+    $('sPhi').textContent = sState.phi; $('sPhi2').textContent = sState.phi;
+    updInterfType();
+  });
+  $('sWr').addEventListener('input', function(){
+    sState.w = parseFloat(this.value); $('sW').textContent = sState.w.toFixed(0);
+  });
+  function updInterfType(){
+    var p = sState.phi;
+    var label;
+    if(p<=30 || p>=330) label='Constructive';
+    else if(p>=150 && p<=210) label='Destructive';
+    else label='Partial';
+    $('sType').textContent = label;
+  }
+  updInterfType();
+  $('sInterf').addEventListener('click', function(){
+    sState.mode='interf'; $('sInterf').classList.add('on'); $('sStand').classList.remove('on');
+    $('interfCtl').style.display=''; $('standCtl').style.display='none';
+  });
+  $('sStand').addEventListener('click', function(){
+    sState.mode='stand'; $('sStand').classList.add('on'); $('sInterf').classList.remove('on');
+    $('interfCtl').style.display='none'; $('standCtl').style.display='';
+  });
+  var nbtns = document.querySelectorAll('#standCtl [data-n]');
+  nbtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      nbtns.forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      sState.n = parseInt(b.dataset.n,10);
+      $('sn').textContent = sState.n;
+      $('snodes').textContent = sState.n + 1;
+      $('santi').textContent = sState.n;
+      $('sfn').textContent = sState.n;
+    });
+  });
+  $('sPause').addEventListener('click', function(){
+    sState.paused = !sState.paused; $('sPause').textContent = sState.paused ? 'Play' : 'Pause';
+  });
+
+  function drawSuper(){
+    var W = sc.width, H = sc.height, mid = H/2;
+    sx.clearRect(0,0,W,H);
+    sx.strokeStyle='#2a405c'; sx.lineWidth=1;
+    sx.beginPath(); sx.moveTo(0,mid); sx.lineTo(W,mid); sx.stroke();
+
+    if(sState.mode==='interf'){
+      var k = TAU / sState.w, w = TAU * 1.0, A = 34;
+      var phi = sState.phi * Math.PI/180;
+      // wave 1
+      curve(sx, W, function(x){ return mid - A*Math.sin(k*x - w*t); }, '#7c8db0', 2);
+      // wave 2 (phase shifted)
+      curve(sx, W, function(x){ return mid - A*Math.sin(k*x - w*t + phi); }, getCSS('--warn'), 2);
+      // resultant
+      curve(sx, W, function(x){ return mid - (A*Math.sin(k*x - w*t) + A*Math.sin(k*x - w*t + phi)); }, getCSS('--accent'), 3.2);
+    } else {
+      // standing wave on a string fixed at both ends, length L = W
+      var n = sState.n, A = 70;
+      var kk = n * Math.PI / W;         // ensures nodes at x=0 and x=W
+      var w2 = TAU * 0.8;
+      var env = Math.cos(w2*t);         // temporal oscillation
+      // faint envelope (max displacement outline)
+      curve(sx, W, function(x){ return mid - A*Math.sin(kk*x); }, 'rgba(94,179,255,.22)', 1.4);
+      curve(sx, W, function(x){ return mid + A*Math.sin(kk*x); }, 'rgba(94,179,255,.22)', 1.4);
+      // instantaneous string
+      curve(sx, W, function(x){ return mid - A*Math.sin(kk*x)*env; }, getCSS('--accent'), 3.4);
+      // nodes (n+1) and antinodes (n)
+      for(var i=0;i<=n;i++){
+        var xn = i*W/n;
+        ring(sx, xn, mid, getCSS('--muted'), 6);
+      }
+      for(var j=0;j<n;j++){
+        var xa = (j+0.5)*W/n;
+        var ya = mid - A*Math.sin(kk*xa)*env;
+        dot(sx, xa, ya, getCSS('--warn'), 6);
+      }
+      // fixed ends
+      sx.fillStyle=getCSS('--muted'); sx.font='12px system-ui';
+      sx.fillText('fixed', 4, mid-A-14); sx.fillText('fixed', W-40, mid-A-14);
+      sx.fillText('○ nodes   ● antinodes', 10, H-12);
+    }
+  }
+
+  /* =========================================================
+     VIEW 3 — BEATS
+  ========================================================= */
+  var bc = $('beatCanvas'), bx = bc.getContext('2d');
+  var bState = { f1:10, f2:11, paused:false };
+  function bUpd(){
+    $('bF1').textContent = bState.f1.toFixed(1); $('bF1v').textContent = bState.f1.toFixed(1);
+    $('bF2').textContent = bState.f2.toFixed(1); $('bF2v').textContent = bState.f2.toFixed(1);
+    var fb = Math.abs(bState.f1 - bState.f2);
+    $('bBeat').textContent = fb.toFixed(1);
+    $('bTb').textContent = fb>0 ? (1/fb).toFixed(2) : '∞';
+  }
+  $('bF1r').addEventListener('input', function(){ bState.f1=parseFloat(this.value); bUpd(); });
+  $('bF2r').addEventListener('input', function(){ bState.f2=parseFloat(this.value); bUpd(); });
+  bUpd();
+  $('bPause').addEventListener('click', function(){
+    bState.paused=!bState.paused; $('bPause').textContent = bState.paused ? 'Play' : 'Pause';
+  });
+
+  function drawBeats(){
+    var W = bc.width, H = bc.height, mid = H/2;
+    bx.clearRect(0,0,W,H);
+    // scaled time axis: show a fixed window; map x to a time coordinate
+    var winSec = 2.0;                 // seconds displayed across width
+    var scale = 40;                   // pixels per unit amplitude (A=1)
+    var top1 = H*0.22, top2 = H*0.5, top3 = H*0.8;
+    // three lanes: f1, f2, sum. Draw guide lines
+    bx.strokeStyle='#2a405c'; bx.lineWidth=1;
+    [top1,top2,top3].forEach(function(yy){ bx.beginPath(); bx.moveTo(0,yy); bx.lineTo(W,yy); bx.stroke(); });
+
+    var f1=bState.f1, f2=bState.f2;
+    // tone 1
+    curve(bx, W, function(x){ var tt=t + (x/W)*winSec; return top1 - 22*Math.sin(TAU*f1*tt); }, '#7c8db0', 2);
+    bx.fillStyle=getCSS('--muted'); bx.font='12px system-ui';
+    bx.fillText('f₁', 6, top1-26);
+    // tone 2
+    curve(bx, W, function(x){ var tt=t + (x/W)*winSec; return top2 - 22*Math.sin(TAU*f2*tt); }, getCSS('--warn'), 2);
+    bx.fillText('f₂', 6, top2-26);
+    // sum + envelope
+    var fb = Math.abs(f1-f2);
+    curve(bx, W, function(x){ var tt=t + (x/W)*winSec; return top3 - 22*(Math.sin(TAU*f1*tt)+Math.sin(TAU*f2*tt)); }, getCSS('--accent'), 2.4);
+    // beat envelope = 2*cos(pi*fb*tt)
+    curve(bx, W, function(x){ var tt=t + (x/W)*winSec; return top3 - 22*(2*Math.abs(Math.cos(Math.PI*fb*tt))); }, getCSS('--good'), 1.6);
+    curve(bx, W, function(x){ var tt=t + (x/W)*winSec; return top3 + 22*(2*Math.abs(Math.cos(Math.PI*fb*tt))); }, getCSS('--good'), 1.6);
+    bx.fillText('sum (with beat envelope)', 6, top3-30);
+  }
+
+  /* ---------- drawing helpers ---------- */
+  function curve(ctx, W, fn, color, lw){
+    ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.beginPath();
+    for(var x=0;x<=W;x+=2){ var y=fn(x); if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.stroke();
+  }
+  function dot(ctx,x,y,color,r){ ctx.fillStyle=color; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill(); }
+  function ring(ctx,x,y,color,r){ ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.stroke(); }
+
+  var cssCache = {};
+  function getCSS(name){
+    if(cssCache[name]) return cssCache[name];
+    var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    cssCache[name]=v; return v;
+  }
+
+  /* ---------- quiz ---------- */
+  document.querySelectorAll('#quiz .q').forEach(function(q){
+    var correct = parseInt(q.dataset.correct,10);
+    var opts = q.querySelectorAll('.opt');
+    var exp = q.querySelector('.exp');
+    opts.forEach(function(opt, idx){
+      opt.addEventListener('click', function(){
+        opts.forEach(function(o){ o.disabled=true; });
+        opts[correct].classList.add('correct');
+        if(idx!==correct) opt.classList.add('wrong');
+        exp.classList.add('show');
+      });
+    });
+  });
+
+  /* ---------- animation loop ---------- */
+  function loop(now){
+    var dt = (now - last)/1000; last = now;
+    if(dt>0.1) dt=0.1;
+    var active = document.querySelector('.view.active').id;
+    // advance per-view time only when that view isn't paused
+    if(active==='view-trav' && !tState.paused) t += dt;
+    else if(active==='view-super' && !sState.paused) t += dt;
+    else if(active==='view-beats' && !bState.paused) t += dt;
+    else if(active==='view-learn') { /* no animation */ }
+
+    if(active==='view-trav') drawTrav();
+    else if(active==='view-super') drawSuper();
+    else if(active==='view-beats') drawBeats();
+
+    if(running) requestAnimationFrame(loop);
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    running = !document.hidden;
+    if(running){ last = performance.now(); requestAnimationFrame(loop); }
+  });
+
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

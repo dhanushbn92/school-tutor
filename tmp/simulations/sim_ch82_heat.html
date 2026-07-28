@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heat Transfer Lab — Heat Transfer &amp; Solar Energy (NIOS Class 12, Ch 10)</title>
+<style>
+  :root{
+    --bg:#0f131c;
+    --panel:#191f2d;
+    --panel2:#212a3c;
+    --ink:#e9edf7;
+    --muted:#98a3bc;
+    --accent:#ff8a5c;
+    --accent-soft:rgba(255,138,92,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3450;
+    --hot:#ff5a4d;
+    --cold:#5aa9ff;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:940px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px;color:var(--ink)}
+  .hide{display:none!important}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 180px;min-width:150px}
+  .ctrl label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 70px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131c;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f131c}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.76rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .stat .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .formulas{font-size:.9rem}
+  .formulas .f{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .formulas .f b{color:var(--accent)}
+  .formulas .f span{color:var(--muted);font-size:.82rem}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-size:.9rem;
+    touch-action:manipulation}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{font-size:.84rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .swatch{width:14px;height:14px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Heat Transfer <span>Lab</span></h1>
+    <p>NIOS Class 12 Physics · Ch 10 — Heat Transfer &amp; Solar Energy</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="cond">Conduction</button>
+    <button class="tab-btn" data-tab="conv">Convection</button>
+    <button class="tab-btn" data-tab="rad">Radiation &amp; Solar</button>
+  </div>
+
+  <!-- ================= CONDUCTION ================= -->
+  <section id="cond" class="mode">
+    <div class="panel">
+      <h2>Conduction — a heated rod</h2>
+      <canvas id="condCanvas" width="820" height="240"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--cold)"></i>cold end</span>
+        <span><i class="swatch" style="background:var(--hot)"></i>hot end</span>
+        <span>dots = heat carriers drifting hot &#8594; cold</span>
+      </div>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Material</label>
+          <div class="seg" id="matSeg">
+            <button data-k="401" class="on">Copper</button>
+            <button data-k="80">Iron</button>
+            <button data-k="0.8">Glass</button>
+            <button data-k="0.15">Wood</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Cross-section area A = <output id="areaOut"></output></label>
+          <input type="range" id="area" min="1" max="50" step="1" value="10">
+        </div>
+        <div class="ctrl">
+          <label>Length L = <output id="lenOut"></output></label>
+          <input type="range" id="len" min="5" max="100" step="1" value="40">
+        </div>
+        <div class="ctrl">
+          <label>Temp difference &Delta;T = <output id="dtOut"></output></label>
+          <input type="range" id="dt" min="10" max="300" step="5" value="100">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Conductivity k</div><div class="v"><span id="kOut"></span> <small>W m&#8315;&#185; K&#8315;&#185;</small></div></div>
+        <div class="stat"><div class="k">Heat current Q/t = kA&Delta;T/L</div><div class="v"><span id="qOut"></span> <small>W</small></div></div>
+      </div>
+      <p class="note">Fourier's law: the rate of heat flow is proportional to conductivity, area and temperature gradient, and inversely proportional to length. The colour band is the steady-state temperature gradient.</p>
+    </div>
+  </section>
+
+  <!-- ================= CONVECTION ================= -->
+  <section id="conv" class="mode hide">
+    <div class="panel">
+      <h2>Convection — a fluid cell</h2>
+      <canvas id="convCanvas" width="820" height="300"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--hot)"></i>warm fluid rises</span>
+        <span><i class="swatch" style="background:var(--cold)"></i>cool fluid sinks</span>
+      </div>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Heater power = <output id="heatOut"></output></label>
+          <input type="range" id="heat" min="10" max="100" step="5" value="55">
+        </div>
+      </div>
+      <p class="note">Heated fluid at the base expands, becomes less dense and rises; at the top it loses heat, grows denser and sinks. This circulating loop is a <b>convection current</b> — the main way heat moves through fluids (and drives sea breezes and boiling water).</p>
+    </div>
+  </section>
+
+  <!-- ================= RADIATION & SOLAR ================= -->
+  <section id="rad" class="mode hide">
+    <div class="panel">
+      <h2>Radiation — Stefan&#8211;Boltzmann law</h2>
+      <canvas id="radCanvas" width="820" height="220"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Surface temperature T = <output id="tOut"></output></label>
+          <input type="range" id="temp" min="100" max="2000" step="10" value="500">
+        </div>
+        <div class="ctrl">
+          <label>Emissivity &epsilon; = <output id="emOut"></output></label>
+          <input type="range" id="em" min="0.1" max="1" step="0.05" value="0.9">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Radiated power E = &sigma;&epsilon;T&#8308;</div><div class="v"><span id="eOut"></span> <small>W m&#8315;&#178;</small></div></div>
+        <div class="stat"><div class="k">Peak wavelength &lambda;<sub>max</sub> = b/T</div><div class="v"><span id="wienOut"></span> <small>&micro;m</small></div></div>
+      </div>
+      <p class="note">Radiated power grows as the <b>fourth power</b> of absolute temperature: double T and the emission rises 16&times;. Wien's law shows the peak wavelength shifts toward the blue as the body gets hotter (glowing red &#8594; white-hot).</p>
+    </div>
+
+    <div class="panel">
+      <h2>Solar collector / greenhouse effect</h2>
+      <canvas id="solarCanvas" width="820" height="230"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Glass cover</label>
+          <div class="seg" id="glassSeg">
+            <button data-g="1" class="on">Cover ON</button>
+            <button data-g="0">Cover OFF</button>
+          </div>
+        </div>
+      </div>
+      <p class="note">A glass cover lets in short-wavelength sunlight but traps the long-wavelength infrared re-radiated by the warm absorber plate. Heat is held inside, so the collector runs hotter — the same trapping that warms a greenhouse.</p>
+    </div>
+  </section>
+
+  <!-- ================= FORMULAS ================= -->
+  <div class="panel formulas">
+    <h2>Key formulas</h2>
+    <div class="f"><b>Fourier conduction:</b> Q/t = k&middot;A&middot;&Delta;T / L <span>&nbsp;— k = conductivity (W m&#8315;&#185; K&#8315;&#185;), A = area (m&#178;), L = length (m), &Delta;T = temp difference (K)</span></div>
+    <div class="f"><b>Stefan&#8211;Boltzmann:</b> E = &sigma;&middot;&epsilon;&middot;T&#8308; <span>&nbsp;— &sigma; = 5.67&times;10&#8315;&#8312; W m&#8315;&#178; K&#8315;&#8308;, &epsilon; = emissivity, T = absolute temperature (K)</span></div>
+    <div class="f"><b>Wien's displacement:</b> &lambda;<sub>max</sub>&middot;T = b <span>&nbsp;— b = 2.898&times;10&#8315;&#179; m&middot;K (peak-wavelength constant)</span></div>
+  </div>
+
+  <!-- ================= QUIZ ================= -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz — tap an answer</h2>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+    if(running) requestAnimationFrame(loop);
+  });
+
+  /* ---------- tab switching ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var modes = { cond:document.getElementById("cond"),
+                conv:document.getElementById("conv"),
+                rad:document.getElementById("rad") };
+  var active = "cond";
+  tabBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      active = b.dataset.tab;
+      for(var k in modes){ modes[k].classList.toggle("hide", k!==active); }
+    });
+  });
+
+  /* ---------- helpers ---------- */
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function mix(c1,c2,t){
+    return "rgb("+Math.round(lerp(c1[0],c2[0],t))+","+
+                  Math.round(lerp(c1[1],c2[1],t))+","+
+                  Math.round(lerp(c1[2],c2[2],t))+")";
+  }
+  var COLD=[90,169,255], HOT=[255,90,77];
+
+  /* ================= CONDUCTION ================= */
+  var condCv = document.getElementById("condCanvas");
+  var cc = condCv.getContext("2d");
+  var kSel = 401;
+  var matSeg = document.getElementById("matSeg");
+  var areaEl=document.getElementById("area"), lenEl=document.getElementById("len"), dtEl=document.getElementById("dt");
+  var particles=[];
+  for(var i=0;i<70;i++){ particles.push({x:Math.random(), y:Math.random()}); }
+
+  matSeg.addEventListener("click", function(e){
+    var btn = e.target.closest("button"); if(!btn) return;
+    matSeg.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+    btn.classList.add("on");
+    kSel = parseFloat(btn.dataset.k);
+    updateCond();
+  });
+  [areaEl,lenEl,dtEl].forEach(function(el){ el.addEventListener("input", updateCond); });
+
+  var condVals={};
+  function updateCond(){
+    var A = parseFloat(areaEl.value);   // cm^2
+    var L = parseFloat(lenEl.value);    // cm
+    var dT = parseFloat(dtEl.value);    // K
+    document.getElementById("areaOut").textContent = A+" cm²";
+    document.getElementById("lenOut").textContent = L+" cm";
+    document.getElementById("dtOut").textContent = dT+" K";
+    document.getElementById("kOut").textContent = kSel;
+    // Q/t = k A dT / L, convert A(cm^2)->m^2, L(cm)->m
+    var Am = A*1e-4, Lm = L*1e-2;
+    var Q = kSel*Am*dT/Lm; // watts
+    document.getElementById("qOut").textContent = Q>=1000 ? (Q/1000).toFixed(2)+"k" : Q.toFixed(1);
+    // speed of drift scaled by heat current (log so wood still moves a little)
+    condVals = {Q:Q, speed: Math.min(0.9, 0.05 + Math.log10(1+Q)/6), dT:dT};
+  }
+
+  function drawCond(){
+    var w=condCv.width, h=condCv.height;
+    cc.clearRect(0,0,w,h);
+    var rx=90, rw=w-180, ry=70, rh=100;
+    // temperature gradient band (cold left -> hot right)
+    for(var x=0;x<rw;x++){
+      var t = x/rw;
+      cc.fillStyle = mix(COLD,HOT,t);
+      cc.fillRect(rx+x, ry, 1, rh);
+    }
+    // rod border
+    cc.strokeStyle="#2b3450"; cc.lineWidth=2;
+    cc.strokeRect(rx,ry,rw,rh);
+    // end reservoirs
+    cc.fillStyle="rgba(90,169,255,.9)"; cc.fillRect(rx-34,ry-6,30,rh+12);
+    cc.fillStyle="rgba(255,90,77,.9)"; cc.fillRect(rx+rw+4,ry-6,30,rh+12);
+    cc.fillStyle="#e9edf7"; cc.font="13px system-ui"; cc.textAlign="center";
+    cc.fillText("COLD", rx-19, ry+rh/2+4);
+    cc.fillText("HOT", rx+rw+19, ry+rh/2+4);
+    // drifting carriers hot->cold (right to left)
+    var sp = condVals.speed||0.1;
+    cc.fillStyle="rgba(255,255,255,.85)";
+    for(var p=0;p<particles.length;p++){
+      var pt=particles[p];
+      pt.x -= sp*0.006;
+      if(pt.x<0){ pt.x=1; pt.y=Math.random(); }
+      var px = rx + pt.x*rw, py = ry+8 + pt.y*(rh-16);
+      cc.beginPath(); cc.arc(px,py,2.2,0,6.2832); cc.fill();
+    }
+    cc.textAlign="left";
+    cc.fillStyle="#98a3bc"; cc.font="12px system-ui";
+    cc.fillText("Steady-state temperature gradient along the rod", rx, ry-14);
+  }
+
+  /* ================= CONVECTION ================= */
+  var convCv=document.getElementById("convCanvas");
+  var cv=convCv.getContext("2d");
+  var heatEl=document.getElementById("heat");
+  var convParts=[];
+  for(var j=0;j<60;j++){
+    convParts.push({a:Math.random()*6.2832, r:0.2+Math.random()*0.75});
+  }
+  heatEl.addEventListener("input", function(){
+    document.getElementById("heatOut").textContent = heatEl.value+"%";
+  });
+  function drawConv(){
+    var w=convCv.width, h=convCv.height;
+    cv.clearRect(0,0,w,h);
+    var bx=60, by=40, bw=w-120, bh=h-90;
+    // container
+    cv.strokeStyle="#2b3450"; cv.lineWidth=2; cv.strokeRect(bx,by,bw,bh);
+    // hot base
+    var g=cv.createLinearGradient(0,by,0,by+bh);
+    g.addColorStop(0,"rgba(90,169,255,.20)");
+    g.addColorStop(1,"rgba(255,90,77,.28)");
+    cv.fillStyle=g; cv.fillRect(bx,by,bw,bh);
+    // heater bar
+    var pw = parseFloat(heatEl.value)/100;
+    cv.fillStyle="rgba(255,90,77,"+(0.4+0.6*pw)+")";
+    cv.fillRect(bx,by+bh,bw,10);
+    cv.fillStyle="#98a3bc"; cv.font="12px system-ui"; cv.textAlign="center";
+    cv.fillText("heater", bx+bw/2, by+bh+26);
+    // two convection roll cells (left + right)
+    var cxs=[bx+bw*0.28, bx+bw*0.72];
+    var cyc=by+bh/2, rxr=bw*0.20, ryr=bh*0.36;
+    var sp = 0.01 + pw*0.045;
+    for(var i=0;i<convParts.length;i++){
+      var p=convParts[i];
+      p.a += sp*(i%2?1:1);
+      var cell = i%2; var cx=cxs[cell];
+      // ellipse loop; direction: rising in center, sinking outward
+      var dir = cell===0 ? 1 : -1;
+      var px = cx + Math.cos(p.a*dir)*rxr*p.r*(cell===0?1:-1);
+      var py = cyc + Math.sin(p.a*dir)*ryr*p.r;
+      // colour by vertical position: bottom hot, top cool
+      var t = 1-(py-by)/bh;
+      cv.fillStyle = mix(COLD,HOT,t);
+      cv.beginPath(); cv.arc(px,py,3,0,6.2832); cv.fill();
+    }
+    // arrows
+    cv.strokeStyle="rgba(233,237,247,.55)"; cv.lineWidth=2;
+    drawArrow(cv, bx+bw*0.28, by+bh-20, bx+bw*0.28, by+24); // rise
+    drawArrow(cv, bx+bw*0.72, by+24, bx+bw*0.72, by+bh-20); // sink
+    cv.textAlign="left";
+  }
+  function drawArrow(ctx,x1,y1,x2,y2){
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    var ang=Math.atan2(y2-y1,x2-x1);
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-8*Math.cos(ang-0.4), y2-8*Math.sin(ang-0.4));
+    ctx.lineTo(x2-8*Math.cos(ang+0.4), y2-8*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fillStyle="rgba(233,237,247,.55)"; ctx.fill();
+  }
+
+  /* ================= RADIATION ================= */
+  var radCv=document.getElementById("radCanvas");
+  var rc=radCv.getContext("2d");
+  var tempEl=document.getElementById("temp"), emEl=document.getElementById("em");
+  var SIGMA=5.67e-8, B=2.898e-3;
+  var rays=[];
+  for(var r=0;r<40;r++){ rays.push({a:Math.random()*6.2832, d:Math.random()}); }
+  [tempEl,emEl].forEach(function(el){ el.addEventListener("input", updateRad); });
+  var radVals={};
+  function updateRad(){
+    var T=parseFloat(tempEl.value), em=parseFloat(emEl.value);
+    document.getElementById("tOut").textContent = T+" K";
+    document.getElementById("emOut").textContent = em.toFixed(2);
+    var E = SIGMA*em*Math.pow(T,4);
+    document.getElementById("eOut").textContent = E>=1000 ? (E/1000).toFixed(1)+"k" : E.toFixed(0);
+    var wien = (B/T)*1e6; // micrometres
+    document.getElementById("wienOut").textContent = wien.toFixed(2);
+    radVals={T:T, em:em, E:E, wien:wien};
+  }
+  function bodyColor(T){
+    // simple hot-body glow: dark red -> orange -> yellow -> white
+    if(T<600) return "rgb("+Math.round(60+ (T-100)/500*180)+",30,20)";
+    if(T<1000) return "rgb(255,"+Math.round((T-600)/400*140)+",30)";
+    if(T<1500) return "rgb(255,"+Math.round(140+(T-1000)/500*90)+","+Math.round((T-1000)/500*120)+")";
+    return "rgb(255,240,"+Math.round(180+(T-1500)/500*60)+")";
+  }
+  function drawRad(){
+    var w=radCv.width,h=radCv.height;
+    rc.clearRect(0,0,w,h);
+    var cx=w/2, cy=h/2, R=44;
+    var em=radVals.em||0.9, T=radVals.T||500;
+    // radiating rays; count/length scale with E via T^4 (normalised)
+    var intensity=Math.min(1, Math.pow(T/2000,4)*em/0.9 + 0.05);
+    rc.strokeStyle="rgba(255,138,92,"+(0.25+0.6*intensity)+")"; rc.lineWidth=2;
+    for(var i=0;i<rays.length;i++){
+      var ray=rays[i];
+      ray.d += 0.004 + intensity*0.02;
+      if(ray.d>1) ray.d-=1;
+      var len = 40 + intensity*120;
+      var r0 = R+6 + ray.d*len;
+      var x1=cx+Math.cos(ray.a)*r0, y1=cy+Math.sin(ray.a)*r0;
+      var x2=cx+Math.cos(ray.a)*(r0+14), y2=cy+Math.sin(ray.a)*(r0+14);
+      rc.beginPath(); rc.moveTo(x1,y1); rc.lineTo(x2,y2); rc.stroke();
+    }
+    // glowing body
+    var grd=rc.createRadialGradient(cx,cy,4,cx,cy,R);
+    grd.addColorStop(0,"#fff");
+    grd.addColorStop(0.4,bodyColor(T));
+    grd.addColorStop(1,bodyColor(Math.max(200,T-300)));
+    rc.fillStyle=grd;
+    rc.beginPath(); rc.arc(cx,cy,R,0,6.2832); rc.fill();
+    rc.fillStyle="#98a3bc"; rc.font="12px system-ui"; rc.textAlign="center";
+    rc.fillText("hot body at "+T+" K", cx, cy+R+22);
+    rc.textAlign="left";
+  }
+
+  /* ================= SOLAR ================= */
+  var solarCv=document.getElementById("solarCanvas");
+  var sc=solarCv.getContext("2d");
+  var glassSeg=document.getElementById("glassSeg");
+  var glassOn=true, plateT=0, solT=0;
+  glassSeg.addEventListener("click", function(e){
+    var btn=e.target.closest("button"); if(!btn) return;
+    glassSeg.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+    btn.classList.add("on");
+    glassOn = btn.dataset.g==="1";
+  });
+  var sunRays=[];
+  for(var s=0;s<8;s++){ sunRays.push({x:0.15+s*0.09, p:Math.random()}); }
+  var irRays=[];
+  for(var s2=0;s2<10;s2++){ irRays.push({x:0.2+Math.random()*0.6, p:Math.random(), bounced:false}); }
+  function drawSolar(){
+    var w=solarCv.width,h=solarCv.height;
+    sc.clearRect(0,0,w,h);
+    var bx=70, plateY=h-60, glassY=60;
+    // absorber plate temperature approaches target (hotter with cover)
+    var target = glassOn?1:0.5;
+    plateT += (target-plateT)*0.03;
+    // plate colour by temperature
+    sc.fillStyle = mix([70,90,120],[255,120,60], plateT);
+    sc.fillRect(bx, plateY, w-2*bx, 22);
+    sc.fillStyle="#98a3bc"; sc.font="12px system-ui"; sc.textAlign="center";
+    sc.fillText("absorber plate", w/2, plateY+38);
+    // glass cover
+    if(glassOn){
+      sc.fillStyle="rgba(120,180,255,.14)";
+      sc.fillRect(bx, glassY, w-2*bx, 8);
+      sc.strokeStyle="rgba(120,180,255,.5)"; sc.lineWidth=1.5;
+      sc.strokeRect(bx, glassY, w-2*bx, 8);
+      sc.fillStyle="#98a3bc"; sc.fillText("glass cover", w/2, glassY-6);
+    }
+    // incoming sunlight (yellow, always passes)
+    sc.strokeStyle="rgba(255,210,90,.85)"; sc.lineWidth=2;
+    for(var i=0;i<sunRays.length;i++){
+      var ray=sunRays[i]; ray.p+=0.012; if(ray.p>1) ray.p-=1;
+      var x = bx + ray.x*(w-2*bx);
+      var y0 = 8, y1 = plateY;
+      var yy = y0 + ray.p*(y1-y0);
+      sc.beginPath(); sc.moveTo(x,yy); sc.lineTo(x+8, yy+12); sc.stroke();
+    }
+    // re-radiated infrared (red) from plate going up
+    sc.strokeStyle="rgba(255,90,77,.8)"; sc.lineWidth=2;
+    for(var k=0;k<irRays.length;k++){
+      var ir=irRays[k]; ir.p+=0.01;
+      var x2 = bx + ir.x*(w-2*bx);
+      var start = plateY;
+      var topLimit = glassOn ? glassY+10 : 0;
+      var yy2 = start - ir.p*(start-topLimit);
+      if(yy2<=topLimit){
+        if(glassOn){ ir.p=0; } // trapped: bounces back down, restart
+        else { ir.p=0; ir.x=0.2+Math.random()*0.6; } // escapes
+      }
+      sc.beginPath(); sc.moveTo(x2,yy2); sc.lineTo(x2+4, yy2+8); sc.stroke();
+    }
+    sc.textAlign="left";
+    sc.fillStyle="#e9edf7"; sc.font="13px system-ui";
+    sc.fillText(glassOn? "IR trapped → plate runs hot" : "IR escapes → plate stays cooler", bx, 30);
+  }
+
+  /* ================= QUIZ ================= */
+  var quizData=[
+    { q:"For a rod, the rate of heat conduction Q/t is:",
+      opts:["Proportional to length L","Proportional to k, A and ΔT, inversely to L","Independent of the material","Proportional to L²"],
+      correct:1,
+      exp:"Fourier's law: Q/t = kAΔT/L. More conductivity, area or temperature difference raises the flow; more length lowers it." },
+    { q:"If the absolute temperature of a radiating body doubles, its radiated power becomes:",
+      opts:["2 times","4 times","8 times","16 times"],
+      correct:3,
+      exp:"E = σεT⁴, so doubling T multiplies power by 2⁴ = 16." },
+    { q:"Convection can transfer heat mainly through:",
+      opts:["Vacuum","Solids only","Bulk motion of a fluid","Electromagnetic waves"],
+      correct:2,
+      exp:"Convection needs a fluid (liquid or gas): warm fluid rises, cool fluid sinks, carrying heat with the moving matter." }
+  ];
+  var quizEl=document.getElementById("quiz");
+  quizData.forEach(function(item, qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    item.opts.forEach(function(opt, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(d.dataset.done) return;
+        d.dataset.done="1";
+        var kids=d.querySelectorAll(".opt");
+        kids[item.correct].classList.add("correct");
+        if(oi!==item.correct) b.classList.add("wrong");
+        d.querySelector(".exp").classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="exp"; ex.textContent="→ "+item.exp;
+    d.appendChild(ex);
+    quizEl.appendChild(d);
+  });
+
+  /* ================= LOOP ================= */
+  function loop(){
+    if(!running) return;
+    if(active==="cond") drawCond();
+    else if(active==="conv") drawConv();
+    else if(active==="rad") drawRad();
+    if(active==="rad") drawSolar(); // solar shares the radiation tab
+    requestAnimationFrame(loop);
+  }
+
+  // init readouts
+  updateCond();
+  document.getElementById("heatOut").textContent = heatEl.value+"%";
+  updateRad();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

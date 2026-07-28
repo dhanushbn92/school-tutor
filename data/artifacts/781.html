@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electric Field Lab — Electric Charge and Electric Field (NIOS Class 12, Ch 13)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212a40;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.15);
+    --pos:#ff6b6b;
+    --neg:#5b8dff;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hint{color:var(--muted);font-size:.85rem;margin-bottom:10px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:70px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:6px 10px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .seg button.pos.on{background:rgba(255,107,107,.18);border-color:var(--pos);color:var(--pos)}
+  .seg button.neg.on{background:rgba(91,141,255,.18);border-color:var(--neg);color:var(--neg)}
+
+  .btn{min-height:44px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;padding:8px 14px;touch-action:manipulation}
+  .btn:active{transform:scale(.98)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .canvas-wrap{position:relative;width:100%;background:#0b0f1a;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  canvas{display:block;width:100%;touch-action:none}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+
+  .formulas{display:grid;grid-template-columns:1fr;gap:10px}
+  .fcard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .fcard .eq{font-size:1.1rem;font-weight:700;color:var(--accent);font-family:"Cambria Math",Georgia,serif}
+  .fcard .d{font-size:.85rem;color:var(--muted);margin-top:4px}
+
+  .quiz .q{margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .quiz .q:last-child{border-bottom:none;margin-bottom:0}
+  .quiz .qtext{font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);border-radius:10px;cursor:pointer;font-size:.92rem;touch-action:manipulation}
+  .quiz .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:rgba(255,123,123,.18);border-color:var(--bad);color:var(--bad)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .quiz .exp.show{display:block}
+
+  .legend{font-size:.8rem;color:var(--muted);margin-top:8px;display:flex;gap:14px;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .view{display:none}
+  .view.active{display:block}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Electric <span>Field Lab</span></h1>
+    <p>NIOS Class 12 Physics · Ch 13 — Electric Charge and Electric Field</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="explorer">Field Explorer</button>
+    <button class="tab-btn" data-view="coulomb">Coulomb's Law</button>
+    <button class="tab-btn" data-view="dipole">Dipole / Superposition</button>
+    <button class="tab-btn" data-view="learn">Formulas &amp; Quiz</button>
+  </div>
+
+  <!-- ============ FIELD EXPLORER ============ -->
+  <section class="view active" id="explorer">
+    <div class="panel">
+      <h2>Field Explorer</h2>
+      <p class="hint">Tap the canvas to add a charge. Drag a charge to move it. Drag the green test charge to feel the force. Charge sign &amp; magnitude set the next placed charge.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>New charge sign</label>
+          <div class="seg" id="signSeg">
+            <button class="pos on" data-sign="1">+ positive</button>
+            <button class="neg" data-sign="-1">&minus; negative</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Charge magnitude <span class="val" id="magVal">2.0 nC</span></label>
+          <input type="range" id="magSlider" min="1" max="10" step="0.5" value="2">
+        </div>
+        <div class="ctrl">
+          <label>Display</label>
+          <div class="seg" id="dispSeg">
+            <button class="on" data-disp="lines">Field lines</button>
+            <button data-disp="vectors">Vector grid</button>
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="clearBtn">Clear all</button>
+        <button class="btn" id="demoBtn">Load example</button>
+      </div>
+      <div class="canvas-wrap"><canvas id="cExp"></canvas></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--pos)"></span>positive charge</span>
+        <span><span class="dot" style="background:var(--neg)"></span>negative charge</span>
+        <span><span class="dot" style="background:var(--good)"></span>test charge (+1 nC)</span>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">|E| at test charge</div><div class="v" id="expE">— N/C</div></div>
+        <div class="stat"><div class="k">Force on test charge</div><div class="v" id="expF">— N</div></div>
+        <div class="stat"><div class="k">Charges placed</div><div class="v" id="expN">0</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COULOMB ============ -->
+  <section class="view" id="coulomb">
+    <div class="panel">
+      <h2>Coulomb's Law</h2>
+      <p class="hint">Two point charges on a line. Change each charge and the separation r. Watch the force follow F = k q₁q₂ / r² — the inverse-square law.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Charge q₁ <span class="val" id="q1Val">+3.0 μC</span></label>
+          <input type="range" id="q1" min="-10" max="10" step="0.5" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Charge q₂ <span class="val" id="q2Val">+3.0 μC</span></label>
+          <input type="range" id="q2" min="-10" max="10" step="0.5" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Separation r <span class="val" id="rVal">0.30 m</span></label>
+          <input type="range" id="rSep" min="0.05" max="0.60" step="0.01" value="0.30">
+        </div>
+      </div>
+      <div class="canvas-wrap"><canvas id="cCoul"></canvas></div>
+      <div class="readout">
+        <div class="stat"><div class="k">Force magnitude</div><div class="v" id="coulF">— N</div></div>
+        <div class="stat"><div class="k">Nature</div><div class="v" id="coulNat">—</div></div>
+        <div class="stat"><div class="k">If r doubles</div><div class="v" id="coulDouble">F → F/4</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DIPOLE ============ -->
+  <section class="view" id="dipole">
+    <div class="panel">
+      <h2>Dipole &amp; Superposition</h2>
+      <p class="hint">An electric dipole: equal +q and −q separated by distance d. The net field at every point is the vector sum of the two individual fields. Slide the separation and pick a probe point to see the superposition.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Separation d <span class="val" id="dVal">80 px</span></label>
+          <input type="range" id="dSep" min="30" max="200" step="5" value="80">
+        </div>
+        <div class="ctrl">
+          <label>Display</label>
+          <div class="seg" id="dipDispSeg">
+            <button class="on" data-disp="lines">Field lines</button>
+            <button data-disp="vectors">Vector grid</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Probe point</label>
+          <div class="seg"><button class="btn" id="dipToggleProbe">Show / hide probe</button></div>
+        </div>
+      </div>
+      <div class="canvas-wrap"><canvas id="cDip"></canvas></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--pos)"></span>+q</span>
+        <span><span class="dot" style="background:var(--neg)"></span>&minus;q</span>
+        <span><span class="dot" style="background:#ffd166"></span>E from +q</span>
+        <span><span class="dot" style="background:#c792ea"></span>E from &minus;q</span>
+        <span><span class="dot" style="background:var(--good)"></span>net E (sum)</span>
+      </div>
+      <p class="hint" id="dipReadout" style="margin-top:10px">Drag the probe point to any location to see the vector sum.</p>
+    </div>
+  </section>
+
+  <!-- ============ LEARN ============ -->
+  <section class="view" id="learn">
+    <div class="panel">
+      <h2>Key Formulas</h2>
+      <div class="formulas">
+        <div class="fcard"><div class="eq">F = k · q₁q₂ / r²</div><div class="d">Coulomb's law. k = 9 × 10⁹ N·m²/C². Force is along the line joining the charges: repulsive for like charges, attractive for unlike.</div></div>
+        <div class="fcard"><div class="eq">E = F / q₀</div><div class="d">Electric field = force per unit positive test charge q₀. Unit: newton per coulomb (N/C) or volt per metre (V/m). E is a vector.</div></div>
+        <div class="fcard"><div class="eq">E = k · Q / r²</div><div class="d">Field due to a point charge Q at distance r. Points away from +Q and toward −Q.</div></div>
+        <div class="fcard"><div class="eq">E<sub>net</sub> = Σ E<sub>i</sub></div><div class="d">Superposition principle: the field of several charges is the vector sum of each charge's field, computed independently.</div></div>
+      </div>
+      <h3 style="margin-top:16px;color:var(--accent)">Field-line rules</h3>
+      <ul class="hint" style="margin-left:18px">
+        <li>Lines start on positive charges and end on negative charges (or at infinity).</li>
+        <li>The tangent to a line gives the direction of E at that point.</li>
+        <li>Line density is proportional to field strength — closer lines mean a stronger field.</li>
+        <li>Field lines never cross (E has one unique direction at each point).</li>
+      </ul>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz</h2>
+      <p class="hint">Click an option to check your answer.</p>
+    </div>
+    <footer>Interactive learning aid. Fields are simulated with Coulomb's law and superposition; values are illustrative.</footer>
+  </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var K = 9e9; // Coulomb constant N m^2 / C^2
+
+  // ---------- tab switching ----------
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var views = document.querySelectorAll(".view");
+  tabBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      var id = b.getAttribute("data-view");
+      views.forEach(function(v){ v.classList.toggle("active", v.id===id); });
+      resizeAll();
+    });
+  });
+
+  var pageVisible = !document.hidden;
+  document.addEventListener("visibilitychange", function(){
+    pageVisible = !document.hidden;
+    if (pageVisible) kick();
+  });
+
+  // ---------- canvas helpers ----------
+  function setup(canvas, h){
+    var ctx = canvas.getContext("2d");
+    return {c:canvas, x:ctx, h:h};
+  }
+  function fit(o){
+    var dpr = Math.min(window.devicePixelRatio||1, 2);
+    var w = o.c.clientWidth || 300;
+    o.cssW = w; o.cssH = o.h;
+    o.c.style.height = o.h + "px";
+    o.c.width = Math.round(w*dpr);
+    o.c.height = Math.round(o.h*dpr);
+    o.x.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function drawArrow(x, x0,y0,x1,y1,color,width){
+    x.strokeStyle=color; x.fillStyle=color; x.lineWidth=width||2;
+    x.beginPath(); x.moveTo(x0,y0); x.lineTo(x1,y1); x.stroke();
+    var ang=Math.atan2(y1-y0,x1-x0), hl=7+ (width||2);
+    x.beginPath();
+    x.moveTo(x1,y1);
+    x.lineTo(x1-hl*Math.cos(ang-0.4), y1-hl*Math.sin(ang-0.4));
+    x.lineTo(x1-hl*Math.cos(ang+0.4), y1-hl*Math.sin(ang+0.4));
+    x.closePath(); x.fill();
+  }
+  function drawCharge(x, px,py,sign,r){
+    r = r||14;
+    x.beginPath(); x.arc(px,py,r,0,7);
+    x.fillStyle = sign>0 ? "#ff6b6b" : "#5b8dff";
+    x.fill();
+    x.strokeStyle="rgba(255,255,255,.7)"; x.lineWidth=2; x.stroke();
+    x.fillStyle="#fff"; x.font="bold "+(r)+"px system-ui"; x.textAlign="center"; x.textBaseline="middle";
+    x.fillText(sign>0?"+":"−", px, py+1);
+  }
+
+  // field from list of charges {x,y,q(Coulombs-ish)} at point (px,py) in canvas px.
+  // We treat 1 canvas px ~ scale metres implicitly; only relative pattern matters for visuals.
+  function fieldAt(charges, px, py){
+    var ex=0, ey=0;
+    for(var i=0;i<charges.length;i++){
+      var c=charges[i];
+      var dx=px-c.x, dy=py-c.y;
+      var r2=dx*dx+dy*dy;
+      if(r2<25) r2=25;
+      var r=Math.sqrt(r2);
+      var e=c.q/r2; // proportional
+      ex += e*dx/r;
+      ey += e*dy/r;
+    }
+    return {ex:ex, ey:ey, mag:Math.sqrt(ex*ex+ey*ey)};
+  }
+
+  // trace a field line by integrating along E direction
+  function traceLine(x, charges, sx, sy, dir, W, H){
+    x.beginPath(); x.moveTo(sx,sy);
+    var px=sx, py=sy, step=4;
+    for(var s=0;s<400;s++){
+      var f=fieldAt(charges,px,py);
+      if(f.mag<1e-9) break;
+      var nx=f.ex/f.mag*dir, ny=f.ey/f.mag*dir;
+      px+=nx*step; py+=ny*step;
+      x.lineTo(px,py);
+      if(px<-10||px>W+10||py<-10||py>H+10) break;
+      // stop near a charge
+      var stop=false;
+      for(var i=0;i<charges.length;i++){
+        var dx=px-charges[i].x, dy=py-charges[i].y;
+        if(dx*dx+dy*dy < 100){ stop=true; break; }
+      }
+      if(stop) break;
+    }
+    x.stroke();
+  }
+
+  function drawFieldLines(x, charges, W, H){
+    x.strokeStyle="rgba(160,180,220,.55)"; x.lineWidth=1.3;
+    var n=12;
+    for(var i=0;i<charges.length;i++){
+      var c=charges[i];
+      if(c.q>0){
+        for(var k=0;k<n;k++){
+          var a=k/n*Math.PI*2;
+          traceLine(x, charges, c.x+16*Math.cos(a), c.y+16*Math.sin(a), 1, W, H);
+        }
+      } else {
+        for(var k2=0;k2<n;k2++){
+          var a2=k2/n*Math.PI*2;
+          traceLine(x, charges, c.x+16*Math.cos(a2), c.y+16*Math.sin(a2), -1, W, H);
+        }
+      }
+    }
+  }
+
+  function drawVectorGrid(x, charges, W, H){
+    var step=34;
+    for(var gy=step/2; gy<H; gy+=step){
+      for(var gx=step/2; gx<W; gx+=step){
+        var f=fieldAt(charges,gx,gy);
+        if(f.mag<1e-9) continue;
+        var len=Math.min(15, 3+Math.log(1+f.mag*4e5)*3);
+        if(!isFinite(len)||len<2) len=6;
+        var ux=f.ex/f.mag, uy=f.ey/f.mag;
+        var alpha=Math.min(0.85, 0.25+len/18);
+        drawArrow(x, gx-ux*len, gy-uy*len, gx+ux*len, gy+uy*len, "rgba(120,200,255,"+alpha+")", 1.4);
+      }
+    }
+  }
+
+  // ========================================================
+  // FIELD EXPLORER
+  // ========================================================
+  var exp = setup(document.getElementById("cExp"), 360);
+  var expCharges = [];
+  var newSign = 1, newMag = 2, expDisp="lines";
+  var testCharge = null; // {x,y}
+  var dragging = null;
+
+  document.getElementById("signSeg").addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#signSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    newSign = parseFloat(b.getAttribute("data-sign"));
+  });
+  var magSlider=document.getElementById("magSlider"), magVal=document.getElementById("magVal");
+  magSlider.addEventListener("input", function(){
+    newMag=parseFloat(magSlider.value);
+    magVal.textContent=newMag.toFixed(1)+" nC";
+  });
+  document.getElementById("dispSeg").addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#dispSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); expDisp=b.getAttribute("data-disp"); drawExp();
+  });
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    expCharges=[]; testCharge=null; drawExp();
+  });
+  document.getElementById("demoBtn").addEventListener("click", function(){
+    var W=exp.cssW, H=exp.cssH;
+    expCharges=[{x:W*0.35,y:H*0.5,q:3e-9,sign:1},{x:W*0.65,y:H*0.5,q:-3e-9,sign:-1}];
+    testCharge={x:W*0.5,y:H*0.28};
+    drawExp();
+  });
+
+  function canvasPos(o, ev){
+    var r=o.c.getBoundingClientRect();
+    var t = ev.touches && ev.touches[0] ? ev.touches[0] : ev;
+    return {x:(t.clientX-r.left), y:(t.clientY-r.top)};
+  }
+  function hitCharge(list, p, extra){
+    for(var i=list.length-1;i>=0;i--){
+      var dx=p.x-list[i].x, dy=p.y-list[i].y;
+      if(dx*dx+dy*dy < 22*22) return list[i];
+    }
+    if(extra){ var dx2=p.x-extra.x, dy2=p.y-extra.y; if(dx2*dx2+dy2*dy2<22*22) return extra; }
+    return null;
+  }
+
+  function expDown(ev){
+    ev.preventDefault();
+    var p=canvasPos(exp,ev);
+    var hitTest = testCharge ? (function(){var dx=p.x-testCharge.x,dy=p.y-testCharge.y;return dx*dx+dy*dy<22*22;})() : false;
+    if(hitTest){ dragging=testCharge; drawExp(); return; }
+    var h=hitCharge(expCharges,p);
+    if(h){ dragging=h; drawExp(); return; }
+    // add new charge (or set test charge with long-press? just add charge)
+    expCharges.push({x:p.x,y:p.y,q:newSign*newMag*1e-9,sign:newSign});
+    if(!testCharge){ testCharge={x:Math.min(exp.cssW-20,p.x+50),y:p.y}; }
+    dragging=null;
+    drawExp();
+  }
+  function expMove(ev){
+    if(!dragging) return;
+    ev.preventDefault();
+    var p=canvasPos(exp,ev);
+    dragging.x=Math.max(6,Math.min(exp.cssW-6,p.x));
+    dragging.y=Math.max(6,Math.min(exp.cssH-6,p.y));
+    drawExp();
+  }
+  function expUp(){ dragging=null; }
+  exp.c.addEventListener("mousedown", expDown);
+  exp.c.addEventListener("mousemove", expMove);
+  window.addEventListener("mouseup", expUp);
+  exp.c.addEventListener("touchstart", expDown, {passive:false});
+  exp.c.addEventListener("touchmove", expMove, {passive:false});
+  window.addEventListener("touchend", expUp);
+
+  function drawExp(){
+    var x=exp.x, W=exp.cssW, H=exp.cssH;
+    x.clearRect(0,0,W,H);
+    x.fillStyle="#0b0f1a"; x.fillRect(0,0,W,H);
+    if(expCharges.length===0){
+      x.fillStyle="#5a6480"; x.font="15px system-ui"; x.textAlign="center";
+      x.fillText("Tap to place a charge", W/2, H/2);
+    } else {
+      if(expDisp==="lines") drawFieldLines(x, expCharges, W, H);
+      else drawVectorGrid(x, expCharges, W, H);
+    }
+    for(var i=0;i<expCharges.length;i++){
+      var c=expCharges[i];
+      drawCharge(x, c.x, c.y, c.sign, 13+Math.min(6,Math.abs(c.q)*1e9*0.5));
+    }
+    // test charge + force
+    if(testCharge && expCharges.length>0){
+      var f=fieldAt(expCharges, testCharge.x, testCharge.y);
+      // Real magnitude in N/C: sum k*Q/r^2 with px->arbitrary; give plausible number
+      var Emag=0, Fx=0, Fy=0;
+      var q0=1e-9;
+      var scale = 0.004; // px -> metres (so ~0.9 m canvas)
+      var eex=0,eey=0;
+      for(var j=0;j<expCharges.length;j++){
+        var cc=expCharges[j];
+        var dx=(testCharge.x-cc.x)*scale, dy=(testCharge.y-cc.y)*scale;
+        var r2=dx*dx+dy*dy; if(r2<1e-4) r2=1e-4;
+        var r=Math.sqrt(r2);
+        var e=K*cc.q/r2;
+        eex+=e*dx/r; eey+=e*dy/r;
+      }
+      Emag=Math.sqrt(eex*eex+eey*eey);
+      var Fmag=Emag*q0;
+      // draw force arrow (direction from field vector)
+      if(f.mag>1e-12){
+        var ux=f.ex/f.mag, uy=f.ey/f.mag;
+        var L=34;
+        drawArrow(x, testCharge.x, testCharge.y, testCharge.x+ux*L, testCharge.y+uy*L, "#5fd68b", 3);
+      }
+      x.beginPath(); x.arc(testCharge.x,testCharge.y,9,0,7);
+      x.fillStyle="#5fd68b"; x.fill(); x.strokeStyle="#0b0f1a"; x.lineWidth=2; x.stroke();
+      document.getElementById("expE").textContent = fmt(Emag)+" N/C";
+      document.getElementById("expF").textContent = fmt(Fmag)+" N";
+    } else {
+      document.getElementById("expE").textContent="— N/C";
+      document.getElementById("expF").textContent="— N";
+    }
+    document.getElementById("expN").textContent = expCharges.length;
+  }
+
+  function fmt(v){
+    if(v===0) return "0";
+    if(!isFinite(v)) return "∞";
+    if(v>=1e4 || v<1e-2){
+      var e=Math.floor(Math.log10(Math.abs(v)));
+      var m=v/Math.pow(10,e);
+      return m.toFixed(2)+"×10"+sup(e);
+    }
+    return v.toFixed(2);
+  }
+  function sup(n){
+    var s=(""+Math.abs(n)).split(""), map={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+    var r=s.map(function(d){return map[d];}).join("");
+    return (n<0?"⁻":"")+r;
+  }
+
+  // ========================================================
+  // COULOMB
+  // ========================================================
+  var coul = setup(document.getElementById("cCoul"), 260);
+  var q1El=document.getElementById("q1"), q2El=document.getElementById("q2"), rEl=document.getElementById("rSep");
+  function coulUpdate(){
+    var q1=parseFloat(q1El.value), q2=parseFloat(q2El.value), r=parseFloat(rEl.value);
+    document.getElementById("q1Val").textContent=(q1>=0?"+":"")+q1.toFixed(1)+" μC";
+    document.getElementById("q2Val").textContent=(q2>=0?"+":"")+q2.toFixed(1)+" μC";
+    document.getElementById("rVal").textContent=r.toFixed(2)+" m";
+    var Q1=q1*1e-6, Q2=q2*1e-6;
+    var F = K*Math.abs(Q1*Q2)/(r*r);
+    document.getElementById("coulF").textContent=fmt(F)+" N";
+    var like = (q1*q2)>0;
+    var nat = (q1===0||q2===0)? "no force" : (like?"Repulsive":"Attractive");
+    document.getElementById("coulNat").textContent=nat;
+    drawCoul(q1,q2,r,F,like);
+  }
+  function drawCoul(q1,q2,r,F,like){
+    var x=coul.x, W=coul.cssW, H=coul.cssH, cy=H/2;
+    x.clearRect(0,0,W,H); x.fillStyle="#0b0f1a"; x.fillRect(0,0,W,H);
+    // map r (0.05..0.60) to pixel gap
+    var maxGap=W*0.6;
+    var gap = 40 + (r-0.05)/(0.60-0.05)*(maxGap-40);
+    var x1=W/2-gap/2, x2=W/2+gap/2;
+    // distance dimension line
+    x.strokeStyle="rgba(150,160,190,.5)"; x.lineWidth=1; x.setLineDash([4,4]);
+    x.beginPath(); x.moveTo(x1,cy-40); x.lineTo(x2,cy-40); x.stroke(); x.setLineDash([]);
+    x.fillStyle="#98a3bd"; x.font="12px system-ui"; x.textAlign="center";
+    x.fillText("r = "+r.toFixed(2)+" m", W/2, cy-46);
+    // force arrows
+    if(q1!==0 && q2!==0){
+      var dir = like ? 1 : -1; // like -> apart (arrows outward), unlike -> together
+      var aLen = Math.max(14, Math.min(70, 12+Math.log(1+F)*9));
+      // on charge1 (left): repulsive -> points left(-), attractive -> points right(+)
+      var d1 = like ? -1 : 1;
+      var d2 = like ? 1 : -1;
+      drawArrow(x, x1, cy, x1 + d1*aLen, cy, "#4fd1c5", 3);
+      drawArrow(x, x2, cy, x2 + d2*aLen, cy, "#4fd1c5", 3);
+      x.fillStyle="#4fd1c5"; x.font="12px system-ui"; x.textAlign="center";
+      x.fillText("F", x1+d1*aLen*0.5, cy-10);
+      x.fillText("F", x2+d2*aLen*0.5, cy-10);
+    }
+    drawCharge(x, x1, cy, q1>=0?1:-1, 15);
+    drawCharge(x, x2, cy, q2>=0?1:-1, 15);
+    x.fillStyle="#98a3bd"; x.textAlign="center"; x.font="12px system-ui";
+    x.fillText("q₁="+(q1>=0?"+":"")+q1.toFixed(1)+"μC", x1, cy+34);
+    x.fillText("q₂="+(q2>=0?"+":"")+q2.toFixed(1)+"μC", x2, cy+34);
+  }
+  q1El.addEventListener("input",coulUpdate);
+  q2El.addEventListener("input",coulUpdate);
+  rEl.addEventListener("input",coulUpdate);
+
+  // ========================================================
+  // DIPOLE
+  // ========================================================
+  var dip = setup(document.getElementById("cDip"), 360);
+  var dipSep=80, dipDisp="lines", dipProbe=null, dipShowProbe=true, dipDrag=false;
+  var dSepEl=document.getElementById("dSep");
+  dSepEl.addEventListener("input", function(){
+    dipSep=parseFloat(dSepEl.value);
+    document.getElementById("dVal").textContent=dipSep+" px";
+    drawDip();
+  });
+  document.getElementById("dipDispSeg").addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#dipDispSeg button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on"); dipDisp=b.getAttribute("data-disp"); drawDip();
+  });
+  document.getElementById("dipToggleProbe").addEventListener("click", function(){
+    dipShowProbe=!dipShowProbe; drawDip();
+  });
+  function dipCharges(){
+    var W=dip.cssW, H=dip.cssH;
+    return [{x:W/2-dipSep/2,y:H/2,q:3e-9,sign:1},{x:W/2+dipSep/2,y:H/2,q:-3e-9,sign:-1}];
+  }
+  function dipDown(ev){
+    ev.preventDefault(); dipDrag=true;
+    var p=canvasPos(dip,ev); dipProbe={x:p.x,y:p.y}; dipShowProbe=true; drawDip();
+  }
+  function dipMove(ev){
+    if(!dipDrag) return; ev.preventDefault();
+    var p=canvasPos(dip,ev);
+    dipProbe={x:Math.max(6,Math.min(dip.cssW-6,p.x)),y:Math.max(6,Math.min(dip.cssH-6,p.y))};
+    drawDip();
+  }
+  function dipUp(){ dipDrag=false; }
+  dip.c.addEventListener("mousedown",dipDown);
+  dip.c.addEventListener("mousemove",dipMove);
+  window.addEventListener("mouseup",dipUp);
+  dip.c.addEventListener("touchstart",dipDown,{passive:false});
+  dip.c.addEventListener("touchmove",dipMove,{passive:false});
+  window.addEventListener("touchend",dipUp);
+
+  function drawDip(){
+    var x=dip.x, W=dip.cssW, H=dip.cssH;
+    var ch=dipCharges();
+    x.clearRect(0,0,W,H); x.fillStyle="#0b0f1a"; x.fillRect(0,0,W,H);
+    if(dipDisp==="lines") drawFieldLines(x,ch,W,H); else drawVectorGrid(x,ch,W,H);
+    for(var i=0;i<ch.length;i++) drawCharge(x,ch[i].x,ch[i].y,ch[i].sign,14);
+    if(!dipProbe){ dipProbe={x:W/2, y:H/2-90}; }
+    if(dipShowProbe){
+      // individual contributions
+      var p=dipProbe;
+      function contrib(c){
+        var dx=p.x-c.x, dy=p.y-c.y, r2=dx*dx+dy*dy; if(r2<25)r2=25;
+        var r=Math.sqrt(r2), e=c.q/r2;
+        return {ex:e*dx/r, ey:e*dy/r, mag:Math.abs(e)};
+      }
+      var e1=contrib(ch[0]), e2=contrib(ch[1]);
+      var net={ex:e1.ex+e2.ex, ey:e1.ey+e2.ey};
+      var scale=6e10;
+      function av(e,col){
+        var lx=e.ex*scale, ly=e.ey*scale;
+        var L=Math.sqrt(lx*lx+ly*ly); if(L>90){lx*=90/L; ly*=90/L;}
+        drawArrow(x,p.x,p.y,p.x+lx,p.y+ly,col,2.2);
+      }
+      av(e1,"#ffd166");
+      av(e2,"#c792ea");
+      var nlx=net.ex*scale, nly=net.ey*scale, nL=Math.sqrt(nlx*nlx+nly*nly);
+      if(nL>95){nlx*=95/nL; nly*=95/nL;}
+      drawArrow(x,p.x,p.y,p.x+nlx,p.y+nly,"#5fd68b",3.2);
+      x.beginPath(); x.arc(p.x,p.y,6,0,7); x.fillStyle="#5fd68b"; x.fill();
+      x.strokeStyle="#0b0f1a"; x.lineWidth=2; x.stroke();
+      var netMag=Math.sqrt(net.ex*net.ex+net.ey*net.ey);
+      document.getElementById("dipReadout").innerHTML =
+        "At the probe: <b style='color:#ffd166'>E₊</b> (from +q) and <b style='color:#c792ea'>E₋</b> (from −q) "+
+        "add as vectors to give the <b style='color:#5fd68b'>net field</b>. |E<sub>net</sub>| ∝ "+
+        (netMag*scale).toFixed(1)+" (arbitrary units). Drag anywhere to move the probe.";
+    } else {
+      document.getElementById("dipReadout").textContent="Probe hidden. Tap 'Show / hide probe' or click the canvas to place it.";
+    }
+  }
+
+  // ========================================================
+  // QUIZ
+  // ========================================================
+  var quizData=[
+    {q:"Two point charges are separated by distance r. If r is doubled, the electrostatic force between them becomes:",
+     opts:["Half","One-quarter","Double","Four times"], a:1,
+     e:"F ∝ 1/r². Doubling r multiplies the denominator by 4, so F becomes F/4."},
+    {q:"The electric field E at a point due to a charge is defined as:",
+     opts:["Force × charge","Force per unit positive test charge (F/q₀)","Charge per unit force","Work done per unit charge"], a:1,
+     e:"E = F/q₀, the force per unit positive test charge. Its unit is N/C (or V/m)."},
+    {q:"Electric field lines of a positive point charge:",
+     opts:["Point radially inward","Point radially outward","Form closed loops","Cross each other"], a:1,
+     e:"Field lines emerge from (point outward of) a positive charge and terminate on negative charges. They never cross."}
+  ];
+  var quizEl=document.getElementById("quiz");
+  quizData.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var qt=document.createElement("div"); qt.className="qtext"; qt.textContent=(qi+1)+". "+item.q; d.appendChild(qt);
+    var exp=document.createElement("div"); exp.className="exp"; exp.textContent=item.e;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(d.getAttribute("data-done")) return;
+        d.setAttribute("data-done","1");
+        var btns=d.querySelectorAll(".opt");
+        btns.forEach(function(x,ix){
+          if(ix===item.a) x.classList.add("correct");
+          else if(ix===oi) x.classList.add("wrong");
+        });
+        exp.classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(exp);
+    quizEl.appendChild(d);
+  });
+
+  // ========================================================
+  // resize + init
+  // ========================================================
+  function resizeAll(){
+    fit(exp); fit(coul); fit(dip);
+    drawExp(); coulUpdate(); drawDip();
+  }
+  var resizeT;
+  window.addEventListener("resize", function(){
+    clearTimeout(resizeT); resizeT=setTimeout(resizeAll,120);
+  });
+
+  // gentle animation of vector-grid pulse only used to keep RAF loop honoring visibility
+  var rafId=null;
+  function frame(){
+    rafId=null;
+    // static scenes; nothing to animate continuously, so we don't reschedule.
+  }
+  function kick(){ if(rafId===null && pageVisible) rafId=requestAnimationFrame(frame); }
+
+  resizeAll();
+  kick();
+})();
+</script>
+</body>
+</html>

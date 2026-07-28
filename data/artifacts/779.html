@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHM Lab — NIOS Class 12 Physics (Ch 11)</title>
+<style>
+  :root{
+    --bg:#0e1622;
+    --panel:#152233;
+    --panel2:#1b2c42;
+    --edge:#263a54;
+    --ink:#e7eefa;
+    --muted:#93a6c0;
+    --accent:#8b5cf6;
+    --accent-dim:#5b3aa8;
+    --accent-ink:#f3efff;
+    --ke:#68d391;
+    --pe:#f6ad55;
+    --tot:#4fd1c5;
+    --bad:#fc8181;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 6px;max-width:1080px;margin:0 auto;}
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 8px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px;}
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    transition:.15s;min-height:40px;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:16px;margin-bottom:16px;
+  }
+  h2{font-size:1.05rem;margin:0 0 10px}
+  .view{display:none}
+  .view.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+  canvas{
+    width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--edge);border-radius:12px;touch-action:none;
+  }
+  .controls label{display:block;font-size:.82rem;color:var(--muted);margin:12px 0 4px}
+  .controls label b{color:var(--ink);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+  .readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px;margin-top:14px;}
+  .stat{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:10px;}
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .v{font-size:1.12rem;font-weight:700;color:var(--accent)}
+  .stat .u{font-size:.72rem;color:var(--muted)}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .btn{
+    background:var(--panel2);border:1px solid var(--edge);color:var(--ink);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.88rem;min-height:40px;transition:.15s;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--edge);border-radius:12px;overflow:hidden}
+  .seg button{background:var(--panel2);border:0;color:var(--muted);padding:9px 14px;cursor:pointer;font-size:.86rem;min-height:40px}
+  .seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+  .note{color:var(--muted);font-size:.82rem;margin:10px 0 0}
+  .formulas{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.formulas{grid-template-columns:1fr 1fr}}
+  .fx{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
+  .fx .eq{font-size:1.05rem;font-weight:700;color:var(--tot);font-family:"Cambria Math",Georgia,serif}
+  .fx .d{font-size:.8rem;color:var(--muted);margin-top:2px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:.82rem;color:var(--muted)}
+  .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .quiz .q{border-top:1px solid var(--edge);padding-top:12px;margin-top:12px}
+  .quiz .q:first-child{border-top:0;padding-top:0;margin-top:0}
+  .quiz p.qt{font-weight:600;margin:0 0 8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--edge);
+    color:var(--ink);padding:10px 12px;border-radius:10px;margin:6px 0;cursor:pointer;font-size:.9rem;min-height:40px}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(104,211,145,.18);border-color:var(--ke);color:#c6f6d5}
+  .opt.wrong{background:rgba(252,129,129,.16);border-color:var(--bad);color:#fed7d7}
+  .expl{font-size:.83rem;color:var(--muted);margin:6px 0 0;display:none}
+  .expl.show{display:block}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:10px 16px 24px}
+  .kbd{font-family:ui-monospace,Consolas,monospace;background:var(--panel2);border:1px solid var(--edge);
+    border-radius:6px;padding:1px 6px;font-size:.8rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>SHM Lab</h1>
+  <p class="sub">NIOS Class 12 Physics · Chapter 11 — Simple Harmonic Motion</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="osc" role="tab">1 · Oscillators</button>
+    <button class="tab" data-view="energy" role="tab">2 · Energy</button>
+    <button class="tab" data-view="phase" role="tab">3 · Phase &amp; Damping</button>
+    <button class="tab" data-view="learn" role="tab">Formulas &amp; Quiz</button>
+  </div>
+
+  <!-- ============ VIEW 1: OSCILLATORS ============ -->
+  <section class="view active" id="view-osc">
+    <div class="grid">
+      <div class="panel">
+        <h2 id="oscTitle">Mass–Spring Oscillator</h2>
+        <canvas id="cOsc" width="640" height="380" aria-label="Oscillator animation and x(t) graph"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>displacement x(t)</span>
+          <span><i style="background:var(--tot)"></i>x = A·cos(ωt)</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <div class="seg" id="oscMode" style="margin-bottom:4px">
+          <button class="on" data-m="spring">Mass–Spring</button>
+          <button data-m="pendulum">Pendulum</button>
+        </div>
+
+        <div id="springCtl">
+          <label>Mass m = <b><span id="vM">0.50</span> kg</b></label>
+          <input type="range" id="sM" min="0.1" max="2" step="0.05" value="0.5">
+          <label>Spring constant k = <b><span id="vK">20</span> N/m</b></label>
+          <input type="range" id="sK" min="2" max="80" step="1" value="20">
+        </div>
+
+        <div id="penCtl" style="display:none">
+          <label>Length L = <b><span id="vL">1.00</span> m</b></label>
+          <input type="range" id="sL" min="0.2" max="3" step="0.05" value="1">
+          <label>Gravity g = <b><span id="vG">9.81</span> m/s²</b></label>
+          <input type="range" id="sG" min="1.6" max="20" step="0.01" value="9.81">
+        </div>
+
+        <label>Amplitude A = <b><span id="vA">0.60</span></b> <span id="uA">m</span></label>
+        <input type="range" id="sA" min="0.1" max="1" step="0.02" value="0.6">
+
+        <div class="readout">
+          <div class="stat"><div class="k">Period T</div><div class="v" id="oT">1.00</div><div class="u">s</div></div>
+          <div class="stat"><div class="k">Frequency f</div><div class="v" id="oF">1.00</div><div class="u">Hz</div></div>
+          <div class="stat"><div class="k">ω</div><div class="v" id="oW">6.28</div><div class="u">rad/s</div></div>
+          <div class="stat"><div class="k">x</div><div class="v" id="oX">0.00</div><div class="u" id="oXu">m</div></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn" id="oPause">Pause</button>
+          <button class="btn" id="oReset">Reset phase</button>
+        </div>
+        <p class="note">Spring: T = 2π√(m/k). Pendulum: T = 2π√(L/g) (small angles). The graph is a live plot of x = A·cos(ωt).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: ENERGY ============ -->
+  <section class="view" id="view-energy">
+    <div class="grid">
+      <div class="panel">
+        <h2>Energy Exchange in SHM</h2>
+        <canvas id="cEn" width="640" height="380" aria-label="Energy bars and curves"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--ke)"></i>Kinetic KE</span>
+          <span><i style="background:var(--pe)"></i>Potential PE</span>
+          <span><i style="background:var(--tot)"></i>Total E</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <label>Mass m = <b><span id="evM">0.50</span> kg</b></label>
+        <input type="range" id="esM" min="0.1" max="2" step="0.05" value="0.5">
+        <label>Spring constant k = <b><span id="evK">20</span> N/m</b></label>
+        <input type="range" id="esK" min="2" max="80" step="1" value="20">
+        <label>Amplitude A = <b><span id="evA">0.60</span> m</b></label>
+        <input type="range" id="esA" min="0.1" max="1" step="0.02" value="0.6">
+        <div class="readout">
+          <div class="stat"><div class="k">KE</div><div class="v" style="color:var(--ke)" id="eKE">0.00</div><div class="u">J</div></div>
+          <div class="stat"><div class="k">PE</div><div class="v" style="color:var(--pe)" id="ePE">0.00</div><div class="u">J</div></div>
+          <div class="stat"><div class="k">Total E</div><div class="v" style="color:var(--tot)" id="eTOT">0.00</div><div class="u">J</div></div>
+          <div class="stat"><div class="k">x</div><div class="v" id="eX">0.00</div><div class="u">m</div></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn" id="ePause">Pause</button>
+        </div>
+        <p class="note">Total energy E = ½kA² stays constant; KE and PE trade off. KE = ½k(A²−x²), PE = ½kx².</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: PHASE & DAMPING ============ -->
+  <section class="view" id="view-phase">
+    <div class="grid">
+      <div class="panel">
+        <h2>Phasor Reference &amp; Damping</h2>
+        <canvas id="cPh" width="640" height="380" aria-label="Circle of reference and damped oscillation"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>rotating phasor</span>
+          <span><i style="background:var(--tot)"></i>x(t)</span>
+          <span><i style="background:var(--bad)"></i>decay envelope</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <div class="seg" id="dampMode" style="margin-bottom:6px">
+          <button class="on" data-d="undamped">Undamped</button>
+          <button data-d="damped">Damped</button>
+        </div>
+        <label>Amplitude A = <b><span id="pvA">0.70</span> m</b></label>
+        <input type="range" id="psA" min="0.2" max="1" step="0.02" value="0.7">
+        <label>Angular frequency ω = <b><span id="pvW">4.0</span> rad/s</b></label>
+        <input type="range" id="psW" min="1" max="8" step="0.1" value="4">
+        <label id="dampLbl" style="opacity:.4">Damping γ = <b><span id="pvB">0.40</span> /s</b></label>
+        <input type="range" id="psB" min="0" max="1.5" step="0.02" value="0.4" disabled>
+        <div class="readout">
+          <div class="stat"><div class="k">Phase ωt</div><div class="v" id="pPh">0°</div><div class="u">deg</div></div>
+          <div class="stat"><div class="k">x</div><div class="v" id="pX">0.00</div><div class="u">m</div></div>
+          <div class="stat"><div class="k">Envelope</div><div class="v" id="pEnv">0.70</div><div class="u">m</div></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn" id="pPause">Pause</button>
+          <button class="btn" id="pReset">Restart</button>
+        </div>
+        <p class="note">A phasor of length A rotates at ω; its x-projection is the SHM. Damped: x = A·e<sup>−γt</sup>·cos(ωt), amplitude decays.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: FORMULAS & QUIZ ============ -->
+  <section class="view" id="view-learn">
+    <div class="panel">
+      <h2>Key Formulas</h2>
+      <div class="formulas">
+        <div class="fx"><div class="eq">a = −ω²x</div><div class="d">Restoring acceleration ∝ displacement, opposite direction</div></div>
+        <div class="fx"><div class="eq">ω = 2πf = 2π/T</div><div class="d">Angular frequency (rad/s)</div></div>
+        <div class="fx"><div class="eq">T = 2π√(m/k)</div><div class="d">Period of a mass–spring system</div></div>
+        <div class="fx"><div class="eq">T = 2π√(L/g)</div><div class="d">Period of a simple pendulum (small angle)</div></div>
+        <div class="fx"><div class="eq">x = A·cos(ωt + φ)</div><div class="d">Displacement; v = −Aω·sin, a = −Aω²·cos</div></div>
+        <div class="fx"><div class="eq">E = ½kA²</div><div class="d">Total mechanical energy = KE + PE = constant</div></div>
+      </div>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz <span class="note" style="font-weight:400">— tap an option to check</span></h2>
+      <div class="q" data-a="1">
+        <p class="qt">1. For a body in SHM, the acceleration is</p>
+        <button class="opt">always directed along the velocity</button>
+        <button class="opt">proportional to displacement and directed toward the mean position</button>
+        <button class="opt">constant in magnitude and direction</button>
+        <button class="opt">zero at the extreme positions</button>
+        <p class="expl">a = −ω²x: magnitude is largest at the extremes and points back toward the mean position.</p>
+      </div>
+      <div class="q" data-a="2">
+        <p class="qt">2. If the mass on a spring is quadrupled (×4), the period T</p>
+        <button class="opt">is halved</button>
+        <button class="opt">stays the same</button>
+        <button class="opt">doubles</button>
+        <button class="opt">becomes four times larger</button>
+        <p class="expl">T = 2π√(m/k) ∝ √m. Multiplying m by 4 multiplies √m by 2, so T doubles.</p>
+      </div>
+      <div class="q" data-a="1">
+        <p class="qt">3. At the mean position of an oscillator, the energy is</p>
+        <button class="opt">maximum PE, zero KE</button>
+        <button class="opt">maximum KE, zero PE</button>
+        <button class="opt">equal KE and PE, both half of total</button>
+        <button class="opt">zero total energy</button>
+        <p class="expl">At x = 0 the speed is greatest, so KE is maximum and PE = ½kx² = 0. Total E is unchanged.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>SHM Lab · vanilla JS · animation pauses when the tab is hidden. Keyboard: <span class="kbd">Space</span> pauses the active view.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TAU = Math.PI*2;
+  var css = getComputedStyle(document.documentElement);
+  function C(n){return css.getPropertyValue(n).trim();}
+  var COL = {
+    ink:C('--ink'), muted:C('--muted'), edge:C('--edge'), accent:C('--accent'),
+    ke:C('--ke'), pe:C('--pe'), tot:C('--tot'), bad:C('--bad'), panel2:C('--panel2')
+  };
+
+  // ---- HiDPI canvas setup ----
+  function setup(cv){
+    var ctx = cv.getContext('2d');
+    function resize(){
+      var w = cv.clientWidth||640;
+      var ratio = 380/640;
+      var h = Math.round(w*ratio);
+      var dpr = Math.min(window.devicePixelRatio||1, 2);
+      cv.width = Math.round(w*dpr);
+      cv.height = Math.round(h*dpr);
+      cv.style.height = h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      cv._w = w; cv._h = h;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+    return ctx;
+  }
+
+  // ---- Tab switching ----
+  var tabs = document.querySelectorAll('.tab');
+  var current = 'osc';
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var v = t.getAttribute('data-view');
+      current = v;
+      document.querySelectorAll('.view').forEach(function(s){s.classList.remove('active');});
+      document.getElementById('view-'+v).classList.add('active');
+      // ensure canvases size correctly after becoming visible
+      window.dispatchEvent(new Event('resize'));
+    });
+  });
+
+  function num(id){return parseFloat(document.getElementById(id).value);}
+  function setTxt(id,v){document.getElementById(id).textContent=v;}
+
+  // =========================================================
+  // VIEW 1 — Oscillators
+  // =========================================================
+  var ctxO = setup(document.getElementById('cOsc'));
+  var oState = {mode:'spring', t:0, paused:false, hist:[]};
+  document.querySelectorAll('#oscMode button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#oscMode button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      oState.mode = b.getAttribute('data-m');
+      var spring = oState.mode==='spring';
+      document.getElementById('springCtl').style.display = spring?'block':'none';
+      document.getElementById('penCtl').style.display = spring?'none':'block';
+      document.getElementById('oscTitle').textContent = spring?'Mass–Spring Oscillator':'Simple Pendulum';
+      document.getElementById('uA').textContent = spring?'m':'rad';
+      document.getElementById('oXu').textContent = spring?'m':'rad';
+      oState.hist = []; oState.t = 0;
+    });
+  });
+  ['sM','sK','sL','sG','sA'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', oReadouts);
+  });
+  document.getElementById('oPause').addEventListener('click', function(){
+    oState.paused=!oState.paused; this.textContent=oState.paused?'Play':'Pause'; this.classList.toggle('on',oState.paused);
+  });
+  document.getElementById('oReset').addEventListener('click', function(){oState.t=0;oState.hist=[];});
+
+  function oOmega(){
+    if(oState.mode==='spring'){ return Math.sqrt(num('sK')/num('sM')); }
+    return Math.sqrt(num('sG')/num('sL'));
+  }
+  function oReadouts(){
+    setTxt('vM', num('sM').toFixed(2));
+    setTxt('vK', num('sK').toFixed(0));
+    setTxt('vL', num('sL').toFixed(2));
+    setTxt('vG', num('sG').toFixed(2));
+    setTxt('vA', num('sA').toFixed(2));
+    var w = oOmega(), T = TAU/w, f = 1/T;
+    setTxt('oT', T.toFixed(2));
+    setTxt('oF', f.toFixed(2));
+    setTxt('oW', w.toFixed(2));
+  }
+
+  function drawOsc(){
+    var ctx=ctxO, cv=ctx.canvas, W=cv._w, H=cv._h;
+    ctx.clearRect(0,0,W,H);
+    var w = oOmega(), A = num('sA');
+    var x = A*Math.cos(w*oState.t); // normalized displacement
+    setTxt('oX', x.toFixed(2));
+
+    var animH = H*0.5;
+    // --- animation region (top half) ---
+    if(oState.mode==='spring'){
+      // horizontal spring, wall on left
+      var cy = animH*0.5;
+      var wallX = 40, restX = W*0.5;
+      var px = restX + (x/1)*(W*0.30); // map A(max1) to 30% width
+      // wall
+      ctx.fillStyle=COL.edge; ctx.fillRect(wallX-8,cy-40,8,80);
+      // spring coils
+      ctx.strokeStyle=COL.muted; ctx.lineWidth=2; ctx.beginPath();
+      var coils=14, span=px-wallX-18;
+      ctx.moveTo(wallX,cy);
+      for(var i=0;i<=coils;i++){
+        var fx=wallX+ span*(i/coils);
+        var fy=cy + (i%2? -12:12)*(i>0&&i<coils?1:0);
+        ctx.lineTo(fx,fy);
+      }
+      ctx.lineTo(px-18,cy); ctx.stroke();
+      // block
+      ctx.fillStyle=COL.accent; roundRect(ctx,px-18,cy-24,44,48,8); ctx.fill();
+      // mean line
+      ctx.strokeStyle='rgba(139,92,246,.35)'; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(restX,cy-46); ctx.lineTo(restX,cy+46); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='center';
+      ctx.fillText('mean', restX, cy+60);
+    } else {
+      // pendulum
+      var pivotX=W*0.5, pivotY=18, Lpx=animH*0.72;
+      var ang = (x)*0.5; // x is A*cos; treat as angle in rad scaled for visibility (A up to 1 rad shown ~0.5)
+      var bx=pivotX+Lpx*Math.sin(ang), by=pivotY+Lpx*Math.cos(ang);
+      ctx.strokeStyle=COL.muted; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(pivotX,pivotY); ctx.lineTo(bx,by); ctx.stroke();
+      ctx.fillStyle=COL.edge; ctx.beginPath(); ctx.arc(pivotX,pivotY,5,0,TAU); ctx.fill();
+      ctx.fillStyle=COL.accent; ctx.beginPath(); ctx.arc(bx,by,18,0,TAU); ctx.fill();
+      // vertical dashed
+      ctx.strokeStyle='rgba(139,92,246,.3)'; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(pivotX,pivotY); ctx.lineTo(pivotX,pivotY+Lpx+22); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // --- x(t) graph (bottom half) ---
+    var gy0 = animH+8, gy1=H-8, gcy=(gy0+gy1)/2, gAmp=(gy1-gy0)/2-6;
+    // axis
+    ctx.strokeStyle=COL.edge; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(30,gcy); ctx.lineTo(W-8,gcy); ctx.stroke();
+    ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='left';
+    ctx.fillText('x(t)', 6, gy0+12);
+    // record history (normalized -1..1)
+    oState.hist.push(x/Math.max(A,0.0001));
+    var maxN = W-40;
+    if(oState.hist.length>maxN) oState.hist.shift();
+    // curve
+    ctx.strokeStyle=COL.tot; ctx.lineWidth=2; ctx.beginPath();
+    for(var j=0;j<oState.hist.length;j++){
+      var gx=30+j, gyv=gcy - oState.hist[j]*gAmp;
+      if(j===0) ctx.moveTo(gx,gyv); else ctx.lineTo(gx,gyv);
+    }
+    ctx.stroke();
+    // moving marker (current value at right end)
+    var curY=gcy - (x/Math.max(A,0.0001))*gAmp;
+    var curX=30+oState.hist.length-1;
+    ctx.fillStyle=COL.accent; ctx.beginPath(); ctx.arc(curX,curY,4,0,TAU); ctx.fill();
+  }
+
+  // =========================================================
+  // VIEW 2 — Energy
+  // =========================================================
+  var ctxE = setup(document.getElementById('cEn'));
+  var eState={t:0, paused:false, hist:[]};
+  ['esM','esK','esA'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', eReadouts);
+  });
+  document.getElementById('ePause').addEventListener('click', function(){
+    eState.paused=!eState.paused; this.textContent=eState.paused?'Play':'Pause'; this.classList.toggle('on',eState.paused);
+  });
+  function eReadouts(){
+    setTxt('evM', num('esM').toFixed(2));
+    setTxt('evK', num('esK').toFixed(0));
+    setTxt('evA', num('esA').toFixed(2));
+  }
+  function drawEnergy(){
+    var ctx=ctxE, cv=ctx.canvas, W=cv._w, H=cv._h;
+    ctx.clearRect(0,0,W,H);
+    var m=num('esM'), k=num('esK'), A=num('esA');
+    var w=Math.sqrt(k/m);
+    var x=A*Math.cos(w*eState.t);
+    var E=0.5*k*A*A;
+    var PE=0.5*k*x*x;
+    var KE=E-PE; if(KE<0)KE=0;
+    setTxt('eKE',KE.toFixed(2)); setTxt('ePE',PE.toFixed(2));
+    setTxt('eTOT',E.toFixed(2)); setTxt('eX',x.toFixed(2));
+
+    // --- bars (left) ---
+    var bx=46, bw=64, gap=34, top=24, bh=H*0.55;
+    function bar(px,val,max,col,lbl){
+      var h=max>0?(val/max)*bh:0;
+      ctx.fillStyle=COL.panel2; ctx.strokeStyle=COL.edge;
+      roundRect(ctx,px,top,bw,bh,8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=col; roundRect(ctx,px,top+bh-h,bw,h,8); ctx.fill();
+      ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='center';
+      ctx.fillText(lbl, px+bw/2, top+bh+16);
+      ctx.fillStyle=COL.ink; ctx.font='bold 11px system-ui';
+      ctx.fillText(val.toFixed(2)+' J', px+bw/2, top+bh+30);
+    }
+    var maxE=E>0?E:1;
+    bar(bx, KE, maxE, COL.ke, 'KE');
+    bar(bx+bw+gap, PE, maxE, COL.pe, 'PE');
+    bar(bx+2*(bw+gap), E, maxE, COL.tot, 'Total');
+
+    // small oscillator dot on a track showing x
+    var trkY=top+bh+52, trkX0=46, trkX1=bx+2*(bw+gap)+bw;
+    ctx.strokeStyle=COL.edge; ctx.beginPath(); ctx.moveTo(trkX0,trkY); ctx.lineTo(trkX1,trkY); ctx.stroke();
+    var mid=(trkX0+trkX1)/2, half=(trkX1-trkX0)/2-14;
+    ctx.strokeStyle='rgba(139,92,246,.3)'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(mid,trkY-14); ctx.lineTo(mid,trkY+14); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=COL.accent; ctx.beginPath(); ctx.arc(mid+(x/A)*half,trkY,10,0,TAU); ctx.fill();
+
+    // --- KE/PE vs time graph (right/bottom) ---
+    var gy0=top+bh+72, gy1=H-6;
+    if(gy0<gy1-20){
+      var gcy=(gy0+gy1)/2, gAmp=(gy1-gy0)/2-2;
+      eState.hist.push({ke:KE,pe:PE,e:E});
+      var maxN=W-40; if(eState.hist.length>maxN)eState.hist.shift();
+      var scale=E>0?gAmp/E:0;
+      function curve(key,col){
+        ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+        for(var j=0;j<eState.hist.length;j++){
+          var gx=30+j, gv=gy1-eState.hist[j][key]*scale;
+          if(j===0)ctx.moveTo(gx,gv); else ctx.lineTo(gx,gv);
+        }
+        ctx.stroke();
+      }
+      ctx.strokeStyle=COL.edge; ctx.beginPath(); ctx.moveTo(30,gy1); ctx.lineTo(W-8,gy1); ctx.stroke();
+      curve('e',COL.tot); curve('pe',COL.pe); curve('ke',COL.ke);
+      ctx.fillStyle=COL.muted; ctx.font='10px system-ui'; ctx.textAlign='left';
+      ctx.fillText('energy vs time', 32, gy0+2);
+    }
+  }
+
+  // =========================================================
+  // VIEW 3 — Phase & Damping
+  // =========================================================
+  var ctxP = setup(document.getElementById('cPh'));
+  var pState={mode:'undamped', t:0, paused:false, hist:[]};
+  document.querySelectorAll('#dampMode button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('#dampMode button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      pState.mode=b.getAttribute('data-d');
+      var damped=pState.mode==='damped';
+      document.getElementById('psB').disabled=!damped;
+      document.getElementById('dampLbl').style.opacity=damped?'1':'.4';
+      pState.t=0; pState.hist=[];
+    });
+  });
+  ['psA','psW','psB'].forEach(function(id){
+    document.getElementById(id).addEventListener('input', pReadouts);
+  });
+  document.getElementById('pPause').addEventListener('click', function(){
+    pState.paused=!pState.paused; this.textContent=pState.paused?'Play':'Pause'; this.classList.toggle('on',pState.paused);
+  });
+  document.getElementById('pReset').addEventListener('click', function(){pState.t=0;pState.hist=[];});
+  function pReadouts(){
+    setTxt('pvA', num('psA').toFixed(2));
+    setTxt('pvW', num('psW').toFixed(1));
+    setTxt('pvB', num('psB').toFixed(2));
+  }
+  function drawPhase(){
+    var ctx=ctxP, cv=ctx.canvas, W=cv._w, H=cv._h;
+    ctx.clearRect(0,0,W,H);
+    var A=num('psA'), w=num('psW');
+    var gamma = pState.mode==='damped'? num('psB') : 0;
+    var env = A*Math.exp(-gamma*pState.t);
+    var phase = w*pState.t;
+    var x = env*Math.cos(phase);
+    setTxt('pPh', (((phase*180/Math.PI)%360+360)%360).toFixed(0)+'°');
+    setTxt('pX', x.toFixed(2));
+    setTxt('pEnv', env.toFixed(2));
+
+    // --- circle of reference (left) ---
+    var R=Math.min(W*0.20, H*0.32);
+    var ccx=R+30, ccy=H*0.32;
+    ctx.strokeStyle=COL.edge; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(ccx,ccy,R,0,TAU); ctx.stroke();
+    // axes
+    ctx.strokeStyle='rgba(147,166,192,.25)';
+    ctx.beginPath(); ctx.moveTo(ccx-R,ccy); ctx.lineTo(ccx+R,ccy); ctx.moveTo(ccx,ccy-R); ctx.lineTo(ccx,ccy+R); ctx.stroke();
+    var rEff=R*(env/Math.max(A,0.0001));
+    var pxp=ccx+rEff*Math.cos(phase), pyp=ccy-rEff*Math.sin(phase);
+    // phasor
+    ctx.strokeStyle=COL.accent; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(ccx,ccy); ctx.lineTo(pxp,pyp); ctx.stroke();
+    ctx.fillStyle=COL.accent; ctx.beginPath(); ctx.arc(pxp,pyp,6,0,TAU); ctx.fill();
+    // projection to x-axis
+    ctx.strokeStyle='rgba(79,209,197,.7)'; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(pxp,pyp); ctx.lineTo(pxp,ccy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=COL.tot; ctx.beginPath(); ctx.arc(pxp,ccy,4,0,TAU); ctx.fill();
+    ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='center';
+    ctx.fillText('circle of reference', ccx, ccy+R+18);
+
+    // --- x(t) graph (right) ---
+    var gx0=ccx+R+34, gx1=W-10;
+    var gcy=H*0.32, gAmp=Math.min(R, (H*0.30));
+    ctx.strokeStyle=COL.edge; ctx.beginPath(); ctx.moveTo(gx0,gcy); ctx.lineTo(gx1,gcy); ctx.stroke();
+    // link line from projection to graph start
+    ctx.strokeStyle='rgba(79,209,197,.4)'; ctx.setLineDash([2,4]);
+    ctx.beginPath(); ctx.moveTo(pxp,ccy); ctx.lineTo(gx0, gcy - (x/Math.max(A,0.0001))*gAmp); ctx.stroke(); ctx.setLineDash([]);
+    // history
+    pState.hist.push(x);
+    var maxN=(gx1-gx0); if(pState.hist.length>maxN)pState.hist.shift();
+    // envelope curves
+    if(gamma>0){
+      ctx.strokeStyle='rgba(252,129,129,.7)'; ctx.lineWidth=1.5;
+      for(var s=-1;s<=1;s+=2){
+        ctx.beginPath();
+        for(var j=0;j<pState.hist.length;j++){
+          // recompute envelope for the time corresponding to this sample
+          var tt = pState.t - (pState.hist.length-1-j)*(1/60);
+          var ev = A*Math.exp(-gamma*Math.max(tt,0));
+          var gv=gcy - s*(ev/Math.max(A,0.0001))*gAmp;
+          if(j===0)ctx.moveTo(gx0+j,gv); else ctx.lineTo(gx0+j,gv);
+        }
+        ctx.stroke();
+      }
+    }
+    // x(t)
+    ctx.strokeStyle=COL.tot; ctx.lineWidth=2; ctx.beginPath();
+    for(var jj=0;jj<pState.hist.length;jj++){
+      var gv2=gcy - (pState.hist[jj]/Math.max(A,0.0001))*gAmp;
+      if(jj===0)ctx.moveTo(gx0+jj,gv2); else ctx.lineTo(gx0+jj,gv2);
+    }
+    ctx.stroke();
+    ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='left';
+    ctx.fillText('x(t) projection', gx0, gcy+gAmp+14);
+  }
+
+  // ---- helper ----
+  function roundRect(ctx,x,y,w,h,r){
+    if(h<0){y+=h;h=-h;}
+    r=Math.min(r,w/2,h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  // =========================================================
+  // Quiz
+  // =========================================================
+  document.querySelectorAll('#quiz .q').forEach(function(q){
+    var ans=parseInt(q.getAttribute('data-a'),10);
+    var opts=q.querySelectorAll('.opt');
+    var expl=q.querySelector('.expl');
+    opts.forEach(function(o,i){
+      o.addEventListener('click', function(){
+        if(q._done) return;
+        q._done=true;
+        opts.forEach(function(x){x.style.cursor='default';});
+        opts[ans].classList.add('correct');
+        if(i!==ans) o.classList.add('wrong');
+        expl.classList.add('show');
+      });
+    });
+  });
+
+  // =========================================================
+  // Animation loop
+  // =========================================================
+  var last=performance.now();
+  function frame(now){
+    var dt=(now-last)/1000; last=now;
+    if(dt>0.1) dt=0.1; // clamp after tab hidden
+    if(!document.hidden){
+      if(current==='osc'){
+        if(!oState.paused) oState.t+=dt;
+        drawOsc();
+      } else if(current==='energy'){
+        if(!eState.paused) eState.t+=dt;
+        drawEnergy();
+      } else if(current==='phase'){
+        if(!pState.paused) pState.t+=dt;
+        drawPhase();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // keyboard: space toggles pause on active view
+  window.addEventListener('keydown', function(e){
+    if(e.code==='Space' && !/input|button|textarea/i.test(e.target.tagName)){
+      e.preventDefault();
+      var map={osc:'oPause',energy:'ePause',phase:'pPause'};
+      if(map[current]) document.getElementById(map[current]).click();
+    }
+  });
+
+  // init readouts and start
+  oReadouts(); eReadouts(); pReadouts();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
