@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Human Impact Lab — NIOS Class 10 Science (Ch30)</title>
+<style>
+  :root{
+    --bg:#0f1710; --panel:#17231550; --panel2:#1a2818; --ink:#e9f1e6;
+    --muted:#a7bda0; --accent:#7ed957; --accent2:#5fb43e; --line:#2c3d29;
+    --good:#4ade80; --bad:#f87171; --warn:#fbbf24; --sky:#5ec6ff; --sun:#ffd24d;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(160deg,#0c130a,#0f1710 40%,#111c0f);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px 14px 60px}
+  header h1{font-size:1.35rem;margin:0 0 4px}
+  header p{margin:0;color:var(--muted);font-size:.9rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+  .tab{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;min-height:40px;
+  }
+  .tab.active{background:var(--accent);color:#0c2005;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel2);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{margin:0 0 6px;font-size:1.05rem;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:.95rem}
+  .mode{display:none}
+  .mode.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:16px}
+  .col{flex:1 1 300px;min-width:0}
+  svg{display:block;max-width:100%;height:auto}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:10px 0}
+  .controls label{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  input[type=range]{width:190px;accent-color:var(--accent);height:26px}
+  button.btn{
+    background:var(--accent);color:#0c2005;border:none;border-radius:10px;
+    padding:9px 14px;font-size:.9rem;font-weight:600;cursor:pointer;min-height:40px;
+  }
+  button.btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .info{
+    margin-top:12px;background:var(--panel);border:1px dashed var(--line);
+    border-radius:12px;padding:12px;font-size:.9rem;min-height:52px;
+  }
+  .info b{color:var(--accent)}
+  .stat{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+  .pill{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;font-size:.85rem;min-width:118px}
+  .pill b{display:block;font-size:1.15rem;color:var(--ink)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:10px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .15s}
+  .card:hover,.card.open{border-color:var(--accent)}
+  .card h4{margin:0 0 6px;font-size:.98rem;color:var(--accent)}
+  .card .body{display:none;font-size:.86rem;color:var(--muted);margin-top:8px}
+  .card.open .body{display:block}
+  .card .body p{margin:4px 0}
+  .card .body b{color:var(--ink)}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .fact{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.86rem}
+  .fact h4{margin:0 0 6px;color:var(--accent);font-size:.95rem}
+  .fact p{margin:4px 0;color:var(--muted)}
+  .quiz .q{margin-bottom:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.92rem}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin:6px 0;cursor:pointer;font-size:.88rem;min-height:40px}
+  .opt.correct{border-color:var(--good);background:#16321a}
+  .opt.wrong{border-color:var(--bad);background:#331717}
+  .expl{font-size:.83rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .binfo{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .binfo button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:6px 12px;font-size:.82rem;cursor:pointer;min-height:36px}
+  .binfo button.on{border-color:var(--accent);color:var(--accent)}
+  .sorter{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  .bin{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:10px;min-height:96px}
+  .bin h4{margin:0 0 6px;font-size:.9rem;text-align:center;color:var(--accent)}
+  .items{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .item{background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+    padding:7px 11px;font-size:.82rem;cursor:pointer;min-height:36px}
+  .item.placed{opacity:.45;pointer-events:none}
+  .drop{font-size:.78rem;color:var(--muted);text-align:center}
+  .foot{color:var(--muted);font-size:.8rem;text-align:center;margin-top:18px}
+  @media (max-width:520px){ .sorter{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Human Impact Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology · Ch30 — Human Impact on Environment</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-m="green">Greenhouse &amp; Warming</button>
+    <button class="tab" data-m="poll">Pollution Types</button>
+    <button class="tab" data-m="cons">Conservation &amp; 3Rs</button>
+    <button class="tab" data-m="facts">Facts</button>
+    <button class="tab" data-m="quiz">Quiz</button>
+  </div>
+
+  <!-- ================= GREENHOUSE ================= -->
+  <section class="mode active" id="m-green">
+    <div class="panel">
+      <h2>Greenhouse Effect &amp; Global Warming</h2>
+      <div class="row">
+        <div class="col">
+          <svg viewBox="0 0 320 240" id="ghSvg" aria-label="Greenhouse effect diagram">
+            <defs>
+              <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#0a1a2a"/><stop offset="1" stop-color="#12324a"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="320" height="240" fill="url(#skyG)"/>
+            <!-- sun -->
+            <circle cx="42" cy="34" r="18" fill="#ffd24d"/>
+            <!-- greenhouse gas band -->
+            <rect id="gasBand" x="0" y="120" width="320" height="34" fill="#7ed957" opacity="0.18"/>
+            <text x="316" y="116" text-anchor="end" font-size="9" fill="#a7bda0">greenhouse gas layer</text>
+            <!-- incoming sunlight -->
+            <line x1="60" y1="50" x2="150" y2="205" stroke="#ffd24d" stroke-width="2"/>
+            <polygon points="150,205 143,196 152,194" fill="#ffd24d"/>
+            <!-- reflected / trapped heat arrows (animated group) -->
+            <g id="heatG"></g>
+            <!-- ground -->
+            <rect x="0" y="205" width="320" height="35" fill="#2c3d29"/>
+            <rect x="0" y="205" width="320" height="6" fill="#3a5233"/>
+            <text x="8" y="228" font-size="10" fill="#cfe0c8">Earth's surface</text>
+          </svg>
+          <div class="controls">
+            <label>CO₂ level: <span id="co2v">420</span> ppm
+              <input type="range" id="co2" min="280" max="900" value="420" step="10">
+            </label>
+            <button class="btn ghost" id="ghPause">Pause</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="stat">
+            <div class="pill">Modeled global temp<b id="tempOut">+1.1 °C</b></div>
+            <div class="pill">CO₂ vs 1750<b id="ppmOut">+140 ppm</b></div>
+            <div class="pill">Sea-level trend<b id="seaOut">rising</b></div>
+          </div>
+          <div class="info" id="ghInfo"></div>
+        </div>
+      </div>
+      <div class="info">
+        <b>How it works:</b> Short-wave sunlight passes through the atmosphere and warms the ground.
+        The warm ground radiates long-wave (infrared) heat. Greenhouse gases — CO₂, methane (CH₄),
+        water vapour, nitrous oxide — absorb and re-emit this heat, keeping Earth ~33 °C warmer than it would
+        otherwise be. Burning fossil fuels adds extra CO₂, thickening this "blanket" and causing
+        <b>global warming</b>: melting glaciers and polar ice, rising sea levels, and shifting weather.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= POLLUTION ================= -->
+  <section class="mode" id="m-poll">
+    <div class="panel">
+      <h2>Pollution Types</h2>
+      <p style="color:var(--muted);font-size:.88rem;margin:0">Tap a card to see causes, effects and how to reduce it.</p>
+      <div class="cards" id="pollCards"></div>
+      <div class="info">
+        <b>Ozone depletion:</b> The ozone (O₃) layer in the stratosphere absorbs harmful ultraviolet (UV)
+        rays. <b>CFCs</b> (chlorofluorocarbons) from old refrigerators, air-conditioners and aerosol sprays
+        release chlorine that destroys ozone, creating the seasonal "ozone hole" over Antarctica. The
+        <b>Montreal Protocol</b> (1987) phased out CFCs and the layer is slowly healing. Note: ozone
+        depletion is a separate problem from the greenhouse effect.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONSERVATION ================= -->
+  <section class="mode" id="m-cons">
+    <div class="panel">
+      <h2>Conservation &amp; the 3 Rs</h2>
+      <div class="row">
+        <div class="col">
+          <h3>Reduce · Reuse · Recycle sorter</h3>
+          <p style="color:var(--muted);font-size:.85rem;margin:2px 0 0">Tap an item, then it drops into the best R-bin.</p>
+          <div class="sorter">
+            <div class="bin" data-bin="reduce"><h4>Reduce</h4><div class="drop">use less</div><div class="items"></div></div>
+            <div class="bin" data-bin="reuse"><h4>Reuse</h4><div class="drop">use again</div><div class="items"></div></div>
+            <div class="bin" data-bin="recycle"><h4>Recycle</h4><div class="drop">remake</div><div class="items"></div></div>
+          </div>
+          <div class="items" id="pool" style="margin-top:12px"></div>
+          <div class="controls"><button class="btn ghost" id="sortReset">Reset sorter</button>
+            <span id="sortScore" style="font-size:.85rem;color:var(--muted)"></span></div>
+        </div>
+        <div class="col">
+          <h3>Forest: deforestation vs afforestation</h3>
+          <svg viewBox="0 0 300 170" id="forestSvg" aria-label="Forest before and after"></svg>
+          <div class="binfo">
+            <button data-f="def" class="on">Deforestation</button>
+            <button data-f="aff">Afforestation</button>
+          </div>
+          <div class="info" id="forestInfo"></div>
+        </div>
+      </div>
+      <div class="info">
+        <b>Biodiversity loss:</b> Habitat destruction, pollution, over-hunting and climate change push
+        species toward extinction, weakening food chains and ecosystem services. <b>Sustainable practices</b>:
+        renewable energy, rainwater harvesting, organic farming, protected reserves &amp; national parks,
+        car-pooling, and the 3 Rs help keep resources for future generations.
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FACTS ================= -->
+  <section class="mode" id="m-facts">
+    <div class="panel">
+      <h2>Facts Panel</h2>
+      <div class="facts">
+        <div class="fact"><h4>Greenhouse gases</h4>
+          <p>CO₂, methane (CH₄), nitrous oxide (N₂O) &amp; water vapour trap heat.</p>
+          <p>CO₂ is the biggest human-caused contributor, mainly from burning coal, oil &amp; gas.</p>
+          <p>Pre-industrial CO₂ ≈ 280 ppm; today ≈ 420 ppm.</p></div>
+        <div class="fact"><h4>Ozone layer</h4>
+          <p>Ozone (O₃) sits in the stratosphere and blocks harmful UV rays.</p>
+          <p>CFCs destroy ozone; the Montreal Protocol banned them.</p>
+          <p>Ground-level ozone, however, is a pollutant in smog.</p></div>
+        <div class="fact"><h4>Pollution</h4>
+          <p>Air: smoke &amp; vehicle exhaust → smog, acid rain, lung disease.</p>
+          <p>Water: sewage &amp; industrial waste → unsafe water, dead fish.</p>
+          <p>Soil: pesticides &amp; plastics reduce fertility. Noise &gt; 85 dB harms hearing.</p></div>
+        <div class="fact"><h4>Conservation</h4>
+          <p>3 Rs: Reduce, Reuse, Recycle.</p>
+          <p>Afforestation and reserves protect biodiversity.</p>
+          <p>Renewable energy &amp; rainwater harvesting are sustainable.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="mode" id="m-quiz">
+    <div class="panel quiz">
+      <h2>Quick Quiz</h2>
+      <p style="color:var(--muted);font-size:.86rem;margin:0 0 10px">Tap an option to check your answer.</p>
+      <div id="quizBox"></div>
+      <div class="info" id="quizScore">Score: 0 / 3</div>
+    </div>
+  </section>
+
+  <div class="foot">Human Impact Lab · self-contained interactive · NIOS Class 10 Science, Chapter 30</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  /* ---------- tabs ---------- */
+  $$(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $$(".tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var m=t.getAttribute("data-m");
+      $$(".mode").forEach(function(sec){sec.classList.remove("active");});
+      $("#m-"+m).classList.add("active");
+    });
+  });
+
+  /* ---------- greenhouse model ---------- */
+  var co2=$("#co2"), co2v=$("#co2v"), tempOut=$("#tempOut"),
+      ppmOut=$("#ppmOut"), seaOut=$("#seaOut"), ghInfo=$("#ghInfo"),
+      gasBand=$("#gasBand"), heatG=$("#heatG");
+  var PRE=280; // pre-industrial ppm
+  // build a few heat arrows
+  var arrows=[];
+  for(var i=0;i<4;i++){
+    var x=70+i*60;
+    var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+    ln.setAttribute("x1",x);ln.setAttribute("x2",x);
+    ln.setAttribute("stroke","#ff8a5c");ln.setAttribute("stroke-width","2");
+    heatG.appendChild(ln);
+    arrows.push({el:ln,x:x,phase:i*0.7});
+  }
+  function updateGH(){
+    var ppm=+co2.value;
+    co2v.textContent=ppm;
+    // climate-sensitivity style log model: ~3 °C per doubling of CO2, ref +0.0 at ~280ppm baseline warming
+    var dT=3.0*Math.log(ppm/PRE)/Math.log(2);   // warming above pre-industrial
+    tempOut.textContent="+"+dT.toFixed(1)+" °C";
+    ppmOut.textContent="+"+(ppm-PRE)+" ppm";
+    // opacity of gas band grows with ppm
+    var op=0.10+Math.min(0.55,(ppm-PRE)/700*0.55);
+    gasBand.setAttribute("opacity",op.toFixed(2));
+    var sea, msg;
+    if(dT<1.0){ sea="stable"; msg="Close to pre-industrial. Ice sheets stable, mild impact."; }
+    else if(dT<2.0){ sea="slowly rising"; msg="Present-day range. Glaciers retreating, seas creeping up, more heatwaves."; }
+    else if(dT<3.0){ sea="rising"; msg="Widespread ice melt, coastal flooding risk, stressed crops and reefs."; }
+    else { sea="rising fast"; msg="Severe warming: major ice loss, large sea-level rise, extreme weather."; }
+    seaOut.textContent=sea;
+    ghInfo.innerHTML="<b>At "+ppm+" ppm:</b> ~"+dT.toFixed(1)+" °C warming above pre-industrial. "+msg+
+      " More greenhouse gas = a thicker heat-trapping blanket.";
+  }
+  co2.addEventListener("input",updateGH);
+  updateGH();
+
+  /* animate heat arrows (bobbing upward = trapped/re-emitted heat) */
+  var paused=false, t0=0;
+  $("#ghPause").addEventListener("click",function(){
+    paused=!paused; this.textContent=paused?"Play":"Pause";
+  });
+  function tick(ts){
+    if(!document.hidden && !paused){
+      var s=ts/600;
+      arrows.forEach(function(a){
+        var y=195-((s+a.phase)%1)*70;   // 195 -> 125 rising
+        a.el.setAttribute("y1",y);
+        a.el.setAttribute("y2",y-12);
+      });
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---------- pollution cards ---------- */
+  var poll=[
+    {t:"Air pollution",c:"Vehicle exhaust, factory smoke, burning coal &amp; crop stubble, dust.",
+     e:"Smog, acid rain, breathing problems, damage to lungs and the ozone by ground-level ozone.",
+     m:"Public transport &amp; EVs, cleaner fuels, filters/scrubbers on chimneys, plant trees."},
+    {t:"Water pollution",c:"Sewage, industrial effluents, fertiliser run-off, oil spills, plastics.",
+     e:"Unsafe drinking water, dead fish, algal blooms (eutrophication), disease.",
+     m:"Treat sewage before release, ban dumping, less chemical fertiliser, clean-up drives."},
+    {t:"Soil pollution",c:"Pesticides, chemical fertilisers, plastic &amp; e-waste, industrial dumping.",
+     e:"Loss of fertility, toxins entering the food chain, harm to soil organisms.",
+     m:"Organic &amp; bio-farming, composting, proper waste disposal, crop rotation."},
+    {t:"Noise pollution",c:"Traffic horns, loudspeakers, machinery, aircraft, construction.",
+     e:"Hearing loss, stress, high blood pressure, poor sleep and concentration.",
+     m:"Horn-free zones, silencers, sound barriers, limit loudspeaker use, green belts."}
+  ];
+  var pc=$("#pollCards");
+  poll.forEach(function(p){
+    var d=document.createElement("div");
+    d.className="card";
+    d.innerHTML="<h4>"+p.t+"</h4><div class='body'><p><b>Causes:</b> "+p.c+"</p>"+
+      "<p><b>Effects:</b> "+p.e+"</p><p><b>Reduce it:</b> "+p.m+"</p></div>";
+    d.addEventListener("click",function(){ d.classList.toggle("open"); });
+    pc.appendChild(d);
+  });
+
+  /* ---------- 3R sorter ---------- */
+  var items=[
+    {n:"Buy less plastic",r:"reduce"},
+    {n:"Cloth shopping bag",r:"reuse"},
+    {n:"Glass jar as container",r:"reuse"},
+    {n:"Turn off idle lights",r:"reduce"},
+    {n:"Old paper → new paper",r:"recycle"},
+    {n:"Melt scrap metal",r:"recycle"},
+    {n:"Refill water bottle",r:"reuse"},
+    {n:"Shorter showers",r:"reduce"},
+    {n:"Sort plastics for pickup",r:"recycle"}
+  ];
+  var pool=$("#pool"), score=0, placed=0;
+  function renderPool(){
+    pool.innerHTML="";
+    items.forEach(function(it,idx){
+      var b=document.createElement("button");
+      b.className="item"; b.textContent=it.n;
+      b.addEventListener("click",function(){ placeItem(it,b); });
+      pool.appendChild(b);
+    });
+  }
+  function placeItem(it,btn){
+    var bin=$(".bin[data-bin='"+it.r+"'] .items");
+    var tag=document.createElement("span");
+    tag.className="item placed"; tag.textContent=it.n;
+    bin.appendChild(tag);
+    btn.classList.add("placed");
+    placed++; score++;
+    $("#sortScore").textContent="Sorted "+placed+" / "+items.length+" correctly.";
+  }
+  $("#sortReset").addEventListener("click",function(){
+    score=0;placed=0;
+    $$(".bin .items").forEach(function(x){x.innerHTML="";});
+    $("#sortScore").textContent="";
+    renderPool();
+  });
+  renderPool();
+
+  /* ---------- forest before/after ---------- */
+  var forestSvg=$("#forestSvg"), forestInfo=$("#forestInfo");
+  function tree(x,y,s){
+    return "<g transform='translate("+x+","+y+") scale("+s+")'>"+
+      "<rect x='-2' y='0' width='4' height='10' fill='#6b4a2b'/>"+
+      "<circle cx='0' cy='-4' r='9' fill='#3f7d33'/>"+
+      "<circle cx='-6' cy='0' r='7' fill='#4a8f3b'/>"+
+      "<circle cx='6' cy='0' r='7' fill='#4a8f3b'/></g>";
+  }
+  function drawForest(mode){
+    var s="<rect x='0' y='0' width='300' height='170' fill='#12324a' opacity='.25'/>"+
+          "<rect x='0' y='130' width='300' height='40' fill='#2c3d29'/>";
+    var n = mode==="aff"?14:3;
+    for(var i=0;i<n;i++){
+      var x=20+ (i% (mode==="aff"?7:3))*40 + (i>=7?18:0);
+      var row = i>=7?150:130;
+      s+=tree(20+(i%7)*40, i<7?128:150, mode==="aff"?1:1);
+    }
+    if(mode==="def"){
+      // stumps
+      for(var j=0;j<5;j++){
+        var sx=140+j*30;
+        s+="<rect x='"+sx+"' y='124' width='6' height='6' fill='#6b4a2b'/>";
+      }
+      s+="<text x='150' y='150' font-size='11' fill='#f0a35c'>cleared land</text>";
+    }
+    forestSvg.innerHTML=s;
+    if(mode==="def"){
+      forestInfo.innerHTML="<b>Deforestation:</b> cutting forests for wood, farms and cities. "+
+        "Effects: more CO₂ in air, soil erosion, loss of wildlife habitat, less rainfall.";
+    } else {
+      forestInfo.innerHTML="<b>Afforestation:</b> planting new forests. "+
+        "Benefits: absorbs CO₂, holds soil, restores habitat &amp; biodiversity, cools the area.";
+    }
+  }
+  $$(".binfo button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $$(".binfo button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      drawForest(b.getAttribute("data-f"));
+    });
+  });
+  drawForest("def");
+
+  /* ---------- quiz ---------- */
+  var quiz=[
+    {q:"Which gas is the main human-caused contributor to the greenhouse effect?",
+     o:["Oxygen","Carbon dioxide","Nitrogen","Helium"],a:1,
+     e:"CO₂ from burning fossil fuels is the largest human-added greenhouse gas."},
+    {q:"The ozone layer is mainly damaged by:",
+     o:["Carbon dioxide","Methane","CFCs (chlorofluorocarbons)","Sulphur dioxide"],a:2,
+     e:"CFCs release chlorine that destroys stratospheric ozone; the Montreal Protocol banned them."},
+    {q:"Which is the best example of 'Reuse' in the 3 Rs?",
+     o:["Melting scrap metal to make new cans","Using a glass jar to store food","Buying fewer plastic items","Turning off unused lights"],a:1,
+     e:"Reuse = using an item again as-is. Melting is Recycle; buying less / switching off is Reduce."}
+  ];
+  var qbox=$("#quizBox"), qScore=0;
+  quiz.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var h="<p>"+(qi+1)+". "+item.q+"</p>";
+    d.innerHTML=h;
+    item.o.forEach(function(opt,oi){
+      var b=document.createElement("button");
+      b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(d.getAttribute("data-done"))return;
+        d.setAttribute("data-done","1");
+        $$(".opt",d).forEach(function(x,xi){
+          if(xi===item.a)x.classList.add("correct");
+        });
+        if(oi!==item.a)b.classList.add("wrong");
+        else qScore++;
+        $(".expl",d).classList.add("show");
+        $("#quizScore").textContent="Score: "+qScore+" / "+quiz.length;
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="expl";
+    ex.textContent="Answer: "+item.o[item.a]+". "+item.e;
+    d.appendChild(ex);
+    qbox.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

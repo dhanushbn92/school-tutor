@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health &amp; Hygiene Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --accent:#4fd1a5;
+    --accent-dark:#2fae86;
+    --bg:#0f1720;
+    --bg2:#152030;
+    --panel:#1b2837;
+    --panel2:#223347;
+    --ink:#e6eef7;
+    --muted:#93a6bd;
+    --line:#2c3d52;
+    --good:#4fd1a5;
+    --bad:#ef6f6f;
+    --warn:#f2c14e;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,#0f1720,#111d2b);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+    min-height:100vh;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.86rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;
+    background:var(--panel);border:2px solid var(--line);
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.86rem;font-weight:600;color:var(--muted);
+    transition:.15s;text-align:center;
+  }
+  .tab:hover{border-color:var(--accent-dark);}
+  .tab.active{color:#08201a;background:var(--accent);border-color:var(--accent);}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  h2{font-size:1.05rem;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:.82rem;margin:0 0 14px;}
+  .hidden{display:none;}
+  .btn{
+    background:var(--accent);color:#08201a;border:none;
+    padding:9px 15px;border-radius:10px;font-weight:700;
+    cursor:pointer;font-size:.86rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  /* filter chips */
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    padding:6px 12px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .chip.on{background:var(--accent);color:#08201a;border-color:var(--accent);}
+  /* disease cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .card{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;cursor:pointer;transition:.15s;position:relative;
+  }
+  .card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .card h3{margin:0 0 6px;font-size:.94rem;}
+  .badge{display:inline-block;font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.3px;}
+  .b-bac{background:#3a5bd8;color:#dbe4ff;}
+  .b-vir{background:#c1476f;color:#ffe0ea;}
+  .b-pro{background:#8a5cd8;color:#eadcff;}
+  .b-fun{background:#b8863a;color:#ffeecb;}
+  .b-non{background:#4a6070;color:#dbe9f7;}
+  .card .tag{font-size:.72rem;color:var(--muted);margin-top:6px;}
+  /* detail modal */
+  .detail{margin-top:14px;background:var(--bg2);border:1px solid var(--accent-dark);border-radius:12px;padding:14px;}
+  .detail h3{margin:0 0 2px;font-size:1.05rem;}
+  .detail .meta{font-size:.78rem;color:var(--muted);margin-bottom:10px;}
+  .detail dl{margin:0;}
+  .detail dt{font-weight:700;color:var(--accent);font-size:.82rem;margin-top:8px;}
+  .detail dd{margin:2px 0 0;font-size:.86rem;}
+  /* immunity */
+  svg{display:block;max-width:100%;height:auto;touch-action:manipulation;}
+  .imm-wrap{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:6px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:10px;}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:5px;}
+  .statusline{font-size:.86rem;font-weight:600;min-height:1.3em;margin-top:8px;color:var(--accent);}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .compare>div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .compare h4{margin:0 0 6px;font-size:.9rem;color:var(--accent);}
+  .compare ul{margin:0;padding-left:18px;font-size:.82rem;}
+  /* plate builder */
+  .plate-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .foods{display:flex;flex-direction:column;gap:7px;}
+  .food{
+    display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+  }
+  .food span.nm{font-size:.84rem;}
+  .food span.gr{font-size:.7rem;color:var(--muted);}
+  .plate-status{margin-top:8px;font-size:.82rem;}
+  .nut-row{display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;border-bottom:1px dashed var(--line);}
+  .nut-row.ok{color:var(--good);}
+  .nut-row.miss{color:var(--muted);}
+  .barwrap{background:var(--bg);border-radius:6px;height:8px;overflow:hidden;flex:1;margin:0 8px;}
+  .bar{height:100%;background:var(--accent);width:0;transition:width .3s;}
+  /* facts + quiz */
+  .facts details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+  .facts summary{cursor:pointer;font-weight:600;font-size:.9rem;}
+  .facts p{margin:8px 0 0;font-size:.84rem;color:var(--ink);}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;}
+  .q p.qtext{font-weight:600;margin:0 0 8px;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);border-radius:8px;padding:9px 11px;margin-bottom:6px;cursor:pointer;font-size:.85rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(79,209,165,.18);border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:rgba(239,111,111,.15);border-color:var(--bad);color:var(--bad);}
+  .expl{font-size:.8rem;color:var(--muted);margin-top:6px;min-height:1em;}
+  .score{font-weight:700;color:var(--accent);margin-top:6px;}
+  footer{color:var(--muted);font-size:.74rem;text-align:center;margin:10px 0 24px;}
+  @media(max-width:560px){
+    .plate-layout{grid-template-columns:1fr;}
+    .compare{grid-template-columns:1fr;}
+  }
+  @media(max-width:360px){
+    .wrap{padding:12px;}
+    .tab{min-width:100px;font-size:.8rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Health &amp; Hygiene Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 32 &middot; explore diseases, immunity, diet &amp; hygiene.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-view="diseases" role="tab">Diseases</div>
+    <div class="tab" data-view="immunity" role="tab">Immunity &amp; Vaccines</div>
+    <div class="tab" data-view="diet" role="tab">Diet &amp; Hygiene</div>
+    <div class="tab" data-view="facts" role="tab">Facts</div>
+    <div class="tab" data-view="quiz" role="tab">Quiz</div>
+  </div>
+
+  <!-- ================= DISEASES ================= -->
+  <section class="panel" id="view-diseases">
+    <h2>Diseases Explorer</h2>
+    <p class="sub">Tap a card to see cause, symptoms and prevention. Filter by type.</p>
+    <div class="chips" id="diseaseChips"></div>
+    <div class="grid" id="diseaseGrid"></div>
+    <div id="diseaseDetail"></div>
+  </section>
+
+  <!-- ================= IMMUNITY ================= -->
+  <section class="panel hidden" id="view-immunity">
+    <h2>Immunity &amp; Vaccination</h2>
+    <p class="sub">Watch white blood cells (WBCs) and antibodies fight invading pathogens.</p>
+    <div class="row" style="margin-bottom:10px;">
+      <button class="btn" id="immInfect">Infection</button>
+      <button class="btn ghost" id="immVaccine">Give Vaccine</button>
+      <button class="btn ghost" id="immReset">Reset</button>
+    </div>
+    <div class="imm-wrap">
+      <svg id="immSvg" viewBox="0 0 400 220" role="img" aria-label="Immune system animation">
+        <rect x="0" y="0" width="400" height="220" fill="#0c1622"/>
+        <g id="immLayer"></g>
+      </svg>
+    </div>
+    <div class="statusline" id="immStatus">Press "Infection" to release pathogens into the bloodstream.</div>
+    <div class="legend">
+      <span><span class="dot" style="background:#ef6f6f"></span>Pathogen (germ)</span>
+      <span><span class="dot" style="background:#7ea6ff"></span>WBC (defender)</span>
+      <span><span class="dot" style="background:#f2c14e"></span>Antibody</span>
+    </div>
+    <div class="compare">
+      <div>
+        <h4>Innate immunity</h4>
+        <ul>
+          <li>Present from birth, non-specific.</li>
+          <li>Skin, mucus, stomach acid, fever.</li>
+          <li>WBCs engulf germs (phagocytosis).</li>
+          <li>Acts fast, no memory.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Acquired immunity</h4>
+        <ul>
+          <li>Develops after exposure, specific.</li>
+          <li>Lymphocytes make antibodies.</li>
+          <li>Memory cells remember the germ.</li>
+          <li>Vaccines build it safely.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DIET & HYGIENE ================= -->
+  <section class="panel hidden" id="view-diet">
+    <h2>Build a Balanced Plate</h2>
+    <p class="sub">Add foods to cover all nutrient groups. A balanced diet prevents deficiency diseases.</p>
+    <div class="plate-layout">
+      <div>
+        <div class="foods" id="foodList"></div>
+        <button class="btn ghost" id="clearPlate" style="margin-top:10px;">Clear plate</button>
+      </div>
+      <div>
+        <div id="nutTracker"></div>
+        <div class="plate-status" id="plateStatus">Your plate is empty.</div>
+      </div>
+    </div>
+    <h2 style="margin-top:18px;">Deficiency Diseases</h2>
+    <p class="sub">What happens when a nutrient is missing.</p>
+    <div class="grid" id="defGrid"></div>
+    <h2 style="margin-top:18px;">Hygiene Tips</h2>
+    <div class="compare">
+      <div>
+        <h4>Personal hygiene</h4>
+        <ul>
+          <li>Wash hands with soap before meals &amp; after toilet.</li>
+          <li>Brush teeth twice; bathe daily.</li>
+          <li>Trim nails; wear clean clothes.</li>
+          <li>Cover mouth when coughing/sneezing.</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Public / community hygiene</h4>
+        <ul>
+          <li>Safe drinking water &amp; proper drainage.</li>
+          <li>Dispose garbage; control mosquitoes.</li>
+          <li>Clean, ventilated homes &amp; toilets.</li>
+          <li>Vaccination drives &amp; awareness.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FACTS ================= -->
+  <section class="panel hidden facts" id="view-facts">
+    <h2>Facts Panel</h2>
+    <p class="sub">Tap each to expand.</p>
+    <details><summary>Pathogens</summary><p>Pathogens are disease-causing microbes: <b>bacteria</b> (TB, cholera, typhoid), <b>viruses</b> (common cold, influenza, COVID-19), <b>protozoa</b> (malaria, amoebiasis), <b>fungi</b> (ringworm), and <b>worms/helminths</b> (tapeworm). They enter through air, water, food, contact or vectors like mosquitoes.</p></details>
+    <details><summary>Communicable vs non-communicable</summary><p><b>Communicable (infectious)</b> diseases spread from person to person or via air, water, food or vectors &mdash; e.g. TB, malaria, cold. <b>Non-communicable (non-infectious)</b> diseases do not spread; they arise from lifestyle, genetics or deficiency &mdash; e.g. diabetes, hypertension, scurvy.</p></details>
+    <details><summary>Immunity</summary><p>Immunity is the body's ability to resist disease. <b>Innate</b> immunity is inborn and non-specific (skin, WBCs, fever). <b>Acquired</b> immunity develops after exposure and is specific: lymphocytes make <b>antibodies</b> and <b>memory cells</b>. Vaccines use weakened/dead germs to train immunity safely.</p></details>
+    <details><summary>Balanced diet</summary><p>A balanced diet supplies all nutrients in the right amounts: <b>carbohydrates</b> (energy), <b>proteins</b> (growth &amp; repair), <b>fats</b> (stored energy), <b>vitamins</b> &amp; <b>minerals</b> (protection &amp; regulation), <b>fibre/roughage</b> (digestion) and <b>water</b>. Lack of a nutrient causes deficiency diseases like scurvy (vitamin C) or rickets (vitamin D).</p></details>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="panel hidden" id="view-quiz">
+    <h2>Quick Quiz</h2>
+    <p class="sub">Tap an option to answer. Answers reveal on click.</p>
+    <div id="quizArea"></div>
+    <div class="score" id="quizScore"></div>
+  </section>
+
+  <footer>General health education for NIOS Class 10 &mdash; not a substitute for professional medical advice.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- tab switching ---------- */
+  var tabs=document.querySelectorAll(".tab");
+  var views={
+    diseases:document.getElementById("view-diseases"),
+    immunity:document.getElementById("view-immunity"),
+    diet:document.getElementById("view-diet"),
+    facts:document.getElementById("view-facts"),
+    quiz:document.getElementById("view-quiz")
+  };
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var v=t.getAttribute("data-view");
+      for(var k in views){views[k].classList.toggle("hidden",k!==v);}
+      if(v==="immunity"){startImm();} else {stopImm();}
+    });
+  });
+
+  /* ---------- disease data ---------- */
+  var diseases=[
+    {n:"Tuberculosis",type:"Bacteria",cls:"b-bac",spread:"Air (droplets)",
+     cause:"Bacterium Mycobacterium tuberculosis, mainly affecting the lungs.",
+     sym:"Persistent cough (over 2 weeks), fever, weight loss, night sweats, blood in sputum.",
+     prev:"BCG vaccine, complete antibiotic course, good ventilation, cover coughs."},
+    {n:"Malaria",type:"Protozoa",cls:"b-pro",spread:"Female Anopheles mosquito",
+     cause:"Protozoan Plasmodium, carried by the bite of an infected female Anopheles mosquito.",
+     sym:"Recurring high fever with chills and shivering, sweating, headache, weakness.",
+     prev:"Mosquito nets, repellents, remove stagnant water, anti-malarial drugs."},
+    {n:"Common Cold",type:"Virus",cls:"b-vir",spread:"Air &amp; contact",
+     cause:"Rhinoviruses and other viruses infecting the nose and throat.",
+     sym:"Runny/blocked nose, sneezing, sore throat, mild fever, cough.",
+     prev:"Wash hands, avoid close contact with patients, cover mouth/nose, rest."},
+    {n:"Ringworm",type:"Fungus",cls:"b-fun",spread:"Contact",
+     cause:"Fungi (dermatophytes) infecting skin, scalp or nails.",
+     sym:"Red, ring-shaped, itchy patches on the skin.",
+     prev:"Keep skin clean &amp; dry, avoid sharing towels/combs, antifungal creams."},
+    {n:"Cholera",type:"Bacteria",cls:"b-bac",spread:"Contaminated water/food",
+     cause:"Bacterium Vibrio cholerae from dirty water or food.",
+     sym:"Severe watery diarrhoea, vomiting, rapid dehydration.",
+     prev:"Safe drinking water, sanitation, ORS, cholera vaccine, wash hands."},
+    {n:"Influenza (Flu)",type:"Virus",cls:"b-vir",spread:"Air (droplets)",
+     cause:"Influenza virus spread by coughing and sneezing.",
+     sym:"Fever, body ache, chills, sore throat, cough, fatigue.",
+     prev:"Annual flu vaccine, hygiene, cover coughs, rest and fluids."},
+    {n:"Diabetes",type:"Non-communicable",cls:"b-non",spread:"Not infectious",
+     cause:"Body cannot make or use insulin properly, so blood sugar rises. Linked to genetics &amp; lifestyle.",
+     sym:"Frequent urination, excessive thirst &amp; hunger, tiredness, slow healing.",
+     prev:"Balanced diet, regular exercise, healthy weight, limit sugar; managed with medicine/insulin."},
+    {n:"Hypertension",type:"Non-communicable",cls:"b-non",spread:"Not infectious",
+     cause:"Persistently high blood pressure due to lifestyle, stress, salt intake &amp; genetics.",
+     sym:"Often none (silent); may cause headache, dizziness; risks heart &amp; kidney damage.",
+     prev:"Low-salt diet, exercise, avoid tobacco/alcohol, manage stress, regular checks."}
+  ];
+  var filters=["All","Bacteria","Virus","Protozoa","Fungus","Non-communicable"];
+  var curFilter="All";
+  var chipBox=document.getElementById("diseaseChips");
+  filters.forEach(function(f){
+    var c=document.createElement("div");
+    c.className="chip"+(f==="All"?" on":"");
+    c.textContent=f;
+    c.addEventListener("click",function(){
+      curFilter=f;
+      chipBox.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});
+      c.classList.add("on");
+      renderDiseases();
+    });
+    chipBox.appendChild(c);
+  });
+  var grid=document.getElementById("diseaseGrid");
+  var detail=document.getElementById("diseaseDetail");
+  function renderDiseases(){
+    grid.innerHTML="";
+    diseases.forEach(function(d,i){
+      if(curFilter!=="All" && d.type!==curFilter) return;
+      var card=document.createElement("div");
+      card.className="card";
+      card.innerHTML='<h3>'+d.n+'</h3><span class="badge '+d.cls+'">'+d.type+'</span>'+
+        '<div class="tag">Spread: '+d.spread+'</div>';
+      card.addEventListener("click",function(){showDetail(i);});
+      grid.appendChild(card);
+    });
+  }
+  function showDetail(i){
+    var d=diseases[i];
+    var comm=(d.type==="Non-communicable")?"Non-communicable":"Communicable";
+    detail.innerHTML='<div class="detail"><h3>'+d.n+'</h3>'+
+      '<div class="meta"><span class="badge '+d.cls+'">'+d.type+'</span> &middot; '+comm+' &middot; Spread: '+d.spread+'</div>'+
+      '<dl><dt>Cause</dt><dd>'+d.cause+'</dd>'+
+      '<dt>Symptoms</dt><dd>'+d.sym+'</dd>'+
+      '<dt>Prevention</dt><dd>'+d.prev+'</dd></dl></div>';
+    detail.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  renderDiseases();
+
+  /* ---------- immunity animation ---------- */
+  var svg=document.getElementById("immSvg");
+  var layer=document.getElementById("immLayer");
+  var NS="http://www.w3.org/2000/svg";
+  var W=400,H=220;
+  var pathogens=[],wbcs=[],antibodies=[];
+  var vaccinated=false, running=false, rafId=null;
+  var immStatus=document.getElementById("immStatus");
+
+  function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs){e.setAttribute(k,attrs[k]);}return e;}
+  function rand(a,b){return a+Math.random()*(b-a);}
+
+  function clearScene(){
+    pathogens=[];wbcs=[];antibodies=[];
+    while(layer.firstChild){layer.removeChild(layer.firstChild);}
+  }
+  function spawnWBCs(n){
+    for(var i=0;i<n;i++){
+      var el=mk("circle",{r:9,fill:"#7ea6ff",stroke:"#b9cdff","stroke-width":1.5});
+      var o={x:rand(30,370),y:rand(30,190),vx:rand(-.5,.5),vy:rand(-.5,.5),el:el};
+      wbcs.push(o);layer.appendChild(el);
+    }
+  }
+  function spawnPathogens(n){
+    for(var i=0;i<n;i++){
+      var g=mk("g",{});
+      var body=mk("circle",{r:7,fill:"#ef6f6f",stroke:"#ffb3b3","stroke-width":1});
+      g.appendChild(body);
+      for(var s=0;s<6;s++){
+        var a=s/6*Math.PI*2;
+        g.appendChild(mk("line",{x1:0,y1:0,x2:Math.cos(a)*11,y2:Math.sin(a)*11,stroke:"#ef6f6f","stroke-width":1.5}));
+      }
+      var o={x:rand(40,360),y:rand(30,190),vx:rand(-1,1),vy:rand(-1,1),el:g,dead:false};
+      pathogens.push(o);layer.appendChild(g);
+    }
+  }
+  function spawnAntibody(x,y,tx,ty){
+    var el=mk("path",{d:"M0,-6 L4,0 L0,6 L-4,0 Z",fill:"#f2c14e"});
+    var o={x:x,y:y,tx:tx,ty:ty,el:el};
+    antibodies.push(o);layer.appendChild(el);
+  }
+  function place(el,x,y,rot){
+    if(el.tagName==="circle"){el.setAttribute("cx",x);el.setAttribute("cy",y);}
+    else{el.setAttribute("transform","translate("+x.toFixed(1)+","+y.toFixed(1)+")"+(rot!=null?" rotate("+rot+")":""));}
+  }
+  function step(){
+    // pathogens move
+    pathogens.forEach(function(p){
+      if(p.dead)return;
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<15||p.x>385)p.vx*=-1;
+      if(p.y<15||p.y>205)p.vy*=-1;
+      place(p.el,p.x,p.y);
+    });
+    // wbcs chase nearest pathogen
+    wbcs.forEach(function(w){
+      var target=null,md=1e9;
+      pathogens.forEach(function(p){if(p.dead)return;var d=(p.x-w.x)*(p.x-w.x)+(p.y-w.y)*(p.y-w.y);if(d<md){md=d;target=p;}});
+      if(target){
+        var dx=target.x-w.x,dy=target.y-w.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+        w.x+=dx/dist*1.4;w.y+=dy/dist*1.4;
+        if(dist<13){target.dead=true;if(target.el.parentNode)layer.removeChild(target.el);}
+      }else{
+        w.x+=w.vx;w.y+=w.vy;
+        if(w.x<15||w.x>385)w.vx*=-1;
+        if(w.y<15||w.y>205)w.vy*=-1;
+      }
+      place(w.el,w.x,w.y);
+    });
+    // antibodies (only when vaccinated) home onto pathogens
+    if(vaccinated){
+      antibodies.forEach(function(ab){
+        var target=null,md=1e9;
+        pathogens.forEach(function(p){if(p.dead)return;var d=(p.x-ab.x)*(p.x-ab.x)+(p.y-ab.y)*(p.y-ab.y);if(d<md){md=d;target=p;}});
+        if(target){
+          var dx=target.x-ab.x,dy=target.y-ab.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+          ab.x+=dx/dist*2.2;ab.y+=dy/dist*2.2;
+          var rot=Math.atan2(dy,dx)*180/Math.PI;
+          place(ab.el,ab.x,ab.y,rot);
+          if(dist<10){target.dead=true;if(target.el.parentNode)layer.removeChild(target.el);ab.x=rand(20,380);ab.y=rand(20,200);}
+        }
+      });
+    }
+    var alive=pathogens.filter(function(p){return !p.dead;}).length;
+    if(running && alive===0 && pathogens.length){
+      immStatus.textContent=vaccinated?
+        "All pathogens cleared quickly! Antibodies from the vaccine recognised the germ immediately.":
+        "Pathogens cleared. WBCs won, but it took time without prepared antibodies.";
+    }
+  }
+  function loop(){
+    if(document.hidden){rafId=null;return;} // pause when tab hidden
+    step();
+    rafId=requestAnimationFrame(loop);
+  }
+  function startLoop(){if(rafId==null && !document.hidden){rafId=requestAnimationFrame(loop);}}
+  function startImm(){
+    if(pathogens.length===0 && wbcs.length===0){resetImm();}
+    running=true;startLoop();
+  }
+  function stopImm(){if(rafId!=null){cancelAnimationFrame(rafId);rafId=null;}}
+  function resetImm(){
+    clearScene();vaccinated=false;
+    spawnWBCs(4);
+    immStatus.textContent='Press "Infection" to release pathogens into the bloodstream.';
+  }
+  document.getElementById("immInfect").addEventListener("click",function(){
+    // keep existing wbcs, add pathogens
+    if(wbcs.length===0)spawnWBCs(4);
+    spawnPathogens(6);
+    running=true;startLoop();
+    immStatus.textContent=vaccinated?
+      "Infection! Vaccine-trained antibodies (yellow) rush in with the WBCs.":
+      "Infection! WBCs (blue) hunt and engulf the germs. No antibodies yet.";
+  });
+  document.getElementById("immVaccine").addEventListener("click",function(){
+    vaccinated=true;
+    // add memory antibodies
+    if(antibodies.length<6){for(var i=antibodies.length;i<6;i++){spawnAntibody(rand(20,380),rand(20,200));}}
+    startLoop();
+    immStatus.textContent="Vaccine given: memory cells produced antibodies (yellow). Now try an infection.";
+  });
+  document.getElementById("immReset").addEventListener("click",function(){
+    resetImm();startLoop();
+  });
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){stopImm();}
+    else if(running && !views.immunity.classList.contains("hidden")){startLoop();}
+  });
+  resetImm();
+
+  /* ---------- diet plate builder ---------- */
+  var nutrients=["Carbohydrates","Proteins","Fats","Vitamins","Minerals","Fibre","Water"];
+  var foods=[
+    {n:"Rice / Roti",g:"grains",nut:["Carbohydrates","Fibre"]},
+    {n:"Dal (lentils)",g:"pulses",nut:["Proteins","Fibre","Minerals"]},
+    {n:"Egg / Fish",g:"protein",nut:["Proteins","Fats"]},
+    {n:"Milk / Curd",g:"dairy",nut:["Proteins","Fats","Minerals"]},
+    {n:"Green vegetables",g:"veg",nut:["Vitamins","Minerals","Fibre"]},
+    {n:"Fruits (orange)",g:"fruit",nut:["Vitamins","Fibre"]},
+    {n:"Nuts / Oil",g:"fat",nut:["Fats"]},
+    {n:"Water",g:"drink",nut:["Water"]}
+  ];
+  var plate={}; // nutrient -> count
+  var foodListEl=document.getElementById("foodList");
+  foods.forEach(function(f,i){
+    var row=document.createElement("div");
+    row.className="food";
+    row.innerHTML='<span><span class="nm">'+f.n+'</span> <span class="gr">('+f.nut.join(", ")+')</span></span>';
+    var b=document.createElement("button");
+    b.className="btn";b.textContent="Add";b.style.padding="6px 12px";
+    b.addEventListener("click",function(){addFood(i);});
+    row.appendChild(b);
+    foodListEl.appendChild(row);
+  });
+  var nutTracker=document.getElementById("nutTracker");
+  var plateStatus=document.getElementById("plateStatus");
+  function addFood(i){
+    foods[i].nut.forEach(function(nt){plate[nt]=(plate[nt]||0)+1;});
+    renderPlate();
+  }
+  document.getElementById("clearPlate").addEventListener("click",function(){plate={};renderPlate();});
+  function renderPlate(){
+    nutTracker.innerHTML="";
+    var have=0;
+    nutrients.forEach(function(nt){
+      var c=plate[nt]||0;
+      if(c>0)have++;
+      var row=document.createElement("div");
+      row.className="nut-row "+(c>0?"ok":"miss");
+      var pct=Math.min(100,c*50);
+      row.innerHTML='<span>'+(c>0?"✔":"•")+' '+nt+'</span>'+
+        '<span class="barwrap"><span class="bar" style="width:'+pct+'%"></span></span>'+
+        '<span>'+c+'</span>';
+      nutTracker.appendChild(row);
+    });
+    if(have===0){plateStatus.textContent="Your plate is empty.";plateStatus.style.color="var(--muted)";}
+    else if(have===nutrients.length){plateStatus.innerHTML="<b>Balanced plate!</b> All 7 nutrient groups covered. ✔";plateStatus.style.color="var(--good)";}
+    else{
+      var missing=nutrients.filter(function(nt){return !plate[nt];});
+      plateStatus.innerHTML="Covered "+have+"/7. Still missing: <b>"+missing.join(", ")+"</b>.";
+      plateStatus.style.color="var(--warn)";
+    }
+  }
+  renderPlate();
+
+  /* deficiency diseases */
+  var defs=[
+    {n:"Scurvy",nut:"Vitamin C",sym:"Bleeding, spongy gums; slow wound healing.",src:"Citrus fruits, amla, guava."},
+    {n:"Rickets",nut:"Vitamin D",sym:"Weak, bent bones in children.",src:"Sunlight, milk, fish, eggs."},
+    {n:"Night blindness",nut:"Vitamin A",sym:"Poor vision in dim light.",src:"Carrots, papaya, green leafy veg."},
+    {n:"Anaemia",nut:"Iron",sym:"Tiredness, pale skin, weakness.",src:"Green leafy veg, jaggery, dates."},
+    {n:"Goitre",nut:"Iodine",sym:"Swelling of the thyroid gland in the neck.",src:"Iodised salt, seafood."},
+    {n:"Kwashiorkor",nut:"Protein",sym:"Swollen belly, stunted growth in children.",src:"Pulses, milk, eggs, fish."},
+    {n:"Beri-beri",nut:"Vitamin B1",sym:"Weak muscles, nerve damage.",src:"Whole grains, pulses, nuts."}
+  ];
+  var defGrid=document.getElementById("defGrid");
+  defs.forEach(function(d){
+    var c=document.createElement("div");
+    c.className="card";c.style.cursor="default";
+    c.innerHTML='<h3>'+d.n+'</h3><span class="badge b-non">'+d.nut+'</span>'+
+      '<div class="tag"><b>Signs:</b> '+d.sym+'</div>'+
+      '<div class="tag"><b>Get it from:</b> '+d.src+'</div>';
+    defGrid.appendChild(c);
+  });
+
+  /* ---------- quiz ---------- */
+  var quiz=[
+    {q:"Malaria is caused by a protozoan spread by:",
+     o:["Houseflies","Female Anopheles mosquito","Cockroaches","Dirty water only"],a:1,
+     e:"Plasmodium is carried by the bite of an infected female Anopheles mosquito."},
+    {q:"Which of these is a NON-communicable disease?",
+     o:["Tuberculosis","Common cold","Diabetes","Cholera"],a:2,
+     e:"Diabetes is a lifestyle/metabolic disease and does not spread from person to person."},
+    {q:"Scurvy is caused by a deficiency of:",
+     o:["Vitamin C","Iron","Protein","Vitamin D"],a:0,
+     e:"Vitamin C (found in citrus fruits and amla) prevents scurvy."}
+  ];
+  var quizArea=document.getElementById("quizArea");
+  var quizScore=document.getElementById("quizScore");
+  var answered=0,correct=0;
+  quiz.forEach(function(item,qi){
+    var box=document.createElement("div");
+    box.className="q";
+    var p=document.createElement("p");p.className="qtext";p.textContent=(qi+1)+". "+item.q;
+    box.appendChild(p);
+    var done=false;
+    item.o.forEach(function(opt,oi){
+      var b=document.createElement("button");
+      b.className="opt";b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(done)return;done=true;answered++;
+        if(oi===item.a){b.classList.add("correct");correct++;}
+        else{b.classList.add("wrong");
+          box.querySelectorAll(".opt")[item.a].classList.add("correct");}
+        expl.textContent=(oi===item.a?"Correct! ":"Answer: "+item.o[item.a]+". ")+item.e;
+        quizScore.textContent="Score: "+correct+" / "+answered+" answered";
+      });
+      box.appendChild(b);
+    });
+    var expl=document.createElement("div");expl.className="expl";
+    box.appendChild(expl);
+    quizArea.appendChild(box);
+  });
+
+})();
+</script>
+</body>
+</html>

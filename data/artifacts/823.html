@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Compounds Lab - NIOS Class 10 Ch28</title>
+<style>
+  :root{
+    --bg:#12161d;--panel:#1a212c;--panel2:#212b39;--line:#2c3846;
+    --txt:#e6edf5;--muted:#9fb0c3;--accent:#33d6a6;--accent2:#2aa886;
+    --bad:#ff7b72;--good:#5ce08f;--warn:#ffcf6b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.5;font-size:16px}
+  header{padding:18px 16px 10px;text-align:center}
+  h1{margin:0;font-size:1.35rem;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:.85rem;margin-top:4px}
+  .wrap{max-width:860px;margin:0 auto;padding:0 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0}
+  .tab{background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.85rem;flex:1 1 auto;
+    min-width:120px;text-align:center;transition:.15s}
+  .tab.active{background:var(--accent);color:#08130f;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin:14px 0}
+  .panel h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:.95rem}
+  p{margin:8px 0}
+  .muted{color:var(--muted);font-size:.85rem}
+  .view{display:none}
+  .view.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .col{flex:1 1 260px;min-width:0}
+  button.ctl{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;cursor:pointer;font-size:.85rem;transition:.15s}
+  button.ctl:hover{border-color:var(--accent)}
+  button.ctl.sel{background:var(--accent);color:#08130f;border-color:var(--accent);font-weight:600}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+  .svgbox{background:#0e131a;border:1px solid var(--line);border-radius:12px;padding:8px;
+    display:flex;justify-content:center;align-items:center;overflow:auto}
+  svg{max-width:100%;height:auto}
+  .formula{font-size:1.25rem;text-align:center;margin:8px 0;font-weight:600;letter-spacing:.5px}
+  .name{text-align:center;color:var(--accent);font-size:1.1rem;font-weight:600}
+  sub{font-size:.7em}
+  .fact{border-left:3px solid var(--accent);padding:8px 10px;margin:10px 0;
+    background:var(--panel2);border-radius:0 10px 10px 0}
+  .fact b{color:var(--accent)}
+  .q{margin:14px 0}
+  .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;cursor:pointer;font-size:.9rem;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(92,224,143,.18);border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:rgba(255,123,114,.15);border-color:var(--bad);color:var(--bad)}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .badge{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:999px;padding:2px 10px;font-size:.75rem;color:var(--muted);margin:2px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left}
+  th{background:var(--panel2);color:var(--accent)}
+  .rxn{background:#0e131a;border:1px solid var(--line);border-radius:10px;padding:10px;
+    font-size:.95rem;text-align:center;margin:8px 0;overflow-x:auto}
+  .lbl{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .score{font-weight:600;color:var(--accent);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Carbon Compounds Lab</h1>
+  <div class="sub">NIOS Class 10 Science &amp; Technology &middot; Ch28 &mdash; Carbon and Its Compounds</div>
+</header>
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-v="bond">Bonding &amp; Allotropes</div>
+    <div class="tab" data-v="build">Build Hydrocarbons</div>
+    <div class="tab" data-v="fg">Functional Groups</div>
+    <div class="tab" data-v="quiz">Quiz</div>
+  </div>
+
+  <!-- ============ VIEW 1: BONDING ============ -->
+  <div class="view active" id="v-bond">
+    <div class="panel">
+      <h2>Why carbon is special</h2>
+      <p>A carbon atom has 4 electrons in its outer shell, so it is <b>tetravalent</b> &mdash; it forms
+      <b>four covalent bonds</b> by sharing electrons. This lets carbon combine with H, O, N, S, halogens and,
+      crucially, with <b>other carbon atoms</b>.</p>
+      <div class="svgbox">
+        <svg viewBox="0 0 260 200" role="img" aria-label="Methane tetrahedral bonds">
+          <line x1="130" y1="100" x2="130" y2="40" stroke="#7a8aa0" stroke-width="3"/>
+          <line x1="130" y1="100" x2="130" y2="160" stroke="#7a8aa0" stroke-width="3"/>
+          <line x1="130" y1="100" x2="70" y2="135" stroke="#7a8aa0" stroke-width="3"/>
+          <line x1="130" y1="100" x2="190" y2="135" stroke="#7a8aa0" stroke-width="3"/>
+          <circle cx="130" cy="100" r="22" fill="#33d6a6"/>
+          <text x="130" y="106" text-anchor="middle" font-size="18" fill="#08130f" font-weight="700">C</text>
+          <g font-size="15" fill="#e6edf5" text-anchor="middle" font-weight="600">
+            <circle cx="130" cy="34" r="14" fill="#3a4a5e"/><text x="130" y="39">H</text>
+            <circle cx="130" cy="166" r="14" fill="#3a4a5e"/><text x="130" y="171">H</text>
+            <circle cx="62" cy="140" r="14" fill="#3a4a5e"/><text x="62" y="145">H</text>
+            <circle cx="198" cy="140" r="14" fill="#3a4a5e"/><text x="198" y="145">H</text>
+          </g>
+        </svg>
+      </div>
+      <p class="muted" style="text-align:center">Methane (CH<sub>4</sub>): one carbon shares four single bonds with four hydrogens.</p>
+      <div class="fact"><b>Catenation:</b> carbon's self-linking ability. C&ndash;C bonds are strong and stable,
+      so carbon builds long chains, branches and rings &mdash; the reason there are <b>millions</b> of carbon compounds.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Allotropes of carbon</h2>
+      <p class="muted">Same element, different arrangement of atoms &rarr; very different properties.</p>
+      <div class="chips">
+        <button class="ctl sel" id="al-d" onclick="showAllo('d')">Diamond</button>
+        <button class="ctl" id="al-g" onclick="showAllo('g')">Graphite</button>
+      </div>
+      <div class="grid2">
+        <div class="svgbox" id="allo-svg"></div>
+        <div class="card" id="allo-txt"></div>
+      </div>
+      <table>
+        <tr><th>Property</th><th>Diamond</th><th>Graphite</th></tr>
+        <tr><td>Each C bonded to</td><td>4 carbons (tetrahedral)</td><td>3 carbons (flat layers)</td></tr>
+        <tr><td>Structure</td><td>Rigid 3-D network</td><td>Sheets held by weak forces</td></tr>
+        <tr><td>Hardness</td><td>Hardest natural substance</td><td>Soft, slippery</td></tr>
+        <tr><td>Electricity</td><td>Non-conductor</td><td>Good conductor (free electron)</td></tr>
+        <tr><td>Uses</td><td>Cutting, drilling, jewellery</td><td>Pencil lead, lubricant, electrodes</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ VIEW 2: BUILD ============ -->
+  <div class="view" id="v-build">
+    <div class="panel">
+      <h2>Build a hydrocarbon</h2>
+      <p class="muted">Hydrocarbons contain only carbon and hydrogen. Pick a chain length and bond type.</p>
+      <div class="lbl">Number of carbon atoms</div>
+      <div class="chips" id="len-chips"></div>
+      <div class="lbl">Type of hydrocarbon</div>
+      <div class="chips" id="type-chips"></div>
+      <div class="svgbox" id="hc-svg" style="min-height:150px"></div>
+      <div class="name" id="hc-name"></div>
+      <div class="formula" id="hc-formula"></div>
+      <div class="card" id="hc-info"></div>
+    </div>
+    <div class="panel">
+      <h3>Homologous series &amp; general formulas</h3>
+      <table>
+        <tr><th>Series</th><th>Bond</th><th>General formula</th><th>Example (2 C)</th></tr>
+        <tr><td>Alkane</td><td>All single C&ndash;C</td><td>C<sub>n</sub>H<sub>2n+2</sub></td><td>Ethane C<sub>2</sub>H<sub>6</sub></td></tr>
+        <tr><td>Alkene</td><td>One double C=C</td><td>C<sub>n</sub>H<sub>2n</sub></td><td>Ethene C<sub>2</sub>H<sub>4</sub></td></tr>
+        <tr><td>Alkyne</td><td>One triple C&equiv;C</td><td>C<sub>n</sub>H<sub>2n-2</sub></td><td>Ethyne C<sub>2</sub>H<sub>2</sub></td></tr>
+      </table>
+      <div class="fact"><b>Homologous series:</b> a family of compounds with the same general formula, where each
+      member differs from the next by a <b>&ndash;CH<sub>2</sub>&ndash;</b> unit (mass 14 u). They have similar chemical
+      properties and a gradual change in physical properties.</div>
+    </div>
+  </div>
+
+  <!-- ============ VIEW 3: FUNCTIONAL GROUPS ============ -->
+  <div class="view" id="v-fg">
+    <div class="panel">
+      <h2>Functional groups</h2>
+      <p class="muted">A functional group is an atom or group of atoms that gives a compound its
+      characteristic chemical properties.</p>
+      <div class="grid2">
+        <div class="card">
+          <div class="lbl">Alcohol &nbsp;&mdash;OH (hydroxyl)</div>
+          <div class="svgbox" style="margin:8px 0">
+            <svg viewBox="0 0 220 110" role="img" aria-label="Ethanol structure">
+              <g stroke="#7a8aa0" stroke-width="2.5">
+                <line x1="45" y1="60" x2="95" y2="60"/><line x1="95" y1="60" x2="145" y2="60"/>
+                <line x1="145" y1="60" x2="185" y2="60"/>
+                <line x1="45" y1="60" x2="45" y2="30"/><line x1="45" y1="60" x2="45" y2="90"/>
+                <line x1="45" y1="60" x2="18" y2="60"/>
+                <line x1="95" y1="60" x2="95" y2="30"/><line x1="95" y1="60" x2="95" y2="90"/>
+              </g>
+              <g font-size="14" text-anchor="middle" fill="#e6edf5" font-weight="600">
+                <text x="45" y="64" fill="#33d6a6">C</text><text x="95" y="64" fill="#33d6a6">C</text>
+                <text x="150" y="64" fill="#ffcf6b">O</text><text x="188" y="64">H</text>
+                <text x="45" y="26">H</text><text x="45" y="102">H</text><text x="14" y="64">H</text>
+                <text x="95" y="26">H</text><text x="95" y="102">H</text>
+              </g>
+            </svg>
+          </div>
+          <div class="name">Ethanol</div>
+          <div class="formula" style="font-size:1rem">C<sub>2</sub>H<sub>5</sub>OH</div>
+          <p class="muted">Present in alcoholic drinks; used as a solvent and fuel. Reacts with sodium
+          releasing hydrogen gas.</p>
+        </div>
+        <div class="card">
+          <div class="lbl">Carboxylic acid &nbsp;&mdash;COOH</div>
+          <div class="svgbox" style="margin:8px 0">
+            <svg viewBox="0 0 220 110" role="img" aria-label="Ethanoic acid structure">
+              <g stroke="#7a8aa0" stroke-width="2.5">
+                <line x1="45" y1="60" x2="95" y2="60"/><line x1="95" y1="60" x2="140" y2="60"/>
+                <line x1="140" y1="60" x2="178" y2="60"/>
+                <line x1="45" y1="60" x2="45" y2="30"/><line x1="45" y1="60" x2="45" y2="90"/>
+                <line x1="45" y1="60" x2="18" y2="60"/>
+                <line x1="92" y1="57" x2="92" y2="28"/><line x1="98" y1="57" x2="98" y2="28"/>
+              </g>
+              <g font-size="14" text-anchor="middle" fill="#e6edf5" font-weight="600">
+                <text x="45" y="64" fill="#33d6a6">C</text><text x="95" y="64" fill="#33d6a6">C</text>
+                <text x="95" y="24" fill="#ffcf6b">O</text>
+                <text x="145" y="64" fill="#ffcf6b">O</text><text x="181" y="64">H</text>
+                <text x="45" y="26">H</text><text x="45" y="102">H</text><text x="14" y="64">H</text>
+              </g>
+            </svg>
+          </div>
+          <div class="name">Ethanoic acid</div>
+          <div class="formula" style="font-size:1rem">CH<sub>3</sub>COOH</div>
+          <p class="muted">Dilute solution is vinegar. A weak acid &mdash; turns blue litmus red and reacts
+          with bases and carbonates.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Two important reactions</h2>
+      <h3>1. Combustion</h3>
+      <p class="muted">Hydrocarbons burn in air/oxygen giving carbon dioxide, water and lots of heat &amp; light.</p>
+      <div class="rxn">CH<sub>4</sub> + 2O<sub>2</sub> &rarr; CO<sub>2</sub> + 2H<sub>2</sub>O + heat</div>
+      <div class="rxn">C<sub>2</sub>H<sub>5</sub>OH + 3O<sub>2</sub> &rarr; 2CO<sub>2</sub> + 3H<sub>2</sub>O + heat</div>
+
+      <h3>2. Esterification</h3>
+      <p class="muted">An alcohol reacts with a carboxylic acid (with a little conc. H<sub>2</sub>SO<sub>4</sub>) to form a
+      sweet-smelling <b>ester</b> and water.</p>
+      <div class="rxn">CH<sub>3</sub>COOH + C<sub>2</sub>H<sub>5</sub>OH
+        <span style="color:var(--accent)">&nbsp;&rarr;&nbsp;</span>
+        CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub> + H<sub>2</sub>O</div>
+      <p class="muted" style="text-align:center">ethanoic acid + ethanol &rarr; ethyl ethanoate (an ester) + water</p>
+      <div class="fact"><b>Esters</b> smell pleasant and are used in perfumes and flavouring agents.</div>
+    </div>
+  </div>
+
+  <!-- ============ VIEW 4: QUIZ ============ -->
+  <div class="view" id="v-quiz">
+    <div class="panel">
+      <h2>Quick quiz</h2>
+      <p class="muted">Tap an option to check your answer.</p>
+      <div id="quiz"></div>
+      <div class="score" id="score"></div>
+    </div>
+  </div>
+
+  <!-- ============ FACTS PANEL (always visible under views) ============ -->
+  <div class="panel">
+    <h2>Key facts</h2>
+    <div class="fact"><b>Tetravalency:</b> carbon has valency 4 &mdash; forms four covalent bonds.</div>
+    <div class="fact"><b>Catenation:</b> carbon bonds to other carbons forming chains, branches &amp; rings.</div>
+    <div class="fact"><b>Homologous series:</b> a family with one general formula; members differ by &ndash;CH<sub>2</sub>&ndash;.</div>
+    <div class="fact"><b>Functional group:</b> the reactive part (&ndash;OH, &ndash;COOH) that decides chemical behaviour.</div>
+    <div class="chips">
+      <span class="badge">Alkane C<sub>n</sub>H<sub>2n+2</sub></span>
+      <span class="badge">Alkene C<sub>n</sub>H<sub>2n</sub></span>
+      <span class="badge">Alkyne C<sub>n</sub>H<sub>2n-2</sub></span>
+      <span class="badge">Diamond vs Graphite</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tabs ---------- */
+  var tabs=document.querySelectorAll('.tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+      document.getElementById('v-'+t.dataset.v).classList.add('active');
+    });
+  });
+
+  /* ---------- Allotropes ---------- */
+  var diaSVG='<svg viewBox="0 0 200 180" role="img" aria-label="Diamond tetrahedral network">'
+    +'<g stroke="#7a8aa0" stroke-width="2">'
+    +'<line x1="100" y1="90" x2="100" y2="35"/><line x1="100" y1="90" x2="55" y2="130"/>'
+    +'<line x1="100" y1="90" x2="145" y2="130"/><line x1="100" y1="90" x2="60" y2="60"/>'
+    +'<line x1="100" y1="35" x2="140" y2="25"/><line x1="55" y1="130" x2="30" y2="160"/>'
+    +'<line x1="145" y1="130" x2="170" y2="160"/><line x1="60" y1="60" x2="30" y2="45"/>'
+    +'</g><g fill="#33d6a6">'
+    +'<circle cx="100" cy="90" r="11"/><circle cx="100" cy="35" r="9"/>'
+    +'<circle cx="55" cy="130" r="9"/><circle cx="145" cy="130" r="9"/><circle cx="60" cy="60" r="9"/>'
+    +'<circle cx="140" cy="25" r="7"/><circle cx="30" cy="160" r="7"/>'
+    +'<circle cx="170" cy="160" r="7"/><circle cx="30" cy="45" r="7"/></g></svg>';
+  var graSVG='<svg viewBox="0 0 210 180" role="img" aria-label="Graphite layers of hexagons">'
+    +'<g stroke="#7a8aa0" stroke-width="2" fill="none">'
+    +'<polygon points="40,40 70,25 100,40 100,70 70,85 40,70"/>'
+    +'<polygon points="100,40 130,25 160,40 160,70 130,85 100,70"/>'
+    +'<polygon points="55,105 85,90 115,105 115,135 85,150 55,135"/>'
+    +'<polygon points="115,105 145,90 175,105 175,135 145,150 115,135"/>'
+    +'</g>'
+    +'<g stroke="#3a4a5e" stroke-width="1.5" stroke-dasharray="4 3">'
+    +'<line x1="40" y1="70" x2="55" y2="105"/><line x1="100" y1="70" x2="115" y2="105"/>'
+    +'<line x1="160" y1="70" x2="175" y2="105"/></g>'
+    +'<g fill="#33d6a6">'
+    +'<circle cx="40" cy="40" r="5"/><circle cx="70" cy="25" r="5"/><circle cx="100" cy="40" r="5"/>'
+    +'<circle cx="100" cy="70" r="5"/><circle cx="70" cy="85" r="5"/><circle cx="40" cy="70" r="5"/>'
+    +'<circle cx="130" cy="25" r="5"/><circle cx="160" cy="40" r="5"/><circle cx="160" cy="70" r="5"/>'
+    +'<circle cx="130" cy="85" r="5"/>'
+    +'<circle cx="55" cy="105" r="5"/><circle cx="85" cy="90" r="5"/><circle cx="115" cy="105" r="5"/>'
+    +'<circle cx="115" cy="135" r="5"/><circle cx="85" cy="150" r="5"/><circle cx="55" cy="135" r="5"/>'
+    +'<circle cx="145" cy="90" r="5"/><circle cx="175" cy="105" r="5"/><circle cx="175" cy="135" r="5"/>'
+    +'<circle cx="145" cy="150" r="5"/></g></svg>';
+  var alloData={
+    d:{svg:diaSVG,txt:'<div class="lbl">Diamond</div><p>Every carbon is bonded to <b>four</b> other carbons in a rigid 3-D tetrahedral network. No free electrons, so it does <b>not conduct electricity</b>. This tight network makes it the <b>hardest natural substance</b> &mdash; used in cutting and drilling tools.</p>'},
+    g:{svg:graSVG,txt:'<div class="lbl">Graphite</div><p>Every carbon is bonded to <b>three</b> others in flat hexagonal <b>layers</b>. The layers slide over each other (soft, slippery &rarr; lubricant, pencil lead). The 4th electron is free to move, so graphite <b>conducts electricity</b>.</p>'}
+  };
+  window.showAllo=function(k){
+    document.getElementById('al-d').classList.toggle('sel',k==='d');
+    document.getElementById('al-g').classList.toggle('sel',k==='g');
+    document.getElementById('allo-svg').innerHTML=alloData[k].svg;
+    document.getElementById('allo-txt').innerHTML=alloData[k].txt;
+  };
+  showAllo('d');
+
+  /* ---------- Build hydrocarbons ---------- */
+  var names={
+    alkane:['methane','ethane','propane','butane'],
+    alkene:[null,'ethene','propene','butene'],
+    alkyne:[null,'ethyne','propyne','butyne']
+  };
+  var state={n:1,type:'alkane'};
+
+  // build length chips
+  var lenBox=document.getElementById('len-chips');
+  [1,2,3,4].forEach(function(n){
+    var b=document.createElement('button');
+    b.className='ctl'+(n===1?' sel':'');b.textContent=n+' C';b.dataset.n=n;
+    b.onclick=function(){state.n=n;syncChips();render();};
+    lenBox.appendChild(b);
+  });
+  var typeBox=document.getElementById('type-chips');
+  [['alkane','Alkane (single)'],['alkene','Alkene (double)'],['alkyne','Alkyne (triple)']].forEach(function(p){
+    var b=document.createElement('button');
+    b.className='ctl'+(p[0]==='alkane'?' sel':'');b.textContent=p[1];b.dataset.t=p[0];
+    b.onclick=function(){state.type=p[0];syncChips();render();};
+    typeBox.appendChild(b);
+  });
+  function syncChips(){
+    lenBox.querySelectorAll('.ctl').forEach(function(b){b.classList.toggle('sel',+b.dataset.n===state.n);});
+    typeBox.querySelectorAll('.ctl').forEach(function(b){b.classList.toggle('sel',b.dataset.t===state.type);});
+  }
+
+  function sub(s){return s.replace(/(\d+)/g,'<sub>$1</sub>');}
+
+  function formula(n,type){
+    var h;
+    if(type==='alkane') h=2*n+2;
+    else if(type==='alkene') h=2*n;
+    else h=2*n-2;
+    var c = n===1?'C':'C'+n;
+    return sub(c + 'H' + h);
+  }
+
+  // draw structural formula on an SVG grid. First C-C bond takes the multiplicity.
+  function drawStruct(n,type){
+    var mult = type==='alkane'?1:(type==='alkene'?2:3);
+    var gap=70, x0=45, y=70;
+    var w = x0 + (n-1)*gap + 45;
+    var s='<svg viewBox="0 0 '+w+' 150" role="img" aria-label="structural formula">';
+    var bonds='<g stroke="#7a8aa0" stroke-width="2.5">';
+    // hydrogens count on each carbon
+    // total H distributed; we place H around each carbon for clarity up to n<=4
+    for(var i=0;i<n;i++){
+      var cx=x0+i*gap;
+      // horizontal bond to next carbon
+      if(i<n-1){
+        var m = (i===0)?mult:1;
+        if(m===1){bonds+='<line x1="'+(cx+16)+'" y1="'+y+'" x2="'+(cx+gap-16)+'" y2="'+y+'"/>';}
+        else if(m===2){
+          bonds+='<line x1="'+(cx+16)+'" y1="'+(y-4)+'" x2="'+(cx+gap-16)+'" y2="'+(y-4)+'"/>';
+          bonds+='<line x1="'+(cx+16)+'" y1="'+(y+4)+'" x2="'+(cx+gap-16)+'" y2="'+(y+4)+'"/>';
+        } else {
+          bonds+='<line x1="'+(cx+16)+'" y1="'+(y-6)+'" x2="'+(cx+gap-16)+'" y2="'+(y-6)+'"/>';
+          bonds+='<line x1="'+(cx+16)+'" y1="'+y+'" x2="'+(cx+gap-16)+'" y2="'+y+'"/>';
+          bonds+='<line x1="'+(cx+16)+'" y1="'+(y+6)+'" x2="'+(cx+gap-16)+'" y2="'+(y+6)+'"/>';
+        }
+      }
+    }
+    // hydrogens: determine per-carbon H count
+    // carbon valence 4, subtract bonds to neighbouring carbons
+    var hcount=[];
+    for(var j=0;j<n;j++){
+      var used=0;
+      if(j>0) used += (j-1===0?mult:1);      // bond to left neighbour
+      if(j<n-1) used += (j===0?mult:1);        // bond to right neighbour
+      hcount.push(4-used);
+    }
+    var atoms='<g font-size="15" text-anchor="middle" font-weight="600">';
+    for(var k=0;k<n;k++){
+      var ccx=x0+k*gap;
+      // place hydrogens: up, down, and outer sides for terminal carbons
+      var hs=hcount[k];
+      var pos=[];
+      // up and down first
+      if(hs>=1) pos.push([ccx,y-30,ccx,y-15]);      // up
+      if(hs>=2) pos.push([ccx,y+34,ccx,y+15]);      // down
+      if(hs>=3){ // third H on the free (outer) side
+        if(k===0) pos.push([ccx-32,y,ccx-15,y]);
+        else pos.push([ccx+32,y,ccx+15,y]);
+      }
+      for(var p=0;p<pos.length;p++){
+        var q=pos[p];
+        bonds+='<line x1="'+q[2]+'" y1="'+q[3]+'" x2="'+q[0]+'" y2="'+q[1]+'"/>';
+        atoms+='<text x="'+q[0]+'" y="'+(q[1]+5)+'" fill="#e6edf5">H</text>';
+      }
+      atoms+='<text x="'+ccx+'" y="'+(y+5)+'" fill="#33d6a6">C</text>';
+    }
+    bonds+='</g>';atoms+='</g>';
+    return s+bonds+atoms+'</svg>';
+  }
+
+  function render(){
+    var n=state.n,type=state.type;
+    var nm=names[type][n-1];
+    var svgEl=document.getElementById('hc-svg');
+    var nameEl=document.getElementById('hc-name');
+    var fEl=document.getElementById('hc-formula');
+    var iEl=document.getElementById('hc-info');
+    if(!nm){
+      svgEl.innerHTML='';
+      nameEl.textContent='Not possible';
+      fEl.innerHTML='';
+      iEl.innerHTML='<p class="muted">An '+type+' needs a '+(type==='alkene'?'double C=C':'triple C&equiv;C')
+        +' bond, which requires at least <b>2 carbon atoms</b>. Choose 2 or more carbons.</p>';
+      return;
+    }
+    svgEl.innerHTML=drawStruct(n,type);
+    nameEl.textContent=nm.charAt(0).toUpperCase()+nm.slice(1);
+    fEl.innerHTML=formula(n,type);
+    var bondTxt = type==='alkane'?'only single C&ndash;C bonds (saturated)'
+      : type==='alkene'?'one C=C <b>double</b> bond (unsaturated)'
+      : 'one C&equiv;C <b>triple</b> bond (unsaturated)';
+    var gen = type==='alkane'?'C<sub>n</sub>H<sub>2n+2</sub>':type==='alkene'?'C<sub>n</sub>H<sub>2n</sub>':'C<sub>n</sub>H<sub>2n-2</sub>';
+    iEl.innerHTML='<p><b>'+nameEl.textContent+'</b> has '+n+' carbon atom'+(n>1?'s':'')+' and '+bondTxt+'.'
+      +' It belongs to the <b>'+type+'</b> series (general formula '+gen+').</p>';
+  }
+  render();
+
+  /* ---------- Quiz ---------- */
+  var Q=[
+    {q:'Why does carbon form a very large number of compounds?',
+     o:['It is a metal','Tetravalency + catenation (self-linking)','It is radioactive','It has only 2 electrons'],
+     a:1,e:'Carbon is tetravalent (4 bonds) and shows catenation, linking to itself in chains and rings.'},
+    {q:'The general formula of an alkene is:',
+     o:['CₙH₂ₙ₊₂','CₙH₂ₙ','CₙH₂ₙ₋₂','CₙHₙ'],
+     a:1,e:'Alkenes have one C=C double bond, general formula CₙH₂ₙ (e.g. ethene C₂H₄).'},
+    {q:'Ethanoic acid reacts with ethanol to form a sweet-smelling compound called:',
+     o:['A soap','An ester','An alkane','A salt only'],
+     a:1,e:'This is esterification: acid + alcohol → ester + water (ethyl ethanoate).'}
+  ];
+  var qbox=document.getElementById('quiz');
+  var answered=0,correct=0;
+  Q.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='q';
+    var h=document.createElement('p');h.innerHTML='<b>'+(qi+1)+'.</b> '+item.q;d.appendChild(h);
+    var ob=document.createElement('div');ob.className='opts';
+    var ex=document.createElement('div');ex.className='expl';ex.textContent=item.e;
+    var done=false;
+    item.o.forEach(function(txt,oi){
+      var op=document.createElement('div');op.className='opt';op.textContent=txt;
+      op.onclick=function(){
+        if(done)return;done=true;answered++;
+        if(oi===item.a){op.classList.add('correct');correct++;}
+        else{op.classList.add('wrong');
+          ob.children[item.a].classList.add('correct');}
+        ex.classList.add('show');
+        updateScore();
+      };
+      ob.appendChild(op);
+    });
+    d.appendChild(ob);d.appendChild(ex);qbox.appendChild(d);
+  });
+  function updateScore(){
+    document.getElementById('score').textContent='Score: '+correct+' / '+Q.length
+      +(answered===Q.length?'  — all done!':'');
+  }
+})();
+</script>
+</body>
+</html>

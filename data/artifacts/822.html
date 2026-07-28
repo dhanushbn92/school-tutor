@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metals &amp; Non-metals Lab - NIOS Class 10 Science &amp; Technology</title>
+<style>
+  :root{
+    --accent:#f0a35e;
+    --accent-dark:#d98639;
+    --bg:#161c26;
+    --bg2:#1d2532;
+    --panel:#212b3a;
+    --panel2:#27324333;
+    --ink:#e8eef7;
+    --muted:#9aabc2;
+    --line:#33415a;
+    --good:#4fca8b;
+    --bad:#f07a7a;
+    --radius:16px;
+    --shadow:0 8px 22px rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,#161c26,#111722);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+    min-height:100vh;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:2px solid transparent;padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#22160a;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 8px;}
+  h3{font-size:.92rem;margin:14px 0 6px;color:var(--accent);}
+  p.note{font-size:.82rem;color:var(--muted);margin:6px 0;}
+  .btn{
+    background:var(--accent);color:#22160a;border:none;padding:9px 16px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+  .btn.ghost:hover{background:var(--panel2);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* Sorter */
+  .pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px;}
+  .chip{
+    background:var(--bg2);border:1px solid var(--line);color:var(--ink);
+    padding:8px 12px;border-radius:20px;font-size:.85rem;cursor:grab;
+    user-select:none;touch-action:manipulation;transition:.12s;
+  }
+  .chip:hover{border-color:var(--accent);}
+  .chip.selected{border-color:var(--accent);background:var(--accent);color:#22160a;font-weight:600;}
+  .chip.el{font-weight:700;}
+  .cols{display:flex;gap:12px;flex-wrap:wrap;}
+  .col{
+    flex:1 1 220px;min-height:120px;background:var(--bg2);
+    border:2px dashed var(--line);border-radius:14px;padding:12px;transition:.15s;
+  }
+  .col.over{border-color:var(--accent);background:#2a3444;}
+  .col h4{margin:0 0 8px;font-size:.9rem;text-align:center;}
+  .col .drop{display:flex;flex-wrap:wrap;gap:6px;min-height:40px;}
+  .placed{padding:6px 10px;border-radius:16px;font-size:.8rem;border:1px solid var(--line);}
+  .placed.ok{background:rgba(79,202,139,.16);border-color:var(--good);}
+  .placed.no{background:rgba(240,122,122,.16);border-color:var(--bad);}
+  .score{font-weight:700;color:var(--accent);}
+  .feedback{font-size:.82rem;color:var(--muted);min-height:1.2em;margin-top:8px;}
+
+  /* Reactivity */
+  .series{display:flex;flex-direction:column;gap:4px;margin:10px 0;}
+  .srow{display:flex;align-items:center;gap:10px;}
+  .srank{width:22px;text-align:right;color:var(--muted);font-size:.8rem;}
+  .sbar{
+    flex:1;border-radius:8px;padding:6px 12px;font-weight:700;font-size:.88rem;
+    color:#22160a;display:flex;justify-content:space-between;align-items:center;
+  }
+  .sel-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:6px 0 12px;}
+  .fld{display:flex;flex-direction:column;gap:3px;font-size:.8rem;color:var(--muted);}
+  select{
+    background:var(--bg2);color:var(--ink);border:1px solid var(--line);
+    border-radius:9px;padding:8px 10px;font-size:.88rem;min-width:120px;
+  }
+  .beaker{
+    margin:14px auto 6px;width:150px;height:170px;position:relative;
+  }
+  .beakerglass{
+    position:absolute;left:15px;right:15px;top:20px;bottom:0;
+    border:3px solid #6a7a94;border-top:none;border-radius:0 0 22px 22px;
+    background:rgba(255,255,255,.04);overflow:hidden;
+  }
+  .liquid{position:absolute;left:0;right:0;bottom:0;height:66%;transition:background .8s;}
+  .metalstrip{
+    position:absolute;left:50%;top:8px;transform:translateX(-50%);
+    width:26px;height:78%;border-radius:4px;transition:background .8s;
+  }
+  .rxn-eq{font-size:.95rem;text-align:center;margin:8px 0;min-height:1.4em;font-weight:600;}
+  .rxn-msg{font-size:.82rem;text-align:center;color:var(--muted);min-height:1.2em;}
+
+  /* Extraction steps */
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:10px 0;}
+  .step{
+    flex:1 1 150px;background:var(--bg2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;position:relative;
+  }
+  .step b{color:var(--accent);display:block;font-size:.86rem;margin-bottom:3px;}
+  .step span{font-size:.78rem;color:var(--muted);}
+  .rust-toggles{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .rustbox{
+    margin:10px 0;padding:14px;border-radius:14px;background:var(--bg2);
+    border:1px solid var(--line);text-align:center;transition:.3s;
+  }
+  .rustbox.rusting{border-color:var(--bad);background:rgba(240,122,122,.10);}
+  .rustbox .big{font-size:1.6rem;font-weight:700;margin:4px 0;}
+
+  /* Facts */
+  ul.facts{margin:6px 0;padding-left:20px;font-size:.85rem;}
+  ul.facts li{margin:5px 0;}
+
+  /* Quiz */
+  .q{margin:12px 0;padding:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;}
+  .q p.qt{font-weight:600;margin:0 0 8px;font-size:.9rem;}
+  .opts{display:flex;flex-direction:column;gap:6px;}
+  .opt{
+    text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:8px 12px;border-radius:9px;cursor:pointer;font-size:.85rem;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.right{background:rgba(79,202,139,.18);border-color:var(--good);}
+  .opt.wrong{background:rgba(240,122,122,.18);border-color:var(--bad);}
+  .qexp{font-size:.8rem;color:var(--muted);margin-top:8px;min-height:1em;}
+  footer{text-align:center;color:var(--muted);font-size:.75rem;padding:10px 0 24px;}
+  @media (max-width:420px){
+    header h1{font-size:1.15rem;}
+    .tab{min-width:calc(50% - 4px);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Metals &amp; Non-metals Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Ch27 &mdash; explore properties, reactivity, extraction &amp; corrosion.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="sort">1 &middot; Properties Sorter</button>
+    <button class="tab" data-mode="react">2 &middot; Reactivity Series</button>
+    <button class="tab" data-mode="extract">3 &middot; Extraction &amp; Corrosion</button>
+    <button class="tab" data-mode="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- MODE 1: SORTER -->
+  <section id="mode-sort">
+    <div class="panel">
+      <h2>Sort into Metals vs Non-metals</h2>
+      <p class="note">Tap an item to select it, then tap a column &mdash; or drag it across. Mixes physical properties and sample elements.</p>
+      <div class="pool" id="pool"></div>
+      <div class="cols">
+        <div class="col" data-cat="metal" id="col-metal">
+          <h4>&#128312; Metals</h4><div class="drop" id="drop-metal"></div>
+        </div>
+        <div class="col" data-cat="nonmetal" id="col-nonmetal">
+          <h4>&#128313; Non-metals</h4><div class="drop" id="drop-nonmetal"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <span class="score" id="sortScore">Score: 0 / 0</span>
+        <button class="btn ghost" id="resetSort">Reset</button>
+      </div>
+      <div class="feedback" id="sortFb">Selected: none</div>
+      <p class="note" style="margin-top:10px;"><b>Metalloids note:</b> Elements like boron, silicon, germanium and arsenic are <i>metalloids</i> &mdash; they show properties of both metals and non-metals (e.g. silicon is a semiconductor).</p>
+    </div>
+  </section>
+
+  <!-- MODE 2: REACTIVITY -->
+  <section id="mode-react" class="hidden">
+    <div class="panel">
+      <h2>Reactivity Series (most &rarr; least reactive)</h2>
+      <p class="note">A more reactive metal displaces a less reactive metal from its salt solution.</p>
+      <div class="series" id="series"></div>
+    </div>
+    <div class="panel">
+      <h2>Displacement Demo</h2>
+      <div class="sel-row">
+        <label class="fld">Metal strip
+          <select id="selMetal"></select>
+        </label>
+        <label class="fld">Salt solution
+          <select id="selSalt"></select>
+        </label>
+        <button class="btn" id="runRxn">React</button>
+      </div>
+      <div class="beaker">
+        <div class="beakerglass">
+          <div class="metalstrip" id="strip"></div>
+          <div class="liquid" id="liquid"></div>
+        </div>
+      </div>
+      <div class="rxn-eq" id="rxnEq"></div>
+      <div class="rxn-msg" id="rxnMsg">Pick a metal and a salt solution, then press React.</div>
+    </div>
+  </section>
+
+  <!-- MODE 3: EXTRACTION & CORROSION -->
+  <section id="mode-extract" class="hidden">
+    <div class="panel">
+      <h2>Metallurgy: Ore to Pure Metal</h2>
+      <p class="note">The main steps of extracting a metal from its ore.</p>
+      <div class="flow">
+        <div class="step"><b>1. Ore mining</b><span>Dig ore from the earth's crust (e.g. haematite for iron).</span></div>
+        <div class="step"><b>2. Concentration</b><span>Remove gangue (impurities) &mdash; e.g. froth flotation, washing.</span></div>
+        <div class="step"><b>3. Reduction</b><span>Convert ore to metal &mdash; roasting/calcination then reduction (e.g. with carbon in a blast furnace).</span></div>
+        <div class="step"><b>4. Refining</b><span>Purify the metal, e.g. electrolytic refining.</span></div>
+      </div>
+      <p class="note"><b>Reactivity guides the method:</b> highly reactive metals (K, Na, Ca, Mg, Al) are extracted by <i>electrolysis</i>; moderately reactive (Zn, Fe, Pb) by <i>reduction with carbon</i>; least reactive (Ag, Au) often occur <i>native</i> (free) in nature.</p>
+    </div>
+    <div class="panel">
+      <h2>Corrosion: Rusting of Iron</h2>
+      <p class="note">Iron rusts (forms hydrated iron(III) oxide, Fe&#8322;O&#8323;&middot;xH&#8322;O) only when <b>both air (oxygen) and water</b> are present. Toggle the conditions:</p>
+      <div class="rust-toggles">
+        <button class="btn ghost" id="tglAir" data-on="0">Air: OFF</button>
+        <button class="btn ghost" id="tglWater" data-on="0">Water: OFF</button>
+      </div>
+      <div class="rustbox" id="rustBox">
+        <div class="big" id="rustIcon">&#129704;</div>
+        <div id="rustText">No rust &mdash; add both air and water to start rusting.</div>
+      </div>
+      <p class="note"><b>Prevention:</b> galvanising (coating with zinc), painting, greasing/oiling, and electroplating all keep air &amp; water away from the iron surface.</p>
+    </div>
+  </section>
+
+  <!-- MODE 4: FACTS & QUIZ -->
+  <section id="mode-facts" class="hidden">
+    <div class="panel">
+      <h2>Quick Facts</h2>
+      <ul class="facts">
+        <li><b>Metals</b> are usually lustrous, malleable, ductile, sonorous and good conductors of heat &amp; electricity.</li>
+        <li><b>Non-metals</b> are generally dull, brittle (if solid) and poor conductors &mdash; but <b>graphite</b> (carbon) conducts electricity.</li>
+        <li>Mercury (Hg) is the only metal liquid at room temperature; bromine is the only liquid non-metal.</li>
+        <li>Sodium &amp; potassium are so soft they can be cut with a knife and are stored under kerosene.</li>
+        <li>Metal oxides are basic; non-metal oxides are acidic.</li>
+        <li>Aluminium is highly reactive yet resists corrosion because a thin oxide layer protects it.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Mini Quiz</h2>
+      <p class="note">Tap the answer you think is correct.</p>
+      <div id="quiz"></div>
+      <p class="score" id="quizScore">Quiz score: 0 / 3</p>
+    </div>
+  </section>
+
+  <footer>Metals &amp; Non-metals Lab &middot; interactive study aid</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- Tab switching ---------- */
+var modes={sort:"mode-sort",react:"mode-react",extract:"mode-extract",facts:"mode-facts"};
+document.getElementById("tabs").addEventListener("click",function(e){
+  var t=e.target.closest(".tab"); if(!t) return;
+  var m=t.getAttribute("data-mode");
+  var tabs=document.querySelectorAll(".tab");
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove("active");
+  t.classList.add("active");
+  for(var k in modes){
+    document.getElementById(modes[k]).classList.toggle("hidden",k!==m);
+  }
+});
+
+/* ---------- MODE 1: Properties sorter ---------- */
+var items=[
+  {t:"lustrous",cat:"metal",el:false},
+  {t:"malleable",cat:"metal",el:false},
+  {t:"ductile",cat:"metal",el:false},
+  {t:"good conductor",cat:"metal",el:false},
+  {t:"sonorous",cat:"metal",el:false},
+  {t:"brittle",cat:"nonmetal",el:false},
+  {t:"dull",cat:"nonmetal",el:false},
+  {t:"poor conductor",cat:"nonmetal",el:false},
+  {t:"Iron (Fe)",cat:"metal",el:true},
+  {t:"Copper (Cu)",cat:"metal",el:true},
+  {t:"Sodium (Na)",cat:"metal",el:true},
+  {t:"Sulphur (S)",cat:"nonmetal",el:true},
+  {t:"Oxygen (O)",cat:"nonmetal",el:true},
+  {t:"Carbon (C)",cat:"nonmetal",el:true}
+];
+var selChip=null, placedCount=0, correctCount=0, total=items.length;
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x;}return a;}
+
+function buildPool(){
+  var pool=document.getElementById("pool");
+  pool.innerHTML=""; selChip=null;
+  document.getElementById("drop-metal").innerHTML="";
+  document.getElementById("drop-nonmetal").innerHTML="";
+  placedCount=0; correctCount=0;
+  updateSortScore();
+  document.getElementById("sortFb").textContent="Selected: none";
+  var list=shuffle(items.slice());
+  list.forEach(function(it){
+    var c=document.createElement("div");
+    c.className="chip"+(it.el?" el":"");
+    c.textContent=it.t;
+    c.setAttribute("draggable","true");
+    c.dataset.cat=it.cat;
+    c.addEventListener("click",function(){selectChip(c);});
+    c.addEventListener("dragstart",function(e){selectChip(c);try{e.dataTransfer.setData("text/plain",it.t);}catch(err){}});
+    pool.appendChild(c);
+  });
+}
+function selectChip(c){
+  if(selChip) selChip.classList.remove("selected");
+  if(selChip===c){selChip=null;document.getElementById("sortFb").textContent="Selected: none";return;}
+  selChip=c; c.classList.add("selected");
+  document.getElementById("sortFb").textContent="Selected: "+c.textContent+" — now tap a column.";
+}
+function placeChip(chip,cat){
+  var correct=(chip.dataset.cat===cat);
+  var el=document.createElement("div");
+  el.className="placed "+(correct?"ok":"no");
+  el.textContent=chip.textContent+(correct?" ✓":" ✗");
+  document.getElementById("drop-"+cat).appendChild(el);
+  chip.parentNode.removeChild(chip);
+  if(selChip===chip) selChip=null;
+  placedCount++; if(correct) correctCount++;
+  updateSortScore();
+  document.getElementById("sortFb").textContent=correct
+    ? "Correct! "+chip.textContent.replace(/ selected/,"")+" is a "+cat+" trait."
+    : "Not quite — that belongs in the other column.";
+}
+function updateSortScore(){
+  document.getElementById("sortScore").textContent="Score: "+correctCount+" / "+placedCount+"  (of "+total+")";
+}
+["metal","nonmetal"].forEach(function(cat){
+  var col=document.getElementById("col-"+cat);
+  col.addEventListener("click",function(){ if(selChip) placeChip(selChip,cat); });
+  col.addEventListener("dragover",function(e){e.preventDefault();col.classList.add("over");});
+  col.addEventListener("dragleave",function(){col.classList.remove("over");});
+  col.addEventListener("drop",function(e){e.preventDefault();col.classList.remove("over");if(selChip)placeChip(selChip,cat);});
+});
+document.getElementById("resetSort").addEventListener("click",buildPool);
+buildPool();
+
+/* ---------- MODE 2: Reactivity series ---------- */
+var series=[
+  {sym:"K", name:"Potassium", col:"#ff8a80"},
+  {sym:"Na",name:"Sodium",    col:"#ff9e80"},
+  {sym:"Ca",name:"Calcium",   col:"#ffab7b"},
+  {sym:"Mg",name:"Magnesium", col:"#ffcc80"},
+  {sym:"Al",name:"Aluminium", col:"#ffd97d"},
+  {sym:"Zn",name:"Zinc",      col:"#e6ee9c"},
+  {sym:"Fe",name:"Iron",      col:"#c5e1a5"},
+  {sym:"Pb",name:"Lead",      col:"#a5d6a7"},
+  {sym:"Cu",name:"Copper",    col:"#80cbc4"},
+  {sym:"Ag",name:"Silver",    col:"#90caf9"},
+  {sym:"Au",name:"Gold",      col:"#b39ddb"}
+];
+var rankOf={};
+series.forEach(function(m,i){rankOf[m.sym]=i;}); // lower index = more reactive
+(function buildSeries(){
+  var box=document.getElementById("series");
+  series.forEach(function(m,i){
+    var row=document.createElement("div"); row.className="srow";
+    var r=document.createElement("div"); r.className="srank"; r.textContent=(i+1);
+    var b=document.createElement("div"); b.className="sbar";
+    b.style.background=m.col;
+    b.innerHTML="<span>"+m.name+" ("+m.sym+")</span><span>"+(i===0?"most":(i===series.length-1?"least":""))+"</span>";
+    row.appendChild(r); row.appendChild(b); box.appendChild(row);
+  });
+})();
+// salt solution colours
+var saltInfo={
+  Cu:{ion:"CuSO₄", colr:"#4a90d9", name:"copper sulphate (blue)"},
+  Fe:{ion:"FeSO₄", colr:"#7bb36a", name:"iron sulphate (pale green)"},
+  Zn:{ion:"ZnSO₄", colr:"#b7c4cf", name:"zinc sulphate (colourless)"},
+  Mg:{ion:"MgSO₄", colr:"#c4c9d0", name:"magnesium sulphate (colourless)"},
+  Ag:{ion:"AgNO₃", colr:"#cfd8dc", name:"silver nitrate (colourless)"},
+  Pb:{ion:"Pb(NO₃)₂", colr:"#c9c2d6", name:"lead nitrate (colourless)"}
+};
+var metalColour={K:"#ff8a80",Na:"#ffc0a0",Ca:"#e0e0e0",Mg:"#d0d0d0",Al:"#d9d9d9",Zn:"#c0c8cf",Fe:"#8a8a8a",Pb:"#6f7681",Cu:"#c67b48",Ag:"#dfe5ea",Au:"#e8c86a"};
+(function fillSelects(){
+  var sm=document.getElementById("selMetal"), ss=document.getElementById("selSalt");
+  series.forEach(function(m){
+    var o=document.createElement("option"); o.value=m.sym; o.textContent=m.name+" ("+m.sym+")"; sm.appendChild(o);
+  });
+  for(var s in saltInfo){
+    var o2=document.createElement("option"); o2.value=s; o2.textContent=saltInfo[s].name; ss.appendChild(o2);
+  }
+  sm.value="Fe"; ss.value="Cu";
+})();
+function subscript(sym){return sym;} // symbols already contain unicode subscripts
+document.getElementById("runRxn").addEventListener("click",function(){
+  var mSym=document.getElementById("selMetal").value;
+  var sSym=document.getElementById("selSalt").value;
+  var strip=document.getElementById("strip");
+  var liquid=document.getElementById("liquid");
+  var eq=document.getElementById("rxnEq");
+  var msg=document.getElementById("rxnMsg");
+  var salt=saltInfo[sSym];
+  strip.style.background=metalColour[mSym];
+  liquid.style.background=salt.colr;
+  var mName=series[rankOf[mSym]].name, sName=series[rankOf[sSym]].name;
+  if(mSym===sSym){
+    eq.textContent="No reaction";
+    msg.textContent="The metal and the salt's metal are the same element — nothing to displace.";
+    return;
+  }
+  if(rankOf[mSym] < rankOf[sSym]){
+    // more reactive -> displacement happens
+    var newColr = (sSym==="Cu")? salt.colr : "#c7d8c2"; // will fade toward product
+    // product solution colour: form salt of the added metal
+    var prodSalt = saltInfo[mSym] ? saltInfo[mSym].colr : "#b7c4cf";
+    liquid.style.background=salt.colr;
+    setTimeout(function(){
+      liquid.style.background=prodSalt;
+      if(sSym==="Cu"){ strip.style.background="#c67b48"; } // copper deposits on strip
+    },40);
+    var anion = (sSym==="Ag")? "NO₃ salt" : "";
+    eq.textContent = mSym+" + "+salt.ion+" → "+ (saltInfo[mSym]?saltInfo[mSym].ion:mSym+"-salt") +" + "+sSym;
+    var colourNote = (sSym==="Cu")
+      ? " Blue copper sulphate fades and reddish-brown copper coats the "+mName+" strip."
+      : " The solution colour changes as "+sName+" is displaced and deposits on the strip.";
+    msg.textContent = mName+" is MORE reactive than "+sName+", so it displaces it." + colourNote;
+  } else {
+    eq.textContent="No reaction";
+    msg.textContent=mName+" is LESS reactive than "+sName+", so it cannot displace it from "+salt.ion+".";
+    liquid.style.background=salt.colr;
+    strip.style.background=metalColour[mSym];
+  }
+});
+// initialise beaker view
+(function(){document.getElementById("strip").style.background=metalColour.Fe;document.getElementById("liquid").style.background=saltInfo.Cu.colr;})();
+
+/* ---------- MODE 3: Rusting toggles ---------- */
+var airOn=false, waterOn=false;
+function updateRust(){
+  var box=document.getElementById("rustBox");
+  var icon=document.getElementById("rustIcon");
+  var text=document.getElementById("rustText");
+  if(airOn && waterOn){
+    box.classList.add("rusting");
+    icon.innerHTML="&#129704;&#128167;"; // metal + water
+    icon.textContent="🧯"; // fallback
+    icon.innerHTML="&#128308;"; // red circle = rust
+    text.innerHTML="<b style='color:var(--bad)'>Rusting!</b> Air + water react with iron to form reddish-brown rust (Fe₂O₃&middot;xH₂O).";
+  } else {
+    box.classList.remove("rusting");
+    icon.innerHTML="&#9899;"; // dark circle = clean iron
+    var missing=[];
+    if(!airOn) missing.push("air");
+    if(!waterOn) missing.push("water");
+    text.textContent="No rust — missing "+missing.join(" & ")+". Rusting needs BOTH.";
+  }
+}
+function tgl(btn,which){
+  var on=btn.getAttribute("data-on")==="1";
+  on=!on; btn.setAttribute("data-on",on?"1":"0");
+  btn.textContent=(which==="air"?"Air: ":"Water: ")+(on?"ON":"OFF");
+  btn.classList.toggle("on",on);
+  if(on){btn.style.background="var(--accent)";btn.style.color="#22160a";}
+  else{btn.style.background="transparent";btn.style.color="var(--accent)";}
+  if(which==="air") airOn=on; else waterOn=on;
+  updateRust();
+}
+document.getElementById("tglAir").addEventListener("click",function(){tgl(this,"air");});
+document.getElementById("tglWater").addEventListener("click",function(){tgl(this,"water");});
+updateRust();
+
+/* ---------- MODE 4: Quiz ---------- */
+var questions=[
+  {q:"Which property is typical of MOST metals?",
+   opts:["Brittle and dull","Malleable and good conductor","Poor conductor of heat","Non-sonorous"],
+   ans:1, exp:"Metals are generally malleable, ductile, sonorous and good conductors of heat and electricity."},
+  {q:"In the reaction Fe + CuSO₄ → FeSO₄ + Cu, why does it happen?",
+   opts:["Copper is more reactive than iron","Iron is more reactive than copper","Both are equally reactive","No displacement occurs"],
+   ans:1, exp:"Iron is above copper in the reactivity series, so it displaces copper; blue CuSO₄ fades and reddish copper deposits."},
+  {q:"Rusting of iron requires:",
+   opts:["Only air","Only water","Both air and water","Neither air nor water"],
+   ans:2, exp:"Iron rusts only in the presence of both oxygen (air) and water/moisture. Galvanising or painting prevents this."}
+];
+var quizCorrect=0, answered=0;
+(function buildQuiz(){
+  var box=document.getElementById("quiz");
+  questions.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.className="qt"; p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    var opts=document.createElement("div"); opts.className="opts";
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(d.dataset.done) return;
+        d.dataset.done="1";
+        var all=opts.querySelectorAll(".opt");
+        all[item.ans].classList.add("right");
+        if(oi!==item.ans) b.classList.add("wrong");
+        answered++;
+        if(oi===item.ans) quizCorrect++;
+        exp.textContent=(oi===item.ans?"Correct! ":"Answer: "+item.opts[item.ans]+". ")+item.exp;
+        document.getElementById("quizScore").textContent="Quiz score: "+quizCorrect+" / "+questions.length;
+      });
+      opts.appendChild(b);
+    });
+    d.appendChild(opts);
+    var exp=document.createElement("div"); exp.className="qexp"; d.appendChild(exp);
+    box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

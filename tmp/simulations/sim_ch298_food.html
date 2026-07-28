@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Production Lab - NIOS Class 10 Science &amp; Technology (Ch31)</title>
+<style>
+  :root{
+    --accent:#4caf7d;
+    --accent-dark:#3a8f63;
+    --bg:#12201a;
+    --panel:#1b2c24;
+    --panel2:#223a2f;
+    --ink:#e8f2ec;
+    --muted:#9fb6ab;
+    --line:#2e4a3d;
+    --good:#5fd398;
+    --bad:#e08a7a;
+    --warn:#e8c06a;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1c3227,#12201a);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;
+    background:var(--panel);border:2px solid transparent;
+    padding:11px 12px;border-radius:12px;cursor:pointer;
+    font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08150f;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:3px solid var(--warn);outline-offset:2px;}
+  .view{display:none;animation:fade .25s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--shadow);margin-bottom:16px;}
+  h2{font-size:1.08rem;margin:0 0 4px;}
+  h3{font-size:.98rem;margin:0 0 8px;}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 12px;}
+  /* crop steps */
+  .steps{display:flex;flex-wrap:wrap;gap:8px;}
+  .step{
+    flex:1 1 120px;min-width:110px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;
+    text-align:center;transition:.15s;position:relative;
+  }
+  .step:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .step.sel{background:var(--accent);color:#08150f;border-color:var(--accent-dark);}
+  .step .ico{font-size:1.5rem;line-height:1;}
+  .step .lbl{font-size:.8rem;font-weight:600;margin-top:4px;}
+  .step .num{position:absolute;top:6px;left:8px;font-size:.7rem;color:var(--muted);}
+  .step.sel .num{color:#0a1f16;}
+  .arrow{display:flex;align-items:center;color:var(--muted);font-weight:700;}
+  .detail{margin-top:14px;background:var(--panel2);border:1px dashed var(--line);
+    border-radius:12px;padding:14px;min-height:70px;}
+  .detail h3{color:var(--accent);}
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .compare .col{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .compare .col.man h3{color:var(--good);}
+  .compare .col.fert h3{color:var(--warn);}
+  .compare ul{margin:6px 0 0;padding-left:18px;font-size:.85rem;}
+  .compare li{margin-bottom:4px;}
+  /* rotation */
+  .rot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;}
+  .rot .season{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 10px;font-size:.82rem;text-align:center;}
+  .rot .season b{display:block;color:var(--accent);font-size:.78rem;}
+  /* husbandry cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;
+    cursor:pointer;transition:.15s;}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .card .ico{font-size:2rem;line-height:1;}
+  .card h3{margin:6px 0 2px;}
+  .card .term{color:var(--accent);font-size:.78rem;font-weight:600;}
+  .card p{font-size:.82rem;color:var(--muted);margin:8px 0 0;}
+  .card .more{display:none;font-size:.82rem;margin-top:8px;border-top:1px solid var(--line);padding-top:8px;}
+  .card.open .more{display:block;}
+  .card .more ul{margin:4px 0 0;padding-left:18px;}
+  .card .more li{margin-bottom:3px;}
+  /* chart */
+  .chartbox{margin-top:8px;}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:180px;padding:10px 6px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;}
+  .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;}
+  .bar .fill{width:70%;background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+    border-radius:6px 6px 0 0;transition:height .6s cubic-bezier(.3,1,.4,1);}
+  .bar .yr{font-size:.72rem;color:var(--muted);margin-top:6px;}
+  .bar .val{font-size:.72rem;color:var(--ink);margin-bottom:4px;font-weight:600;}
+  .slider-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap;}
+  .slider-row label{font-size:.85rem;color:var(--muted);}
+  input[type=range]{flex:1;min-width:150px;accent-color:var(--accent);height:26px;}
+  .proscons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .proscons .col{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .proscons .pros h3{color:var(--good);}
+  .proscons .cons h3{color:var(--bad);}
+  .proscons ul{margin:6px 0 0;padding-left:18px;font-size:.84rem;}
+  .proscons li{margin-bottom:4px;}
+  .pest{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+  .pest .col{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .pest .bio h3{color:var(--good);}
+  .pest .chem h3{color:var(--warn);}
+  .pest ul{margin:6px 0 0;padding-left:18px;font-size:.84rem;}
+  /* facts */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .fact h3{color:var(--accent);font-size:.9rem;}
+  .fact p{font-size:.84rem;margin:4px 0 0;color:var(--ink);}
+  .npk{display:flex;gap:8px;margin-top:8px;}
+  .npk .n{flex:1;text-align:center;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:8px 4px;}
+  .npk .n b{display:block;font-size:1.2rem;color:var(--accent);}
+  .npk .n span{font-size:.72rem;color:var(--muted);}
+  /* quiz */
+  .q{margin-bottom:16px;}
+  .q p.qtext{font-weight:600;margin:0 0 8px;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;
+    font-size:.88rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(95,211,152,.18);border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:rgba(224,138,122,.16);border-color:var(--bad);color:var(--bad);}
+  .opt:disabled{cursor:default;}
+  .explain{font-size:.83rem;color:var(--muted);margin-top:6px;display:none;}
+  .explain.show{display:block;}
+  .score{font-weight:700;color:var(--accent);margin-top:8px;}
+  .btn{background:var(--accent);color:#08150f;border:none;border-radius:10px;padding:9px 16px;
+    font-weight:700;cursor:pointer;font-size:.88rem;margin-top:8px;}
+  .btn:hover{background:var(--accent-dark);}
+  .note{font-size:.78rem;color:var(--muted);margin-top:10px;}
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 0 24px;}
+  @media(max-width:520px){
+    .compare,.proscons,.pest{grid-template-columns:1fr;}
+    .arrow{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Food Production Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology - Chapter 31: Food Production</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="crop" role="tab">Crop Production</button>
+    <button class="tab" data-view="animal" role="tab">Animal Husbandry</button>
+    <button class="tab" data-view="green" role="tab">Green Revolution</button>
+    <button class="tab" data-view="facts" role="tab">Facts</button>
+    <button class="tab" data-view="quiz" role="tab">Quiz</button>
+  </div>
+
+  <!-- CROP -->
+  <section class="view active" id="crop">
+    <div class="panel">
+      <h2>Steps of Crop Production</h2>
+      <p class="sub">Tap each step of farming to learn its role. The right order runs left to right.</p>
+      <div class="steps" id="stepList"></div>
+      <div class="detail" id="stepDetail">
+        <h3>Select a step</h3>
+        <p>Click any farming step above to read what it does and why it matters.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Manure vs Chemical Fertilizer</h2>
+      <p class="sub">Both add plant nutrients, but they behave very differently in the soil.</p>
+      <div class="compare">
+        <div class="col man">
+          <h3>Manure (organic)</h3>
+          <ul>
+            <li>Made from decomposed plant/animal waste (compost, cow dung, green manure).</li>
+            <li>Adds humus - improves soil texture, water holding and aeration.</li>
+            <li>Nutrients released slowly; feeds soil micro-organisms.</li>
+            <li>Cheap, eco-friendly, low nutrient concentration.</li>
+          </ul>
+        </div>
+        <div class="col fert">
+          <h3>Chemical fertilizer (inorganic)</h3>
+          <ul>
+            <li>Factory-made salts: urea (N), superphosphate (P), muriate of potash (K).</li>
+            <li>High in one specific nutrient; acts fast, boosts yield quickly.</li>
+            <li>Adds no humus; overuse harms soil and pollutes water (eutrophication).</li>
+            <li>Costly; must be applied in correct dose.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Crop Rotation</h2>
+      <p class="sub">Growing different crops in a field in a planned sequence keeps soil fertile. Legumes (pulses) fix nitrogen through root nodule bacteria (<i>Rhizobium</i>), so cereals grown next need less fertilizer.</p>
+      <div class="rot">
+        <div class="season"><b>Season 1</b>Wheat / Maize<br><small>heavy N feeder</small></div>
+        <div class="arrow">-&gt;</div>
+        <div class="season"><b>Season 2</b>Legume (gram/pea)<br><small>fixes nitrogen</small></div>
+        <div class="arrow">-&gt;</div>
+        <div class="season"><b>Season 3</b>Mustard / Potato<br><small>different nutrients</small></div>
+        <div class="arrow">-&gt;</div>
+        <div class="season"><b>Restart</b>Soil restored<br><small>fewer pests</small></div>
+      </div>
+      <p class="note">Benefits: restores fertility, breaks pest/disease cycles, controls weeds, prevents nutrient exhaustion.</p>
+    </div>
+  </section>
+
+  <!-- ANIMAL -->
+  <section class="view" id="animal">
+    <div class="panel">
+      <h2>Animal Husbandry</h2>
+      <p class="sub">The science of rearing and breeding animals for food and useful products. Tap a card for details on improving yield and breeds.</p>
+      <div class="cards" id="animalCards"></div>
+    </div>
+    <div class="panel">
+      <h2>Improving Yield &amp; Breeds</h2>
+      <p class="sub">Common methods across all animal farming.</p>
+      <div class="facts">
+        <div class="fact"><h3>Better breeds</h3><p>Cross-breeding local (hardy, disease-resistant) with exotic (high-yield) varieties - e.g. cattle breeds, layer/broiler poultry.</p></div>
+        <div class="fact"><h3>Feed &amp; nutrition</h3><p>Balanced, nutritious feed and clean water raise milk, egg, meat and honey output.</p></div>
+        <div class="fact"><h3>Health &amp; shelter</h3><p>Vaccination, disease control, hygienic ventilated housing reduce losses.</p></div>
+        <div class="fact"><h3>Scientific care</h3><p>Proper breeding records, artificial insemination and record-keeping improve stock over generations.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GREEN REVOLUTION -->
+  <section class="view" id="green">
+    <div class="panel">
+      <h2>Green Revolution: Yield Concept</h2>
+      <p class="sub">The Green Revolution (1960s onward, led in India by Dr M.S. Swaminathan) used High-Yielding Variety (HYV) seeds, irrigation, fertilizers and pesticides to sharply raise food-grain output. Move the slider to see how added inputs push yield.</p>
+      <div class="chartbox">
+        <div class="bars" id="yieldBars"></div>
+        <div class="slider-row">
+          <label for="inputSlider">Modern inputs (HYV seed + fertilizer + irrigation):</label>
+          <input type="range" id="inputSlider" min="0" max="100" value="40">
+          <span id="inputPct" style="font-weight:700;color:var(--accent);">40%</span>
+        </div>
+        <p class="note" id="yieldNote">More inputs raise yield - but only up to a point, and with rising cost and environmental strain.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Pros &amp; Cons of High-Yield Methods</h2>
+      <div class="proscons">
+        <div class="col pros">
+          <h3>Advantages</h3>
+          <ul>
+            <li>Much higher food-grain production; helped India reach self-sufficiency.</li>
+            <li>More food per hectare from the same land.</li>
+            <li>Boosted farm incomes and food security.</li>
+          </ul>
+        </div>
+        <div class="col cons">
+          <h3>Concerns</h3>
+          <ul>
+            <li>Overuse of chemical fertilizers &amp; pesticides degrades soil and pollutes water.</li>
+            <li>Heavy irrigation lowers water table; loss of crop diversity.</li>
+            <li>High input cost; benefits uneven for small farmers.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="note">Sustainable farming aims for high yield with low harm: organic manure, crop rotation, drip irrigation and integrated pest management.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Pest Management</h2>
+      <p class="sub">Two broad approaches to protecting crops from pests.</p>
+      <div class="pest">
+        <div class="col bio">
+          <h3>Biological control</h3>
+          <ul>
+            <li>Uses natural enemies - ladybird beetles eat aphids, <i>Trichogramma</i> wasps.</li>
+            <li>Bio-pesticides like <i>Bacillus thuringiensis</i> (Bt) and neem.</li>
+            <li>Eco-friendly, safe for soil and no chemical residue.</li>
+          </ul>
+        </div>
+        <div class="col chem">
+          <h3>Chemical control</h3>
+          <ul>
+            <li>Synthetic pesticides/insecticides kill pests fast.</li>
+            <li>Effective but residues harm health and helpful insects.</li>
+            <li>Overuse causes pest resistance and pollution.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="view" id="facts">
+    <div class="panel">
+      <h2>Facts Panel</h2>
+      <p class="sub">Quick reference for the key ideas in this chapter.</p>
+      <div class="facts">
+        <div class="fact">
+          <h3>Essential nutrients (NPK)</h3>
+          <div class="npk">
+            <div class="n"><b>N</b><span>Nitrogen<br>leaf &amp; protein growth</span></div>
+            <div class="n"><b>P</b><span>Phosphorus<br>roots &amp; flowering</span></div>
+            <div class="n"><b>K</b><span>Potassium<br>fruit &amp; disease resistance</span></div>
+          </div>
+          <p style="margin-top:8px">These three macronutrients are needed in large amounts; plants also need Ca, Mg, S and micronutrients.</p>
+        </div>
+        <div class="fact"><h3>Manure vs fertilizer</h3><p>Manure = natural, slow, adds humus, improves soil. Fertilizer = manufactured, fast, nutrient-rich but adds no humus and can pollute if overused.</p></div>
+        <div class="fact"><h3>Crop rotation</h3><p>Planned sequence of crops (especially legumes) that restores soil fertility, controls pests and weeds, and avoids nutrient exhaustion.</p></div>
+        <div class="fact"><h3>Irrigation</h3><p>Supplying water to crops - canals, wells, tube-wells, drip and sprinkler systems. Drip irrigation saves the most water.</p></div>
+        <div class="fact"><h3>Animal husbandry terms</h3><p>Poultry = birds for eggs/meat; Pisciculture = fish farming; Apiculture = bee-keeping for honey/wax; Dairy = milk from cattle.</p></div>
+        <div class="fact"><h3>Green Revolution</h3><p>Rapid rise in food-grain output using HYV seeds, irrigation, fertilizers &amp; pesticides. Made India self-sufficient in food grains.</p></div>
+        <div class="fact"><h3>Storage</h3><p>Protects harvested grain from moisture, insects, rodents and fungi. Grains are dried and kept in silos/granaries; fumigants control pests.</p></div>
+        <div class="fact"><h3>Nitrogen fixing</h3><p><i>Rhizobium</i> bacteria in legume root nodules convert atmospheric nitrogen into a usable form, naturally enriching the soil.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="quiz">
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p class="sub">Answer all three, then check the score. Tap an option to reveal the answer.</p>
+      <div id="quizBox"></div>
+      <div class="score" id="scoreLine" style="display:none"></div>
+      <button class="btn" id="resetQuiz" style="display:none">Try again</button>
+    </div>
+  </section>
+
+  <footer>Food Production Lab - self-contained interactive for NIOS Class 10 Science &amp; Technology.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- Tab switching ----
+  var tabs=document.querySelectorAll('.tab');
+  var views=document.querySelectorAll('.view');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      views.forEach(function(v){v.classList.remove('active');});
+      t.classList.add('active');
+      document.getElementById(t.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---- Crop steps ----
+  var steps=[
+    {ico:'🚜',lbl:'Soil preparation',role:'Ploughing, levelling and tilling loosen the soil so roots breathe and grow. It mixes in manure and lets water and air reach the seeds.'},
+    {ico:'🌱',lbl:'Sowing',role:'Placing good-quality seeds in the soil at the right depth and spacing. Seed drills sow evenly, saving seed and giving space to each plant.'},
+    {ico:'💩',lbl:'Manuring / fertilizers',role:'Adding nutrients (N, P, K) as organic manure or chemical fertilizers so the crop grows healthy. Correct dose is important to avoid soil damage.'},
+    {ico:'💧',lbl:'Irrigation',role:'Supplying water at regular intervals through wells, canals, drip or sprinkler systems. Too little or too much water both harm the crop.'},
+    {ico:'🌿',lbl:'Weeding',role:'Removing unwanted wild plants (weeds) that compete with the crop for water, light and nutrients. Done by hand, tools or selective weedicides.'},
+    {ico:'🌾',lbl:'Harvesting',role:'Cutting and gathering the mature crop, then threshing to separate grain from the plant. Done with sickles or machines like harvesters/combines.'},
+    {ico:'🏬',lbl:'Storage',role:'Keeping dried grain safe from moisture, insects, rodents and fungi in silos or granaries so it lasts until use or sale.'}
+  ];
+  var stepList=document.getElementById('stepList');
+  var stepDetail=document.getElementById('stepDetail');
+  steps.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='step';d.tabIndex=0;
+    d.innerHTML='<div class="num">'+(i+1)+'</div><div class="ico">'+s.ico+'</div><div class="lbl">'+s.lbl+'</div>';
+    function pick(){
+      document.querySelectorAll('.step').forEach(function(x){x.classList.remove('sel');});
+      d.classList.add('sel');
+      stepDetail.innerHTML='<h3>'+(i+1)+'. '+s.lbl+'</h3><p>'+s.role+'</p>';
+    }
+    d.addEventListener('click',pick);
+    d.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pick();}});
+    stepList.appendChild(d);
+  });
+
+  // ---- Animal husbandry cards ----
+  var animals=[
+    {ico:'🐄',name:'Cattle farming',term:'Dairy & draught',gives:'Milk, and animals for ploughing/transport.',pts:['Cows &amp; buffaloes reared for milk (dairy).','Cross-breeding local + exotic breeds raises milk yield.','Needs balanced feed, clean sheds and vaccination.','Products: milk, curd, ghee; dung used as manure/fuel.']},
+    {ico:'🐔',name:'Poultry farming',term:'Egg & meat birds',gives:'Eggs and meat.',pts:['Rearing fowl, ducks, turkey for eggs and meat.','Layers give eggs; broilers give meat.','Improved breeds, feed and disease control raise output.','Hygienic, ventilated housing prevents infections.']},
+    {ico:'🐟',name:'Fish farming',term:'Pisciculture',gives:'Fish - a protein-rich food.',pts:['Rearing fish in ponds/tanks (capture &amp; culture fisheries).','Composite fish culture rears several species together.','Good food, clean water and disease control raise yield.','Provides protein and income; includes prawns.']},
+    {ico:'🐝',name:'Bee-keeping',term:'Apiculture',gives:'Honey and bees-wax.',pts:['Rearing honey bees in artificial hives (bee boxes).','Bees also pollinate crops, boosting fruit/seed yield.','Improved bee varieties give more honey.','Products: honey (food/medicine) and wax.']}
+  ];
+  var ac=document.getElementById('animalCards');
+  animals.forEach(function(a){
+    var c=document.createElement('div');
+    c.className='card';c.tabIndex=0;
+    var list=a.pts.map(function(p){return '<li>'+p+'</li>';}).join('');
+    c.innerHTML='<div class="ico">'+a.ico+'</div><div class="term">'+a.term+'</div>'+
+      '<h3>'+a.name+'</h3><p>Provides: '+a.gives+'</p>'+
+      '<div class="more"><ul>'+list+'</ul></div>';
+    function toggle(){c.classList.toggle('open');}
+    c.addEventListener('click',toggle);
+    c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+    ac.appendChild(c);
+  });
+
+  // ---- Yield chart ----
+  var years=['1965','1980','1995','2010','Now'];
+  var baseline=[10,18,26,34,42];
+  var barsBox=document.getElementById('yieldBars');
+  var bars=[];
+  years.forEach(function(y,i){
+    var b=document.createElement('div');b.className='bar';
+    b.innerHTML='<div class="val"></div><div class="fill" style="height:0"></div><div class="yr">'+y+'</div>';
+    barsBox.appendChild(b);
+    bars.push(b);
+  });
+  var slider=document.getElementById('inputSlider');
+  var pct=document.getElementById('inputPct');
+  var note=document.getElementById('yieldNote');
+  function drawYield(){
+    var f=parseInt(slider.value,10)/100; // 0..1
+    pct.textContent=slider.value+'%';
+    bars.forEach(function(b,i){
+      // diminishing returns curve; later years respond more to inputs
+      var boost=baseline[i]*(0.5+ f*1.4*(0.6+0.4*(i/(years.length-1))));
+      var val=Math.min(100,Math.round(boost));
+      b.querySelector('.fill').style.height=val+'%';
+      b.querySelector('.val').textContent=val;
+    });
+    if(f<0.25){note.textContent='Low inputs: yields stay near traditional levels.';}
+    else if(f<0.7){note.textContent='More HYV seeds, fertilizer and irrigation lift yields strongly.';}
+    else{note.textContent='Very high inputs give smaller extra gains (diminishing returns) with rising cost and soil/water strain.';}
+  }
+  slider.addEventListener('input',drawYield);
+  drawYield();
+
+  // ---- Quiz ----
+  var quiz=[
+    {q:'Which set of three elements are the main (macro) nutrients supplied by fertilizers?',
+     opts:['Nitrogen, Phosphorus, Potassium','Oxygen, Carbon, Hydrogen','Iron, Zinc, Copper','Sodium, Chlorine, Calcium'],
+     ans:0,exp:'N, P and K are the primary macronutrients. Urea supplies N, superphosphate P, and potash K.'},
+    {q:'Rearing of fish for food is called:',
+     opts:['Apiculture','Pisciculture','Sericulture','Horticulture'],
+     ans:1,exp:'Pisciculture = fish farming. Apiculture is bee-keeping, sericulture is silkworm rearing.'},
+    {q:'A key advantage of crop rotation with legumes is that it:',
+     opts:['Removes all need for water','Naturally restores soil nitrogen','Stops the crop from flowering','Makes soil permanently barren'],
+     ans:1,exp:'Legume root nodules host Rhizobium bacteria that fix atmospheric nitrogen, enriching the soil for the next crop.'}
+  ];
+  var quizBox=document.getElementById('quizBox');
+  var scoreLine=document.getElementById('scoreLine');
+  var resetBtn=document.getElementById('resetQuiz');
+  var answered, score;
+  function buildQuiz(){
+    quizBox.innerHTML='';answered=0;score=0;
+    scoreLine.style.display='none';resetBtn.style.display='none';
+    quiz.forEach(function(item,qi){
+      var wrap=document.createElement('div');wrap.className='q';
+      var html='<p class="qtext">'+(qi+1)+'. '+item.q+'</p>';
+      item.opts.forEach(function(o,oi){
+        html+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+      });
+      html+='<div class="explain" id="exp'+qi+'"></div>';
+      wrap.innerHTML=html;
+      quizBox.appendChild(wrap);
+    });
+    quizBox.querySelectorAll('.opt').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var qi=+btn.dataset.q, oi=+btn.dataset.o;
+        var item=quiz[qi];
+        var group=quizBox.querySelectorAll('.opt[data-q="'+qi+'"]');
+        if(group[0].disabled) return; // already answered
+        group.forEach(function(b){
+          b.disabled=true;
+          if(+b.dataset.o===item.ans) b.classList.add('correct');
+        });
+        if(oi!==item.ans) btn.classList.add('wrong');
+        else score++;
+        var exp=document.getElementById('exp'+qi);
+        exp.textContent=(oi===item.ans?'Correct! ':'Answer: '+item.opts[item.ans]+'. ')+item.exp;
+        exp.classList.add('show');
+        answered++;
+        if(answered===quiz.length){
+          scoreLine.textContent='Your score: '+score+' / '+quiz.length;
+          scoreLine.style.display='block';
+          resetBtn.style.display='inline-block';
+        }
+      });
+    });
+  }
+  resetBtn.addEventListener('click',buildQuiz);
+  buildQuiz();
+})();
+</script>
+</body>
+</html>

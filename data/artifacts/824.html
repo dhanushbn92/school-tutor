@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecosystem Lab - NIOS Class 10 Science &amp; Technology (Ch 29 Natural Environment)</title>
+<style>
+  :root{
+    --accent:#4bb98a;
+    --accent-dark:#2f9c6f;
+    --bg:#101c22;
+    --panel:#17262e;
+    --panel2:#1e3038;
+    --ink:#e7f0ec;
+    --muted:#9db3ad;
+    --line:#2a3d45;
+    --good:#4bb98a;
+    --bad:#e08a6b;
+    --sun:#f2c14e;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#183038,#101c22);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#06231a;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 8px;}
+  h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  p.lead{color:var(--muted);font-size:.86rem;margin:0 0 12px;}
+  .btn{background:var(--accent);color:#06231a;border:none;padding:9px 15px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#06231a;}
+  .btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+  .org{display:flex;align-items:center;gap:7px;background:var(--panel2);border:2px solid var(--line);
+    border-radius:12px;padding:8px 11px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.12s;
+    min-height:44px;}
+  .org:hover{border-color:var(--accent);}
+  .org.used{opacity:.35;cursor:default;}
+  .org:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+  .ic{width:24px;height:24px;flex:0 0 24px;}
+  .chain{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+  .link{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:9px 11px;}
+  .link .lvl{font-size:.72rem;color:var(--muted);width:118px;flex:0 0 118px;}
+  .link .nm{font-weight:700;font-size:.9rem;}
+  .link .en{margin-left:auto;font-size:.8rem;color:var(--sun);font-weight:700;white-space:nowrap;}
+  .arrow{color:var(--muted);text-align:center;font-size:1rem;margin:-4px 0;}
+  .note{font-size:.8rem;color:var(--muted);background:var(--panel2);border-left:3px solid var(--accent);
+    padding:8px 11px;border-radius:0 10px 10px 0;margin:10px 0;}
+  .grid2{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 300px;min-width:280px;}
+  .facts dt{font-weight:700;color:var(--accent);margin-top:9px;font-size:.88rem;}
+  .facts dd{margin:2px 0 0;color:var(--ink);font-size:.85rem;}
+  .facts{margin:0;}
+  .quiz .q{margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:12px;}
+  .quiz .q:last-child{border-bottom:none;}
+  .quiz p.stem{font-weight:600;margin:0 0 8px;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);padding:9px 11px;border-radius:10px;margin-bottom:6px;cursor:pointer;font-size:.85rem;
+    transition:.12s;min-height:42px;}
+  .opt:hover{border-color:var(--accent);}
+  .opt:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+  .opt.correct{background:rgba(75,185,138,.22);border-color:var(--good);}
+  .opt.wrong{background:rgba(224,138,107,.22);border-color:var(--bad);}
+  .feedback{font-size:.82rem;margin-top:4px;color:var(--muted);}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;}
+  .pyr-lbl{font-size:.78rem;fill:var(--ink);}
+  .pyr-en{font-size:.72rem;fill:var(--sun);font-weight:700;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+  .cyc-desc{font-size:.85rem;color:var(--ink);background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:11px;margin-top:10px;min-height:64px;}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--panel2);
+    border:1px solid var(--line);color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ecosystem Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 29: Natural Environment</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" role="tab" data-view="build">Food Chain &amp; Web</button>
+    <button class="tab" role="tab" data-view="pyramid">Ecological Pyramid</button>
+    <button class="tab" role="tab" data-view="cycles">Biogeochemical Cycles</button>
+    <button class="tab" role="tab" data-view="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- BUILD -->
+  <section class="panel" id="view-build">
+    <h2>Build a food chain</h2>
+    <p class="lead">Tap organisms in order: producer &rarr; primary consumer &rarr; secondary &rarr; tertiary &rarr; decomposer. Watch energy fall by the 10% law at each step.</p>
+    <div class="pool" id="pool"></div>
+    <div class="row">
+      <button class="btn" id="autoBtn">Sample chain</button>
+      <button class="btn ghost" id="clearBtn">Clear</button>
+    </div>
+    <div class="chain" id="chain"></div>
+    <div class="note" id="buildNote">Producers trap only about 1% of sunlight. Start with a producer (green). Each higher level keeps only ~10% of the energy below it.</div>
+  </section>
+
+  <!-- PYRAMID -->
+  <section class="panel hidden" id="view-pyramid">
+    <h2>Ecological pyramid</h2>
+    <p class="lead">This energy pyramid updates from the chain you built. Energy shrinks upward because ~90% is lost as heat and life processes at each level.</p>
+    <svg id="pyrSvg" viewBox="0 0 420 300" role="img" aria-label="Energy pyramid of the built food chain"></svg>
+    <div class="note" id="pyrNote">Build a chain in the first tab, then return here.</div>
+  </section>
+
+  <!-- CYCLES -->
+  <section class="panel hidden" id="view-cycles">
+    <h2>Biogeochemical cycles</h2>
+    <p class="lead">Matter is recycled endlessly through living things and the environment. Pick a cycle to animate it.</p>
+    <div class="row seg" id="cycSeg">
+      <button class="btn ghost on" data-cyc="carbon">Carbon</button>
+      <button class="btn ghost" data-cyc="nitrogen">Nitrogen</button>
+      <button class="btn ghost" data-cyc="water">Water</button>
+    </div>
+    <svg id="cycSvg" viewBox="0 0 420 300" role="img" aria-label="Animated biogeochemical cycle"></svg>
+    <div class="cyc-desc" id="cycDesc"></div>
+    <div class="note">Decomposers (bacteria &amp; fungi) break down dead matter and release elements back to the soil and air, closing every nutrient cycle.</div>
+  </section>
+
+  <!-- LEARN -->
+  <section class="panel hidden" id="view-learn">
+    <div class="grid2">
+      <div class="col">
+        <h2>Key facts</h2>
+        <dl class="facts">
+          <dt>Ecosystem</dt><dd>A community of living organisms (biotic) interacting with their non-living surroundings (abiotic: air, water, soil, sunlight) as one working unit.</dd>
+          <dt>Producers (autotrophs)</dt><dd>Green plants &amp; algae make their own food by photosynthesis. They form the first trophic level and support every other organism.</dd>
+          <dt>Consumers (heterotrophs)</dt><dd>Cannot make food. Herbivores (primary) eat producers; carnivores (secondary/tertiary) eat other consumers; omnivores eat both.</dd>
+          <dt>Decomposers</dt><dd>Bacteria &amp; fungi (saprotrophs) break down dead plants, animals and waste, returning nutrients to the soil and air.</dd>
+          <dt>10% energy law (Lindeman)</dt><dd>Only about 10% of the energy at one trophic level passes to the next; ~90% is lost as heat and metabolism. This limits food chains to ~4-5 links.</dd>
+          <dt>Food web</dt><dd>Many interlinked food chains. Webs are more stable than single chains because organisms have alternative food sources.</dd>
+          <dt>Biogeochemical cycles</dt><dd>Carbon, nitrogen and water cycle continuously between organisms and the environment, so a fixed amount of matter is reused forever.</dd>
+        </dl>
+      </div>
+      <div class="col">
+        <h2>Quick quiz <span class="badge">tap an answer</span></h2>
+        <div class="quiz" id="quiz"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Ecosystem Lab &middot; self-contained interactive &middot; energy figures illustrative (10% law)</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- data ---------- */
+  // Trophic role: 0 producer, 1 primary, 2 secondary, 3 tertiary, 4 decomposer
+  var ORGS = [
+    {id:"grass", name:"Grass", role:0, col:"#4bb98a", ic:"leaf"},
+    {id:"phyto", name:"Phytoplankton", role:0, col:"#5fce9d", ic:"leaf"},
+    {id:"grasshopper", name:"Grasshopper", role:1, col:"#8fd14f", ic:"bug"},
+    {id:"rabbit", name:"Rabbit", role:1, col:"#c0a67e", ic:"bug"},
+    {id:"frog", name:"Frog", role:2, col:"#6bb3d4", ic:"drop"},
+    {id:"smallfish", name:"Small fish", role:2, col:"#6ea8e0", ic:"drop"},
+    {id:"snake", name:"Snake", role:3, col:"#d98cc0", ic:"bug"},
+    {id:"hawk", name:"Hawk", role:3, col:"#e0a86b", ic:"bug"},
+    {id:"fungi", name:"Fungi &amp; bacteria", role:4, col:"#b58fd1", ic:"deco"}
+  ];
+  var ROLE_NAME = ["Producer","Primary consumer","Secondary consumer","Tertiary consumer","Decomposer"];
+
+  function icon(kind,col){
+    if(kind==="leaf") return '<path d="M12 3C7 5 4 9 4 14c6 0 10-3 10-11z" fill="'+col+'"/><path d="M6 18c3-4 6-6 8-7" stroke="#06231a" stroke-width="1.4" fill="none"/>';
+    if(kind==="bug") return '<ellipse cx="12" cy="13" rx="5" ry="6.5" fill="'+col+'"/><circle cx="12" cy="6" r="2.6" fill="'+col+'"/><path d="M7 10l-3-2M17 10l3-2M7 16l-3 2M17 16l3 2" stroke="'+col+'" stroke-width="1.4"/>';
+    if(kind==="drop") return '<path d="M12 3c4 5 6 8 6 11a6 6 0 1 1-12 0c0-3 2-6 6-11z" fill="'+col+'"/>';
+    if(kind==="deco") return '<circle cx="9" cy="15" r="4" fill="'+col+'"/><circle cx="16" cy="13" r="3" fill="'+col+'"/><path d="M6 20h14" stroke="'+col+'" stroke-width="1.6"/>';
+    return "";
+  }
+
+  /* ---------- tabs ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  var views = {
+    build: document.getElementById("view-build"),
+    pyramid: document.getElementById("view-pyramid"),
+    cycles: document.getElementById("view-cycles"),
+    learn: document.getElementById("view-learn")
+  };
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var v = t.getAttribute("data-view");
+      Object.keys(views).forEach(function(k){ views[k].classList.toggle("hidden", k!==v); });
+      if(v==="pyramid") drawPyramid();
+    });
+  });
+
+  /* ---------- build mode ---------- */
+  var pool = document.getElementById("pool");
+  var chainEl = document.getElementById("chain");
+  var buildNote = document.getElementById("buildNote");
+  var chain = []; // array of org ids in order
+  var START_ENERGY = 10000; // kJ at producer level (illustrative)
+
+  function renderPool(){
+    pool.innerHTML = "";
+    ORGS.forEach(function(o){
+      var b = document.createElement("button");
+      b.className = "org" + (chain.indexOf(o.id)>=0 ? " used":"");
+      b.setAttribute("type","button");
+      b.setAttribute("aria-label", o.name.replace("&amp;","and")+", "+ROLE_NAME[o.role]);
+      b.innerHTML = '<svg class="ic" viewBox="0 0 24 24">'+icon(o.ic,o.col)+'</svg><span>'+o.name+'</span>';
+      b.addEventListener("click", function(){ addToChain(o.id); });
+      pool.appendChild(b);
+    });
+  }
+
+  function orgById(id){ for(var i=0;i<ORGS.length;i++){ if(ORGS[i].id===id) return ORGS[i]; } return null; }
+
+  function addToChain(id){
+    if(chain.indexOf(id)>=0) return;
+    var o = orgById(id);
+    if(chain.length===0 && o.role!==0){
+      flash("Start with a producer (green plant/algae) - it captures the Sun's energy.");
+      return;
+    }
+    if(chain.length>0){
+      var prev = orgById(chain[chain.length-1]);
+      if(prev.role===4){ flash("The decomposer ends the chain. Clear to start again."); return; }
+      // must move up a level, except decomposer (role 4) can follow any consumer/producer
+      if(o.role!==4 && o.role <= prev.role){
+        flash(o.name.replace("&amp;","and")+" is not a higher feeding level than "+prev.name.replace("&amp;","and")+". Pick a higher consumer.");
+        return;
+      }
+    }
+    chain.push(id);
+    renderPool();
+    renderChain();
+  }
+
+  function flash(msg){ buildNote.innerHTML = msg; }
+
+  function renderChain(){
+    chainEl.innerHTML = "";
+    if(chain.length===0){
+      flash("Producers trap only about 1% of sunlight. Start with a producer (green). Each higher level keeps only ~10% of the energy below it.");
+      return;
+    }
+    var energy = START_ENERGY;
+    chain.forEach(function(id, i){
+      var o = orgById(id);
+      if(i>0){
+        var a = document.createElement("div"); a.className="arrow"; a.textContent="↓"; chainEl.appendChild(a);
+        if(o.role!==4) energy = energy*0.1; // 10% law; decomposer feeds on dead matter, shown separately
+      }
+      var row = document.createElement("div"); row.className="link";
+      var enTxt = (o.role===4) ? "recycles nutrients" : Math.round(energy)+" kJ";
+      row.innerHTML = '<svg class="ic" viewBox="0 0 24 24" style="width:26px;height:26px;flex:0 0 26px">'+icon(o.ic,o.col)+'</svg>'
+        + '<span class="lvl">'+ROLE_NAME[o.role]+'</span>'
+        + '<span class="nm">'+o.name+'</span>'
+        + '<span class="en">'+enTxt+'</span>';
+      chainEl.appendChild(row);
+    });
+    var links = chain.filter(function(id){ return orgById(id).role!==4; }).length;
+    var last = orgById(chain[chain.length-1]);
+    var extra = last.role===4 ? " Decomposers break down every dead organism and return nutrients to the soil - closing the loop." : "";
+    flash("Chain has "+links+" feeding level(s). Energy fell from "+START_ENERGY+" kJ to "+Math.round(energy)+" kJ up the chain (10% law)."+extra);
+  }
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    chain = []; renderPool(); renderChain();
+  });
+  document.getElementById("autoBtn").addEventListener("click", function(){
+    chain = ["grass","grasshopper","frog","snake","fungi"];
+    renderPool(); renderChain();
+  });
+
+  /* ---------- pyramid ---------- */
+  var pyrSvg = document.getElementById("pyrSvg");
+  var pyrNote = document.getElementById("pyrNote");
+  function drawPyramid(){
+    var feeders = chain.map(orgById).filter(function(o){ return o.role!==4; });
+    if(feeders.length===0){
+      pyrSvg.innerHTML = '<text x="210" y="150" text-anchor="middle" fill="#9db3ad" font-size="13">Build a chain first</text>';
+      pyrNote.textContent = "Build a chain in the first tab, then return here.";
+      return;
+    }
+    var n = feeders.length;
+    var maxW = 320, cx=210, topY=30, botY=270, h=(botY-topY)/n;
+    var energy = START_ENERGY, svg="";
+    for(var i=0;i<n;i++){
+      var lvlFromBottom = n-1-i; // 0 = base (widest)
+      var frac = Math.pow(0.10, lvlFromBottom); // width proportional to energy
+      var w = Math.max(46, maxW*Math.pow(frac,0.28)); // dampened so top is visible
+      var y = topY + i*h;
+      var o = feeders[n-1-i];
+      var eVal = START_ENERGY*Math.pow(0.1,lvlFromBottom);
+      var x = cx - w/2;
+      svg += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+(h-6).toFixed(1)+'" rx="6" fill="'+o.col+'" opacity="0.85"/>';
+      svg += '<text class="pyr-lbl" x="'+cx+'" y="'+(y+(h-6)/2-2).toFixed(1)+'" text-anchor="middle">'+o.name.replace("&amp;","and")+'</text>';
+      svg += '<text class="pyr-en" x="'+cx+'" y="'+(y+(h-6)/2+13).toFixed(1)+'" text-anchor="middle">'+Math.round(eVal)+' kJ</text>';
+    }
+    // sun
+    svg = '<circle cx="40" cy="30" r="16" fill="#f2c14e"/><text x="40" y="60" text-anchor="middle" fill="#9db3ad" font-size="9">Sunlight</text>' + svg;
+    pyrSvg.innerHTML = svg;
+    pyrNote.innerHTML = "Wide base = producers hold the most energy. Each level up keeps only ~10%, so the top carnivore gets the least - which is why apex predators are few.";
+  }
+
+  /* ---------- cycles (animated canvas-free SVG) ---------- */
+  var cycSvg = document.getElementById("cycSvg");
+  var cycDesc = document.getElementById("cycDesc");
+  var cycSeg = document.getElementById("cycSeg");
+  var currentCyc = "carbon";
+  var animT = 0, rafId = null;
+
+  var CYC = {
+    carbon: {
+      title:"Carbon cycle",
+      desc:"CO₂ in air → plants fix it by photosynthesis → passes to animals when they eat → respiration, burning fuels and decomposition return CO₂ to the air. Decomposers release carbon locked in dead bodies.",
+      nodes:[
+        {x:210,y:40,r:30,label:"CO₂ (air)",col:"#6ea8e0"},
+        {x:70,y:170,r:30,label:"Plants",col:"#4bb98a"},
+        {x:210,y:255,r:30,label:"Animals",col:"#c0a67e"},
+        {x:350,y:170,r:30,label:"Decomposers",col:"#b58fd1"}
+      ],
+      edges:[[0,1,"photosynthesis"],[1,2,"eaten"],[2,3,"death"],[3,0,"respiration"],[1,0,"respiration"]]
+    },
+    nitrogen: {
+      title:"Nitrogen cycle",
+      desc:"Nitrogen gas (N₂) is fixed into nitrates by soil bacteria and lightning → plants absorb nitrates → animals get nitrogen by eating plants → decomposers release it, and denitrifying bacteria return N₂ to the air.",
+      nodes:[
+        {x:210,y:40,r:30,label:"N₂ (air)",col:"#6ea8e0"},
+        {x:60,y:150,r:30,label:"Nitrates (soil)",col:"#e0a86b"},
+        {x:190,y:255,r:30,label:"Plants",col:"#4bb98a"},
+        {x:340,y:255,r:30,label:"Animals",col:"#c0a67e"},
+        {x:350,y:150,r:30,label:"Decomposers",col:"#b58fd1"}
+      ],
+      edges:[[0,1,"fixation"],[1,2,"uptake"],[2,3,"eaten"],[3,4,"death"],[4,1,"ammonif."],[1,0,"denitrif."]]
+    },
+    water: {
+      title:"Water cycle",
+      desc:"The Sun evaporates water from oceans and land; plants add water by transpiration → vapour rises and condenses into clouds → precipitation (rain/snow) falls → water runs off and infiltrates soil, returning to the sea.",
+      nodes:[
+        {x:210,y:45,r:30,label:"Clouds",col:"#aecbe0"},
+        {x:60,y:180,r:30,label:"Ocean",col:"#6ea8e0"},
+        {x:210,y:255,r:30,label:"Soil/Rivers",col:"#c0a67e"},
+        {x:350,y:180,r:30,label:"Plants",col:"#4bb98a"}
+      ],
+      edges:[[1,0,"evaporation"],[3,0,"transpiration"],[0,2,"precipitation"],[2,1,"run-off"]]
+    }
+  };
+
+  function buildCycStatic(){
+    var c = CYC[currentCyc];
+    var s = "";
+    // edges (lines) + labels
+    c.edges.forEach(function(e){
+      var a=c.nodes[e[0]], b=c.nodes[e[1]];
+      s += '<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#2a3d45" stroke-width="2"/>';
+      var mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      s += '<text x="'+mx+'" y="'+(my-4)+'" text-anchor="middle" fill="#9db3ad" font-size="8.5">'+e[2]+'</text>';
+    });
+    // moving particles placeholder groups
+    c.edges.forEach(function(e,i){
+      s += '<circle class="pt" data-e="'+i+'" r="4.5" fill="#f2c14e"/>';
+    });
+    // nodes on top
+    c.nodes.forEach(function(nd){
+      s += '<circle cx="'+nd.x+'" cy="'+nd.y+'" r="'+nd.r+'" fill="'+nd.col+'" opacity="0.9"/>';
+      s += '<text x="'+nd.x+'" y="'+(nd.y+3)+'" text-anchor="middle" fill="#06231a" font-size="9" font-weight="700">'+nd.label+'</text>';
+    });
+    cycSvg.innerHTML = s;
+    cycDesc.innerHTML = "<strong>"+c.title+".</strong> "+c.desc;
+  }
+
+  function animateCyc(){
+    if(document.hidden){ rafId = requestAnimationFrame(animateCyc); return; }
+    animT += 0.010;
+    var c = CYC[currentCyc];
+    var pts = cycSvg.querySelectorAll(".pt");
+    pts.forEach(function(p){
+      var ei = parseInt(p.getAttribute("data-e"),10);
+      var e = c.edges[ei];
+      var a=c.nodes[e[0]], b=c.nodes[e[1]];
+      var t = (animT + ei*0.17) % 1;
+      p.setAttribute("cx", (a.x+(b.x-a.x)*t).toFixed(1));
+      p.setAttribute("cy", (a.y+(b.y-a.y)*t).toFixed(1));
+    });
+    rafId = requestAnimationFrame(animateCyc);
+  }
+
+  cycSeg.querySelectorAll("button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      cycSeg.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+      btn.classList.add("on");
+      currentCyc = btn.getAttribute("data-cyc");
+      buildCycStatic();
+    });
+  });
+
+  /* ---------- quiz ---------- */
+  var QUIZ = [
+    {q:"About how much energy passes from one trophic level to the next?",
+     opts:["100%","50%","10%","1%"], a:2,
+     fb:"The 10% law: only ~10% of energy moves up; the rest is lost as heat and life activity."},
+    {q:"Which group returns nutrients from dead matter back to the environment?",
+     opts:["Producers","Decomposers","Herbivores","Carnivores"], a:1,
+     fb:"Decomposers (bacteria and fungi) break down dead bodies, closing every nutrient cycle."},
+    {q:"In the carbon cycle, plants take CO₂ from the air mainly by:",
+     opts:["Respiration","Photosynthesis","Transpiration","Combustion"], a:1,
+     fb:"Photosynthesis fixes atmospheric CO₂ into food; respiration and burning release it back."}
+  ];
+  function renderQuiz(){
+    var box = document.getElementById("quiz");
+    box.innerHTML = "";
+    QUIZ.forEach(function(item, qi){
+      var d = document.createElement("div"); d.className="q";
+      var stem = document.createElement("p"); stem.className="stem"; stem.textContent=(qi+1)+". "+item.q;
+      d.appendChild(stem);
+      var fb = document.createElement("div"); fb.className="feedback"; fb.style.display="none"; fb.textContent=item.fb;
+      var answered=false;
+      item.opts.forEach(function(opt, oi){
+        var b=document.createElement("button"); b.className="opt"; b.type="button"; b.textContent=opt;
+        b.addEventListener("click", function(){
+          if(answered) return; answered=true;
+          if(oi===item.a){ b.classList.add("correct"); }
+          else{ b.classList.add("wrong");
+            var kids=d.querySelectorAll(".opt"); kids[item.a].classList.add("correct"); }
+          fb.style.display="block";
+        });
+        d.appendChild(b);
+      });
+      d.appendChild(fb);
+      box.appendChild(d);
+    });
+  }
+
+  /* ---------- visibility handling ---------- */
+  document.addEventListener("visibilitychange", function(){
+    // animation loop already checks document.hidden and skips work
+  });
+
+  /* ---------- init ---------- */
+  renderPool();
+  renderChain();
+  buildCycStatic();
+  renderQuiz();
+  rafId = requestAnimationFrame(animateCyc);
+})();
+</script>
+</body>
+</html>
