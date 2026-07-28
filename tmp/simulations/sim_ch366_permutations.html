@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counting Lab - Permutations & Combinations</title>
+<style>
+  :root{
+    --bg:#0f1620; --panel:#182231; --panel2:#1e2b3d; --line:#2b3a50;
+    --ink:#e7eef7; --mut:#9fb0c4; --accent:#5ad1c4; --accent2:#2f9e93;
+    --good:#4ade80; --bad:#f87171; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  .sub{color:var(--mut);font-size:.85rem;margin:0 0 14px}
+  .wrap{max-width:920px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;text-align:center;min-width:120px;touch-action:manipulation;
+  }
+  .tab.active{background:var(--accent);color:#06231f;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  label{font-size:.85rem;color:var(--mut);display:block;margin-bottom:4px}
+  .ctrl{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .fld{flex:1 1 130px;min-width:110px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  input[type=number],select{
+    width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:9px;font-size:1rem;
+  }
+  .big{font-size:1.05rem;font-weight:600;color:var(--ink)}
+  .chip{
+    display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:4px 9px;margin:3px;font-size:.85rem;
+  }
+  .chip.hl{background:var(--accent);color:#06231f;border-color:var(--accent)}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 220px}
+  .val{font-size:1.5rem;font-weight:700;color:var(--accent)}
+  .mono{font-family:ui-monospace,Consolas,monospace;font-size:.9rem;word-break:break-word}
+  button.act{
+    background:var(--accent2);color:#eafffb;border:1px solid var(--accent);
+    border-radius:10px;padding:9px 14px;cursor:pointer;font-size:.9rem;touch-action:manipulation;
+  }
+  button.act:hover{background:var(--accent)}
+  svg{max-width:100%;height:auto;display:block}
+  .list{max-height:230px;overflow:auto;margin-top:8px;font-family:ui-monospace,Consolas,monospace;font-size:.82rem}
+  .facts dt{color:var(--accent);font-weight:600;margin-top:8px}
+  .facts dd{margin:2px 0 6px;color:var(--mut);font-size:.88rem}
+  .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .q:first-child{border-top:0;padding-top:0;margin-top:0}
+  .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(74,222,128,.14)}
+  .opt.wrong{border-color:var(--bad);background:rgba(248,113,113,.14)}
+  .exp{font-size:.85rem;color:var(--mut);margin-top:6px;display:none}
+  .exp.show{display:block}
+  .note{font-size:.82rem;color:var(--mut)}
+  .warn{color:var(--bad);font-size:.82rem}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;margin-top:8px}
+  td,th{border:1px solid var(--line);padding:5px 7px;text-align:center}
+  .pt td{font-family:ui-monospace,Consolas,monospace}
+  .pt td.on{background:var(--accent);color:#06231f;font-weight:700}
+  @media(max-width:400px){ h1{font-size:1.15rem} .val{font-size:1.25rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Counting Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics - Ch 11: Permutations &amp; Combinations</p>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-v="fpc">1. Counting Principle</div>
+    <div class="tab" data-v="pc">2. nPr vs nCr</div>
+    <div class="tab" data-v="app">3. Applications</div>
+    <div class="tab" data-v="facts">Facts</div>
+    <div class="tab" data-v="quiz">Quiz</div>
+  </div>
+
+  <!-- ===================== VIEW 1: FPC ===================== -->
+  <section class="view active" id="v-fpc">
+    <div class="panel">
+      <h2>Fundamental Principle of Counting</h2>
+      <p class="note">If a first task can be done in <b>a</b> ways and a second in <b>b</b> ways, together they can be done in <b>a x b</b> ways. Drag the sliders to build outfits and watch the tree grow.</p>
+      <div class="ctrl">
+        <div class="fld">
+          <label>Shirts: <span id="sLbl">3</span></label>
+          <input type="range" id="sN" min="1" max="5" value="3">
+        </div>
+        <div class="fld">
+          <label>Pants: <span id="pLbl">2</span></label>
+          <input type="range" id="pN" min="1" max="5" value="2">
+        </div>
+        <div class="fld">
+          <label>Shoes: <span id="hLbl">1</span></label>
+          <input type="range" id="hN" min="1" max="4" value="1">
+        </div>
+      </div>
+      <div class="box">
+        <span class="big" id="fpcEq">3 x 2 x 1 = 6</span>
+        <span class="note">total outfits</span>
+      </div>
+      <svg id="tree" viewBox="0 0 640 360" role="img" aria-label="counting tree"></svg>
+    </div>
+    <div class="panel">
+      <h2>Number Plates</h2>
+      <p class="note">A plate has <b id="dLbl">2</b> letters (A-Z) then <b id="nLbl">2</b> digits (0-9), repetition allowed.</p>
+      <div class="ctrl">
+        <div class="fld">
+          <label>Letters: <span id="npL">2</span></label>
+          <input type="range" id="npLetters" min="0" max="4" value="2">
+        </div>
+        <div class="fld">
+          <label>Digits: <span id="npD">2</span></label>
+          <input type="range" id="npDigits" min="0" max="6" value="2">
+        </div>
+      </div>
+      <div class="box mono" id="npOut"></div>
+    </div>
+  </section>
+
+  <!-- ===================== VIEW 2: P vs C ===================== -->
+  <section class="view" id="v-pc">
+    <div class="panel">
+      <h2>Permutations vs Combinations</h2>
+      <div class="ctrl">
+        <div class="fld">
+          <label>n (total items): <span id="nLbl2">5</span></label>
+          <input type="range" id="pcN" min="0" max="20" value="5">
+        </div>
+        <div class="fld">
+          <label>r (chosen): <span id="rLbl2">2</span></label>
+          <input type="range" id="pcR" min="0" max="20" value="2">
+        </div>
+      </div>
+      <div class="warn" id="pcWarn"></div>
+      <div class="row">
+        <div class="col box">
+          <label>Permutation <span class="note">order matters</span></label>
+          <div class="val" id="nprVal">20</div>
+          <div class="mono" id="nprEq"></div>
+        </div>
+        <div class="col box">
+          <label>Combination <span class="note">order ignored</span></label>
+          <div class="val" id="ncrVal">10</div>
+          <div class="mono" id="ncrEq"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>See it: choose r from {A, B, C, ...}</h2>
+      <p class="note">For small n, r all permutations and combinations are listed. Notice each combination (unordered set) expands into r! permutations.</p>
+      <div class="row">
+        <div class="col">
+          <label>Combinations (<span id="cCount">0</span>) - sets</label>
+          <div class="list" id="cList"></div>
+        </div>
+        <div class="col">
+          <label>Permutations (<span id="pCount">0</span>) - ordered</label>
+          <div class="list" id="pList"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Factorial Explorer</h2>
+      <div class="ctrl">
+        <div class="fld">
+          <label>k: <span id="fLbl">5</span></label>
+          <input type="range" id="fK" min="0" max="20" value="5">
+        </div>
+      </div>
+      <div class="box mono" id="factOut"></div>
+    </div>
+  </section>
+
+  <!-- ===================== VIEW 3: Applications ===================== -->
+  <section class="view" id="v-app">
+    <div class="panel">
+      <h2>Arrangements with Repetition</h2>
+      <p class="note">Distinct arrangements of the letters of a word = n! / (p! q! ...) where p, q ... are counts of repeated letters.</p>
+      <div class="ctrl">
+        <div class="fld" style="flex:1 1 100%">
+          <label>Type a word (letters only)</label>
+          <input type="text" id="word" value="BALLOON" maxlength="12" autocomplete="off">
+        </div>
+      </div>
+      <div class="box mono" id="wordOut"></div>
+    </div>
+    <div class="panel">
+      <h2>Circular Permutations</h2>
+      <p class="note">Arranging n distinct objects in a circle = (n-1)! because rotations are the same. If reflections are also equal (like a bead necklace), divide by 2.</p>
+      <div class="ctrl">
+        <div class="fld">
+          <label>n around the table: <span id="cirLbl">5</span></label>
+          <input type="range" id="cirN" min="1" max="12" value="5">
+        </div>
+      </div>
+      <div class="box mono" id="cirOut"></div>
+    </div>
+    <div class="panel">
+      <h2>Pascal's Triangle &rarr; nCr</h2>
+      <p class="note">Row n, entry r of Pascal's triangle equals nCr. Move the slider to highlight a row.</p>
+      <div class="ctrl">
+        <div class="fld">
+          <label>Highlight row n = <span id="ptLbl">4</span></label>
+          <input type="range" id="ptN" min="0" max="8" value="4">
+        </div>
+      </div>
+      <div style="overflow-x:auto"><table class="pt" id="ptTbl"></table></div>
+    </div>
+    <div class="panel">
+      <h2>"How many ways?" Problem Picker</h2>
+      <div class="ctrl">
+        <div class="fld" style="flex:1 1 100%">
+          <label>Choose a problem</label>
+          <select id="probSel"></select>
+        </div>
+      </div>
+      <div class="box" id="probOut"></div>
+    </div>
+  </section>
+
+  <!-- ===================== VIEW 4: Facts ===================== -->
+  <section class="view" id="v-facts">
+    <div class="panel">
+      <h2>Formula &amp; Facts Panel</h2>
+      <dl class="facts">
+        <dt>Factorial</dt>
+        <dd>n! = n x (n-1) x ... x 2 x 1, and by definition 0! = 1.</dd>
+        <dt>Permutation (order matters)</dt>
+        <dd>nPr = n! / (n - r)! = n x (n-1) x ... x (n - r + 1). Number of ordered arrangements of r items from n.</dd>
+        <dt>Combination (order ignored)</dt>
+        <dd>nCr = n! / [ r! (n - r)! ] = nPr / r!. Number of ways to choose r items from n.</dd>
+        <dt>Relation</dt>
+        <dd>nCr = nCr(n-r) (symmetry), and nPr = r! x nCr.</dd>
+        <dt>With repetition allowed</dt>
+        <dd>r items from n with repetition: ordered = n^r; the plate/PIN counting principle.</dd>
+        <dt>Word arrangements</dt>
+        <dd>Letters of a word with repeats: n! / (p! q! ...).</dd>
+        <dt>Circular</dt>
+        <dd>n distinct objects in a circle: (n - 1)!.</dd>
+        <dt>When to use which?</dt>
+        <dd>Ask: does order/rank/position matter? Yes &rarr; permutation. Just a group/committee/selection? &rarr; combination.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ===================== VIEW 5: Quiz ===================== -->
+  <section class="view" id="v-quiz">
+    <div class="panel">
+      <h2>Quick Quiz (3 questions)</h2>
+      <p class="note">Tap an option to check your answer.</p>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <p class="sub" style="text-align:center">Exact integer arithmetic (BigInt). Large n is guarded.</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- exact math with BigInt ---------- */
+function factBig(n){ let r=1n; for(let i=2n;i<=BigInt(n);i++) r*=i; return r; }
+function nprBig(n,r){ if(r<0||r>n) return 0n; let res=1n; for(let i=0;i<r;i++) res*=BigInt(n-i); return res; }
+function ncrBig(n,r){ if(r<0||r>n) return 0n; r=Math.min(r,n-r); let num=1n,den=1n; for(let i=0;i<r;i++){ num*=BigInt(n-i); den*=BigInt(i+1);} return num/den; }
+function fmt(b){ return b.toString(); }
+
+/* ---------- tabs ---------- */
+var tabs=document.getElementById('tabs');
+tabs.addEventListener('click',function(e){
+  var t=e.target.closest('.tab'); if(!t) return;
+  var v=t.getAttribute('data-v');
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(x){x.classList.toggle('active',x===t);});
+  Array.prototype.forEach.call(document.querySelectorAll('.view'),function(x){x.classList.toggle('active',x.id==='v-'+v);});
+});
+
+/* ---------- VIEW 1: FPC tree ---------- */
+var sN=document.getElementById('sN'),pN=document.getElementById('pN'),hN=document.getElementById('hN');
+function drawTree(){
+  var s=+sN.value,p=+pN.value,h=+hN.value;
+  document.getElementById('sLbl').textContent=s;
+  document.getElementById('pLbl').textContent=p;
+  document.getElementById('hLbl').textContent=h;
+  var total=s*p*h;
+  document.getElementById('fpcEq').textContent=s+' x '+p+' x '+h+' = '+total;
+  var W=640,H=360, sw=['#5ad1c4','#f0b429','#f87171','#a78bfa','#60a5fa'];
+  var svg='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="transparent"/>';
+  var x0=30, x1=210, x2=400, x3=590, leafH=H/(total+1);
+  // root
+  svg+='<circle cx="'+x0+'" cy="'+(H/2)+'" r="6" fill="#e7eef7"/>';
+  svg+='<text x="'+x0+'" y="'+(H/2-12)+'" fill="#9fb0c4" font-size="11" text-anchor="middle">start</text>';
+  var idx=0;
+  for(var i=0;i<s;i++){
+    var y1=(H)*(i+1)/(s+1);
+    svg+='<line x1="'+x0+'" y1="'+(H/2)+'" x2="'+x1+'" y2="'+y1+'" stroke="'+sw[i%5]+'" stroke-width="1.5" opacity=".8"/>';
+    svg+='<text x="'+x1+'" y="'+(y1-6)+'" fill="'+sw[i%5]+'" font-size="12" text-anchor="middle">S'+(i+1)+'</text>';
+    svg+='<circle cx="'+x1+'" cy="'+y1+'" r="4" fill="'+sw[i%5]+'"/>';
+    for(var j=0;j<p;j++){
+      var y2=y1 + (j-(p-1)/2)*(H/(s+1))/(p+0.5);
+      svg+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="#2b3a50" stroke-width="1"/>';
+      svg+='<circle cx="'+x2+'" cy="'+y2+'" r="3" fill="#9fb0c4"/>';
+      for(var k=0;k<h;k++){
+        idx++;
+        var y3=y2 + (k-(h-1)/2)*7;
+        svg+='<line x1="'+x2+'" y1="'+y2+'" x2="'+x3+'" y2="'+y3+'" stroke="#2b3a50" stroke-width=".8"/>';
+        svg+='<circle cx="'+x3+'" cy="'+y3+'" r="2.4" fill="#5ad1c4"/>';
+      }
+    }
+  }
+  svg+='<text x="'+x3+'" y="20" fill="#5ad1c4" font-size="12" text-anchor="end">'+idx+' leaves</text>';
+  document.getElementById('tree').innerHTML=svg;
+}
+[sN,pN,hN].forEach(function(el){el.addEventListener('input',drawTree);});
+drawTree();
+
+/* number plates */
+var npL=document.getElementById('npLetters'),npD=document.getElementById('npDigits');
+function drawPlate(){
+  var L=+npL.value,D=+npD.value;
+  document.getElementById('npL').textContent=L;
+  document.getElementById('npD').textContent=D;
+  document.getElementById('dLbl').textContent=L;
+  document.getElementById('nLbl').textContent=D;
+  var total=(26n**BigInt(L))*(10n**BigInt(D));
+  var parts=[];
+  for(var i=0;i<L;i++) parts.push('26');
+  for(var j=0;j<D;j++) parts.push('10');
+  var eq=parts.length?parts.join(' x '):'1';
+  document.getElementById('npOut').innerHTML='26^'+L+' x 10^'+D+' = '+eq+'<br><b style="color:#5ad1c4;font-size:1.05rem">'+fmt(total)+'</b> possible plates';
+}
+[npL,npD].forEach(function(el){el.addEventListener('input',drawPlate);});
+drawPlate();
+
+/* ---------- VIEW 2: P vs C ---------- */
+var pcN=document.getElementById('pcN'),pcR=document.getElementById('pcR');
+function updatePC(){
+  var n=+pcN.value,r=+pcR.value;
+  document.getElementById('nLbl2').textContent=n;
+  document.getElementById('rLbl2').textContent=r;
+  var warn=document.getElementById('pcWarn');
+  warn.textContent = (r>n) ? 'r > n: cannot choose more than available, so both are 0.' : '';
+  var npr=nprBig(n,r), ncr=ncrBig(n,r);
+  document.getElementById('nprVal').textContent=fmt(npr);
+  document.getElementById('ncrVal').textContent=fmt(ncr);
+  document.getElementById('nprEq').textContent = n+'P'+r+' = '+n+'!/('+n+'-'+r+')! = '+n+'!/'+(n-r)+'!';
+  document.getElementById('ncrEq').textContent = n+'C'+r+' = '+n+'!/['+r+'!('+n+'-'+r+')!] = '+n+'P'+r+'/'+r+'!';
+  buildLists(n,r);
+}
+function buildLists(n,r){
+  var cL=document.getElementById('cList'),pL=document.getElementById('pList');
+  var alpha='ABCDEFGHIJ';
+  // only enumerate when small & feasible
+  if(n<0||r<0||r>n||n>10){
+    cL.innerHTML='<span class="note">(list shown for 0 &lt;= n &lt;= 10)</span>';
+    pL.innerHTML='<span class="note">(list shown for 0 &lt;= n &lt;= 10)</span>';
+    document.getElementById('cCount').textContent=fmt(ncrBig(Math.max(n,0),r));
+    document.getElementById('pCount').textContent=fmt(nprBig(Math.max(n,0),r));
+    return;
+  }
+  var items=alpha.slice(0,n).split('');
+  var combos=[];
+  (function comb(start,acc){
+    if(acc.length===r){combos.push(acc.slice());return;}
+    for(var i=start;i<items.length;i++){acc.push(items[i]);comb(i+1,acc);acc.pop();}
+  })(0,[]);
+  var perms=[];
+  combos.forEach(function(c){
+    (function perm(arr,acc){
+      if(arr.length===0){perms.push(acc.join(''));return;}
+      for(var i=0;i<arr.length;i++){
+        var rest=arr.slice(0,i).concat(arr.slice(i+1));
+        perm(rest,acc.concat(arr[i]));
+      }
+    })(c,[]);
+  });
+  var MAX=200;
+  cL.innerHTML = combos.slice(0,MAX).map(function(c){return c.join('');}).join('  ') + (combos.length>MAX?' ...':'') || '<span class="note">(none)</span>';
+  pL.innerHTML = perms.slice(0,MAX).join('  ') + (perms.length>MAX?' ...':'') || '<span class="note">(none)</span>';
+  document.getElementById('cCount').textContent=combos.length;
+  document.getElementById('pCount').textContent=perms.length;
+}
+[pcN,pcR].forEach(function(el){el.addEventListener('input',updatePC);});
+updatePC();
+
+/* factorial explorer */
+var fK=document.getElementById('fK');
+function updateFact(){
+  var k=+fK.value;
+  document.getElementById('fLbl').textContent=k;
+  var expand = k<=0 ? '1' : Array.from({length:k},function(_,i){return k-i;}).join(' x ');
+  document.getElementById('factOut').innerHTML=k+'! = '+expand+' = <b style="color:#5ad1c4">'+fmt(factBig(k))+'</b>';
+}
+fK.addEventListener('input',updateFact); updateFact();
+
+/* ---------- VIEW 3: Applications ---------- */
+var word=document.getElementById('word');
+function updateWord(){
+  var w=word.value.toUpperCase().replace(/[^A-Z]/g,'');
+  var n=w.length;
+  var counts={};
+  for(var i=0;i<w.length;i++){counts[w[i]]=(counts[w[i]]||0)+1;}
+  var den=1n, denParts=[];
+  Object.keys(counts).forEach(function(ch){
+    if(counts[ch]>1){den*=factBig(counts[ch]); denParts.push(ch+':'+counts[ch]+'!');}
+  });
+  var total = n===0?0n : factBig(n)/den;
+  var out = w?('<b>'+w+'</b> ('+n+' letters)<br>'+n+'!'+(denParts.length?' / ('+denParts.join(' x ')+')':'')+' = <b style="color:#5ad1c4">'+fmt(total)+'</b> distinct arrangements'):'<span class="note">Type a word.</span>';
+  document.getElementById('wordOut').innerHTML=out;
+}
+word.addEventListener('input',updateWord); updateWord();
+
+/* circular */
+var cirN=document.getElementById('cirN');
+function updateCir(){
+  var n=+cirN.value;
+  document.getElementById('cirLbl').textContent=n;
+  var circ = n<=0?0n:factBig(n-1);
+  var neck = n<=2?circ:factBig(n-1)/2n;
+  document.getElementById('cirOut').innerHTML=
+    'Round a table: (n-1)! = '+Math.max(n-1,0)+'! = <b style="color:#5ad1c4">'+fmt(circ)+'</b><br>'+
+    'Necklace (reflections equal): (n-1)!/2 = <b style="color:#5ad1c4">'+fmt(neck)+'</b>';
+}
+cirN.addEventListener('input',updateCir); updateCir();
+
+/* Pascal's triangle */
+var ptN=document.getElementById('ptN');
+function drawPascal(){
+  var hi=+ptN.value;
+  document.getElementById('ptLbl').textContent=hi;
+  var maxN=8, html='';
+  for(var n=0;n<=maxN;n++){
+    html+='<tr>';
+    // leading spacer for pyramid shape
+    var pad=(maxN-n);
+    html+='<td colspan="'+pad+'" style="border:0;background:transparent"></td>';
+    for(var r=0;r<=n;r++){
+      var v=fmt(ncrBig(n,r));
+      html+='<td colspan="2" class="'+(n===hi?'on':'')+'">'+v+'</td>';
+    }
+    html+='</tr>';
+  }
+  var t=document.getElementById('ptTbl');
+  t.innerHTML=html;
+}
+ptN.addEventListener('input',drawPascal); drawPascal();
+
+/* problem picker */
+var problems=[
+  {q:"How many ways can 5 students be seated in a row?",
+   sol:"Order matters, all seated: 5! = 5P5 = <b>120</b>."},
+  {q:"From 8 players, how many ways to pick a team of 3 (no ranking)?",
+   sol:"Selection, order ignored: 8C3 = 8!/(3! 5!) = <b>56</b>."},
+  {q:"How many 3-letter codes from A-Z if letters may repeat?",
+   sol:"Counting principle with repetition: 26^3 = <b>17,576</b>."},
+  {q:"How many ways to arrange the letters of the word LEVEL?",
+   sol:"5 letters, L x2, E x2: 5!/(2! 2!) = 120/4 = <b>30</b>."},
+  {q:"In how many ways can 6 people sit around a round table?",
+   sol:"Circular: (6-1)! = 5! = <b>120</b>."},
+  {q:"Choose a president and a secretary from 10 members.",
+   sol:"Distinct roles, order matters: 10P2 = 10x9 = <b>90</b>."}
+];
+var probSel=document.getElementById('probSel');
+problems.forEach(function(p,i){var o=document.createElement('option');o.value=i;o.textContent='Q'+(i+1)+': '+p.q;probSel.appendChild(o);});
+function showProb(){
+  var p=problems[+probSel.value];
+  document.getElementById('probOut').innerHTML='<div class="note" style="margin-bottom:6px">'+p.q+'</div><div>'+p.sol+'</div>';
+}
+probSel.addEventListener('change',showProb); showProb();
+
+/* ---------- VIEW 5: Quiz ---------- */
+var quizData=[
+  {q:"A menu has 4 starters and 3 mains. How many starter+main meals?",
+   opts:["7","12","24","1"],a:1,e:"Counting principle: 4 x 3 = 12."},
+  {q:"How many ways to arrange 3 of 6 distinct books on a shelf?",
+   opts:["20","120","216","6P3 = 120"],a:1,e:"Order matters: 6P3 = 6x5x4 = 120."},
+  {q:"A committee of 2 is chosen from 5 people. How many committees?",
+   opts:["20","10","25","5"],a:1,e:"Order ignored: 5C2 = 5!/(2!3!) = 10."}
+];
+var quiz=document.getElementById('quiz');
+quizData.forEach(function(item,qi){
+  var d=document.createElement('div'); d.className='q';
+  var h='<div class="big">Q'+(qi+1)+'. '+item.q+'</div><div class="opts">';
+  item.opts.forEach(function(o,oi){ h+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</div>'; });
+  h+='</div><div class="exp" id="exp'+qi+'"></div>';
+  d.innerHTML=h; quiz.appendChild(d);
+});
+quiz.addEventListener('click',function(e){
+  var opt=e.target.closest('.opt'); if(!opt) return;
+  var qi=+opt.getAttribute('data-q'), oi=+opt.getAttribute('data-o');
+  var parent=opt.parentNode;
+  if(parent.getAttribute('data-done')) return;
+  parent.setAttribute('data-done','1');
+  var item=quizData[qi];
+  Array.prototype.forEach.call(parent.children,function(c,ci){
+    if(ci===item.a) c.classList.add('correct');
+    else if(ci===oi) c.classList.add('wrong');
+  });
+  var exp=document.getElementById('exp'+qi);
+  exp.innerHTML=(oi===item.a?'Correct! ':'Not quite. ')+item.e;
+  exp.classList.add('show');
+});
+</script>
+</body>
+</html>

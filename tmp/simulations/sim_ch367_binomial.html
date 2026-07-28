@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binomial Theorem Lab &mdash; NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#12151c; --panel:#1a1f2b; --panel2:#212837; --line:#2c3547;
+    --ink:#e6ebf5; --muted:#9aa7bd; --accent:#5ad0c0; --accent-d:#2f8f83;
+    --hl:#f0b34a; --good:#5ad07a; --bad:#e06a6a;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem; margin:0 0 2px}
+  .sub{color:var(--muted); font-size:.85rem; margin:0 0 14px}
+  .wrap{max-width:860px; margin:0 auto}
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+  .tab{
+    flex:1 1 auto; min-width:120px; text-align:center; cursor:pointer;
+    background:var(--panel); border:1px solid var(--line); color:var(--muted);
+    padding:10px 8px; border-radius:12px; font-weight:600; font-size:.9rem;
+    transition:.15s; user-select:none;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent); color:#0c1015; border-color:var(--accent)}
+  .panel{
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:16px; margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  label{display:block; font-size:.8rem; color:var(--muted); margin:0 0 4px}
+  .row{display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end}
+  .fld{flex:1 1 90px; min-width:80px}
+  input[type=number],input[type=text]{
+    width:100%; background:var(--panel2); border:1px solid var(--line);
+    color:var(--ink); border-radius:10px; padding:9px 10px; font-size:1rem;
+  }
+  input:focus{outline:none; border-color:var(--accent)}
+  .rng{width:100%}
+  button{
+    background:var(--accent); color:#0c1015; border:none; cursor:pointer;
+    padding:10px 16px; border-radius:10px; font-weight:700; font-size:.9rem;
+    transition:.15s;
+  }
+  button:hover{background:var(--accent-d); color:#fff}
+  button.ghost{background:var(--panel2); color:var(--ink); border:1px solid var(--line)}
+  button.ghost:hover{border-color:var(--accent); background:var(--panel2); color:var(--accent)}
+  .out{
+    background:var(--panel2); border:1px solid var(--line); border-radius:10px;
+    padding:12px; margin-top:12px; overflow-x:auto;
+  }
+  .expr{font-size:1.02rem; line-height:2.1; word-break:break-word}
+  .term{
+    display:inline-block; padding:2px 6px; margin:2px 1px; border-radius:8px;
+    background:#151b27; border:1px solid var(--line); cursor:pointer; transition:.12s;
+    white-space:nowrap;
+  }
+  .term:hover{border-color:var(--accent)}
+  .term.sel{background:var(--hl); color:#1a1206; border-color:var(--hl)}
+  .coef{color:var(--accent); font-weight:700}
+  sup{font-size:.72em}
+  sub{font-size:.72em}
+  .note{font-size:.85rem; color:var(--muted); margin-top:8px}
+  .kv{font-size:.95rem; margin:6px 0}
+  .kv b{color:var(--hl)}
+  /* Pascal */
+  #pascal{display:flex; flex-direction:column; align-items:center; gap:5px; padding:4px 0}
+  .prow{display:flex; gap:5px; justify-content:center; flex-wrap:nowrap}
+  .cell{
+    min-width:34px; padding:5px 6px; text-align:center; border-radius:8px;
+    background:var(--panel2); border:1px solid var(--line); cursor:pointer;
+    font-size:.82rem; transition:.12s; white-space:nowrap;
+  }
+  .cell:hover{border-color:var(--accent); color:var(--accent)}
+  .cell.sel{background:var(--hl); color:#1a1206; border-color:var(--hl); font-weight:700}
+  .cell.mirror{border-color:var(--accent); color:var(--accent)}
+  .facts details{border-bottom:1px solid var(--line); padding:8px 0}
+  .facts details:last-child{border-bottom:none}
+  .facts summary{cursor:pointer; font-weight:600; color:var(--accent)}
+  .facts p{margin:8px 0 2px; font-size:.9rem; color:var(--ink)}
+  .quiz-q{margin-bottom:14px; border-bottom:1px solid var(--line); padding-bottom:12px}
+  .quiz-q:last-child{border-bottom:none; padding-bottom:0}
+  .opts{list-style:none; padding:0; margin:8px 0 0}
+  .opts li{
+    background:var(--panel2); border:1px solid var(--line); border-radius:9px;
+    padding:9px 12px; margin:6px 0; cursor:pointer; font-size:.9rem; transition:.12s;
+  }
+  .opts li:hover{border-color:var(--accent)}
+  .opts li.correct{background:rgba(90,208,122,.16); border-color:var(--good); color:#bff3cd}
+  .opts li.wrong{background:rgba(224,106,106,.16); border-color:var(--bad); color:#f3c9c9}
+  .ans{font-size:.85rem; color:var(--muted); margin-top:6px; display:none}
+  .ans.show{display:block}
+  .mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace}
+  .pill{display:inline-block; background:var(--panel2); border:1px solid var(--line);
+    border-radius:20px; padding:3px 10px; font-size:.8rem; margin:3px 4px 0 0}
+  .flex{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+  @media(max-width:420px){
+    .cell{min-width:26px; padding:4px 3px; font-size:.72rem}
+    h1{font-size:1.15rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Binomial Theorem Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics &middot; Ch.12 Binomial Theorem &middot; exact integer coefficients</p>
+
+  <div class="tabs">
+    <div class="tab active" data-v="build">Expansion</div>
+    <div class="tab" data-v="pascal">Pascal's Triangle</div>
+    <div class="tab" data-v="apps">Applications</div>
+    <div class="tab" data-v="facts">Facts</div>
+    <div class="tab" data-v="quiz">Quiz</div>
+  </div>
+
+  <!-- EXPANSION BUILDER -->
+  <section class="view active" id="v-build">
+    <div class="panel">
+      <div class="row">
+        <div class="fld"><label>n (power)</label><input type="number" id="b-n" value="5" min="0" max="30" step="1"></div>
+        <div class="fld"><label>a (first term)</label><input type="text" id="b-a" value="x"></div>
+        <div class="fld"><label>b (second term)</label><input type="text" id="b-b" value="y"></div>
+        <div class="fld" style="flex:0 0 auto"><button id="b-go">Expand</button></div>
+      </div>
+      <p class="note">Enter symbols like <span class="mono">x</span>, <span class="mono">2x</span>, <span class="mono">-3</span>, or <span class="mono">1</span>. Coefficients shown are exact <span class="mono">nC<sub>k</sub></span> values.</p>
+      <div class="out expr" id="b-out"></div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <div class="fld"><label>General term: choose k (0 &hellip; n)</label><input type="range" class="rng" id="b-k" min="0" max="5" value="2"></div>
+        <div class="fld" style="flex:0 0 auto"><span class="pill" id="b-klbl">k = 2</span></div>
+      </div>
+      <div class="out" id="b-gen"></div>
+      <p class="note">Click any term above, or drag the slider, to inspect <span class="mono">T<sub>k+1</sub> = <sup>n</sup>C<sub>k</sub>&middot;a<sup>n&minus;k</sup>&middot;b<sup>k</sup></span>.</p>
+    </div>
+  </section>
+
+  <!-- PASCAL -->
+  <section class="view" id="v-pascal">
+    <div class="panel">
+      <div class="row">
+        <div class="fld"><label>Rows (n = 0 &hellip; <span id="p-max">8</span>)</label><input type="range" class="rng" id="p-rows" min="1" max="12" value="8"></div>
+        <div class="fld" style="flex:0 0 auto"><span class="pill" id="p-rowlbl">show rows 0&ndash;8</span></div>
+      </div>
+      <div class="out"><div id="pascal"></div></div>
+      <div class="out" id="p-info">Click any cell to read its value as <span class="mono"><sup>n</sup>C<sub>k</sub></span>.</div>
+      <p class="note">Row <span class="mono">n</span> holds the coefficients of <span class="mono">(a+b)<sup>n</sup></span>. Each entry is the sum of the two above it (Pascal's rule). Symmetry: <span class="mono"><sup>n</sup>C<sub>k</sub> = <sup>n</sup>C<sub>n&minus;k</sub></span> &mdash; the row reads the same forwards and backwards (its mirror cell is outlined).</p>
+    </div>
+  </section>
+
+  <!-- APPLICATIONS -->
+  <section class="view" id="v-apps">
+    <div class="panel">
+      <label style="font-weight:700;color:var(--accent)">Find a specific term / coefficient</label>
+      <div class="row" style="margin-top:6px">
+        <div class="fld"><label>n</label><input type="number" id="a-n" value="10" min="0" max="30"></div>
+        <div class="fld"><label>a</label><input type="text" id="a-a" value="x"></div>
+        <div class="fld"><label>b</label><input type="text" id="a-b" value="2"></div>
+        <div class="fld"><label>k (term index)</label><input type="number" id="a-k" value="3" min="0"></div>
+        <div class="fld" style="flex:0 0 auto"><button id="a-go">Find term</button></div>
+      </div>
+      <div class="out" id="a-term"></div>
+    </div>
+    <div class="panel">
+      <label style="font-weight:700;color:var(--accent)">Middle term(s)</label>
+      <div class="out" id="a-mid"></div>
+      <p class="note">If n is even there is one middle term (T<sub>n/2+1</sub>); if n is odd there are two.</p>
+    </div>
+    <div class="panel">
+      <label style="font-weight:700;color:var(--accent)">Sum of coefficients &amp; (1+x)<sup>n</sup></label>
+      <div class="out" id="a-sum"></div>
+      <p class="note">Putting a = b = 1 gives the sum of all coefficients = 2<sup>n</sup>. The special case (1+x)<sup>n</sup> = &sum; <sup>n</sup>C<sub>k</sub> x<sup>k</sup>.</p>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="view facts" id="v-facts">
+    <div class="panel">
+      <details open><summary>Binomial Theorem</summary>
+        <p>For any positive integer n:</p>
+        <p class="mono">(a + b)<sup>n</sup> = &sum;<sub>k=0</sub><sup>n</sup> <sup>n</sup>C<sub>k</sub> a<sup>n&minus;k</sup> b<sup>k</sup></p>
+        <p>= <sup>n</sup>C<sub>0</sub>a<sup>n</sup> + <sup>n</sup>C<sub>1</sub>a<sup>n&minus;1</sup>b + &hellip; + <sup>n</sup>C<sub>n</sub>b<sup>n</sup>. There are (n+1) terms.</p>
+      </details>
+      <details><summary>General term T<sub>k+1</sub></summary>
+        <p>The (k+1)<sup>th</sup> term is <span class="mono">T<sub>k+1</sub> = <sup>n</sup>C<sub>k</sub> a<sup>n&minus;k</sup> b<sup>k</sup></span>, for k = 0, 1, &hellip;, n. Use it to find any single term without writing the whole expansion.</p>
+      </details>
+      <details><summary>Binomial coefficient <sup>n</sup>C<sub>k</sub></summary>
+        <p><span class="mono"><sup>n</sup>C<sub>k</sub> = n! / (k!(n&minus;k)!)</span>. It is always a whole number. Symmetry: <span class="mono"><sup>n</sup>C<sub>k</sub> = <sup>n</sup>C<sub>n&minus;k</sub></span>. Also <sup>n</sup>C<sub>0</sub> = <sup>n</sup>C<sub>n</sub> = 1.</p>
+      </details>
+      <details><summary>Pascal's Triangle</summary>
+        <p>Row n lists <sup>n</sup>C<sub>0</sub> &hellip; <sup>n</sup>C<sub>n</sub>. Pascal's rule: <span class="mono"><sup>n</sup>C<sub>k</sub> = <sup>n&minus;1</sup>C<sub>k&minus;1</sub> + <sup>n&minus;1</sup>C<sub>k</sub></span> &mdash; each entry is the sum of the two directly above it.</p>
+      </details>
+      <details><summary>Useful results</summary>
+        <p>Sum of coefficients (a=b=1): <span class="mono">&sum; <sup>n</sup>C<sub>k</sub> = 2<sup>n</sup></span>. Alternating sum (a=1,b=&minus;1): <span class="mono">&sum; (&minus;1)<sup>k</sup> <sup>n</sup>C<sub>k</sub> = 0</span>. Middle term is the largest coefficient.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="v-quiz">
+    <div class="panel" id="quiz"></div>
+  </section>
+
+  <p class="sub" style="text-align:center;margin-top:6px">Tip: tap a term or a Pascal cell to explore. All maths is computed with exact big-integer arithmetic.</p>
+</div>
+
+<script>
+"use strict";
+// ---------- exact binomial via BigInt ----------
+function nCk(n,k){
+  if(k<0||k>n) return 0n;
+  if(k>n-k) k=n-k;
+  let r=1n; const N=BigInt(n);
+  for(let i=0n;i<BigInt(k);i++){ r=r*(N-i)/(i+1n); }
+  return r;
+}
+function factStr(n){ return n; }
+
+// superscript / power formatting for a symbolic base
+function pow(base, e){
+  if(e===0) return "";
+  if(e===1) return base;
+  return base+"<sup>"+e+"</sup>";
+}
+// parse coefficient & symbol from a token like "2x", "-3", "x", "1"
+function parseTok(t){
+  t=(t||"").trim();
+  if(t==="") t="1";
+  // match optional sign+number then optional symbol
+  const m=t.match(/^([+-]?\d*(?:\.\d+)?)?([a-zA-Z][a-zA-Z0-9_]*)?$/);
+  if(!m) return {coef:null,sym:t,raw:t}; // fallback: treat as opaque symbol
+  let numStr=m[1], sym=m[2]||"";
+  let coef;
+  if(numStr===undefined||numStr===""||numStr==="+") coef=1;
+  else if(numStr==="-") coef=-1;
+  else coef=parseFloat(numStr);
+  if(!sym && (numStr===undefined||numStr==="")) { coef=1; }
+  return {coef:coef, sym:sym, raw:t};
+}
+// Render (coef^power)*(sym^power) numeric part exactly using BigInt when integer
+function numPow(coef,e){
+  // returns BigInt if coef integer, else Number
+  if(Number.isInteger(coef)){
+    let r=1n; let c=BigInt(Math.trunc(coef));
+    for(let i=0;i<e;i++) r*=c;
+    return {big:true,val:r};
+  }
+  return {big:false,val:Math.pow(coef,e)};
+}
+
+// ---------- EXPANSION BUILDER ----------
+const bN=document.getElementById('b-n'), bA=document.getElementById('b-a'),
+      bB=document.getElementById('b-b'), bOut=document.getElementById('b-out'),
+      bK=document.getElementById('b-k'), bKlbl=document.getElementById('b-klbl'),
+      bGen=document.getElementById('b-gen');
+let curN=5, curTerms=[];
+
+function buildExpansion(){
+  let n=parseInt(bN.value,10);
+  if(isNaN(n)||n<0){n=0;} if(n>30){n=30; bN.value=30;}
+  curN=n;
+  const A=parseTok(bA.value), B=parseTok(bB.value);
+  bK.max=n; if(parseInt(bK.value,10)>n) bK.value=n;
+  curTerms=[];
+  let html="";
+  for(let k=0;k<=n;k++){
+    const c=nCk(n,k);            // BigInt binomial coef
+    const ae=n-k, be=k;
+    // numeric coefficient part from a-coef and b-coef
+    const an=numPow(A.coef??1,ae), bn=numPow(B.coef??1,be);
+    let coefStr, coefVal;
+    if(an.big&&bn.big){
+      coefVal=c*an.val*bn.val;    // exact BigInt
+      coefStr=coefVal.toString();
+    } else {
+      const v=Number(c)*(an.big?Number(an.val):an.val)*(bn.big?Number(bn.val):bn.val);
+      coefStr=(""+v); coefVal=v;
+    }
+    // symbolic part
+    let sym="";
+    if(A.sym) sym+=pow(A.sym,ae);
+    if(B.sym) sym+=pow(B.sym,be);
+    // assemble display term
+    let disp="";
+    const showCoef = (coefStr!=="1") || sym==="";
+    let sign="+";
+    let cs=coefStr;
+    if(cs[0]==="-"){ sign="&minus;"; cs=cs.slice(1); }
+    if(k===0) sign = (coefStr[0]==="-")?"&minus;":"";
+    else sign=" "+sign+" ";
+    if(cs==="1" && sym!=="") disp=sym;
+    else disp=cs+(sym?sym:"");
+    html+=sign+'<span class="term" data-k="'+k+'">'+disp+'</span>';
+    curTerms.push({k,coefStr,sym,c});
+  }
+  bOut.innerHTML='(<span class="mono">'+(bA.value||'a')+'</span> + <span class="mono">'+(bB.value||'b')+'</span>)<sup>'+n+'</sup> ='+html;
+  // attach term click
+  bOut.querySelectorAll('.term').forEach(el=>{
+    el.addEventListener('click',()=>{ bK.value=el.dataset.k; showGeneral(); });
+  });
+  showGeneral();
+}
+function showGeneral(){
+  const k=parseInt(bK.value,10), n=curN;
+  bKlbl.textContent="k = "+k;
+  bOut.querySelectorAll('.term').forEach(el=>{
+    el.classList.toggle('sel', parseInt(el.dataset.k,10)===k);
+  });
+  const A=parseTok(bA.value), B=parseTok(bB.value);
+  const c=nCk(n,k), ae=n-k, be=k;
+  const t=curTerms[k];
+  let simpleC=c.toString();
+  bGen.innerHTML=
+    '<div class="kv">Term number: <b>T<sub>'+(k+1)+'</sub></b> &nbsp;(the '+(k+1)+ordinal(k+1)+' term)</div>'+
+    '<div class="kv mono">T<sub>'+(k+1)+'</sub> = <sup>'+n+'</sup>C<sub>'+k+'</sub> &middot; ('+(bA.value||'a')+')<sup>'+ae+'</sup> &middot; ('+(bB.value||'b')+')<sup>'+be+'</sup></div>'+
+    '<div class="kv"><sup>'+n+'</sup>C<sub>'+k+'</sub> = <span class="coef">'+simpleC+'</span></div>'+
+    '<div class="kv">Result: <span class="coef">'+(t?(t.coefStr==="1"&&t.sym?"":t.coefStr):simpleC)+'</span> '+(t?t.sym:'')+'</div>';
+}
+function ordinal(x){ const s=["th","st","nd","rd"], v=x%100; return (s[(v-20)%10]||s[v]||s[0]); }
+
+bN.addEventListener('input',buildExpansion);
+bA.addEventListener('input',buildExpansion);
+bB.addEventListener('input',buildExpansion);
+document.getElementById('b-go').addEventListener('click',buildExpansion);
+bK.addEventListener('input',showGeneral);
+
+// ---------- PASCAL ----------
+const pRows=document.getElementById('p-rows'), pMax=document.getElementById('p-max'),
+      pRowlbl=document.getElementById('p-rowlbl'), pEl=document.getElementById('pascal'),
+      pInfo=document.getElementById('p-info');
+function buildPascal(){
+  const rows=parseInt(pRows.value,10);
+  pMax.textContent=rows; pRowlbl.textContent="show rows 0–"+rows;
+  let html="";
+  for(let n=0;n<=rows;n++){
+    html+='<div class="prow">';
+    for(let k=0;k<=n;k++){
+      html+='<div class="cell" data-n="'+n+'" data-k="'+k+'">'+nCk(n,k).toString()+'</div>';
+    }
+    html+='</div>';
+  }
+  pEl.innerHTML=html;
+  pEl.querySelectorAll('.cell').forEach(el=>{
+    el.addEventListener('click',()=>pickCell(el));
+  });
+}
+function pickCell(el){
+  const n=+el.dataset.n, k=+el.dataset.k;
+  pEl.querySelectorAll('.cell').forEach(c=>c.classList.remove('sel','mirror'));
+  el.classList.add('sel');
+  // highlight mirror
+  const mk=n-k;
+  if(mk!==k){
+    const m=pEl.querySelector('.cell[data-n="'+n+'"][data-k="'+mk+'"]');
+    if(m) m.classList.add('mirror');
+  }
+  pInfo.innerHTML=
+    '<div class="kv"><span class="coef mono"><sup>'+n+'</sup>C<sub>'+k+'</sub> = '+nCk(n,k).toString()+'</span></div>'+
+    '<div class="kv mono"><sup>'+n+'</sup>C<sub>'+k+'</sub> = '+n+'! / ('+k+'! &middot; '+mk+'!)</div>'+
+    '<div class="kv">This is the coefficient of <span class="mono">a<sup>'+(n-k)+'</sup>b<sup>'+k+'</sup></span> in (a+b)<sup>'+n+'</sup>.</div>'+
+    '<div class="kv">Symmetry: <span class="mono"><sup>'+n+'</sup>C<sub>'+k+'</sub> = <sup>'+n+'</sup>C<sub>'+mk+'</sub> = '+nCk(n,mk).toString()+'</span>'+(mk!==k?' (mirror cell outlined)':' (this is the centre)')+'</div>';
+}
+pRows.addEventListener('input',buildPascal);
+
+// ---------- APPLICATIONS ----------
+const aN=document.getElementById('a-n'), aA=document.getElementById('a-a'),
+      aB=document.getElementById('a-b'), aK=document.getElementById('a-k'),
+      aTerm=document.getElementById('a-term'), aMid=document.getElementById('a-mid'),
+      aSum=document.getElementById('a-sum');
+
+function termFor(n,Araw,Braw,k){
+  const A=parseTok(Araw), B=parseTok(Braw);
+  const c=nCk(n,k), ae=n-k, be=k;
+  const an=numPow(A.coef??1,ae), bn=numPow(B.coef??1,be);
+  let coefStr;
+  if(an.big&&bn.big){ coefStr=(c*an.val*bn.val).toString(); }
+  else { coefStr=(""+ (Number(c)*(an.big?Number(an.val):an.val)*(bn.big?Number(bn.val):bn.val))); }
+  let sym=""; if(A.sym) sym+=pow(A.sym,ae); if(B.sym) sym+=pow(B.sym,be);
+  return {c,coefStr,sym,ae,be};
+}
+function computeApps(){
+  let n=parseInt(aN.value,10); if(isNaN(n)||n<0)n=0; if(n>30){n=30;aN.value=30;}
+  let k=parseInt(aK.value,10); if(isNaN(k)||k<0)k=0; if(k>n){k=n;aK.value=n;}
+  // specific term
+  const t=termFor(n,aA.value,aB.value,k);
+  aTerm.innerHTML=
+    '<div class="kv mono">T<sub>'+(k+1)+'</sub> = <sup>'+n+'</sup>C<sub>'+k+'</sub>('+(aA.value||'a')+')<sup>'+t.ae+'</sup>('+(aB.value||'b')+')<sup>'+t.be+'</sup></div>'+
+    '<div class="kv">Binomial coefficient <sup>'+n+'</sup>C<sub>'+k+'</sub> = <span class="coef">'+t.c.toString()+'</span></div>'+
+    '<div class="kv">Full term T<sub>'+(k+1)+'</sub> = <span class="coef">'+(t.coefStr==="1"&&t.sym?"":t.coefStr)+'</span> '+t.sym+'</div>'+
+    '<div class="kv">Its numeric coefficient = <span class="coef">'+t.coefStr+'</span></div>';
+  // middle term
+  if(n%2===0){
+    const mk=n/2, m=termFor(n,aA.value,aB.value,mk);
+    aMid.innerHTML='<div class="kv">n = '+n+' is even &rarr; one middle term: <b>T<sub>'+(mk+1)+'</sub></b></div>'+
+      '<div class="kv">T<sub>'+(mk+1)+'</sub> = <span class="coef">'+(m.coefStr==="1"&&m.sym?"":m.coefStr)+'</span> '+m.sym+'  (coef <sup>'+n+'</sup>C<sub>'+mk+'</sub> = '+m.c.toString()+')</div>';
+  } else {
+    const k1=(n-1)/2, k2=(n+1)/2;
+    const m1=termFor(n,aA.value,aB.value,k1), m2=termFor(n,aA.value,aB.value,k2);
+    aMid.innerHTML='<div class="kv">n = '+n+' is odd &rarr; two middle terms: <b>T<sub>'+(k1+1)+'</sub></b> and <b>T<sub>'+(k2+1)+'</sub></b></div>'+
+      '<div class="kv">T<sub>'+(k1+1)+'</sub> = <span class="coef">'+(m1.coefStr==="1"&&m1.sym?"":m1.coefStr)+'</span> '+m1.sym+'</div>'+
+      '<div class="kv">T<sub>'+(k2+1)+'</sub> = <span class="coef">'+(m2.coefStr==="1"&&m2.sym?"":m2.coefStr)+'</span> '+m2.sym+'</div>';
+  }
+  // sum of coefficients & (1+x)^n
+  let sum=0n; for(let i=0;i<=n;i++) sum+=nCk(n,i);
+  let alt=0n; for(let i=0;i<=n;i++) alt+= (i%2===0?1n:-1n)*nCk(n,i);
+  let onex=""; for(let i=0;i<=n;i++){ const cc=nCk(n,i).toString();
+    let sign = i===0?"":" + "; onex+=sign+(cc==="1"&&i>0?"":cc)+(i===0?"":(i===1?"x":"x<sup>"+i+"</sup>")); }
+  aSum.innerHTML=
+    '<div class="kv">Sum of coefficients (put a=b=1): <span class="coef">'+sum.toString()+'</span> = 2<sup>'+n+'</sup></div>'+
+    '<div class="kv">Alternating sum (a=1, b=&minus;1): <span class="coef">'+alt.toString()+'</span>'+(n>0?' (= 0)':'')+'</div>'+
+    '<div class="kv mono">(1 + x)<sup>'+n+'</sup> = '+onex+'</div>';
+}
+['input'].forEach(ev=>{ [aN,aA,aB,aK].forEach(el=>el.addEventListener(ev,computeApps)); });
+document.getElementById('a-go').addEventListener('click',computeApps);
+
+// ---------- QUIZ ----------
+const quizData=[
+  { q:"In the expansion of (a+b)^n, how many terms are there?",
+    opts:["n","n − 1","n + 1","2n"], correct:2,
+    exp:"There are (n+1) terms, one for each k = 0,1,…,n." },
+  { q:"What is the coefficient of x² in (1+x)⁵?",
+    opts:["5","10","20","25"], correct:1,
+    exp:"Coefficient of x² is ⁵C₂ = 5!/(2!3!) = 10." },
+  { q:"The sum of all binomial coefficients ⁿC₀ + ⁿC₁ + … + ⁿCₙ equals:",
+    opts:["n²","2ⁿ","n!","2n"], correct:1,
+    exp:"Put a = b = 1 in (a+b)ⁿ: the sum is 2ⁿ." }
+];
+function buildQuiz(){
+  const box=document.getElementById('quiz');
+  box.innerHTML=quizData.map((it,qi)=>{
+    return '<div class="quiz-q"><div style="font-weight:600">Q'+(qi+1)+'. '+it.q+'</div>'+
+      '<ul class="opts" data-q="'+qi+'">'+
+      it.opts.map((o,oi)=>'<li data-o="'+oi+'">'+o+'</li>').join('')+
+      '</ul><div class="ans" id="ans-'+qi+'"></div></div>';
+  }).join('');
+  box.querySelectorAll('.opts').forEach(ul=>{
+    ul.addEventListener('click',e=>{
+      const li=e.target.closest('li'); if(!li) return;
+      const qi=+ul.dataset.q, oi=+li.dataset.o, it=quizData[qi];
+      ul.querySelectorAll('li').forEach(x=>x.classList.remove('correct','wrong'));
+      ul.querySelectorAll('li')[it.correct].classList.add('correct');
+      if(oi!==it.correct) li.classList.add('wrong');
+      const a=document.getElementById('ans-'+qi);
+      a.textContent=(oi===it.correct?"Correct! ":"Answer: option "+(it.correct+1)+". ")+it.exp;
+      a.classList.add('show');
+    });
+  });
+}
+
+// ---------- TAB SWITCHING ----------
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('v-'+t.dataset.v).classList.add('active');
+  });
+});
+
+// init
+buildExpansion();
+buildPascal();
+computeApps();
+buildQuiz();
+</script>
+</body>
+</html>

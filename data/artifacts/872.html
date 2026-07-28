@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circles Lab · NIOS Class 12 Maths Ch15</title>
+<style>
+  :root{
+    --bg:#141821; --panel:#1c2230; --panel2:#232a3b; --ink:#e7ecf5;
+    --muted:#94a1b8; --accent:#5cc8ff; --accent-dim:#2a5e78;
+    --good:#57d18c; --warn:#ffb454; --bad:#ff6b7d; --line:#2e3648;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  h2{font-size:1.02rem;margin:0 0 10px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.86rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tab.active{background:var(--accent);color:#08202c;border-color:var(--accent);font-weight:600}
+  .wrap{display:grid;grid-template-columns:minmax(280px,1fr) minmax(240px,340px);gap:14px}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:10px;touch-action:none}
+  .ctrl{margin:10px 0}
+  .ctrl label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+  .ctrl label b{color:var(--ink);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+  .eqbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:.95rem}
+  .eqbox .lbl{color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  .eq{font-family:"Cambria Math",Georgia,serif;font-size:1.05rem;color:var(--accent);word-break:break-word}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.82rem;font-weight:600;margin-top:4px}
+  .p-good{background:rgba(87,209,140,.16);color:var(--good)}
+  .p-warn{background:rgba(255,180,84,.16);color:var(--warn)}
+  .p-bad{background:rgba(255,107,125,.16);color:var(--bad)}
+  .p-accent{background:rgba(92,200,255,.16);color:var(--accent)}
+  .facts{font-size:.86rem}
+  .facts .row{padding:7px 0;border-bottom:1px solid var(--line)}
+  .facts .row:last-child{border-bottom:none}
+  .facts .k{color:var(--muted);display:block;font-size:.76rem}
+  .facts .v{font-family:"Cambria Math",Georgia,serif}
+  details.q{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  details.q summary{cursor:pointer;font-weight:600;font-size:.9rem;list-style:none}
+  details.q summary::-webkit-details-marker{display:none}
+  details.q summary::before{content:"▸ ";color:var(--accent)}
+  details.q[open] summary::before{content:"▾ "}
+  .opt{font-size:.86rem;color:var(--muted);margin:6px 0 0 14px}
+  .ans{margin-top:8px;padding:8px 10px;background:rgba(87,209,140,.12);border-left:3px solid var(--good);border-radius:6px;font-size:.86rem}
+  .hint{color:var(--muted);font-size:.8rem;margin-top:8px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.84rem}
+  .btn:active{background:var(--accent);color:#08202c}
+  .mode{display:none}
+  .mode.active{display:block}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85rem}
+</style>
+</head>
+<body>
+<h1>Circles Lab</h1>
+<p class="sub">NIOS Class 12 Mathematics · Chapter 15 — Circles. Drag points, adjust sliders; everything updates live.</p>
+
+<div class="tabs">
+  <button class="tab active" data-mode="explorer">1 · Circle Explorer</button>
+  <button class="tab" data-mode="lines">2 · Points &amp; Lines</button>
+  <button class="tab" data-mode="three">3 · Circle Through 3 Points</button>
+</div>
+
+<!-- ================= MODE 1 ================= -->
+<div class="mode active" id="m-explorer">
+<div class="wrap">
+  <div class="panel">
+    <h2>Interactive circle</h2>
+    <canvas id="cv1" width="480" height="480"></canvas>
+    <p class="hint">Drag the centre dot on the plane, or use the sliders below.</p>
+    <div class="ctrl"><label>centre h <b id="lh">2</b></label><input type="range" id="sh" min="-8" max="8" step="0.5" value="2"></div>
+    <div class="ctrl"><label>centre k <b id="lk">1</b></label><input type="range" id="sk" min="-8" max="8" step="0.5" value="1"></div>
+    <div class="ctrl"><label>radius r <b id="lr">3</b></label><input type="range" id="sr" min="0.5" max="8" step="0.5" value="3"></div>
+  </div>
+  <div class="panel">
+    <h2>Equations</h2>
+    <div class="eqbox"><div class="lbl">Standard form (x−h)²+(y−k)²=r²</div><div class="eq" id="eqStd"></div></div>
+    <div class="eqbox"><div class="lbl">General form x²+y²+2gx+2fy+c=0</div><div class="eq" id="eqGen"></div></div>
+    <div class="facts" id="facts1"></div>
+  </div>
+</div>
+</div>
+
+<!-- ================= MODE 2 ================= -->
+<div class="mode" id="m-lines">
+<div class="wrap">
+  <div class="panel">
+    <h2>Point &amp; line tests</h2>
+    <canvas id="cv2" width="480" height="480"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--accent)"></i>circle</span>
+      <span><i class="dot" style="background:var(--warn)"></i>test point P</span>
+      <span><i class="dot" style="background:var(--good)"></i>line points A,B</span>
+    </div>
+    <p class="hint">Drag P (orange) and the two line handles A, B (green). Adjust the circle radius below.</p>
+    <div class="ctrl"><label>radius r <b id="lr2">4</b></label><input type="range" id="sr2" min="1" max="8" step="0.5" value="4"></div>
+  </div>
+  <div class="panel">
+    <h2>Relationships</h2>
+    <div class="eqbox"><div class="lbl">Point P vs circle</div><div id="ptRes"></div><div class="hint" id="ptExpl"></div></div>
+    <div class="eqbox"><div class="lbl">Line AB vs circle</div><div id="lnRes"></div><div class="hint" id="lnExpl"></div></div>
+    <div class="eqbox"><div class="lbl">Tangent condition</div><div class="eq" style="font-size:.95rem">distance(centre, line) = r</div><div class="hint">A line touches the circle iff its perpendicular distance from the centre equals the radius.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ================= MODE 3 ================= -->
+<div class="mode" id="m-three">
+<div class="wrap">
+  <div class="panel">
+    <h2>Circle through three points</h2>
+    <canvas id="cv3" width="480" height="480"></canvas>
+    <p class="hint">Drag the three green points. A unique circle passes through them (unless they are collinear).</p>
+    <button class="btn" id="reset3">Reset points</button>
+  </div>
+  <div class="panel">
+    <h2>Result</h2>
+    <div class="eqbox"><div class="lbl">Given points</div><div class="eq" id="pts3" style="font-size:.92rem"></div></div>
+    <div class="eqbox"><div class="lbl">Centre &amp; radius</div><div id="cr3"></div></div>
+    <div class="eqbox"><div class="lbl">Standard equation</div><div class="eq" id="eq3std"></div></div>
+    <div class="eqbox"><div class="lbl">General equation</div><div class="eq" id="eq3gen"></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ================= FACTS + QUIZ ================= -->
+<div class="wrap" style="margin-top:14px">
+  <div class="panel">
+    <h2>Key facts</h2>
+    <div class="facts">
+      <div class="row"><span class="k">Standard equation</span><span class="v">(x−h)² + (y−k)² = r²,  centre (h,k), radius r</span></div>
+      <div class="row"><span class="k">General equation</span><span class="v">x² + y² + 2gx + 2fy + c = 0</span></div>
+      <div class="row"><span class="k">Centre from general form</span><span class="v">(−g, −f)</span></div>
+      <div class="row"><span class="k">Radius from general form</span><span class="v">√(g² + f² − c)  (real circle needs g²+f²−c &gt; 0)</span></div>
+      <div class="row"><span class="k">Point (x₁,y₁) position</span><span class="v">S₁ = (x₁−h)²+(y₁−k)²−r² : &lt;0 inside, =0 on, &gt;0 outside</span></div>
+      <div class="row"><span class="k">Tangent condition (line to circle)</span><span class="v">perpendicular distance from centre = r</span></div>
+      <div class="row"><span class="k">Tangent from y=mx+c to x²+y²=a²</span><span class="v">c² = a²(1+m²)</span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <details class="q">
+      <summary>Q1. Centre &amp; radius of x²+y²−6x+4y−12=0?</summary>
+      <div class="opt">a) (3,−2), r=5 &nbsp; b) (−3,2), r=5 &nbsp; c) (3,−2), r=25 &nbsp; d) (6,−4), r=5</div>
+      <div class="ans"><b>a) (3,−2), r=5.</b> 2g=−6→g=−3, 2f=4→f=2, so centre (−g,−f)=(3,−2); r=√(9+4+12)=√25=5.</div>
+    </details>
+    <details class="q">
+      <summary>Q2. The line 3x+4y=10 and circle x²+y²=4 — relationship?</summary>
+      <div class="opt">a) secant &nbsp; b) tangent &nbsp; c) does not meet</div>
+      <div class="ans"><b>b) tangent.</b> Distance of centre (0,0) from line = |−10|/√(9+16)=10/5=2 = radius. Distance = r ⇒ tangent.</div>
+    </details>
+    <details class="q">
+      <summary>Q3. Is the point (1,2) inside x²+y²=9?</summary>
+      <div class="opt">a) inside &nbsp; b) on &nbsp; c) outside</div>
+      <div class="ans"><b>a) inside.</b> S₁ = 1²+2²−9 = 5−9 = −4 &lt; 0, so the point lies inside the circle.</div>
+    </details>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabs=document.querySelectorAll(".tab");
+  var modes={explorer:document.getElementById("m-explorer"),lines:document.getElementById("m-lines"),three:document.getElementById("m-three")};
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      for(var k in modes){modes[k].classList.remove("active");}
+      modes[t.dataset.mode].classList.add("active");
+      // force redraw of newly shown canvas
+      if(t.dataset.mode==="explorer")draw1();
+      if(t.dataset.mode==="lines")draw2();
+      if(t.dataset.mode==="three")draw3();
+    });
+  });
+
+  // ---------- shared plane math ----------
+  var SCALE=26;          // pixels per unit
+  var SIZE=480;          // logical canvas size
+  function toPx(p,W,H){ return {x:W/2 + p.x*SCALE, y:H/2 - p.y*SCALE}; }
+  function toWorld(px,W,H){ return {x:(px.x-W/2)/SCALE, y:(H/2-px.y)/SCALE}; }
+  function fmt(n){ n=Math.round(n*1000)/1000; if(Object.is(n,-0))n=0; return (""+n); }
+  function fmtSigned(n){ n=Math.round(n*1000)/1000; if(Object.is(n,-0))n=0; return (n>=0?"+ "+n:"− "+Math.abs(n)); }
+
+  function grid(ctx,W,H){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle="#2a3244"; ctx.lineWidth=1;
+    for(var gx=W/2%SCALE; gx<W; gx+=SCALE){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(var gy=H/2%SCALE; gy<H; gy+=SCALE){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    // axes
+    ctx.strokeStyle="#4a5670"; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+  }
+  function drawCircle(ctx,c,r,W,H,color){
+    var pc=toPx(c,W,H);
+    ctx.strokeStyle=color; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.arc(pc.x,pc.y,r*SCALE,0,Math.PI*2); ctx.stroke();
+  }
+  function drawDot(ctx,p,W,H,color,label){
+    var pp=toPx(p,W,H);
+    ctx.fillStyle=color; ctx.beginPath(); ctx.arc(pp.x,pp.y,7,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#0c1017"; ctx.lineWidth=1.5; ctx.stroke();
+    if(label){ctx.fillStyle="#e7ecf5";ctx.font="12px system-ui";ctx.fillText(label,pp.x+9,pp.y-8);}
+  }
+
+  // generic pointer-drag helper: returns pointer world pos on move
+  function attachDrag(canvas, hitTest, onDrag){
+    var active=null;
+    function getPos(ev){
+      var r=canvas.getBoundingClientRect();
+      var cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+      var cy=(ev.touches?ev.touches[0].clientY:ev.clientY)-r.top;
+      // map displayed px -> logical canvas px
+      var sx=canvas.width/r.width, sy=canvas.height/r.height;
+      return {x:cx*sx, y:cy*sy};
+    }
+    function start(ev){
+      var p=getPos(ev); active=hitTest(p);
+      if(active!==null){ev.preventDefault(); move(ev);}
+    }
+    function move(ev){
+      if(active===null)return; ev.preventDefault();
+      var p=getPos(ev);
+      onDrag(active, toWorld(p,canvas.width,canvas.height));
+    }
+    function end(){active=null;}
+    canvas.addEventListener("mousedown",start); canvas.addEventListener("touchstart",start,{passive:false});
+    window.addEventListener("mousemove",move); window.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("mouseup",end); window.addEventListener("touchend",end);
+  }
+  function near(a,b){ // both logical-canvas px
+    return Math.hypot(a.x-b.x,a.y-b.y)<20;
+  }
+  function clampU(v){return Math.max(-8,Math.min(8,Math.round(v*2)/2));}
+
+  // ================= MODE 1 =================
+  var cv1=document.getElementById("cv1"), ctx1=cv1.getContext("2d");
+  var state1={h:2,k:1,r:3};
+  var sh=document.getElementById("sh"),sk=document.getElementById("sk"),sr=document.getElementById("sr");
+  function sync1(){
+    document.getElementById("lh").textContent=fmt(state1.h);
+    document.getElementById("lk").textContent=fmt(state1.k);
+    document.getElementById("lr").textContent=fmt(state1.r);
+    sh.value=state1.h; sk.value=state1.k; sr.value=state1.r;
+  }
+  function eqs1(){
+    var h=state1.h,k=state1.k,r=state1.r;
+    document.getElementById("eqStd").textContent=
+      "(x "+fmtSigned(-h)+")² + (y "+fmtSigned(-k)+")² = "+fmt(r*r);
+    // general: x²+y²+2gx+2fy+c=0, g=-h, f=-k, c=h²+k²-r²
+    var g=-h,f=-k,c=h*h+k*k-r*r;
+    document.getElementById("eqGen").textContent=
+      "x² + y² "+fmtSigned(2*g)+"x "+fmtSigned(2*f)+"y "+fmtSigned(c)+" = 0";
+    document.getElementById("facts1").innerHTML=
+      '<div class="row"><span class="k">Centre (h,k)</span><span class="v">('+fmt(h)+", "+fmt(k)+')</span></div>'+
+      '<div class="row"><span class="k">Radius r</span><span class="v">'+fmt(r)+'</span></div>'+
+      '<div class="row"><span class="k">g, f, c</span><span class="v">g='+fmt(g)+", f="+fmt(f)+", c="+fmt(c)+'</span></div>'+
+      '<div class="row"><span class="k">Check −g,−f</span><span class="v">(−g,−f) = ('+fmt(-g)+", "+fmt(-f)+') = centre ✓</span></div>'+
+      '<div class="row"><span class="k">Check √(g²+f²−c)</span><span class="v">√('+fmt(g*g+f*f-c)+') = '+fmt(r)+' = r ✓</span></div>';
+  }
+  function draw1(){
+    grid(ctx1,cv1.width,cv1.height);
+    drawCircle(ctx1,{x:state1.h,y:state1.k},state1.r,cv1.width,cv1.height,"#5cc8ff");
+    drawDot(ctx1,{x:state1.h,y:state1.k},cv1.width,cv1.height,"#ffb454","C("+fmt(state1.h)+","+fmt(state1.k)+")");
+  }
+  function upd1(){sync1();eqs1();draw1();}
+  sh.addEventListener("input",function(){state1.h=parseFloat(sh.value);upd1();});
+  sk.addEventListener("input",function(){state1.k=parseFloat(sk.value);upd1();});
+  sr.addEventListener("input",function(){state1.r=parseFloat(sr.value);upd1();});
+  attachDrag(cv1,function(p){
+    var cpx=toPx({x:state1.h,y:state1.k},cv1.width,cv1.height);
+    return near(p,cpx)?"c":null;
+  },function(_,w){ state1.h=clampU(w.x); state1.k=clampU(w.y); upd1(); });
+  upd1();
+
+  // ================= MODE 2 =================
+  var cv2=document.getElementById("cv2"), ctx2=cv2.getContext("2d");
+  var state2={r:4, P:{x:3,y:2}, A:{x:-5,y:-1}, B:{x:5,y:3}};
+  var sr2=document.getElementById("sr2");
+  function pointTest(){
+    var S1=state2.P.x*state2.P.x+state2.P.y*state2.P.y-state2.r*state2.r; // centre origin
+    var el=document.getElementById("ptRes"), ex=document.getElementById("ptExpl");
+    var cls,txt;
+    if(Math.abs(S1)<1e-9){cls="p-warn";txt="ON the circle";}
+    else if(S1<0){cls="p-good";txt="INSIDE";}
+    else {cls="p-bad";txt="OUTSIDE";}
+    el.innerHTML='<span class="pill '+cls+'">'+txt+'</span>';
+    ex.innerHTML="S₁ = x₁²+y₁²−r² = "+fmt(state2.P.x*state2.P.x)+" + "+fmt(state2.P.y*state2.P.y)+" − "+fmt(state2.r*state2.r)+" = <b>"+fmt(S1)+"</b>";
+  }
+  function lineTest(){
+    var A=state2.A,B=state2.B,r=state2.r;
+    // distance from origin to line AB
+    var dx=B.x-A.x, dy=B.y-A.y;
+    var L=Math.hypot(dx,dy);
+    var el=document.getElementById("lnRes"), ex=document.getElementById("lnExpl");
+    if(L<1e-9){el.innerHTML='<span class="pill p-warn">A and B coincide</span>';ex.textContent="Move the handles apart to define a line.";return;}
+    // line through A,B: (y-A.y)dx - (x-A.x)dy = 0  => -dy*x + dx*y + (dy*A.x - dx*A.y)=0
+    var a=-dy, b=dx, c=dy*A.x - dx*A.y;
+    var dist=Math.abs(c)/Math.hypot(a,b); // origin distance
+    var cls,txt;
+    if(Math.abs(dist-r)<1e-6){cls="p-warn";txt="TANGENT (touches, 1 point)";}
+    else if(dist<r){cls="p-good";txt="SECANT (cuts, 2 points)";}
+    else {cls="p-bad";txt="DOES NOT MEET (0 points)";}
+    el.innerHTML='<span class="pill '+cls+'">'+txt+'</span>';
+    ex.innerHTML="perpendicular distance from centre = <b>"+fmt(dist)+"</b>, radius r = "+fmt(r)+
+      " → "+(Math.abs(dist-r)<1e-6?"equal ⇒ tangent":(dist<r?"less than r ⇒ secant":"greater than r ⇒ no intersection"));
+    return {a:a,b:b,c:c,dist:dist};
+  }
+  function draw2(){
+    var W=cv2.width,H=cv2.height;
+    grid(ctx2,W,H);
+    drawCircle(ctx2,{x:0,y:0},state2.r,W,H,"#5cc8ff");
+    // extend line across canvas
+    var A=state2.A,B=state2.B;
+    var dx=B.x-A.x,dy=B.y-A.y;
+    if(Math.hypot(dx,dy)>1e-9){
+      var t=40;
+      var p1=toPx({x:A.x-dx*t,y:A.y-dy*t},W,H);
+      var p2=toPx({x:B.x+dx*t,y:B.y+dy*t},W,H);
+      ctx2.strokeStyle="#57d18c";ctx2.lineWidth=2;
+      ctx2.beginPath();ctx2.moveTo(p1.x,p1.y);ctx2.lineTo(p2.x,p2.y);ctx2.stroke();
+    }
+    drawDot(ctx2,{x:0,y:0},W,H,"#5cc8ff","O");
+    drawDot(ctx2,state2.A,W,H,"#57d18c","A");
+    drawDot(ctx2,state2.B,W,H,"#57d18c","B");
+    drawDot(ctx2,state2.P,W,H,"#ffb454","P");
+  }
+  function upd2(){
+    document.getElementById("lr2").textContent=fmt(state2.r);
+    sr2.value=state2.r;
+    pointTest();lineTest();draw2();
+  }
+  sr2.addEventListener("input",function(){state2.r=parseFloat(sr2.value);upd2();});
+  attachDrag(cv2,function(p){
+    var W=cv2.width,H=cv2.height;
+    if(near(p,toPx(state2.P,W,H)))return "P";
+    if(near(p,toPx(state2.A,W,H)))return "A";
+    if(near(p,toPx(state2.B,W,H)))return "B";
+    return null;
+  },function(which,w){
+    var nx=clampU(w.x), ny=clampU(w.y);
+    state2[which]={x:nx,y:ny}; upd2();
+  });
+  upd2();
+
+  // ================= MODE 3 =================
+  var cv3=document.getElementById("cv3"), ctx3=cv3.getContext("2d");
+  var def3=[{x:-3,y:0},{x:3,y:0},{x:0,y:4}];
+  var state3=JSON.parse(JSON.stringify(def3));
+  function circleFrom3(P){
+    var ax=P[0].x,ay=P[0].y,bx=P[1].x,by=P[1].y,cx=P[2].x,cy=P[2].y;
+    var d=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+    if(Math.abs(d)<1e-9)return null; // collinear
+    var ux=((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/d;
+    var uy=((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/d;
+    var r=Math.hypot(ax-ux,ay-uy);
+    return {h:ux,k:uy,r:r};
+  }
+  function upd3(){
+    document.getElementById("pts3").textContent=
+      state3.map(function(p,i){return "P"+(i+1)+"("+fmt(p.x)+","+fmt(p.y)+")";}).join("   ");
+    var c=circleFrom3(state3);
+    var crEl=document.getElementById("cr3");
+    var stdEl=document.getElementById("eq3std"), genEl=document.getElementById("eq3gen");
+    if(!c){
+      crEl.innerHTML='<span class="pill p-bad">Points are collinear — no unique circle</span>';
+      stdEl.textContent="—"; genEl.textContent="—";
+    }else{
+      crEl.innerHTML='<span class="pill p-accent">centre ('+fmt(c.h)+", "+fmt(c.k)+"), radius "+fmt(c.r)+'</span>';
+      stdEl.textContent="(x "+fmtSigned(-c.h)+")² + (y "+fmtSigned(-c.k)+")² = "+fmt(c.r*c.r);
+      var g=-c.h,f=-c.k,cc=c.h*c.h+c.k*c.k-c.r*c.r;
+      genEl.textContent="x² + y² "+fmtSigned(2*g)+"x "+fmtSigned(2*f)+"y "+fmtSigned(cc)+" = 0";
+    }
+    draw3(c);
+  }
+  function draw3(c){
+    var W=cv3.width,H=cv3.height;
+    grid(ctx3,W,H);
+    if(c){
+      drawCircle(ctx3,{x:c.h,y:c.k},c.r,W,H,"#5cc8ff");
+      drawDot(ctx3,{x:c.h,y:c.k},W,H,"#ffb454","C");
+    }
+    state3.forEach(function(p,i){drawDot(ctx3,p,W,H,"#57d18c","P"+(i+1));});
+  }
+  attachDrag(cv3,function(p){
+    var W=cv3.width,H=cv3.height;
+    for(var i=0;i<state3.length;i++){ if(near(p,toPx(state3[i],W,H)))return i; }
+    return null;
+  },function(i,w){ state3[i]={x:clampU(w.x),y:clampU(w.y)}; upd3(); });
+  document.getElementById("reset3").addEventListener("click",function(){
+    state3=JSON.parse(JSON.stringify(def3)); upd3();
+  });
+  upd3();
+})();
+</script>
+</body>
+</html>

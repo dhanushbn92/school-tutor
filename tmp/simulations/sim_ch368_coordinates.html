@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinate Geometry Lab — Cartesian System (NIOS Class 12, Ch 13)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#222a40;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#57c7ff;
+    --accent-soft:rgba(87,199,255,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --a:#ffb454;
+    --b:#c88bff;
+    --c:#5fd68b;
+    --line:#2b3450;
+    --grid:#232c44;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 6px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 150px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.9rem;margin-bottom:6px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+
+  .stage{position:relative;width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;touch-action:none;user-select:none}
+  svg{display:block;width:100%;height:auto}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .chip{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;min-width:120px}
+  .chip .k{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .chip .v{font-size:1.05rem;font-weight:700;margin-top:2px}
+  .chip.big .v{font-size:1.2rem;color:var(--accent)}
+  .ca .v{color:var(--a)} .cb .v{color:var(--b)} .cc .v{color:var(--c)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:14px}
+  .ctrl{flex:1 1 200px;min-width:170px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:700}
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+
+  .seg{display:flex;gap:6px;margin-top:4px}
+  .seg button{flex:1;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-top:12px;font-size:.95rem;overflow-x:auto}
+  .formula code{color:var(--accent);font-family:"Cascadia Code",Consolas,monospace;white-space:nowrap}
+  .work{color:var(--muted);font-size:.86rem;margin-top:6px;line-height:1.7}
+  .work b{color:var(--ink)}
+
+  .facts p{font-size:.9rem;margin:8px 0;color:var(--muted)}
+  .facts b{color:var(--ink)}
+  .facts code{color:var(--accent);font-family:"Cascadia Code",Consolas,monospace}
+
+  .q{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;background:var(--panel2)}
+  .q p.qt{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin:6px 0;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .expl.show{display:block}
+
+  .badge{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:999px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--muted);margin-left:6px}
+  .badge.g{color:var(--good);border-color:var(--good)}
+  .badge.r{color:var(--bad);border-color:var(--bad)}
+  .hidden{display:none}
+  @media(max-width:420px){ header h1{font-size:1.2rem} .chip{flex:1 1 100%} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Coordinate</span> Geometry Lab</h1>
+    <p>NIOS Class 12 Mathematics &middot; Ch 13 — Cartesian System of Rectangular Co-ordinates</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="plane">Plane &amp; Distance</button>
+    <button class="tab-btn" data-tab="section">Section &amp; Midpoint</button>
+    <button class="tab-btn" data-tab="area">Area &amp; Centroid</button>
+  </div>
+
+  <!-- ================= MODE 1 : PLANE & DISTANCE ================= -->
+  <section id="tab-plane">
+    <div class="panel">
+      <h2>The plane &amp; distance</h2>
+      <div class="stage"><svg id="svg1" viewBox="0 0 500 380"></svg></div>
+      <p class="hint">Drag point <b style="color:var(--a)">A</b> and <b style="color:var(--b)">B</b>. The dashed right triangle shows the horizontal &amp; vertical legs used by the distance formula.</p>
+      <div class="readout">
+        <div class="chip ca"><div class="k">A (quadrant)</div><div class="v" id="p1-a">–</div></div>
+        <div class="chip cb"><div class="k">B (quadrant)</div><div class="v" id="p1-b">–</div></div>
+        <div class="chip big"><div class="k">Distance AB</div><div class="v" id="p1-d">–</div></div>
+      </div>
+      <div class="formula">
+        <code>d = &radic;[(x&#8322;&minus;x&#8321;)&sup2; + (y&#8322;&minus;y&#8321;)&sup2;]</code>
+        <div class="work" id="p1-work"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 2 : SECTION & MIDPOINT ================= -->
+  <section id="tab-section" class="hidden">
+    <div class="panel">
+      <h2>Section &amp; midpoint</h2>
+      <div class="stage"><svg id="svg2" viewBox="0 0 500 380"></svg></div>
+      <p class="hint">Drag <b style="color:var(--a)">A</b>, <b style="color:var(--b)">B</b>. Point <b style="color:var(--c)">P</b> divides AB in ratio <b>m : n</b>.</p>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Ratio m : n = <output id="s-mn">1 : 1</output></label>
+          <input type="range" id="s-ratio" min="0.05" max="20" step="0.05" value="1">
+        </div>
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Division type</label>
+          <div class="seg" id="s-type">
+            <button class="on" data-v="int">Internal</button>
+            <button data-v="ext">External</button>
+          </div>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip cc big"><div class="k">Dividing point P</div><div class="v" id="s-p">–</div></div>
+        <div class="chip"><div class="k">Midpoint of AB</div><div class="v" id="s-mid">–</div></div>
+      </div>
+      <div class="formula">
+        <code>P = ( (m&middot;x&#8322; &plusmn; n&middot;x&#8321;)/(m &plusmn; n) , (m&middot;y&#8322; &plusmn; n&middot;y&#8321;)/(m &plusmn; n) )</code>
+        <div class="work" id="s-work"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 3 : AREA & CENTROID ================= -->
+  <section id="tab-area" class="hidden">
+    <div class="panel">
+      <h2>Area, collinearity &amp; centroid</h2>
+      <div class="stage"><svg id="svg3" viewBox="0 0 500 380"></svg></div>
+      <p class="hint">Drag the three vertices <b style="color:var(--a)">A</b>, <b style="color:var(--b)">B</b>, <b style="color:var(--c)">C</b>. Area uses the shoelace / determinant formula; centroid G is marked.</p>
+      <div class="readout">
+        <div class="chip big"><div class="k">Area of &triangle;ABC <span id="ar-col"></span></div><div class="v" id="ar-area">–</div></div>
+        <div class="chip"><div class="k">Centroid G</div><div class="v" id="ar-g">–</div></div>
+      </div>
+      <div class="formula">
+        <code>Area = &frac12;&middot;|x&#8321;(y&#8322;&minus;y&#8323;) + x&#8322;(y&#8323;&minus;y&#8321;) + x&#8323;(y&#8321;&minus;y&#8322;)|</code>
+        <div class="work" id="ar-work"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FACTS ================= -->
+  <div class="panel facts">
+    <h3>Formula reference</h3>
+    <p><b>Distance:</b> <code>d = &radic;[(x&#8322;&minus;x&#8321;)&sup2; + (y&#8322;&minus;y&#8321;)&sup2;]</code></p>
+    <p><b>Section (internal, ratio m:n):</b> <code>( (mx&#8322;+nx&#8321;)/(m+n) , (my&#8322;+ny&#8321;)/(m+n) )</code></p>
+    <p><b>Section (external, ratio m:n):</b> <code>( (mx&#8322;&minus;nx&#8321;)/(m&minus;n) , (my&#8322;&minus;ny&#8321;)/(m&minus;n) )</code></p>
+    <p><b>Midpoint:</b> <code>( (x&#8321;+x&#8322;)/2 , (y&#8321;+y&#8322;)/2 )</code> &mdash; section with m:n = 1:1.</p>
+    <p><b>Area of triangle:</b> <code>&frac12;|x&#8321;(y&#8322;&minus;y&#8323;)+x&#8322;(y&#8323;&minus;y&#8321;)+x&#8323;(y&#8321;&minus;y&#8322;)|</code></p>
+    <p><b>Collinearity:</b> three points are collinear &hArr; area of the triangle = 0.</p>
+    <p><b>Centroid:</b> <code>G = ( (x&#8321;+x&#8322;+x&#8323;)/3 , (y&#8321;+y&#8322;+y&#8323;)/3 )</code></p>
+  </div>
+
+  <!-- ================= QUIZ ================= -->
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <div id="quiz"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ---------- coordinate <-> pixel mapping ---------- */
+var W=500,H=380,PAD=28;
+var XMIN=-10,XMAX=10,YMIN=-8,YMAX=8;
+function sx(x){ return PAD + (x-XMIN)/(XMAX-XMIN)*(W-2*PAD); }
+function sy(y){ return H-PAD - (y-YMIN)/(YMAX-YMIN)*(H-2*PAD); }
+function ix(px){ return XMIN + (px-PAD)/(W-2*PAD)*(XMAX-XMIN); }
+function iy(py){ return YMIN + (H-PAD-py)/(H-2*PAD)*(YMAX-YMIN); }
+function clampX(x){ return Math.max(XMIN,Math.min(XMAX,x)); }
+function clampY(y){ return Math.max(YMIN,Math.min(YMAX,y)); }
+var SVGNS="http://www.w3.org/2000/svg";
+function el(name,attrs){
+  var e=document.createElementNS(SVGNS,name);
+  for(var k in attrs){ e.setAttribute(k,attrs[k]); }
+  return e;
+}
+function fmt(n){
+  var r=Math.round(n*100)/100;
+  if(Object.is(r,-0)) r=0;
+  return (Math.abs(r-Math.round(r))<1e-9)? String(Math.round(r)) : String(r);
+}
+function quadrant(x,y){
+  if(x===0&&y===0) return "origin";
+  if(x===0) return "y-axis";
+  if(y===0) return "x-axis";
+  if(x>0&&y>0) return "Q I";
+  if(x<0&&y>0) return "Q II";
+  if(x<0&&y<0) return "Q III";
+  return "Q IV";
+}
+
+/* ---------- draw shared grid & axes into an svg ---------- */
+function drawGrid(svg){
+  svg.appendChild(el("rect",{x:0,y:0,width:W,height:H,fill:"var(--panel2)"}));
+  var g=el("g",{});
+  for(var x=XMIN;x<=XMAX;x++){
+    g.appendChild(el("line",{x1:sx(x),y1:sy(YMIN),x2:sx(x),y2:sy(YMAX),
+      stroke:"var(--grid)","stroke-width":(x===0?0:1)}));
+  }
+  for(var y=YMIN;y<=YMAX;y++){
+    g.appendChild(el("line",{x1:sx(XMIN),y1:sy(y),x2:sx(XMAX),y2:sy(y),
+      stroke:"var(--grid)","stroke-width":(y===0?0:1)}));
+  }
+  svg.appendChild(g);
+  // axes
+  svg.appendChild(el("line",{x1:sx(XMIN),y1:sy(0),x2:sx(XMAX),y2:sy(0),stroke:"#4a5578","stroke-width":1.6}));
+  svg.appendChild(el("line",{x1:sx(0),y1:sy(YMIN),x2:sx(0),y2:sy(YMAX),stroke:"#4a5578","stroke-width":1.6}));
+  // axis ticks/labels
+  for(var xt=XMIN;xt<=XMAX;xt+=2){ if(xt===0) continue;
+    var t=el("text",{x:sx(xt),y:sy(0)+13,fill:"var(--muted)","font-size":"9","text-anchor":"middle"});
+    t.textContent=xt; svg.appendChild(t);
+  }
+  for(var yt=YMIN;yt<=YMAX;yt+=2){ if(yt===0) continue;
+    var t2=el("text",{x:sx(0)+6,y:sy(yt)+3,fill:"var(--muted)","font-size":"9"});
+    t2.textContent=yt; svg.appendChild(t2);
+  }
+  var o=el("text",{x:sx(0)-9,y:sy(0)+13,fill:"var(--muted)","font-size":"9"}); o.textContent="O";
+  svg.appendChild(o);
+}
+
+/* ---------- draggable point helper ---------- */
+function makeDraggable(svg, node, onMove){
+  function toCoord(evt){
+    var pt=svg.getBoundingClientRect();
+    var cx=(evt.touches?evt.touches[0].clientX:evt.clientX);
+    var cy=(evt.touches?evt.touches[0].clientY:evt.clientY);
+    var px=(cx-pt.left)/pt.width*W;
+    var py=(cy-pt.top)/pt.height*H;
+    return {x:clampX(Math.round(ix(px))), y:clampY(Math.round(iy(py)))};
+  }
+  var dragging=false;
+  function start(e){ dragging=true; e.preventDefault(); var c=toCoord(e); onMove(c.x,c.y); }
+  function move(e){ if(!dragging) return; e.preventDefault(); var c=toCoord(e); onMove(c.x,c.y); }
+  function end(){ dragging=false; }
+  node.addEventListener("mousedown",start);
+  node.addEventListener("touchstart",start,{passive:false});
+  window.addEventListener("mousemove",move);
+  window.addEventListener("touchmove",move,{passive:false});
+  window.addEventListener("mouseup",end);
+  window.addEventListener("touchend",end);
+}
+function pointNode(svg,color,label){
+  var g=el("g",{style:"cursor:grab"});
+  var hit=el("circle",{r:16,fill:"transparent"});
+  var dot=el("circle",{r:7,fill:color,stroke:"var(--bg)","stroke-width":2});
+  var tx=el("text",{fill:color,"font-size":"13","font-weight":"700","text-anchor":"middle",y:-12});
+  tx.textContent=label;
+  g.appendChild(hit); g.appendChild(dot); g.appendChild(tx);
+  svg.appendChild(g);
+  return {g:g,dot:dot,hit:hit,tx:tx};
+}
+
+/* =========================================================
+   MODE 1 : PLANE & DISTANCE
+   ========================================================= */
+var svg1=document.getElementById("svg1");
+var m1={ A:{x:-4,y:-2}, B:{x:5,y:4} };
+var m1nodes;
+function buildM1(){
+  drawGrid(svg1);
+  m1.tri=el("path",{fill:"var(--accent-soft)",stroke:"none"});
+  m1.legX=el("line",{stroke:"var(--muted)","stroke-width":1.4,"stroke-dasharray":"5 4"});
+  m1.legY=el("line",{stroke:"var(--muted)","stroke-width":1.4,"stroke-dasharray":"5 4"});
+  m1.hyp=el("line",{stroke:"var(--accent)","stroke-width":2.4});
+  m1.legXt=el("text",{fill:"var(--muted)","font-size":"10","text-anchor":"middle"});
+  m1.legYt=el("text",{fill:"var(--muted)","font-size":"10"});
+  svg1.appendChild(m1.tri); svg1.appendChild(m1.legX); svg1.appendChild(m1.legY);
+  svg1.appendChild(m1.hyp); svg1.appendChild(m1.legXt); svg1.appendChild(m1.legYt);
+  m1nodes={ A:pointNode(svg1,"var(--a)","A"), B:pointNode(svg1,"var(--b)","B") };
+  makeDraggable(svg1,m1nodes.A.g,function(x,y){ m1.A={x:x,y:y}; renderM1(); });
+  makeDraggable(svg1,m1nodes.B.g,function(x,y){ m1.B={x:x,y:y}; renderM1(); });
+  renderM1();
+}
+function renderM1(){
+  var A=m1.A,B=m1.B;
+  var ax=sx(A.x),ay=sy(A.y),bx=sx(B.x),by=sy(B.y);
+  var cx=sx(B.x),cy=sy(A.y); // right-angle corner
+  m1.tri.setAttribute("d","M"+ax+" "+ay+" L"+cx+" "+cy+" L"+bx+" "+by+" Z");
+  m1.legX.setAttribute("x1",ax); m1.legX.setAttribute("y1",ay);
+  m1.legX.setAttribute("x2",cx); m1.legX.setAttribute("y2",cy);
+  m1.legY.setAttribute("x1",cx); m1.legY.setAttribute("y1",cy);
+  m1.legY.setAttribute("x2",bx); m1.legY.setAttribute("y2",by);
+  m1.hyp.setAttribute("x1",ax); m1.hyp.setAttribute("y1",ay);
+  m1.hyp.setAttribute("x2",bx); m1.hyp.setAttribute("y2",by);
+  var dx=B.x-A.x, dy=B.y-A.y;
+  m1.legXt.setAttribute("x",(ax+cx)/2); m1.legXt.setAttribute("y",cy+ (A.y<=B.y?14:-6));
+  m1.legXt.textContent="|x₂−x₁| = "+Math.abs(dx);
+  m1.legYt.setAttribute("x",cx+6); m1.legYt.setAttribute("y",(cy+by)/2);
+  m1.legYt.textContent="|y₂−y₁| = "+Math.abs(dy);
+  m1nodes.A.g.setAttribute("transform","translate("+ax+","+ay+")");
+  m1nodes.B.g.setAttribute("transform","translate("+bx+","+by+")");
+  var d=Math.sqrt(dx*dx+dy*dy);
+  document.getElementById("p1-a").textContent="("+A.x+", "+A.y+")  "+quadrant(A.x,A.y);
+  document.getElementById("p1-b").textContent="("+B.x+", "+B.y+")  "+quadrant(B.x,B.y);
+  document.getElementById("p1-d").textContent=fmt(d)+" units";
+  var sq=dx*dx+dy*dy;
+  document.getElementById("p1-work").innerHTML=
+    "d = &radic;[("+B.x+"&minus;("+A.x+"))&sup2; + ("+B.y+"&minus;("+A.y+"))&sup2;]<br>"+
+    "= &radic;[("+dx+")&sup2; + ("+dy+")&sup2;] = &radic;["+(dx*dx)+" + "+(dy*dy)+"] = &radic;"+sq+
+    " &asymp; <b>"+fmt(d)+"</b>";
+}
+
+/* =========================================================
+   MODE 2 : SECTION & MIDPOINT
+   ========================================================= */
+var svg2=document.getElementById("svg2");
+var m2={ A:{x:-5,y:-3}, B:{x:6,y:4}, ratio:1, type:"int" };
+var m2nodes;
+function buildM2(){
+  drawGrid(svg2);
+  m2.seg=el("line",{stroke:"var(--accent)","stroke-width":2.4});
+  m2.ext=el("line",{stroke:"var(--muted)","stroke-width":1.4,"stroke-dasharray":"4 5"});
+  svg2.appendChild(m2.ext); svg2.appendChild(m2.seg);
+  m2.mid=el("circle",{r:5,fill:"none",stroke:"var(--muted)","stroke-width":1.8});
+  svg2.appendChild(m2.mid);
+  m2.P=pointNode(svg2,"var(--c)","P");
+  m2nodes={ A:pointNode(svg2,"var(--a)","A"), B:pointNode(svg2,"var(--b)","B") };
+  makeDraggable(svg2,m2nodes.A.g,function(x,y){ m2.A={x:x,y:y}; renderM2(); });
+  makeDraggable(svg2,m2nodes.B.g,function(x,y){ m2.B={x:x,y:y}; renderM2(); });
+  document.getElementById("s-ratio").addEventListener("input",function(){
+    m2.ratio=parseFloat(this.value); renderM2();
+  });
+  var seg=document.getElementById("s-type");
+  seg.querySelectorAll("button").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      seg.querySelectorAll("button").forEach(function(b){b.classList.remove("on");});
+      btn.classList.add("on"); m2.type=btn.getAttribute("data-v"); renderM2();
+    });
+  });
+  renderM2();
+}
+function renderM2(){
+  var A=m2.A,B=m2.B,m=m2.ratio,n=1,internal=(m2.type==="int");
+  var px,py,ok=true;
+  if(internal){
+    px=(m*B.x+n*A.x)/(m+n); py=(m*B.y+n*A.y)/(m+n);
+  }else{
+    if(Math.abs(m-n)<1e-9){ ok=false; px=A.x; py=A.y; }
+    else{ px=(m*B.x-n*A.x)/(m-n); py=(m*B.y-n*A.y)/(m-n); }
+  }
+  var ax=sx(A.x),ay=sy(A.y),bx=sx(B.x),by=sy(B.y);
+  m2.seg.setAttribute("x1",ax); m2.seg.setAttribute("y1",ay);
+  m2.seg.setAttribute("x2",bx); m2.seg.setAttribute("y2",by);
+  // dashed extension line for external division
+  if(internal){ m2.ext.setAttribute("opacity",0); }
+  else{
+    m2.ext.setAttribute("opacity",1);
+    m2.ext.setAttribute("x1",ax); m2.ext.setAttribute("y1",ay);
+    m2.ext.setAttribute("x2",sx(px)); m2.ext.setAttribute("y2",sy(py));
+  }
+  var midx=(A.x+B.x)/2, midy=(A.y+B.y)/2;
+  m2.mid.setAttribute("cx",sx(midx)); m2.mid.setAttribute("cy",sy(midy));
+  m2nodes.A.g.setAttribute("transform","translate("+ax+","+ay+")");
+  m2nodes.B.g.setAttribute("transform","translate("+bx+","+by+")");
+  m2.P.g.setAttribute("transform","translate("+sx(clampX(px))+","+sy(clampY(py))+")");
+  m2.P.dot.setAttribute("opacity", ok?1:0);
+  m2.P.tx.setAttribute("opacity", ok?1:0);
+
+  var mr=Math.round(m*100)/100;
+  document.getElementById("s-mn").textContent=mr+" : 1";
+  document.getElementById("s-p").textContent= ok? ("("+fmt(px)+", "+fmt(py)+")") : "undefined (m = n)";
+  document.getElementById("s-mid").textContent="("+fmt(midx)+", "+fmt(midy)+")";
+  var sign=internal?"+":"&minus;", den=internal?(m+n):(m-n);
+  document.getElementById("s-work").innerHTML= ok?
+    ("P = ( ("+mr+"&middot;"+B.x+" "+sign+" 1&middot;"+A.x+")/("+mr+" "+sign+" 1) , "+
+     "("+mr+"&middot;"+B.y+" "+sign+" 1&middot;"+A.y+")/("+mr+" "+sign+" 1) )<br>"+
+     "= ( "+fmt(px)+" , "+fmt(py)+" )  &nbsp; [denominator = "+fmt(den)+"]")
+    : "External division needs m &ne; n; here m = n so the line AB is parallel to itself — no finite point.";
+}
+
+/* =========================================================
+   MODE 3 : AREA & CENTROID
+   ========================================================= */
+var svg3=document.getElementById("svg3");
+var m3={ A:{x:-5,y:-2}, B:{x:4,y:-3}, C:{x:1,y:5} };
+var m3nodes;
+function buildM3(){
+  drawGrid(svg3);
+  m3.tri=el("path",{fill:"var(--accent-soft)",stroke:"var(--accent)","stroke-width":2,"stroke-linejoin":"round"});
+  svg3.appendChild(m3.tri);
+  m3.G=el("circle",{r:5,fill:"var(--accent)",stroke:"var(--bg)","stroke-width":1.6});
+  m3.Gt=el("text",{fill:"var(--accent)","font-size":"11","font-weight":"700",y:-9,"text-anchor":"middle"});
+  m3.Gt.textContent="G";
+  var gg=el("g",{}); gg.appendChild(m3.G); m3.Gwrap=gg; svg3.appendChild(gg); svg3.appendChild(m3.Gt);
+  m3nodes={ A:pointNode(svg3,"var(--a)","A"), B:pointNode(svg3,"var(--b)","B"), C:pointNode(svg3,"var(--c)","C") };
+  ["A","B","C"].forEach(function(key){
+    makeDraggable(svg3,m3nodes[key].g,function(x,y){ m3[key]={x:x,y:y}; renderM3(); });
+  });
+  renderM3();
+}
+function renderM3(){
+  var A=m3.A,B=m3.B,C=m3.C;
+  var signed=(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y))/2;
+  var area=Math.abs(signed);
+  var pa=sx(A.x)+" "+sy(A.y), pb=sx(B.x)+" "+sy(B.y), pc=sx(C.x)+" "+sy(C.y);
+  m3.tri.setAttribute("d","M"+pa+" L"+pb+" L"+pc+" Z");
+  m3nodes.A.g.setAttribute("transform","translate("+sx(A.x)+","+sy(A.y)+")");
+  m3nodes.B.g.setAttribute("transform","translate("+sx(B.x)+","+sy(B.y)+")");
+  m3nodes.C.g.setAttribute("transform","translate("+sx(C.x)+","+sy(C.y)+")");
+  var gx=(A.x+B.x+C.x)/3, gy=(A.y+B.y+C.y)/3;
+  m3.G.setAttribute("cx",sx(gx)); m3.G.setAttribute("cy",sy(gy));
+  m3.Gt.setAttribute("x",sx(gx)); m3.Gt.setAttribute("y",sy(gy)-9);
+  var collinear=(area<1e-9);
+  document.getElementById("ar-area").textContent=fmt(area)+" sq units";
+  document.getElementById("ar-g").textContent="("+fmt(gx)+", "+fmt(gy)+")";
+  document.getElementById("ar-col").innerHTML= collinear
+    ? '<span class="badge r">collinear</span>' : '<span class="badge g">triangle</span>';
+  var inner=A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y);
+  document.getElementById("ar-work").innerHTML=
+    "= &frac12;|"+A.x+"("+B.y+"&minus;"+C.y+") + "+B.x+"("+C.y+"&minus;"+A.y+") + "+C.x+"("+A.y+"&minus;"+B.y+")|<br>"+
+    "= &frac12;|"+inner+"| = <b>"+fmt(area)+"</b> sq units"+
+    (collinear? " &rarr; area = 0, so A, B, C are <b>collinear</b>." : "");
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+var tabMap={ plane:"tab-plane", section:"tab-section", area:"tab-area" };
+document.querySelectorAll(".tab-btn").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+    btn.classList.add("active");
+    for(var k in tabMap){ document.getElementById(tabMap[k]).classList.add("hidden"); }
+    document.getElementById(tabMap[btn.getAttribute("data-tab")]).classList.remove("hidden");
+  });
+});
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+var QUIZ=[
+  { q:"The distance between the points (3, 4) and (0, 0) is:",
+    opts:["5 units","7 units","√7 units","25 units"], a:0,
+    e:"d = √(3² + 4²) = √(9+16) = √25 = 5." },
+  { q:"The midpoint of the segment joining (−2, 6) and (4, −2) is:",
+    opts:["(1, 2)","(2, 4)","(6, 4)","(1, 4)"], a:0,
+    e:"Midpoint = ((−2+4)/2 , (6+−2)/2) = (1, 2)." },
+  { q:"Points A(1, 2), B(2, 4), C(3, 6) are:",
+    opts:["Collinear (area = 0)","Vertices of a right triangle","An equilateral triangle","None of these"], a:0,
+    e:"Area = ½|1(4−6)+2(6−2)+3(2−4)| = ½|−2+8−6| = 0, so the points are collinear." }
+];
+(function buildQuiz(){
+  var box=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.className="qt"; p.textContent=(qi+1)+". "+item.q;
+    d.appendChild(p);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered) return; answered=true;
+        if(oi===item.a){ b.classList.add("correct"); }
+        else{ b.classList.add("wrong");
+          var kids=d.querySelectorAll(".opt"); kids[item.a].classList.add("correct"); }
+        d.querySelector(".expl").classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="expl"; ex.innerHTML="<b>Why:</b> "+item.e;
+    d.appendChild(ex);
+    box.appendChild(d);
+  });
+})();
+
+/* init all stages */
+buildM1(); buildM2(); buildM3();
+</script>
+</body>
+</html>

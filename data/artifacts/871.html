@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Straight Lines Lab — Straight Lines (NIOS Class 12, Ch 14)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#5fc8ff;
+    --accent-soft:rgba(95,200,255,.16);
+    --accent2:#ff9d5c;
+    --accent2-soft:rgba(255,157,92,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:4px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:80px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.86rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+  input.a2::-webkit-slider-thumb{background:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}
+  input.a2::-moz-range-thumb{background:var(--accent2)}
+
+  .btn{min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-weight:600;font-size:.92rem;cursor:pointer;touch-action:manipulation}
+  .btn.accent{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.98)}
+
+  canvas{width:100%;height:auto;display:block;background:#0c1018;border:1px solid var(--line);
+    border-radius:12px;touch-action:none}
+
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;font-size:.9rem;min-width:120px;flex:1 1 auto}
+  .chip b{color:var(--accent);font-variant-numeric:tabular-nums}
+  .chip.c2 b{color:var(--accent2)}
+  .chip.ok b{color:var(--good)}
+  .chip.no b{color:var(--muted)}
+
+  .status{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--panel2);
+    border:1px solid var(--line);font-size:.92rem}
+  .status .tag{font-weight:700}
+  .tag.par{color:var(--good)}
+  .tag.perp{color:var(--accent2)}
+  .tag.gen{color:var(--muted)}
+
+  .forms code{display:block;background:#0c1018;border:1px solid var(--line);border-radius:8px;
+    padding:9px 11px;margin:6px 0;font-family:ui-monospace,"Cascadia Code",Consolas,monospace;
+    font-size:.9rem;color:var(--ink);overflow-x:auto;white-space:nowrap}
+  .forms code b{color:var(--accent)}
+
+  details.fact{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:0;margin-bottom:8px;overflow:hidden}
+  details.fact summary{padding:11px 13px;cursor:pointer;font-weight:600;font-size:.93rem;list-style:none}
+  details.fact summary::-webkit-details-marker{display:none}
+  details.fact summary::before{content:"+ ";color:var(--accent);font-weight:800}
+  details.fact[open] summary::before{content:"− "}
+  details.fact .body{padding:0 13px 12px;font-size:.9rem;color:var(--muted)}
+  details.fact .body b{color:var(--ink)}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px}
+  .quiz .q p.qtext{font-weight:600;margin-bottom:9px;font-size:.95rem}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .quiz .opt:active{transform:scale(.99)}
+  .quiz .opt.right{background:rgba(95,214,139,.16);border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:var(--bad)}
+  .quiz .expl{font-size:.87rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .expl.show{display:block}
+
+  .hint{font-size:.83rem;color:var(--muted);margin-top:8px}
+  .hide{display:none}
+  @media(max-width:420px){
+    header h1{font-size:1.22rem}
+    .chip{min-width:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Straight Lines</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Chapter 14 — slope &amp; forms, angle &amp; relationships, distance. Drag the points, move the sliders.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="slope">Slope &amp; Forms</button>
+    <button class="tab-btn" data-mode="angle">Angle &amp; Relations</button>
+    <button class="tab-btn" data-mode="dist">Distance</button>
+  </div>
+
+  <!-- ========== MODE 1: SLOPE & FORMS ========== -->
+  <section id="m-slope">
+    <div class="panel">
+      <h2>Slope &amp; forms of a line</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Slope m = <output id="mOut">1.00</output>  (θ = <output id="thOut">45.0°</output>)</label>
+          <input type="range" id="mSlider" min="-4" max="4" step="0.05" value="1">
+        </div>
+        <div class="ctrl">
+          <label>y-intercept c = <output id="cOut">0.00</output></label>
+          <input type="range" id="cSlider" min="-8" max="8" step="0.1" value="0">
+        </div>
+      </div>
+      <canvas id="cv1" width="620" height="440"></canvas>
+      <p class="hint">Tip: drag the blue dot on the line to change slope &amp; intercept together.</p>
+      <div class="readout">
+        <div class="chip">slope m = tanθ = <b id="mChip">1.00</b></div>
+        <div class="chip">y-intercept (0, <b id="yiChip">0.00</b>)</div>
+        <div class="chip">x-intercept (<b id="xiChip">0.00</b>, 0)</div>
+      </div>
+
+      <h3 style="margin-top:16px">Forms of this line</h3>
+      <div class="seg" id="formSeg">
+        <button class="on" data-f="slope">Slope-intercept</button>
+        <button data-f="point">Point-slope</button>
+        <button data-f="two">Two-point</button>
+        <button data-f="inter">Intercept</button>
+        <button data-f="gen">General</button>
+      </div>
+      <div class="forms" id="formBox"></div>
+    </div>
+  </section>
+
+  <!-- ========== MODE 2: ANGLE & RELATIONS ========== -->
+  <section id="m-angle" class="hide">
+    <div class="panel">
+      <h2>Angle between two lines &amp; relationships</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label style="color:var(--accent)">Line 1: m₁ = <output id="m1Out">1.00</output></label>
+          <input type="range" id="m1Slider" min="-4" max="4" step="0.05" value="1">
+        </div>
+        <div class="ctrl">
+          <label style="color:var(--accent)">Line 1: c₁ = <output id="c1Out">0.00</output></label>
+          <input type="range" id="c1Slider" min="-8" max="8" step="0.1" value="0">
+        </div>
+        <div class="ctrl">
+          <label style="color:var(--accent2)">Line 2: m₂ = <output id="m2Out">-0.50</output></label>
+          <input type="range" id="m2Slider" class="a2" min="-4" max="4" step="0.05" value="-0.5">
+        </div>
+        <div class="ctrl">
+          <label style="color:var(--accent2)">Line 2: c₂ = <output id="c2Out">2.00</output></label>
+          <input type="range" id="c2Slider" class="a2" min="-8" max="8" step="0.1" value="2">
+        </div>
+      </div>
+      <canvas id="cv2" width="620" height="440"></canvas>
+      <div class="readout">
+        <div class="chip">m₁ = <b id="m1Chip">1.00</b></div>
+        <div class="chip c2">m₂ = <b id="m2Chip">-0.50</b></div>
+        <div class="chip">angle θ = <b id="angChip">71.6°</b></div>
+      </div>
+      <div class="status" id="relStatus">—</div>
+      <p class="hint">Angle uses tanθ = |(m₁ − m₂) / (1 + m₁m₂)|. Parallel ⇒ m₁ = m₂; perpendicular ⇒ m₁·m₂ = −1.</p>
+    </div>
+  </section>
+
+  <!-- ========== MODE 3: DISTANCE ========== -->
+  <section id="m-dist" class="hide">
+    <div class="panel">
+      <h2>Distance from a point &amp; between parallel lines</h2>
+      <div class="seg" id="distSeg">
+        <button class="on" data-d="point">Point → line</button>
+        <button data-d="par">Two parallel lines</button>
+      </div>
+
+      <div id="distPointCtrls">
+        <div class="controls" style="margin-top:12px">
+          <div class="ctrl">
+            <label>Line slope m = <output id="dmOut">1.00</output></label>
+            <input type="range" id="dmSlider" min="-4" max="4" step="0.05" value="1">
+          </div>
+          <div class="ctrl">
+            <label>Line intercept c = <output id="dcOut">-1.00</output></label>
+            <input type="range" id="dcSlider" min="-8" max="8" step="0.1" value="-1">
+          </div>
+        </div>
+        <p class="hint">Drag the orange point P. Its foot of perpendicular and the distance are shown live.</p>
+      </div>
+
+      <div id="distParCtrls" class="hide">
+        <div class="controls" style="margin-top:12px">
+          <div class="ctrl">
+            <label>Common slope m = <output id="pmOut">0.75</output></label>
+            <input type="range" id="pmSlider" min="-4" max="4" step="0.05" value="0.75">
+          </div>
+          <div class="ctrl">
+            <label>Intercept c₁ = <output id="pc1Out">3.00</output></label>
+            <input type="range" id="pc1Slider" min="-8" max="8" step="0.1" value="3">
+          </div>
+          <div class="ctrl">
+            <label>Intercept c₂ = <output id="pc2Out">-2.00</output></label>
+            <input type="range" id="pc2Slider" class="a2" min="-8" max="8" step="0.1" value="-2">
+          </div>
+        </div>
+        <p class="hint">Both lines share slope m, so they are parallel. Distance = |c₁ − c₂| / √(1 + m²).</p>
+      </div>
+
+      <canvas id="cv3" width="620" height="440"></canvas>
+      <div class="readout" id="distReadout"></div>
+      <div class="status" id="distFormula">—</div>
+    </div>
+  </section>
+
+  <!-- ========== FACTS ========== -->
+  <div class="panel">
+    <h2>Key facts</h2>
+    <details class="fact"><summary>Slope of a line</summary>
+      <div class="body">The slope <b>m = tanθ</b>, where θ is the angle the line makes with the positive x-axis. Through two points, <b>m = (y₂ − y₁)/(x₂ − x₁)</b>. A horizontal line has m = 0; a vertical line has undefined slope (θ = 90°).</div></details>
+    <details class="fact"><summary>The five forms of a line</summary>
+      <div class="body"><b>Slope-intercept:</b> y = mx + c. &nbsp; <b>Point-slope:</b> y − y₁ = m(x − x₁). &nbsp; <b>Two-point:</b> (y − y₁)/(y₂ − y₁) = (x − x₁)/(x₂ − x₁). &nbsp; <b>Intercept:</b> x/a + y/b = 1 (a, b are x- and y-intercepts). &nbsp; <b>General:</b> ax + by + c = 0, with slope −a/b.</div></details>
+    <details class="fact"><summary>Angle between two lines</summary>
+      <div class="body">If lines have slopes m₁ and m₂, then <b>tanθ = |(m₁ − m₂)/(1 + m₁m₂)|</b>. The acute angle is taken. <b>Parallel:</b> m₁ = m₂ (θ = 0). <b>Perpendicular:</b> m₁·m₂ = −1 (θ = 90°, denominator 1 + m₁m₂ = 0).</div></details>
+    <details class="fact"><summary>Distance from a point to a line</summary>
+      <div class="body">For line <b>ax + by + c = 0</b> and point <b>(x₀, y₀)</b>: distance = <b>|ax₀ + by₀ + c| / √(a² + b²)</b>. The perpendicular from the point meets the line at the foot of the perpendicular.</div></details>
+    <details class="fact"><summary>Distance between two parallel lines</summary>
+      <div class="body">Parallel lines <b>y = mx + c₁</b> and <b>y = mx + c₂</b> are distance <b>|c₁ − c₂| / √(1 + m²)</b> apart. In general form ax + by + c₁ = 0 and ax + by + c₂ = 0, it is <b>|c₁ − c₂| / √(a² + b²)</b>.</div></details>
+  </div>
+
+  <!-- ========== QUIZ ========== -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz</h2>
+    <p class="hint" style="margin-top:0">Tap an option to check. Explanations reveal on click.</p>
+    <div id="quizBox"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- shared math / geometry helpers ----------
+  function fmt(x, d){ d = (d===undefined)?2:d; if(Object.is(x,-0)) x=0; return x.toFixed(d); }
+  function deg(r){ return r*180/Math.PI; }
+
+  // A view maps math coords -> pixels. x in [xmin,xmax], y in [ymin,ymax].
+  function makeView(cv){
+    var range = 10; // show -10..10 both axes
+    return {
+      cv:cv, range:range,
+      W:function(){ return cv.width; }, H:function(){ return cv.height; },
+      sx:function(x){ return (x + range) / (2*range) * cv.width; },
+      sy:function(y){ return cv.height - (y + range) / (2*range) * cv.height; },
+      ix:function(px){ return px / cv.width * 2*range - range; },
+      iy:function(py){ return (cv.height - py) / cv.height * 2*range - range; }
+    };
+  }
+
+  function drawGrid(ctx, v){
+    var W=v.W(), H=v.H();
+    ctx.clearRect(0,0,W,H);
+    ctx.lineWidth=1;
+    ctx.strokeStyle="#1c2436";
+    for(var g=-10; g<=10; g++){
+      var X=v.sx(g), Y=v.sy(g);
+      ctx.beginPath(); ctx.moveTo(X,0); ctx.lineTo(X,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,Y); ctx.lineTo(W,Y); ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle="#4a5878"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(0,v.sy(0)); ctx.lineTo(W,v.sy(0)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(v.sx(0),0); ctx.lineTo(v.sx(0),H); ctx.stroke();
+    // ticks labels
+    ctx.fillStyle="#6b799a"; ctx.font="11px system-ui"; ctx.textAlign="center"; ctx.textBaseline="top";
+    for(var t=-8; t<=8; t+=2){ if(t===0) continue; ctx.fillText(String(t), v.sx(t), v.sy(0)+3); }
+    ctx.textAlign="right"; ctx.textBaseline="middle";
+    for(var s=-8; s<=8; s+=2){ if(s===0) continue; ctx.fillText(String(s), v.sx(0)-4, v.sy(s)); }
+    ctx.textAlign="left"; ctx.textBaseline="top";
+    ctx.fillStyle="#8592b3"; ctx.fillText("x", W-14, v.sy(0)+3);
+    ctx.textBaseline="bottom"; ctx.fillText("y", v.sx(0)+4, 12);
+  }
+
+  // draw full line y = m x + c across the view (clipped to box)
+  function drawLine(ctx, v, m, c, color, width){
+    var xL=-v.range, xR=v.range;
+    ctx.strokeStyle=color; ctx.lineWidth=width||2.4;
+    ctx.beginPath();
+    ctx.moveTo(v.sx(xL), v.sy(m*xL+c));
+    ctx.lineTo(v.sx(xR), v.sy(m*xR+c));
+    ctx.stroke();
+  }
+
+  function dot(ctx, v, x, y, color, r){
+    ctx.beginPath(); ctx.arc(v.sx(x), v.sy(y), r||6, 0, 2*Math.PI);
+    ctx.fillStyle=color; ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle="#0c1018"; ctx.stroke();
+  }
+
+  // Convert a canvas so its internal resolution matches CSS size for crispness on redraw isn't needed;
+  // fixed width/height attribute + CSS scaling is fine. Pointer coords must be scaled.
+  function evtToCanvas(cv, e){
+    var rect = cv.getBoundingClientRect();
+    var cx = (e.touches? e.touches[0].clientX : e.clientX) - rect.left;
+    var cy = (e.touches? e.touches[0].clientY : e.clientY) - rect.top;
+    return { px: cx * cv.width / rect.width, py: cy * cv.height / rect.height };
+  }
+
+  // =========================================================
+  // MODE 1 : slope & forms
+  // =========================================================
+  (function(){
+    var cv=document.getElementById("cv1"), ctx=cv.getContext("2d");
+    var v=makeView(cv);
+    var m=1, c=0;
+    var mS=document.getElementById("mSlider"), cS=document.getElementById("cSlider");
+
+    function computeForms(){
+      // slope-intercept y=mx+c ; a=m, b=-1, gen: m x - y + c = 0 -> multiply to keep integers-ish
+      var xInt = (m!==0)? -c/m : null;
+      var yInt = c;
+      // point on line at x=2 for point-slope demo
+      var px=2, py=m*px+c;
+      var box=document.getElementById("formBox");
+      var f=activeForm;
+      var html="";
+      if(f==="slope"){
+        html='<code>y = <b>'+fmt(m)+'</b> x '+(c<0?'− '+fmt(-c):'+ '+fmt(c))+'</code>';
+      } else if(f==="point"){
+        html='<code>y − ('+fmt(py)+') = <b>'+fmt(m)+'</b> ( x − '+fmt(px)+' )</code><p class="hint">using point (2, '+fmt(py)+') on the line</p>';
+      } else if(f==="two"){
+        var x1=0,y1=c,x2=2,y2=m*2+c;
+        html='<code>(y − '+fmt(y1)+') / ('+fmt(y2-y1)+') = (x − '+fmt(x1)+') / ('+fmt(x2-x1)+')</code>'+
+             '<p class="hint">through ('+fmt(x1)+', '+fmt(y1)+') and ('+fmt(x2)+', '+fmt(y2)+')</p>';
+      } else if(f==="inter"){
+        if(m===0 || c===0){
+          html='<code>intercept form needs a ≠ 0 and b ≠ 0</code><p class="hint">'+(c===0?'line passes through the origin (b = 0)':'line is horizontal (no x-intercept)')+'</p>';
+        } else {
+          html='<code>x / ('+fmt(xInt)+') + y / ('+fmt(yInt)+') = 1</code>'+
+               '<p class="hint">a = x-intercept = '+fmt(xInt)+', b = y-intercept = '+fmt(yInt)+'</p>';
+        }
+      } else { // general  m x - y + c = 0
+        html='<code><b>'+fmt(m)+'</b> x + ('+fmt(-1)+') y + ('+fmt(c)+') = 0</code>'+
+             '<p class="hint">a = '+fmt(m)+', b = −1, c = '+fmt(c)+',  slope = −a/b = '+fmt(m)+'</p>';
+      }
+      box.innerHTML=html;
+    }
+
+    function draw(){
+      drawGrid(ctx,v);
+      drawLine(ctx,v,m,c,"#5fc8ff",2.6);
+      // intercepts
+      dot(ctx,v,0,c,"#5fc8ff",5);
+      if(m!==0) dot(ctx,v,-c/m,0,"#ff9d5c",5);
+      // angle arc at x-axis crossing if within view
+      if(m!==0){
+        var xc=-c/m;
+        if(Math.abs(xc)<v.range){
+          ctx.strokeStyle="rgba(95,200,255,.7)"; ctx.lineWidth=2;
+          var a0=0, a1=-Math.atan(m); // canvas y is down so angle sign flips
+          ctx.beginPath(); ctx.arc(v.sx(xc), v.sy(0), 26, Math.min(a0,a1), Math.max(a0,a1)); ctx.stroke();
+        }
+      }
+      // draggable handle at x=2
+      dot(ctx,v,2,m*2+c,"#e8ecf6",8);
+    }
+
+    function refresh(){
+      document.getElementById("mOut").textContent=fmt(m);
+      document.getElementById("thOut").textContent=fmt(deg(Math.atan(m)),1)+"°";
+      document.getElementById("cOut").textContent=fmt(c);
+      document.getElementById("mChip").textContent=fmt(m);
+      document.getElementById("yiChip").textContent=fmt(c);
+      document.getElementById("xiChip").textContent=(m!==0)?fmt(-c/m):"none";
+      computeForms();
+      draw();
+    }
+
+    var activeForm="slope";
+    document.getElementById("formSeg").addEventListener("click",function(e){
+      var b=e.target.closest("button"); if(!b) return;
+      this.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); activeForm=b.dataset.f; computeForms();
+    });
+
+    mS.addEventListener("input",function(){ m=parseFloat(mS.value); refresh(); });
+    cS.addEventListener("input",function(){ c=parseFloat(cS.value); refresh(); });
+
+    // drag handle: changing point at x=2 -> new slope/intercept keeping intercept? We let drag set slope via y, and intercept via vertical.
+    var dragging=false;
+    function tryStart(e){
+      var p=evtToCanvas(cv,e);
+      var hx=v.sx(2), hy=v.sy(m*2+c);
+      if(Math.hypot(p.px-hx,p.py-hy)<26){ dragging=true; e.preventDefault(); }
+    }
+    function move(e){
+      if(!dragging) return; e.preventDefault();
+      var p=evtToCanvas(cv,e);
+      var X=v.ix(p.px), Y=v.iy(p.py);
+      // keep the line through origin-intercept fixed? Instead: fix x-intercept? Simplest intuitive: dragging point at x=2 with intercept fixed changes slope.
+      // We update slope from (Y - c)/(X) but anchor at current c; also allow small intercept shift when near x-axis.
+      // Use: line must pass through dragged point and keep y-intercept c -> m=(Y-c)/X (X!=0)
+      if(Math.abs(X)>0.3){
+        m = (Y - c)/X;
+        m = Math.max(-4, Math.min(4, m));
+      }
+      mS.value=m; refresh();
+    }
+    function end(){ dragging=false; }
+    cv.addEventListener("mousedown",tryStart); cv.addEventListener("mousemove",move);
+    window.addEventListener("mouseup",end);
+    cv.addEventListener("touchstart",tryStart,{passive:false});
+    cv.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("touchend",end);
+
+    refresh();
+  })();
+
+  // =========================================================
+  // MODE 2 : angle & relationships
+  // =========================================================
+  (function(){
+    var cv=document.getElementById("cv2"), ctx=cv.getContext("2d");
+    var v=makeView(cv);
+    var m1=1,c1=0,m2=-0.5,c2=2;
+    var els={
+      m1:document.getElementById("m1Slider"),c1:document.getElementById("c1Slider"),
+      m2:document.getElementById("m2Slider"),c2:document.getElementById("c2Slider")
+    };
+
+    function draw(){
+      drawGrid(ctx,v);
+      drawLine(ctx,v,m1,c1,"#5fc8ff",2.6);
+      drawLine(ctx,v,m2,c2,"#ff9d5c",2.6);
+      // intersection point
+      if(Math.abs(m1-m2)>1e-9){
+        var xi=(c2-c1)/(m1-m2), yi=m1*xi+c1;
+        if(Math.abs(xi)<v.range && Math.abs(yi)<v.range){
+          dot(ctx,v,xi,yi,"#e8ecf6",6);
+          // angle arc
+          ctx.strokeStyle="rgba(232,236,246,.7)"; ctx.lineWidth=2;
+          var a1=-Math.atan(m1), a2=-Math.atan(m2);
+          var lo=Math.min(a1,a2), hi=Math.max(a1,a2);
+          ctx.beginPath(); ctx.arc(v.sx(xi), v.sy(yi), 30, lo, hi); ctx.stroke();
+        }
+      }
+    }
+
+    function refresh(){
+      document.getElementById("m1Out").textContent=fmt(m1);
+      document.getElementById("c1Out").textContent=fmt(c1);
+      document.getElementById("m2Out").textContent=fmt(m2);
+      document.getElementById("c2Out").textContent=fmt(c2);
+      document.getElementById("m1Chip").textContent=fmt(m1);
+      document.getElementById("m2Chip").textContent=fmt(m2);
+
+      var st=document.getElementById("relStatus");
+      var prod=m1*m2;
+      var angEl=document.getElementById("angChip");
+      if(Math.abs(m1-m2)<1e-9){
+        angEl.textContent="0.0°";
+        st.innerHTML='<span class="tag par">PARALLEL</span> — equal slopes (m₁ = m₂ = '+fmt(m1)+'), so the lines never meet. Angle between them is 0°.';
+      } else if(Math.abs(1+prod)<1e-9){
+        angEl.textContent="90.0°";
+        st.innerHTML='<span class="tag perp">PERPENDICULAR</span> — m₁·m₂ = '+fmt(prod)+' ≈ −1, so 1 + m₁m₂ = 0 and the angle is exactly 90°.';
+      } else {
+        var t=Math.abs((m1-m2)/(1+prod));
+        var ang=deg(Math.atan(t));
+        angEl.textContent=fmt(ang,1)+"°";
+        st.innerHTML='<span class="tag gen">INTERSECTING</span> — tanθ = |(m₁ − m₂)/(1 + m₁m₂)| = |('+fmt(m1)+' − '+fmt(m2)+')/(1 + '+fmt(prod)+')| = '+fmt(t)+', so θ = '+fmt(ang,1)+'° (acute).';
+      }
+      draw();
+    }
+
+    els.m1.addEventListener("input",function(){m1=parseFloat(els.m1.value);refresh();});
+    els.c1.addEventListener("input",function(){c1=parseFloat(els.c1.value);refresh();});
+    els.m2.addEventListener("input",function(){m2=parseFloat(els.m2.value);refresh();});
+    els.c2.addEventListener("input",function(){c2=parseFloat(els.c2.value);refresh();});
+    refresh();
+    window._angleRefresh=refresh;
+  })();
+
+  // =========================================================
+  // MODE 3 : distance
+  // =========================================================
+  (function(){
+    var cv=document.getElementById("cv3"), ctx=cv.getContext("2d");
+    var v=makeView(cv);
+    var sub="point";
+    // point mode
+    var m=1,c=-1, P={x:3,y:4};
+    // parallel mode
+    var pm=0.75, pc1=3, pc2=-2;
+
+    var dm=document.getElementById("dmSlider"), dc=document.getElementById("dcSlider");
+    var pmS=document.getElementById("pmSlider"), pc1S=document.getElementById("pc1Slider"), pc2S=document.getElementById("pc2Slider");
+
+    function drawPoint(){
+      drawGrid(ctx,v);
+      drawLine(ctx,v,m,c,"#5fc8ff",2.6);
+      // line ax+by+c0=0 with a=m,b=-1,c0=c
+      var a=m,b=-1,c0=c;
+      var den=Math.sqrt(a*a+b*b);
+      var dval=Math.abs(a*P.x+b*P.y+c0)/den;
+      // foot of perpendicular
+      var t=(a*P.x+b*P.y+c0)/(a*a+b*b);
+      var fx=P.x-a*t, fy=P.y-b*t;
+      // perpendicular segment
+      ctx.strokeStyle="rgba(255,157,92,.8)"; ctx.setLineDash([6,5]); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(v.sx(P.x),v.sy(P.y)); ctx.lineTo(v.sx(fx),v.sy(fy)); ctx.stroke();
+      ctx.setLineDash([]);
+      dot(ctx,v,fx,fy,"#5fc8ff",5);
+      dot(ctx,v,P.x,P.y,"#ff9d5c",8);
+      // readout
+      document.getElementById("distReadout").innerHTML=
+        '<div class="chip c2">P = (<b>'+fmt(P.x)+', '+fmt(P.y)+'</b>)</div>'+
+        '<div class="chip">foot F = (<b>'+fmt(fx)+', '+fmt(fy)+'</b>)</div>'+
+        '<div class="chip ok">distance = <b>'+fmt(dval)+'</b></div>';
+      document.getElementById("distFormula").innerHTML=
+        'Line: '+fmt(a)+' x + (−1) y + ('+fmt(c0)+') = 0.  d = |a·x₀ + b·y₀ + c| / √(a²+b²) = |'+
+        fmt(a)+'·'+fmt(P.x)+' + (−1)·'+fmt(P.y)+' + '+fmt(c0)+'| / √('+fmt(a*a+1)+') = <span class="tag par">'+fmt(dval)+'</span>.';
+    }
+
+    function drawPar(){
+      drawGrid(ctx,v);
+      drawLine(ctx,v,pm,pc1,"#5fc8ff",2.6);
+      drawLine(ctx,v,pm,pc2,"#ff9d5c",2.6);
+      var den=Math.sqrt(1+pm*pm);
+      var dval=Math.abs(pc1-pc2)/den;
+      // draw perpendicular between them: pick point on line1 at x=0 -> (0,pc1); direction perpendicular to line
+      var x0=0,y0=pc1;
+      // foot on line2: using a=pm,b=-1,c=pc2
+      var a=pm,b=-1,c0=pc2;
+      var t=(a*x0+b*y0+c0)/(a*a+b*b);
+      var fx=x0-a*t, fy=y0-b*t;
+      ctx.strokeStyle="rgba(232,236,246,.8)"; ctx.setLineDash([6,5]); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(v.sx(x0),v.sy(y0)); ctx.lineTo(v.sx(fx),v.sy(fy)); ctx.stroke();
+      ctx.setLineDash([]);
+      dot(ctx,v,x0,y0,"#5fc8ff",5); dot(ctx,v,fx,fy,"#ff9d5c",5);
+      document.getElementById("distReadout").innerHTML=
+        '<div class="chip">L₁: y = '+fmt(pm)+'x + '+fmt(pc1)+'</div>'+
+        '<div class="chip c2">L₂: y = '+fmt(pm)+'x + '+fmt(pc2)+'</div>'+
+        '<div class="chip ok">distance = <b>'+fmt(dval)+'</b></div>';
+      document.getElementById("distFormula").innerHTML=
+        'Both have slope '+fmt(pm)+' ⇒ parallel.  d = |c₁ − c₂| / √(1 + m²) = |'+fmt(pc1)+' − '+fmt(pc2)+'| / √(1 + '+fmt(pm*pm)+') = <span class="tag par">'+fmt(dval)+'</span>.';
+    }
+
+    function refresh(){
+      document.getElementById("dmOut").textContent=fmt(m);
+      document.getElementById("dcOut").textContent=fmt(c);
+      document.getElementById("pmOut").textContent=fmt(pm);
+      document.getElementById("pc1Out").textContent=fmt(pc1);
+      document.getElementById("pc2Out").textContent=fmt(pc2);
+      if(sub==="point") drawPoint(); else drawPar();
+    }
+
+    dm.addEventListener("input",function(){m=parseFloat(dm.value);refresh();});
+    dc.addEventListener("input",function(){c=parseFloat(dc.value);refresh();});
+    pmS.addEventListener("input",function(){pm=parseFloat(pmS.value);refresh();});
+    pc1S.addEventListener("input",function(){pc1=parseFloat(pc1S.value);refresh();});
+    pc2S.addEventListener("input",function(){pc2=parseFloat(pc2S.value);refresh();});
+
+    document.getElementById("distSeg").addEventListener("click",function(e){
+      var b=e.target.closest("button"); if(!b) return;
+      this.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); sub=b.dataset.d;
+      document.getElementById("distPointCtrls").classList.toggle("hide",sub!=="point");
+      document.getElementById("distParCtrls").classList.toggle("hide",sub!=="par");
+      refresh();
+    });
+
+    // drag P in point mode
+    var dragging=false;
+    function tryStart(e){
+      if(sub!=="point") return;
+      var p=evtToCanvas(cv,e);
+      if(Math.hypot(p.px-v.sx(P.x),p.py-v.sy(P.y))<28){ dragging=true; e.preventDefault(); }
+    }
+    function move(e){
+      if(!dragging) return; e.preventDefault();
+      var p=evtToCanvas(cv,e);
+      P.x=Math.max(-v.range,Math.min(v.range,v.ix(p.px)));
+      P.y=Math.max(-v.range,Math.min(v.range,v.iy(p.py)));
+      refresh();
+    }
+    function end(){dragging=false;}
+    cv.addEventListener("mousedown",tryStart); cv.addEventListener("mousemove",move);
+    window.addEventListener("mouseup",end);
+    cv.addEventListener("touchstart",tryStart,{passive:false});
+    cv.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("touchend",end);
+
+    refresh();
+  })();
+
+  // =========================================================
+  // TABS
+  // =========================================================
+  var sections={slope:document.getElementById("m-slope"),angle:document.getElementById("m-angle"),dist:document.getElementById("m-dist")};
+  document.querySelectorAll(".tab-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active");});
+      btn.classList.add("active");
+      var mode=btn.dataset.mode;
+      for(var k in sections){ sections[k].classList.toggle("hide", k!==mode); }
+      if(mode==="angle" && window._angleRefresh) window._angleRefresh();
+    });
+  });
+
+  // =========================================================
+  // QUIZ
+  // =========================================================
+  var QUIZ=[
+    {q:"A line makes an angle of 45° with the positive x-axis. What is its slope?",
+     opts:["0","1","√3","undefined"], ans:1,
+     ex:"Slope m = tanθ = tan45° = 1."},
+    {q:"Lines y = 2x + 3 and y = 2x − 5 are:",
+     opts:["Perpendicular","Intersecting at 45°","Parallel","The same line"], ans:2,
+     ex:"Equal slopes (m₁ = m₂ = 2) but different intercepts ⇒ parallel, distinct lines."},
+    {q:"Distance of the point (1, 2) from the line 3x + 4y − 10 = 0 is:",
+     opts:["1/5","1","0.2","2"], ans:2,
+     ex:"|3·1 + 4·2 − 10| / √(3²+4²) = |1| / 5 = 0.2."}
+  ];
+  var qb=document.getElementById("quizBox");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var html='<p class="qtext">'+(qi+1)+'. '+item.q+'</p>';
+    item.opts.forEach(function(o,oi){ html+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>'; });
+    html+='<p class="expl" id="ex'+qi+'">'+item.ex+'</p>';
+    d.innerHTML=html; qb.appendChild(d);
+  });
+  qb.addEventListener("click",function(e){
+    var b=e.target.closest(".opt"); if(!b) return;
+    var qi=+b.dataset.q, oi=+b.dataset.o;
+    var q=qb.querySelectorAll('.opt[data-q="'+qi+'"]');
+    q.forEach(function(x){ x.classList.remove("right","wrong"); });
+    if(oi===QUIZ[qi].ans){ b.classList.add("right"); }
+    else { b.classList.add("wrong"); q[QUIZ[qi].ans].classList.add("right"); }
+    document.getElementById("ex"+qi).classList.add("show");
+  });
+})();
+</script>
+</body>
+</html>
