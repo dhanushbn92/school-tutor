@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semiconductors Lab — NIOS Class 12 Physics (Ch 24)</title>
+<style>
+  :root{
+    --bg:#0f151c;
+    --panel:#182230;
+    --panel2:#1e2b3b;
+    --line:#2c3c50;
+    --txt:#e7eef6;
+    --muted:#93a4b8;
+    --accent:#4fd1c5;
+    --accent-dim:#2f8f87;
+    --electron:#4fd1c5;
+    --hole:#f6a35c;
+    --pos:#f2606c;
+    --neg:#5aa9ff;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+    padding:14px;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px;}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent);}
+  p.sub{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{
+    display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;
+  }
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    transition:.15s;user-select:none;
+  }
+  .tab:hover{color:var(--txt);}
+  .tab.active{background:var(--accent-dim);border-color:var(--accent);color:#eafffb;font-weight:600;}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .mode{display:none;}
+  .mode.active{display:block;}
+  .row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;}
+  .col{flex:1 1 320px;min-width:0;}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:manipulation;}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+  button.ctl{
+    background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.15s;
+  }
+  button.ctl:hover{border-color:var(--accent);}
+  button.ctl.on{background:var(--accent-dim);border-color:var(--accent);color:#eafffb;}
+  label.sl{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px;}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .readout{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.9rem;}
+  .readout b{color:var(--accent);}
+  .facts{font-size:.9rem;}
+  .facts ul{margin:6px 0 0;padding-left:18px;}
+  .facts li{margin-bottom:6px;}
+  .formula{font-family:"Cambria Math",Georgia,serif;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:8px 10px;margin:8px 0;display:inline-block;font-size:.95rem;}
+  .quiz .q{margin-bottom:16px;}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0;}
+  .quiz .opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .quiz .opt:hover{border-color:var(--accent);}
+  .quiz .opt.correct{background:#173d2f;border-color:#2fae7a;color:#c9ffe6;}
+  .quiz .opt.wrong{background:#3d1a1f;border-color:#c0505c;color:#ffd7dc;}
+  .quiz .expl{font-size:.85rem;color:var(--muted);margin-top:6px;display:none;}
+  .quiz .expl.show{display:block;}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);margin-left:6px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:8px;}
+  @media(max-width:480px){
+    body{padding:10px;}
+    h1{font-size:1.15rem;}
+    .tab{padding:8px 11px;font-size:.82rem;}
+  }
+</style>
+</head>
+<body>
+<h1>Semiconductors Lab <span class="badge">NIOS Physics · Ch 24</span></h1>
+<p class="sub">Semiconductors and Semiconducting Devices — explore doping, the p–n junction diode, and energy bands.</p>
+
+<div class="tabs" role="tablist">
+  <div class="tab active" data-mode="doping" role="tab">1 · Doping &amp; Carriers</div>
+  <div class="tab" data-mode="junction" role="tab">2 · p–n Junction Diode</div>
+  <div class="tab" data-mode="bands" role="tab">3 · Energy Bands</div>
+  <div class="tab" data-mode="learn" role="tab">Formulas &amp; Quiz</div>
+</div>
+
+<!-- ============ MODE 1: DOPING ============ -->
+<section class="mode active" id="mode-doping">
+  <div class="panel">
+    <h2>Doping a Silicon Lattice</h2>
+    <div class="row">
+      <div class="col">
+        <canvas id="cvDope" width="520" height="420" aria-label="Silicon lattice showing carriers"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--electron)"></i> Free electron (–)</span>
+          <span><i class="dot" style="background:var(--hole)"></i> Hole (+)</span>
+          <span><i class="dot" style="background:#7fd08a"></i> Donor ion (P)</span>
+          <span><i class="dot" style="background:#e07fb0"></i> Acceptor ion (B)</span>
+        </div>
+      </div>
+      <div class="col">
+        <div class="controls">
+          <button class="ctl on" data-dope="intrinsic">Intrinsic (pure Si)</button>
+          <button class="ctl" data-dope="n">n-type (add P)</button>
+          <button class="ctl" data-dope="p">p-type (add B)</button>
+        </div>
+        <div class="readout" id="dopeInfo"></div>
+        <div class="facts" style="margin-top:12px">
+          <ul>
+            <li><b>Intrinsic:</b> pure Si — equal, small numbers of thermally generated electrons and holes (n<sub>e</sub> = n<sub>h</sub> = n<sub>i</sub>).</li>
+            <li><b>n-type:</b> pentavalent donor (P, As) gives an extra loosely-bound electron. Majority = electrons, minority = holes.</li>
+            <li><b>p-type:</b> trivalent acceptor (B, Al) leaves a vacancy (hole). Majority = holes, minority = electrons.</li>
+            <li>The doped crystal stays electrically neutral overall.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODE 2: JUNCTION ============ -->
+<section class="mode" id="mode-junction">
+  <div class="panel">
+    <h2>p–n Junction Diode &amp; Biasing</h2>
+    <div class="row">
+      <div class="col">
+        <canvas id="cvJunc" width="520" height="300" aria-label="p-n junction with depletion region and current flow"></canvas>
+        <label class="sl">Bias voltage: <b id="vLabel">0.0 V</b> &nbsp;(&#8592; reverse &nbsp;·&nbsp; forward &#8594;)</label>
+        <input type="range" id="bias" min="-5" max="1.2" step="0.05" value="0">
+        <div class="legend">
+          <span><i class="dot" style="background:var(--electron)"></i> Electrons</span>
+          <span><i class="dot" style="background:var(--hole)"></i> Holes</span>
+          <span><i class="dot" style="background:#3a4a60"></i> Depletion region</span>
+        </div>
+      </div>
+      <div class="col">
+        <canvas id="cvIV" width="520" height="300" aria-label="Current-voltage characteristic curve"></canvas>
+        <div class="readout" id="juncInfo"></div>
+      </div>
+    </div>
+    <div class="facts" style="margin-top:12px">
+      <ul>
+        <li><b>Depletion region:</b> near the junction, electrons and holes recombine, leaving fixed ions and a built-in potential barrier.</li>
+        <li><b>Forward bias</b> (p to +, n to –): barrier shrinks; once V &gt; knee (~0.7 V for Si), current rises steeply.</li>
+        <li><b>Reverse bias</b> (p to –, n to +): barrier widens; only a tiny saturation leakage current flows.</li>
+        <li>A diode therefore conducts in one direction — it acts as a <b>rectifier</b>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODE 3: BANDS ============ -->
+<section class="mode" id="mode-bands">
+  <div class="panel">
+    <h2>Energy Band Diagrams</h2>
+    <div class="row">
+      <div class="col" style="flex:1 1 100%">
+        <canvas id="cvBands" width="640" height="340" aria-label="Energy band comparison for conductor, semiconductor, insulator"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--neg)"></i> Conduction band</span>
+          <span><i class="dot" style="background:var(--hole)"></i> Valence band</span>
+          <span><i class="dot" style="background:#3a4a60"></i> Forbidden gap (E<sub>g</sub>)</span>
+        </div>
+        <div class="facts" style="margin-top:12px">
+          <ul>
+            <li><b>Conductor</b> (e.g. Cu): valence and conduction bands overlap — E<sub>g</sub> &#8776; 0. Electrons move freely.</li>
+            <li><b>Semiconductor</b> (Si E<sub>g</sub> &#8776; 1.1 eV, Ge &#8776; 0.7 eV): small gap; some electrons cross at room temperature.</li>
+            <li><b>Insulator</b> (e.g. diamond E<sub>g</sub> &#8776; 6 eV): large gap; almost no electrons reach the conduction band.</li>
+            <li>Higher temperature or doping increases conduction-band electrons in a semiconductor.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODE 4: LEARN ============ -->
+<section class="mode" id="mode-learn">
+  <div class="panel">
+    <h2>Formulas &amp; Key Facts</h2>
+    <div class="facts">
+      <div class="formula">n<sub>e</sub> &middot; n<sub>h</sub> = n<sub>i</sub><sup>2</sup> &nbsp;(mass-action law)</div>
+      <div class="formula">Band gap: E<sub>g</sub>(Si) &#8776; 1.1 eV, E<sub>g</sub>(Ge) &#8776; 0.7 eV</div>
+      <div class="formula">Knee (cut-in) voltage: V<sub>Si</sub> &#8776; 0.7 V, V<sub>Ge</sub> &#8776; 0.3 V</div>
+      <div class="formula">Diode current: I = I<sub>0</sub>(e<sup>eV/kT</sup> &minus; 1)</div>
+      <ul>
+        <li><b>Forward bias:</b> p-side to +, n-side to &minus;. Low resistance, large current above knee voltage.</li>
+        <li><b>Reverse bias:</b> p-side to &minus;, n-side to +. High resistance, tiny reverse saturation current I<sub>0</sub>.</li>
+        <li><b>Rectifier:</b> because a diode conducts in only one direction, it converts AC to pulsating DC (half-wave / full-wave).</li>
+        <li><b>Majority carriers:</b> electrons in n-type, holes in p-type. Minority carriers are the opposite type.</li>
+        <li>Doping level is tiny (~1 part in 10<sup>6</sup>) yet hugely raises conductivity.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel quiz" id="quiz">
+    <h2>Quick Quiz <span class="badge">tap an option</span></h2>
+    <div id="quizBody"></div>
+  </div>
+  <footer>Semiconductors Lab · self-contained interactive · units: eV, V, A. Values are illustrative for NIOS Class 12.</footer>
+</section>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+    if(running) loop();
+  });
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  var modes = {
+    doping: document.getElementById("mode-doping"),
+    junction: document.getElementById("mode-junction"),
+    bands: document.getElementById("mode-bands"),
+    learn: document.getElementById("mode-learn")
+  };
+  var current = "doping";
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      for(var k in modes) modes[k].classList.remove("active");
+      current = t.getAttribute("data-mode");
+      modes[current].classList.add("active");
+    });
+  });
+
+  /* ================= MODE 1: DOPING ================= */
+  var cD = document.getElementById("cvDope"), gD = cD.getContext("2d");
+  var dopeInfo = document.getElementById("dopeInfo");
+  var dopeType = "intrinsic";
+  var carriers = [];
+  var COLS = 5, ROWS = 4;   // lattice grid of Si atoms
+
+  function buildCarriers(){
+    carriers = [];
+    var W = cD.width, H = cD.height;
+    var n;
+    if(dopeType === "intrinsic"){ n = {e:3, h:3}; }
+    else if(dopeType === "n"){ n = {e:9, h:1}; }
+    else { n = {e:1, h:9}; }
+    for(var i=0;i<n.e;i++) carriers.push(mkCarrier("e"));
+    for(var j=0;j<n.h;j++) carriers.push(mkCarrier("h"));
+  }
+  function mkCarrier(type){
+    return {
+      type:type,
+      x: 30 + Math.random()*(cD.width-60),
+      y: 30 + Math.random()*(cD.height-60),
+      vx:(Math.random()-.5)*1.4,
+      vy:(Math.random()-.5)*1.4
+    };
+  }
+  function setDope(t){
+    dopeType = t;
+    document.querySelectorAll("[data-dope]").forEach(function(b){
+      b.classList.toggle("on", b.getAttribute("data-dope")===t);
+    });
+    buildCarriers();
+    var txt;
+    if(t==="intrinsic"){
+      txt = "<b>Intrinsic silicon.</b> Each Si atom shares 4 covalent bonds. Thermal energy frees a few electron–hole pairs: n<sub>e</sub> = n<sub>h</sub>. Conductivity is low.";
+    } else if(t==="n"){
+      txt = "<b>n-type.</b> Pentavalent donors (P) each donate 1 free electron. <b>Majority = electrons</b>, minority = holes. Donor ions are fixed positive.";
+    } else {
+      txt = "<b>p-type.</b> Trivalent acceptors (B) each create 1 hole. <b>Majority = holes</b>, minority = electrons. Acceptor ions are fixed negative.";
+    }
+    dopeInfo.innerHTML = txt;
+  }
+  document.querySelectorAll("[data-dope]").forEach(function(b){
+    b.addEventListener("click", function(){ setDope(b.getAttribute("data-dope")); });
+  });
+
+  function drawDope(){
+    var W=cD.width, H=cD.height;
+    gD.clearRect(0,0,W,H);
+    // lattice atoms + bonds
+    var mx=55, my=45, sx=(W-2*mx)/(COLS-1), sy=(H-2*my)/(ROWS-1);
+    gD.strokeStyle="#33465e"; gD.lineWidth=2;
+    for(var r=0;r<ROWS;r++){
+      for(var c=0;c<COLS;c++){
+        var x=mx+c*sx, y=my+r*sy;
+        if(c<COLS-1){ gD.beginPath();gD.moveTo(x,y);gD.lineTo(x+sx,y);gD.stroke(); }
+        if(r<ROWS-1){ gD.beginPath();gD.moveTo(x,y);gD.lineTo(x,y+sy);gD.stroke(); }
+      }
+    }
+    for(var r2=0;r2<ROWS;r2++){
+      for(var c2=0;c2<COLS;c2++){
+        var xx=mx+c2*sx, yy=my+r2*sy;
+        var isDopant = (dopeType!=="intrinsic") && (r2===1 && c2===2);
+        gD.beginPath();
+        gD.arc(xx,yy,13,0,7);
+        if(isDopant){
+          gD.fillStyle = dopeType==="n" ? "#7fd08a" : "#e07fb0";
+        } else {
+          gD.fillStyle="#3d566f";
+        }
+        gD.fill();
+        gD.fillStyle="#0b1017"; gD.font="11px system-ui"; gD.textAlign="center"; gD.textBaseline="middle";
+        gD.fillText(isDopant ? (dopeType==="n"?"P":"B") : "Si", xx, yy);
+      }
+    }
+    // carriers
+    carriers.forEach(function(p){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<18||p.x>W-18) p.vx*=-1;
+      if(p.y<18||p.y>H-18) p.vy*=-1;
+      if(Math.random()<0.03){ p.vx+=(Math.random()-.5)*.6; p.vy+=(Math.random()-.5)*.6; }
+      var sp=Math.hypot(p.vx,p.vy); if(sp>2){p.vx*=2/sp;p.vy*=2/sp;}
+      gD.beginPath(); gD.arc(p.x,p.y,7,0,7);
+      gD.fillStyle = p.type==="e" ? getComputedStyle(document.documentElement).getPropertyValue('--electron') : getComputedStyle(document.documentElement).getPropertyValue('--hole');
+      gD.fill();
+      gD.fillStyle="#0b1017"; gD.font="bold 10px system-ui";
+      gD.fillText(p.type==="e"?"−":"+", p.x, p.y+0.5);
+    });
+  }
+
+  /* ================= MODE 2: JUNCTION ================= */
+  var cJ=document.getElementById("cvJunc"), gJ=cJ.getContext("2d");
+  var cIV=document.getElementById("cvIV"), gIV=cIV.getContext("2d");
+  var biasSlider=document.getElementById("bias");
+  var vLabel=document.getElementById("vLabel");
+  var juncInfo=document.getElementById("juncInfo");
+  var jCarriers=[];
+  var VKNEE=0.7, I0=0.02; // saturation ~ arbitrary units
+  var flowPhase=0;
+
+  for(var i=0;i<40;i++){
+    var side = i<20 ? "p":"n";
+    jCarriers.push({
+      side:side,
+      type: side==="p" ? "h":"e",
+      x: side==="p" ? 30+Math.random()*180 : 310+Math.random()*180,
+      y: 55+Math.random()*190,
+      vx:(Math.random()-.5)*0.6, vy:(Math.random()-.5)*0.6
+    });
+  }
+
+  function diodeCurrent(V){
+    // returns current in arbitrary "mA" units; Shockley-like
+    if(V>=0){
+      return I0*(Math.exp(V/0.045)-1); // steep near 0.7
+    } else {
+      return -I0*(1-Math.exp(V/0.6))*0.3; // small reverse leakage, mild
+    }
+  }
+
+  function drawJunction(){
+    var W=cJ.width,H=cJ.height, mid=W/2;
+    var V=parseFloat(biasSlider.value);
+    gJ.clearRect(0,0,W,H);
+    // p and n regions
+    gJ.fillStyle="#241d2b"; gJ.fillRect(0,30,mid,H-60);
+    gJ.fillStyle="#1c2733"; gJ.fillRect(mid,30,mid,H-60);
+    // depletion width: wider in reverse, narrower forward
+    var base=44;
+    var dw = base*(1 - V/1.6);         // forward shrinks, reverse widens
+    dw = Math.max(8, Math.min(120, dw));
+    gJ.fillStyle="#3a4a60";
+    gJ.fillRect(mid-dw/2,30,dw,H-60);
+    // junction line
+    gJ.strokeStyle="#6b7f96"; gJ.lineWidth=1;
+    gJ.beginPath();gJ.moveTo(mid,30);gJ.lineTo(mid,H-30);gJ.stroke();
+    // labels
+    gJ.fillStyle="#f6a35c"; gJ.font="bold 15px system-ui"; gJ.textAlign="center"; gJ.textBaseline="alphabetic";
+    gJ.fillText("p", 40, 52);
+    gJ.fillStyle="#5aa9ff"; gJ.fillText("n", W-40, 52);
+    gJ.fillStyle="#93a4b8"; gJ.font="11px system-ui";
+    gJ.fillText("depletion", mid, H-14);
+
+    // fixed ions in depletion
+    gJ.font="11px system-ui";
+    for(var k=0;k<5;k++){
+      var yy=55+k*40;
+      gJ.fillStyle="#c47fb0"; gJ.fillText("−", mid-dw/2-10, yy); // acceptor - on p side
+      gJ.fillStyle="#7fd08a"; gJ.fillText("+", mid+dw/2+10, yy);      // donor + on n side
+    }
+
+    var I=diodeCurrent(V);
+    var forward = V>0;
+    var conducting = V>VKNEE*0.55; // visually flow above ~0.4
+    // carriers movement
+    var drift = forward ? Math.min(2.4, (V/1.2)*2.4) : -0.2; // toward junction if forward
+    jCarriers.forEach(function(p){
+      // random thermal
+      p.x+=p.vx; p.y+=p.vy;
+      // drift toward/away junction when biased
+      var dir = (p.side==="p") ? 1 : -1; // p moves right, n moves left, toward junction
+      if(conducting){
+        p.x += dir*drift*0.5;
+      } else if(V<0){
+        p.x -= dir*0.4; // pulled away, widen
+      }
+      // bounds & recombination at junction when conducting
+      if(conducting && Math.abs(p.x-mid)<dw/2+4){
+        // cross and reset from far edge (current flow illusion)
+        if(p.side==="p"){ p.x = 30+Math.random()*40; }
+        else { p.x = W-30-Math.random()*40; }
+        p.y = 55+Math.random()*190;
+      }
+      // keep in own region roughly
+      if(p.side==="p"){ if(p.x<20)p.x=20; if(p.x>mid-6 && !conducting)p.x=mid-6; }
+      else { if(p.x>W-20)p.x=W-20; if(p.x<mid+6 && !conducting)p.x=mid+6; }
+      if(p.y<40){p.y=40;p.vy*=-1;} if(p.y>H-40){p.y=H-40;p.vy*=-1;}
+      gJ.beginPath();gJ.arc(p.x,p.y,6,0,7);
+      gJ.fillStyle = p.type==="e" ? "#4fd1c5":"#f6a35c";
+      gJ.fill();
+      gJ.fillStyle="#0b1017";gJ.font="bold 9px system-ui";gJ.textAlign="center";gJ.textBaseline="middle";
+      gJ.fillText(p.type==="e"?"−":"+",p.x,p.y+0.5);
+    });
+
+    // external current arrows if conducting
+    if(conducting){
+      flowPhase=(flowPhase+0.06)%1;
+      gJ.strokeStyle="#4fd1c5"; gJ.fillStyle="#4fd1c5"; gJ.lineWidth=2;
+      var ay=18;
+      for(var a=0;a<6;a++){
+        var ax=((a/6 + flowPhase)%1)*W;
+        gJ.beginPath();gJ.moveTo(ax,ay);gJ.lineTo(ax+8,ay-4);gJ.lineTo(ax+8,ay+4);gJ.closePath();gJ.fill();
+      }
+    }
+
+    juncInfo.innerHTML =
+      "Bias V = <b>"+V.toFixed(2)+" V</b> &nbsp; Current I &#8776; <b>"+
+      (I>=0?"+":"")+I.toFixed(2)+" (mA)</b><br>"+
+      (V>VKNEE ? "Forward, above knee — <b>conducting strongly</b>." :
+       V>0 ? "Forward, below knee ("+VKNEE+" V) — barely conducting." :
+       "Reverse bias — only tiny leakage current I<sub>0</sub>.");
+    vLabel.textContent = V.toFixed(2)+" V";
+    drawIV(V,I);
+  }
+
+  function drawIV(Vnow,Inow){
+    var W=cIV.width,H=cIV.height;
+    gIV.clearRect(0,0,W,H);
+    var ox=W*0.55, oy=H*0.5; // origin
+    var sxU = (W*0.4)/1.2;    // px per volt (forward span to 1.2V)
+    var sxR = (ox-40)/5;      // px per volt reverse
+    var syU = (oy-20)/6;      // scale current up
+    // axes
+    gIV.strokeStyle="#3a4a60"; gIV.lineWidth=1;
+    gIV.beginPath();gIV.moveTo(20,oy);gIV.lineTo(W-10,oy);gIV.stroke();
+    gIV.beginPath();gIV.moveTo(ox,10);gIV.lineTo(ox,H-10);gIV.stroke();
+    gIV.fillStyle="#93a4b8"; gIV.font="11px system-ui"; gIV.textAlign="left";gIV.textBaseline="alphabetic";
+    gIV.fillText("I (mA)", ox+6, 18);
+    gIV.fillText("V (V)", W-46, oy-6);
+    gIV.fillText("+", ox+ (W*0.4) -8, oy+14);
+    gIV.fillText("−", 24, oy-6);
+    // curve
+    gIV.strokeStyle="#4fd1c5"; gIV.lineWidth=2.5; gIV.beginPath();
+    var first=true;
+    for(var V=-5; V<=1.2; V+=0.02){
+      var I=diodeCurrent(V);
+      var px = V>=0 ? ox + V*sxU : ox + V*sxR;
+      var py = oy - Math.max(-oy+15, Math.min(oy-15, I*syU));
+      if(first){gIV.moveTo(px,py);first=false;} else gIV.lineTo(px,py);
+    }
+    gIV.stroke();
+    // knee marker
+    var kx=ox+VKNEE*sxU;
+    gIV.setLineDash([4,4]); gIV.strokeStyle="#f6a35c"; gIV.lineWidth=1;
+    gIV.beginPath();gIV.moveTo(kx,20);gIV.lineTo(kx,oy);gIV.stroke(); gIV.setLineDash([]);
+    gIV.fillStyle="#f6a35c"; gIV.fillText("knee 0.7 V", kx-6, 34);
+    // moving operating point
+    var opx = Vnow>=0 ? ox+Vnow*sxU : ox+Vnow*sxR;
+    var opy = oy - Math.max(-oy+15, Math.min(oy-15, Inow*syU));
+    gIV.beginPath();gIV.arc(opx,opy,5,0,7);gIV.fillStyle="#ffffff";gIV.fill();
+    gIV.strokeStyle="#4fd1c5";gIV.lineWidth=2;gIV.stroke();
+  }
+  biasSlider.addEventListener("input", function(){ if(!running) drawJunction(); });
+
+  /* ================= MODE 3: BANDS ================= */
+  var cB=document.getElementById("cvBands"), gB=cB.getContext("2d");
+  function drawBands(){
+    var W=cB.width,H=cB.height;
+    gB.clearRect(0,0,W,H);
+    var mats=[
+      {name:"Conductor", gap:0, overlap:true},
+      {name:"Semiconductor", gap:0.30},
+      {name:"Insulator", gap:0.62}
+    ];
+    var colW=W/3, pad=26;
+    mats.forEach(function(m,i){
+      var x0=i*colW+pad, w=colW-2*pad;
+      var top=50, bottom=H-40, span=bottom-top;
+      // valence band (bottom)
+      var vTop, cBot;
+      if(m.overlap){
+        vTop = top+span*0.55; cBot = top+span*0.50; // overlap
+      } else {
+        var g=m.gap*span;
+        var mid=top+span*0.5;
+        cBot = mid - g/2;
+        vTop = mid + g/2;
+      }
+      // conduction band
+      gB.fillStyle="rgba(90,169,255,0.85)";
+      gB.fillRect(x0, top, w, cBot-top);
+      // valence band
+      gB.fillStyle="rgba(246,163,92,0.9)";
+      gB.fillRect(x0, vTop, w, bottom-vTop);
+      // gap label
+      if(!m.overlap){
+        gB.fillStyle="#3a4a60";
+        gB.fillRect(x0, cBot, w, vTop-cBot);
+        gB.fillStyle="#e7eef6"; gB.font="12px system-ui"; gB.textAlign="center"; gB.textBaseline="middle";
+        var egTxt = m.name==="Semiconductor" ? "Eg ≈ 1.1 eV" : "Eg ≈ 6 eV";
+        gB.fillText(egTxt, x0+w/2, (cBot+vTop)/2);
+      } else {
+        gB.fillStyle="#e7eef6"; gB.font="12px system-ui"; gB.textAlign="center"; gB.textBaseline="middle";
+        gB.fillText("overlap", x0+w/2, (cBot+vTop)/2);
+      }
+      // labels
+      gB.fillStyle="#0b1017"; gB.font="bold 11px system-ui"; gB.textAlign="center";gB.textBaseline="middle";
+      gB.fillText("Conduction", x0+w/2, top+(cBot-top)/2);
+      gB.fillText("Valence", x0+w/2, vTop+(bottom-vTop)/2);
+      // title
+      gB.fillStyle="#4fd1c5"; gB.font="bold 14px system-ui"; gB.textBaseline="alphabetic";
+      gB.fillText(m.name, x0+w/2, 32);
+      // few electrons dots in conduction band for semiconductor
+      if(m.name==="Semiconductor"){
+        gB.fillStyle="#eafffb";
+        for(var d=0; d<4; d++){
+          gB.beginPath(); gB.arc(x0+15+d*(w-30)/3, top+12+ (d%2)*8, 3,0,7); gB.fill();
+        }
+      }
+    });
+  }
+
+  /* ================= QUIZ ================= */
+  var quizData=[
+    {
+      q:"1. In an n-type semiconductor, the majority charge carriers are:",
+      opts:["Holes","Free electrons","Protons","Positive ions"],
+      ans:1,
+      expl:"Pentavalent donors supply extra free electrons, so electrons are the majority carriers in n-type."
+    },
+    {
+      q:"2. The approximate knee (cut-in) voltage of a silicon p–n junction diode is:",
+      opts:["0.1 V","0.3 V","0.7 V","1.1 V"],
+      ans:2,
+      expl:"Silicon conducts strongly once forward voltage exceeds ~0.7 V (Ge is ~0.3 V; 1.1 eV is Si's band gap, not its knee voltage)."
+    },
+    {
+      q:"3. Which material has valence and conduction bands that overlap (Eg ≈ 0)?",
+      opts:["Insulator","Semiconductor","Conductor","Pure silicon"],
+      ans:2,
+      expl:"In conductors the bands overlap, so electrons move freely and conductivity is high."
+    }
+  ];
+  var quizBody=document.getElementById("quizBody");
+  quizData.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var h=document.createElement("div"); h.innerHTML="<b>"+item.q+"</b>"; div.appendChild(h);
+    var opts=document.createElement("div"); opts.className="opts";
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement("div"); b.className="opt"; b.textContent=o;
+      b.addEventListener("click", function(){
+        if(div.getAttribute("data-done")) return;
+        div.setAttribute("data-done","1");
+        var kids=opts.querySelectorAll(".opt");
+        kids[item.ans].classList.add("correct");
+        if(oi!==item.ans) b.classList.add("wrong");
+        expl.classList.add("show");
+      });
+      opts.appendChild(b);
+    });
+    div.appendChild(opts);
+    var expl=document.createElement("div"); expl.className="expl"; expl.textContent="Explanation: "+item.expl;
+    div.appendChild(expl);
+    quizBody.appendChild(div);
+  });
+
+  /* ================= ANIMATION LOOP ================= */
+  function loop(){
+    if(!running) return;
+    if(current==="doping") drawDope();
+    else if(current==="junction") drawJunction();
+    else if(current==="bands") drawBands();
+    requestAnimationFrame(loop);
+  }
+  setDope("intrinsic");
+  drawBands();
+  loop();
+})();
+</script>
+</body>
+</html>

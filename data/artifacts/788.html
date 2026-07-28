@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Optics Lab — Wave Phenomena and Light (NIOS Class 12, Ch 20)</title>
+<style>
+  :root{
+    --bg:#0e1420;
+    --panel:#18202f;
+    --panel2:#212b3e;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#57c7d4;
+    --accent-soft:rgba(87,199,212,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3752;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0e1420;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0e1420}
+
+  canvas{display:block;width:100%;height:auto;border-radius:12px;background:#080c15;border:1px solid var(--line)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 12px;min-width:104px;flex:1 1 104px;text-align:center}
+  .chip .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .chip .v{font-size:1.08rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .chip .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .caption{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--panel2);
+    border-left:4px solid var(--accent);font-size:.92rem;color:var(--ink)}
+  .caption b{color:var(--accent)}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;margin:8px 0;font-size:1.05rem;text-align:center;
+    font-family:Georgia,"Times New Roman",serif}
+  .info p{font-size:.92rem;color:var(--muted);margin:6px 0}
+  .info p b{color:var(--ink)}
+  .info .grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .info .cell{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;font-size:.85rem;color:var(--muted)}
+  .info .cell b{display:block;color:var(--accent);font-size:.92rem;margin-bottom:2px}
+
+  .bar-wrap{margin-top:10px}
+  .bar-track{height:26px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,#3a4a6a,var(--accent));transition:width .08s linear}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:10px;font-size:.95rem}
+  .quiz .opts{display:grid;gap:8px}
+  .quiz .opts button{min-height:46px;text-align:left;padding:10px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:.92rem;
+    cursor:pointer;touch-action:manipulation}
+  .quiz .opts button:disabled{cursor:default;opacity:.9}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.12);color:var(--bad)}
+  .quiz .expl{display:none;margin-top:10px;font-size:.88rem;color:var(--muted);
+    border-top:1px dashed var(--line);padding-top:10px}
+  .quiz .expl.show{display:block}
+  .quiz .expl b{color:var(--accent)}
+
+  .hidden{display:none}
+  @media (max-width:420px){
+    .wrap{padding:10px 10px 40px}
+    header h1{font-size:1.25rem}
+    .chip{min-width:88px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🌈 Wave Optics <span>Lab</span></h1>
+  <p>Wave Phenomena and Light — NIOS Class 12 · Physics (312) · Chapter 20</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tabYoung" type="button">🔦 Double Slit</button>
+  <button class="tab-btn" id="tabDiff" type="button">📏 Single Slit</button>
+  <button class="tab-btn" id="tabPol" type="button">🕶 Polarization</button>
+</div>
+
+<!-- ============ YOUNG'S DOUBLE SLIT ============ -->
+<section class="panel" id="panelYoung">
+  <h2>Young's double-slit interference</h2>
+  <div class="controls">
+    <div class="ctrl">
+      <label>Slit separation d = <output id="oY_d">0.50</output> mm</label>
+      <input type="range" id="Y_d" min="0.10" max="2.00" step="0.01" value="0.50">
+    </div>
+    <div class="ctrl">
+      <label>Wavelength &lambda; = <output id="oY_l">550</output> nm</label>
+      <input type="range" id="Y_l" min="400" max="700" step="1" value="550">
+    </div>
+    <div class="ctrl">
+      <label>Screen distance D = <output id="oY_D">1.00</output> m</label>
+      <input type="range" id="Y_D" min="0.50" max="3.00" step="0.01" value="1.00">
+    </div>
+  </div>
+  <canvas id="cY" width="880" height="300"></canvas>
+  <div class="chips">
+    <div class="chip"><div class="k">Fringe spacing &beta;</div><div class="v"><span id="vY_beta">1.10</span> <small>mm</small></div></div>
+    <div class="chip"><div class="k">&lambda;D/d</div><div class="v"><span id="vY_calc">1.10</span> <small>mm</small></div></div>
+    <div class="chip"><div class="k">Light colour</div><div class="v" id="vY_col">green</div></div>
+  </div>
+  <div class="caption">Two coherent slits make waves overlap. Bright fringes fall where the
+    path difference is a whole number of wavelengths (<b>path diff = m&lambda;</b>); dark fringes where
+    it is a half-odd multiple. Spacing <b>&beta; = &lambda;D/d</b> — widen the slits and fringes crowd together.</div>
+</section>
+
+<!-- ============ SINGLE SLIT DIFFRACTION ============ -->
+<section class="panel hidden" id="panelDiff">
+  <h2>Single-slit diffraction</h2>
+  <div class="controls">
+    <div class="ctrl">
+      <label>Slit width a = <output id="oD_a">0.10</output> mm</label>
+      <input type="range" id="D_a" min="0.02" max="0.40" step="0.01" value="0.10">
+    </div>
+    <div class="ctrl">
+      <label>Wavelength &lambda; = <output id="oD_l">550</output> nm</label>
+      <input type="range" id="D_l" min="400" max="700" step="1" value="550">
+    </div>
+    <div class="ctrl">
+      <label>Screen distance D = <output id="oD_D">1.00</output> m</label>
+      <input type="range" id="D_D" min="0.50" max="3.00" step="0.01" value="1.00">
+    </div>
+  </div>
+  <canvas id="cD" width="880" height="300"></canvas>
+  <div class="chips">
+    <div class="chip"><div class="k">Central max width</div><div class="v"><span id="vD_w">11.0</span> <small>mm</small></div></div>
+    <div class="chip"><div class="k">1st minimum angle</div><div class="v"><span id="vD_th">0.31</span> <small>&deg;</small></div></div>
+    <div class="chip"><div class="k">Light colour</div><div class="v" id="vD_col">green</div></div>
+  </div>
+  <div class="caption">A single slit spreads light into a broad, bright <b>central maximum</b> flanked by
+    fainter side maxima. Dark bands (minima) sit where <b>a&nbsp;sin&theta; = m&lambda;</b> (m = &plusmn;1, &plusmn;2, …).
+    Narrow the slit and the pattern fans out wider.</div>
+</section>
+
+<!-- ============ POLARIZATION ============ -->
+<section class="panel hidden" id="panelPol">
+  <h2>Polarization &amp; Malus's law</h2>
+  <div class="controls">
+    <div class="ctrl">
+      <label>Analyzer angle &theta; = <output id="oP_th">30</output>&deg;</label>
+      <input type="range" id="P_th" min="0" max="180" step="1" value="30">
+    </div>
+  </div>
+  <canvas id="cP" width="880" height="280"></canvas>
+  <div class="bar-wrap">
+    <label style="font-size:.85rem;color:var(--muted)">Transmitted brightness I / I&#8320;</label>
+    <div class="bar-track"><div class="bar-fill" id="P_bar" style="width:75%"></div></div>
+  </div>
+  <div class="chips">
+    <div class="chip"><div class="k">cos&theta;</div><div class="v" id="vP_cos">0.866</div></div>
+    <div class="chip"><div class="k">I / I&#8320; = cos&sup2;&theta;</div><div class="v" id="vP_I">0.750</div></div>
+    <div class="chip"><div class="k">Transmitted</div><div class="v"><span id="vP_pct">75.0</span> <small>%</small></div></div>
+  </div>
+  <div class="caption">Unpolarized light loses half its intensity through the first polarizer, becoming
+    plane-polarized. The <b>analyzer</b> passes only the component along its axis, so
+    <b>I = I&#8320;cos&sup2;&theta;</b>. Crossed polarizers (&theta; = 90&deg;) give darkness.</div>
+</section>
+
+<!-- ============ FORMULAS ============ -->
+<section class="panel info">
+  <h2>Formula reference</h2>
+  <div class="formula">&beta; = &lambda;D / d &nbsp;&nbsp;(fringe spacing, double slit)</div>
+  <div class="formula">bright: d&nbsp;sin&theta; = m&lambda; &nbsp;·&nbsp; dark: d&nbsp;sin&theta; = (m + &frac12;)&lambda;</div>
+  <div class="formula">single-slit minima: a&nbsp;sin&theta; = m&lambda; &nbsp;(m = &plusmn;1, &plusmn;2, …)</div>
+  <div class="formula">Malus's law: I = I&#8320; cos&sup2;&theta;</div>
+  <div class="grid">
+    <div class="cell"><b>&lambda;</b>wavelength of light (nm)</div>
+    <div class="cell"><b>d</b>slit separation (double slit)</div>
+    <div class="cell"><b>a</b>slit width (single slit)</div>
+    <div class="cell"><b>D</b>slit-to-screen distance (m)</div>
+    <div class="cell"><b>&theta;</b>angle / analyzer rotation</div>
+    <div class="cell"><b>m</b>order (integer)</div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="panel quiz">
+  <h2>Quick quiz — tap an answer</h2>
+  <div class="q" data-correct="1">
+    <p>1. In Young's experiment, if the slit separation d is increased, the fringe spacing &beta;…</p>
+    <div class="opts">
+      <button type="button">increases</button>
+      <button type="button">decreases</button>
+      <button type="button">stays the same</button>
+    </div>
+    <div class="expl"><b>Correct: decreases.</b> Since &beta; = &lambda;D/d, &beta; is inversely proportional to d — larger d packs fringes closer.</div>
+  </div>
+  <div class="q" data-correct="2">
+    <p>2. In single-slit diffraction, dark fringes (minima) occur when…</p>
+    <div class="opts">
+      <button type="button">a sin&theta; = (m + &frac12;)&lambda;</button>
+      <button type="button">a sin&theta; = m&lambda;, m = &plusmn;1, &plusmn;2, …</button>
+      <button type="button">a cos&theta; = m&lambda;</button>
+    </div>
+    <div class="expl"><b>Correct: a sin&theta; = m&lambda;.</b> Note m = 0 is the central maximum, not a minimum, so minima start at m = &plusmn;1.</div>
+  </div>
+  <div class="q" data-correct="1">
+    <p>3. Plane-polarized light hits an analyzer turned to &theta; = 60&deg;. The transmitted intensity is…</p>
+    <div class="opts">
+      <button type="button">I&#8320; / &radic;2</button>
+      <button type="button">I&#8320; / 4</button>
+      <button type="button">zero</button>
+    </div>
+    <div class="expl"><b>Correct: I&#8320;/4.</b> Malus's law: I = I&#8320;cos&sup2;60&deg; = I&#8320;(0.5)&sup2; = I&#8320;/4.</div>
+  </div>
+</section>
+
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- helpers ----------
+  var running = true;
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+    if(running) scheduleAll();
+  });
+
+  // wavelength (nm) -> approximate RGB
+  function wlColor(wl){
+    var r=0,g=0,b=0;
+    if(wl>=400&&wl<440){r=-(wl-440)/40;b=1;}
+    else if(wl<490){g=(wl-440)/50;b=1;}
+    else if(wl<510){g=1;b=-(wl-510)/20;}
+    else if(wl<580){r=(wl-510)/70;g=1;}
+    else if(wl<645){r=1;g=-(wl-645)/65;}
+    else {r=1;}
+    var f=1;
+    if(wl>700)f=0.3; if(wl<420)f=0.3+0.7*(wl-380)/40;
+    r=Math.round(255*Math.pow(Math.max(0,Math.min(1,r))*f,0.8));
+    g=Math.round(255*Math.pow(Math.max(0,Math.min(1,g))*f,0.8));
+    b=Math.round(255*Math.pow(Math.max(0,Math.min(1,b))*f,0.8));
+    return [r,g,b];
+  }
+  function colName(wl){
+    if(wl<450)return "violet"; if(wl<490)return "blue"; if(wl<560)return "green";
+    if(wl<590)return "yellow"; if(wl<620)return "orange"; return "red";
+  }
+  function fmt(n,d){ return n.toFixed(d===undefined?2:d); }
+
+  // ---------- tab switching ----------
+  var panels = {Young:document.getElementById("panelYoung"),
+                Diff:document.getElementById("panelDiff"),
+                Pol:document.getElementById("panelPol")};
+  var tabs = {Young:document.getElementById("tabYoung"),
+              Diff:document.getElementById("tabDiff"),
+              Pol:document.getElementById("tabPol")};
+  var current = "Young";
+  function selectTab(name){
+    current = name;
+    for(var k in panels){
+      panels[k].classList.toggle("hidden", k!==name);
+      tabs[k].classList.toggle("active", k===name);
+    }
+    scheduleAll();
+  }
+  tabs.Young.onclick=function(){selectTab("Young");};
+  tabs.Diff.onclick=function(){selectTab("Diff");};
+  tabs.Pol.onclick=function(){selectTab("Pol");};
+
+  // ============ YOUNG'S DOUBLE SLIT ============
+  var cY=document.getElementById("cY"), gY=cY.getContext("2d");
+  var Y_d=document.getElementById("Y_d"), Y_l=document.getElementById("Y_l"), Y_D=document.getElementById("Y_D");
+  function drawYoung(){
+    var d = parseFloat(Y_d.value)*1e-3;      // m
+    var lam = parseFloat(Y_l.value)*1e-9;    // m
+    var D = parseFloat(Y_D.value);           // m
+    document.getElementById("oY_d").textContent = fmt(parseFloat(Y_d.value),2);
+    document.getElementById("oY_l").textContent = Y_l.value;
+    document.getElementById("oY_D").textContent = fmt(D,2);
+    var beta = lam*D/d;                        // m
+    document.getElementById("vY_beta").textContent = fmt(beta*1000,2);
+    document.getElementById("vY_calc").textContent = fmt(beta*1000,2);
+    document.getElementById("vY_col").textContent = colName(parseFloat(Y_l.value));
+    var col = wlColor(parseFloat(Y_l.value));
+
+    var W=cY.width, H=cY.height;
+    gY.clearRect(0,0,W,H);
+    // screen coordinate: y position on screen (metres). Intensity I ∝ cos²(πdy/(λD))
+    // map screen span so ~8 fringes fit
+    var span = 8*beta;                         // metres shown top->bottom
+    var img = gY.createImageData(W,H);
+    for(var x=0;x<W;x++){
+      var y_m = (x/W - 0.5)*span;             // horizontal pixel -> screen position
+      var phase = Math.PI*d*y_m/(lam*D);
+      var I = Math.cos(phase); I=I*I;          // 0..1
+      var r=col[0]*I, g=col[1]*I, b=col[2]*I;
+      for(var y=0;y<H;y++){
+        var idx=(y*W+x)*4;
+        img.data[idx]=r; img.data[idx+1]=g; img.data[idx+2]=b; img.data[idx+3]=255;
+      }
+    }
+    gY.putImageData(img,0,0);
+    // overlay: intensity curve + labels
+    gY.strokeStyle="rgba(255,255,255,.85)"; gY.lineWidth=2; gY.beginPath();
+    for(var xx=0;xx<W;xx++){
+      var ym=(xx/W-0.5)*span; var ph=Math.PI*d*ym/(lam*D); var Ii=Math.cos(ph); Ii*=Ii;
+      var yy = H-10 - Ii*(H*0.5);
+      if(xx===0)gY.moveTo(xx,yy); else gY.lineTo(xx,yy);
+    }
+    gY.stroke();
+    gY.fillStyle="rgba(255,255,255,.9)"; gY.font="13px system-ui";
+    gY.fillText("Intensity across screen", 12, 22);
+    gY.fillText("central maximum", W/2-52, H-18);
+    // tick marks at fringe centres
+    gY.strokeStyle="rgba(255,255,255,.35)"; gY.lineWidth=1;
+    for(var m=-3;m<=3;m++){
+      var pos = (m*beta/span + 0.5)*W;
+      if(pos>2&&pos<W-2){ gY.beginPath(); gY.moveTo(pos,H-6); gY.lineTo(pos,H); gY.stroke(); }
+    }
+  }
+
+  // ============ SINGLE SLIT DIFFRACTION ============
+  var cD=document.getElementById("cD"), gD=cD.getContext("2d");
+  var D_a=document.getElementById("D_a"), D_l=document.getElementById("D_l"), D_D=document.getElementById("D_D");
+  function drawDiff(){
+    var a = parseFloat(D_a.value)*1e-3;       // m
+    var lam = parseFloat(D_l.value)*1e-9;     // m
+    var D = parseFloat(D_D.value);            // m
+    document.getElementById("oD_a").textContent = fmt(parseFloat(D_a.value),2);
+    document.getElementById("oD_l").textContent = D_l.value;
+    document.getElementById("oD_D").textContent = fmt(D,2);
+    // first minimum: a sinθ = λ -> θ ≈ λ/a ; central max width on screen ≈ 2λD/a
+    var theta1 = Math.asin(Math.min(1,lam/a));
+    var width = 2*lam*D/a;                     // m (central max full width)
+    document.getElementById("vD_w").textContent = fmt(width*1000,1);
+    document.getElementById("vD_th").textContent = fmt(theta1*180/Math.PI,2);
+    document.getElementById("vD_col").textContent = colName(parseFloat(D_l.value));
+    var col = wlColor(parseFloat(D_l.value));
+
+    var W=cD.width, H=cD.height;
+    gD.clearRect(0,0,W,H);
+    // show ±3 orders of minima across the width
+    var span = 3*width;                         // metres shown
+    var img = gD.createImageData(W,H);
+    for(var x=0;x<W;x++){
+      var y_m=(x/W-0.5)*span;
+      var beta = Math.PI*a*y_m/(lam*D);         // β = πa y/(λD)
+      var I; if(Math.abs(beta)<1e-6){I=1;} else {var s=Math.sin(beta)/beta; I=s*s;}
+      var r=col[0]*I, g=col[1]*I, b=col[2]*I;
+      for(var y=0;y<H;y++){
+        var idx=(y*W+x)*4;
+        img.data[idx]=r; img.data[idx+1]=g; img.data[idx+2]=b; img.data[idx+3]=255;
+      }
+    }
+    gD.putImageData(img,0,0);
+    gD.strokeStyle="rgba(255,255,255,.85)"; gD.lineWidth=2; gD.beginPath();
+    for(var xx=0;xx<W;xx++){
+      var ym=(xx/W-0.5)*span; var bb=Math.PI*a*ym/(lam*D);
+      var Ii; if(Math.abs(bb)<1e-6){Ii=1;} else {var ss=Math.sin(bb)/bb; Ii=ss*ss;}
+      var yy=H-10 - Ii*(H*0.55);
+      if(xx===0)gD.moveTo(xx,yy); else gD.lineTo(xx,yy);
+    }
+    gD.stroke();
+    gD.fillStyle="rgba(255,255,255,.9)"; gD.font="13px system-ui";
+    gD.fillText("sinc² intensity — central maximum + side lobes", 12, 22);
+    // mark minima at m = ±1,±2
+    gD.strokeStyle="rgba(255,255,255,.4)"; gD.lineWidth=1;
+    for(var m=-2;m<=2;m++){ if(m===0)continue;
+      var ymin = m*lam*D/a; var pos=(ymin/span+0.5)*W;
+      if(pos>2&&pos<W-2){ gD.beginPath(); gD.moveTo(pos,0); gD.lineTo(pos,H); gD.stroke();
+        gD.fillText("m="+m, pos+3, H-8); }
+    }
+  }
+
+  // ============ POLARIZATION ============
+  var cP=document.getElementById("cP"), gP=cP.getContext("2d");
+  var P_th=document.getElementById("P_th");
+  function drawPol(){
+    var th = parseFloat(P_th.value);
+    var rad = th*Math.PI/180;
+    var I = Math.cos(rad); I=I*I;             // I/I0
+    document.getElementById("oP_th").textContent = th;
+    document.getElementById("vP_cos").textContent = fmt(Math.cos(rad),3);
+    document.getElementById("vP_I").textContent = fmt(I,3);
+    document.getElementById("vP_pct").textContent = fmt(I*100,1);
+    document.getElementById("P_bar").style.width = (I*100)+"%";
+
+    var W=cP.width, H=cP.height, cy=H/2;
+    gP.clearRect(0,0,W,H);
+    // beam line
+    gP.strokeStyle="rgba(255,255,255,.12)"; gP.lineWidth=2;
+    gP.beginPath(); gP.moveTo(0,cy); gP.lineTo(W,cy); gP.stroke();
+
+    // three stages: source | polarizer | analyzer | screen
+    var xs=[W*0.10, W*0.36, W*0.62, W*0.90];
+    // unpolarized source: arrows in many directions
+    drawSource(xs[0],cy);
+    // polarizer (vertical axis, angle 90°)
+    drawPolarizer(xs[1],cy,90,"Polarizer","0°");
+    // analyzer at angle th (measured from polarizer axis)
+    drawPolarizer(xs[2],cy,90+th,"Analyzer",th+"°");
+    // screen brightness disk
+    var bright=Math.round(255*I);
+    gP.fillStyle="rgb("+bright+","+bright+","+Math.min(255,bright+20)+")";
+    gP.beginPath(); gP.arc(xs[3],cy,34,0,2*Math.PI); gP.fill();
+    gP.strokeStyle="rgba(255,255,255,.35)"; gP.lineWidth=2; gP.stroke();
+    gP.fillStyle="var(--muted)";
+    gP.fillStyle="rgba(152,163,189,.95)"; gP.font="13px system-ui"; gP.textAlign="center";
+    gP.fillText("Screen", xs[3], cy+58);
+    gP.fillText("I = I₀cos²θ = "+fmt(I,3)+" I₀", xs[3], cy-52);
+    gP.textAlign="left";
+  }
+  function drawSource(x,cy){
+    gP.save(); gP.translate(x,cy);
+    gP.strokeStyle="rgba(255,220,120,.9)"; gP.lineWidth=2;
+    for(var k=0;k<8;k++){
+      var ang=k*Math.PI/8; gP.beginPath();
+      gP.moveTo(-18*Math.cos(ang),-18*Math.sin(ang));
+      gP.lineTo(18*Math.cos(ang),18*Math.sin(ang)); gP.stroke();
+    }
+    gP.restore();
+    gP.fillStyle="rgba(152,163,189,.95)"; gP.font="13px system-ui"; gP.textAlign="center";
+    gP.fillText("Unpolarized", x, cy+58); gP.fillText("source", x, cy+74); gP.textAlign="left";
+  }
+  function drawPolarizer(x,cy,angleDeg,label,sub){
+    var a=angleDeg*Math.PI/180;
+    // frame
+    gP.strokeStyle="rgba(87,199,212,.9)"; gP.lineWidth=2;
+    gP.strokeRect(x-30,cy-46,60,92);
+    // grating slats show transmission axis
+    gP.save(); gP.translate(x,cy); gP.rotate(a);
+    gP.strokeStyle="rgba(87,199,212,.55)"; gP.lineWidth=1.4;
+    for(var s=-40;s<=40;s+=8){ gP.beginPath(); gP.moveTo(s,-42); gP.lineTo(s,42); gP.stroke(); }
+    // bold axis arrow
+    gP.strokeStyle="rgba(255,255,255,.9)"; gP.lineWidth=3; gP.beginPath();
+    gP.moveTo(0,-40); gP.lineTo(0,40); gP.stroke();
+    gP.restore();
+    gP.fillStyle="rgba(233,237,247,.95)"; gP.font="bold 13px system-ui"; gP.textAlign="center";
+    gP.fillText(label, x, cy-58);
+    gP.fillStyle="rgba(152,163,189,.95)"; gP.font="12px system-ui";
+    gP.fillText(sub, x, cy+62); gP.textAlign="left";
+  }
+
+  // ---------- animation scheduling (redraw on demand) ----------
+  var pending=false;
+  function scheduleAll(){
+    if(!running||pending)return; pending=true;
+    requestAnimationFrame(function(){ pending=false; redraw(); });
+  }
+  function redraw(){
+    if(current==="Young")drawYoung();
+    else if(current==="Diff")drawDiff();
+    else drawPol();
+  }
+  [Y_d,Y_l,Y_D,D_a,D_l,D_D,P_th].forEach(function(el){
+    el.addEventListener("input",scheduleAll);
+  });
+
+  // ---------- quiz ----------
+  document.querySelectorAll(".quiz .q").forEach(function(q){
+    var correct=parseInt(q.getAttribute("data-correct"),10);
+    var btns=q.querySelectorAll(".opts button");
+    var expl=q.querySelector(".expl");
+    btns.forEach(function(b,i){
+      b.addEventListener("click",function(){
+        btns.forEach(function(bb,j){
+          bb.disabled=true;
+          if(j===correct)bb.classList.add("correct");
+        });
+        if(i!==correct)b.classList.add("wrong");
+        expl.classList.add("show");
+      });
+    });
+  });
+
+  // initial draw
+  redraw();
+})();
+</script>
+</body>
+</html>

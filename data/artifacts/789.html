@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atomic Structure Lab — NIOS Class 12 Physics (Ch 21)</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#161f30; --panel2:#1d2940; --line:#2a3a56;
+    --txt:#e8eef8; --muted:#93a4c2; --accent:#4dd6b0; --accent-d:#2fa588;
+    --warn:#ffcf6b; --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    min-height:42px;
+  }
+  .tab.on{background:var(--accent);color:#062018;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+  .view{display:none}
+  .view.on{display:block}
+  canvas{width:100%;height:auto;display:block;background:#0a101c;border-radius:12px;touch-action:manipulation}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.88rem;min-height:42px;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .btn.acc{background:var(--accent);color:#062018;border-color:var(--accent);font-weight:600}
+  .chip{display:inline-flex;gap:6px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.82rem}
+  .lvlbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .lvlbtn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;cursor:pointer;min-height:40px;font-size:.85rem}
+  .lvlbtn.on{background:var(--accent);color:#062018;border-color:var(--accent);font-weight:600}
+  .readout{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .readout .kv{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .readout .k{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .readout .v{font-size:1rem;font-weight:600}
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:760px){.grid2{grid-template-columns:1.2fr .8fr}}
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:.9rem}
+  .formula b{color:var(--accent)}
+  .mono{font-family:ui-monospace,Consolas,monospace}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:.8rem}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .q{margin-bottom:14px}
+  .q p{margin:0 0 8px;font-weight:600}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-size:.88rem;min-height:42px}
+  .opt.correct{background:#123c30;border-color:var(--accent);color:#bff3e2}
+  .opt.wrong{background:#3c1a1a;border-color:#e07a7a;color:#f4cccc}
+  .exp{font-size:.82rem;color:var(--muted);margin-top:4px;display:none}
+  .exp.show{display:block}
+  .note{color:var(--muted);font-size:.82rem;margin-top:8px}
+  select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;font-size:.85rem}
+  input[type=range]{accent-color:var(--accent);width:150px}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>Atomic Structure Lab</h1>
+<p class="sub">NIOS Class 12 Physics · Chapter 21 — Structure of Atom</p>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" data-v="bohr">Bohr Model</button>
+  <button class="tab" data-v="spectra">Spectral Series</button>
+  <button class="tab" data-v="ruth">Rutherford Scattering</button>
+  <button class="tab" data-v="ref">Formulas &amp; Quiz</button>
+</div>
+
+<!-- BOHR -->
+<section class="view on" id="v-bohr">
+  <div class="grid2">
+    <div class="panel">
+      <h2>Bohr Model of Hydrogen</h2>
+      <canvas id="cBohr" width="640" height="420" aria-label="Hydrogen atom orbits"></canvas>
+      <div class="lvlbtns" id="lvlBtns"></div>
+      <p class="note">Tap an energy level (n) — the electron jumps there, emitting (drop) or absorbing (rise) a photon of the correct color.</p>
+    </div>
+    <div class="panel">
+      <h2>Current State</h2>
+      <div class="readout">
+        <div class="kv"><div class="k">Level n</div><div class="v" id="bN">1</div></div>
+        <div class="kv"><div class="k">Radius rₙ = n²·a₀</div><div class="v" id="bR">0.053 nm</div></div>
+        <div class="kv"><div class="k">Energy Eₙ = −13.6/n²</div><div class="v" id="bE">−13.60 eV</div></div>
+        <div class="kv"><div class="k">Last transition</div><div class="v" id="bT">—</div></div>
+      </div>
+      <div class="formula" style="margin-top:12px">
+        <b>rₙ</b> = n²·a₀, a₀ = 0.0529 nm (Bohr radius)<br>
+        <b>Eₙ</b> = −13.6/n² eV<br>
+        <b>ΔE</b> = hf = hc/λ (photon energy)
+      </div>
+      <div id="photonBox" class="chip" style="display:none">
+        <span class="dot" id="photonDot"></span>
+        <span id="photonTxt"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECTRA -->
+<section class="view" id="v-spectra">
+  <div class="grid2">
+    <div class="panel">
+      <h2>Emission Spectral Series</h2>
+      <canvas id="cSpec" width="640" height="420" aria-label="Spectral lines"></canvas>
+      <div class="row">
+        <label class="chip">Series
+          <select id="serSel">
+            <option value="1">Lyman (n→1, UV)</option>
+            <option value="2" selected>Balmer (n→2, visible)</option>
+            <option value="3">Paschen (n→3, IR)</option>
+          </select>
+        </label>
+        <button class="btn acc" id="emitBtn">Emit electron drop</button>
+      </div>
+      <div class="legend" id="specLegend"></div>
+    </div>
+    <div class="panel">
+      <h2>Rydberg Formula</h2>
+      <div class="formula">
+        <b>1/λ = R (1/n₁² − 1/n₂²)</b><br>
+        R = 1.097 × 10⁷ m⁻¹ (Rydberg constant)<br>
+        n₂ &gt; n₁ (electron falls n₂ → n₁)
+      </div>
+      <div class="readout" style="grid-template-columns:1fr">
+        <div class="kv"><div class="k">Transition</div><div class="v" id="sT">n=3 → n=2</div></div>
+        <div class="kv"><div class="k">Wavelength λ</div><div class="v" id="sL">656 nm</div></div>
+        <div class="kv"><div class="k">Photon energy</div><div class="v" id="sE">1.89 eV</div></div>
+        <div class="kv"><div class="k">Region / color</div><div class="v" id="sC">Visible · red</div></div>
+      </div>
+      <p class="note">The Balmer series produces the visible lines: Hα red (656 nm), Hβ blue-green (486 nm), Hγ violet (434 nm), Hδ violet (410 nm).</p>
+    </div>
+  </div>
+</section>
+
+<!-- RUTHERFORD -->
+<section class="view" id="v-ruth">
+  <div class="grid2">
+    <div class="panel">
+      <h2>Rutherford Alpha Scattering</h2>
+      <canvas id="cRuth" width="640" height="420" aria-label="Alpha scattering"></canvas>
+      <div class="row">
+        <button class="btn acc" id="fireBtn">Fire alpha particles</button>
+        <button class="btn" id="rClear">Clear paths</button>
+        <label class="chip">Beam rate
+          <input type="range" id="rate" min="1" max="8" value="4">
+        </label>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--warn)"></span>α-particle (He²⁺)</span>
+        <span><span class="dot" style="background:#ff6b6b"></span>Gold nucleus (+Ze)</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>What it shows</h2>
+      <p class="note" style="margin-top:0">Most α-particles pass almost straight through — the atom is mostly empty space. A very few pass close to the tiny, dense, positively-charged nucleus and are deflected through large angles; the rarest hit near head-on and bounce back.</p>
+      <div class="readout" style="grid-template-columns:1fr 1fr;margin-top:10px">
+        <div class="kv"><div class="k">Fired</div><div class="v" id="rFired">0</div></div>
+        <div class="kv"><div class="k">Deflected &gt;90°</div><div class="v" id="rBack">0</div></div>
+      </div>
+      <div class="formula" style="margin-top:12px">
+        Coulomb repulsion: <b>F = k·(2e)(Ze)/r²</b><br>
+        Nucleus size ≈ 10⁻¹⁵ m; atom ≈ 10⁻¹⁰ m.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REFERENCE + QUIZ -->
+<section class="view" id="v-ref">
+  <div class="panel">
+    <h2>Key Formulas</h2>
+    <div class="formula"><b>Bohr radius:</b> rₙ = n² a₀, &nbsp; a₀ = 0.0529 nm</div>
+    <div class="formula"><b>Orbit energy:</b> Eₙ = −13.6/n² eV &nbsp;(ground state E₁ = −13.6 eV)</div>
+    <div class="formula"><b>Photon:</b> E = hf = hc/λ, &nbsp; h = 6.626×10⁻³⁴ J·s, &nbsp; hc = 1240 eV·nm</div>
+    <div class="formula"><b>Rydberg:</b> 1/λ = R(1/n₁² − 1/n₂²), &nbsp; R = 1.097×10⁷ m⁻¹</div>
+    <div class="formula"><b>Angular momentum (Bohr postulate):</b> mvr = n·h/2π</div>
+  </div>
+  <div class="panel">
+    <h2>Quick Quiz</h2>
+    <div id="quiz"></div>
+    <div class="row"><span class="chip">Score: <b id="score" style="margin-left:4px">0 / 3</b></span></div>
+  </div>
+</section>
+
+<footer>Interactive learning aid · values rounded for clarity</footer>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  /* ---------- Tabs ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("on");});
+      t.classList.add("on");
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("on");});
+      document.getElementById("v-"+t.dataset.v).classList.add("on");
+    });
+  });
+
+  /* ---------- Physics constants ---------- */
+  var A0 = 0.0529;      // nm
+  var E1 = -13.6;       // eV
+  var HC = 1240;        // eV·nm
+  var R  = 1.097e7;     // m^-1
+
+  function energy(n){ return E1/(n*n); }              // eV
+  function radius(n){ return n*n*A0; }                // nm
+  // wavelength (nm) for drop n2 -> n1
+  function lambda(n1,n2){
+    var inv = R*(1/(n1*n1) - 1/(n2*n2)); // per metre
+    return (1/inv)*1e9; // nm
+  }
+  // approximate visible color from wavelength (nm)
+  function wl2color(wl){
+    if(wl < 380) return "#8a7dff";        // UV
+    if(wl > 750) return "#c0392b";        // IR (deep red)
+    var r=0,g=0,b=0;
+    if(wl<440){r=-(wl-440)/60;b=1;}
+    else if(wl<490){g=(wl-440)/50;b=1;}
+    else if(wl<510){g=1;b=-(wl-510)/20;}
+    else if(wl<580){r=(wl-510)/70;g=1;}
+    else if(wl<645){r=1;g=-(wl-645)/65;}
+    else {r=1;}
+    var f=255;
+    return "rgb("+Math.round(r*f)+","+Math.round(g*f)+","+Math.round(b*f)+")";
+  }
+  function regionName(wl){
+    if(wl<380) return "Ultraviolet";
+    if(wl>750) return "Infrared";
+    return "Visible";
+  }
+  function colorName(wl){
+    if(wl<380) return "UV";
+    if(wl>750) return "IR";
+    if(wl<450) return "violet";
+    if(wl<490) return "blue";
+    if(wl<560) return "green";
+    if(wl<590) return "yellow";
+    if(wl<630) return "orange";
+    return "red";
+  }
+
+  /* =========================================================
+     BOHR MODEL
+  ========================================================= */
+  var bc = document.getElementById("cBohr");
+  var bx = bc.getContext("2d");
+  var NMAX = 5;
+  var curN = 1, targetN = 1;
+  var eAngle = 0, eR = 0;           // electron polar coords (px radius)
+  var transT = 1, transFrom = 1, transTo = 1; // 0..1
+  var photon = null; // {x,y,vx,vy,color,life}
+
+  // build level buttons
+  var lvlWrap = document.getElementById("lvlBtns");
+  for(var i=1;i<=NMAX;i++){
+    (function(n){
+      var b=document.createElement("button");
+      b.className="lvlbtn"+(n===1?" on":"");
+      b.textContent="n="+n;
+      b.addEventListener("click",function(){ jumpTo(n); });
+      lvlWrap.appendChild(b);
+    })(i);
+  }
+  function markLvl(n){
+    lvlWrap.querySelectorAll(".lvlbtn").forEach(function(b,idx){
+      b.classList.toggle("on", idx+1===n);
+    });
+  }
+
+  function orbitPx(n){
+    // scale so n=NMAX fits; use n^2 but compressed for visibility (sqrt-ish)
+    var maxR = Math.min(bc.width,bc.height)*0.42;
+    return maxR * (n/NMAX);
+  }
+
+  function updateBohrReadout(){
+    document.getElementById("bN").textContent = curN;
+    document.getElementById("bR").textContent = radius(curN).toFixed(3)+" nm";
+    document.getElementById("bE").textContent = energy(curN).toFixed(2)+" eV";
+  }
+
+  function jumpTo(n){
+    if(n===targetN) return;
+    transFrom = curN; transTo = n; targetN = n; transT = 0;
+    markLvl(n);
+    var dE = energy(n) - energy(transFrom); // <0 emit, >0 absorb
+    var absE = Math.abs(dE);
+    var wl = HC/absE; // nm
+    var col = wl2color(wl);
+    var box = document.getElementById("photonBox");
+    box.style.display = "inline-flex";
+    document.getElementById("photonDot").style.background = col;
+    var verb = dE<0 ? "Emitted" : "Absorbed";
+    document.getElementById("photonTxt").textContent =
+      verb+" photon: "+wl.toFixed(0)+" nm ("+regionName(wl)+", "+colorName(wl)+"), "+absE.toFixed(2)+" eV";
+    document.getElementById("bT").textContent =
+      "n="+transFrom+"→"+n+" ("+(dE<0?"emit":"absorb")+")";
+    // spawn photon visual
+    var cx=bc.width/2, cy=bc.height/2;
+    var ang = Math.random()*Math.PI*2;
+    photon = {x:cx,y:cy,vx:Math.cos(ang),vy:Math.sin(ang),color:col,life:1,absorb:dE>0};
+  }
+
+  function drawBohr(){
+    var w=bc.width,h=bc.height,cx=w/2,cy=h/2;
+    bx.clearRect(0,0,w,h);
+    // orbits
+    for(var n=1;n<=NMAX;n++){
+      var rp=orbitPx(n);
+      bx.beginPath();
+      bx.arc(cx,cy,rp,0,Math.PI*2);
+      bx.strokeStyle = (n===curN)?"rgba(77,214,176,0.9)":"rgba(120,150,190,0.25)";
+      bx.lineWidth = (n===curN)?2:1;
+      bx.stroke();
+      bx.fillStyle = (n===curN)?"#4dd6b0":"#6b83a8";
+      bx.font="12px system-ui";
+      bx.fillText("n="+n, cx+rp+4, cy-2);
+    }
+    // nucleus
+    var pulse = 6+Math.sin(Date.now()/300)*1.2;
+    var g=bx.createRadialGradient(cx,cy,1,cx,cy,14);
+    g.addColorStop(0,"#ffd27a"); g.addColorStop(1,"#e0602a");
+    bx.beginPath(); bx.arc(cx,cy,pulse+6,0,Math.PI*2);
+    bx.fillStyle=g; bx.fill();
+    bx.fillStyle="#3a1600"; bx.font="bold 12px system-ui"; bx.textAlign="center";
+    bx.fillText("+", cx, cy+4); bx.textAlign="start";
+
+    // transition animation
+    var rp;
+    if(transT<1){
+      transT = Math.min(1, transT + 0.03);
+      var ease = transT<0.5 ? 2*transT*transT : 1-Math.pow(-2*transT+2,2)/2;
+      rp = orbitPx(transFrom) + (orbitPx(transTo)-orbitPx(transFrom))*ease;
+      if(transT>=1){ curN=transTo; updateBohrReadout(); }
+    } else {
+      rp = orbitPx(curN);
+    }
+    // electron
+    eAngle += 0.03 + 0.01*(NMAX-curN);
+    var ex=cx+Math.cos(eAngle)*rp, ey=cy+Math.sin(eAngle)*rp;
+    bx.beginPath(); bx.arc(ex,ey,6,0,Math.PI*2);
+    bx.fillStyle="#6fb2ff"; bx.shadowColor="#6fb2ff"; bx.shadowBlur=12; bx.fill();
+    bx.shadowBlur=0;
+    bx.fillStyle="#cfe3ff"; bx.font="10px system-ui"; bx.fillText("e⁻",ex+7,ey-6);
+
+    // photon wave
+    if(photon){
+      photon.life -= 0.012;
+      var travel = (1-photon.life)*orbitPx(NMAX);
+      var px,py;
+      if(photon.absorb){ // incoming toward center
+        px=cx+photon.vx*(orbitPx(NMAX)-travel);
+        py=cy+photon.vy*(orbitPx(NMAX)-travel);
+      } else {
+        px=cx+photon.vx*travel; py=cy+photon.vy*travel;
+      }
+      bx.save();
+      bx.translate(px,py);
+      bx.rotate(Math.atan2(photon.vy,photon.vx));
+      bx.strokeStyle=photon.color; bx.lineWidth=2.5; bx.globalAlpha=Math.max(0,photon.life);
+      bx.beginPath();
+      for(var t=-14;t<=14;t++){ var yy=Math.sin(t*0.9)*4; if(t===-14)bx.moveTo(t,yy); else bx.lineTo(t,yy); }
+      bx.stroke(); bx.restore(); bx.globalAlpha=1;
+      if(photon.life<=0) photon=null;
+    }
+  }
+
+  /* =========================================================
+     SPECTRAL SERIES
+  ========================================================= */
+  var sc=document.getElementById("cSpec"), sxx=sc.getContext("2d");
+  var serN1 = 2;
+  var flyElectron = null; // {t,from,to}
+  var specLines = []; // {wl,x,color,label,glow}
+  var visMin=380, visMax=750;
+
+  function buildSpecLines(){
+    specLines=[];
+    // show first several lines of the series
+    for(var n2=serN1+1;n2<=serN1+6;n2++){
+      var wl=lambda(serN1,n2);
+      specLines.push({n1:serN1,n2:n2,wl:wl,color:wl2color(wl),glow:0});
+    }
+  }
+  function specXForWl(wl){
+    // map spectrum region depending on series
+    var lo,hi;
+    if(serN1===1){lo=90;hi=125;}       // Lyman UV
+    else if(serN1===2){lo=380;hi=700;} // Balmer visible
+    else {lo=800;hi=1900;}             // Paschen IR
+    var w=sc.width, m=60;
+    var x=m + (wl-lo)/(hi-lo)*(w-2*m);
+    return Math.max(m, Math.min(w-m, x));
+  }
+
+  function drawSpec(){
+    var w=sc.width,h=sc.height;
+    sxx.clearRect(0,0,w,h);
+    // background spectrum bar
+    var barY=h*0.30, barH=70;
+    if(serN1===2){
+      var grd=sxx.createLinearGradient(60,0,w-60,0);
+      grd.addColorStop(0,"#7a5bff");grd.addColorStop(.25,"#4d7bff");
+      grd.addColorStop(.5,"#37d67a");grd.addColorStop(.75,"#ffd24d");
+      grd.addColorStop(1,"#e04a3a");
+      sxx.fillStyle=grd;
+    } else {
+      sxx.fillStyle="#222c40";
+    }
+    sxx.globalAlpha=0.28; sxx.fillRect(60,barY,w-120,barH); sxx.globalAlpha=1;
+    sxx.strokeStyle="#33456a"; sxx.strokeRect(60,barY,w-120,barH);
+
+    // lines
+    specLines.forEach(function(L){
+      var x=specXForWl(L.wl);
+      L.glow=Math.max(0,L.glow-0.02);
+      sxx.strokeStyle=L.color;
+      sxx.lineWidth=(L.n2===serN1+1?3:2)+L.glow*4;
+      sxx.globalAlpha=0.55+L.glow*0.45;
+      sxx.beginPath(); sxx.moveTo(x,barY-6); sxx.lineTo(x,barY+barH+6); sxx.stroke();
+      sxx.globalAlpha=1;
+      sxx.fillStyle="#9fb3d4"; sxx.font="10px system-ui"; sxx.textAlign="center";
+      sxx.fillText(L.wl.toFixed(0), x, barY+barH+20);
+      sxx.fillText("n="+L.n2, x, barY-12);
+    });
+    sxx.textAlign="start";
+    sxx.fillStyle="#93a4c2"; sxx.font="12px system-ui";
+    var reg = serN1===1?"UV region":(serN1===2?"Visible region":"IR region");
+    sxx.fillText(reg+"  (drops to n="+serN1+")", 60, barY-30);
+    sxx.fillText("wavelength (nm) →", w-190, barY+barH+38);
+
+    // mini energy-level diagram at bottom
+    var baseY=h-24, topY=h*0.62, x0=90;
+    sxx.strokeStyle="#3a4f76"; sxx.lineWidth=1;
+    for(var n=1;n<=6;n++){
+      var yy=baseY-(baseY-topY)*(1-1/(n*n));
+      sxx.beginPath(); sxx.moveTo(x0,yy); sxx.lineTo(x0+90,yy); sxx.stroke();
+      sxx.fillStyle="#7d93b8"; sxx.font="10px system-ui";
+      sxx.fillText("n="+n, x0+94, yy+3);
+    }
+    // flying electron transition arrow
+    if(flyElectron){
+      flyElectron.t=Math.min(1,flyElectron.t+0.04);
+      function yFor(n){ return baseY-(baseY-topY)*(1-1/(n*n)); }
+      var y2=yFor(flyElectron.from), y1=yFor(flyElectron.to);
+      var yy=y2+(y1-y2)*flyElectron.t;
+      var ex=x0+45;
+      sxx.strokeStyle="#6fb2ff"; sxx.lineWidth=2;
+      sxx.beginPath(); sxx.moveTo(ex,y2); sxx.lineTo(ex,y1); sxx.stroke();
+      sxx.beginPath(); sxx.arc(ex,yy,5,0,Math.PI*2);
+      sxx.fillStyle="#6fb2ff"; sxx.shadowColor="#6fb2ff"; sxx.shadowBlur=10; sxx.fill(); sxx.shadowBlur=0;
+      if(flyElectron.t>=1){
+        var L=specLines.find(function(l){return l.n2===flyElectron.from;});
+        if(L) L.glow=1;
+        flyElectron=null;
+      }
+    }
+  }
+
+  function updateSpecReadout(n1,n2){
+    var wl=lambda(n1,n2);
+    var e=HC/wl;
+    document.getElementById("sT").textContent="n="+n2+" → n="+n1;
+    document.getElementById("sL").textContent=wl.toFixed(0)+" nm";
+    document.getElementById("sE").textContent=e.toFixed(2)+" eV";
+    document.getElementById("sC").textContent=regionName(wl)+" · "+colorName(wl);
+  }
+
+  function buildLegend(){
+    var el=document.getElementById("specLegend");
+    el.innerHTML="";
+    if(serN1===2){
+      var b=[[656,"Hα"],[486,"Hβ"],[434,"Hγ"],[410,"Hδ"]];
+      b.forEach(function(p){
+        var s=document.createElement("span");
+        s.innerHTML='<span class="dot" style="background:'+wl2color(p[0])+'"></span>'+p[1]+" "+p[0]+" nm";
+        el.appendChild(s);
+      });
+    } else {
+      var s=document.createElement("span");
+      s.textContent = serN1===1?"Lyman lines are all ultraviolet (invisible).":"Paschen lines are all infrared (invisible).";
+      el.appendChild(s);
+    }
+  }
+
+  document.getElementById("serSel").addEventListener("change",function(e){
+    serN1=parseInt(e.target.value,10);
+    buildSpecLines(); buildLegend();
+    updateSpecReadout(serN1,serN1+1);
+  });
+  document.getElementById("emitBtn").addEventListener("click",function(){
+    var from = serN1+1+Math.floor(Math.random()*4); // random upper level
+    flyElectron={t:0,from:from,to:serN1};
+    updateSpecReadout(serN1,from);
+  });
+
+  /* =========================================================
+     RUTHERFORD SCATTERING
+  ========================================================= */
+  var rc=document.getElementById("cRuth"), rx=rc.getContext("2d");
+  var alphas=[]; var trails=[]; var fired=0, back=0;
+  var firing=false, fireTimer=0;
+  var Nx, Ny; // nucleus position
+
+  function resetRuth(){ alphas=[]; trails=[]; fired=0; back=0; updRuth(); }
+  function updRuth(){
+    document.getElementById("rFired").textContent=fired;
+    document.getElementById("rBack").textContent=back;
+  }
+
+  function spawnAlpha(){
+    Nx=rc.width*0.62; Ny=rc.height/2;
+    // impact parameter b: distributed, many large (miss), few tiny (hit)
+    var b=(Math.random()*2-1)*rc.height*0.42;
+    var y=Ny+b;
+    alphas.push({x:-10,y:y,vx:3.2,vy:0,b:b,counted:false,trail:[],back:false});
+    fired++; updRuth();
+  }
+
+  function drawRuth(){
+    var w=rc.width,h=rc.height;
+    rx.clearRect(0,0,w,h);
+    Nx=w*0.62; Ny=h/2;
+    // faint atom boundary
+    rx.beginPath(); rx.arc(Nx,Ny,Math.min(w,h)*0.42,0,Math.PI*2);
+    rx.strokeStyle="rgba(120,150,190,0.15)"; rx.setLineDash([5,5]); rx.lineWidth=1; rx.stroke();
+    rx.setLineDash([]);
+    rx.fillStyle="#5d7099"; rx.font="11px system-ui";
+    rx.fillText("gold atom (mostly empty)", 12, 20);
+
+    // trails (fade)
+    for(var i=trails.length-1;i>=0;i--){
+      var tr=trails[i]; tr.a-=0.006;
+      if(tr.a<=0){ trails.splice(i,1); continue; }
+      rx.strokeStyle="rgba(255,207,107,"+tr.a+")"; rx.lineWidth=1;
+      rx.beginPath();
+      for(var k=0;k<tr.pts.length;k++){ var p=tr.pts[k]; if(k===0)rx.moveTo(p.x,p.y); else rx.lineTo(p.x,p.y); }
+      rx.stroke();
+    }
+
+    // update alphas
+    var kConst=2600; // scattering strength (tuned visually)
+    for(var j=alphas.length-1;j>=0;j--){
+      var a=alphas[j];
+      var dx=a.x-Nx, dy=a.y-Ny;
+      var r2=dx*dx+dy*dy; var r=Math.sqrt(r2)+1;
+      var f=kConst/r2;
+      if(f>2.2)f=2.2; // cap
+      a.vx+=f*dx/r; a.vy+=f*dy/r;
+      a.x+=a.vx; a.y+=a.vy;
+      a.trail.push({x:a.x,y:a.y});
+      if(a.trail.length>60)a.trail.shift();
+      // draw path
+      rx.strokeStyle="rgba(255,207,107,0.65)"; rx.lineWidth=1.5;
+      rx.beginPath();
+      for(var m=0;m<a.trail.length;m++){var p=a.trail[m]; if(m===0)rx.moveTo(p.x,p.y);else rx.lineTo(p.x,p.y);}
+      rx.stroke();
+      // particle head
+      rx.beginPath(); rx.arc(a.x,a.y,3.5,0,Math.PI*2);
+      rx.fillStyle="#ffcf6b"; rx.fill();
+      // count strong deflection
+      if(!a.counted && a.vx<0){ back++; a.counted=true; a.back=true; updRuth(); }
+      // off screen -> archive trail
+      if(a.x< -40||a.x>w+40||a.y<-40||a.y>h+40){
+        trails.push({pts:a.trail.slice(),a:0.5});
+        alphas.splice(j,1);
+      }
+    }
+
+    // nucleus (draw last, on top)
+    var pr=8+Math.sin(Date.now()/250)*1.5;
+    var g=rx.createRadialGradient(Nx,Ny,1,Nx,Ny,18);
+    g.addColorStop(0,"#ff9a8a"); g.addColorStop(1,"#c0392b");
+    rx.beginPath(); rx.arc(Nx,Ny,pr+6,0,Math.PI*2); rx.fillStyle=g; rx.fill();
+    rx.fillStyle="#fff"; rx.font="bold 11px system-ui"; rx.textAlign="center";
+    rx.fillText("+Ze",Nx,Ny+4); rx.textAlign="start";
+
+    // continuous fire
+    if(firing){
+      fireTimer++;
+      var interval=Math.max(4, 20-parseInt(document.getElementById("rate").value,10)*2);
+      if(fireTimer>=interval){ fireTimer=0; if(alphas.length<40) spawnAlpha(); }
+    }
+  }
+
+  document.getElementById("fireBtn").addEventListener("click",function(){
+    firing=!firing;
+    this.textContent=firing?"Stop beam":"Fire alpha particles";
+    this.classList.toggle("acc",!firing);
+  });
+  document.getElementById("rClear").addEventListener("click",resetRuth);
+
+  /* =========================================================
+     QUIZ
+  ========================================================= */
+  var QUESTIONS=[
+    {q:"The energy of the electron in the ground state (n=1) of hydrogen is:",
+     opts:["−3.4 eV","−13.6 eV","+13.6 eV","0 eV"], ans:1,
+     exp:"Eₙ = −13.6/n²; for n=1 this gives −13.6 eV."},
+    {q:"The visible spectral lines of hydrogen belong to which series?",
+     opts:["Lyman","Balmer","Paschen","Brackett"], ans:1,
+     exp:"Balmer series (drops to n=2) gives the visible lines like Hα at 656 nm."},
+    {q:"Rutherford's alpha-scattering experiment established that:",
+     opts:["Electrons are embedded in a positive sphere","Mass and positive charge are concentrated in a tiny nucleus","The atom is a uniform solid sphere","Electrons orbit in fixed cubic shells"], ans:1,
+     exp:"A few α-particles deflected sharply, proving a tiny, dense, positively-charged nucleus."}
+  ];
+  var score=0, answered={};
+  function buildQuiz(){
+    var box=document.getElementById("quiz"); box.innerHTML="";
+    QUESTIONS.forEach(function(Q,qi){
+      var d=document.createElement("div"); d.className="q";
+      var p=document.createElement("p"); p.textContent=(qi+1)+". "+Q.q; d.appendChild(p);
+      Q.opts.forEach(function(o,oi){
+        var b=document.createElement("button"); b.className="opt"; b.textContent=o;
+        b.addEventListener("click",function(){
+          if(answered[qi])return; answered[qi]=true;
+          if(oi===Q.ans){ b.classList.add("correct"); score++; }
+          else{ b.classList.add("wrong");
+            d.querySelectorAll(".opt")[Q.ans].classList.add("correct"); }
+          d.querySelector(".exp").classList.add("show");
+          document.getElementById("score").textContent=score+" / 3";
+        });
+        d.appendChild(b);
+      });
+      var e=document.createElement("div"); e.className="exp"; e.textContent="✓ "+Q.exp;
+      d.appendChild(e);
+      box.appendChild(d);
+    });
+  }
+
+  /* =========================================================
+     MAIN LOOP
+  ========================================================= */
+  function loop(){
+    if(running){
+      drawBohr();
+      drawSpec();
+      drawRuth();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // init
+  updateBohrReadout();
+  buildSpecLines(); buildLegend(); updateSpecReadout(2,3);
+  updRuth();
+  buildQuiz();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

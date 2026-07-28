@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dual Nature Lab — Radiation &amp; Matter (NIOS Class 12, Ch 22)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212940;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#6ad0ff;
+    --accent-soft:rgba(106,208,255,.15);
+    --good:#66d99a;
+    --bad:#ff7d7d;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 130px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hide{display:none !important}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 210px;min-width:180px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:88px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .stat{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.05rem;font-weight:700;margin-top:2px}
+  .stat .v.good{color:var(--good)}
+  .stat .v.bad{color:var(--bad)}
+
+  .formulas{display:flex;flex-wrap:wrap;gap:10px}
+  .formula{flex:1 1 200px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .formula .eq{font-size:1.15rem;font-weight:700;color:var(--accent);font-family:"Cambria Math",Georgia,serif}
+  .formula .d{font-size:.82rem;color:var(--muted);margin-top:6px}
+
+  .note{font-size:.85rem;color:var(--muted);margin-top:10px}
+  .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.82rem;font-weight:700}
+  .badge.on{background:rgba(102,217,154,.16);color:var(--good);border:1px solid rgba(102,217,154,.4)}
+  .badge.off{background:rgba(255,125,125,.14);color:var(--bad);border:1px solid rgba(255,125,125,.4)}
+
+  .quiz .q{margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .quiz .q:last-child{border-bottom:none}
+  .quiz .opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .quiz .opt{text-align:left;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:10px;padding:10px 12px;cursor:pointer;font-size:.92rem;touch-action:manipulation}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(102,217,154,.14);color:var(--good)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,125,125,.12);color:var(--bad)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .quiz .exp.show{display:block}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Dual Nature</span> Lab</h1>
+    <p>NIOS Class 12 Physics · Ch 22 — Dual Nature of Radiation and Matter</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="photo">Photoelectric</button>
+    <button class="tab-btn" data-tab="debroglie">de Broglie</button>
+    <button class="tab-btn" data-tab="photon">Photon</button>
+    <button class="tab-btn" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ===================== PHOTOELECTRIC ===================== -->
+  <section id="tab-photo">
+    <div class="panel">
+      <h2>Photoelectric Effect</h2>
+      <canvas id="peCanvas" width="900" height="300" aria-label="Photoelectric emission animation"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Frequency f = <output id="peFreqOut"></output></label>
+          <input id="peFreq" type="range" min="2" max="15" step="0.1" value="7">
+        </div>
+        <div class="ctrl">
+          <label>Intensity = <output id="peIntOut"></output></label>
+          <input id="peInt" type="range" min="1" max="10" step="1" value="5">
+        </div>
+        <div class="ctrl">
+          <label>Metal (work function &phi;)</label>
+          <div class="seg" id="peMetal">
+            <button data-w="2.30" class="on">Na (2.30 eV)</button>
+            <button data-w="2.90">Ca (2.90 eV)</button>
+            <button data-w="4.30">Cu (4.30 eV)</button>
+            <button data-w="5.10">Pt (5.10 eV)</button>
+          </div>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Emission</div><div class="v"><span id="peBadge" class="badge off">No electrons</span></div></div>
+        <div class="stat"><div class="k">Threshold frequency f&#8320;</div><div class="v" id="peF0"></div></div>
+        <div class="stat"><div class="k">Max kinetic energy KE&#8339;&#8339;&#8339;</div><div class="v" id="peKE"></div></div>
+        <div class="stat"><div class="k">Stopping potential V&#8320;</div><div class="v" id="peV0"></div></div>
+      </div>
+      <p class="note">Photon energy E = hf. Emission happens only when hf &gt; &phi; (f &gt; f&#8320;). Raising intensity adds
+      <em>more</em> electrons but never changes their maximum KE — a purely quantum result.</p>
+    </div>
+
+    <div class="panel">
+      <h2>KE<sub>max</sub> vs Frequency</h2>
+      <canvas id="peGraph" width="900" height="340" aria-label="KE versus frequency graph"></canvas>
+      <p class="note">Straight line above f&#8320;. Its slope equals Planck's constant h; the x-intercept is the threshold
+      frequency f&#8320; = &phi;/h; the y-intercept magnitude is the work function &phi;.</p>
+    </div>
+  </section>
+
+  <!-- ===================== DE BROGLIE ===================== -->
+  <section id="tab-debroglie" class="hide">
+    <div class="panel">
+      <h2>de Broglie Matter Waves</h2>
+      <canvas id="dbCanvas" width="900" height="260" aria-label="Matter wave visualisation"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Object</label>
+          <div class="seg" id="dbObj">
+            <button data-obj="electron" class="on">Electron</button>
+            <button data-obj="proton">Proton</button>
+            <button data-obj="dust">Dust grain</button>
+            <button data-obj="baseball">Baseball</button>
+          </div>
+        </div>
+        <div class="ctrl">
+          <label>Speed v = <output id="dbSpeedOut"></output></label>
+          <input id="dbSpeed" type="range" min="0" max="100" step="1" value="40">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Mass m</div><div class="v" id="dbMass"></div></div>
+        <div class="stat"><div class="k">Momentum p = mv</div><div class="v" id="dbMom"></div></div>
+        <div class="stat"><div class="k">Wavelength &lambda; = h/p</div><div class="v" id="dbLam"></div></div>
+      </div>
+      <p class="note" id="dbNote"></p>
+    </div>
+  </section>
+
+  <!-- ===================== PHOTON ===================== -->
+  <section id="tab-photon" class="hide">
+    <div class="panel">
+      <h2>Photon Picture</h2>
+      <canvas id="phCanvas" width="900" height="160" aria-label="Photon colour to energy"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Wavelength &lambda; = <output id="phLamOut"></output> (visible light)</label>
+          <input id="phLam" type="range" min="380" max="750" step="1" value="520">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">Colour</div><div class="v" id="phColour"></div></div>
+        <div class="stat"><div class="k">Frequency f = c/&lambda;</div><div class="v" id="phFreq"></div></div>
+        <div class="stat"><div class="k">Energy E = hf</div><div class="v" id="phEnergy"></div></div>
+        <div class="stat"><div class="k">Momentum p = h/&lambda;</div><div class="v" id="phMom"></div></div>
+      </div>
+      <p class="note">A single photon of light carries both energy (E = hf) and momentum (p = h/&lambda;). Blue/violet
+      photons are more energetic than red ones because they have a higher frequency.</p>
+    </div>
+  </section>
+
+  <!-- ===================== FORMULAS (always shown) ===================== -->
+  <div class="panel" id="formulaPanel">
+    <h2>Key Formulas</h2>
+    <div class="formulas">
+      <div class="formula"><div class="eq">E = h f</div><div class="d">Energy of a photon. h = 6.626&times;10&#8315;&#179;&#8308; J·s = 4.136&times;10&#8315;&#185;&#8309; eV·s.</div></div>
+      <div class="formula"><div class="eq">KE<sub>max</sub> = h f &minus; &phi;</div><div class="d">Einstein's photoelectric equation. &phi; is the work function; emission needs hf &gt; &phi;.</div></div>
+      <div class="formula"><div class="eq">&lambda; = h / p</div><div class="d">de Broglie wavelength of a particle of momentum p = mv.</div></div>
+      <div class="formula"><div class="eq">V&#8320; = KE<sub>max</sub> / e</div><div class="d">Stopping potential — the reverse voltage that just halts the fastest electrons.</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section id="tab-quiz" class="hide">
+    <div class="panel quiz" id="quizBox">
+      <h2>Quick Check (3 questions)</h2>
+    </div>
+  </section>
+
+  <footer>Dual Nature Lab · values use h = 4.136&times;10&#8315;&#185;&#8309; eV·s, c = 3&times;10&#8312; m/s</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- Physical constants ----
+  var H_eVs = 4.135667e-15;   // Planck constant in eV·s
+  var H_Js  = 6.62607e-34;    // Planck constant in J·s
+  var C     = 2.998e8;        // speed of light m/s
+  var FREQ_UNIT = 1e14;       // slider value f (in 1e14 Hz)
+
+  // ---- Tabs ----
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var sections = {
+    photo: document.getElementById("tab-photo"),
+    debroglie: document.getElementById("tab-debroglie"),
+    photon: document.getElementById("tab-photon"),
+    quiz: document.getElementById("tab-quiz")
+  };
+  var formulaPanel = document.getElementById("formulaPanel");
+  var current = "photo";
+  tabBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      current = b.dataset.tab;
+      for(var k in sections){ sections[k].classList.toggle("hide", k!==current); }
+      formulaPanel.classList.toggle("hide", current==="quiz");
+    });
+  });
+
+  // ============ PHOTOELECTRIC ============
+  var peFreq = document.getElementById("peFreq");
+  var peInt  = document.getElementById("peInt");
+  var peFreqOut = document.getElementById("peFreqOut");
+  var peIntOut  = document.getElementById("peIntOut");
+  var peBadge = document.getElementById("peBadge");
+  var peF0 = document.getElementById("peF0");
+  var peKE = document.getElementById("peKE");
+  var peV0 = document.getElementById("peV0");
+  var peKEv = peKE; // alias
+  var phi = 2.30; // eV
+  var metalBtns = document.querySelectorAll("#peMetal button");
+  metalBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      metalBtns.forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      phi = parseFloat(b.dataset.w);
+      updatePE();
+    });
+  });
+
+  var peCanvas = document.getElementById("peCanvas");
+  var peCtx = peCanvas.getContext("2d");
+  var peGraph = document.getElementById("peGraph");
+  var pgCtx = peGraph.getContext("2d");
+  var electrons = [];
+
+  function peState(){
+    var f = parseFloat(peFreq.value) * FREQ_UNIT;       // Hz
+    var E = H_eVs * f;                                   // eV
+    var ke = E - phi;                                    // eV
+    var emitting = ke > 0;
+    var f0 = phi / H_eVs;                                // Hz
+    return {f:f, E:E, ke:ke, emitting:emitting, f0:f0};
+  }
+
+  function updatePE(){
+    var s = peState();
+    peFreqOut.textContent = (parseFloat(peFreq.value)).toFixed(1) + " ×10¹⁴ Hz  (E = " + s.E.toFixed(2) + " eV)";
+    peIntOut.textContent = peInt.value + " / 10";
+    peF0.textContent = (s.f0/1e14).toFixed(2) + " ×10¹⁴ Hz";
+    if(s.emitting){
+      peBadge.textContent = "Electrons ejected";
+      peBadge.className = "badge on";
+      peKE.textContent = s.ke.toFixed(2) + " eV";
+      peKE.className = "v good";
+      peV0.textContent = s.ke.toFixed(2) + " V";
+    }else{
+      peBadge.textContent = "No electrons (hf ≤ φ)";
+      peBadge.className = "badge off";
+      peKE.textContent = "0 eV";
+      peKE.className = "v bad";
+      peV0.textContent = "0 V";
+    }
+    drawGraph();
+  }
+  peFreq.addEventListener("input", updatePE);
+  peInt.addEventListener("input", updatePE);
+
+  function spawnElectrons(){
+    var s = peState();
+    if(!s.emitting) return;
+    var rate = parseInt(peInt.value,10); // electrons per burst ~ intensity
+    for(var i=0;i<rate;i++){
+      var speed = 1.2 + Math.min(s.ke,4)*0.9;
+      electrons.push({
+        x: peCanvas.width*0.30 + (Math.random()*20-10),
+        y: 60 + Math.random()*(peCanvas.height-120),
+        vx: speed*(0.6+Math.random()*0.5),
+        vy: (Math.random()-0.5)*1.2,
+        life: 1
+      });
+    }
+  }
+
+  function drawPE(){
+    var W=peCanvas.width, Hh=peCanvas.height;
+    var s = peState();
+    peCtx.clearRect(0,0,W,Hh);
+    // metal plate (left)
+    var plateX = W*0.30;
+    peCtx.fillStyle = "#39415f";
+    peCtx.fillRect(plateX-26, 30, 26, Hh-60);
+    peCtx.fillStyle = "#8fa0c8";
+    peCtx.font = "14px system-ui";
+    peCtx.fillText("metal", plateX-58, Hh-14);
+    // collector plate (right)
+    peCtx.fillStyle = "#2c3450";
+    peCtx.fillRect(W-30, 30, 20, Hh-60);
+    // incoming light beam (color by frequency)
+    var fv = parseFloat(peFreq.value);
+    var hue = 300 - (fv-2)/13*250; // low f -> red-ish, high f -> violet/blue
+    if(hue<0) hue+=360;
+    var beamY0 = 40, beamY1 = Hh-40;
+    for(var yb=beamY0; yb<beamY1; yb+=26){
+      peCtx.strokeStyle = "hsla("+hue+",90%,65%,.8)";
+      peCtx.lineWidth = 2;
+      var off = (Date.now()/40)% 26;
+      peCtx.beginPath();
+      var startX = 6;
+      for(var x=startX;x<plateX-26;x+=4){
+        var yy = yb + Math.sin((x+off)*0.18)*5;
+        if(x===startX) peCtx.moveTo(x,yy); else peCtx.lineTo(x,yy);
+      }
+      peCtx.stroke();
+    }
+    peCtx.fillStyle = "hsla("+hue+",90%,70%,1)";
+    peCtx.font = "13px system-ui";
+    peCtx.fillText("light  f = "+fv.toFixed(1)+"×10¹⁴ Hz", 8, 22);
+
+    // electrons
+    for(var i=electrons.length-1;i>=0;i--){
+      var e=electrons[i];
+      e.x+=e.vx; e.y+=e.vy;
+      if(e.x>W-30 || e.x<plateX-26){ electrons.splice(i,1); continue; }
+      peCtx.beginPath();
+      peCtx.fillStyle = "#ffd76a";
+      peCtx.arc(e.x,e.y,4,0,Math.PI*2);
+      peCtx.fill();
+      peCtx.strokeStyle="rgba(255,215,106,.35)";
+      peCtx.beginPath(); peCtx.moveTo(e.x-e.vx*3,e.y); peCtx.lineTo(e.x,e.y); peCtx.stroke();
+    }
+    // status text
+    peCtx.font="13px system-ui";
+    if(s.emitting){
+      peCtx.fillStyle="#66d99a";
+      peCtx.fillText("e⁻ emitted (KE_max = "+s.ke.toFixed(2)+" eV)", plateX+8, 22);
+    }else{
+      peCtx.fillStyle="#ff7d7d";
+      peCtx.fillText("hf ≤ φ — no emission", plateX+8, 22);
+    }
+  }
+
+  function drawGraph(){
+    var W=peGraph.width, Hh=peGraph.height;
+    pgCtx.clearRect(0,0,W,Hh);
+    var padL=56, padB=40, padT=20, padR=20;
+    var gx0=padL, gy0=Hh-padB, gx1=W-padR, gy1=padT;
+    // axes
+    pgCtx.strokeStyle="#4a557a"; pgCtx.lineWidth=1.5;
+    pgCtx.beginPath(); pgCtx.moveTo(gx0,gy1); pgCtx.lineTo(gx0,gy0); pgCtx.lineTo(gx1,gy0); pgCtx.stroke();
+    pgCtx.fillStyle="#98a3bd"; pgCtx.font="12px system-ui";
+    pgCtx.fillText("f (×10¹⁴ Hz)", gx1-90, gy0+28);
+    pgCtx.save(); pgCtx.translate(16,gy1+130); pgCtx.rotate(-Math.PI/2);
+    pgCtx.fillText("KE_max (eV)", 0,0); pgCtx.restore();
+
+    // scale: f from 0..16 (x10^14), KE 0..6 eV
+    var fMax=16, keMax=6;
+    function X(f){ return gx0 + (f/fMax)*(gx1-gx0); }
+    function Y(ke){ return gy0 - (ke/keMax)*(gy0-gy1); }
+    // gridlines
+    pgCtx.strokeStyle="rgba(74,85,122,.35)";
+    for(var g=2; g<=fMax; g+=2){ pgCtx.beginPath(); pgCtx.moveTo(X(g),gy0); pgCtx.lineTo(X(g),gy1); pgCtx.stroke(); pgCtx.fillStyle="#7581a0"; pgCtx.fillText(g+"", X(g)-6, gy0+16);}
+    for(var k=1;k<=keMax;k++){ pgCtx.beginPath(); pgCtx.moveTo(gx0,Y(k)); pgCtx.lineTo(gx1,Y(k)); pgCtx.stroke(); pgCtx.fillStyle="#7581a0"; pgCtx.fillText(k+"", gx0-22, Y(k)+4);}
+
+    // line: KE = h f - phi (h in eV per (1e14 Hz) => H_eVs*1e14)
+    var slope = H_eVs*1e14; // eV per (x10^14 Hz)
+    var f0 = phi/slope;     // threshold in slider units
+    pgCtx.strokeStyle="#6ad0ff"; pgCtx.lineWidth=2.5;
+    pgCtx.beginPath();
+    pgCtx.moveTo(X(f0), Y(0));
+    var fEnd=fMax, keEnd=slope*fEnd - phi; if(keEnd>keMax){ fEnd=(keMax+phi)/slope; keEnd=keMax; }
+    pgCtx.lineTo(X(fEnd), Y(keEnd));
+    pgCtx.stroke();
+    // below threshold (flat at 0)
+    pgCtx.strokeStyle="rgba(255,125,125,.6)"; pgCtx.setLineDash([5,4]);
+    pgCtx.beginPath(); pgCtx.moveTo(X(0),Y(0)); pgCtx.lineTo(X(f0),Y(0)); pgCtx.stroke(); pgCtx.setLineDash([]);
+
+    // threshold marker
+    pgCtx.fillStyle="#ffb454";
+    pgCtx.beginPath(); pgCtx.arc(X(f0),Y(0),5,0,Math.PI*2); pgCtx.fill();
+    pgCtx.fillText("f₀="+f0.toFixed(2), X(f0)-10, Y(0)-10);
+
+    // current operating point
+    var s=peState();
+    var fCur=parseFloat(peFreq.value);
+    var keCur = Math.max(0, slope*fCur - phi);
+    var yc = Y(Math.min(keCur,keMax));
+    pgCtx.fillStyle = s.emitting ? "#66d99a" : "#ff7d7d";
+    pgCtx.beginPath(); pgCtx.arc(X(fCur), yc, 6, 0, Math.PI*2); pgCtx.fill();
+    pgCtx.strokeStyle="rgba(255,255,255,.25)"; pgCtx.setLineDash([3,3]);
+    pgCtx.beginPath(); pgCtx.moveTo(X(fCur),gy0); pgCtx.lineTo(X(fCur),yc); pgCtx.stroke(); pgCtx.setLineDash([]);
+
+    pgCtx.fillStyle="#98a3bd"; pgCtx.font="12px system-ui";
+    pgCtx.fillText("slope = h", X(fEnd)-70, Y(keEnd)-8);
+  }
+
+  // ============ DE BROGLIE ============
+  var dbSpeed = document.getElementById("dbSpeed");
+  var dbSpeedOut = document.getElementById("dbSpeedOut");
+  var dbMass = document.getElementById("dbMass");
+  var dbMom = document.getElementById("dbMom");
+  var dbLam = document.getElementById("dbLam");
+  var dbNote = document.getElementById("dbNote");
+  var dbCanvas = document.getElementById("dbCanvas");
+  var dbCtx = dbCanvas.getContext("2d");
+  var dbObj = "electron";
+  // {mass kg, vmax m/s, label}
+  var OBJS = {
+    electron:{m:9.11e-31, vmax:2.0e6, name:"Electron"},
+    proton:{m:1.673e-27, vmax:1.0e6, name:"Proton"},
+    dust:{m:1.0e-9, vmax:0.01, name:"Dust grain"},
+    baseball:{m:0.145, vmax:45, name:"Baseball"}
+  };
+  var dbBtns=document.querySelectorAll("#dbObj button");
+  dbBtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      dbBtns.forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      dbObj=b.dataset.obj;
+      updateDB();
+    });
+  });
+  function fmtSci(x, unit){
+    if(x===0) return "0 "+unit;
+    var e=Math.floor(Math.log10(Math.abs(x)));
+    var m=x/Math.pow(10,e);
+    return m.toFixed(2)+"×10"+supd(e)+" "+unit;
+  }
+  function supd(n){
+    var map={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+    return (""+n).split("").map(function(c){return map[c]||c;}).join("");
+  }
+  function updateDB(){
+    var o=OBJS[dbObj];
+    var v=(parseFloat(dbSpeed.value)/100)*o.vmax;
+    if(v<=0) v=o.vmax*0.001;
+    var p=o.m*v;
+    var lam=H_Js/p;
+    dbSpeedOut.textContent = fmtSci(v,"m/s");
+    dbMass.textContent = fmtSci(o.m,"kg");
+    dbMom.textContent = fmtSci(p,"kg·m/s");
+    dbLam.textContent = fmtSci(lam,"m");
+    var atom=1e-10;
+    if(lam>atom*0.1){
+      dbNote.innerHTML="&lambda; is comparable to atomic spacing (~10⁻¹⁰ m), so the wave nature of the "+o.name.toLowerCase()+" is <b>observable</b> — it diffracts through crystals.";
+    }else{
+      dbNote.innerHTML="&lambda; ≈ "+fmtSci(lam,"m")+" is unimaginably smaller than any object or slit, so for the "+o.name.toLowerCase()+" the wave nature is <b>impossible to detect</b>. That is why everyday objects show no wave behaviour.";
+    }
+  }
+  dbSpeed.addEventListener("input", updateDB);
+
+  function drawDB(){
+    var W=dbCanvas.width,Hh=dbCanvas.height;
+    dbCtx.clearRect(0,0,W,Hh);
+    var o=OBJS[dbObj];
+    var v=(parseFloat(dbSpeed.value)/100)*o.vmax; if(v<=0)v=o.vmax*0.001;
+    var p=o.m*v; var lam=H_Js/p;
+    // wavelength -> pixels (log-mapped so extremes still visible)
+    var logl=Math.log10(lam); // e.g electron ~ -10, baseball ~ -34
+    var px = Math.max(6, Math.min(220, (logl+36)*8)); // scale
+    var cy=Hh/2;
+    // travelling wave packet
+    var t=Date.now()/500;
+    dbCtx.strokeStyle="#6ad0ff"; dbCtx.lineWidth=2;
+    dbCtx.beginPath();
+    for(var x=20;x<W-20;x++){
+      var env=Math.exp(-Math.pow((x-(W/2)),2)/(2*90*90));
+      var y=cy - Math.sin((x)/(px/ (2*Math.PI)) - t*3)*38*env;
+      if(x===20)dbCtx.moveTo(x,y); else dbCtx.lineTo(x,y);
+    }
+    dbCtx.stroke();
+    // particle dot
+    dbCtx.fillStyle="#ffd76a";
+    dbCtx.beginPath(); dbCtx.arc(W/2,cy,7,0,Math.PI*2); dbCtx.fill();
+    dbCtx.fillStyle="#98a3bd"; dbCtx.font="13px system-ui";
+    dbCtx.fillText(o.name+" — matter wave (λ = "+fmtSci(lam,"m")+")", 16, 24);
+    // wavelength ruler
+    dbCtx.strokeStyle="rgba(255,180,84,.8)"; dbCtx.lineWidth=1.5;
+    dbCtx.beginPath();
+    dbCtx.moveTo(W/2-px/2, Hh-30); dbCtx.lineTo(W/2+px/2, Hh-30);
+    dbCtx.moveTo(W/2-px/2, Hh-36); dbCtx.lineTo(W/2-px/2, Hh-24);
+    dbCtx.moveTo(W/2+px/2, Hh-36); dbCtx.lineTo(W/2+px/2, Hh-24);
+    dbCtx.stroke();
+    dbCtx.fillStyle="#ffb454";
+    dbCtx.fillText("λ (visual, not to scale)", W/2-px/2, Hh-40);
+  }
+
+  // ============ PHOTON ============
+  var phLam=document.getElementById("phLam");
+  var phLamOut=document.getElementById("phLamOut");
+  var phColour=document.getElementById("phColour");
+  var phFreq=document.getElementById("phFreq");
+  var phEnergy=document.getElementById("phEnergy");
+  var phMom=document.getElementById("phMom");
+  var phCanvas=document.getElementById("phCanvas");
+  var phCtx=phCanvas.getContext("2d");
+
+  function wlToRGB(w){
+    var r=0,g=0,b=0;
+    if(w>=380&&w<440){r=-(w-440)/(440-380);g=0;b=1;}
+    else if(w<490){r=0;g=(w-440)/(490-440);b=1;}
+    else if(w<510){r=0;g=1;b=-(w-510)/(510-490);}
+    else if(w<580){r=(w-510)/(580-510);g=1;b=0;}
+    else if(w<645){r=1;g=-(w-645)/(645-580);b=0;}
+    else {r=1;g=0;b=0;}
+    return "rgb("+Math.round(r*255)+","+Math.round(g*255)+","+Math.round(b*255)+")";
+  }
+  function colourName(w){
+    if(w<450)return "Violet";
+    if(w<485)return "Blue";
+    if(w<500)return "Cyan";
+    if(w<565)return "Green";
+    if(w<590)return "Yellow";
+    if(w<625)return "Orange";
+    return "Red";
+  }
+  function updatePhoton(){
+    var lamNm=parseFloat(phLam.value);
+    var lam=lamNm*1e-9;
+    var f=C/lam;             // Hz
+    var E_eV=H_eVs*f;        // eV
+    var p=H_Js/lam;          // kg·m/s
+    phLamOut.textContent=lamNm+" nm";
+    phColour.textContent=colourName(lamNm);
+    phColour.style.color=wlToRGB(lamNm);
+    phFreq.textContent=(f/1e14).toFixed(2)+" ×10¹⁴ Hz";
+    phEnergy.textContent=E_eV.toFixed(2)+" eV";
+    phMom.textContent=fmtSci(p,"kg·m/s");
+  }
+  phLam.addEventListener("input",updatePhoton);
+
+  function drawPhoton(){
+    var W=phCanvas.width,Hh=phCanvas.height;
+    phCtx.clearRect(0,0,W,Hh);
+    var lamNm=parseFloat(phLam.value);
+    var col=wlToRGB(lamNm);
+    // spectrum bar
+    for(var x=0;x<W;x++){
+      var w=380+(x/W)*(750-380);
+      phCtx.fillStyle=wlToRGB(w);
+      phCtx.fillRect(x,20,1,40);
+    }
+    // marker
+    var mx=(lamNm-380)/(750-380)*W;
+    phCtx.strokeStyle="#fff"; phCtx.lineWidth=2;
+    phCtx.beginPath(); phCtx.moveTo(mx,14); phCtx.lineTo(mx,66); phCtx.stroke();
+    // travelling wave in chosen colour
+    var t=Date.now()/300;
+    var cy=115; var wavePx=(lamNm-380)/(750-380)*40+10;
+    phCtx.strokeStyle=col; phCtx.lineWidth=2.5;
+    phCtx.beginPath();
+    for(var xx=10;xx<W-10;xx++){
+      var y=cy - Math.sin(xx/wavePx - t*4)*22;
+      if(xx===10)phCtx.moveTo(xx,y); else phCtx.lineTo(xx,y);
+    }
+    phCtx.stroke();
+    // photon quantum
+    var qx=((Date.now()/8)%(W-40))+20;
+    phCtx.fillStyle=col;
+    phCtx.beginPath(); phCtx.arc(qx,cy,6,0,Math.PI*2); phCtx.fill();
+    phCtx.fillStyle="rgba(255,255,255,.85)"; phCtx.font="12px system-ui";
+    phCtx.fillText("photon", qx-18, cy-14);
+  }
+
+  // ============ QUIZ ============
+  var quizData=[
+    {q:"Increasing only the intensity of light (same frequency, above threshold) will:",
+     opts:["Increase the maximum KE of emitted electrons",
+           "Increase the number of electrons emitted per second",
+           "Increase the stopping potential",
+           "Lower the threshold frequency"],
+     a:1,
+     e:"Intensity sets how many photons arrive, so more electrons are ejected. Max KE depends only on frequency (hf − φ)."},
+    {q:"The slope of the KE_max vs frequency graph equals:",
+     opts:["The work function φ","The electron charge e","Planck's constant h","The threshold frequency f₀"],
+     a:2,
+     e:"KE_max = hf − φ, a straight line whose slope is h and x-intercept is f₀ = φ/h."},
+    {q:"Why don't we observe the wave nature of a moving cricket ball?",
+     opts:["Balls have no momentum",
+           "Its de Broglie wavelength λ = h/p is far too small to detect",
+           "Light cannot reflect off it",
+           "Its work function is too high"],
+     a:1,
+     e:"For large masses p is huge, so λ = h/p (~10⁻³⁴ m) is immeasurably tiny — no observable diffraction."}
+  ];
+  var quizBox=document.getElementById("quizBox");
+  quizData.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var h=document.createElement("h3"); h.textContent=(qi+1)+". "+item.q; div.appendChild(h);
+    var opts=document.createElement("div"); opts.className="opts";
+    var exp=document.createElement("div"); exp.className="exp"; exp.textContent="Explanation: "+item.e;
+    item.opts.forEach(function(txt,oi){
+      var btn=document.createElement("button"); btn.className="opt"; btn.textContent=txt;
+      btn.addEventListener("click",function(){
+        var all=opts.querySelectorAll(".opt");
+        all.forEach(function(x){x.disabled=true;});
+        if(oi===item.a){ btn.classList.add("correct"); }
+        else{ btn.classList.add("wrong"); all[item.a].classList.add("correct"); }
+        exp.classList.add("show");
+      });
+      opts.appendChild(btn);
+    });
+    div.appendChild(opts); div.appendChild(exp); quizBox.appendChild(div);
+  });
+
+  // ============ ANIMATION LOOP ============
+  var lastSpawn=0;
+  function loop(ts){
+    if(!document.hidden){
+      if(current==="photo"){
+        if(ts-lastSpawn>140){ spawnElectrons(); lastSpawn=ts; }
+        drawPE();
+      } else if(current==="debroglie"){ drawDB(); }
+      else if(current==="photon"){ drawPhoton(); }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // init
+  updatePE(); updateDB(); updatePhoton();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuclei &amp; Radioactivity Lab — NIOS Class 12 Physics, Ch 23</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#98a2bb;
+    --accent:#57d1c9;
+    --accent-soft:rgba(87,209,201,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffb454;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 130px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .view{display:none}
+  .view.active{display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;flex-wrap:wrap;gap:6px}
+  .seg button{flex:1 1 80px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .btn{min-height:46px;padding:0 16px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .btn.accent{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.98)}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.1rem;font-weight:700;margin-top:2px}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;
+    font-family:"Cambria Math","Georgia",serif;font-size:1rem}
+  .formula small{display:block;color:var(--muted);font-family:system-ui,sans-serif;font-size:.8rem;margin-top:4px}
+  .note{color:var(--muted);font-size:.86rem;margin-top:8px}
+  sub,sup{font-size:.7em}
+
+  .quiz .q{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .quiz .q:last-child{border-bottom:none;margin-bottom:0}
+  .quiz .qt{font-weight:600;margin-bottom:8px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{text-align:left;min-height:44px;padding:8px 12px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:var(--bad)}
+  .expl{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .expl.show{display:block}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Nuclei &amp; Radioactivity</span> Lab</h1>
+    <p>NIOS Class 12 Physics · Chapter 23 — decay, decay types, and mass–energy</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="decay">1 · Radioactive decay</button>
+    <button class="tab-btn" data-view="types">2 · Decay types</button>
+    <button class="tab-btn" data-view="energy">3 · Mass–energy</button>
+    <button class="tab-btn" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ================= VIEW 1: DECAY ================= -->
+  <section class="view active" id="view-decay">
+    <div class="panel">
+      <h2>Radioactive decay of a sample</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Half-life T½ = <output id="thOut">4.0 s</output></label>
+          <input type="range" id="thSlider" min="1" max="12" step="0.5" value="4">
+        </div>
+        <div class="ctrl" style="flex:0 0 auto">
+          <label>&nbsp;</label>
+          <div class="row">
+            <button class="btn accent" id="playBtn">Pause</button>
+            <button class="btn" id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+      <canvas id="sampleCanvas" width="900" height="240"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--accent)"></i> undecayed nucleus</span>
+        <span><i class="dot" style="background:var(--muted)"></i> decayed nucleus</span>
+      </div>
+      <canvas id="curveCanvas" width="900" height="300" style="margin-top:12px"></canvas>
+      <div class="stats">
+        <div class="stat"><div class="k">Time t</div><div class="v" id="tVal">0.0 s</div></div>
+        <div class="stat"><div class="k">Half-lives elapsed</div><div class="v" id="nhVal">0.00</div></div>
+        <div class="stat"><div class="k">Remaining N(t)</div><div class="v" id="remVal">200</div></div>
+        <div class="stat"><div class="k">Decayed</div><div class="v" id="decVal">0</div></div>
+        <div class="stat"><div class="k">Decay constant λ</div><div class="v" id="lamVal">0.173 s⁻¹</div></div>
+      </div>
+      <div class="formula">N(t) = N<sub>0</sub> e<sup>−λt</sup>&nbsp;&nbsp;·&nbsp;&nbsp;λ = ln2 / T½
+        <small>Every half-life, the count drops to one half. N₀ = 200 nuclei. Dashed lines mark each T½.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW 2: DECAY TYPES ================= -->
+  <section class="view" id="view-types">
+    <div class="panel">
+      <h2>Alpha, beta &amp; gamma decay</h2>
+      <div class="seg" id="typeSeg" style="margin-bottom:12px">
+        <button class="on" data-type="alpha">Alpha (α)</button>
+        <button data-type="beta">Beta⁻ (β⁻)</button>
+        <button data-type="gamma">Gamma (γ)</button>
+      </div>
+      <canvas id="typeCanvas" width="900" height="300"></canvas>
+      <div class="formula" id="typeEq"></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Parent (Z, A)</div><div class="v" id="parentVal"></div></div>
+        <div class="stat"><div class="k">Emitted</div><div class="v" id="emitVal"></div></div>
+        <div class="stat"><div class="k">Daughter (Z, A)</div><div class="v" id="daughterVal"></div></div>
+      </div>
+      <p class="note" id="typeNote"></p>
+      <div class="formula"><small>Conservation: the sum of mass numbers A and the sum of charges (atomic numbers Z, counting the emitted particle) are equal on both sides.</small></div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW 3: MASS-ENERGY ================= -->
+  <section class="view" id="view-energy">
+    <div class="panel">
+      <h2>Mass–energy &amp; binding energy per nucleon</h2>
+      <canvas id="beCanvas" width="900" height="320"></canvas>
+      <p class="note">Peak near <b>Fe-56</b> (~8.8 MeV/nucleon). Light nuclei gain by <b>fusing</b> toward the peak; heavy nuclei gain by <b>splitting</b> toward it — both move to more tightly bound (higher B.E./A) states, releasing energy.</p>
+      <div class="seg" id="reactSeg" style="margin:12px 0">
+        <button class="on" data-react="fusion">Fusion (light)</button>
+        <button data-react="fission">Fission (heavy)</button>
+      </div>
+      <canvas id="reactCanvas" width="900" height="220"></canvas>
+      <div class="formula" id="reactEq"></div>
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl">
+          <label>Mass defect Δm = <output id="dmOut">0.0304 u</output></label>
+          <input type="range" id="dmSlider" min="0.001" max="0.2" step="0.001" value="0.0304">
+        </div>
+        <div class="stat" style="flex:1 1 200px"><div class="k">Energy released E = Δm·c²</div><div class="v" id="eOut">28.3 MeV</div></div>
+      </div>
+      <div class="formula">E = m c²&nbsp;&nbsp;·&nbsp;&nbsp;1 u = 931.5 MeV/c²
+        <small>Binding energy = (mass of separate nucleons − mass of nucleus) × c². Higher B.E./A ⇒ more stable.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= VIEW 4: QUIZ ================= -->
+  <section class="view" id="view-quiz">
+    <div class="panel quiz" id="quizBox"></div>
+  </section>
+
+  <!-- Formulas quick panel (always relevant) -->
+  <div class="panel">
+    <h3>Key formulas</h3>
+    <div class="formula">N = N<sub>0</sub> e<sup>−λt</sup><small>Number of undecayed nuclei after time t</small></div>
+    <div class="formula">T½ = ln2 / λ ≈ 0.693 / λ<small>Half-life ↔ decay constant</small></div>
+    <div class="formula">E = m c²<small>Mass–energy equivalence; 1 u ≡ 931.5 MeV</small></div>
+    <div class="formula">B.E. = [Z·m<sub>p</sub> + (A−Z)·m<sub>n</sub> − M<sub>nucleus</sub>] c²<small>Binding energy of a nucleus; per nucleon = B.E. / A</small></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- Tab switching ----------
+  var tabs = document.querySelectorAll('.tab-btn');
+  var views = document.querySelectorAll('.view');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var id = t.getAttribute('data-view');
+      views.forEach(function(v){ v.classList.toggle('active', v.id === 'view-'+id); });
+    });
+  });
+
+  // ================= VIEW 1: DECAY =================
+  var N0 = 200;
+  var thSlider = document.getElementById('thSlider');
+  var thOut = document.getElementById('thOut');
+  var playBtn = document.getElementById('playBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var sCanvas = document.getElementById('sampleCanvas');
+  var sCtx = sCanvas.getContext('2d');
+  var cCanvas = document.getElementById('curveCanvas');
+  var cCtx = cCanvas.getContext('2d');
+  var tVal = document.getElementById('tVal'), nhVal = document.getElementById('nhVal');
+  var remVal = document.getElementById('remVal'), decVal = document.getElementById('decVal');
+  var lamVal = document.getElementById('lamVal');
+
+  var running = true;
+  var simT = 0;          // seconds
+  var halfLife = 4.0;    // seconds
+  var lambda = Math.LN2 / halfLife;
+  var maxT = 30;         // window seconds
+
+  // grid layout of nuclei
+  var COLS = 25, ROWS = 8; // 200 dots
+  var order = [];
+  for (var i=0;i<N0;i++) order.push(i);
+  // random decay order (each nucleus assigned a threshold fraction)
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} }
+  shuffle(order);
+
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  function setHalfLife(){
+    halfLife = parseFloat(thSlider.value);
+    lambda = Math.LN2 / halfLife;
+    thOut.textContent = halfLife.toFixed(1) + ' s';
+    lamVal.textContent = lambda.toFixed(3) + ' s⁻¹';
+    maxT = Math.max(30, halfLife*6);
+  }
+  thSlider.addEventListener('input', setHalfLife);
+
+  playBtn.addEventListener('click', function(){
+    running = !running;
+    playBtn.textContent = running ? 'Pause' : 'Play';
+  });
+  resetBtn.addEventListener('click', function(){ simT = 0; });
+
+  function fitCanvas(cv){
+    var w = cv.clientWidth || 900;
+    var ratio = cv.height / cv.width;
+    // keep internal resolution; scale drawing coordinates via canvas width attr already set
+    return w;
+  }
+
+  function drawSample(remaining){
+    var W = sCanvas.width, H = sCanvas.height;
+    sCtx.clearRect(0,0,W,H);
+    var pad = 16;
+    var gw = (W - 2*pad) / COLS;
+    var gh = (H - 2*pad) / ROWS;
+    var r = Math.min(gw, gh) * 0.32;
+    var accent = css('--accent'), muted = css('--muted');
+    for (var idx=0; idx<N0; idx++){
+      var col = idx % COLS, rowi = Math.floor(idx / COLS);
+      var cx = pad + gw*(col+0.5);
+      var cy = pad + gh*(rowi+0.5);
+      // 'order' gives decay ranking: first (remaining..N0) are decayed
+      var rank = order[idx];
+      var decayed = rank >= remaining;
+      sCtx.beginPath();
+      sCtx.arc(cx, cy, r, 0, Math.PI*2);
+      sCtx.fillStyle = decayed ? muted : accent;
+      sCtx.globalAlpha = decayed ? 0.45 : 1;
+      sCtx.fill();
+      sCtx.globalAlpha = 1;
+    }
+  }
+
+  function drawCurve(){
+    var W = cCanvas.width, H = cCanvas.height;
+    cCtx.clearRect(0,0,W,H);
+    var L=52, R=14, T=14, B=34;
+    var pw = W-L-R, ph = H-T-B;
+    var accent = css('--accent'), muted = css('--muted'), line = css('--line'), warn = css('--warn');
+    // axes
+    cCtx.strokeStyle = line; cCtx.lineWidth = 1;
+    cCtx.beginPath(); cCtx.moveTo(L,T); cCtx.lineTo(L,T+ph); cCtx.lineTo(L+pw,T+ph); cCtx.stroke();
+    // y ticks (N)
+    cCtx.fillStyle = muted; cCtx.font = '11px system-ui';
+    cCtx.textAlign='right'; cCtx.textBaseline='middle';
+    for (var k=0;k<=4;k++){
+      var yy = T + ph*(k/4);
+      var val = N0*(1 - k/4);
+      cCtx.fillText(Math.round(val), L-6, yy);
+      cCtx.strokeStyle = line; cCtx.globalAlpha=0.5;
+      cCtx.beginPath(); cCtx.moveTo(L,yy); cCtx.lineTo(L+pw,yy); cCtx.stroke(); cCtx.globalAlpha=1;
+    }
+    // x ticks (time)
+    cCtx.textAlign='center'; cCtx.textBaseline='top';
+    for (var xk=0; xk<=5; xk++){
+      var tt = maxT*(xk/5);
+      var xx = L + pw*(xk/5);
+      cCtx.fillText(tt.toFixed(0)+'s', xx, T+ph+6);
+    }
+    // half-life markers
+    cCtx.setLineDash([5,5]); cCtx.strokeStyle = warn; cCtx.globalAlpha=0.6;
+    for (var hn=1; halfLife*hn <= maxT; hn++){
+      var hx = L + pw*(halfLife*hn/maxT);
+      cCtx.beginPath(); cCtx.moveTo(hx,T); cCtx.lineTo(hx,T+ph); cCtx.stroke();
+      cCtx.fillStyle = warn; cCtx.globalAlpha=1;
+      cCtx.textAlign='center'; cCtx.textBaseline='bottom';
+      cCtx.fillText(hn+'·T½', hx, T+12);
+      cCtx.globalAlpha=0.6;
+    }
+    cCtx.setLineDash([]); cCtx.globalAlpha=1;
+    // decay curve
+    cCtx.strokeStyle = accent; cCtx.lineWidth = 2.5; cCtx.beginPath();
+    for (var px=0; px<=pw; px++){
+      var t = maxT*(px/pw);
+      var N = N0*Math.exp(-lambda*t);
+      var x = L+px, y = T + ph*(1 - N/N0);
+      if (px===0) cCtx.moveTo(x,y); else cCtx.lineTo(x,y);
+    }
+    cCtx.stroke();
+    // current point marker
+    var curN = N0*Math.exp(-lambda*simT);
+    var mx = L + pw*(Math.min(simT,maxT)/maxT);
+    var my = T + ph*(1 - curN/N0);
+    cCtx.fillStyle = warn;
+    cCtx.beginPath(); cCtx.arc(mx,my,5,0,Math.PI*2); cCtx.fill();
+    // labels
+    cCtx.fillStyle = muted; cCtx.font='11px system-ui';
+    cCtx.textAlign='left'; cCtx.textBaseline='top';
+    cCtx.fillText('N (nuclei) vs time (s)', L+4, T+2);
+  }
+
+  function updateStats(remaining){
+    tVal.textContent = simT.toFixed(1) + ' s';
+    nhVal.textContent = (simT/halfLife).toFixed(2);
+    remVal.textContent = remaining;
+    decVal.textContent = (N0 - remaining);
+  }
+
+  // ================= VIEW 2: DECAY TYPES =================
+  var typeCanvas = document.getElementById('typeCanvas');
+  var tCtx = typeCanvas.getContext('2d');
+  var typeSeg = document.getElementById('typeSeg');
+  var typeEq = document.getElementById('typeEq');
+  var parentVal = document.getElementById('parentVal');
+  var emitVal = document.getElementById('emitVal');
+  var daughterVal = document.getElementById('daughterVal');
+  var typeNote = document.getElementById('typeNote');
+  var curType = 'alpha';
+  var animType = 0; // 0..1 progress
+
+  var decayData = {
+    alpha: {
+      parent:{sym:'U',Z:92,A:238}, daughter:{sym:'Th',Z:90,A:234},
+      emit:'α (⁴₂He)', color:'--warn',
+      eq:'<sup>238</sup><sub>92</sub>U → <sup>234</sup><sub>90</sub>Th + <sup>4</sup><sub>2</sub>He',
+      note:'Alpha decay: nucleus emits a helium-4 nucleus. Z drops by 2, A drops by 4.'
+    },
+    beta: {
+      parent:{sym:'Th',Z:90,A:234}, daughter:{sym:'Pa',Z:91,A:234},
+      emit:'β⁻ (e⁻) + ν̄', color:'--good',
+      eq:'<sup>234</sup><sub>90</sub>Th → <sup>234</sup><sub>91</sub>Pa + <sup>0</sup><sub>-1</sub>e + ν̄',
+      note:'Beta-minus decay: a neutron → proton + electron (+ antineutrino). Z rises by 1, A unchanged.'
+    },
+    gamma: {
+      parent:{sym:'Co*',Z:27,A:60}, daughter:{sym:'Co',Z:27,A:60},
+      emit:'γ (photon)', color:'--accent',
+      eq:'<sup>60</sup><sub>27</sub>Co* → <sup>60</sup><sub>27</sub>Co + γ',
+      note:'Gamma decay: an excited nucleus (*) sheds energy as a photon. Both Z and A are unchanged.'
+    }
+  };
+
+  typeSeg.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      typeSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      curType = b.getAttribute('data-type');
+      animType = 0;
+      updateTypeInfo();
+    });
+  });
+
+  function updateTypeInfo(){
+    var d = decayData[curType];
+    typeEq.innerHTML = d.eq + '<small>Nuclear reaction equation</small>';
+    parentVal.textContent = d.parent.sym+' (Z='+d.parent.Z+', A='+d.parent.A+')';
+    emitVal.textContent = d.emit;
+    daughterVal.textContent = d.daughter.sym+' (Z='+d.daughter.Z+', A='+d.daughter.A+')';
+    typeNote.textContent = d.note;
+  }
+
+  function drawNucleusGlyph(ctx, cx, cy, R, Z, A, label, colorVar){
+    var Nn = A - Z;
+    var np = Z + Nn;
+    // draw protons/neutrons as small circles packed in a spiral-ish grid
+    var pcol = css('--warn'), ncol = css('--muted');
+    var count = Math.min(np, 60);
+    var shown = np;
+    var rr = R*0.16;
+    ctx.save();
+    // pack in concentric rings
+    var placed = 0;
+    var rings = [1,6,12,18,24,30];
+    var ringIdx = 0, ringPos = 0;
+    var protonsLeft = Z, neutronsLeft = Nn;
+    var idxTotal = 0;
+    var totalToShow = Math.min(np, 60);
+    for (var ri=0; ri<rings.length && placed<totalToShow; ri++){
+      var inRing = Math.min(rings[ri], totalToShow-placed);
+      var radius = ri===0 ? 0 : R*0.22*ri;
+      for (var pi=0; pi<inRing; pi++){
+        var ang = (pi/inRing)*Math.PI*2 + ri*0.6;
+        var x = cx + radius*Math.cos(ang);
+        var y = cy + radius*Math.sin(ang);
+        // alternate proton/neutron to roughly show composition
+        var isProton = (placed % 2 === 0 && protonsLeft>0) || neutronsLeft<=0;
+        if (isProton){ protonsLeft--; } else { neutronsLeft--; }
+        ctx.beginPath(); ctx.arc(x,y,rr,0,Math.PI*2);
+        ctx.fillStyle = isProton ? pcol : ncol;
+        ctx.fill();
+        placed++;
+      }
+    }
+    ctx.restore();
+    // outline
+    ctx.strokeStyle = css(colorVar); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke();
+    // label
+    ctx.fillStyle = css('--ink'); ctx.font='bold 15px system-ui';
+    ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(label, cx, cy+R+8);
+    ctx.fillStyle = css('--muted'); ctx.font='11px system-ui';
+    ctx.fillText('Z='+Z+', A='+A, cx, cy+R+26);
+  }
+
+  function drawTypes(){
+    var W=typeCanvas.width, H=typeCanvas.height;
+    tCtx.clearRect(0,0,W,H);
+    var d = decayData[curType];
+    var p = animType; // progress
+    // parent on left, daughter on right, emitted particle flies
+    var pR = 46, dR = 44;
+    var leftX = W*0.24, rightX = W*0.72, cy = H*0.42;
+    // parent (fades as decays)
+    tCtx.globalAlpha = 1 - 0.15*p;
+    drawNucleusGlyph(tCtx, leftX, cy, pR, d.parent.Z, d.parent.A, d.parent.sym, d.color);
+    tCtx.globalAlpha = 1;
+    // arrow
+    tCtx.strokeStyle = css('--line'); tCtx.lineWidth=2;
+    tCtx.beginPath(); tCtx.moveTo(leftX+pR+18, cy); tCtx.lineTo(rightX-dR-18, cy); tCtx.stroke();
+    tCtx.fillStyle = css('--line');
+    tCtx.beginPath(); var ax=rightX-dR-18; tCtx.moveTo(ax,cy); tCtx.lineTo(ax-10,cy-6); tCtx.lineTo(ax-10,cy+6); tCtx.closePath(); tCtx.fill();
+    tCtx.fillStyle=css('--muted'); tCtx.font='12px system-ui'; tCtx.textAlign='center'; tCtx.textBaseline='bottom';
+    tCtx.fillText('decays', (leftX+rightX)/2, cy-10);
+    // daughter (fades in)
+    tCtx.globalAlpha = 0.3 + 0.7*p;
+    drawNucleusGlyph(tCtx, rightX, cy, dR, d.daughter.Z, d.daughter.A, d.daughter.sym, d.color);
+    tCtx.globalAlpha = 1;
+    // emitted particle flies down-right
+    var ex = rightX + p*(W*0.18);
+    var ey = cy + p*(H*0.32);
+    tCtx.fillStyle = css(curType==='gamma'?'--accent':(curType==='beta'?'--good':'--warn'));
+    tCtx.globalAlpha = p<0.05?0:1;
+    if (curType==='gamma'){
+      // wavy photon
+      tCtx.strokeStyle = tCtx.fillStyle; tCtx.lineWidth=2.5; tCtx.beginPath();
+      for(var wx=0; wx<40; wx++){
+        var xx=ex+wx, yy=ey+Math.sin(wx*0.6)*5;
+        if(wx===0)tCtx.moveTo(xx,yy);else tCtx.lineTo(xx,yy);
+      }
+      tCtx.stroke();
+    } else {
+      tCtx.beginPath(); tCtx.arc(ex,ey, curType==='alpha'?13:8, 0, Math.PI*2); tCtx.fill();
+      tCtx.fillStyle=css('--bg'); tCtx.font='bold 11px system-ui'; tCtx.textAlign='center'; tCtx.textBaseline='middle';
+      tCtx.fillText(curType==='alpha'?'α':'β⁻', ex, ey);
+    }
+    tCtx.globalAlpha=1;
+    tCtx.fillStyle=css('--muted'); tCtx.font='11px system-ui'; tCtx.textAlign='left'; tCtx.textBaseline='top';
+    tCtx.fillText('emitted: '+d.emit, ex-4, ey+16);
+  }
+
+  // ================= VIEW 3: MASS-ENERGY =================
+  var beCanvas = document.getElementById('beCanvas');
+  var beCtx = beCanvas.getContext('2d');
+  var reactCanvas = document.getElementById('reactCanvas');
+  var rCtx = reactCanvas.getContext('2d');
+  var reactSeg = document.getElementById('reactSeg');
+  var reactEq = document.getElementById('reactEq');
+  var dmSlider = document.getElementById('dmSlider');
+  var dmOut = document.getElementById('dmOut');
+  var eOut = document.getElementById('eOut');
+  var curReact = 'fusion';
+
+  // representative B.E./A data points (A, MeV per nucleon)
+  var bePts = [
+    [2,1.11],[3,2.83],[4,7.07],[6,5.33],[7,5.61],[9,6.46],[12,7.68],[16,7.98],
+    [20,8.03],[24,8.26],[28,8.45],[32,8.49],[40,8.55],[48,8.67],[56,8.79],
+    [63,8.75],[75,8.71],[90,8.67],[107,8.55],[120,8.50],[140,8.38],
+    [160,8.20],[184,7.95],[208,7.87],[235,7.59],[238,7.57]
+  ];
+
+  function drawBE(){
+    var W=beCanvas.width, H=beCanvas.height;
+    beCtx.clearRect(0,0,W,H);
+    var L=54,R=16,T=16,B=40;
+    var pw=W-L-R, ph=H-T-B;
+    var line=css('--line'), muted=css('--muted'), accent=css('--accent'), warn=css('--warn');
+    var maxA=240, maxBE=9;
+    function X(a){return L+pw*(a/maxA);}
+    function Y(b){return T+ph*(1-b/maxBE);}
+    // axes + grid
+    beCtx.strokeStyle=line; beCtx.lineWidth=1;
+    beCtx.beginPath(); beCtx.moveTo(L,T); beCtx.lineTo(L,T+ph); beCtx.lineTo(L+pw,T+ph); beCtx.stroke();
+    beCtx.fillStyle=muted; beCtx.font='11px system-ui';
+    beCtx.textAlign='right'; beCtx.textBaseline='middle';
+    for(var b=0;b<=9;b+=3){ var yy=Y(b); beCtx.fillText(b, L-6, yy);
+      beCtx.globalAlpha=0.4; beCtx.beginPath(); beCtx.moveTo(L,yy); beCtx.lineTo(L+pw,yy); beCtx.stroke(); beCtx.globalAlpha=1; }
+    beCtx.textAlign='center'; beCtx.textBaseline='top';
+    for(var a=0;a<=240;a+=40){ beCtx.fillText(a, X(a), T+ph+6); }
+    // curve
+    beCtx.strokeStyle=accent; beCtx.lineWidth=2.5; beCtx.beginPath();
+    bePts.forEach(function(pt,i){ var x=X(pt[0]),y=Y(pt[1]); if(i===0)beCtx.moveTo(x,y); else beCtx.lineTo(x,y); });
+    beCtx.stroke();
+    // points
+    beCtx.fillStyle=accent;
+    bePts.forEach(function(pt){ beCtx.beginPath(); beCtx.arc(X(pt[0]),Y(pt[1]),2.5,0,Math.PI*2); beCtx.fill(); });
+    // Fe-56 peak marker
+    beCtx.fillStyle=warn; beCtx.beginPath(); beCtx.arc(X(56),Y(8.79),5,0,Math.PI*2); beCtx.fill();
+    beCtx.font='bold 11px system-ui'; beCtx.textAlign='center'; beCtx.textBaseline='bottom';
+    beCtx.fillText('Fe-56 peak (~8.8)', X(56), Y(8.79)-8);
+    // fusion / fission arrows
+    beCtx.fillStyle=muted; beCtx.font='11px system-ui';
+    beCtx.textAlign='left'; beCtx.textBaseline='top';
+    beCtx.fillText('← fusion', X(10), Y(3.5));
+    beCtx.textAlign='right';
+    beCtx.fillText('fission →', X(232), Y(6.3));
+    // labels
+    beCtx.fillStyle=muted; beCtx.textAlign='left'; beCtx.textBaseline='top';
+    beCtx.fillText('B.E. / nucleon (MeV) vs mass number A', L+4, T+2);
+  }
+
+  var reactData = {
+    fusion:{ eq:'<sup>2</sup><sub>1</sub>H + <sup>3</sup><sub>1</sub>H → <sup>4</sup><sub>2</sub>He + <sup>1</sup><sub>0</sub>n + 17.6 MeV', dm:0.0189 },
+    fission:{ eq:'<sup>235</sup><sub>92</sub>U + n → <sup>141</sup><sub>56</sub>Ba + <sup>92</sup><sub>36</sub>Kr + 3n + ~200 MeV', dm:0.2 }
+  };
+
+  reactSeg.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      reactSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      curReact = b.getAttribute('data-react');
+      reactEq.innerHTML = reactData[curReact].eq + '<small>Both release energy by moving toward the B.E./A peak</small>';
+      reactPhase = 0;
+    });
+  });
+  reactEq.innerHTML = reactData.fusion.eq + '<small>Both release energy by moving toward the B.E./A peak</small>';
+
+  function setDm(){
+    var dm = parseFloat(dmSlider.value);
+    dmOut.textContent = dm.toFixed(4) + ' u';
+    eOut.textContent = (dm*931.5).toFixed(1) + ' MeV';
+  }
+  dmSlider.addEventListener('input', setDm);
+
+  var reactPhase = 0;
+  function drawReact(){
+    var W=reactCanvas.width, H=reactCanvas.height;
+    rCtx.clearRect(0,0,W,H);
+    var cy=H*0.5;
+    var p = (Math.sin(reactPhase)+1)/2; // 0..1 oscillate
+    var warn=css('--warn'), muted=css('--muted'), accent=css('--accent'), good=css('--good');
+    function ball(x,y,r,color,label){
+      rCtx.beginPath(); rCtx.arc(x,y,r,0,Math.PI*2); rCtx.fillStyle=color; rCtx.fill();
+      if(label){ rCtx.fillStyle=css('--bg'); rCtx.font='bold 11px system-ui'; rCtx.textAlign='center'; rCtx.textBaseline='middle'; rCtx.fillText(label,x,y); }
+    }
+    if(curReact==='fusion'){
+      // two small nuclei approach and merge
+      var gap = 120*(1-p);
+      ball(W*0.4 - gap, cy, 18, warn, 'D');
+      ball(W*0.4 + gap + 30, cy, 20, muted, 'T');
+      if(p>0.7){ ball(W*0.68, cy, 26, accent, 'He'); ball(W*0.85, cy-4, 10, muted, 'n');
+        rCtx.fillStyle=good; rCtx.font='12px system-ui'; rCtx.textAlign='center'; rCtx.fillText('+ energy', W*0.85, cy+28); }
+      rCtx.fillStyle=muted; rCtx.font='12px system-ui'; rCtx.textAlign='center'; rCtx.textBaseline='top';
+      rCtx.fillText('Light nuclei fuse → heavier, more stable nucleus', W/2, 8);
+    } else {
+      // neutron hits heavy nucleus which splits
+      ball(W*0.4, cy, 34, warn, 'U-235');
+      if(p<0.5){ ball(W*0.4 - 90 + p*160, cy, 8, muted, 'n'); }
+      if(p>=0.5){
+        var s=(p-0.5)*2;
+        ball(W*0.4 - s*90, cy - s*18, 22, accent, 'Ba');
+        ball(W*0.4 + 40 + s*90, cy + s*18, 20, good, 'Kr');
+        // scattered neutrons
+        for(var i=0;i<3;i++){ ball(W*0.4 + s*(60+i*40), cy + (i-1)*20*s, 6, muted, ''); }
+        rCtx.fillStyle=good; rCtx.font='12px system-ui'; rCtx.textAlign='center'; rCtx.textBaseline='top';
+        rCtx.fillText('+ ~200 MeV + neutrons', W*0.7, cy+40);
+      }
+      rCtx.fillStyle=muted; rCtx.font='12px system-ui'; rCtx.textAlign='center'; rCtx.textBaseline='top';
+      rCtx.fillText('Heavy nucleus splits → two mid-size, more stable nuclei', W/2, 8);
+    }
+  }
+
+  // ================= VIEW 4: QUIZ =================
+  var quizData = [
+    {
+      q:'A radioactive sample has a half-life of 5 years. What fraction of the original nuclei remains after 15 years?',
+      opts:['1/2','1/8','1/16','1/6'],
+      correct:1,
+      expl:'15 years = 3 half-lives, so N/N₀ = (1/2)³ = 1/8.'
+    },
+    {
+      q:'In beta-minus (β⁻) decay, how do the atomic number Z and mass number A of the nucleus change?',
+      opts:['Z −1, A −4','Z +1, A unchanged','Z −2, A −4','Z unchanged, A unchanged'],
+      correct:1,
+      expl:'A neutron converts to a proton (emitting an electron + antineutrino): Z increases by 1, A stays the same.'
+    },
+    {
+      q:'Energy is released in nuclear fusion of light nuclei because the products have:',
+      opts:['lower binding energy per nucleon','higher binding energy per nucleon','the same mass as reactants','more nucleons than reactants'],
+      correct:1,
+      expl:'Moving toward the B.E./A peak means higher binding energy per nucleon and greater stability, so energy is released.'
+    }
+  ];
+  var quizBox = document.getElementById('quizBox');
+  quizData.forEach(function(item, qi){
+    var qDiv = document.createElement('div'); qDiv.className='q';
+    var qt = document.createElement('div'); qt.className='qt'; qt.textContent=(qi+1)+'. '+item.q;
+    qDiv.appendChild(qt);
+    var opts = document.createElement('div'); opts.className='opts';
+    var expl = document.createElement('div'); expl.className='expl'; expl.textContent='Explanation: '+item.expl;
+    var answered=false;
+    item.opts.forEach(function(o, oi){
+      var btn = document.createElement('button'); btn.className='opt'; btn.textContent=o;
+      btn.addEventListener('click', function(){
+        if(answered) return; answered=true;
+        opts.querySelectorAll('.opt').forEach(function(b,bi){
+          if(bi===item.correct) b.classList.add('correct');
+          else if(bi===oi) b.classList.add('wrong');
+        });
+        expl.classList.add('show');
+      });
+      opts.appendChild(btn);
+    });
+    qDiv.appendChild(opts); qDiv.appendChild(expl);
+    quizBox.appendChild(qDiv);
+  });
+
+  // ================= ANIMATION LOOP =================
+  var lastTs = null;
+  function frame(ts){
+    if(document.hidden){ lastTs = ts; requestAnimationFrame(frame); return; }
+    if(lastTs===null) lastTs=ts;
+    var dt = Math.min((ts-lastTs)/1000, 0.05);
+    lastTs = ts;
+
+    // decay sim advance
+    if(running){ simT += dt; if(simT>maxT*1.5) simT = 0; }
+    var remainingF = N0*Math.exp(-lambda*simT);
+    var remaining = Math.round(remainingF);
+    if(remaining>N0) remaining=N0; if(remaining<0) remaining=0;
+    drawSample(remaining);
+    drawCurve();
+    updateStats(remaining);
+
+    // decay-type anim
+    animType += dt*0.5; if(animType>1.4) animType=0;
+    drawTypes();
+
+    // reaction anim
+    reactPhase += dt*1.2;
+    drawReact();
+
+    requestAnimationFrame(frame);
+  }
+
+  // init
+  setHalfLife();
+  updateTypeInfo();
+  setDm();
+  drawBE();
+  window.addEventListener('resize', drawBE);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
