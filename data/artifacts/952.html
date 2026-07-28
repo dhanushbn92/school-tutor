@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>पर्यावरणस्य संरक्षणम् | Environmental Protection — Sanskrit Learning Game</title>
+<style>
+  :root{
+    --accent:#3fae6f;
+    --accent-soft:#e3f5ea;
+    --accent-dark:#2c8a54;
+    --bg:#0f1a15;
+    --panel:#182a22;
+    --panel-2:#20372c;
+    --ink:#eaf3ee;
+    --muted:#9fbcad;
+    --good:#5fd39a;
+    --good-soft:#123425;
+    --bad:#ef6d84;
+    --bad-soft:#3a1620;
+    --line:#2c4638;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#1c3327 0%,#0f1a15 60%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6vw,2.4rem);color:var(--good);}
+  header.top h1{
+    font-size:clamp(1.2rem,4.5vw,1.7rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.35);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--good);}
+  .tab-btn.active{background:var(--accent);color:#06140d;box-shadow:0 4px 14px rgba(63,174,111,.4);}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--good);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .theme-tag{
+    display:inline-block;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--good);font-size:.75rem;font-weight:700;letter-spacing:.04em;
+    padding:4px 12px;border-radius:999px;margin-bottom:12px;
+  }
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5vw,1.85rem);
+    line-height:1.85;
+    text-align:center;
+    color:var(--good);
+    margin-bottom:6px;
+  }
+  .verse-translit{text-align:center;font-style:italic;color:var(--muted);font-size:.92rem;margin-bottom:16px;}
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;color:var(--ink);
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--good);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.anvaya-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .anvaya-box .deva-inline{font-family:var(--deva);color:var(--good);}
+  .moral-box{background:var(--good-soft);border-color:#1e5a3d;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#06140d;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--good);transform:scale(1.25);}
+
+  /* ---- Match ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--panel-2);color:var(--good);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;border:1px solid var(--line);}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.96rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--good);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:#12281d;box-shadow:0 0 0 3px rgba(63,174,111,.22);}
+  .word-item.done,.mean-item.done{border-color:#1e5a3d;background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--good);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--good-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #1e5a3d;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.4vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--good);
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .quiz-qtext{font-size:1rem;margin-bottom:12px;color:var(--ink);}
+  .quiz-qtext .deva-inline{font-family:var(--deva);color:var(--good);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    text-align:left;border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:11px 14px;cursor:pointer;color:var(--ink);font-weight:500;font-size:.95rem;transition:.15s;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);color:var(--good);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#1e5a3d;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.92rem;margin-bottom:8px;color:var(--ink);}
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--good);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--good);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.15rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">पर्यावरणस्य संरक्षणम्</div>
+    <h1>Environmental Protection &middot; Sanskrit Learning Game</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 18 &middot; Paryāvaraṇasya Saṁrakṣaṇam</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">🌳 Theme Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse &amp; Theme Explorer</h2>
+      <p class="mode-sub">Explore trees, water, air and conservation through Devanagari statements and public-domain verses.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Conservation MCQ Quiz</h2>
+      <p class="mode-sub">Answer questions on the conservation theme and the verses. Read the explanation after each.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Sanskrit verses &middot; पर्यावरण-संरक्षणम् &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: EXPLORER STAGES ---------------- */
+var VERSES = [
+  {
+    tag:"प्रकृति · Nature",
+    deva:"प्रकृतिः सर्वेषां जीवानां माता अस्ति। तस्याः रक्षणम् अस्माकं कर्तव्यम्।",
+    translit:"prakṛtiḥ sarveṣāṁ jīvānāṁ mātā asti; tasyāḥ rakṣaṇam asmākaṁ kartavyam",
+    words:[
+      {w:"प्रकृतिः", m:"nature"},
+      {w:"जीवानाम्", m:"of living beings"},
+      {w:"माता", m:"mother"},
+      {w:"कर्तव्यम्", m:"duty"}
+    ],
+    trans:"Nature is the mother of all living beings; protecting her is our duty.",
+    anvaya:null,
+    moral:"Nature nourishes every creature like a mother — so caring for her is a shared human duty, not a choice."
+  },
+  {
+    tag:"वृक्षाः · Trees",
+    deva:"दशकूपसमा वापी दशवापीसमो ह्रदः। दशह्रदसमः पुत्रो दशपुत्रसमो द्रुमः॥",
+    translit:"daśakūpasamā vāpī daśavāpīsamo hradaḥ; daśahradasamaḥ putro daśaputrasamo drumaḥ",
+    words:[
+      {w:"वापी", m:"a step-well / pond"},
+      {w:"ह्रदः", m:"a lake"},
+      {w:"पुत्रः", m:"a son"},
+      {w:"द्रुमः", m:"a tree"}
+    ],
+    trans:"A pond equals ten wells, a lake equals ten ponds, a son equals ten lakes, and one tree equals ten sons.",
+    anvaya:"वापी दशकूपसमा (अस्ति), ह्रदः दशवापीसमः, पुत्रः दशह्रदसमः, द्रुमः दशपुत्रसमः (अस्ति)।",
+    moral:"This classic verse ranks a single tree above ten sons in value — a striking measure of how precious trees are to life."
+  },
+  {
+    tag:"वृक्षाः · Selfless Trees",
+    deva:"छायामन्यस्य कुर्वन्ति तिष्ठन्ति स्वयमातपे। फलान्यपि परार्थाय वृक्षाः सत्पुरुषा इव॥",
+    translit:"chāyām anyasya kurvanti tiṣṭhanti svayam ātape; phalāny api parārthāya vṛkṣāḥ satpuruṣā iva",
+    words:[
+      {w:"छायाम्", m:"shade"},
+      {w:"आतपे", m:"in the (hot) sunshine"},
+      {w:"परार्थाय", m:"for others' sake"},
+      {w:"सत्पुरुषाः", m:"good/noble people"}
+    ],
+    trans:"Trees give shade to others while themselves standing in the sun; their fruits too are for others — trees are like noble people.",
+    anvaya:"वृक्षाः अन्यस्य छायां कुर्वन्ति, स्वयम् आतपे तिष्ठन्ति, फलानि अपि परार्थाय (सन्ति), सत्पुरुषाः इव।",
+    moral:"Trees embody selfless giving — they bear heat so others get shade. Protecting them protects a living lesson in generosity."
+  },
+  {
+    tag:"जलम् · वायुः · Water & Air",
+    deva:"जलं वायुश्च जीवनस्य आधारौ स्तः। तयोः शुद्धता एव आरोग्यस्य मूलम्।",
+    translit:"jalaṁ vāyuś ca jīvanasya ādhārau staḥ; tayoḥ śuddhatā eva ārogyasya mūlam",
+    words:[
+      {w:"जलम्", m:"water"},
+      {w:"वायुः", m:"air"},
+      {w:"आधारौ", m:"two supports"},
+      {w:"आरोग्यस्य", m:"of health"}
+    ],
+    trans:"Water and air are the two supports of life; their purity alone is the root of health.",
+    anvaya:null,
+    moral:"Clean water and clean air are the foundation of every life. Keeping them pure is the heart of environmental protection."
+  },
+  {
+    tag:"प्रदूषणम् · संरक्षणम् · Pollution & Conservation",
+    deva:"प्रदूषणं प्रकृतेः हानिः। तस्य निवारणं संरक्षणं च सर्वेषां दायित्वम्।",
+    translit:"pradūṣaṇaṁ prakṛteḥ hāniḥ; tasya nivāraṇaṁ saṁrakṣaṇaṁ ca sarveṣāṁ dāyitvam",
+    words:[
+      {w:"प्रदूषणम्", m:"pollution"},
+      {w:"हानिः", m:"harm / loss"},
+      {w:"निवारणम्", m:"prevention"},
+      {w:"दायित्वम्", m:"responsibility"}
+    ],
+    trans:"Pollution is harm to nature; preventing it and conserving nature is everyone's responsibility.",
+    anvaya:null,
+    moral:"Pollution damages the very nature that sustains us. Preventing harm and conserving resources is a duty shared by all."
+  },
+  {
+    tag:"परोपकारः · Service",
+    deva:"परोपकाराय फलन्ति वृक्षाः परोपकाराय वहन्ति नद्यः। परोपकाराय दुहन्ति गावः परोपकारार्थमिदं शरीरम्॥",
+    translit:"paropakārāya phalanti vṛkṣāḥ paropakārāya vahanti nadyaḥ; paropakārāya duhanti gāvaḥ paropakārārtham idaṁ śarīram",
+    words:[
+      {w:"परोपकाराय", m:"for helping others"},
+      {w:"वृक्षाः", m:"trees"},
+      {w:"नद्यः", m:"rivers"},
+      {w:"गावः", m:"cows"}
+    ],
+    trans:"Trees bear fruit for others, rivers flow for others, cows give milk for others — this body too is meant for the service of others.",
+    anvaya:"वृक्षाः परोपकाराय फलन्ति, नद्यः परोपकाराय वहन्ति, गावः परोपकाराय दुहन्ति, इदं शरीरम् (अपि) परोपकारार्थम् (अस्ति)।",
+    moral:"All of nature exists in service — trees, rivers, cattle. Learning from them, we too should live to protect and serve the natural world."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  var anvaya = v.anvaya ? '<div class="anvaya-box"><div class="block-label">अन्वय · Prose Order</div><span class="deva-inline">'+v.anvaya+'</span></div>' : '';
+  verseCard.innerHTML =
+    '<div style="text-align:center;"><span class="theme-tag">'+v.tag+'</span></div>'+
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ · Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    anvaya+
+    '<div class="moral-box"><div class="block-label">भावः · Message</div>'+v.moral+'</div>';
+  verseCount.textContent = "Stage "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"पर्यावरणम्", m:"environment"},
+  {w:"वृक्षः", m:"tree"},
+  {w:"जलम्", m:"water"},
+  {w:"वायुः", m:"air"},
+  {w:"प्रदूषणम्", m:"pollution"},
+  {w:"संरक्षणम्", m:"protection"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'In the verse <span class="deva-inline">छायामन्यस्य कुर्वन्ति तिष्ठन्ति स्वयमातपे</span>, trees are compared to which kind of people?',
+    options:[
+      {t:'<span class="deva-inline">सत्पुरुषाः</span> — noble/good people', ok:true},
+      {t:'<span class="deva-inline">मूर्खाः</span> — foolish people', ok:false},
+      {t:'<span class="deva-inline">धनिकाः</span> — wealthy people', ok:false}
+    ],
+    explain:'The verse ends <b>वृक्षाः सत्पुरुषा इव</b> — trees are like noble people, because they bear the sun themselves yet give shade and fruit to others.'
+  },
+  {
+    q:'According to the classic tree verse <span class="deva-inline">दशकूपसमा वापी...</span>, one tree (<span class="deva-inline">द्रुमः</span>) is said to equal how many of what?',
+    options:[
+      {t:'Ten sons (<span class="deva-inline">दशपुत्रसमः</span>)', ok:true},
+      {t:'Ten wells (<span class="deva-inline">दशकूपसमः</span>)', ok:false},
+      {t:'Ten ponds (<span class="deva-inline">दशवापीसमः</span>)', ok:false}
+    ],
+    explain:'The verse climbs a ladder of value ending <b>दशपुत्रसमो द्रुमः</b> — one tree equals ten sons, showing how highly trees were valued.'
+  },
+  {
+    q:'What does the chapter call <span class="deva-inline">प्रदूषणम्</span> (pollution) in relation to nature (<span class="deva-inline">प्रकृति</span>)?',
+    options:[
+      {t:'<span class="deva-inline">हानिः</span> — harm/loss to nature', ok:true},
+      {t:'<span class="deva-inline">लाभः</span> — a benefit to nature', ok:false},
+      {t:'<span class="deva-inline">भूषणम्</span> — an ornament of nature', ok:false}
+    ],
+    explain:'The statement <b>प्रदूषणं प्रकृतेः हानिः</b> teaches that pollution is harm to nature, so its prevention (<b>निवारणम्</b>) and conservation (<b>संरक्षणम्</b>) are everyone\'s duty.'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o, i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-qtext">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    var bi = parseInt(b.dataset.i, 10);
+    b.disabled = true;
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
