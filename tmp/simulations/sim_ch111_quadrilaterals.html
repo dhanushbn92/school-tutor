@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadrilaterals Lab — NIOS Class 10 Maths (Ch13)</title>
+<style>
+  :root{
+    --bg:#141a24; --panel:#1d2735; --panel2:#243044; --ink:#e8eef7;
+    --muted:#9fb0c6; --accent:#5ad1c8; --accent-d:#2f9e97; --line:#34435c;
+    --good:#57d68a; --bad:#f07b7b; --mark:#f2b34b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 4px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  p.sub{margin:0 0 14px;color:var(--muted);font-size:.9rem}
+  .wrap{max-width:960px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;text-align:center;min-width:120px;transition:.15s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent);color:#08211f;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .view{display:none}
+  .view.active{display:block}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+  .card{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px;cursor:pointer;text-align:center;transition:.15s;
+  }
+  .card:hover{border-color:var(--accent)}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(90,209,200,.3)}
+  .card svg{width:100%;height:82px;display:block}
+  .card .nm{margin-top:6px;font-size:.85rem;font-weight:600}
+  .detail{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;display:none}
+  .detail.show{display:block}
+  .detail h3{margin:0 0 8px;color:var(--accent)}
+  .detail ul{margin:6px 0 0;padding-left:20px}
+  .detail li{margin:3px 0;font-size:.9rem}
+  .stage{display:flex;flex-direction:column;align-items:center}
+  svg.board{width:100%;max-width:460px;height:auto;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:none}
+  .readout{margin-top:12px;width:100%;max-width:460px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.9rem}
+  .readout b{color:var(--accent)}
+  .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line)}
+  .row:last-child{border:none}
+  .btn{background:var(--accent);color:#08211f;border:none;border-radius:10px;padding:9px 14px;font-size:.9rem;font-weight:600;cursor:pointer;margin:6px 6px 0 0}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:12px}
+  .choice{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;text-align:center;font-size:.9rem;transition:.15s}
+  .choice:hover{border-color:var(--accent)}
+  .choice.correct{background:rgba(87,214,138,.18);border-color:var(--good);color:var(--good)}
+  .choice.wrong{background:rgba(240,123,123,.18);border-color:var(--bad);color:var(--bad)}
+  .fb{margin-top:10px;font-size:.9rem;min-height:1.2em}
+  .fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+  .facts{columns:2;column-gap:18px}
+  .facts .f{break-inside:avoid;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px}
+  .facts h4{margin:0 0 4px;color:var(--accent);font-size:.92rem}
+  .facts p{margin:0;font-size:.85rem;color:var(--muted)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .q .qt{font-weight:600;margin-bottom:8px;font-size:.92rem}
+  .q .opt{padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin:5px 0;cursor:pointer;font-size:.88rem;transition:.15s}
+  .q .opt:hover{border-color:var(--accent)}
+  .q .opt.correct{background:rgba(87,214,138,.18);border-color:var(--good)}
+  .q .opt.wrong{background:rgba(240,123,123,.18);border-color:var(--bad)}
+  .q .exp{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .q .exp.show{display:block}
+  .hierarchy{width:100%;max-width:520px;height:auto}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  @media(max-width:520px){.facts{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Quadrilaterals Lab</h1>
+  <p class="sub">NIOS Class 10 Mathematics · Chapter 13 · A four-sided closed figure. Interior angle sum is always 360&deg;.</p>
+
+  <div class="tabs">
+    <div class="tab active" data-v="fam">Family</div>
+    <div class="tab" data-v="prop">Properties</div>
+    <div class="tab" data-v="id">Identify-it</div>
+    <div class="tab" data-v="facts">Facts</div>
+    <div class="tab" data-v="quiz">Quiz</div>
+  </div>
+
+  <!-- FAMILY -->
+  <div class="view active" id="fam">
+    <div class="panel">
+      <h2>Family of Quadrilaterals</h2>
+      <p class="note">Tap a shape to see its defining properties. Tick marks show equal sides; arrows show parallel sides; arcs show equal angles.</p>
+      <div class="cards" id="cards"></div>
+      <div class="detail" id="detail"></div>
+    </div>
+    <div class="panel">
+      <h2>Hierarchy Tree</h2>
+      <p class="note">A shape lower in the tree has all the properties of those above it. A <b>square</b> is both a special rectangle and a special rhombus.</p>
+      <svg class="hierarchy" viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" id="tree"></svg>
+    </div>
+  </div>
+
+  <!-- PROPERTIES -->
+  <div class="view" id="prop">
+    <div class="panel">
+      <h2>Interactive Properties</h2>
+      <div style="margin-bottom:10px">
+        <button class="btn" id="modeGen" >General quad · angle sum</button>
+        <button class="btn ghost" id="modePar">Parallelogram · properties</button>
+      </div>
+      <div class="stage">
+        <svg class="board" id="board" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="readout" id="readout"></div>
+      </div>
+      <p class="note">Drag any labelled vertex (round handle). Values update live.</p>
+    </div>
+  </div>
+
+  <!-- IDENTIFY -->
+  <div class="view" id="id">
+    <div class="panel">
+      <h2>Identify-it</h2>
+      <p class="note">Study the marked properties, then name the quadrilateral.</p>
+      <div class="stage">
+        <svg class="board" id="idBoard" viewBox="0 0 460 320" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="choices" id="idChoices"></div>
+      <div class="fb" id="idFb"></div>
+      <button class="btn" id="idNext">Next figure &rarr;</button>
+    </div>
+  </div>
+
+  <!-- FACTS -->
+  <div class="view" id="facts">
+    <div class="panel">
+      <h2>Facts Panel</h2>
+      <div class="facts" id="factsList"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="view" id="quiz">
+    <div class="panel">
+      <h2>Quick Quiz (3 questions)</h2>
+      <div id="quizList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var tabs=document.querySelectorAll(".tab");
+var views=document.querySelectorAll(".view");
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    views.forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    document.getElementById(t.dataset.v).classList.add("active");
+    if(t.dataset.v==="prop") drawProp();
+  });
+});
+
+/* ---------- shape mini-diagram generator (SVG string) ---------- */
+/* helpers for marks */
+function tick(x,y,ang,n){ // n small ticks perpendicular to side at (x,y) direction ang
+  var s="";var len=6,gap=4;
+  var px=Math.cos(ang+Math.PI/2),py=Math.sin(ang+Math.PI/2);
+  for(var i=0;i<n;i++){
+    var off=(i-(n-1)/2)*gap;
+    var cx=x+Math.cos(ang)*off, cy=y+Math.sin(ang)*off;
+    s+='<line x1="'+(cx-px*len)+'" y1="'+(cy-py*len)+'" x2="'+(cx+px*len)+'" y2="'+(cy+py*len)+'" stroke="var(--mark)" stroke-width="2"/>';
+  }
+  return s;
+}
+function arrow(x,y,ang,n){ // parallel arrows along side
+  var s="";var L=7;
+  for(var i=0;i<n;i++){
+    var off=i*7;
+    var bx=x+Math.cos(ang)*off, by=y+Math.sin(ang)*off;
+    var a1=ang+2.5, a2=ang-2.5;
+    s+='<line x1="'+bx+'" y1="'+by+'" x2="'+(bx-Math.cos(a1)*L)+'" y2="'+(by-Math.sin(a1)*L)+'" stroke="var(--accent)" stroke-width="1.8"/>';
+    s+='<line x1="'+bx+'" y1="'+by+'" x2="'+(bx-Math.cos(a2)*L)+'" y2="'+(by-Math.sin(a2)*L)+'" stroke="var(--accent)" stroke-width="1.8"/>';
+  }
+  return s;
+}
+function rightAngle(x,y,a1,a2){ // small square corner
+  var d=10;
+  var p1x=x+Math.cos(a1)*d,p1y=y+Math.sin(a1)*d;
+  var p2x=x+Math.cos(a2)*d,p2y=y+Math.sin(a2)*d;
+  var p3x=p1x+Math.cos(a2)*d,p3y=p1y+Math.sin(a2)*d;
+  return '<polyline points="'+p1x+','+p1y+' '+p3x+','+p3y+' '+p2x+','+p2y+'" fill="none" stroke="var(--muted)" stroke-width="1.5"/>';
+}
+function poly(pts){
+  var d=pts.map(function(p){return p[0]+","+p[1];}).join(" ");
+  return '<polygon points="'+d+'" fill="rgba(90,209,200,.10)" stroke="var(--accent)" stroke-width="2.4"/>';
+}
+function ang(a,b){return Math.atan2(b[1]-a[1],b[0]-a[0]);}
+function mid(a,b){return [(a[0]+b[0])/2,(a[1]+b[1])/2];}
+
+/* build each shape's mini svg; vb is 120x100 */
+function shapeSVG(kind){
+  var W=120,H=100,inner="";
+  var A,B,C,D;
+  if(kind==="parallelogram"){
+    A=[20,80];B=[80,80];C=[100,25];D=[40,25];
+    inner+=poly([A,B,C,D]);
+    inner+=arrow(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+arrow(mid(D,C)[0],mid(D,C)[1],ang(D,C),1);
+    inner+=arrow(mid(A,D)[0],mid(A,D)[1],ang(A,D),2)+arrow(mid(B,C)[0],mid(B,C)[1],ang(B,C),2);
+    inner+=tick(mid(A,B)[0],mid(A,B)[1]-1,ang(A,B),1)+tick(mid(D,C)[0],mid(D,C)[1]-1,ang(D,C),1);
+  }else if(kind==="rectangle"){
+    A=[22,78];B=[98,78];C=[98,25];D=[22,25];
+    inner+=poly([A,B,C,D]);
+    inner+=rightAngle(A,ang(A,B),ang(A,D))+rightAngle(B,ang(B,A),ang(B,C));
+    inner+=rightAngle(C,ang(C,B),ang(C,D))+rightAngle(D,ang(D,A),ang(D,C));
+    inner+='<line x1="22" y1="78" x2="98" y2="25" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+    inner+='<line x1="98" y1="78" x2="22" y2="25" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  }else if(kind==="rhombus"){
+    A=[22,80];B=[78,80];C=[98,30];D=[42,30];
+    inner+=poly([A,B,C,D]);
+    inner+=tick(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+tick(mid(B,C)[0],mid(B,C)[1],ang(B,C),1);
+    inner+=tick(mid(C,D)[0],mid(C,D)[1],ang(C,D),1)+tick(mid(D,A)[0],mid(D,A)[1],ang(D,A),1);
+    inner+='<line x1="22" y1="80" x2="98" y2="30" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+    inner+='<line x1="78" y1="80" x2="42" y2="30" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  }else if(kind==="square"){
+    A=[28,82];B=[92,82];C=[92,26];D=[28,26];
+    inner+=poly([A,B,C,D]);
+    inner+=rightAngle(A,ang(A,B),ang(A,D));
+    inner+=tick(mid(A,B)[0],mid(A,B)[1],ang(A,B),2)+tick(mid(B,C)[0],mid(B,C)[1],ang(B,C),2);
+    inner+=tick(mid(C,D)[0],mid(C,D)[1],ang(C,D),2)+tick(mid(D,A)[0],mid(D,A)[1],ang(D,A),2);
+    inner+='<line x1="28" y1="82" x2="92" y2="26" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+    inner+='<line x1="92" y1="82" x2="28" y2="26" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  }else if(kind==="trapezium"){
+    A=[16,80];B=[104,80];C=[82,28];D=[40,28];
+    inner+=poly([A,B,C,D]);
+    inner+=arrow(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+arrow(mid(D,C)[0],mid(D,C)[1],ang(D,C),1);
+  }else if(kind==="kite"){
+    A=[60,90];B=[95,50];C=[60,15];D=[25,50];
+    inner+=poly([A,B,C,D]);
+    inner+=tick(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+tick(mid(B,C)[0],mid(B,C)[1],ang(B,C),2);
+    inner+=tick(mid(C,D)[0],mid(C,D)[1],ang(C,D),2)+tick(mid(D,A)[0],mid(D,A)[1],ang(D,A),1);
+    inner+='<line x1="60" y1="90" x2="60" y2="15" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+    inner+='<line x1="95" y1="50" x2="25" y2="50" stroke="var(--muted)" stroke-dasharray="3 3"/>';
+  }
+  return '<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';
+}
+
+/* ---------- shape data ---------- */
+var SHAPES=[
+  {k:"parallelogram",nm:"Parallelogram",props:[
+    "Both pairs of opposite sides are parallel and equal.",
+    "Opposite angles are equal.",
+    "Adjacent (co-interior) angles are supplementary (sum 180&deg;).",
+    "Diagonals bisect each other (but are not equal)."
+  ]},
+  {k:"rectangle",nm:"Rectangle",props:[
+    "A parallelogram with all four angles equal to 90&deg;.",
+    "Opposite sides parallel and equal.",
+    "Diagonals are equal and bisect each other."
+  ]},
+  {k:"rhombus",nm:"Rhombus",props:[
+    "A parallelogram with all four sides equal.",
+    "Opposite angles equal; opposite sides parallel.",
+    "Diagonals bisect each other at right angles (90&deg;) and bisect the angles."
+  ]},
+  {k:"square",nm:"Square",props:[
+    "All four sides equal AND all four angles 90&deg;.",
+    "It is both a special rectangle and a special rhombus.",
+    "Diagonals are equal, bisect each other at right angles, and bisect the angles."
+  ]},
+  {k:"trapezium",nm:"Trapezium",props:[
+    "Exactly one pair of opposite sides is parallel (the parallel sides are the bases).",
+    "In an isosceles trapezium the non-parallel sides are equal and base angles are equal.",
+    "Diagonals are generally unequal."
+  ]},
+  {k:"kite",nm:"Kite",props:[
+    "Two pairs of adjacent (consecutive) sides are equal.",
+    "One pair of opposite angles (between unequal sides) is equal.",
+    "Diagonals intersect at right angles; the main diagonal bisects the other."
+  ]}
+];
+
+var cardsEl=document.getElementById("cards");
+var detailEl=document.getElementById("detail");
+SHAPES.forEach(function(s,i){
+  var c=document.createElement("div");
+  c.className="card"; c.dataset.i=i;
+  c.innerHTML=shapeSVG(s.k)+'<div class="nm">'+s.nm+'</div>';
+  c.addEventListener("click",function(){
+    document.querySelectorAll(".card").forEach(function(x){x.classList.remove("sel");});
+    c.classList.add("sel");
+    detailEl.classList.add("show");
+    detailEl.innerHTML='<h3>'+s.nm+'</h3><ul>'+s.props.map(function(p){return "<li>"+p+"</li>";}).join("")+"</ul>";
+  });
+  cardsEl.appendChild(c);
+});
+
+/* ---------- hierarchy tree ---------- */
+(function(){
+  var t=document.getElementById("tree");
+  function node(x,y,label){
+    return '<rect x="'+(x-52)+'" y="'+(y-16)+'" width="104" height="32" rx="8" fill="var(--panel2)" stroke="var(--accent)" stroke-width="1.5"/>'+
+           '<text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" fill="var(--ink)" font-size="13" font-family="Segoe UI,sans-serif">'+label+'</text>';
+  }
+  function edge(x1,y1,x2,y2){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--line)" stroke-width="2"/>';}
+  var s="";
+  // Quadrilateral -> {Parallelogram, Trapezium, Kite}
+  s+=edge(260,36,120,110)+edge(260,36,260,110)+edge(260,36,400,110);
+  // Parallelogram -> Rectangle, Rhombus
+  s+=edge(120,126,80,200)+edge(120,126,200,200);
+  // Rectangle -> Square, Rhombus -> Square
+  s+=edge(80,216,190,278)+edge(200,216,190,278);
+  s+=node(260,36,"Quadrilateral");
+  s+=node(120,110,"Parallelogram");
+  s+=node(260,110,"Trapezium");
+  s+=node(400,110,"Kite");
+  s+=node(80,200,"Rectangle");
+  s+=node(200,200,"Rhombus");
+  s+=node(190,278,"Square");
+  t.innerHTML=s;
+})();
+
+/* =====================================================================
+   PROPERTIES VIEW
+   ===================================================================== */
+var board=document.getElementById("board");
+var readout=document.getElementById("readout");
+var propMode="gen"; // "gen" general quad, "par" parallelogram
+var VB={w:460,h:360};
+
+// vertices in board coords (SVG viewBox units)
+var Vgen=[[80,300],[380,290],[330,80],[110,110]];      // A B C D free
+var Vpar=[[100,290],[300,300]];                          // A,B free; C,D derived to keep parallelogram
+// For parallelogram we keep it as: A,B,C free (D = A + C - B) -> guarantees parallelogram
+var Ppar=[[90,300],[330,300],[360,110]]; // A,B,C ; D computed
+
+document.getElementById("modeGen").addEventListener("click",function(){propMode="gen";setBtn();drawProp();});
+document.getElementById("modePar").addEventListener("click",function(){propMode="par";setBtn();drawProp();});
+function setBtn(){
+  document.getElementById("modeGen").className="btn"+(propMode==="gen"?"":" ghost");
+  document.getElementById("modePar").className="btn"+(propMode==="par"?"":" ghost");
+}
+
+function dist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1]);}
+function interiorAngle(prev,cur,next){
+  var v1=[prev[0]-cur[0],prev[1]-cur[1]];
+  var v2=[next[0]-cur[0],next[1]-cur[1]];
+  var d=v1[0]*v2[0]+v1[1]*v2[1];
+  var m=Math.hypot(v1[0],v1[1])*Math.hypot(v2[0],v2[1]);
+  var a=Math.acos(Math.max(-1,Math.min(1,d/m)))*180/Math.PI;
+  return a;
+}
+
+function currentPar(){
+  var A=Ppar[0],B=Ppar[1],C=Ppar[2];
+  var D=[A[0]+C[0]-B[0], A[1]+C[1]-B[1]];
+  return [A,B,C,D];
+}
+
+function drawProp(){
+  var pts,drag,labels=["A","B","C","D"];
+  if(propMode==="gen"){pts=Vgen;drag=[0,1,2,3];}
+  else {pts=currentPar();drag=[0,1,2];}
+  // ensure simple (non-self-intersecting) not strictly enforced; ordering fixed
+  var s="";
+  // polygon
+  s+='<polygon points="'+pts.map(function(p){return p[0]+","+p[1];}).join(" ")+'" fill="rgba(90,209,200,.10)" stroke="var(--accent)" stroke-width="2.6"/>';
+
+  if(propMode==="par"){
+    // parallel marks: AB & DC one arrow, AD & BC two arrows
+    var A=pts[0],B=pts[1],C=pts[2],D=pts[3];
+    s+=arrow(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+arrow(mid(D,C)[0],mid(D,C)[1],ang(D,C),1);
+    s+=arrow(mid(A,D)[0],mid(A,D)[1],ang(A,D),2)+arrow(mid(B,C)[0],mid(B,C)[1],ang(B,C),2);
+    // equal-side ticks
+    s+=tick(mid(A,B)[0],mid(A,B)[1],ang(A,B),1)+tick(mid(D,C)[0],mid(D,C)[1],ang(D,C),1);
+    s+=tick(mid(A,D)[0],mid(A,D)[1],ang(A,D),2)+tick(mid(B,C)[0],mid(B,C)[1],ang(B,C),2);
+    // diagonals + intersection (they bisect => midpoint of AC == midpoint of BD)
+    s+='<line x1="'+A[0]+'" y1="'+A[1]+'" x2="'+C[0]+'" y2="'+C[1]+'" stroke="var(--mark)" stroke-dasharray="4 4" stroke-width="1.6"/>';
+    s+='<line x1="'+B[0]+'" y1="'+B[1]+'" x2="'+D[0]+'" y2="'+D[1]+'" stroke="var(--mark)" stroke-dasharray="4 4" stroke-width="1.6"/>';
+    var mc=mid(A,C);
+    s+='<circle cx="'+mc[0]+'" cy="'+mc[1]+'" r="4" fill="var(--mark)"/>';
+    s+=halfTicks(A,mc)+halfTicks(C,mc)+halfTicks(B,mc,2)+halfTicks(D,mc,2);
+  }
+
+  // vertex labels + handles
+  pts.forEach(function(p,i){
+    var isDrag=drag.indexOf(i)>=0;
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(isDrag?11:6)+'" fill="'+(isDrag?"var(--accent)":"var(--muted)")+'" stroke="#08211f" stroke-width="'+(isDrag?2:1)+'" data-h="'+(isDrag?i:-1)+'" style="cursor:'+(isDrag?"grab":"default")+'"/>';
+    var lx=p[0]+(p[0]<VB.w/2?-16:12), ly=p[1]+(p[1]<VB.h/2?-10:16);
+    s+='<text x="'+lx+'" y="'+ly+'" fill="var(--ink)" font-size="15" font-weight="700">'+labels[i]+'</text>';
+  });
+  board.innerHTML=s;
+  updateReadout(pts);
+  attachDrag();
+}
+function halfTicks(a,m,n){n=n||1;var mm=mid(a,m);return tick(mm[0],mm[1],ang(a,m),n);}
+
+function updateReadout(pts){
+  var A=pts[0],B=pts[1],C=pts[2],D=pts[3];
+  var angs=[
+    interiorAngle(D,A,B),
+    interiorAngle(A,B,C),
+    interiorAngle(B,C,D),
+    interiorAngle(C,D,A)
+  ];
+  var sum=angs.reduce(function(a,b){return a+b;},0);
+  var html="";
+  if(propMode==="gen"){
+    html+='<div class="row"><span>&ang;A</span><b>'+angs[0].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>&ang;B</span><b>'+angs[1].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>&ang;C</span><b>'+angs[2].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>&ang;D</span><b>'+angs[3].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>Angle sum</span><b>'+sum.toFixed(1)+'&deg; = 360&deg; always</b></div>';
+  }else{
+    var AB=dist(A,B),DC=dist(D,C),AD=dist(A,D),BC=dist(B,C);
+    html+='<div class="row"><span>AB vs DC (opp.)</span><b>'+AB.toFixed(0)+' = '+DC.toFixed(0)+'</b></div>';
+    html+='<div class="row"><span>AD vs BC (opp.)</span><b>'+AD.toFixed(0)+' = '+BC.toFixed(0)+'</b></div>';
+    html+='<div class="row"><span>&ang;A vs &ang;C (opp.)</span><b>'+angs[0].toFixed(1)+'&deg; = '+angs[2].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>&ang;B vs &ang;D (opp.)</span><b>'+angs[1].toFixed(1)+'&deg; = '+angs[3].toFixed(1)+'&deg;</b></div>';
+    html+='<div class="row"><span>&ang;A + &ang;B (adj.)</span><b>'+(angs[0]+angs[1]).toFixed(0)+'&deg; = 180&deg;</b></div>';
+    html+='<div class="row"><span>Diagonals</span><b>bisect each other &#10003;</b></div>';
+    html+='<div class="row"><span>Angle sum</span><b>'+sum.toFixed(0)+'&deg;</b></div>';
+  }
+  readout.innerHTML=html;
+}
+
+/* dragging (mouse + touch) */
+var dragState=null;
+function boardPoint(evt){
+  var rect=board.getBoundingClientRect();
+  var cx=(evt.touches?evt.touches[0].clientX:evt.clientX);
+  var cy=(evt.touches?evt.touches[0].clientY:evt.clientY);
+  return [ (cx-rect.left)/rect.width*VB.w, (cy-rect.top)/rect.height*VB.h ];
+}
+function attachDrag(){
+  board.querySelectorAll('[data-h]').forEach(function(h){
+    var idx=parseInt(h.getAttribute("data-h"),10);
+    if(idx<0) return;
+    h.addEventListener("mousedown",function(e){startDrag(idx,e);});
+    h.addEventListener("touchstart",function(e){startDrag(idx,e);e.preventDefault();},{passive:false});
+  });
+}
+function startDrag(idx,e){dragState=idx;e.preventDefault&&e.preventDefault();}
+function moveDrag(e){
+  if(dragState===null) return;
+  var p=boardPoint(e);
+  p[0]=Math.max(20,Math.min(VB.w-20,p[0]));
+  p[1]=Math.max(20,Math.min(VB.h-20,p[1]));
+  if(propMode==="gen"){Vgen[dragState]=p;}
+  else{Ppar[dragState]=p;}
+  drawProp();
+  e.preventDefault&&e.preventDefault();
+}
+function endDrag(){dragState=null;}
+window.addEventListener("mousemove",moveDrag);
+window.addEventListener("touchmove",moveDrag,{passive:false});
+window.addEventListener("mouseup",endDrag);
+window.addEventListener("touchend",endDrag);
+setBtn();
+drawProp();
+
+/* =====================================================================
+   IDENTIFY-IT
+   ===================================================================== */
+var idBoard=document.getElementById("idBoard");
+var idChoices=document.getElementById("idChoices");
+var idFb=document.getElementById("idFb");
+var NAMES=["Parallelogram","Rectangle","Rhombus","Square","Trapezium","Kite"];
+var idAnswer=null, idLocked=false;
+
+function idFigure(kind){
+  // large marked figure in 460x320
+  var inner="", A,B,C,D;
+  function P(a,b,c,d){inner+='<polygon points="'+[a,b,c,d].map(function(p){return p[0]+","+p[1];}).join(" ")+'" fill="rgba(90,209,200,.10)" stroke="var(--accent)" stroke-width="2.6"/>';}
+  function T(a,b,n){var m=mid(a,b);inner+=tick(m[0],m[1],ang(a,b),n);}
+  function AR(a,b,n){var m=mid(a,b);inner+=arrow(m[0],m[1],ang(a,b),n);}
+  function RA(v,a1,a2){var d=16;var p1=[v[0]+Math.cos(a1)*d,v[1]+Math.sin(a1)*d];var p2=[v[0]+Math.cos(a2)*d,v[1]+Math.sin(a2)*d];var p3=[p1[0]+Math.cos(a2)*d,p1[1]+Math.sin(a2)*d];inner+='<polyline points="'+p1[0]+','+p1[1]+' '+p3[0]+','+p3[1]+' '+p2[0]+','+p2[1]+'" fill="none" stroke="var(--muted)" stroke-width="1.6"/>';}
+  function DG(a,b){inner+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="var(--mark)" stroke-dasharray="5 5" stroke-width="1.6"/>';}
+
+  if(kind==="parallelogram"){
+    A=[70,250];B=[300,250];C=[380,90];D=[150,90];
+    P(A,B,C,D);AR(A,B,1);AR(D,C,1);AR(A,D,2);AR(B,C,2);T(A,B,1);T(D,C,1);
+  }else if(kind==="rectangle"){
+    A=[80,240];B=[380,240];C=[380,90];D=[80,90];
+    P(A,B,C,D);RA(A,ang(A,B),ang(A,D));RA(B,ang(B,A),ang(B,C));RA(C,ang(C,B),ang(C,D));RA(D,ang(D,A),ang(D,C));
+    T(A,B,1);T(D,C,1);
+  }else if(kind==="rhombus"){
+    A=[90,250];B=[270,250];C=[350,110];D=[170,110];
+    P(A,B,C,D);T(A,B,1);T(B,C,1);T(C,D,1);T(D,A,1);
+    DG(A,C);DG(B,D);
+    // right angle at diagonal intersection
+    var ix=[(A[0]+C[0])/2,(A[1]+C[1])/2];RA(ix,ang(ix,A),ang(ix,B));
+  }else if(kind==="square"){
+    A=[130,250];B=[330,250];C=[330,90];D=[130,90];
+    P(A,B,C,D);RA(A,ang(A,B),ang(A,D));T(A,B,2);T(B,C,2);T(C,D,2);T(D,A,2);
+  }else if(kind==="trapezium"){
+    A=[60,250];B=[400,250];C=[320,100];D=[150,100];
+    P(A,B,C,D);AR(A,B,1);AR(D,C,1);
+  }else if(kind==="kite"){
+    A=[230,290];B=[350,160];C=[230,40];D=[110,160];
+    P(A,B,C,D);T(A,B,1);T(D,A,1);T(B,C,2);T(C,D,2);
+    DG(A,C);DG(B,D);
+    var ix2=[230,160];RA(ix2,ang(ix2,C),ang(ix2,B));
+  }
+  return inner;
+}
+
+function newId(){
+  idLocked=false; idFb.textContent=""; idFb.className="fb";
+  idAnswer=NAMES[Math.floor(Math.random()*NAMES.length)];
+  idBoard.innerHTML=idFigure(idAnswer.toLowerCase());
+  // shuffle choices
+  var opts=NAMES.slice().sort(function(){return Math.random()-0.5;});
+  idChoices.innerHTML="";
+  opts.forEach(function(nm){
+    var c=document.createElement("div");
+    c.className="choice";c.textContent=nm;
+    c.addEventListener("click",function(){
+      if(idLocked) return; idLocked=true;
+      if(nm===idAnswer){c.classList.add("correct");idFb.textContent="Correct — it is a "+idAnswer+".";idFb.className="fb good";}
+      else{
+        c.classList.add("wrong");idFb.textContent="Not quite — the marks show a "+idAnswer+".";idFb.className="fb bad";
+        Array.prototype.forEach.call(idChoices.children,function(ch){if(ch.textContent===idAnswer)ch.classList.add("correct");});
+      }
+    });
+    idChoices.appendChild(c);
+  });
+}
+document.getElementById("idNext").addEventListener("click",newId);
+newId();
+
+/* =====================================================================
+   FACTS
+   ===================================================================== */
+var FACTS=[
+  ["Angle sum","The four interior angles of ANY quadrilateral add up to 360&deg;. A diagonal splits it into two triangles (180&deg; + 180&deg;)."],
+  ["Parallelogram","Opposite sides equal & parallel, opposite angles equal, adjacent angles supplementary, diagonals bisect each other."],
+  ["Rectangle","A parallelogram with all angles 90&deg;. Diagonals are equal and bisect each other."],
+  ["Rhombus","A parallelogram with all sides equal. Diagonals bisect each other at 90&deg; and bisect the angles."],
+  ["Square","All sides equal and all angles 90&deg;. It is a special rectangle and a special rhombus; diagonals equal & perpendicular bisectors."],
+  ["Trapezium","Exactly one pair of parallel sides (bases). Isosceles trapezium: legs equal, base angles equal, diagonals equal."],
+  ["Kite","Two pairs of adjacent sides equal. Diagonals perpendicular; one diagonal bisects the other and the vertex angles."],
+  ["Diagonals summary","Equal: rectangle, square, isosceles trapezium. Perpendicular: rhombus, square, kite. Bisect each other: all parallelograms."]
+];
+var fl=document.getElementById("factsList");
+FACTS.forEach(function(f){
+  var d=document.createElement("div");d.className="f";
+  d.innerHTML="<h4>"+f[0]+"</h4><p>"+f[1]+"</p>";
+  fl.appendChild(d);
+});
+
+/* =====================================================================
+   QUIZ
+   ===================================================================== */
+var QUIZ=[
+  {q:"The sum of the interior angles of any quadrilateral is:",
+   o:["180&deg;","270&deg;","360&deg;","540&deg;"],a:2,
+   e:"A diagonal divides a quadrilateral into two triangles, so the angles total 180&deg; + 180&deg; = 360&deg;."},
+  {q:"Which quadrilateral has diagonals that are equal AND bisect each other at right angles?",
+   o:["Rhombus","Rectangle","Square","Parallelogram"],a:2,
+   e:"A square is both a rectangle (equal diagonals) and a rhombus (perpendicular diagonals), so its diagonals are equal and perpendicular bisectors."},
+  {q:"A quadrilateral with exactly one pair of parallel sides is a:",
+   o:["Parallelogram","Trapezium","Kite","Rhombus"],a:1,
+   e:"A trapezium has exactly one pair of parallel sides (the bases). A parallelogram has two pairs."}
+];
+var ql=document.getElementById("quizList");
+QUIZ.forEach(function(item,qi){
+  var box=document.createElement("div");box.className="q";
+  var h='<div class="qt">'+(qi+1)+". "+item.q+"</div>";
+  item.o.forEach(function(opt,oi){h+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</div>';});
+  h+='<div class="exp">'+item.e+'</div>';
+  box.innerHTML=h;
+  ql.appendChild(box);
+});
+var answered={};
+ql.querySelectorAll(".opt").forEach(function(opt){
+  opt.addEventListener("click",function(){
+    var qi=+opt.dataset.q, oi=+opt.dataset.o;
+    if(answered[qi]) return; answered[qi]=true;
+    var correct=QUIZ[qi].a;
+    var box=opt.parentElement;
+    box.querySelectorAll(".opt").forEach(function(o){
+      var ooi=+o.dataset.o;
+      if(ooi===correct)o.classList.add("correct");
+      else if(o===opt)o.classList.add("wrong");
+    });
+    box.querySelector(".exp").classList.add("show");
+  });
+});
+
+// pre-select first family card
+document.querySelector(".card").click();
+</script>
+</body>
+</html>

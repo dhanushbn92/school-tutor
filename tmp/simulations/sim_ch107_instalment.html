@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instalment Buying Lab - NIOS Class 10 Maths</title>
+<style>
+  :root{
+    --accent:#f2a154;
+    --accent-dark:#d9863a;
+    --accent-soft:rgba(242,161,84,.16);
+    --bg1:#171a21;
+    --bg2:#1f232d;
+    --panel:#242935;
+    --panel2:#2b313f;
+    --ink:#eef1f7;
+    --muted:#9aa6bd;
+    --line:#39404f;
+    --good:#57c78a;
+    --bad:#e2726e;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,var(--bg1),var(--bg2));
+    color:var(--ink);line-height:1.55;min-height:100vh;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);
+    border:2px solid var(--line);padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.88rem;font-weight:600;color:var(--muted);
+    transition:.15s;text-align:center;
+  }
+  .tab.active{color:#171a21;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:3px solid var(--accent-soft);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .panel h2{margin:0 0 4px;font-size:1.08rem;}
+  .panel .sub{margin:0 0 14px;color:var(--muted);font-size:.85rem;}
+  .hidden{display:none;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px;font-weight:600;}
+  .field input{
+    width:100%;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:10px;font-size:1rem;
+  }
+  .field input:focus{outline:none;border-color:var(--accent);}
+  .field .unit{font-size:.72rem;color:var(--muted);font-weight:400;}
+  .out{margin-top:16px;}
+  .rows{display:flex;flex-direction:column;gap:2px;}
+  .row{
+    display:flex;justify-content:space-between;gap:12px;align-items:baseline;
+    padding:9px 12px;background:var(--panel2);border-radius:10px;
+  }
+  .row .k{color:var(--muted);font-size:.86rem;}
+  .row .v{font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;}
+  .row.big{background:var(--accent-soft);border:1px solid var(--accent-dark);}
+  .row.big .v{color:var(--accent);font-size:1.15rem;}
+  .row.good .v{color:var(--good);}
+  .row.bad .v{color:var(--bad);}
+  .work{
+    margin-top:14px;background:var(--panel2);border-radius:10px;padding:12px 14px;
+    font-size:.86rem;border-left:3px solid var(--accent);
+  }
+  .work b{color:var(--accent);}
+  .work .step{margin:6px 0;}
+  .mono{font-variant-numeric:tabular-nums;}
+  .note{font-size:.78rem;color:var(--muted);margin-top:10px;}
+  .barwrap{margin-top:16px;display:flex;flex-direction:column;gap:12px;}
+  .bar-item .lbl{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px;}
+  .bar-item .lbl .amt{font-weight:700;font-variant-numeric:tabular-nums;}
+  .track{background:var(--panel2);border-radius:8px;height:26px;overflow:hidden;}
+  .fill{height:100%;border-radius:8px;transition:width .35s ease;min-width:2px;}
+  .fill.c0{background:linear-gradient(90deg,#57c78a,#48a473);}
+  .fill.c1{background:linear-gradient(90deg,#f2a154,#d9863a);}
+  .fill.c2{background:linear-gradient(90deg,#6ea8f0,#4d84cf);}
+  .verdict{
+    margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:600;
+    background:var(--accent-soft);border:1px solid var(--accent-dark);font-size:.92rem;
+  }
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+  .fact{background:var(--panel2);border-radius:12px;padding:12px 14px;border:1px solid var(--line);}
+  .fact h3{margin:0 0 4px;font-size:.9rem;color:var(--accent);}
+  .fact p{margin:0;font-size:.82rem;color:var(--muted);}
+  .quiz-q{background:var(--panel2);border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);}
+  .quiz-q p.q{margin:0 0 8px;font-weight:600;font-size:.9rem;}
+  .opts{display:flex;flex-direction:column;gap:6px;}
+  .opt{
+    display:block;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    text-align:left;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:.86rem;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(87,199,138,.18);border-color:var(--good);color:#bff0d3;}
+  .opt.wrong{background:rgba(226,114,110,.18);border-color:var(--bad);color:#f4c4c2;}
+  .opt:disabled{cursor:default;}
+  .explain{margin-top:8px;font-size:.8rem;color:var(--muted);}
+  .explain.show{color:var(--ink);}
+  footer{text-align:center;color:var(--muted);font-size:.75rem;padding:8px 0 20px;}
+  @media (max-width:400px){
+    .row{flex-direction:column;gap:2px;align-items:flex-start;}
+    header h1{font-size:1.2rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Instalment Buying Lab</h1>
+    <p>NIOS Class 10 Mathematics &middot; Chapter 9 &middot; Instalment Buying (simple-interest scheme)</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="m1" role="tab">Cash vs Instalment</button>
+    <button class="tab" data-mode="m2" role="tab">Find Instalment / Rate</button>
+    <button class="tab" data-mode="m3" role="tab">Compare Options</button>
+  </div>
+
+  <!-- MODE 1 -->
+  <section class="panel" id="m1">
+    <h2>Cash price vs instalment plan</h2>
+    <p class="sub">Enter a plan and see the total paid, the extra over cash price, and the effective interest rate.</p>
+    <div class="grid">
+      <div class="field"><label>Cash price <span class="unit">(&#8377;)</span></label><input id="a_cash" type="number" min="0" step="1" value="12000"></div>
+      <div class="field"><label>Down payment <span class="unit">(&#8377;)</span></label><input id="a_down" type="number" min="0" step="1" value="2000"></div>
+      <div class="field"><label>No. of instalments <span class="unit">(monthly)</span></label><input id="a_n" type="number" min="1" step="1" value="12"></div>
+      <div class="field"><label>Each instalment <span class="unit">(&#8377;)</span></label><input id="a_inst" type="number" min="0" step="0.01" value="900"></div>
+    </div>
+    <div class="out">
+      <div class="rows">
+        <div class="row"><span class="k">Balance financed (cash &minus; down)</span><span class="v" id="a_bal">&mdash;</span></div>
+        <div class="row"><span class="k">Instalments total (n &times; instalment)</span><span class="v" id="a_insttot">&mdash;</span></div>
+        <div class="row big"><span class="k">Total amount paid (down + instalments)</span><span class="v" id="a_total">&mdash;</span></div>
+        <div class="row bad"><span class="k">Extra paid over cash price</span><span class="v" id="a_extra">&mdash;</span></div>
+        <div class="row good"><span class="k">Effective interest rate</span><span class="v" id="a_rate">&mdash;</span></div>
+      </div>
+      <div class="work" id="a_work"></div>
+    </div>
+  </section>
+
+  <!-- MODE 2 -->
+  <section class="panel hidden" id="m2">
+    <h2>Find each instalment (or the rate)</h2>
+    <p class="sub">Given cash price, down payment, interest rate and number of instalments, compute each equal monthly instalment with step-by-step working.</p>
+    <div class="grid">
+      <div class="field"><label>Cash price <span class="unit">(&#8377;)</span></label><input id="b_cash" type="number" min="0" step="1" value="10000"></div>
+      <div class="field"><label>Down payment <span class="unit">(&#8377;)</span></label><input id="b_down" type="number" min="0" step="1" value="1600"></div>
+      <div class="field"><label>Rate <span class="unit">(% per annum, S.I.)</span></label><input id="b_rate" type="number" min="0" step="0.1" value="12"></div>
+      <div class="field"><label>No. of instalments <span class="unit">(monthly)</span></label><input id="b_n" type="number" min="1" step="1" value="8"></div>
+    </div>
+    <div class="out">
+      <div class="rows">
+        <div class="row big"><span class="k">Each monthly instalment</span><span class="v" id="b_inst">&mdash;</span></div>
+        <div class="row"><span class="k">Total paid</span><span class="v" id="b_total">&mdash;</span></div>
+        <div class="row bad"><span class="k">Interest (extra over cash)</span><span class="v" id="b_int">&mdash;</span></div>
+      </div>
+      <div class="work" id="b_work"></div>
+    </div>
+  </section>
+
+  <!-- MODE 3 -->
+  <section class="panel hidden" id="m3">
+    <h2>Compare: cash vs two instalment plans</h2>
+    <p class="sub">Which option costs least in total? Bars show the total money paid under each plan.</p>
+    <div class="grid">
+      <div class="field"><label>Cash price <span class="unit">(&#8377;)</span></label><input id="c_cash" type="number" min="0" step="1" value="15000"></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>Plan A &mdash; down <span class="unit">(&#8377;)</span></label><input id="c_a_down" type="number" min="0" step="1" value="3000"></div>
+      <div class="field"><label>Plan A &mdash; no. instalments</label><input id="c_a_n" type="number" min="1" step="1" value="6"></div>
+      <div class="field"><label>Plan A &mdash; each instalment <span class="unit">(&#8377;)</span></label><input id="c_a_inst" type="number" min="0" step="0.01" value="2100"></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>Plan B &mdash; down <span class="unit">(&#8377;)</span></label><input id="c_b_down" type="number" min="0" step="1" value="1500"></div>
+      <div class="field"><label>Plan B &mdash; no. instalments</label><input id="c_b_n" type="number" min="1" step="1" value="12"></div>
+      <div class="field"><label>Plan B &mdash; each instalment <span class="unit">(&#8377;)</span></label><input id="c_b_inst" type="number" min="0" step="0.01" value="1180"></div>
+    </div>
+    <div class="barwrap" id="c_bars"></div>
+    <div class="verdict" id="c_verdict"></div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="panel">
+    <h2>Key facts</h2>
+    <p class="sub">The vocabulary of instalment buying.</p>
+    <div class="facts">
+      <div class="fact"><h3>Cash price</h3><p>The full price if you pay everything at once, on the spot. This is the cheapest way to buy.</p></div>
+      <div class="fact"><h3>Down payment (cash down)</h3><p>An amount paid immediately when buying. The rest (cash price &minus; down payment) is the balance financed.</p></div>
+      <div class="fact"><h3>Instalment</h3><p>Each equal periodic payment (usually monthly) that clears the balance over time.</p></div>
+      <div class="fact"><h3>Interest in instalment schemes</h3><p>Because you pay over time, the seller charges simple interest on the unpaid balance. So total paid &gt; cash price. The gap is the interest.</p></div>
+    </div>
+    <p class="note">Working rule used here: with balance P = cash &minus; down, rate r% p.a., and n equal monthly instalments X:
+      &nbsp;P(1 + rn/1200) = X&middot;n + X&middot;r&middot;n(n&minus;1)/2400. Each instalment gathers simple interest for the months it stays unpaid.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel">
+    <h2>Quick quiz</h2>
+    <p class="sub">Tap an option to check &mdash; the answer reveals on click.</p>
+    <div id="quiz"></div>
+  </section>
+
+  <footer>Instalment Buying Lab &middot; recomputes as you type &middot; all figures in &#8377;</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var R = "₹";
+  function num(id){ var v = parseFloat(document.getElementById(id).value); return isFinite(v)?v:0; }
+  function money(x){
+    if(!isFinite(x)) return "—";
+    var neg = x<0; x=Math.abs(x);
+    var s = (Math.round(x*100)/100).toFixed(2).replace(/\.00$/,"");
+    // Indian grouping
+    var parts = s.split(".");
+    var ip = parts[0], dp = parts.length>1 ? "."+parts[1] : "";
+    var last3 = ip.slice(-3), rest = ip.slice(0,-3);
+    if(rest) last3 = "," + last3;
+    rest = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+    return (neg?"-":"") + R + rest + last3 + dp;
+  }
+  function pct(x){ if(!isFinite(x)) return "—"; return (Math.round(x*100)/100) + " %"; }
+
+  // ---------- MODE 1 ----------
+  function calc1(){
+    var cash=num('a_cash'), down=num('a_down'), n=Math.max(0,Math.round(num('a_n'))), inst=num('a_inst');
+    var bal = cash - down;
+    var insttot = n*inst;
+    var total = down + insttot;
+    var extra = total - cash;
+    // effective rate r from  bal(1+rn/1200)=inst*n + inst*r*n(n-1)/2400
+    // r = 2400*(inst*n - bal) / ( n*(2*bal - inst*(n-1)) )
+    var rate = NaN;
+    if(n>0){
+      var denom = n*(2*bal - inst*(n-1));
+      if(Math.abs(denom) > 1e-9) rate = 2400*(inst*n - bal)/denom;
+      if(inst*n <= bal) rate = 0;
+    }
+    document.getElementById('a_bal').textContent = money(bal);
+    document.getElementById('a_insttot').textContent = money(insttot);
+    document.getElementById('a_total').textContent = money(total);
+    document.getElementById('a_extra').textContent = money(extra);
+    document.getElementById('a_rate').textContent = (n>0 && isFinite(rate)) ? pct(rate) : "—";
+
+    var w = "";
+    w += "<div class='step'><b>Balance financed</b> = cash &minus; down = "+money(cash)+" &minus; "+money(down)+" = <b>"+money(bal)+"</b></div>";
+    w += "<div class='step'><b>Instalments total</b> = "+n+" &times; "+money(inst)+" = <b>"+money(insttot)+"</b></div>";
+    w += "<div class='step'><b>Total paid</b> = down + instalments = "+money(down)+" + "+money(insttot)+" = <b>"+money(total)+"</b></div>";
+    w += "<div class='step'><b>Extra over cash</b> (interest) = "+money(total)+" &minus; "+money(cash)+" = <b>"+money(extra)+"</b></div>";
+    if(n>0 && isFinite(rate)){
+      w += "<div class='step'><b>Effective rate</b> from P(1+rn/1200)=X&middot;n+X&middot;r&middot;n(n&minus;1)/2400 &rarr; "+
+           "r = 2400(X&middot;n &minus; P) / [ n(2P &minus; X(n&minus;1)) ] = <b>"+pct(rate)+"</b> per annum</div>";
+    }
+    if(extra < 0){
+      w += "<div class='step' style='color:var(--good)'>You pay <b>less</b> than cash price here &mdash; check your instalment amount.</div>";
+    }
+    document.getElementById('a_work').innerHTML = w;
+  }
+
+  // ---------- MODE 2 ----------
+  function calc2(){
+    var cash=num('b_cash'), down=num('b_down'), r=num('b_rate'), n=Math.max(1,Math.round(num('b_n')));
+    var P = cash - down;
+    // X = P(2400 + 2 r n) / ( n (2400 + r(n-1)) )
+    var numer = P*(2400 + 2*r*n);
+    var den = n*(2400 + r*(n-1));
+    var X = den>0 ? numer/den : NaN;
+    var total = down + n*X;
+    var interest = total - cash;
+    document.getElementById('b_inst').textContent = money(X);
+    document.getElementById('b_total').textContent = money(total);
+    document.getElementById('b_int').textContent = money(interest);
+
+    var w = "";
+    w += "<div class='step'><b>Balance P</b> = cash &minus; down = "+money(cash)+" &minus; "+money(down)+" = <b>"+money(P)+"</b></div>";
+    w += "<div class='step'>Equation: P(1 + rn/1200) = X&middot;n + X&middot;r&middot;n(n&minus;1)/2400</div>";
+    w += "<div class='step'>Solve for X: &nbsp;X = P(2400 + 2rn) &divide; [ n(2400 + r(n&minus;1)) ]</div>";
+    w += "<div class='step mono'>= "+money(P)+"(2400 + 2&middot;"+r+"&middot;"+n+") &divide; ["+n+"(2400 + "+r+"&middot;"+(n-1)+")]</div>";
+    w += "<div class='step mono'>= "+fmtPlain(numer)+" &divide; "+fmtPlain(den)+" = <b>"+money(X)+"</b> per month</div>";
+    w += "<div class='step'><b>Total paid</b> = "+money(down)+" + "+n+"&times;"+money(X)+" = <b>"+money(total)+"</b>; &nbsp;<b>interest</b> = <b>"+money(interest)+"</b></div>";
+    document.getElementById('b_work').innerHTML = w;
+  }
+  function fmtPlain(x){ return (Math.round(x*100)/100).toLocaleString('en-IN'); }
+
+  // ---------- MODE 3 ----------
+  function calc3(){
+    var cash=num('c_cash');
+    var aDown=num('c_a_down'), aN=Math.max(0,Math.round(num('c_a_n'))), aInst=num('c_a_inst');
+    var bDown=num('c_b_down'), bN=Math.max(0,Math.round(num('c_b_n'))), bInst=num('c_b_inst');
+    var aTot = aDown + aN*aInst;
+    var bTot = bDown + bN*bInst;
+    var items = [
+      {name:"Cash price", val:cash, cls:"c0"},
+      {name:"Plan A total", val:aTot, cls:"c1", sub:money(aDown)+" down + "+aN+"×"+money(aInst)},
+      {name:"Plan B total", val:bTot, cls:"c2", sub:money(bDown)+" down + "+bN+"×"+money(bInst)}
+    ];
+    var max = Math.max(cash, aTot, bTot, 1);
+    var html = "";
+    items.forEach(function(it){
+      var pctw = Math.max(2, (it.val/max)*100);
+      html += "<div class='bar-item'><div class='lbl'><span>"+it.name+(it.sub?" <span style='color:var(--muted);font-size:.8em'>("+it.sub+")</span>":"")+
+              "</span><span class='amt'>"+money(it.val)+"</span></div><div class='track'><div class='fill "+it.cls+"' style='width:"+pctw+"%'></div></div></div>";
+    });
+    document.getElementById('c_bars').innerHTML = html;
+
+    var best = Math.min(cash, aTot, bTot);
+    var label = best===cash ? "Paying <b>cash</b>" : (best===aTot ? "<b>Plan A</b>" : "<b>Plan B</b>");
+    var v = label + " costs the least, at " + money(best) + ".";
+    var extraA = aTot - cash, extraB = bTot - cash;
+    v += "<br>Plan A costs " + money(extraA) + " more than cash; Plan B costs " + money(extraB) + " more than cash.";
+    document.getElementById('c_verdict').innerHTML = v;
+  }
+
+  // ---------- tabs ----------
+  var tabs = document.querySelectorAll('.tab');
+  var modes = {m1:document.getElementById('m1'), m2:document.getElementById('m2'), m3:document.getElementById('m3')};
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      for(var k in modes){ modes[k].classList.add('hidden'); }
+      modes[t.dataset.mode].classList.remove('hidden');
+    });
+  });
+
+  // ---------- bind inputs ----------
+  function bind(ids, fn){ ids.forEach(function(id){ document.getElementById(id).addEventListener('input', fn); }); }
+  bind(['a_cash','a_down','a_n','a_inst'], calc1);
+  bind(['b_cash','b_down','b_rate','b_n'], calc2);
+  bind(['c_cash','c_a_down','c_a_n','c_a_inst','c_b_down','c_b_n','c_b_inst'], calc3);
+
+  // ---------- quiz ----------
+  var QUIZ = [
+    {q:"A fan's cash price is "+R+"2,000. Under a plan you pay "+R+"500 down and "+R+"260 per month for 6 months. How much extra do you pay over the cash price?",
+     opts:["₹20","₹60","₹260","₹560"], correct:1,
+     ex:"Total paid = 500 + 6×260 = 500 + 1560 = ₹2060. Extra = 2060 − 2000 = ₹60."},
+    {q:"In an instalment scheme, the balance that carries interest equals:",
+     opts:["Cash price + down payment","Cash price − down payment","Down payment only","Total of all instalments"], correct:1,
+     ex:"You pay the down payment immediately, so only (cash price − down payment) is financed and charged interest."},
+    {q:"Why is the total paid under an instalment plan usually more than the cash price?",
+     opts:["The shop rounds figures up","Simple interest is charged on the unpaid balance","Down payments are refunded","Instalments are tax"], correct:1,
+     ex:"Because you clear the balance over time, the seller charges simple interest on the money still owed, so total > cash price."}
+  ];
+  function buildQuiz(){
+    var root = document.getElementById('quiz'); var html="";
+    QUIZ.forEach(function(item,i){
+      html += "<div class='quiz-q'><p class='q'>Q"+(i+1)+". "+item.q+"</p><div class='opts'>";
+      item.opts.forEach(function(o,j){ html += "<button class='opt' data-q='"+i+"' data-o='"+j+"'>"+o+"</button>"; });
+      html += "</div><div class='explain' id='ex_"+i+"'></div></div>";
+    });
+    root.innerHTML = html;
+    root.querySelectorAll('.opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var qi=+btn.dataset.q, oi=+btn.dataset.o, item=QUIZ[qi];
+        var group = root.querySelectorAll(".opt[data-q='"+qi+"']");
+        group.forEach(function(b){ b.disabled=true; });
+        group[item.correct].classList.add('correct');
+        if(oi!==item.correct) btn.classList.add('wrong');
+        var ex = document.getElementById('ex_'+qi);
+        ex.textContent = (oi===item.correct?"Correct! ":"Not quite. ") + item.ex;
+        ex.classList.add('show');
+      });
+    });
+  }
+
+  calc1(); calc2(); calc3(); buildQuiz();
+})();
+</script>
+</body>
+</html>

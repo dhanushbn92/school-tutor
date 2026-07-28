@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congruence of Triangles Lab - NIOS Class 10 Maths</title>
+<style>
+  :root{
+    --accent:#6ea8fe;
+    --accent-dark:#4d86e6;
+    --bg:#161b26;
+    --panel:#1e2533;
+    --panel2:#252d3d;
+    --ink:#e7edf7;
+    --muted:#9aa8bf;
+    --good:#4fc98a;
+    --bad:#f0836b;
+    --line:#3a465c;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#141924,#1a2131);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;
+    background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:0 0 10px;}
+  h3{font-size:.98rem;margin:14px 0 6px;}
+  p.lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .btn{
+    background:var(--accent);color:#0e1420;border:none;
+    padding:9px 15px;border-radius:10px;font-weight:700;
+    cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#0e1420;border-color:var(--accent-dark);}
+  .btn:disabled{opacity:.45;cursor:default;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .crit-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    padding:7px 14px;border-radius:20px;cursor:pointer;font-weight:700;
+    font-size:.85rem;transition:.15s;
+  }
+  .chip:hover{color:var(--ink);}
+  .chip.active{background:var(--accent);color:#0e1420;border-color:var(--accent-dark);}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .stage{background:var(--panel2);border-radius:14px;padding:8px;border:1px solid var(--line);}
+  .desc{background:var(--panel2);border-radius:12px;padding:12px 14px;margin-top:12px;border:1px solid var(--line);}
+  .desc h3{margin-top:0;}
+  .desc code{background:#11161f;padding:1px 6px;border-radius:5px;color:var(--accent);font-size:.85rem;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .swatch{width:14px;height:14px;border-radius:3px;display:inline-block;}
+  .opts{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
+  .opt{
+    text-align:left;background:var(--panel2);border:1.5px solid var(--line);
+    color:var(--ink);padding:11px 14px;border-radius:11px;cursor:pointer;
+    font-size:.9rem;font-weight:600;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(79,201,138,.16);border-color:var(--good);}
+  .opt.wrong{background:rgba(240,131,107,.16);border-color:var(--bad);}
+  .fb{margin-top:10px;padding:11px 14px;border-radius:11px;font-size:.88rem;display:none;}
+  .fb.show{display:block;}
+  .fb.ok{background:rgba(79,201,138,.14);border:1px solid var(--good);}
+  .fb.no{background:rgba(240,131,107,.14);border:1px solid var(--bad);}
+  .facts details{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:0 14px;margin-bottom:9px;}
+  .facts summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none;font-size:.92rem;}
+  .facts summary::-webkit-details-marker{display:none;}
+  .facts summary::before{content:"+ ";color:var(--accent);font-weight:800;}
+  .facts details[open] summary::before{content:"\2212 ";}
+  .facts .body{padding:0 0 12px;color:var(--muted);font-size:.88rem;}
+  .facts .body b{color:var(--ink);}
+  .quiz .q{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+  .quiz .q:last-child{border-bottom:none;}
+  .qtext{font-weight:700;margin-bottom:8px;font-size:.92rem;}
+  .cpct-list{list-style:none;padding:0;margin:8px 0 0;}
+  .cpct-list li{padding:8px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;font-size:.9rem;display:flex;justify-content:space-between;gap:10px;}
+  .cpct-list li.on{border-color:var(--good);background:rgba(79,201,138,.12);}
+  .tag{font-size:.72rem;color:var(--muted);}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+  @media(max-width:520px){
+    header h1{font-size:1.15rem;}
+    .tab{min-width:calc(50% - 4px);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Congruence of Triangles Lab</h1>
+    <p>NIOS Class 10 Mathematics &middot; Chapter 11 &middot; Explore SSS, SAS, ASA, AAS, RHS &amp; CPCT</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-view="criteria">Criteria</button>
+    <button class="tab" data-view="check">Is it congruent?</button>
+    <button class="tab" data-view="cpct">CPCT</button>
+    <button class="tab" data-view="facts">Facts</button>
+    <button class="tab" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ===================== CRITERIA ===================== -->
+  <section id="criteria" class="panel">
+    <h2>Congruence Criteria</h2>
+    <p class="lead">Pick a rule. Matching parts are marked (tick-marks = equal sides, arcs = equal angles). Press <b>Overlay</b> to slide &amp; rotate &triangle;DEF onto &triangle;ABC and watch them coincide.</p>
+    <div class="crit-tabs" id="critChips"></div>
+    <div class="stage">
+      <svg id="critSvg" viewBox="0 0 460 300" aria-label="Two congruent triangles"></svg>
+    </div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#6ea8fe"></span>&triangle;ABC (fixed)</span>
+      <span><span class="swatch" style="background:#f0a64f"></span>&triangle;DEF (moves)</span>
+      <span>| , || , ||| = equal sides</span>
+      <span>arc = equal angle</span>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="overlayBtn">Overlay animation</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+    <div class="desc" id="critDesc"></div>
+  </section>
+
+  <!-- ===================== CHECK ===================== -->
+  <section id="check" class="panel hidden">
+    <h2>Is it congruent?</h2>
+    <p class="lead">Study the marked parts, then choose the criterion that proves the triangles congruent &mdash; or say it cannot be proved. Beware of <b>SSA</b> and <b>AAA</b>!</p>
+    <div class="stage">
+      <svg id="checkSvg" viewBox="0 0 460 260" aria-label="Two triangles with some equal parts"></svg>
+    </div>
+    <div class="legend"><span id="checkGiven"></span></div>
+    <div class="opts" id="checkOpts"></div>
+    <div class="fb" id="checkFb"></div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn ghost" id="checkNext">Next case &rarr;</button>
+      <span class="tag" id="checkScore"></span>
+    </div>
+  </section>
+
+  <!-- ===================== CPCT ===================== -->
+  <section id="cpct" class="panel hidden">
+    <h2>CPCT &mdash; Corresponding Parts of Congruent Triangles are Equal</h2>
+    <p class="lead">These two triangles are congruent by <b>SAS</b> (two sides and the included angle match). Once congruence is established, <i>every</i> remaining pair of corresponding parts must also be equal. Reveal them one by one.</p>
+    <div class="stage">
+      <svg id="cpctSvg" viewBox="0 0 460 280" aria-label="Two congruent triangles for CPCT"></svg>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <button class="btn" id="cpctBtn">Reveal next corresponding part</button>
+      <button class="btn ghost" id="cpctReset">Reset</button>
+    </div>
+    <ul class="cpct-list" id="cpctList"></ul>
+  </section>
+
+  <!-- ===================== FACTS ===================== -->
+  <section id="facts" class="panel facts hidden">
+    <h2>Facts Panel</h2>
+    <details open><summary>SSS &mdash; Side-Side-Side</summary><div class="body">If <b>all three sides</b> of one triangle equal the three sides of another, the triangles are congruent. Three fixed side-lengths lock the shape completely.</div></details>
+    <details><summary>SAS &mdash; Side-Angle-Side</summary><div class="body">If <b>two sides and the angle between them</b> (the included angle) are equal, the triangles are congruent. The angle must sit <b>between</b> the two known sides.</div></details>
+    <details><summary>ASA &mdash; Angle-Side-Angle</summary><div class="body">If <b>two angles and the side between them</b> are equal, the triangles are congruent. The side is the one joining the two known angles.</div></details>
+    <details><summary>AAS &mdash; Angle-Angle-Side</summary><div class="body">If <b>two angles and a non-included side</b> are equal, the triangles are congruent. Because the third angle is fixed (angles sum to 180&deg;), AAS reduces to ASA.</div></details>
+    <details><summary>RHS &mdash; Right angle-Hypotenuse-Side</summary><div class="body">For <b>right-angled</b> triangles: if the <b>hypotenuse and one other side</b> are equal, they are congruent. This is the only criterion that starts from a right angle plus a non-included side.</div></details>
+    <details><summary>Why SSA is NOT valid</summary><div class="body">Two sides and a <b>non-included</b> angle can produce <b>two different triangles</b> (the "ambiguous case"). The unfixed side can swing to two positions, so SSA does not guarantee congruence. Exception: when the angle is a right angle it becomes the valid RHS rule.</div></details>
+    <details><summary>Why AAA is NOT valid</summary><div class="body">Equal angles guarantee the same <b>shape</b> (similar triangles) but not the same <b>size</b> &mdash; a small triangle and a large triangle can have identical angles. Congruence needs at least one pair of equal sides.</div></details>
+    <details><summary>CPCT</summary><div class="body"><b>Corresponding Parts of Congruent Triangles are Equal.</b> Once two triangles are proved congruent by any criterion, all their remaining corresponding sides and angles are automatically equal. CPCT is used <i>after</i> congruence to prove further facts.</div></details>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section id="quiz" class="panel quiz hidden">
+    <h2>Quick Quiz</h2>
+    <p class="lead">Tap an answer to check it.</p>
+    <div id="quizBox"></div>
+  </section>
+
+  <footer>Geometry rendered with plain SVG &middot; No external resources &middot; Congruence of Triangles Lab</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs){var e=document.createElementNS(SVGNS,tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+
+  /* ---------- Tab switching ---------- */
+  var views={};
+  ["criteria","check","cpct","facts","quiz"].forEach(function(v){views[v]=document.getElementById(v);});
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var v=t.getAttribute("data-view");
+      for(var k in views){views[k].classList.toggle("hidden",k!==v);}
+      if(v!=="criteria")stopOverlay();
+    });
+  });
+
+  /* ---------- shared drawing helpers ---------- */
+  // draw a triangle given 3 points; returns nothing (appends to group)
+  function polyPts(pts){return pts.map(function(p){return p[0]+","+p[1];}).join(" ");}
+
+  // tick marks on the midpoint of a segment, perpendicular; count=1..3
+  function tickMarks(g,a,b,count,color){
+    var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+    var dx=b[0]-a[0], dy=b[1]-a[1];
+    var len=Math.sqrt(dx*dx+dy*dy)||1;
+    var ux=dx/len, uy=dy/len;      // along
+    var px=-uy, py=ux;             // perpendicular
+    var gap=5, tl=7;
+    var start=-(count-1)/2*gap;
+    for(var i=0;i<count;i++){
+      var off=start+i*gap;
+      var cx=mx+ux*off, cy=my+uy*off;
+      g.appendChild(el("line",{x1:cx+px*tl,y1:cy+py*tl,x2:cx-px*tl,y2:cy-py*tl,stroke:color,"stroke-width":2.2,"stroke-linecap":"round"}));
+    }
+  }
+
+  // angle arc at vertex v between rays to p1 and p2; double=true draws two arcs
+  function angleArc(g,v,p1,p2,color,radius,dbl,square){
+    var a1=Math.atan2(p1[1]-v[1],p1[0]-v[0]);
+    var a2=Math.atan2(p2[1]-v[1],p2[0]-v[0]);
+    // normalize sweep to the smaller angle
+    var diff=a2-a1;
+    while(diff<=-Math.PI)diff+=2*Math.PI;
+    while(diff>Math.PI)diff-=2*Math.PI;
+    if(square){
+      // right-angle box
+      var r=12;
+      var u1=[Math.cos(a1),Math.sin(a1)], u2=[Math.cos(a2),Math.sin(a2)];
+      var pA=[v[0]+u1[0]*r,v[1]+u1[1]*r];
+      var pC=[v[0]+u2[0]*r,v[1]+u2[1]*r];
+      var pB=[v[0]+(u1[0]+u2[0])*r,v[1]+(u1[1]+u2[1])*r];
+      g.appendChild(el("polyline",{points:polyPts([pA,pB,pC]),fill:"none",stroke:color,"stroke-width":2}));
+      return;
+    }
+    function arcPath(rad){
+      var s=[v[0]+Math.cos(a1)*rad,v[1]+Math.sin(a1)*rad];
+      var e=[v[0]+Math.cos(a1+diff)*rad,v[1]+Math.sin(a1+diff)*rad];
+      var large=0, sweep=diff>0?1:0;
+      return "M "+s[0]+" "+s[1]+" A "+rad+" "+rad+" 0 "+large+" "+sweep+" "+e[0]+" "+e[1];
+    }
+    g.appendChild(el("path",{d:arcPath(radius),fill:"none",stroke:color,"stroke-width":2.2}));
+    if(dbl)g.appendChild(el("path",{d:arcPath(radius-4),fill:"none",stroke:color,"stroke-width":2.2}));
+  }
+
+  function vertexLabel(g,p,text,color,dx,dy){
+    var t=el("text",{x:p[0]+dx,y:p[1]+dy,fill:color,"font-size":15,"font-weight":"700","font-family":"sans-serif"});
+    t.textContent=text; g.appendChild(t);
+  }
+
+  /* ======================================================================
+     CRITERIA MODE
+     ====================================================================== */
+  var CRIT={
+    SSS:{
+      name:"SSS &mdash; Side-Side-Side",
+      A:[[70,230],[210,230],[130,90]],
+      D:[[300,230],[440,230],[360,90]],
+      sides:[1,2,3],   // tick counts for AB,BC,CA
+      angles:[],       // arcs on vertices [idx,double]
+      right:-1,
+      text:"All three pairs of sides are marked equal: <code>AB=DE</code>, <code>BC=EF</code>, <code>CA=FD</code>. Three fixed lengths can build only one triangle shape, so &triangle;ABC &cong; &triangle;DEF by <b>SSS</b>."
+    },
+    SAS:{
+      name:"SAS &mdash; Side-Angle-Side",
+      A:[[70,230],[210,230],[110,90]],
+      D:[[300,230],[440,230],[340,90]],
+      sides:[1,0,2],   // AB and CA marked
+      angles:[[0,false]], // included angle at A (between AB & CA)
+      right:-1,
+      text:"Two sides and the <b>included</b> angle match: <code>AB=DE</code>, <code>CA=FD</code>, and the angle A between them equals angle D. So &triangle;ABC &cong; &triangle;DEF by <b>SAS</b>."
+    },
+    ASA:{
+      name:"ASA &mdash; Angle-Side-Angle",
+      A:[[70,230],[210,230],[150,100]],
+      D:[[300,230],[440,230],[380,100]],
+      sides:[1,0,0],   // included side AB
+      angles:[[0,false],[1,true]], // angles at A and B
+      right:-1,
+      text:"Two angles and the <b>included</b> side match: angle A = angle D, angle B = angle E, and the side <code>AB=DE</code> between them. So &triangle;ABC &cong; &triangle;DEF by <b>ASA</b>."
+    },
+    AAS:{
+      name:"AAS &mdash; Angle-Angle-Side",
+      A:[[70,230],[210,230],[150,100]],
+      D:[[300,230],[440,230],[380,100]],
+      sides:[0,0,1],   // non-included side CA
+      angles:[[0,false],[1,true]], // angles at A and B
+      right:-1,
+      text:"Two angles and a <b>non-included</b> side match: angle A = angle D, angle B = angle E, and side <code>CA=FD</code>. Since the third angle is fixed (angles add to 180&deg;), this is <b>AAS</b>."
+    },
+    RHS:{
+      name:"RHS &mdash; Right angle-Hypotenuse-Side",
+      A:[[70,230],[70,100],[200,230]],
+      D:[[300,230],[300,100],[430,230]],
+      sides:[1,0,2],   // one leg AB and hypotenuse CA (BC is the other leg)
+      angles:[],
+      right:0,         // right angle at vertex index 0 (A)
+      text:"Right-angled triangles with equal <b>hypotenuse</b> (<code>CA=FD</code>) and one <b>side</b> (<code>AB=DE</code>), plus the right angle at A and D. So &triangle;ABC &cong; &triangle;DEF by <b>RHS</b>."
+    }
+  };
+  var critKeys=["SSS","SAS","ASA","AAS","RHS"];
+  var curCrit="SSS";
+  var critSvg=document.getElementById("critSvg");
+  var critDesc=document.getElementById("critDesc");
+
+  // build chips
+  var critChips=document.getElementById("critChips");
+  critKeys.forEach(function(k){
+    var b=document.createElement("button");
+    b.className="chip"+(k===curCrit?" active":"");
+    b.textContent=k;
+    b.addEventListener("click",function(){
+      curCrit=k;
+      critChips.querySelectorAll(".chip").forEach(function(c){c.classList.toggle("active",c===b);});
+      stopOverlay();
+      drawCrit();
+    });
+    critChips.appendChild(b);
+  });
+
+  // draw one triangle with markings into group g using label set
+  function drawMarkedTriangle(g,pts,labels,color,sides,angles,right){
+    g.appendChild(el("polygon",{points:polyPts(pts),fill:color+"22",stroke:color,"stroke-width":2.6,"stroke-linejoin":"round"}));
+    // sides: index0=pts0-1, 1=pts1-2, 2=pts2-0
+    var pairs=[[0,1],[1,2],[2,0]];
+    for(var s=0;s<3;s++){ if(sides[s])tickMarks(g,pts[pairs[s][0]],pts[pairs[s][1]],sides[s],color); }
+    // angles at vertex idx between the two adjacent vertices
+    angles.forEach(function(a){
+      var idx=a[0];
+      var prev=pts[(idx+2)%3], next=pts[(idx+1)%3];
+      angleArc(g,pts[idx],prev,next,color,20,a[1],false);
+    });
+    if(right>=0){
+      var prev2=pts[(right+2)%3], next2=pts[(right+1)%3];
+      angleArc(g,pts[right],prev2,next2,color,0,false,true);
+    }
+    // labels
+    var off=[[-16,4],[10,4],[0,-8]];
+    for(var i=0;i<3;i++){ vertexLabel(g,pts[i],labels[i],color,off[i][0],off[i][1]); }
+  }
+
+  var overlayTimer=null, overlayStart=0;
+  function stopOverlay(){ if(overlayTimer){cancelAnimationFrame(overlayTimer);overlayTimer=null;} var mg=document.getElementById("moveGroup"); if(mg)mg.setAttribute("transform",""); }
+
+  function drawCrit(){
+    stopOverlay();
+    clear(critSvg);
+    var c=CRIT[curCrit];
+    var gA=el("g",{}); critSvg.appendChild(gA);
+    drawMarkedTriangle(gA,c.A,["A","B","C"],"#6ea8fe",c.sides,c.angles,c.right);
+    var gD=el("g",{id:"moveGroup"}); critSvg.appendChild(gD);
+    drawMarkedTriangle(gD,c.D,["D","E","F"],"#f0a64f",c.sides,c.angles,c.right);
+    critDesc.innerHTML="<h3>"+c.name+"</h3><p style='margin:0;font-size:.9rem;'>"+c.text+"</p>";
+  }
+
+  // Overlay: translate + slight scale-in of DEF group onto ABC.
+  // We compute the translation that maps D->A (first vertices) and animate.
+  document.getElementById("overlayBtn").addEventListener("click",function(){
+    var c=CRIT[curCrit];
+    var mg=document.getElementById("moveGroup");
+    if(!mg)return;
+    stopOverlay();
+    var dx=c.A[0][0]-c.D[0][0];
+    var dy=c.A[0][1]-c.D[0][1];
+    // pivot for any tiny rotation = D[0]
+    var px=c.D[0][0], py=c.D[0][1];
+    overlayStart=performance.now();
+    var dur=1500;
+    function step(now){
+      if(document.hidden){ overlayTimer=requestAnimationFrame(step); return; }
+      var t=Math.min(1,(now-overlayStart)/dur);
+      var e=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2; // easeInOut
+      var tx=dx*e, ty=dy*e;
+      mg.setAttribute("transform","translate("+tx.toFixed(2)+","+ty.toFixed(2)+")");
+      mg.setAttribute("opacity",(1-0.15*Math.sin(e*Math.PI)).toFixed(3));
+      if(t<1){ overlayTimer=requestAnimationFrame(step); }
+      else{ mg.setAttribute("opacity","1"); overlayTimer=null; }
+    }
+    overlayTimer=requestAnimationFrame(step);
+  });
+  document.getElementById("resetBtn").addEventListener("click",function(){ drawCrit(); });
+
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden && overlayTimer){ /* resume handled by loop guard */ }
+  });
+
+  /* ======================================================================
+     CHECK MODE  (Is it congruent?)
+     ====================================================================== */
+  var CASES=[
+    {
+      A:[[60,210],[200,210],[120,80]], D:[[260,210],[400,210],[320,80]],
+      sides:[1,2,3], angles:[], right:-1,
+      given:"Given: all three pairs of sides equal.",
+      answer:"SSS",
+      opts:["SSS","SAS","ASA","Cannot be proved"],
+      why:"Three pairs of equal sides fix the triangle uniquely &mdash; this is the <b>SSS</b> criterion."
+    },
+    {
+      A:[[60,210],[200,210],[95,80]], D:[[260,210],[400,210],[295,80]],
+      sides:[1,0,2], angles:[[0,false]], right:-1,
+      given:"Given: two sides and the angle between them equal.",
+      answer:"SAS",
+      opts:["SSS","SAS","AAA","Cannot be proved"],
+      why:"Two sides with the <b>included</b> angle equal &rarr; <b>SAS</b>. (AAA is never a valid criterion.)"
+    },
+    {
+      A:[[60,210],[200,210],[150,90]], D:[[260,210],[400,210],[350,90]],
+      sides:[1,0,0], angles:[[0,false],[1,true]], right:-1,
+      given:"Given: two angles and the side between them equal.",
+      answer:"ASA",
+      opts:["ASA","SSS","SSA","Cannot be proved"],
+      why:"Two angles with the <b>included</b> side equal &rarr; <b>ASA</b>."
+    },
+    {
+      A:[[60,205],[60,90],[185,205]], D:[[260,205],[260,90],[385,205]],
+      sides:[1,0,2], angles:[], right:0,
+      given:"Given: right angle, equal hypotenuse and one equal side.",
+      answer:"RHS",
+      opts:["SSA","RHS","SAS","Cannot be proved"],
+      why:"Right angle + equal hypotenuse + one equal side &rarr; <b>RHS</b>. Note SSA alone is invalid, but with a right angle it becomes valid RHS."
+    },
+    {
+      A:[[60,210],[200,210],[95,80]], D:[[260,210],[405,210],[300,80]],
+      sides:[1,0,2], angles:[[1,false]], right:-1,
+      given:"Given: two sides and a NON-included angle equal (angle not between the two sides).",
+      answer:"Cannot be proved",
+      opts:["SAS","SSS","SSA is valid","Cannot be proved"],
+      why:"This is <b>SSA</b> (two sides + non-included angle). It is the ambiguous case and does <b>NOT</b> prove congruence. There is no valid SSA rule."
+    },
+    {
+      A:[[60,210],[190,210],[125,110]], D:[[255,210],[420,210],[338,80]],
+      sides:[0,0,0], angles:[[0,false],[1,true],[2,false]], right:-1,
+      given:"Given: all three pairs of angles equal (no sides given).",
+      answer:"Cannot be proved",
+      opts:["AAA proves it","ASA","SSS","Cannot be proved"],
+      why:"Equal angles give the same shape but not the same size (these two differ in size!). <b>AAA</b> is NOT a congruence criterion &mdash; congruence needs an equal side."
+    }
+  ];
+  var checkIdx=0, checkAns=0, checkTot=0, checkDone=false;
+  var checkSvg=document.getElementById("checkSvg");
+  var checkOpts=document.getElementById("checkOpts");
+  var checkFb=document.getElementById("checkFb");
+  var checkGiven=document.getElementById("checkGiven");
+  var checkScore=document.getElementById("checkScore");
+
+  function drawCheck(){
+    var c=CASES[checkIdx];
+    clear(checkSvg);
+    var gA=el("g",{}); checkSvg.appendChild(gA);
+    drawMarkedTriangle(gA,c.A,["A","B","C"],"#6ea8fe",c.sides,c.angles,c.right);
+    var gD=el("g",{}); checkSvg.appendChild(gD);
+    drawMarkedTriangle(gD,c.D,["D","E","F"],"#f0a64f",c.sides,c.angles,c.right);
+    checkGiven.innerHTML=c.given;
+    checkOpts.innerHTML="";
+    checkFb.className="fb";
+    checkFb.innerHTML="";
+    checkDone=false;
+    c.opts.forEach(function(o){
+      var b=document.createElement("button");
+      b.className="opt"; b.textContent=o;
+      b.addEventListener("click",function(){ pickCheck(b,o,c); });
+      checkOpts.appendChild(b);
+    });
+    checkScore.textContent="Score: "+checkAns+" / "+checkTot;
+  }
+  function pickCheck(btn,val,c){
+    if(checkDone)return;
+    checkDone=true; checkTot++;
+    var correct=(val===c.answer);
+    Array.prototype.forEach.call(checkOpts.children,function(b){
+      if(b.textContent===c.answer)b.classList.add("correct");
+      else b.classList.add("disabled");
+    });
+    if(!correct)btn.classList.add("wrong");
+    if(correct)checkAns++;
+    checkFb.className="fb show "+(correct?"ok":"no");
+    checkFb.innerHTML=(correct?"<b>Correct!</b> ":"<b>Not quite.</b> Answer: <b>"+c.answer+"</b>. ")+c.why;
+    checkScore.textContent="Score: "+checkAns+" / "+checkTot;
+  }
+  document.getElementById("checkNext").addEventListener("click",function(){
+    checkIdx=(checkIdx+1)%CASES.length; drawCheck();
+  });
+
+  /* ======================================================================
+     CPCT MODE
+     ====================================================================== */
+  // Two congruent triangles by SAS. Given: AB=DE, angle A=angle D, AC=DF.
+  var cpA=[[70,240],[210,240],[95,110]];
+  var cpD=[[300,240],[440,240],[325,110]];
+  var cpctSvg=document.getElementById("cpctSvg");
+  var cpctList=document.getElementById("cpctList");
+  // remaining parts revealed by CPCT (after the 3 given SAS parts)
+  var CPCT_ITEMS=[
+    {label:"BC = EF",tag:"third side",sides:[0,1,0],angles:[],right:-1},
+    {label:"&ang;B = &ang;E",tag:"angle",sides:[0,0,0],angles:[[1,false]],right:-1},
+    {label:"&ang;C = &ang;F",tag:"angle",sides:[0,0,0],angles:[[2,true]],right:-1}
+  ];
+  var cpctStep=0;
+  function drawCpct(){
+    clear(cpctSvg);
+    // accumulate markings up to cpctStep, plus the SAS given (AB tick=1, CA tick=2, angle A)
+    var sides=[1,0,2], angles=[[0,false]], right=-1;
+    // merge revealed
+    for(var i=0;i<cpctStep;i++){
+      var it=CPCT_ITEMS[i];
+      it.sides.forEach(function(v,idx){ if(v)sides[idx]=(sides[idx]||0)+1; });
+      it.angles.forEach(function(a){ angles.push(a); });
+    }
+    var gA=el("g",{}); cpctSvg.appendChild(gA);
+    drawMarkedTriangle(gA,cpA,["A","B","C"],"#6ea8fe",sides,angles,right);
+    var gD=el("g",{}); cpctSvg.appendChild(gD);
+    drawMarkedTriangle(gD,cpD,["D","E","F"],"#f0a64f",sides,angles,right);
+    // list
+    cpctList.innerHTML="";
+    var given=[["AB = DE","given (side)"],["&ang;A = &ang;D","given (angle)"],["CA = FD","given (side)"]];
+    given.forEach(function(g){
+      var li=document.createElement("li"); li.className="on";
+      li.innerHTML="<span>"+g[0]+"</span><span class='tag'>"+g[1]+"</span>"; cpctList.appendChild(li);
+    });
+    CPCT_ITEMS.forEach(function(it,i){
+      var li=document.createElement("li");
+      var on=i<cpctStep;
+      if(on)li.className="on";
+      li.innerHTML="<span>"+(on?it.label:"&mdash; hidden &mdash;")+"</span><span class='tag'>"+(on?"by CPCT ("+it.tag+")":"reveal me")+"</span>";
+      cpctList.appendChild(li);
+    });
+  }
+  document.getElementById("cpctBtn").addEventListener("click",function(){
+    if(cpctStep<CPCT_ITEMS.length){cpctStep++;drawCpct();}
+  });
+  document.getElementById("cpctReset").addEventListener("click",function(){cpctStep=0;drawCpct();});
+
+  /* ======================================================================
+     QUIZ MODE
+     ====================================================================== */
+  var QUIZ=[
+    {q:"In &triangle;PQR and &triangle;XYZ, PQ=XY, QR=YZ and &ang;Q=&ang;Y. Which criterion proves congruence?",
+     opts:["SSA","SAS","AAA","ASA"],ans:1,
+     why:"PQ and QR are two sides and &ang;Q is the angle <b>between</b> them &rarr; SAS."},
+    {q:"Two triangles have all three angles equal. Are they necessarily congruent?",
+     opts:["Yes, by AAA","Yes, by ASA","No &mdash; AAA is not a congruence rule","Only if right-angled"],ans:2,
+     why:"Equal angles give similar (same shape) triangles, but sizes may differ. AAA does not prove congruence."},
+    {q:"Which criterion applies ONLY to right-angled triangles using the hypotenuse?",
+     opts:["SSS","RHS","AAS","SAS"],ans:1,
+     why:"RHS (Right angle-Hypotenuse-Side) needs a right angle plus equal hypotenuse and one side."}
+  ];
+  var quizBox=document.getElementById("quizBox");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var qt=document.createElement("div"); qt.className="qtext"; qt.innerHTML=(qi+1)+". "+item.q; d.appendChild(qt);
+    var opts=document.createElement("div"); opts.className="opts";
+    var fb=document.createElement("div"); fb.className="fb";
+    var answered=false;
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement("button"); b.className="opt"; b.innerHTML=o;
+      b.addEventListener("click",function(){
+        if(answered)return; answered=true;
+        Array.prototype.forEach.call(opts.children,function(x,xi){
+          if(xi===item.ans)x.classList.add("correct");
+          else x.classList.add("disabled");
+        });
+        var ok=(oi===item.ans);
+        if(!ok)b.classList.add("wrong");
+        fb.className="fb show "+(ok?"ok":"no");
+        fb.innerHTML=(ok?"<b>Correct!</b> ":"<b>Answer: "+item.opts[item.ans]+".</b> ")+item.why;
+      });
+      opts.appendChild(b);
+    });
+    d.appendChild(opts); d.appendChild(fb); quizBox.appendChild(d);
+  });
+
+  /* ---------- init ---------- */
+  drawCrit();
+  drawCheck();
+  drawCpct();
+})();
+</script>
+</body>
+</html>
