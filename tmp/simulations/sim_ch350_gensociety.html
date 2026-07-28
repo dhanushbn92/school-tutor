@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genetics &amp; Society Lab - NIOS Class 12 Biology (Ch 24)</title>
+<style>
+  :root{
+    --accent:#7bb4ff;
+    --accent-dark:#4f8fe6;
+    --bg:#0f1622;
+    --panel:#182231;
+    --panel-2:#1f2c3e;
+    --ink:#e8eef6;
+    --muted:#9fb0c6;
+    --line:#2c3a4f;
+    --good:#5ad19a;
+    --bad:#ff8a8a;
+    --warn:#ffcf7a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1b2740,#0f1622 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);border:1px solid var(--line);
+    padding:11px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#0f1622;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
+  .panel h2{font-size:1.05rem;margin:0 0 6px;}
+  .panel h3{font-size:.98rem;margin:14px 0 6px;color:var(--accent);}
+  .hidden{display:none;}
+  .lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+  .card{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;
+    cursor:pointer;transition:.15s;text-align:left;color:var(--ink);
+  }
+  .card:hover{transform:translateY(-2px);border-color:var(--accent);}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(123,180,255,.35) inset;}
+  .card .nm{font-weight:700;font-size:.92rem;}
+  .card .ty{font-size:.72rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.4px;}
+  .pill{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:999px;margin-top:6px;font-weight:600;}
+  .pill.mend{background:rgba(90,209,154,.16);color:var(--good);}
+  .pill.chrom{background:rgba(255,207,122,.16);color:var(--warn);}
+  .detail{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;min-height:60px;}
+  .detail h4{margin:0 0 6px;font-size:1rem;}
+  .kv{margin:6px 0;font-size:.88rem;}
+  .kv b{color:var(--accent);}
+  .btn{background:var(--accent);color:#0f1622;border:none;padding:9px 14px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel-2);color:var(--accent);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#0f1622;}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line);}
+  .facts{background:var(--panel-2);border-left:3px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:.88rem;}
+  .facts ul{margin:6px 0 0;padding-left:18px;}
+  .facts li{margin:4px 0;}
+  .split{display:flex;gap:14px;flex-wrap:wrap;}
+  .split>div{flex:1 1 300px;min-width:260px;}
+  .quiz .q{margin:0 0 6px;font-weight:600;font-size:.92rem;}
+  .opts{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
+  .opt{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+    cursor:pointer;font-size:.87rem;transition:.12s;text-align:left;color:var(--ink);}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(90,209,154,.18);border-color:var(--good);}
+  .opt.wrong{background:rgba(255,138,138,.16);border-color:var(--bad);}
+  .fb{font-size:.82rem;margin:2px 0 14px;min-height:16px;color:var(--muted);}
+  .note{font-size:.82rem;color:var(--muted);margin-top:10px;background:rgba(255,207,122,.08);
+    border:1px solid rgba(255,207,122,.25);border-radius:10px;padding:10px 12px;}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .subtab{background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;
+    padding:6px 14px;font-size:.82rem;cursor:pointer;font-weight:600;}
+  .subtab.active{background:var(--accent);color:#0f1622;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin:8px 0 20px;}
+  @media(max-width:420px){header h1{font-size:1.15rem;}.tab{min-width:104px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Genetics &amp; Society Lab</h1>
+  <p>NIOS Class 12 Biology &middot; Chapter 24 &mdash; explore human genetic disorders, inheritance patterns, and applied genetics.</p>
+</header>
+
+<div class="tabs" role="tablist">
+  <div class="tab active" data-tab="disorders" role="tab">Disorders Explorer</div>
+  <div class="tab" data-tab="pedigree" role="tab">Pedigree &amp; Patterns</div>
+  <div class="tab" data-tab="applied" role="tab">Applied &amp; Ethics</div>
+  <div class="tab" data-tab="quiz" role="tab">Quiz</div>
+</div>
+
+<!-- ===================== DISORDERS ===================== -->
+<section id="disorders" class="panel">
+  <h2>Human Genetic Disorders</h2>
+  <p class="lead">Tap a card to read its cause, inheritance pattern, and main features. Green = Mendelian (single-gene); amber = chromosomal.</p>
+  <div class="grid" id="cardGrid"></div>
+  <div class="detail" id="disDetail">
+    <h4>Select a disorder</h4>
+    <p class="kv" style="color:var(--muted)">Details appear here. All disorders shown here are real conditions &mdash; described factually for study, without judgement of people who live with them.</p>
+  </div>
+</section>
+
+<!-- ===================== PEDIGREE ===================== -->
+<section id="pedigree" class="panel hidden">
+  <h2>Pedigree &amp; Inheritance Patterns</h2>
+  <p class="lead">Switch pattern to see how a trait moves through a family. Squares = males, circles = females; filled = affected, half = carrier.</p>
+  <div class="subtabs" id="pedTabs">
+    <div class="subtab active" data-p="AR">Autosomal recessive</div>
+    <div class="subtab" data-p="AD">Autosomal dominant</div>
+    <div class="subtab" data-p="XR">X-linked recessive</div>
+  </div>
+  <div class="split">
+    <div>
+      <svg id="pedSvg" viewBox="0 0 360 300" aria-label="Pedigree chart"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:#2f3d52"></i>Unaffected</span>
+        <span><i class="sw" style="background:var(--accent)"></i>Affected</span>
+        <span><i class="sw" style="background:linear-gradient(90deg,var(--accent) 50%,#2f3d52 50%)"></i>Carrier</span>
+      </div>
+    </div>
+    <div>
+      <div class="detail" id="pedInfo"></div>
+      <div class="row" style="margin-top:10px"><button class="btn" id="pedCount">Count affected &amp; carriers</button></div>
+      <div class="fb" id="pedTally"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== APPLIED ===================== -->
+<section id="applied" class="panel hidden">
+  <h2>Applied Genetics &amp; Ethics</h2>
+  <p class="lead">Tap a topic to learn how genetics is used in society.</p>
+  <div class="subtabs" id="appTabs"></div>
+  <div class="split">
+    <div>
+      <svg id="appSvg" viewBox="0 0 360 220" aria-label="Illustration"></svg>
+    </div>
+    <div>
+      <div class="detail" id="appInfo"></div>
+    </div>
+  </div>
+  <div class="note" id="ethicsNote"></div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="quiz" class="panel hidden">
+  <h2>Quick Quiz</h2>
+  <p class="lead">Choose an answer &mdash; the correct option is revealed on click.</p>
+  <div class="quiz" id="quizBox"></div>
+  <div class="row"><button class="btn ghost" id="quizReset">Reset quiz</button><span class="fb" id="quizScore"></span></div>
+</section>
+
+<!-- ===================== FACTS ===================== -->
+<section class="panel">
+  <h3 style="margin-top:0">Facts Panel</h3>
+  <div class="facts">
+    <ul>
+      <li>Humans have <b>46 chromosomes</b> (23 pairs); 22 autosome pairs + 1 sex-chromosome pair (XX female, XY male).</li>
+      <li><b>Mendelian / single-gene</b> disorders arise from a mutation in one gene; <b>chromosomal</b> disorders arise from a change in chromosome number or structure.</li>
+      <li>A <b>carrier</b> has one copy of a recessive allele but is usually unaffected; two carriers have a 1 in 4 risk of an affected child.</li>
+      <li><b>Aneuploidy</b> (an abnormal chromosome number, e.g. trisomy 21) usually results from <b>non-disjunction</b> during meiosis.</li>
+      <li>The <b>Human Genome Project</b> (completed 2003) sequenced the ~3 billion base pairs of human DNA.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>Educational simulation &middot; conditions described factually and respectfully &middot; not a diagnostic tool.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- data ---------- */
+var disorders=[
+ {id:"sickle",nm:"Sickle-cell anaemia",cls:"mend",cause:"Point mutation in the HBB gene (β-globin) on chromosome 11 — glutamic acid replaced by valine.",inh:"Autosomal recessive (carriers have sickle-cell trait, offering some malaria resistance).",feat:"Red blood cells become rigid and sickle-shaped, causing anaemia, blocked vessels and pain crises."},
+ {id:"thal",nm:"Thalassaemia",cls:"mend",cause:"Mutations/deletions in globin genes (HBA or HBB) reducing α- or β-globin chain production.",inh:"Autosomal recessive.",feat:"Reduced haemoglobin → chronic anaemia; severe forms need regular blood transfusions."},
+ {id:"haemo",nm:"Haemophilia",cls:"mend",cause:"Mutation in a clotting-factor gene (F8 → factor VIII, or F9 → factor IX) on the X chromosome.",inh:"X-linked recessive — mostly affects males; females are usually carriers.",feat:"Blood fails to clot properly, causing prolonged bleeding after injury and into joints."},
+ {id:"cb",nm:"Colour blindness",cls:"mend",cause:"Mutation in opsin genes (OPN1LW / OPN1MW) on the X chromosome affecting cone photopigments.",inh:"X-linked recessive — red–green type far commoner in males.",feat:"Difficulty distinguishing red and green hues; vision otherwise normal."},
+ {id:"cf",nm:"Cystic fibrosis",cls:"mend",cause:"Mutation (commonly ΔF508) in the CFTR gene on chromosome 7, disrupting a chloride channel.",inh:"Autosomal recessive.",feat:"Thick, sticky mucus in lungs and pancreas → repeated infections and digestive problems."},
+ {id:"pku",nm:"Phenylketonuria (PKU)",cls:"mend",cause:"Mutation in the PAH gene (chromosome 12); the enzyme phenylalanine hydroxylase is deficient.",inh:"Autosomal recessive.",feat:"Phenylalanine builds up, harming the brain if untreated; managed with a low-phenylalanine diet."},
+ {id:"down",nm:"Down syndrome",cls:"chrom",cause:"Trisomy 21 — an extra copy of chromosome 21 (usually from non-disjunction in meiosis).",inh:"Chromosomal (usually not inherited; risk rises with maternal age).",feat:"Intellectual disability of variable degree, characteristic facial features, sometimes heart defects."},
+ {id:"turner",nm:"Turner syndrome",cls:"chrom",cause:"Monosomy X (45,XO) — a single X chromosome, the second sex chromosome missing.",inh:"Chromosomal (not inherited).",feat:"Affects females: short stature, non-functional ovaries, usually infertile; normal intelligence."},
+ {id:"kline",nm:"Klinefelter syndrome",cls:"chrom",cause:"47,XXY — an extra X chromosome in males.",inh:"Chromosomal (not inherited).",feat:"Affects males: reduced fertility, small testes, sometimes tall stature and mild learning differences."}
+];
+
+var applied=[
+ {id:"dna",t:"DNA Fingerprinting",body:"Every person (except identical twins) has a unique DNA profile. Highly variable regions — short tandem repeats (VNTRs/STRs) — are amplified and compared.\n\n<b>Uses:</b> forensic identification of suspects, paternity/maternity testing, identifying disaster victims, and settling immigration or inheritance disputes.",eth:false},
+ {id:"counsel",t:"Genetic Counselling",body:"Trained counsellors help families understand the risk of an inherited disorder using family history (pedigrees) and, where appropriate, genetic tests.\n\n<b>Aim:</b> give balanced, non-directive information so couples can make their own informed choices about having children or managing a condition.",eth:false},
+ {id:"prenatal",t:"Prenatal Diagnosis",body:"Tests during pregnancy detect chromosomal or gene disorders in the foetus.\n\n<b>Amniocentesis</b> samples amniotic fluid (~15–18 weeks) to karyotype foetal cells; <b>chorionic villus sampling</b> is done earlier. Used to detect conditions such as Down syndrome.\n\n<b>Caution:</b> such tests must never be misused for sex determination — this is illegal in India under the PC-PNDT Act.",eth:true},
+ {id:"hgp",t:"Human Genome Project",body:"An international effort (1990–2003) that sequenced the ~3 billion base pairs of the human genome and mapped its ~20,000–25,000 genes.\n\n<b>Benefits:</b> better understanding of disease genes, improved diagnostics, and the foundation for personalised medicine and gene therapy.",eth:false},
+ {id:"ethics",t:"Ethical Considerations",body:"Genetic technology brings real benefits but also raises concerns that society must weigh carefully.\n\n<b>Promise:</b> earlier diagnosis, targeted treatment, and hope for gene therapy.\n\n<b>Concerns:</b> privacy of genetic data, possible discrimination (jobs/insurance), consent, misuse for sex selection, and equitable access. A balanced view keeps the person — not just the gene — at the centre.",eth:true}
+];
+
+var quiz=[
+ {q:"1. Haemophilia and red–green colour blindness are both inherited as:",o:["Autosomal dominant","X-linked recessive","Chromosomal trisomy","Mitochondrial"],a:1,e:"Both genes lie on the X chromosome and are recessive, so they affect males far more often."},
+ {q:"2. Down syndrome is caused by:",o:["A mutation in a single gene","An extra chromosome 21 (trisomy 21)","A missing X chromosome","Deletion on chromosome 7"],a:1,e:"Down syndrome results from an extra copy of chromosome 21, usually due to non-disjunction."},
+ {q:"3. Amniocentesis is used to:",o:["Amplify DNA for fingerprinting","Sequence the whole genome","Sample amniotic fluid for prenatal diagnosis","Treat cystic fibrosis"],a:2,e:"Amniocentesis samples amniotic fluid to examine foetal chromosomes before birth."}
+];
+
+/* ---------- helpers ---------- */
+function $(s){return document.querySelector(s);}
+function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+
+/* ---------- tabs ---------- */
+var tabs=document.querySelectorAll(".tab");
+tabs.forEach(function(t){t.addEventListener("click",function(){
+  tabs.forEach(function(x){x.classList.remove("active");});
+  t.classList.add("active");
+  ["disorders","pedigree","applied","quiz"].forEach(function(id){
+    $("#"+id).classList.toggle("hidden",id!==t.dataset.tab);});
+});});
+
+/* ---------- disorders ---------- */
+var grid=$("#cardGrid");
+disorders.forEach(function(d){
+  var c=el("div","card",
+    '<div class="nm">'+d.nm+'</div>'+
+    '<span class="pill '+d.cls+'">'+(d.cls==="mend"?"Mendelian":"Chromosomal")+'</span>');
+  c.addEventListener("click",function(){
+    document.querySelectorAll("#cardGrid .card").forEach(function(x){x.classList.remove("sel");});
+    c.classList.add("sel");
+    $("#disDetail").innerHTML='<h4>'+d.nm+'</h4>'+
+      '<div class="kv"><b>Cause:</b> '+d.cause+'</div>'+
+      '<div class="kv"><b>Inheritance:</b> '+d.inh+'</div>'+
+      '<div class="kv"><b>Main features:</b> '+d.feat+'</div>';
+  });
+  grid.appendChild(c);
+});
+
+/* ---------- pedigree ---------- */
+var pedData={
+ AR:{title:"Autosomal recessive",desc:"Two unaffected carrier parents can have an affected child. Trait can skip generations; affects males and females equally.",
+     rows:[[{s:"sq",st:"car",x:120},{s:"ci",st:"car",x:240}],
+           [{s:"sq",st:"un",x:70},{s:"ci",st:"aff",x:150},{s:"sq",st:"car",x:230},{s:"ci",st:"un",x:300}]]},
+ AD:{title:"Autosomal dominant",desc:"An affected parent passes the trait to about half the children. The trait appears in every generation and affects both sexes.",
+     rows:[[{s:"sq",st:"aff",x:120},{s:"ci",st:"un",x:240}],
+           [{s:"ci",st:"aff",x:70},{s:"sq",st:"un",x:150},{s:"ci",st:"aff",x:230},{s:"sq",st:"un",x:300}]]},
+ XR:{title:"X-linked recessive",desc:"A carrier mother passes it to about half her sons (affected) and half her daughters (carriers). Mostly males are affected.",
+     rows:[[{s:"sq",st:"un",x:120},{s:"ci",st:"car",x:240}],
+           [{s:"sq",st:"aff",x:70},{s:"ci",st:"car",x:150},{s:"sq",st:"un",x:230},{s:"ci",st:"un",x:300}]]}
+};
+var curPat="AR";
+function drawPed(key){
+  var d=pedData[key],svg=$("#pedSvg");
+  var ns="http://www.w3.org/2000/svg";
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var yRow=[70,210];
+  // mating line + connectors for row0 to row1
+  function ln(x1,y1,x2,y2){var l=document.createElementNS(ns,"line");
+    l.setAttribute("x1",x1);l.setAttribute("y1",y1);l.setAttribute("x2",x2);l.setAttribute("y2",y2);
+    l.setAttribute("stroke","#3a4a63");l.setAttribute("stroke-width","2");svg.appendChild(l);}
+  var p0=d.rows[0];
+  ln(p0[0].x,yRow[0],p0[1].x,yRow[0]);
+  var midx=(p0[0].x+p0[1].x)/2;
+  ln(midx,yRow[0],midx,140);
+  var kids=d.rows[1];
+  var minx=kids[0].x,maxx=kids[kids.length-1].x;
+  ln(minx,140,maxx,140);
+  kids.forEach(function(k){ln(k.x,140,k.x,yRow[1]);});
+  function sym(o,y){
+    var fill;
+    if(o.st==="aff")fill="var(--accent)";else fill="#2f3d52";
+    if(o.s==="sq"){
+      var r=document.createElementNS(ns,"rect");
+      r.setAttribute("x",o.x-16);r.setAttribute("y",y-16);r.setAttribute("width",32);r.setAttribute("height",32);
+      r.setAttribute("rx",4);r.setAttribute("fill",fill);r.setAttribute("stroke","#7f92ad");r.setAttribute("stroke-width","2");
+      svg.appendChild(r);
+      if(o.st==="car"){var h=document.createElementNS(ns,"path");
+        h.setAttribute("d","M"+(o.x-16)+" "+(y-16)+" L"+o.x+" "+(y-16)+" L"+o.x+" "+(y+16)+" L"+(o.x-16)+" "+(y+16)+" Z");
+        h.setAttribute("fill","var(--accent)");svg.appendChild(h);}
+    }else{
+      var c=document.createElementNS(ns,"circle");
+      c.setAttribute("cx",o.x);c.setAttribute("cy",y);c.setAttribute("r",17);
+      c.setAttribute("fill",fill);c.setAttribute("stroke","#7f92ad");c.setAttribute("stroke-width","2");
+      svg.appendChild(c);
+      if(o.st==="car"){var cl=document.createElementNS(ns,"path");
+        cl.setAttribute("d","M "+o.x+" "+(y-17)+" A 17 17 0 0 0 "+o.x+" "+(y+17)+" Z");
+        cl.setAttribute("fill","var(--accent)");svg.appendChild(cl);}
+    }
+  }
+  d.rows[0].forEach(function(o){sym(o,yRow[0]);});
+  d.rows[1].forEach(function(o){sym(o,yRow[1]);});
+  // labels
+  function lbl(x,y,txt){var t=document.createElementNS(ns,"text");
+    t.setAttribute("x",x);t.setAttribute("y",y);t.setAttribute("fill","#9fb0c6");
+    t.setAttribute("font-size","11");t.setAttribute("text-anchor","middle");t.textContent=txt;svg.appendChild(t);}
+  lbl(30,74,"I");lbl(30,214,"II");
+  $("#pedInfo").innerHTML='<h4>'+d.title+'</h4><div class="kv" style="color:var(--muted)">'+d.desc+'</div>';
+  $("#pedTally").textContent="";
+}
+$("#pedTabs").addEventListener("click",function(e){
+  var t=e.target.closest(".subtab");if(!t)return;
+  document.querySelectorAll("#pedTabs .subtab").forEach(function(x){x.classList.remove("active");});
+  t.classList.add("active");curPat=t.dataset.p;drawPed(curPat);
+});
+$("#pedCount").addEventListener("click",function(){
+  var d=pedData[curPat],aff=0,car=0;
+  d.rows.forEach(function(r){r.forEach(function(o){if(o.st==="aff")aff++;if(o.st==="car")car++;});});
+  $("#pedTally").textContent="In this family: "+aff+" affected, "+car+" carrier(s).";
+});
+drawPed("AR");
+
+/* ---------- applied ---------- */
+var appTabs=$("#appTabs");
+applied.forEach(function(a,i){
+  var b=el("div","subtab"+(i===0?" active":""),a.t);
+  b.dataset.id=a.id;
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#appTabs .subtab").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");showApp(a);
+  });
+  appTabs.appendChild(b);
+});
+function showApp(a){
+  $("#appInfo").innerHTML='<h4>'+a.t+'</h4><div class="kv" style="color:var(--muted)">'+a.body.replace(/\n/g,"<br>")+'</div>';
+  var note=$("#ethicsNote");
+  if(a.eth){note.style.display="block";note.innerHTML="<b>Ethics note:</b> genetic tools must be used with consent, privacy, and respect for the individual — and never for sex selection.";}
+  else{note.style.display="none";}
+  drawApp(a.id);
+}
+function drawApp(id){
+  var svg=$("#appSvg"),ns="http://www.w3.org/2000/svg";
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  function add(tag,attrs){var e=document.createElementNS(ns,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);svg.appendChild(e);return e;}
+  function txt(x,y,s,sz,anc){var t=add("text",{x:x,y:y,fill:"#cdd8e8","font-size":sz||12,"text-anchor":anc||"middle"});t.textContent=s;return t;}
+  add("rect",{x:0,y:0,width:360,height:220,fill:"none"});
+  if(id==="dna"){
+    // gel electrophoresis bands
+    var cols=[40,110,180,250,320],pat=[[1,3,5],[2,3],[1,3,5],[2,4,5],[3,4]];
+    txt(180,20,"DNA fingerprint (gel bands)",13);
+    ["Crime","Sus.1","Sus.2","Child","M/F"].forEach(function(l,i){txt(cols[i],210,l,11);});
+    for(var i=0;i<cols.length;i++){
+      add("rect",{x:cols[i]-22,y:34,width:44,height:160,fill:"#12202f",stroke:"#2c3a4f"});
+      pat[i].forEach(function(b){add("rect",{x:cols[i]-18,y:40+b*26,width:36,height:8,rx:2,fill:"var(--accent)"});});
+    }
+  }else if(id==="counsel"){
+    add("circle",{cx:110,cy:90,r:26,fill:"#2f3d52",stroke:"#7f92ad","stroke-width":2});
+    add("rect",{x:224,y:66,width:48,height:48,rx:4,fill:"var(--accent)",stroke:"#7f92ad","stroke-width":2});
+    add("line",{x1:136,y1:90,x2:224,y2:90,stroke:"#3a4a63","stroke-width":2});
+    txt(110,150,"Family",11);txt(248,150,"Counsellor",11);
+    txt(180,185,"Risk explained → informed choice",12);
+  }else if(id==="prenatal"){
+    add("ellipse",{cx:150,cy:120,rx:70,ry:55,fill:"#12202f",stroke:"#2c3a4f"});
+    add("circle",{cx:150,cy:120,r:26,fill:"var(--accent)",opacity:.85});
+    add("line",{x1:150,y1:20,x2:150,y2:94,stroke:"#ffcf7a","stroke-width":3});
+    add("polygon",{points:"146,20 154,20 150,10",fill:"#ffcf7a"});
+    txt(150,200,"Amniocentesis: sample amniotic fluid",12);
+    txt(255,60,"needle",10,"start");
+  }else if(id==="hgp"){
+    // double helix
+    for(var k=0;k<10;k++){var y=30+k*17;var ox=Math.sin(k*0.7)*40;
+      add("line",{x1:180-ox,y1:y,x2:180+ox,y2:y,stroke:"var(--accent)","stroke-width":2,opacity:.8});
+      add("circle",{cx:180-ox,cy:y,r:4,fill:"#5ad19a"});add("circle",{cx:180+ox,cy:y,r:4,fill:"#ffcf7a"});}
+    txt(180,215,"~3 billion base pairs mapped",12);
+  }else{ // ethics balance
+    add("line",{x1:180,y1:40,x2:180,y2:150,stroke:"#7f92ad","stroke-width":3});
+    add("line",{x1:90,y1:70,x2:270,y2:70,stroke:"var(--accent)","stroke-width":3});
+    add("rect",{x:66,y:74,width:48,height:30,rx:4,fill:"rgba(90,209,154,.3)",stroke:"#5ad19a"});
+    add("rect",{x:246,y:74,width:48,height:30,rx:4,fill:"rgba(255,138,138,.25)",stroke:"#ff8a8a"});
+    txt(90,124,"Benefits",11);txt(270,124,"Concerns",11);
+    txt(180,185,"Weigh both — keep the person central",12);
+  }
+}
+showApp(applied[0]);
+
+/* ---------- quiz ---------- */
+var qbox=$("#quizBox"),answered=0,correct=0;
+function buildQuiz(){
+  qbox.innerHTML="";answered=0;correct=0;$("#quizScore").textContent="";
+  quiz.forEach(function(item,qi){
+    var wrap=el("div");
+    wrap.appendChild(el("p","q",item.q));
+    var opts=el("div","opts");
+    var fb=el("div","fb");
+    item.o.forEach(function(text,oi){
+      var o=el("div","opt",text);
+      o.addEventListener("click",function(){
+        if(wrap.dataset.done)return;
+        wrap.dataset.done="1";answered++;
+        var kids=opts.querySelectorAll(".opt");
+        kids[item.a].classList.add("correct");
+        if(oi===item.a){correct++;fb.textContent="Correct. "+item.e;}
+        else{o.classList.add("wrong");fb.textContent="Not quite. "+item.e;}
+        if(answered===quiz.length)$("#quizScore").textContent="Score: "+correct+" / "+quiz.length;
+      });
+      opts.appendChild(o);
+    });
+    wrap.appendChild(opts);wrap.appendChild(fb);qbox.appendChild(wrap);
+  });
+}
+$("#quizReset").addEventListener("click",buildQuiz);
+buildQuiz();
+</script>
+</body>
+</html>

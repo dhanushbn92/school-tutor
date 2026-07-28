@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conservation Lab - NIOS Class 12 Biology (Ch26)</title>
+<style>
+  :root{
+    --accent:#3fb488;
+    --accent-dark:#2c9370;
+    --bg:#111a18;
+    --panel:#182421;
+    --panel2:#20302c;
+    --ink:#e7f2ee;
+    --muted:#9db3ac;
+    --good:#3fb488;
+    --bad:#e08a6a;
+    --line:#2c3f39;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -5%,#1a2b26,#111a18 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#08201a;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:.1rem 0 .6rem;}
+  h3{font-size:.98rem;margin:.2rem 0 .5rem;}
+  p.lead{color:var(--muted);font-size:.9rem;margin:.2rem 0 .8rem;}
+  .btn{background:var(--accent);color:#08201a;border:none;padding:9px 15px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .row{display:flex;gap:12px;flex-wrap:wrap;}
+  .col{flex:1 1 300px;min-width:260px;}
+  /* Sorter */
+  .cards{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px;}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 11px;
+    font-size:.85rem;font-weight:600;cursor:grab;user-select:none;display:flex;align-items:center;gap:6px;
+    touch-action:manipulation;transition:.12s;}
+  .card:active{cursor:grabbing;}
+  .card.sel{outline:2px solid var(--accent);}
+  .card .em{font-size:1.15rem;}
+  .bins{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .bin{flex:1 1 200px;min-width:180px;background:var(--panel2);border:2px dashed var(--line);
+    border-radius:14px;padding:10px;min-height:110px;}
+  .bin.over{border-color:var(--accent);background:#1c2f2a;}
+  .bin h4{margin:0 0 6px;font-size:.9rem;}
+  .bin .drop{display:flex;flex-wrap:wrap;gap:6px;min-height:40px;}
+  .bin .hint{color:var(--muted);font-size:.78rem;}
+  .card.correct{border-color:var(--good);}
+  .card.wrong{border-color:var(--bad);}
+  /* toggles */
+  .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:3px;gap:3px;flex-wrap:wrap;}
+  .seg button{background:transparent;border:none;color:var(--muted);padding:7px 12px;border-radius:9px;
+    font-weight:600;font-size:.82rem;cursor:pointer;}
+  .seg button.on{background:var(--accent);color:#08201a;}
+  /* insitu/exsitu grid */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+  .mini{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;}
+  .mini h4{margin:0 0 4px;font-size:.88rem;}
+  .mini ul{margin:4px 0 0;padding-left:18px;font-size:.82rem;color:var(--muted);}
+  /* India projects */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0;}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:8px 13px;
+    font-size:.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.12s;}
+  .chip.on{background:var(--accent);color:#08201a;border-color:var(--accent-dark);}
+  .infobox{background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:10px;padding:11px 13px;font-size:.86rem;margin-top:8px;min-height:56px;}
+  /* forest before/after */
+  .forestwrap{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:10px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .slider-row{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;}
+  input[type=range]{flex:1 1 160px;accent-color:var(--accent);}
+  .stat{font-size:.82rem;color:var(--muted);}
+  .stat b{color:var(--ink);}
+  /* facts */
+  .facts{background:linear-gradient(150deg,#1a2b26,#152420);border:1px solid var(--line);}
+  .facts li{margin-bottom:6px;font-size:.86rem;}
+  /* quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;}
+  .q .opts{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .opt{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:9px 11px;border-radius:9px;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.right{background:#1c3a30;border-color:var(--good);color:#eafff6;}
+  .opt.wrong{background:#3a241d;border-color:var(--bad);color:#ffe8e0;}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:8px;display:none;}
+  .expl.show{display:block;}
+  .score{font-weight:700;margin-top:6px;}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:20px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted);}
+  .footer{color:var(--muted);font-size:.78rem;text-align:center;margin:6px 0 20px;}
+  .live{font-size:.85rem;margin-top:8px;color:var(--accent);font-weight:600;min-height:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Conservation Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Chapter 26: Conservation and Use of Natural Resources</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="res">Natural Resources</div>
+    <div class="tab" data-t="bio">Biodiversity &amp; Conservation</div>
+    <div class="tab" data-t="threat">Threats &amp; Solutions</div>
+    <div class="tab" data-t="quiz">Quiz</div>
+  </div>
+
+  <!-- ============ MODE 1: RESOURCES ============ -->
+  <section class="panel" id="p-res">
+    <h2>Sort the Natural Resources</h2>
+    <p class="lead">Drag each card (or tap a card, then tap a bin) into <b>Renewable</b> or
+      <b>Non-renewable</b>. Renewable resources regenerate within a human lifespan if used
+      sustainably; non-renewable ones exist in fixed stocks and take geological time to form.</p>
+    <div class="cards" id="poolRes"></div>
+    <div class="bins">
+      <div class="bin" data-bin="renew">
+        <h4>&#127807; Renewable</h4>
+        <div class="drop" id="binRenew"><span class="hint">Drop renewable resources here</span></div>
+      </div>
+      <div class="bin" data-bin="nonrenew">
+        <h4>&#9935; Non-renewable</h4>
+        <div class="drop" id="binNon"><span class="hint">Drop non-renewable resources here</span></div>
+      </div>
+    </div>
+    <div class="slider-row">
+      <button class="btn" id="checkRes">Check answers</button>
+      <button class="btn ghost" id="resetRes">Reset</button>
+      <span class="live" id="resLive"></span>
+    </div>
+    <div class="infobox" id="resInfo">Tip: forests, water and soil renew naturally, but only if
+      the rate of use stays below the rate of renewal &mdash; that is <b>sustainable use</b>.</div>
+  </section>
+
+  <!-- ============ MODE 2: BIODIVERSITY ============ -->
+  <section class="panel hidden" id="p-bio">
+    <h2>Biodiversity &amp; Conservation Strategies</h2>
+    <p class="lead">Conservation of biodiversity uses two broad approaches. Toggle between them,
+      then explore India's flagship programmes.</p>
+    <div class="seg" id="segBio">
+      <button class="on" data-m="in">In-situ (on-site)</button>
+      <button data-m="ex">Ex-situ (off-site)</button>
+    </div>
+    <div class="grid2" id="bioGrid" style="margin-top:12px;"></div>
+
+    <h3 style="margin-top:16px;">Endangered &amp; Extinct &mdash; IUCN status</h3>
+    <p class="lead">Species are ranked by extinction risk. Tap a card to see its status.</p>
+    <div class="chips" id="iucnChips"></div>
+    <div class="infobox" id="iucnInfo">Select a species above.</div>
+
+    <h3 style="margin-top:16px;">Biodiversity Hotspots of India</h3>
+    <p class="lead">A hotspot is a biologically rich region under serious threat. India has four.</p>
+    <div class="infobox" id="hotBox">
+      India's four biodiversity hotspots: the <b>Himalaya</b>, the <b>Western Ghats &amp; Sri Lanka</b>,
+      the <b>Indo-Burma</b> region (north-east India), and <b>Sundaland</b> (Nicobar Islands).
+      They hold exceptional endemism but face habitat loss.
+    </div>
+
+    <h3 style="margin-top:16px;">India's Flagship Conservation Projects</h3>
+    <div class="chips" id="projChips"></div>
+    <div class="infobox" id="projInfo">Tap a project to learn more.</div>
+  </section>
+
+  <!-- ============ MODE 3: THREATS ============ -->
+  <section class="panel hidden" id="p-threat">
+    <h2>Threats &amp; Solutions</h2>
+    <p class="lead">Move the slider to see how <b>deforestation</b> strips a forest of its trees,
+      wildlife and soil &mdash; then how <b>afforestation</b> and protection restore it.</p>
+    <div class="forestwrap">
+      <svg id="forestSvg" viewBox="0 0 400 200" role="img" aria-label="Forest health illustration"></svg>
+    </div>
+    <div class="slider-row">
+      <span class="stat">Forest cover</span>
+      <input type="range" id="forest" min="0" max="100" value="80" aria-label="Forest cover">
+      <span class="stat"><b id="forestPct">80%</b></span>
+    </div>
+    <div class="stat" id="forestState" style="margin-top:4px;"></div>
+
+    <div class="row" style="margin-top:14px;">
+      <div class="col">
+        <h3>&#9888; Threats</h3>
+        <div class="mini">
+          <ul style="margin:0;padding-left:18px;font-size:.85rem;">
+            <li><b>Deforestation</b> &mdash; clearing forests for farming, mining, urbanisation.</li>
+            <li><b>Overexploitation</b> &mdash; harvesting faster than resources can renew.</li>
+            <li><b>Habitat loss &amp; fragmentation</b> &mdash; the leading cause of extinction.</li>
+            <li><b>Poaching</b> &mdash; illegal hunting for skin, horn, ivory, tusks.</li>
+            <li><b>Pollution &amp; invasive species</b> add further pressure.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <h3>&#10004; Solutions</h3>
+        <div class="mini">
+          <ul style="margin:0;padding-left:18px;font-size:.85rem;">
+            <li><b>Afforestation &amp; reforestation</b> to rebuild green cover.</li>
+            <li><b>Wildlife protection laws</b> &mdash; Wildlife (Protection) Act 1972; Forest
+              (Conservation) Act 1980.</li>
+            <li><b>The 3Rs</b> &mdash; Reduce, Reuse, Recycle.</li>
+            <li><b>Sustainable development</b> &mdash; meeting present needs without compromising
+              future generations.</li>
+            <li><b>Protected areas &amp; community participation</b> (e.g. Chipko movement, JFM).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="seg" id="threeR" style="margin-top:12px;">
+      <button class="on" data-r="reduce">Reduce</button>
+      <button data-r="reuse">Reuse</button>
+      <button data-r="recycle">Recycle</button>
+    </div>
+    <div class="infobox" id="rInfo"></div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel hidden" id="p-quiz">
+    <h2>Quick Quiz <span class="badge">3 questions</span></h2>
+    <p class="lead">Choose an answer to reveal the explanation.</p>
+    <div id="quizHost"></div>
+    <div class="score" id="score"></div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <section class="panel facts">
+    <h2>&#128161; Key Facts</h2>
+    <ul style="margin:.2rem 0 0;padding-left:20px;">
+      <li><b>In-situ</b> conservation protects species in their natural habitat: national parks,
+        wildlife sanctuaries and biosphere reserves.</li>
+      <li><b>Ex-situ</b> conservation protects species outside their habitat: zoos, botanical gardens,
+        seed banks, gene banks and cryopreservation.</li>
+      <li>India has 18 biosphere reserves and four global biodiversity hotspots.</li>
+      <li>Project Tiger began in 1973; Project Elephant began in 1992.</li>
+      <li><b>Sustainable development</b> = using resources to meet present needs without compromising
+        the ability of future generations to meet theirs (Brundtland, 1987).</li>
+    </ul>
+  </section>
+
+  <div class="footer">Conservation Lab &middot; factual content for NIOS Class 12 Biology, Chapter 26.</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  /* ---------- Tabs ---------- */
+  var panels={res:$("#p-res"),bio:$("#p-bio"),threat:$("#p-threat"),quiz:$("#p-quiz")};
+  $$("#tabs .tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $$("#tabs .tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      Object.keys(panels).forEach(function(k){panels[k].classList.add("hidden");});
+      panels[t.dataset.t].classList.remove("hidden");
+    });
+  });
+
+  /* ---------- MODE 1: Resource sorter ---------- */
+  var RES=[
+    {n:"Forests",e:"🌲",t:"renew"},
+    {n:"Wildlife",e:"🦌",t:"renew"},
+    {n:"Freshwater",e:"💧",t:"renew"},
+    {n:"Solar energy",e:"☀️",t:"renew"},
+    {n:"Wind",e:"💨",t:"renew"},
+    {n:"Soil",e:"🌱",t:"renew"},
+    {n:"Coal",e:"⛏️",t:"nonrenew"},
+    {n:"Petroleum",e:"🛢️",t:"nonrenew"},
+    {n:"Natural gas",e:"🔥",t:"nonrenew"},
+    {n:"Minerals (ores)",e:"💎",t:"nonrenew"}
+  ];
+  var pool=$("#poolRes"), binR=$("#binRenew"), binN=$("#binNon"), selCard=null;
+  function makeCard(r){
+    var c=document.createElement("div");
+    c.className="card"; c.draggable=true; c.dataset.t=r.t; c.dataset.n=r.n;
+    c.innerHTML='<span class="em">'+r.e+'</span>'+r.n;
+    c.addEventListener("dragstart",function(ev){ev.dataTransfer.setData("text/plain",r.n);dragged=c;});
+    c.addEventListener("click",function(){
+      if(selCard===c){c.classList.remove("sel");selCard=null;return;}
+      $$(".card.sel").forEach(function(x){x.classList.remove("sel");});
+      c.classList.add("sel"); selCard=c;
+    });
+    return c;
+  }
+  var dragged=null;
+  function buildPool(){
+    pool.innerHTML=""; binR.innerHTML='<span class="hint">Drop renewable resources here</span>';
+    binN.innerHTML='<span class="hint">Drop non-renewable resources here</span>';
+    RES.slice().sort(function(){return Math.random()-.5;}).forEach(function(r){pool.appendChild(makeCard(r));});
+    $("#resLive").textContent="";
+  }
+  function clearHints(el){var h=el.querySelector(".hint"); if(h) h.remove();}
+  function placeCard(c,binEl){clearHints(binEl); c.classList.remove("sel"); selCard=null;
+    c.classList.remove("correct","wrong"); binEl.appendChild(c);}
+  $$(".bin").forEach(function(b){
+    var drop=b.querySelector(".drop"), key=b.dataset.bin;
+    b.addEventListener("dragover",function(ev){ev.preventDefault();b.classList.add("over");});
+    b.addEventListener("dragleave",function(){b.classList.remove("over");});
+    b.addEventListener("drop",function(ev){ev.preventDefault();b.classList.remove("over");
+      if(dragged){placeCard(dragged,drop);dragged=null;}});
+    b.addEventListener("click",function(){
+      if(selCard){placeCard(selCard,drop);}
+    });
+  });
+  pool.addEventListener("dragover",function(ev){ev.preventDefault();});
+  pool.addEventListener("drop",function(ev){ev.preventDefault(); if(dragged){dragged.classList.remove("correct","wrong");pool.appendChild(dragged);dragged=null;}});
+  $("#checkRes").addEventListener("click",function(){
+    var all=$$("#binRenew .card, #binNon .card"), ok=0, placed=all.length;
+    all.forEach(function(c){
+      var inBin=c.parentElement.parentElement.dataset.bin==="renew"?"renew":"nonrenew";
+      if(c.dataset.t===inBin){c.classList.add("correct");c.classList.remove("wrong");ok++;}
+      else{c.classList.add("wrong");c.classList.remove("correct");}
+    });
+    var msg = placed===0 ? "Place some cards first." :
+      ok+" / "+RES.length+" correct." + (ok===RES.length?" Perfect!":"");
+    $("#resLive").textContent=msg;
+  });
+  $("#resetRes").addEventListener("click",buildPool);
+  buildPool();
+
+  /* ---------- MODE 2: Biodiversity ---------- */
+  var BIO={
+    in:[
+      {h:"National Parks",b:["Strictly protected; no grazing or forestry.","e.g. Jim Corbett, Kaziranga, Gir."]},
+      {h:"Wildlife Sanctuaries",b:["Protect specific fauna; some regulated activity allowed.","e.g. Periyar, Bharatpur."]},
+      {h:"Biosphere Reserves",b:["Large multi-zone areas (core, buffer, transition).","e.g. Nilgiri, Sundarbans, Nanda Devi."]},
+      {h:"Sacred groves",b:["Community-protected forest patches with high endemism.","Traditional in-situ conservation."]}
+    ],
+    ex:[
+      {h:"Zoological Parks",b:["Captive breeding of endangered animals.","Reintroduction to the wild is a goal."]},
+      {h:"Botanical Gardens",b:["Living collections of plant species.","Support research and education."]},
+      {h:"Seed / Gene Banks",b:["Store seeds and germplasm at low temperature.","e.g. NBPGR, New Delhi."]},
+      {h:"Cryopreservation",b:["Freeze gametes, tissue and embryos in liquid N₂.","Long-term ex-situ backup."]}
+    ]
+  };
+  var bioGrid=$("#bioGrid"), bioMode="in";
+  function renderBio(){
+    bioGrid.innerHTML="";
+    BIO[bioMode].forEach(function(o){
+      var d=document.createElement("div"); d.className="mini";
+      d.innerHTML='<h4>'+o.h+'</h4><ul>'+o.b.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
+      bioGrid.appendChild(d);
+    });
+  }
+  $$("#segBio button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $$("#segBio button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); bioMode=b.dataset.m; renderBio();
+    });
+  });
+  renderBio();
+
+  /* IUCN species */
+  var IUCN=[
+    {n:"Cheetah (Asiatic)",e:"🐆",s:"Extinct in India",d:"The Asiatic cheetah was declared extinct in India in 1952. African cheetahs were reintroduced to Kuno National Park from 2022."},
+    {n:"Bengal Tiger",e:"🐅",s:"Endangered",d:"Protected under Project Tiger (1973); India holds the majority of the world's wild tigers."},
+    {n:"Great Indian Bustard",e:"🦅",s:"Critically Endangered",d:"One of the heaviest flying birds; only a few hundred survive, mainly in Rajasthan."},
+    {n:"One-horned Rhino",e:"🦏",s:"Vulnerable",d:"Recovered from near-extinction; strongholds in Kaziranga and Manas, Assam."},
+    {n:"Asiatic Lion",e:"🦁",s:"Endangered",d:"Survives only in the Gir Forest, Gujarat — the last wild population on Earth."},
+    {n:"Dodo",e:"🦤",s:"Extinct",d:"A flightless bird of Mauritius, hunted to global extinction by the late 1600s."}
+  ];
+  var chips=$("#iucnChips"), iInfo=$("#iucnInfo");
+  IUCN.forEach(function(sp){
+    var c=document.createElement("div"); c.className="chip";
+    c.innerHTML='<span>'+sp.e+'</span>'+sp.n;
+    c.addEventListener("click",function(){
+      $$("#iucnChips .chip").forEach(function(x){x.classList.remove("on");});
+      c.classList.add("on");
+      iInfo.innerHTML='<b>'+sp.n+'</b> &mdash; <b>'+sp.s+'</b><br>'+sp.d;
+    });
+    chips.appendChild(c);
+  });
+
+  /* India projects */
+  var PROJ=[
+    {n:"Project Tiger",y:"1973",d:"Launched to protect the Bengal tiger and its habitat through a network of tiger reserves, coordinated by the National Tiger Conservation Authority."},
+    {n:"Project Elephant",y:"1992",d:"Protects wild Asian elephants, their habitats and migration corridors, and reduces human–elephant conflict."},
+    {n:"Crocodile Project",y:"1975",d:"Captive breeding and release programme that revived gharial, mugger and saltwater crocodile populations."},
+    {n:"Biosphere Reserve Prog.",y:"1986",d:"Establishes multi-zone reserves (core/buffer/transition) balancing conservation with sustainable human use."}
+  ];
+  var pc=$("#projChips"), pInfo=$("#projInfo");
+  PROJ.forEach(function(p){
+    var c=document.createElement("div"); c.className="chip"; c.textContent=p.n;
+    c.addEventListener("click",function(){
+      $$("#projChips .chip").forEach(function(x){x.classList.remove("on");});
+      c.classList.add("on");
+      pInfo.innerHTML='<b>'+p.n+'</b> (since '+p.y+')<br>'+p.d;
+    });
+    pc.appendChild(c);
+  });
+
+  /* ---------- MODE 3: Forest before/after ---------- */
+  var svg=$("#forestSvg"), forest=$("#forest"), fPct=$("#forestPct"), fState=$("#forestState");
+  var SVGNS="http://www.w3.org/2000/svg";
+  // static tree positions
+  var TREES=[];
+  (function(){var seed=7;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+    for(var i=0;i<26;i++){TREES.push({x:20+rnd()*360,y:120+rnd()*60,s:.7+rnd()*.6});}})();
+  function el(name,attrs){var e=document.createElementNS(SVGNS,name);
+    for(var k in attrs){e.setAttribute(k,attrs[k]);}return e;}
+  function drawForest(){
+    var pct=+forest.value; svg.innerHTML="";
+    var lush=pct/100;
+    // sky
+    var sky=el("rect",{x:0,y:0,width:400,height:200,fill:"#122019"});
+    svg.appendChild(sky);
+    // sun
+    svg.appendChild(el("circle",{cx:350,cy:34,r:16,fill:"#e8c15a",opacity:.85}));
+    // ground: greener when lush, browner when bare
+    var g = lush>.5 ? "#2f5138" : "#5a4a2c";
+    if(pct<=15) g="#6b5227";
+    svg.appendChild(el("rect",{x:0,y:150,width:400,height:50,fill:g}));
+    // river/water shrinks with cover (soil erosion / drying)
+    var wOp = .25+.5*lush;
+    svg.appendChild(el("path",{d:"M0 185 Q100 175 200 185 T400 183 L400 200 L0 200 Z",fill:"#2b6f8c",opacity:wOp}));
+    // number of trees shown proportional to cover
+    var nShow=Math.round(TREES.length*lush);
+    for(var i=0;i<nShow;i++){
+      var t=TREES[i];
+      // trunk
+      svg.appendChild(el("rect",{x:t.x-2*t.s,y:t.y,width:4*t.s,height:16*t.s,fill:"#6b4b2e"}));
+      // canopy
+      svg.appendChild(el("circle",{cx:t.x,cy:t.y-2*t.s,r:9*t.s,fill: lush>.4?"#3fb488":"#6d8a5a"}));
+      svg.appendChild(el("circle",{cx:t.x-5*t.s,cy:t.y+2*t.s,r:6*t.s,fill:"#2c9370"}));
+      svg.appendChild(el("circle",{cx:t.x+5*t.s,cy:t.y+2*t.s,r:6*t.s,fill:"#37a37c"}));
+    }
+    // stumps for cleared trees
+    for(var j=nShow;j<TREES.length;j++){
+      var s=TREES[j];
+      svg.appendChild(el("rect",{x:s.x-3*s.s,y:s.y+8*s.s,width:6*s.s,height:5*s.s,fill:"#4a3417"}));
+    }
+    // wildlife appears only when reasonably forested
+    if(lush>=.5){
+      var deer=el("text",{x:60,y:172,"font-size":16}); deer.textContent="🦌"; svg.appendChild(deer);
+      var bird=el("text",{x:300,y:70,"font-size":13}); bird.textContent="🐦"; svg.appendChild(bird);
+    }
+    if(lush>=.75){
+      var tig=el("text",{x:180,y:174,"font-size":18}); tig.textContent="🐅"; svg.appendChild(tig);
+    }
+    fPct.textContent=pct+"%";
+    var msg;
+    if(pct>=75) msg="Healthy forest — rich biodiversity, stable soil and water cycle.";
+    else if(pct>=45) msg="Degrading — fragmentation begins; sensitive species decline.";
+    else if(pct>=15) msg="Heavily deforested — soil erosion, habitat loss, wildlife pushed out.";
+    else msg="Barren — desertification risk. Afforestation is urgently needed.";
+    fState.innerHTML="<b>Status:</b> "+msg;
+  }
+  forest.addEventListener("input",drawForest);
+  drawForest();
+
+  var RTEXT={
+    reduce:"<b>Reduce</b> — cut consumption at source: use less paper, water, plastic and energy so fewer raw resources are extracted in the first place.",
+    reuse:"<b>Reuse</b> — use items again instead of discarding them: refill bottles, repair goods, donate clothes — extending product life lowers demand.",
+    recycle:"<b>Recycle</b> — reprocess used materials (paper, glass, metal, plastic) into new products, saving energy and reducing landfill and mining."
+  };
+  var rInfo=$("#rInfo"); rInfo.innerHTML=RTEXT.reduce;
+  $$("#threeR button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $$("#threeR button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); rInfo.innerHTML=RTEXT[b.dataset.r];
+    });
+  });
+
+  /* ---------- QUIZ ---------- */
+  var QUIZ=[
+    {q:"Which of these is an example of in-situ conservation?",
+     o:["A seed bank","A botanical garden","A biosphere reserve","A zoo"],
+     a:2,
+     e:"In-situ conservation protects species in their natural habitat — national parks, wildlife sanctuaries and biosphere reserves. Seed banks, botanical gardens and zoos are ex-situ."},
+    {q:"Which resource is NON-renewable?",
+     o:["Forests","Solar energy","Coal","Wind"],
+     a:2,
+     e:"Coal is a fossil fuel that forms over millions of years and exists in a fixed stock, so it is non-renewable. Forests, solar and wind can renew within human timescales."},
+    {q:"Project Tiger was launched in India in the year:",
+     o:["1952","1973","1992","2006"],
+     a:1,
+     e:"Project Tiger began in 1973 to conserve the Bengal tiger. (Project Elephant began in 1992; the Asiatic cheetah was declared extinct in India in 1952.)"}
+  ];
+  var host=$("#quizHost"), answered={}, scoreEl=$("#score");
+  QUIZ.forEach(function(item,qi){
+    var box=document.createElement("div"); box.className="q";
+    box.innerHTML='<b>Q'+(qi+1)+'.</b> '+item.q;
+    var opts=document.createElement("div"); opts.className="opts";
+    item.o.forEach(function(txt,oi){
+      var btn=document.createElement("button"); btn.className="opt"; btn.textContent=txt;
+      btn.addEventListener("click",function(){
+        if(answered[qi]) return;
+        answered[qi]=true;
+        $$(".opt",opts).forEach(function(x,xi){
+          x.disabled=true;
+          if(xi===item.a) x.classList.add("right");
+          else if(xi===oi) x.classList.add("wrong");
+        });
+        expl.classList.add("show");
+        updateScore();
+      });
+      opts.appendChild(btn);
+    });
+    box.appendChild(opts);
+    var expl=document.createElement("div"); expl.className="expl";
+    expl.innerHTML="<b>Explanation:</b> "+item.e;
+    box.appendChild(expl);
+    host.appendChild(box);
+  });
+  function updateScore(){
+    var done=Object.keys(answered).length, boxes=$$("#quizHost .q"), c=0;
+    QUIZ.forEach(function(it,qi){
+      if(answered[qi] && boxes[qi].querySelector(".opt.wrong")===null) c++;
+    });
+    scoreEl.textContent="Score: "+c+" / "+QUIZ.length+(done===QUIZ.length?"  — quiz complete!":"");
+  }
+})();
+</script>
+</body>
+</html>

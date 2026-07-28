@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molecular Genetics Lab — NIOS Class 12 Biology (Ch 23)</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#161f30; --panel2:#1d2942; --edge:#28344d;
+    --ink:#e7edf7; --muted:#9fb0cc; --accent:#4fd1c5; --accent2:#f6ad55;
+    --a:#5aa9ff; --t:#f47b7b; --g:#7bd88f; --c:#f6c453;
+    --radius:16px; --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 50% -10%,#16233b,#0e1420 60%);
+    color:var(--ink); font-family:"Segoe UI",Roboto,system-ui,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.32rem;margin:0 0 2px}
+  h2{font-size:1.05rem;margin:0 0 8px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 12px}
+  .wrap{max-width:920px;margin:0 auto}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{
+    flex:1 1 auto;min-width:120px;cursor:pointer;border:1px solid var(--edge);
+    background:var(--panel);color:var(--ink);padding:10px 12px;border-radius:12px;
+    font-size:.9rem;text-align:center;transition:.15s;user-select:none;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.on{background:linear-gradient(180deg,#20304d,#182339);border-color:var(--accent);color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--edge);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+  .view{display:none}
+  .view.on{display:block}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .col{flex:1 1 300px;min-width:0}
+  button.act{
+    cursor:pointer;border:1px solid var(--edge);background:var(--panel2);color:var(--ink);
+    padding:9px 14px;border-radius:10px;font-size:.86rem;transition:.15s;margin:3px 3px 3px 0;
+  }
+  button.act:hover{border-color:var(--accent);color:var(--accent)}
+  button.act.primary{background:var(--accent);color:#062024;border-color:var(--accent);font-weight:600}
+  button.act.primary:hover{filter:brightness(1.08);color:#062024}
+  button.act:disabled{opacity:.45;cursor:default}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:8px 0}
+  .chip{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:13px;height:13px;border-radius:4px;display:inline-block}
+  svg{width:100%;height:auto;display:block;border-radius:12px;background:#0c1220;border:1px solid var(--edge)}
+  .facts{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:.86rem;margin-top:12px}
+  .facts b{color:var(--accent)}
+  .info{background:#0c1220;border:1px solid var(--edge);border-radius:10px;padding:10px 12px;font-size:.85rem;min-height:44px;margin-top:10px}
+  .info b{color:var(--accent2)}
+  code,.mono{font-family:"Cascadia Code",Consolas,monospace;letter-spacing:.4px}
+  input[type=text]{
+    width:100%;background:#0c1220;border:1px solid var(--edge);color:var(--ink);
+    border-radius:10px;padding:10px;font-family:"Cascadia Code",Consolas,monospace;
+    font-size:1rem;letter-spacing:2px;text-transform:uppercase;
+  }
+  .seqout{font-family:"Cascadia Code",Consolas,monospace;font-size:.95rem;word-break:break-all;line-height:2}
+  .codon{display:inline-block;padding:2px 6px;margin:2px;border-radius:6px;background:var(--panel2);border:1px solid var(--edge)}
+  .codon.start{border-color:var(--g);color:var(--g)}
+  .codon.stop{border-color:var(--t);color:var(--t)}
+  .aa{display:inline-block;background:#122238;border:1px solid var(--edge);border-radius:8px;padding:3px 8px;margin:3px;font-size:.82rem}
+  table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:8px}
+  th,td{border:1px solid var(--edge);padding:4px 6px;text-align:center}
+  th{background:var(--panel2);color:var(--accent)}
+  .small{font-size:.8rem;color:var(--muted)}
+  .quiz .q{background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:12px;margin-bottom:10px}
+  .quiz .opt{display:block;background:#0c1220;border:1px solid var(--edge);border-radius:8px;padding:8px 10px;margin:6px 0;cursor:pointer;font-size:.85rem;transition:.12s}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{border-color:var(--g);background:#123020;color:var(--g)}
+  .quiz .opt.wrong{border-color:var(--t);background:#301818;color:var(--t)}
+  .quiz .exp{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:600}
+  .pill.silent{background:#123020;color:var(--g)}
+  .pill.missense{background:#2f2712;color:var(--c)}
+  .pill.nonsense{background:#301818;color:var(--t)}
+  .pill.frameshift{background:#2a1836;color:#d59bf0}
+  select{background:#0c1220;border:1px solid var(--edge);color:var(--ink);border-radius:8px;padding:7px 9px;font-size:.85rem}
+  label.lbl{font-size:.82rem;color:var(--muted);display:block;margin:6px 0 3px}
+  .flash{animation:fl .6s ease}
+  @keyframes fl{0%{background:#20304d}100%{}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Molecular Genetics Lab</h1>
+  <p class="sub">NIOS Class 12 Biology · Chapter 23 — Molecular Inheritance &amp; Gene Expression</p>
+
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-v="dna">1 · DNA Structure</div>
+    <div class="tab" data-v="dogma">2 · Central Dogma</div>
+    <div class="tab" data-v="mut">3 · Mutations</div>
+    <div class="tab" data-v="quiz">Quiz</div>
+  </div>
+
+  <!-- ============ VIEW 1: DNA ============ -->
+  <section class="view on" id="v-dna">
+    <div class="panel">
+      <h2>The DNA Double Helix</h2>
+      <p class="small">Click any base to inspect it. Two antiparallel strands (5′→3′ and 3′→5′) held by
+        a sugar-phosphate backbone; bases pair by hydrogen bonds: <b>A=T</b> (2 bonds), <b>G≡C</b> (3 bonds).</p>
+      <div class="legend">
+        <span class="chip"><span class="dot" style="background:var(--a)"></span>A — Adenine</span>
+        <span class="chip"><span class="dot" style="background:var(--t)"></span>T — Thymine</span>
+        <span class="chip"><span class="dot" style="background:var(--g)"></span>G — Guanine</span>
+        <span class="chip"><span class="dot" style="background:var(--c)"></span>C — Cytosine</span>
+      </div>
+      <svg id="helix" viewBox="0 0 360 320" role="img" aria-label="DNA double helix"></svg>
+      <div class="info" id="dnaInfo"><b>Base info:</b> click a base above to see its pairing partner and details.</div>
+      <div class="facts">
+        <b>DNA vs RNA:</b> DNA is double-stranded, uses deoxyribose sugar and the base <b>Thymine (T)</b>.
+        RNA is usually single-stranded, uses ribose sugar and <b>Uracil (U)</b> in place of T.
+        Adenine pairs with T in DNA but with U in RNA.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: CENTRAL DOGMA ============ -->
+  <section class="view" id="v-dogma">
+    <div class="panel">
+      <h2>Central Dogma: DNA → RNA → Protein</h2>
+      <div>
+        <button class="act primary" data-anim="replication">▶ Replication</button>
+        <button class="act primary" data-anim="transcription">▶ Transcription</button>
+        <button class="act primary" data-anim="translation">▶ Translation</button>
+        <button class="act" id="dogmaPause">⏸ Pause</button>
+      </div>
+      <svg id="dogma" viewBox="0 0 360 260" role="img" aria-label="Central dogma animation"></svg>
+      <div class="info" id="dogmaInfo"><b>Step:</b> pick a process above to animate it.</div>
+      <div class="facts">
+        <b>Replication</b> is <i>semiconservative</i>: each daughter DNA keeps one old (template) strand
+        and one newly made strand. <b>Transcription</b> copies a gene into mRNA using base pairing, with
+        <b>U replacing T</b>. <b>Translation</b> reads mRNA in triplets (codons); tRNA anticodons deliver
+        amino acids at the ribosome to build a polypeptide.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Translate an mRNA</h2>
+      <label class="lbl">Enter an mRNA sequence (letters A, U, G, C — reading starts at the first AUG):</label>
+      <input type="text" id="mrna" value="AUGGCCUUUUGCUAA" maxlength="60" spellcheck="false">
+      <div style="margin-top:8px">
+        <button class="act primary" id="translateBtn">Translate</button>
+        <button class="act" id="randMrna">Random mRNA</button>
+      </div>
+      <div class="info" style="margin-top:12px">
+        <div class="small">Codons (reading frame from start AUG):</div>
+        <div class="seqout" id="codonOut">—</div>
+        <div class="small" style="margin-top:8px">Polypeptide (amino acid chain):</div>
+        <div id="aaOut" style="margin-top:4px">—</div>
+      </div>
+
+      <details style="margin-top:12px">
+        <summary class="small" style="cursor:pointer;color:var(--accent)">Show standard genetic code table</summary>
+        <div id="codeTable"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: MUTATIONS ============ -->
+  <section class="view" id="v-mut">
+    <div class="panel">
+      <h2>Point Mutations &amp; Their Effect on Protein</h2>
+      <p class="small">Reference mRNA: <span class="mono" id="wtSeq"></span> →
+        protein <span class="mono" id="wtProt"></span></p>
+      <div class="row">
+        <div class="col">
+          <label class="lbl">Mutation type</label>
+          <select id="mutType">
+            <option value="sub">Substitution (one base changed)</option>
+            <option value="ins">Insertion (one base added)</option>
+            <option value="del">Deletion (one base removed)</option>
+          </select>
+        </div>
+        <div class="col">
+          <label class="lbl">Position (base number, 1-based)</label>
+          <select id="mutPos"></select>
+        </div>
+        <div class="col" id="baseWrap">
+          <label class="lbl">New / inserted base</label>
+          <select id="mutBase"><option>A</option><option>U</option><option>G</option><option>C</option></select>
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <button class="act primary" id="applyMut">Apply mutation</button>
+        <button class="act" id="resetMut">Reset</button>
+      </div>
+      <div class="info" style="margin-top:12px">
+        <div class="small">Mutant mRNA:</div>
+        <div class="seqout" id="mutSeqOut">—</div>
+        <div class="small" style="margin-top:8px">Mutant protein:</div>
+        <div id="mutProtOut" style="margin-top:4px">—</div>
+        <div style="margin-top:10px" id="mutVerdict"></div>
+      </div>
+      <div class="facts">
+        <b>Types of effect:</b>
+        <span class="pill silent">Silent</span> new codon codes the same amino acid ·
+        <span class="pill missense">Missense</span> a different amino acid ·
+        <span class="pill nonsense">Nonsense</span> a stop codon appears early ·
+        <span class="pill frameshift">Frameshift</span> insertion/deletion (not a multiple of 3) shifts the whole reading frame.
+        <br><b>Example:</b> in sickle-cell anaemia a single substitution (GAG→GUG) changes glutamic acid to valine — a missense mutation.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: QUIZ ============ -->
+  <section class="view" id="v-quiz">
+    <div class="panel quiz" id="quizBox">
+      <h2>Quick Check (3 questions)</h2>
+      <p class="small">Tap an option to reveal the answer.</p>
+    </div>
+  </section>
+
+  <p class="small" style="text-align:center;opacity:.6">Self-contained interactive · vanilla JS · no external resources</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- Standard genetic code (mRNA codon -> amino acid 3-letter) ---------- */
+var CODE = {
+ UUU:"Phe",UUC:"Phe",UUA:"Leu",UUG:"Leu",
+ CUU:"Leu",CUC:"Leu",CUA:"Leu",CUG:"Leu",
+ AUU:"Ile",AUC:"Ile",AUA:"Ile",AUG:"Met",
+ GUU:"Val",GUC:"Val",GUA:"Val",GUG:"Val",
+ UCU:"Ser",UCC:"Ser",UCA:"Ser",UCG:"Ser",
+ CCU:"Pro",CCC:"Pro",CCA:"Pro",CCG:"Pro",
+ ACU:"Thr",ACC:"Thr",ACA:"Thr",ACG:"Thr",
+ GCU:"Ala",GCC:"Ala",GCA:"Ala",GCG:"Ala",
+ UAU:"Tyr",UAC:"Tyr",UAA:"Stop",UAG:"Stop",
+ CAU:"His",CAC:"His",CAA:"Gln",CAG:"Gln",
+ AAU:"Asn",AAC:"Asn",AAA:"Lys",AAG:"Lys",
+ GAU:"Asp",GAC:"Asp",GAA:"Glu",GAG:"Glu",
+ UGU:"Cys",UGC:"Cys",UGA:"Stop",UGG:"Trp",
+ CGU:"Arg",CGC:"Arg",CGA:"Arg",CGG:"Arg",
+ AGU:"Ser",AGC:"Ser",AGA:"Arg",AGG:"Arg",
+ GGU:"Gly",GGC:"Gly",GGA:"Gly",GGG:"Gly"
+};
+var COLOR={A:"var(--a)",T:"var(--t)",U:"var(--t)",G:"var(--g)",C:"var(--c)"};
+var COMP_DNA={A:"T",T:"A",G:"C",C:"G"};       /* DNA-DNA pairing */
+var COMP_RNA={A:"U",T:"A",G:"C",C:"G"};       /* DNA template -> mRNA (U for T) */
+
+/* ================= TABS ================= */
+var tabs=document.getElementById("tabs");
+tabs.addEventListener("click",function(e){
+  var t=e.target.closest(".tab"); if(!t) return;
+  var v=t.getAttribute("data-v");
+  [].forEach.call(tabs.children,function(c){c.classList.toggle("on",c===t);});
+  ["dna","dogma","mut","quiz"].forEach(function(id){
+    document.getElementById("v-"+id).classList.toggle("on",id===v);
+  });
+});
+
+/* ================= VIEW 1: DNA HELIX ================= */
+(function(){
+  var svg=document.getElementById("helix");
+  var info=document.getElementById("dnaInfo");
+  var SVGNS="http://www.w3.org/2000/svg";
+  /* top-strand (5'->3') bases; bottom strand is complementary (3'->5') */
+  var top=["A","T","G","C","A","T","T","G","C","A"];
+  var N=top.length, H=320, W=360, midx=180, amp=70, gapY=(H-30)/(N-1);
+  var names={A:"Adenine (purine)",T:"Thymine (pyrimidine)",G:"Guanine (purine)",C:"Cytosine (pyrimidine)"};
+
+  function el(tag,attrs){var e=document.createElementNS(SVGNS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+  function build(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    /* backbone paths */
+    var p1="",p2="";
+    for(var i=0;i<N;i++){
+      var y=15+i*gapY;
+      var off=amp*Math.sin(i*0.7);
+      var x1=midx-off, x2=midx+off;
+      p1+=(i?"L":"M")+x1.toFixed(1)+" "+y.toFixed(1)+" ";
+      p2+=(i?"L":"M")+x2.toFixed(1)+" "+y.toFixed(1)+" ";
+    }
+    svg.appendChild(el("path",{d:p1,fill:"none",stroke:"#3b5170","stroke-width":5,"stroke-linecap":"round",opacity:.75}));
+    svg.appendChild(el("path",{d:p2,fill:"none",stroke:"#3b5170","stroke-width":5,"stroke-linecap":"round",opacity:.75}));
+    /* labels 5'/3' */
+    svg.appendChild(el("text",{x:midx-amp-6,y:12,fill:"var(--muted)","font-size":11,"text-anchor":"end"})).textContent="5′";
+    svg.appendChild(el("text",{x:midx+amp+6,y:12,fill:"var(--muted)","font-size":11})).textContent="3′";
+    svg.appendChild(el("text",{x:midx-amp-6,y:H-4,fill:"var(--muted)","font-size":11,"text-anchor":"end"})).textContent="3′";
+    svg.appendChild(el("text",{x:midx+amp+6,y:H-4,fill:"var(--muted)","font-size":11})).textContent="5′";
+
+    for(var j=0;j<N;j++){
+      (function(i){
+        var y=15+i*gapY, off=amp*Math.sin(i*0.7);
+        var x1=midx-off, x2=midx+off;
+        var base=top[i], pair=COMP_DNA[base];
+        var bonds=(base==="G"||base==="C")?3:2;
+        /* rung */
+        svg.appendChild(el("line",{x1:x1,y1:y,x2:x2,y2:y,stroke:"#2b3a55","stroke-width":bonds===3?3:2,"stroke-dasharray":bonds===3?"1 3":"1 4"}));
+        var c1=el("circle",{cx:x1,cy:y,r:9,fill:COLOR[base],stroke:"#0c1220","stroke-width":1.5,cursor:"pointer"});
+        var c2=el("circle",{cx:x2,cy:y,r:9,fill:COLOR[pair],stroke:"#0c1220","stroke-width":1.5,cursor:"pointer"});
+        var t1=el("text",{x:x1,y:y+3.5,"font-size":10,"text-anchor":"middle",fill:"#08121f","font-weight":"700","pointer-events":"none"});t1.textContent=base;
+        var t2=el("text",{x:x2,y:y+3.5,"font-size":10,"text-anchor":"middle",fill:"#08121f","font-weight":"700","pointer-events":"none"});t2.textContent=pair;
+        function show(b,part,bd){
+          info.innerHTML="<b>Base "+b+" — "+names[b]+"</b><br>Pairs with <b>"+part+"</b> ("+names[part]+
+            ") via <b>"+bd+" hydrogen bonds</b>. In RNA, "+(b==="A"?"A would pair with U (Uracil) instead of T.":
+            (b==="T"?"T is replaced by U (Uracil).":"pairing is the same, but the sugar is ribose."));
+        }
+        c1.addEventListener("click",function(){show(base,pair,bonds);});
+        c2.addEventListener("click",function(){show(pair,base,bonds);});
+        svg.appendChild(c1);svg.appendChild(c2);svg.appendChild(t1);svg.appendChild(t2);
+      })(j);
+    }
+  }
+  build();
+})();
+
+/* ================= VIEW 2: TRANSLATION ENGINE ================= */
+function cleanRNA(s){return (s||"").toUpperCase().replace(/[^AUGC]/g,"");}
+function translate(seq){
+  /* find first AUG */
+  var i=seq.indexOf("AUG");
+  var codons=[],aas=[],started=false;
+  var start=(i>=0)?i:0;
+  for(var k=start;k+3<=seq.length;k+=3){
+    var cod=seq.substr(k,3);
+    codons.push(cod);
+    var aa=CODE[cod]||"?";
+    aas.push(aa);
+    if(aa==="Stop")break;
+  }
+  return {codons:codons,aas:aas,startIndex:i};
+}
+function renderTranslation(seq,codonEl,aaEl){
+  var r=translate(seq);
+  if(!seq.length||r.codons.length===0){codonEl.textContent="(no valid codons)";aaEl.textContent="—";return r;}
+  codonEl.innerHTML="";
+  r.codons.forEach(function(c,idx){
+    var span=document.createElement("span");
+    span.className="codon"+(c==="AUG"&&idx===0?" start":"")+(CODE[c]==="Stop"?" stop":"");
+    span.textContent=c;
+    codonEl.appendChild(span);
+  });
+  aaEl.innerHTML="";
+  r.aas.forEach(function(a){
+    if(a==="Stop"){var s=document.createElement("span");s.className="aa";s.style.color="var(--t)";s.textContent="⏹ Stop";aaEl.appendChild(s);return;}
+    var s=document.createElement("span");s.className="aa";s.textContent=a;aaEl.appendChild(s);
+  });
+  if(r.startIndex<0){
+    var w=document.createElement("div");w.className="small";w.style.color="var(--accent2)";
+    w.textContent="No AUG start codon found — read from position 1.";aaEl.appendChild(w);
+  }
+  return r;
+}
+(function(){
+  var input=document.getElementById("mrna");
+  var codonOut=document.getElementById("codonOut");
+  var aaOut=document.getElementById("aaOut");
+  function go(){renderTranslation(cleanRNA(input.value),codonOut,aaOut);}
+  document.getElementById("translateBtn").addEventListener("click",go);
+  document.getElementById("randMrna").addEventListener("click",function(){
+    var bank=["AUG","GCC","UUU","UGC","GGA","AAA","CAU","GUG","ACC","UAU"];
+    var s="AUG";for(var i=0;i<4;i++)s+=bank[1+Math.floor(Math.random()*(bank.length-1))];
+    s+=["UAA","UAG","UGA"][Math.floor(Math.random()*3)];
+    input.value=s;go();
+  });
+  go();
+
+  /* code table */
+  var tbl=document.getElementById("codeTable");
+  var bases=["U","C","A","G"];
+  var html="<table><tr><th>1st</th><th>U</th><th>C</th><th>A</th><th>G</th><th>3rd</th></tr>";
+  bases.forEach(function(b1){
+    ["U","C","A","G"].forEach(function(b3,ri){
+      html+="<tr>";
+      if(ri===0)html+="<th rowspan='4'>"+b1+"</th>";
+      bases.forEach(function(b2){
+        var cod=b1+b2+b3;var aa=CODE[cod];
+        var cls=aa==="Stop"?"style='color:var(--t)'":(cod==="AUG"?"style='color:var(--g)'":"");
+        html+="<td "+cls+"><span class='mono'>"+cod+"</span><br>"+aa+"</td>";
+      });
+      html+="<th>"+b3+"</th></tr>";
+    });
+  });
+  html+="</table><p class='small'>Green = AUG (Met / Start) · Red = Stop (UAA, UAG, UGA)</p>";
+  tbl.innerHTML=html;
+})();
+
+/* ================= VIEW 2: DOGMA ANIMATION ================= */
+(function(){
+  var svg=document.getElementById("dogma");
+  var info=document.getElementById("dogmaInfo");
+  var SVGNS="http://www.w3.org/2000/svg";
+  var raf=null, paused=false, t=0, current=null;
+  var tmpl="TACGGCAAT"; /* DNA template strand 3'->5' (arbitrary) */
+
+  function el(tag,attrs,txt){var e=document.createElementNS(SVGNS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(txt!=null)e.textContent=txt;return e;}
+  function clear(){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+  function baseCircle(x,y,b,r){r=r||10;var g=el("g",{});g.appendChild(el("circle",{cx:x,cy:y,r:r,fill:COLOR[b]||"#556",stroke:"#0c1220","stroke-width":1.4}));g.appendChild(el("text",{x:x,y:y+3.5,"font-size":10,"text-anchor":"middle",fill:"#08121f","font-weight":"700"},b));return g;}
+
+  function stopAnim(){if(raf){cancelAnimationFrame(raf);raf=null;}}
+
+  function replication(){
+    current="replication";stopAnim();t=0;
+    info.innerHTML="<b>Replication:</b> the helix unwinds; each parent strand (blue) templates a new strand (highlighted). Result: two identical DNA molecules — one old + one new strand each (semiconservative).";
+    var seqT=tmpl.split("");
+    function frame(){
+      if(paused){raf=requestAnimationFrame(frame);return;}
+      clear();
+      var n=seqT.length, x0=40, dx=(360-80)/(n-1);
+      svg.appendChild(el("text",{x:20,y:60,fill:"var(--muted)","font-size":10},"parent"));
+      svg.appendChild(el("text",{x:20,y:200,fill:"var(--muted)","font-size":10},"parent"));
+      var shown=Math.min(n,Math.floor(t/12)+1);
+      for(var i=0;i<n;i++){
+        var x=x0+i*dx;
+        /* parent top */
+        svg.appendChild(baseCircle(x,60,seqT[i]));
+        /* new complementary (bottom of top helix) */
+        if(i<shown){var nb=COMP_DNA[seqT[i]];var g=baseCircle(x,95,nb);g.setAttribute("opacity",0.95);svg.appendChild(el("line",{x1:x,y1:70,x2:x,y2:85,stroke:"#2b3a55","stroke-width":2}));svg.appendChild(g);}
+        /* parent bottom (the other original strand) */
+        svg.appendChild(baseCircle(x,200,COMP_DNA[seqT[i]]));
+        if(i<shown){var nb2=seqT[i];var g2=baseCircle(x,165,nb2);svg.appendChild(el("line",{x1:x,y1:175,x2:x,y2:190,stroke:"#2b3a55","stroke-width":2}));svg.appendChild(g2);}
+      }
+      svg.appendChild(el("text",{x:180,y:130,fill:"var(--accent)","font-size":11,"text-anchor":"middle"},"new strand ↑ ↓ new strand"));
+      t+=1;if(shown<n||t<n*12+40)raf=requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  function transcription(){
+    current="transcription";stopAnim();t=0;
+    info.innerHTML="<b>Transcription:</b> RNA polymerase reads the DNA template (3′→5′) and builds mRNA (green) by complementary base pairing — <b>U replaces T</b>.";
+    var seqT=tmpl.split("");
+    function frame(){
+      if(paused){raf=requestAnimationFrame(frame);return;}
+      clear();
+      var n=seqT.length,x0=40,dx=(360-80)/(n-1);
+      svg.appendChild(el("text",{x:20,y:80,fill:"var(--muted)","font-size":10},"DNA"));
+      svg.appendChild(el("text",{x:20,y:170,fill:"var(--accent)","font-size":10},"mRNA"));
+      var shown=Math.min(n,Math.floor(t/14)+1);
+      for(var i=0;i<n;i++){
+        var x=x0+i*dx;
+        svg.appendChild(baseCircle(x,80,seqT[i]));
+        if(i<shown){
+          var mb=COMP_RNA[seqT[i]];
+          svg.appendChild(el("line",{x1:x,y1:95,x2:x,y2:150,stroke:"#2b3a55","stroke-width":1.5,"stroke-dasharray":"2 3"}));
+          svg.appendChild(baseCircle(x,165,mb));
+        }
+      }
+      /* polymerase marker */
+      var px=x0+Math.min(shown,n-1)*dx;
+      svg.appendChild(el("rect",{x:px-14,y:52,width:28,height:130,rx:8,fill:"none",stroke:"var(--accent)","stroke-width":1.5,opacity:.5}));
+      t+=1;if(shown<n||t<n*14+40)raf=requestAnimationFrame(frame);
+    }
+    frame();
+  }
+
+  function translation(){
+    current="translation";stopAnim();t=0;
+    var mrna=""; tmpl.split("").forEach(function(b){mrna+=COMP_RNA[b];});
+    /* pad to full codons; prepend AUG for a clean demo */
+    var demo="AUG"+mrna.substr(0,6); /* AUG + 2 codons */
+    demo=demo.substr(0,9);
+    var codons=[demo.substr(0,3),demo.substr(3,3),demo.substr(6,3)];
+    info.innerHTML="<b>Translation:</b> the ribosome moves along mRNA; each codon is matched by a tRNA anticodon that carries one amino acid, forming the polypeptide chain.";
+    function frame(){
+      if(paused){raf=requestAnimationFrame(frame);return;}
+      clear();
+      var x0=50,cw=90;
+      svg.appendChild(el("text",{x:20,y:70,fill:"var(--accent)","font-size":10},"mRNA"));
+      /* mRNA codons */
+      for(var i=0;i<codons.length;i++){
+        var cx=x0+i*cw;
+        for(var j=0;j<3;j++){svg.appendChild(baseCircle(cx+j*22,80,codons[i][j],9));}
+      }
+      var step=Math.min(codons.length,Math.floor(t/40)+1);
+      /* ribosome box over current codon */
+      var ci=Math.min(step-1,codons.length-1);
+      var rx=x0+ci*cw-6;
+      svg.appendChild(el("rect",{x:rx,y:52,width:78,height:150,rx:14,fill:"rgba(79,209,197,.08)",stroke:"var(--accent)","stroke-width":1.5}));
+      svg.appendChild(el("text",{x:rx+39,y:48,fill:"var(--accent)","font-size":10,"text-anchor":"middle"},"ribosome"));
+      /* tRNA + anticodon + amino acid for codons read so far */
+      for(var k=0;k<step;k++){
+        var cx2=x0+k*cw;
+        var cod=codons[k];
+        /* anticodon = complement of the mRNA codon (A-U, G-C) */
+        var anti=cod.split("").map(function(b){return ({A:"U",U:"A",G:"C",C:"G"})[b];});
+        for(var j2=0;j2<3;j2++){svg.appendChild(baseCircle(cx2+j2*22,120,anti[j2],9));}
+        svg.appendChild(el("line",{x1:cx2+22,y1:98,x2:cx2+22,y2:108,stroke:"#2b3a55","stroke-width":1.5}));
+        /* amino acid bead in chain */
+        var aa=CODE[cod]||"?";
+        var bx=70+k*70, by=230;
+        var beadColor=aa==="Stop"?"var(--t)":"var(--accent2)";
+        svg.appendChild(el("circle",{cx:bx,cy:by,r:16,fill:beadColor,opacity:.9}));
+        svg.appendChild(el("text",{x:bx,y:by+4,"font-size":9,"text-anchor":"middle",fill:"#08121f","font-weight":"700"},aa));
+        if(k>0)svg.appendChild(el("line",{x1:70+(k-1)*70+16,y1:by,x2:bx-16,y2:by,stroke:"var(--accent2)","stroke-width":3}));
+      }
+      svg.appendChild(el("text",{x:20,y:by2()+4,fill:"var(--accent2)","font-size":10},"chain"));
+      t+=1;if(step<codons.length||t<codons.length*40+60)raf=requestAnimationFrame(frame);
+    }
+    function by2(){return 230;}
+    frame();
+  }
+
+  var map={replication:replication,transcription:transcription,translation:translation};
+  document.querySelectorAll("[data-anim]").forEach(function(b){
+    b.addEventListener("click",function(){paused=false;document.getElementById("dogmaPause").textContent="⏸ Pause";map[b.getAttribute("data-anim")]();});
+  });
+  document.getElementById("dogmaPause").addEventListener("click",function(){
+    paused=!paused;this.textContent=paused?"▶ Resume":"⏸ Pause";
+  });
+  /* pause on hidden tab */
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){paused=true;var pb=document.getElementById("dogmaPause");if(pb)pb.textContent="▶ Resume";}
+  });
+  transcription();
+})();
+
+/* ================= VIEW 3: MUTATIONS ================= */
+(function(){
+  var WT="AUGGCCUUUUGCGGAUAA"; /* Met-Ala-Phe-Cys-Gly-Stop */
+  var input;
+  function protString(seq){var r=translate(seq);return r.aas.map(function(a){return a;});}
+  function protHTML(seq,ref){
+    var r=translate(seq);var refA=ref?translate(ref).aas:null;
+    var out="";
+    r.aas.forEach(function(a,i){
+      var changed=refA&&(a!==refA[i]);
+      var col=a==="Stop"?"var(--t)":(changed?"var(--accent2)":"var(--ink)");
+      out+="<span class='aa' style='color:"+col+(changed?";border-color:var(--accent2)":"")+"'>"+(a==="Stop"?"⏹ Stop":a)+"</span>";
+    });
+    return out||"—";
+  }
+  document.getElementById("wtSeq").textContent=WT;
+  document.getElementById("wtProt").textContent=translate(WT).aas.join("-");
+
+  var posSel=document.getElementById("mutPos");
+  for(var i=1;i<=WT.length;i++){var o=document.createElement("option");o.value=i;o.textContent=i;posSel.appendChild(o);}
+  posSel.value=8; /* interesting default */
+
+  var typeSel=document.getElementById("mutType");
+  var baseWrap=document.getElementById("baseWrap");
+  typeSel.addEventListener("change",function(){baseWrap.style.display=(typeSel.value==="del")?"none":"block";});
+
+  function classify(wt,mut){
+    var a1=translate(wt).aas, a2=translate(mut).aas;
+    var typ=typeSel.value;
+    if(typ!=="sub"){ /* insertion or deletion */
+      return {cls:"frameshift",label:"Frameshift",why:"An insertion or deletion that is not a multiple of 3 shifts the reading frame from the mutation point onward, changing every downstream codon (and usually creating a premature stop)."};
+    }
+    /* substitution: compare protein up to stop */
+    var join1=a1.join("-"),join2=a2.join("-");
+    if(join1===join2)return {cls:"silent",label:"Silent",why:"The new codon codes for the same amino acid, so the protein is unchanged (thanks to the degeneracy of the genetic code)."};
+    /* find first differing */
+    for(var i=0;i<a2.length;i++){
+      if(a2[i]==="Stop"&&(a1[i]!=="Stop"))
+        return {cls:"nonsense",label:"Nonsense",why:"The changed codon became a STOP codon, so translation ends early and a truncated, usually non-functional protein is made."};
+    }
+    return {cls:"missense",label:"Missense",why:"The changed codon now codes for a different amino acid, which may alter the protein's shape or function (e.g. sickle-cell: Glu→Val)."};
+  }
+
+  function apply(){
+    var seq=WT.split(""), pos=parseInt(posSel.value,10)-1, typ=typeSel.value, nb=document.getElementById("mutBase").value;
+    var mut;
+    if(typ==="sub"){ if(seq[pos]===nb){ /* ensure a real change if possible */ } seq[pos]=nb; mut=seq.join(""); }
+    else if(typ==="ins"){ seq.splice(pos,0,nb); mut=seq.join(""); }
+    else { seq.splice(pos,1); mut=seq.join(""); }
+    /* highlight seq */
+    var html="";
+    for(var i=0;i<mut.length;i++){
+      var hi=(typ==="sub"&&i===pos)||(typ==="ins"&&i===pos);
+      html+="<span style='"+(hi?"color:var(--accent2);font-weight:700;text-decoration:underline":"")+"'>"+mut[i]+"</span>";
+    }
+    document.getElementById("mutSeqOut").innerHTML=html;
+    document.getElementById("mutProtOut").innerHTML=protHTML(mut,WT);
+    var v=classify(WT,mut);
+    document.getElementById("mutVerdict").innerHTML=
+      "<span class='pill "+v.cls+"'>"+v.label+"</span> <span class='small'>"+v.why+"</span>";
+    document.getElementById("mutSeqOut").parentElement.classList.remove("flash");void document.getElementById("mutSeqOut").offsetWidth;
+    document.getElementById("mutSeqOut").parentElement.classList.add("flash");
+  }
+  function reset(){
+    document.getElementById("mutSeqOut").textContent=WT;
+    document.getElementById("mutProtOut").innerHTML=protHTML(WT);
+    document.getElementById("mutVerdict").innerHTML="<span class='small'>Apply a mutation to see its effect.</span>";
+  }
+  document.getElementById("applyMut").addEventListener("click",apply);
+  document.getElementById("resetMut").addEventListener("click",reset);
+  reset();
+})();
+
+/* ================= VIEW 4: QUIZ ================= */
+(function(){
+  var Q=[
+    {q:"Which base pairs with Adenine in an mRNA molecule?",
+     opts:["Thymine (T)","Uracil (U)","Guanine (G)","Cytosine (C)"],a:1,
+     e:"RNA uses Uracil in place of Thymine, so Adenine pairs with U in RNA."},
+    {q:"The codon AUG is special because it:",
+     opts:["Is a stop codon","Codes for Methionine and signals START","Codes for two amino acids","Is only found in RNA viruses"],a:1,
+     e:"AUG codes for Methionine and is the standard start codon for translation."},
+    {q:"An insertion of a single base in the middle of a gene most likely causes a:",
+     opts:["Silent mutation","Missense mutation only","Frameshift mutation","No change at all"],a:2,
+     e:"Adding one base (not a multiple of 3) shifts the reading frame, altering all downstream codons — a frameshift."}
+  ];
+  var box=document.getElementById("quizBox");
+  Q.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var h=document.createElement("div");h.innerHTML="<b>Q"+(qi+1)+".</b> "+item.q;d.appendChild(h);
+    item.opts.forEach(function(op,oi){
+      var b=document.createElement("div");b.className="opt";b.textContent=op;
+      b.addEventListener("click",function(){
+        if(d.dataset.done)return;d.dataset.done="1";
+        [].forEach.call(d.querySelectorAll(".opt"),function(x,xi){
+          if(xi===item.a)x.classList.add("correct");
+          else if(xi===oi)x.classList.add("wrong");
+        });
+        var ex=d.querySelector(".exp");ex.style.display="block";
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("div");ex.className="exp";ex.textContent="Explanation: "+item.e;d.appendChild(ex);
+    box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

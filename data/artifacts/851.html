@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecology Lab — NIOS Class 12 Biology (Ch25)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#152420; --panel2:#1b2e28; --line:#2a4038;
+    --ink:#e6f2ec; --muted:#9db8ad; --accent:#3fd6a4; --accent2:#2aa77f;
+    --warn:#f0b45a; --shadow:0 6px 20px rgba(0,0,0,.35);
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 8px;text-align:center}
+  h1{margin:0;font-size:clamp(20px,4vw,30px);letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .wrap{max-width:960px;margin:0 auto;padding:8px 12px 40px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;
+    transition:.15s;min-height:40px;
+  }
+  .tab:hover{border-color:var(--accent2)}
+  .tab.active{background:var(--accent);color:#06110d;border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    padding:16px;margin:12px 0;box-shadow:var(--shadow);
+  }
+  .panel h2{margin:0 0 6px;font-size:18px;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:14px;color:var(--ink)}
+  .mode{display:none}
+  .mode.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 300px;min-width:0}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  button.btn,select,input[type=range]{font-family:inherit}
+  button.btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:13px;min-height:38px;font-weight:600;
+  }
+  button.btn:hover{border-color:var(--accent)}
+  button.btn.on{background:var(--accent);color:#06110d;border-color:var(--accent)}
+  select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 10px;border-radius:10px;font-size:13px;min-height:38px}
+  label.lbl{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  svg{display:block;width:100%;height:auto}
+  canvas{display:block;width:100%;border-radius:10px;background:#0b1310}
+  .facts{background:var(--panel2);border-left:3px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+  .facts b{color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;min-height:34px}
+  .chip.on{border-color:var(--accent);color:var(--accent)}
+  .readout{font-size:13px;background:var(--panel2);border-radius:10px;padding:8px 10px;margin-top:8px}
+  .readout span{color:var(--accent);font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent)}
+  .quiz .q{margin:12px 0;padding:12px;background:var(--panel2);border-radius:12px;border:1px solid var(--line)}
+  .quiz .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:9px 12px;border-radius:9px;margin:6px 0;cursor:pointer;font-size:13px;min-height:40px}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:rgba(63,214,164,.18);border-color:var(--accent)}
+  .quiz .opt.wrong{background:rgba(240,120,90,.16);border-color:#e0765a}
+  .expl{font-size:12.5px;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:6px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:-1px;margin-right:4px}
+  .small{font-size:12px;color:var(--muted)}
+  .kpi{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .kpi div{flex:1 1 90px;background:var(--panel2);border-radius:10px;padding:8px;text-align:center;border:1px solid var(--line)}
+  .kpi b{display:block;font-size:18px;color:var(--accent)}
+  .kpi small{color:var(--muted);font-size:11px}
+  footer{text-align:center;color:var(--muted);font-size:11px;padding:16px}
+  @media(max-width:420px){.panel{padding:12px}.tab{padding:8px 11px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌿 Ecology Lab</h1>
+  <div class="sub">NIOS Class 12 Biology · Ch25 Principles of Ecology · interactive</div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-m="energy">Energy Flow &amp; Pyramids</button>
+    <button class="tab" data-m="cycles">Biogeochemical Cycles</button>
+    <button class="tab" data-m="pop">Population &amp; Interactions</button>
+    <button class="tab" data-m="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: ENERGY ============ -->
+  <section class="mode active" id="m-energy">
+    <div class="panel">
+      <h2>Ecosystem &amp; Energy Flow</h2>
+      <p class="small">Energy enters as sunlight, is fixed by producers, and flows one-way up the food chain. Only about <b>10%</b> of the energy at one trophic level is passed to the next (Lindeman's <b>10% law</b>); the rest is lost as heat in respiration.</p>
+
+      <div class="controls">
+        <div>
+          <label class="lbl" for="chainSel">Food chain / web</label>
+          <select id="chainSel">
+            <option value="grass">Grassland: Grass → Grasshopper → Frog → Snake → Hawk</option>
+            <option value="pond">Pond: Phytoplankton → Zooplankton → Small fish → Big fish</option>
+            <option value="forest">Forest: Leaves → Caterpillar → Bird → Fox</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="prodE">Producer energy (kcal/m²/yr)</label>
+          <select id="prodE">
+            <option value="10000">10,000</option>
+            <option value="100000" selected>100,000</option>
+            <option value="1000000">1,000,000</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl" for="pyrType">Pyramid type</label>
+          <select id="pyrType">
+            <option value="energy">Energy pyramid</option>
+            <option value="number">Number pyramid</option>
+            <option value="biomass">Biomass pyramid</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <h3>Food chain (energy flow)</h3>
+          <svg id="chainSvg" viewBox="0 0 360 260" role="img" aria-label="food chain"></svg>
+        </div>
+        <div class="col">
+          <h3>Ecological pyramid</h3>
+          <svg id="pyrSvg" viewBox="0 0 360 260" role="img" aria-label="ecological pyramid"></svg>
+        </div>
+      </div>
+
+      <div class="readout" id="energyRead"></div>
+      <div class="facts" style="margin-top:10px" id="energyFacts"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: CYCLES ============ -->
+  <section class="mode" id="m-cycles">
+    <div class="panel">
+      <h2>Biogeochemical Cycles</h2>
+      <p class="small">Nutrients cycle repeatedly between living organisms (biotic) and the physical environment (abiotic). Pick a cycle and watch the atoms move.</p>
+      <div class="controls">
+        <button class="btn on" data-cy="carbon">Carbon</button>
+        <button class="btn" data-cy="nitrogen">Nitrogen</button>
+        <button class="btn" data-cy="water">Water</button>
+        <button class="btn" id="cyPause" style="margin-left:auto">⏸ Pause</button>
+      </div>
+      <canvas id="cyc" width="720" height="380"></canvas>
+      <div class="legend" id="cyLegend"></div>
+      <div class="facts" style="margin-top:10px" id="cyFacts"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: POPULATION ============ -->
+  <section class="mode" id="m-pop">
+    <div class="panel">
+      <h2>Population Growth</h2>
+      <p class="small">Compare the <b>exponential (J-shaped)</b> curve — unlimited resources — with the <b>logistic (S-shaped)</b> curve, which levels off at the carrying capacity <b>K</b>. Logistic: dN/dt = rN(K−N)/K.</p>
+      <div class="controls">
+        <div style="flex:1 1 160px">
+          <label class="lbl">Growth rate r = <span id="rVal">0.35</span></label>
+          <input type="range" id="rRange" min="0.05" max="0.8" step="0.01" value="0.35">
+        </div>
+        <div style="flex:1 1 160px">
+          <label class="lbl">Carrying capacity K = <span id="kVal">1000</span></label>
+          <input type="range" id="kRange" min="200" max="1500" step="50" value="1000">
+        </div>
+        <button class="btn" id="popReplay">▶ Replay</button>
+      </div>
+      <canvas id="popC" width="720" height="320"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--warn)"></i>Exponential (J)</span>
+        <span><i style="background:var(--accent)"></i>Logistic (S)</span>
+        <span><i style="background:#5a83f0"></i>Carrying capacity K</span>
+      </div>
+      <div class="kpi" id="popKpi"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Species Interactions</h2>
+      <p class="small">Tap an interaction. + benefit, − harm, 0 no effect.</p>
+      <div class="chips" id="intChips"></div>
+      <div class="facts" style="margin-top:10px" id="intFacts"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Ecological Succession</h2>
+      <div class="row">
+        <div class="col">
+          <h3>Primary succession</h3>
+          <p class="small">Starts on bare, lifeless substrate (new volcanic rock, sand dune). Pioneers are <b>lichens/mosses</b> → soil forms → herbs → shrubs → forest (climax). Very slow (centuries).</p>
+        </div>
+        <div class="col">
+          <h3>Secondary succession</h3>
+          <p class="small">Starts where a community was removed but soil remains (after fire, flood, abandoned field). Faster because soil, seeds and nutrients persist. Ends at the same climax community.</p>
+        </div>
+      </div>
+      <svg id="succSvg" viewBox="0 0 360 90" role="img" aria-label="succession"></svg>
+    </div>
+  </section>
+
+  <!-- ============ MODE 4: QUIZ ============ -->
+  <section class="mode" id="m-quiz">
+    <div class="panel quiz" id="quiz">
+      <h2>Check Your Understanding</h2>
+      <p class="small">Click an option; the answer and explanation reveal instantly.</p>
+      <div id="quizHost"></div>
+      <div class="readout" id="quizScore">Score: <span>0 / 3</span></div>
+    </div>
+  </section>
+
+  <footer>Ecology Lab · self-contained · vanilla JS/SVG/Canvas · animations pause when tab is hidden</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var A="#3fd6a4", WARN="#f0b45a", INK="#e6f2ec", MUT="#9db8ad", LINE="#2a4038";
+  var raf=null, hidden=false;
+  document.addEventListener("visibilitychange",function(){hidden=document.hidden;});
+
+  /* ---------- tabs ---------- */
+  var tabs=document.querySelectorAll(".tab"), modes=document.querySelectorAll(".mode");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var m=t.getAttribute("data-m");
+      modes.forEach(function(s){s.classList.toggle("active", s.id==="m-"+m);});
+    });
+  });
+
+  /* ================= MODE 1: ENERGY ================= */
+  var CHAINS={
+    grass:{levels:["Grass\n(Producer)","Grasshopper","Frog","Snake","Hawk"],
+      short:["Grass","Grasshopper","Frog","Snake","Hawk"],
+      mass:[6000,120,25,6,1.2]},
+    pond:{levels:["Phytoplankton\n(Producer)","Zooplankton","Small fish","Big fish"],
+      short:["Phytoplankton","Zooplankton","Small fish","Big fish"],
+      mass:[8000,180,20,3]},
+    forest:{levels:["Leaves\n(Producer)","Caterpillar","Bird","Fox"],
+      short:["Leaves","Caterpillar","Bird","Fox"],
+      mass:[7000,140,18,4]}
+  };
+  var chainSel=document.getElementById("chainSel"),
+      prodE=document.getElementById("prodE"),
+      pyrType=document.getElementById("pyrType");
+
+  function trophColor(i){var c=["#3fd6a4","#7bd08a","#e6d15a","#f0a24a","#e8785a"];return c[i%c.length];}
+
+  function drawChain(){
+    var c=CHAINS[chainSel.value], n=c.levels.length;
+    var E0=+prodE.value;
+    var svg=document.getElementById("chainSvg");
+    var W=360, boxH=34, gap=(260-n*boxH)/(n+1);
+    var s="";
+    var energies=[];
+    for(var i=0;i<n;i++){energies.push(E0*Math.pow(0.1,i));}
+    // draw from producer bottom to top -> we place top predator at top
+    for(var i=0;i<n;i++){
+      var idx=n-1-i; // top row is highest trophic
+      var y=gap+i*(boxH+gap);
+      var col=trophColor(idx);
+      s+='<rect x="70" y="'+y+'" width="220" height="'+boxH+'" rx="8" fill="'+col+'" opacity="0.9"/>';
+      var label=c.short[idx];
+      s+='<text x="180" y="'+(y+15)+'" fill="#06110d" font-size="12" font-weight="700" text-anchor="middle">'+label+'</text>';
+      s+='<text x="180" y="'+(y+28)+'" fill="#06110d" font-size="9" text-anchor="middle">'+fmt(energies[idx])+' kcal</text>';
+      s+='<text x="60" y="'+(y+20)+'" fill="'+MUT+'" font-size="10" text-anchor="end">T'+(idx+1)+'</text>';
+      // arrow up (energy flows to next level = drawn above)
+      if(i<n-1){
+        var ay=y-gap+ boxH; var ytop=y;
+        s+='<line x1="180" y1="'+(y)+'" x2="180" y2="'+(y-gap+2)+'" stroke="'+A+'" stroke-width="2" marker-end="url(#ar)"/>';
+      }
+    }
+    s+='<text x="180" y="256" fill="'+MUT+'" font-size="10" text-anchor="middle">↑ ~10% energy transferred; ~90% lost as heat</text>';
+    svg.innerHTML='<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="'+A+'"/></marker></defs>'+s;
+
+    var last=energies[n-1];
+    document.getElementById("energyRead").innerHTML=
+      'Producers fix <span>'+fmt(E0)+'</span> kcal/m²/yr. After '+(n-1)+' transfers at 10% each, the top consumer receives only <span>'+fmt(last)+'</span> kcal/m²/yr — that is why food chains rarely exceed 4–5 links.';
+    document.getElementById("energyFacts").innerHTML=
+      '<b>Key ideas.</b> Energy flow is <b>unidirectional</b> and follows the 2nd law of thermodynamics. Each step is a trophic level (T1 producers, T2 herbivores, T3 primary carnivores…). <b>Decomposers</b> (bacteria, fungi) break down dead matter at every level, returning nutrients to the soil. Gross primary productivity (GPP) − respiration = Net primary productivity (NPP), the energy available to consumers.';
+    drawPyramid();
+  }
+
+  function drawPyramid(){
+    var c=CHAINS[chainSel.value], n=c.levels.length, E0=+prodE.value;
+    var type=pyrType.value;
+    var vals=[], unit="", note="";
+    if(type==="energy"){for(var i=0;i<n;i++)vals.push(E0*Math.pow(0.1,i)); unit="kcal/m²/yr"; note="Energy pyramid is <b>always upright</b>.";}
+    else if(type==="biomass"){vals=c.mass.slice(0,n); unit="g/m² (dry)"; note="Biomass pyramid is usually upright on land, but <b>inverted</b> in oceans (tiny phytoplankton support larger zooplankton).";}
+    else{ // numbers
+      var base=100000; vals=[]; for(var i=0;i<n;i++)vals.push(Math.max(1,Math.round(base*Math.pow(0.04,i)))); unit="individuals"; note="Number pyramid can be <b>inverted</b> — e.g. one large tree supports many insects.";}
+    var max=Math.max.apply(null,vals);
+    var svg=document.getElementById("pyrSvg");
+    var s="", W=360, bandH=40, top=14;
+    for(var i=0;i<n;i++){
+      var idx=n-1-i; // top predator drawn at top, producer at bottom
+      var v=vals[idx];
+      var w=40+ (Math.log10(v+1)/Math.log10(max+1))*260;
+      var y=top+i*(bandH+6);
+      var x=(W-w)/2;
+      s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+bandH+'" rx="6" fill="'+trophColor(idx)+'" opacity="0.9"/>';
+      s+='<text x="180" y="'+(y+17)+'" fill="#06110d" font-size="11" font-weight="700" text-anchor="middle">'+c.short[idx]+'</text>';
+      s+='<text x="180" y="'+(y+31)+'" fill="#06110d" font-size="9" text-anchor="middle">'+fmt(v)+' '+unit+'</text>';
+    }
+    svg.innerHTML=s;
+    document.getElementById("energyFacts").innerHTML=
+      document.getElementById("energyFacts").innerHTML.split("<hr")[0]+
+      '<hr style="border:none;border-top:1px solid '+LINE+';margin:8px 0"><b>This pyramid.</b> '+note;
+  }
+
+  function fmt(x){
+    if(x>=1e6)return (x/1e6).toFixed(x%1e6?1:0)+"M";
+    if(x>=1e3)return (x/1e3).toFixed(x%1e3?1:0)+"k";
+    return (Math.round(x*100)/100).toString();
+  }
+  chainSel.onchange=drawChain; prodE.onchange=drawChain; pyrType.onchange=drawPyramid;
+  drawChain();
+
+  /* ================= MODE 2: CYCLES ================= */
+  var cyc=document.getElementById("cyc"), cx=cyc.getContext("2d");
+  var curCycle="carbon", cyPaused=false, particles=[];
+  var CY={
+    carbon:{
+      title:"Carbon cycle",
+      legend:[["Atmospheric CO₂","#9db8ad"],["Photosynthesis (fixation)",A],["Respiration / combustion",WARN]],
+      nodes:[
+        {x:360,y:50,r:34,t:"Atmosphere CO₂",c:"#243a33"},
+        {x:150,y:200,r:34,t:"Producers",c:"#1e3a2c"},
+        {x:360,y:300,r:32,t:"Consumers",c:"#243a33"},
+        {x:570,y:200,r:34,t:"Decomposers /\nFossil fuels",c:"#2a2e22"}
+      ],
+      flows:[[0,1,A],[1,2,A],[2,3,WARN],[3,0,WARN],[1,0,WARN]],
+      facts:"<b>Carbon cycle.</b> CO₂ is fixed into glucose by <b>photosynthesis</b> in producers. It passes along food chains, and returns to the air through <b>respiration</b>, <b>decomposition</b>, and <b>combustion</b> of wood and fossil fuels. Oceans dissolve large amounts of CO₂. Burning fossil fuels releases stored carbon faster than it is fixed — raising atmospheric CO₂ and driving the greenhouse effect."
+    },
+    nitrogen:{
+      title:"Nitrogen cycle",
+      legend:[["N₂ fixation",A],["Nitrification","#7bd08a"],["Assimilation","#e6d15a"],["Denitrification",WARN]],
+      nodes:[
+        {x:360,y:48,r:34,t:"Atmospheric N₂",c:"#243a33"},
+        {x:150,y:190,r:34,t:"Ammonia\nNH₃ / NH₄⁺",c:"#1e3a2c"},
+        {x:360,y:300,r:32,t:"Nitrite→Nitrate\nNO₂⁻ / NO₃⁻",c:"#243a33"},
+        {x:570,y:190,r:34,t:"Plant & animal\nproteins",c:"#2a2e22"}
+      ],
+      flows:[[0,1,A],[1,2,"#7bd08a"],[2,3,"#e6d15a"],[3,1,"#7bd08a"],[2,0,WARN]],
+      facts:"<b>Nitrogen cycle.</b> N₂ gas is inert. <b>Nitrogen-fixing bacteria</b> (Rhizobium in root nodules, Azotobacter) and lightning convert N₂ → ammonia. <b>Nitrifying bacteria</b> (Nitrosomonas, Nitrobacter) turn ammonia → nitrite → nitrate, which plants absorb (<b>assimilation</b>) to make proteins. Decomposers release ammonia (ammonification). <b>Denitrifying bacteria</b> (Pseudomonas) return nitrate to N₂ gas, closing the cycle."
+    },
+    water:{
+      title:"Water (hydrological) cycle",
+      legend:[["Evaporation / transpiration",WARN],["Condensation","#9db8ad"],["Precipitation",A],["Runoff / infiltration","#5a83f0"]],
+      nodes:[
+        {x:360,y:48,r:34,t:"Clouds\n(vapour)",c:"#243a33"},
+        {x:150,y:200,r:34,t:"Ocean /\nwater bodies",c:"#1c3340"},
+        {x:360,y:300,r:32,t:"Land & soil",c:"#2a2e22"},
+        {x:570,y:200,r:34,t:"Plants\n(transpiration)",c:"#1e3a2c"}
+      ],
+      flows:[[1,0,WARN],[3,0,WARN],[0,2,A],[2,1,"#5a83f0"],[2,3,"#5a83f0"]],
+      facts:"<b>Water cycle.</b> Solar energy drives <b>evaporation</b> from oceans and <b>transpiration</b> from plants. Vapour rises and <b>condenses</b> into clouds, then falls as <b>precipitation</b> (rain/snow). Water returns via surface <b>runoff</b> to rivers and oceans, or <b>infiltrates</b> to recharge groundwater. This cycle distributes fresh water and links all other nutrient cycles."
+    }
+  };
+
+  function buildParticles(){
+    particles=[];
+    var d=CY[curCycle];
+    d.flows.forEach(function(f){
+      var n=3;
+      for(var k=0;k<n;k++){
+        particles.push({a:f[0],b:f[1],c:f[2],t:k/n});
+      }
+    });
+  }
+  function nodePt(i){var nd=CY[curCycle].nodes[i];return {x:nd.x,y:nd.y};}
+
+  function drawCyc(){
+    var d=CY[curCycle];
+    cx.clearRect(0,0,720,380);
+    // flows lines
+    d.flows.forEach(function(f){
+      var p=nodePt(f[0]), q=nodePt(f[1]);
+      cx.strokeStyle="rgba(255,255,255,0.08)"; cx.lineWidth=2;
+      cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();
+    });
+    // nodes
+    d.nodes.forEach(function(nd){
+      cx.beginPath();cx.arc(nd.x,nd.y,nd.r,0,7);cx.fillStyle=nd.c;cx.fill();
+      cx.strokeStyle=A;cx.lineWidth=1.5;cx.stroke();
+      cx.fillStyle=INK;cx.font="11px system-ui,sans-serif";cx.textAlign="center";
+      var lines=nd.t.split("\n");
+      var oy=-(lines.length-1)*6;
+      lines.forEach(function(ln,i){cx.fillText(ln,nd.x,nd.y+oy+i*12+4);});
+    });
+    // particles
+    particles.forEach(function(pt){
+      var p=nodePt(pt.a), q=nodePt(pt.b);
+      var x=p.x+(q.x-p.x)*pt.t, y=p.y+(q.y-p.y)*pt.t;
+      cx.beginPath();cx.arc(x,y,4,0,7);cx.fillStyle=pt.c;cx.fill();
+    });
+    cx.fillStyle=MUT;cx.font="12px system-ui,sans-serif";cx.textAlign="left";
+    cx.fillText(d.title,12,20);
+  }
+  function stepCyc(){
+    if(!cyPaused){
+      particles.forEach(function(pt){pt.t+=0.006; if(pt.t>1)pt.t-=1;});
+    }
+  }
+  function renderCyLegend(){
+    var d=CY[curCycle];
+    document.getElementById("cyLegend").innerHTML=d.legend.map(function(l){
+      return '<span><i style="background:'+l[1]+'"></i>'+l[0]+'</span>';
+    }).join("");
+    document.getElementById("cyFacts").innerHTML=d.facts;
+  }
+  document.querySelectorAll("[data-cy]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("[data-cy]").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      curCycle=b.getAttribute("data-cy");
+      buildParticles();renderCyLegend();drawCyc();
+    });
+  });
+  document.getElementById("cyPause").addEventListener("click",function(){
+    cyPaused=!cyPaused; this.textContent=cyPaused?"▶ Play":"⏸ Pause";
+  });
+  buildParticles();renderCyLegend();
+
+  /* ================= MODE 3: POPULATION ================= */
+  var popC=document.getElementById("popC"), pcx=popC.getContext("2d");
+  var rRange=document.getElementById("rRange"), kRange=document.getElementById("kRange");
+  var rVal=document.getElementById("rVal"), kVal=document.getElementById("kVal");
+  var popT=0, popMaxT=60, popAnimating=true;
+
+  function computeSeries(){
+    var r=+rRange.value, K=+kRange.value, N0=10, dt=0.2;
+    var exp=[N0], log=[N0];
+    for(var t=dt;t<=popMaxT;t+=dt){
+      var pe=exp[exp.length-1]; exp.push(pe+r*pe*dt);
+      var pl=log[log.length-1]; log.push(pl+r*pl*(1-pl/K)*dt);
+    }
+    return {exp:exp,log:log,K:K,r:r,dt:dt};
+  }
+  var series=computeSeries();
+
+  function drawPop(){
+    var W=720,H=320,mL=48,mB=34,mT=14,mR=14;
+    pcx.clearRect(0,0,W,H);
+    var K=series.K;
+    var yMax=K*1.25;
+    var pw=W-mL-mR, ph=H-mT-mB;
+    function X(t){return mL+ (t/popMaxT)*pw;}
+    function Y(v){return mT+ph-(Math.min(v,yMax)/yMax)*ph;}
+    // grid
+    pcx.strokeStyle="rgba(255,255,255,.06)";pcx.lineWidth=1;
+    pcx.fillStyle=MUT;pcx.font="10px system-ui";pcx.textAlign="right";
+    for(var g=0;g<=4;g++){
+      var v=yMax*g/4, y=Y(v);
+      pcx.beginPath();pcx.moveTo(mL,y);pcx.lineTo(W-mR,y);pcx.stroke();
+      pcx.fillText(Math.round(v),mL-5,y+3);
+    }
+    // K line
+    pcx.strokeStyle="#5a83f0";pcx.setLineDash([6,5]);pcx.lineWidth=1.5;
+    pcx.beginPath();pcx.moveTo(mL,Y(K));pcx.lineTo(W-mR,Y(K));pcx.stroke();
+    pcx.setLineDash([]);
+    pcx.fillStyle="#5a83f0";pcx.textAlign="left";pcx.fillText("K = "+K,mL+4,Y(K)-4);
+    // axes labels
+    pcx.fillStyle=MUT;pcx.textAlign="center";
+    pcx.fillText("Time →",W/2,H-8);
+    pcx.save();pcx.translate(12,H/2);pcx.rotate(-Math.PI/2);pcx.fillText("Population (N)",0,0);pcx.restore();
+    // curves up to popT index
+    var idxMax=Math.floor(series.exp.length*(popT/popMaxT));
+    function curve(arr,color){
+      pcx.strokeStyle=color;pcx.lineWidth=2.4;pcx.beginPath();
+      for(var i=0;i<=idxMax&&i<arr.length;i++){
+        var t=i*series.dt; var x=X(t),y=Y(arr[i]);
+        if(i===0)pcx.moveTo(x,y);else pcx.lineTo(x,y);
+      }
+      pcx.stroke();
+    }
+    curve(series.exp,WARN);
+    curve(series.log,A);
+    // moving dots
+    if(idxMax>0&&idxMax<series.exp.length){
+      var t=idxMax*series.dt;
+      [[series.exp[idxMax],WARN],[series.log[idxMax],A]].forEach(function(d){
+        pcx.beginPath();pcx.arc(X(t),Y(d[0]),4,0,7);pcx.fillStyle=d[1];pcx.fill();
+      });
+    }
+    updateKpi(idxMax);
+  }
+  function updateKpi(idx){
+    var lg=series.log[Math.min(idx,series.log.length-1)];
+    var ex=series.exp[Math.min(idx,series.exp.length-1)];
+    var K=series.K;
+    var phase = lg< K*0.5 ? "lag / exponential" : lg<K*0.9 ? "deceleration" : "stationary (≈K)";
+    document.getElementById("popKpi").innerHTML=
+      '<div><b>'+Math.round(lg)+'</b><small>Logistic N</small></div>'+
+      '<div><b>'+(ex>1e6?fmt(ex):Math.round(ex))+'</b><small>Exponential N</small></div>'+
+      '<div><b>'+series.r+'</b><small>rate r</small></div>'+
+      '<div><b>'+phase+'</b><small>logistic phase</small></div>';
+  }
+  function stepPop(){
+    if(popAnimating && !hidden){
+      popT+=0.25;
+      if(popT>=popMaxT){popT=popMaxT;popAnimating=false;}
+    }
+  }
+  function resetPop(){series=computeSeries();popT=0;popAnimating=true;}
+  rRange.oninput=function(){rVal.textContent=(+this.value).toFixed(2);resetPop();};
+  kRange.oninput=function(){kVal.textContent=this.value;resetPop();};
+  document.getElementById("popReplay").onclick=resetPop;
+  drawPop();
+
+  /* interactions */
+  var INTER=[
+    {n:"Mutualism (+ / +)",e:"Both species benefit. e.g. Rhizobium bacteria &amp; legume roots; pollinating insects &amp; flowers; lichen (fungus + alga)."},
+    {n:"Commensalism (+ / 0)",e:"One benefits, the other is unaffected. e.g. orchid growing on a tree branch; barnacles on a whale; cattle egret feeding near grazing cattle."},
+    {n:"Parasitism (+ / −)",e:"Parasite benefits at the host's expense but usually does not kill it immediately. e.g. Plasmodium in humans; tapeworm; Cuscuta (dodder) on plants."},
+    {n:"Predation (+ / −)",e:"Predator kills and eats prey. Keeps prey populations in check and transfers energy up the chain. e.g. lion &amp; deer; sparrow &amp; insect."},
+    {n:"Competition (− / −)",e:"Both species harmed while competing for the same limited resource (food, space, light). e.g. Paramecium species (Gause's principle: no two species occupy the same niche indefinitely)."},
+    {n:"Amensalism (− / 0)",e:"One is harmed, the other unaffected. e.g. Penicillium releases penicillin that kills nearby bacteria; large tree shades out small herbs."}
+  ];
+  var chipHost=document.getElementById("intChips");
+  INTER.forEach(function(it,i){
+    var b=document.createElement("button");b.className="chip";b.textContent=it.n;
+    b.onclick=function(){
+      document.querySelectorAll("#intChips .chip").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      document.getElementById("intFacts").innerHTML="<b>"+it.n+".</b> "+it.e;
+    };
+    chipHost.appendChild(b);
+    if(i===0){b.classList.add("on");document.getElementById("intFacts").innerHTML="<b>"+it.n+".</b> "+it.e;}
+  });
+
+  /* succession diagram */
+  (function(){
+    var stages=["Bare rock","Lichens","Mosses","Herbs","Shrubs","Forest (climax)"];
+    var s="",W=360,x0=6,gap=(W-12)/stages.length;
+    stages.forEach(function(st,i){
+      var x=x0+i*gap;
+      var h=14+i*10;
+      s+='<rect x="'+(x+4)+'" y="'+(74-h)+'" width="'+(gap-10)+'" height="'+h+'" rx="4" fill="'+trophColor(Math.min(i,4))+'" opacity="0.85"/>';
+      s+='<text x="'+(x+gap/2)+'" y="86" fill="'+MUT+'" font-size="8" text-anchor="middle">'+st+'</text>';
+      if(i<stages.length-1)s+='<text x="'+(x+gap-3)+'" y="40" fill="'+A+'" font-size="11" text-anchor="middle">→</text>';
+    });
+    document.getElementById("succSvg").innerHTML=s;
+  })();
+
+  /* ================= MODE 4: QUIZ ================= */
+  var QUIZ=[
+    {q:"According to the 10% law, if producers fix 20,000 kcal, how much energy is available to a primary carnivore (3rd trophic level)?",
+     opts:["2000 kcal","200 kcal","20 kcal","2 kcal"],a:1,
+     e:"10% at each transfer: 20,000 → 2000 (herbivore) → 200 kcal (primary carnivore)."},
+    {q:"Which curve levels off at the carrying capacity K?",
+     opts:["Exponential (J-shaped)","Logistic (S-shaped)","Both never level off","Neither depends on resources"],a:1,
+     e:"The logistic model dN/dt = rN(K−N)/K slows as N approaches K, producing an S-shaped curve. Exponential growth is unlimited (J-shaped)."},
+    {q:"Rhizobium living in the root nodules of a legume, both benefiting, is an example of:",
+     opts:["Parasitism","Commensalism","Mutualism","Predation"],a:2,
+     e:"Both partners gain: the plant gets fixed nitrogen, the bacterium gets shelter and carbohydrates — a classic mutualism."}
+  ];
+  var score=0, answered=[];
+  var host=document.getElementById("quizHost");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var h="<div style='font-weight:600;margin-bottom:6px'>Q"+(qi+1)+". "+item.q+"</div>";
+    item.opts.forEach(function(o,oi){
+      h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+    });
+    h+='<div class="expl" id="expl'+qi+'"></div>';
+    d.innerHTML=h;host.appendChild(d);
+  });
+  host.addEventListener("click",function(ev){
+    var b=ev.target.closest(".opt"); if(!b)return;
+    var qi=+b.getAttribute("data-q"), oi=+b.getAttribute("data-o");
+    if(answered[qi])return;
+    answered[qi]=true;
+    var item=QUIZ[qi];
+    var opts=host.querySelectorAll('.opt[data-q="'+qi+'"]');
+    opts.forEach(function(o){
+      var k=+o.getAttribute("data-o");
+      if(k===item.a)o.classList.add("correct");
+      if(k===oi&&oi!==item.a)o.classList.add("wrong");
+      o.disabled=true;
+    });
+    if(oi===item.a)score++;
+    var ex=document.getElementById("expl"+qi);
+    ex.innerHTML=(oi===item.a?"Correct. ":"Not quite. ")+item.e;
+    ex.classList.add("show");
+    document.querySelector("#quizScore span").textContent=score+" / 3";
+  });
+
+  /* ================= ANIMATION LOOP ================= */
+  function loop(){
+    if(!hidden){
+      stepCyc();drawCyc();
+      stepPop();drawPop();
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>
