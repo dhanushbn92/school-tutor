@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Special Angles Lab — Trigonometric Ratios (NIOS Class 10, Ch 22)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212a40;
+    --ink:#e8ecf6;
+    --muted:#98a3bd;
+    --accent:#5ec8f2;
+    --accent-soft:rgba(94,200,242,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:940px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .panel p{color:var(--muted);font-size:.9rem;margin-bottom:8px}
+  .panel p b, .panel p strong{color:var(--ink)}
+  .view{display:none}
+  .view.on{display:block}
+
+  canvas{width:100%;max-width:520px;height:auto;display:block;margin:0 auto 10px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .seg button{flex:1 1 90px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .kv{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;font-size:.9rem}
+  .chip b{color:var(--accent)}
+
+  table.trig{width:100%;border-collapse:collapse;margin-top:6px;font-size:.95rem}
+  table.trig th,table.trig td{border:1px solid var(--line);padding:10px 6px;text-align:center}
+  table.trig th{background:var(--panel2);color:var(--accent);font-weight:700}
+  table.trig td.deg{background:var(--panel2);color:var(--ink);font-weight:700}
+  table.trig td.cell{cursor:pointer;transition:background .12s;font-weight:600;min-width:52px}
+  table.trig td.cell:hover{background:var(--accent-soft)}
+  table.trig td.cell.sel{background:var(--accent);color:#0f1320;font-weight:800}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;line-height:1.05;vertical-align:middle}
+  .frac .num{border-bottom:1.5px solid currentColor;padding:0 4px}
+  .frac .den{padding:0 4px}
+  .surd{white-space:nowrap}
+
+  .derivebox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-top:10px;min-height:56px;font-size:.95rem}
+  .derivebox .muted{color:var(--muted)}
+
+  .exprgrid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .exprgrid button{flex:1 1 46%;min-height:48px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:6px 8px;text-align:left}
+  .exprgrid button.on{border-color:var(--accent);background:var(--accent-soft)}
+  .result{background:var(--panel2);border:1px solid var(--accent);border-radius:12px;
+    padding:14px;margin-top:8px;font-size:1.05rem}
+  .result .steps{color:var(--muted);font-size:.88rem;margin-top:8px;line-height:1.7}
+
+  .quiz{margin-bottom:14px}
+  .quiz .q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:11px 12px;margin-bottom:7px;cursor:pointer;
+    font-size:.92rem;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.16)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.16)}
+  .opt:disabled{cursor:default}
+  .explain{font-size:.86rem;color:var(--muted);margin-top:4px;display:none}
+  .explain.show{display:block}
+
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .hl{color:var(--accent);font-weight:700}
+  .foot{color:var(--muted);font-size:.8rem;text-align:center;margin-top:12px}
+  sup{font-size:.7em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Special Angles</span> Lab</h1>
+    <p>NIOS Class 10 Maths · Ch 22 — Trigonometric Ratios of Some Special Angles (0°, 30°, 45°, 60°, 90°)</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="derive">Derive</button>
+    <button class="tab-btn" data-view="table">Value Table</button>
+    <button class="tab-btn" data-view="eval">Evaluate</button>
+    <button class="tab-btn" data-view="facts">Facts</button>
+    <button class="tab-btn" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ===================== DERIVE ===================== -->
+  <section class="view on" id="view-derive">
+    <div class="panel">
+      <h2>Derive the exact values</h2>
+      <p>Pick a triangle. The ratios for the special angles come straight from two triangles you can draw with a ruler — no calculator needed.</p>
+      <div class="seg" id="triSeg">
+        <button class="on" data-tri="45">45°–45°–90°</button>
+        <button data-tri="30">30°–60°–90°</button>
+      </div>
+      <canvas id="triCanvas" width="520" height="360" aria-label="special triangle diagram"></canvas>
+      <div id="triExplain"></div>
+    </div>
+  </section>
+
+  <!-- ===================== TABLE ===================== -->
+  <section class="view" id="view-table">
+    <div class="panel">
+      <h2>The value table</h2>
+      <p>Tap any coloured cell to see how that value is derived. Exact values only — fractions and surds.</p>
+      <div style="overflow-x:auto">
+      <table class="trig" id="trigTable">
+        <thead>
+          <tr><th>θ</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr>
+        </thead>
+        <tbody id="trigBody"></tbody>
+      </table>
+      </div>
+      <div class="derivebox" id="cellDerive"><span class="muted">Tap a cell above to reveal its derivation.</span></div>
+      <div class="note"><span class="hl">Memory pattern</span> — read the sine row as
+        <span class="surd">√0⁄2, √1⁄2, √2⁄2, √3⁄2, √4⁄2</span> = 0, ½, 1/√2, √3/2, 1.
+        Cosine is the same list <b>reversed</b>. Tangent = sine ÷ cosine.</div>
+    </div>
+  </section>
+
+  <!-- ===================== EVALUATE ===================== -->
+  <section class="view" id="view-eval">
+    <div class="panel">
+      <h2>Evaluate an expression</h2>
+      <p>Choose an expression. The lab substitutes the exact special-angle values and simplifies.</p>
+      <div class="exprgrid" id="exprGrid"></div>
+      <div class="result" id="exprResult"></div>
+      <div class="note">Each result is worked out with exact surds, then simplified — try to predict the answer before revealing it.</div>
+    </div>
+  </section>
+
+  <!-- ===================== FACTS ===================== -->
+  <section class="view" id="view-facts">
+    <div class="panel">
+      <h2>Facts panel</h2>
+      <h3>The special-angle table</h3>
+      <div style="overflow-x:auto">
+      <table class="trig">
+        <thead><tr><th>θ</th><th>0°</th><th>30°</th><th>45°</th><th>60°</th><th>90°</th></tr></thead>
+        <tbody>
+          <tr><td class="deg">sin</td><td>0</td><td>½</td><td>1/√2</td><td>√3/2</td><td>1</td></tr>
+          <tr><td class="deg">cos</td><td>1</td><td>√3/2</td><td>1/√2</td><td>½</td><td>0</td></tr>
+          <tr><td class="deg">tan</td><td>0</td><td>1/√3</td><td>1</td><td>√3</td><td>—</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="kv">
+        <div class="chip"><b>45–45–90</b>: sides 1 : 1 : √2</div>
+        <div class="chip"><b>30–60–90</b>: sides 1 : √3 : 2</div>
+      </div>
+      <h3 style="margin-top:14px">The two special triangles</h3>
+      <p>Cut a <b>unit square</b> along its diagonal → an isosceles right triangle with legs 1, 1 and hypotenuse √2. That gives 45°.</p>
+      <p>Cut an <b>equilateral triangle</b> of side 2 down its height → a triangle with sides 1, √3, 2 and angles 30°, 60°, 90°.</p>
+      <div class="kv">
+        <div class="chip">tan θ = sin θ / cos θ</div>
+        <div class="chip">tan 90° is undefined (cos 90° = 0)</div>
+        <div class="chip">sin θ = cos(90°−θ)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="view" id="view-quiz">
+    <div class="panel">
+      <h2>Quick quiz</h2>
+      <p>Tap an option. The correct answer and reason are revealed instantly.</p>
+      <div id="quizBox"></div>
+      <div class="foot" id="quizScore"></div>
+    </div>
+  </section>
+
+  <div class="foot">Special Angles Lab · self-contained · exact surd values</div>
+</div>
+
+<script>
+"use strict";
+/* ---------- fraction / surd HTML helpers ---------- */
+function frac(n,d){return '<span class="frac"><span class="num">'+n+'</span><span class="den">'+d+'</span></span>';}
+var R2='√2', R3='√3';
+
+/* ---------- tab switching ---------- */
+var tabBtns=document.querySelectorAll('.tab-btn');
+var views={derive:document.getElementById('view-derive'),table:document.getElementById('view-table'),
+  eval:document.getElementById('view-eval'),facts:document.getElementById('view-facts'),quiz:document.getElementById('view-quiz')};
+tabBtns.forEach(function(b){b.addEventListener('click',function(){
+  tabBtns.forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active');
+  for(var k in views){views[k].classList.remove('on');}
+  views[b.dataset.view].classList.add('on');
+  if(b.dataset.view==='derive'){drawTri(curTri);}
+});});
+
+/* ===================== DERIVE / CANVAS ===================== */
+var cv=document.getElementById('triCanvas');
+var ctx=cv.getContext('2d');
+var curTri='45';
+var css=getComputedStyle(document.documentElement);
+var C={ink:css.getPropertyValue('--ink').trim()||'#e8ecf6',
+       accent:css.getPropertyValue('--accent').trim()||'#5ec8f2',
+       muted:css.getPropertyValue('--muted').trim()||'#98a3bd',
+       line:css.getPropertyValue('--line').trim()||'#2c3550',
+       good:css.getPropertyValue('--good').trim()||'#5fd68b'};
+
+function lbl(x,y,txt,color,size){ctx.fillStyle=color||C.ink;ctx.font=(size||16)+'px system-ui,Segoe UI,Arial';
+  ctx.fillText(txt,x,y);}
+
+function drawTri(which){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.lineWidth=2.5;ctx.lineJoin='round';
+  if(which==='45'){
+    // isosceles right triangle from unit square diagonal
+    var ax=90,ay=290, bx=390,by=290, cx=90,cy=70; // right angle at A(left-bottom-> we use vertices)
+    // Right angle at bottom-left (ax,ay); horizontal leg to (bx,by); vertical leg to (cx,cy)
+    // draw faint square
+    ctx.strokeStyle=C.line;ctx.setLineDash([6,6]);
+    ctx.strokeRect(90,70,300,220-(-0)); // square outline approx
+    ctx.setLineDash([]);
+    // actual square: from (90,70) to (390,290) => 300x220, not unit but proportion shown
+    // triangle = lower-right half: (90,290)-(390,290)-(390,70)
+    ax=90;ay=290; bx=390;by=290; cx=390;cy=70;
+    ctx.strokeStyle=C.accent;ctx.beginPath();
+    ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx,cy);ctx.closePath();ctx.stroke();
+    // right-angle mark at B (bx,by)
+    ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;ctx.strokeRect(bx-16,by-16,16,16);
+    // side labels
+    lbl((ax+bx)/2-8,by+26,'1',C.good,18);            // bottom leg =1
+    lbl(bx+12,(by+cy)/2+6,'1',C.good,18);            // right leg =1
+    // hypotenuse label rotated-ish
+    lbl((ax+cx)/2-52,(ay+cy)/2-8,'√2',C.accent,18);  // hypotenuse
+    // angle labels
+    lbl(ax+20,ay-10,'45°',C.muted,15);
+    lbl(cx-42,cy+34,'45°',C.muted,15);
+    lbl(bx-38,by-22,'90°',C.muted,13);
+    lbl(70,40,'Half of a unit square',C.muted,14);
+  } else {
+    // 30-60-90 from equilateral triangle side 2, cut down the height
+    // full equilateral faint: base (90,290)-(390,290), apex (240,60)
+    ctx.strokeStyle=C.line;ctx.setLineDash([6,6]);
+    ctx.beginPath();ctx.moveTo(90,290);ctx.lineTo(390,290);ctx.lineTo(240,60);ctx.closePath();ctx.stroke();
+    // altitude
+    ctx.beginPath();ctx.moveTo(240,290);ctx.lineTo(240,60);ctx.stroke();
+    ctx.setLineDash([]);
+    // highlight right half triangle: (240,290)-(390,290)-(240,60)
+    ctx.strokeStyle=C.accent;ctx.lineWidth=2.5;ctx.beginPath();
+    ctx.moveTo(240,290);ctx.lineTo(390,290);ctx.lineTo(240,60);ctx.closePath();ctx.stroke();
+    // right-angle mark at foot (240,290)
+    ctx.strokeStyle=C.ink;ctx.lineWidth=1.6;ctx.strokeRect(240,290-16,16,16);
+    // labels
+    lbl(300,314,'1',C.good,18);                 // base half =1
+    lbl(248,180,'√3',C.good,18);                // altitude = √3
+    lbl(325,175,'2',C.accent,18);               // hypotenuse (equilateral side) =2
+    lbl(250,80,'30°',C.muted,15);               // apex angle
+    lbl(348,282,'60°',C.muted,15);              // base angle
+    lbl(196,282,'90°',C.muted,13);
+    lbl(70,40,'Half of an equilateral triangle (side 2)',C.muted,14);
+  }
+}
+
+var triExplain=document.getElementById('triExplain');
+function explainTri(which){
+  var h='';
+  if(which==='45'){
+    h='<div class="derivebox">'+
+      '<b>From the unit square.</b> Its diagonal splits it into two 45°–45°–90° triangles. '+
+      'The two legs both equal <span class="hl">1</span>, so by Pythagoras the hypotenuse = '+
+      '√(1²+1²) = <span class="hl">√2</span>.'+
+      '<div class="kv" style="margin-top:10px">'+
+      '<div class="chip">sin 45° = opp/hyp = '+frac('1',R2)+'</div>'+
+      '<div class="chip">cos 45° = adj/hyp = '+frac('1',R2)+'</div>'+
+      '<div class="chip">tan 45° = opp/adj = '+frac('1','1')+' = 1</div>'+
+      '</div></div>';
+  } else {
+    h='<div class="derivebox">'+
+      '<b>From the equilateral triangle (side 2).</b> The altitude bisects the base into <span class="hl">1</span> '+
+      'and the top angle into two <span class="hl">30°</span> halves. The altitude = √(2²−1²) = <span class="hl">√3</span>. '+
+      'This gives a 30°–60°–90° triangle with sides <b>1 : √3 : 2</b>.'+
+      '<div class="kv" style="margin-top:10px">'+
+      '<div class="chip">sin 30° = '+frac('1','2')+' , cos 30° = '+frac(R3,'2')+'</div>'+
+      '<div class="chip">sin 60° = '+frac(R3,'2')+' , cos 60° = '+frac('1','2')+'</div>'+
+      '<div class="chip">tan 30° = '+frac('1',R3)+' , tan 60° = '+frac(R3,'1')+' = √3</div>'+
+      '</div></div>';
+  }
+  triExplain.innerHTML=h;
+}
+
+var triSeg=document.getElementById('triSeg');
+triSeg.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  triSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');
+  curTri=b.dataset.tri;
+  drawTri(curTri);explainTri(curTri);
+});
+drawTri('45');explainTri('45');
+
+/* ===================== VALUE TABLE ===================== */
+// display html + derivation text for each ratio at each angle
+var TABLE={
+  sin:{
+    '0°':{v:'0', d:'sin 0° = 0. As the angle shrinks to 0, the opposite side vanishes: opp/hyp → 0.'},
+    '30°':{v:frac('1','2'), d:'In the 30–60–90 triangle sin 30° = opp/hyp = 1/2.'},
+    '45°':{v:frac('1',R2), d:'In the 45–45–90 triangle sin 45° = opp/hyp = 1/√2 (= √2/2).'},
+    '60°':{v:frac(R3,'2'), d:'In the 30–60–90 triangle sin 60° = opp/hyp = √3/2.'},
+    '90°':{v:'1', d:'sin 90° = 1. The opposite side equals the hypotenuse: opp/hyp = 1.'}
+  },
+  cos:{
+    '0°':{v:'1', d:'cos 0° = 1. The adjacent side equals the hypotenuse: adj/hyp = 1.'},
+    '30°':{v:frac(R3,'2'), d:'cos 30° = adj/hyp = √3/2 (= sin 60°).'},
+    '45°':{v:frac('1',R2), d:'cos 45° = adj/hyp = 1/√2 (= √2/2).'},
+    '60°':{v:frac('1','2'), d:'cos 60° = adj/hyp = 1/2 (= sin 30°).'},
+    '90°':{v:'0', d:'cos 90° = 0. The adjacent side vanishes: adj/hyp → 0.'}
+  },
+  tan:{
+    '0°':{v:'0', d:'tan 0° = sin 0° / cos 0° = 0 / 1 = 0.'},
+    '30°':{v:frac('1',R3), d:'tan 30° = sin/cos = (1/2)/(√3/2) = 1/√3.'},
+    '45°':{v:'1', d:'tan 45° = sin/cos = (1/√2)/(1/√2) = 1.'},
+    '60°':{v:'√3', d:'tan 60° = sin/cos = (√3/2)/(1/2) = √3.'},
+    '90°':{v:'∞', d:'tan 90° is undefined: cos 90° = 0, so sin/cos divides by zero.'}
+  }
+};
+var ANGLES=['0°','30°','45°','60°','90°'];
+var ROWS=['sin','cos','tan'];
+var tbody=document.getElementById('trigBody');
+ROWS.forEach(function(r){
+  var tr=document.createElement('tr');
+  var th='<td class="deg">'+r+'</td>';
+  ANGLES.forEach(function(a){
+    th+='<td class="cell" data-r="'+r+'" data-a="'+a+'">'+TABLE[r][a].v+'</td>';
+  });
+  tr.innerHTML=th;tbody.appendChild(tr);
+});
+var cellDerive=document.getElementById('cellDerive');
+tbody.addEventListener('click',function(e){
+  var td=e.target.closest('td.cell'); if(!td)return;
+  tbody.querySelectorAll('td.cell').forEach(function(x){x.classList.remove('sel');});
+  td.classList.add('sel');
+  var r=td.dataset.r,a=td.dataset.a;
+  cellDerive.innerHTML='<b>'+r+' '+a+' = '+TABLE[r][a].v+'</b><br>'+
+    '<span style="color:var(--muted)">'+TABLE[r][a].d+'</span>';
+});
+
+/* ===================== EVALUATE ===================== */
+// exact numeric checks use Math but DISPLAYED answers are exact surds
+var EXPR=[
+  {t:'sin 30° · cos 60° + cos 30° · sin 60°',
+   ans:'1',
+   steps:['= (1/2)(1/2) + (√3/2)(√3/2)','= 1/4 + 3/4','= 1  &nbsp;[this is sin(30°+60°)=sin 90°]']},
+  {t:'sin²30° + cos²30°',
+   ans:'1',
+   steps:['= (1/2)² + (√3/2)²','= 1/4 + 3/4','= 1  &nbsp;[the identity sin²θ+cos²θ=1]']},
+  {t:'2 · sin 30° · cos 30°',
+   ans:'√3/2',
+   steps:['= 2 · (1/2) · (√3/2)','= (√3/2)  &nbsp;[this equals sin 60°]']},
+  {t:'tan 45° − tan 30° · tan 60°',
+   ans:'0',
+   steps:['= 1 − (1/√3)(√3)','= 1 − 1','= 0']},
+  {t:'cos 60° + sin 30°',
+   ans:'1',
+   steps:['= 1/2 + 1/2','= 1']},
+  {t:'tan²60° − 2 · sin²45°',
+   ans:'2',
+   steps:['= (√3)² − 2 · (1/√2)²','= 3 − 2 · (1/2)','= 3 − 1','= 2']}
+];
+var exprGrid=document.getElementById('exprGrid');
+var exprResult=document.getElementById('exprResult');
+EXPR.forEach(function(ex,i){
+  var b=document.createElement('button');
+  b.innerHTML=ex.t;b.dataset.i=i;exprGrid.appendChild(b);
+});
+exprGrid.addEventListener('click',function(e){
+  var b=e.target.closest('button'); if(!b)return;
+  exprGrid.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');
+  var ex=EXPR[b.dataset.i];
+  var st=ex.steps.map(function(s){return s;}).join('<br>');
+  exprResult.innerHTML='<b>'+ex.t+' = <span class="hl">'+ex.ans+'</span></b>'+
+    '<div class="steps">'+st+'</div>';
+});
+exprResult.innerHTML='<span style="color:var(--muted)">Pick an expression above to evaluate it exactly.</span>';
+
+/* ===================== QUIZ ===================== */
+var QUIZ=[
+  {q:'What is the exact value of sin 60°?',
+   opts:['1/2','√3/2','1/√2','√3'],ci:1,
+   ex:'From the 30–60–90 triangle, sin 60° = opposite/hypotenuse = √3/2.'},
+  {q:'Which special angle has sin = cos (so tan = 1)?',
+   opts:['30°','45°','60°','90°'],ci:1,
+   ex:'At 45° the legs are equal (1 and 1), so sin 45° = cos 45° = 1/√2 and tan 45° = 1.'},
+  {q:'Evaluate sin²30° + cos²30°.',
+   opts:['1/2','√3/2','1','0'],ci:2,
+   ex:'(1/2)² + (√3/2)² = 1/4 + 3/4 = 1 — the identity sin²θ + cos²θ = 1.'}
+];
+var quizBox=document.getElementById('quizBox');
+var quizScore=document.getElementById('quizScore');
+var answered=0,correct=0;
+QUIZ.forEach(function(item,qi){
+  var div=document.createElement('div');div.className='quiz';
+  var h='<div class="q">'+(qi+1)+'. '+item.q+'</div>';
+  item.opts.forEach(function(o,oi){
+    h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+  });
+  h+='<div class="explain" id="ex-'+qi+'">'+item.ex+'</div>';
+  div.innerHTML=h;quizBox.appendChild(div);
+});
+quizBox.addEventListener('click',function(e){
+  var b=e.target.closest('.opt'); if(!b||b.disabled)return;
+  var qi=+b.dataset.q, oi=+b.dataset.o, item=QUIZ[qi];
+  var btns=quizBox.querySelectorAll('.opt[data-q="'+qi+'"]');
+  btns.forEach(function(x){x.disabled=true;});
+  if(oi===item.ci){b.classList.add('correct');correct++;}
+  else{b.classList.add('wrong');btns[item.ci].classList.add('correct');}
+  document.getElementById('ex-'+qi).classList.add('show');
+  answered++;
+  quizScore.textContent='Score: '+correct+' / '+answered+(answered===QUIZ.length?' — done!':'');
+});
+</script>
+</body>
+</html>

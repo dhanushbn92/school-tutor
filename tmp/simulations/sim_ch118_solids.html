@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surface Area &amp; Volume Lab — NIOS Class 10 Maths Ch20</title>
+<style>
+  :root{
+    --bg:#12161d; --panel:#1b212c; --panel2:#232b38; --ink:#e8edf4; --muted:#9aa7ba;
+    --accent:#4bd0c0; --accent-d:#2f9a8d; --line:#2c3644; --good:#5cd07a; --bad:#e8746a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.45; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 8px;max-width:1080px;margin:0 auto}
+  h1{font-size:clamp(19px,4.5vw,26px);margin:0 0 4px}
+  .sub{color:var(--muted);font-size:14px}
+  .wrap{max-width:1080px;margin:0 auto;padding:8px 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:9px 14px;border-radius:999px;font-size:14px;cursor:pointer;
+    touch-action:manipulation;
+  }
+  .tab.active{background:var(--accent);color:#08201d;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:none}
+  .controls label{display:block;font-size:13px;color:var(--muted);margin:12px 0 4px}
+  .row{display:flex;align-items:center;gap:10px}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .val{min-width:52px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  select{
+    width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:10px;font-size:15px
+  }
+  .results{margin-top:8px}
+  .res{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;margin-top:8px;font-size:14px}
+  .res b{color:var(--accent);font-variant-numeric:tabular-nums}
+  .formula{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);margin-top:2px}
+  .btn{background:var(--accent-d);color:#eafffb;border:1px solid var(--accent);border-radius:10px;padding:9px 14px;font-size:14px;cursor:pointer;touch-action:manipulation}
+  .btn:active{transform:translateY(1px)}
+  .facts table{width:100%;border-collapse:collapse;font-size:13px}
+  .facts th,.facts td{border:1px solid var(--line);padding:7px 8px;text-align:left}
+  .facts th{background:var(--panel2);color:var(--accent)}
+  .facts td:first-child{white-space:nowrap;font-weight:600}
+  .facts .m{font-family:ui-monospace,Consolas,monospace;color:var(--muted)}
+  .quiz .q{margin-bottom:14px}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+  .quiz .opt{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;font-size:14px;text-align:left;color:var(--ink)}
+  .quiz .opt.correct{border-color:var(--good);background:#1f3327}
+  .quiz .opt.wrong{border-color:var(--bad);background:#33211f}
+  .quiz .exp{font-size:13px;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+  .hide{display:none}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Surface Area &amp; Volume Lab</h1>
+  <div class="sub">NIOS Class 10 Mathematics — Ch20: Surface Areas and Volumes of Solid Figures</div>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="calc">Solid Calculator</button>
+    <button class="tab" data-mode="nets">Nets (Fold)</button>
+    <button class="tab" data-mode="combo">Combined Solids</button>
+    <button class="tab" data-mode="facts">Formula Facts</button>
+    <button class="tab" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- CALCULATOR -->
+  <section id="m-calc">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="cCalc" width="520" height="380" aria-label="3D drawing of solid"></canvas>
+        <div class="legend"><span><span class="swatch" style="background:#4bd0c0"></span>front faces</span><span><span class="swatch" style="background:#2f9a8d"></span>side/depth</span></div>
+        <div class="hint">Drag on the drawing to rotate the view.</div>
+      </div>
+      <div class="panel controls">
+        <label for="solidSel">Solid</label>
+        <select id="solidSel">
+          <option value="cube">Cube</option>
+          <option value="cuboid">Cuboid</option>
+          <option value="cylinder">Cylinder</option>
+          <option value="cone">Cone</option>
+          <option value="sphere">Sphere</option>
+          <option value="hemisphere">Hemisphere</option>
+        </select>
+        <div id="sliders"></div>
+        <div class="results" id="calcRes"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NETS -->
+  <section id="m-nets" class="hide">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="cNet" width="520" height="380" aria-label="Net folding animation"></canvas>
+        <div class="row" style="margin-top:12px;gap:12px">
+          <button class="btn" id="netPlay">Fold up ▶</button>
+          <input type="range" id="netFold" min="0" max="100" value="0">
+        </div>
+        <div class="hint">Slide or press play to fold the flat net into the 3-D solid.</div>
+      </div>
+      <div class="panel controls">
+        <label for="netSel">Net of</label>
+        <select id="netSel">
+          <option value="cube">Cube</option>
+          <option value="cuboid">Cuboid</option>
+          <option value="cylinder">Cylinder</option>
+          <option value="cone">Cone</option>
+        </select>
+        <div class="results" id="netRes"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMBINED -->
+  <section id="m-combo" class="hide">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="cCombo" width="520" height="380" aria-label="Combined solid drawing"></canvas>
+        <div class="hint">Composite solids share a circular base of radius r.</div>
+      </div>
+      <div class="panel controls">
+        <label for="comboSel">Composite</label>
+        <select id="comboSel">
+          <option value="cylhemi">Cylinder + Hemisphere (capsule)</option>
+          <option value="conecyl">Cone on a Cylinder</option>
+          <option value="conehemi">Cone on a Hemisphere (ice-cream)</option>
+        </select>
+        <div id="comboSliders"></div>
+        <div class="results" id="comboRes"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <section id="m-facts" class="hide">
+    <div class="panel facts">
+      <table>
+        <thead><tr><th>Solid</th><th>Curved / Lateral SA</th><th>Total SA</th><th>Volume</th></tr></thead>
+        <tbody>
+          <tr><td>Cube (side a)</td><td class="m">4a²</td><td class="m">6a²</td><td class="m">a³</td></tr>
+          <tr><td>Cuboid (l,b,h)</td><td class="m">2h(l+b)</td><td class="m">2(lb+bh+hl)</td><td class="m">l·b·h</td></tr>
+          <tr><td>Cylinder (r,h)</td><td class="m">2πrh</td><td class="m">2πr(r+h)</td><td class="m">πr²h</td></tr>
+          <tr><td>Cone (r,h,l)</td><td class="m">πrl</td><td class="m">πr(r+l)</td><td class="m">⅓πr²h</td></tr>
+          <tr><td>Sphere (r)</td><td class="m">4πr²</td><td class="m">4πr²</td><td class="m">4⁄3·πr³</td></tr>
+          <tr><td>Hemisphere (r)</td><td class="m">2πr²</td><td class="m">3πr²</td><td class="m">2⁄3·πr³</td></tr>
+        </tbody>
+      </table>
+      <div class="hint">Slant height of a cone: l = √(r² + h²). π ≈ 3.14159265.</div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="m-quiz" class="hide">
+    <div class="panel quiz" id="quizBox"></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+const PI = Math.PI;
+const fmt = (x)=> (Math.abs(x)>=1000? x.toFixed(1): x.toFixed(2)).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+
+/* ---------- Tab switching ---------- */
+const modes = ["calc","nets","combo","facts","quiz"];
+const tabs = document.getElementById("tabs");
+tabs.addEventListener("click", e=>{
+  const b = e.target.closest(".tab"); if(!b) return;
+  const m = b.dataset.mode;
+  [...tabs.children].forEach(t=>t.classList.toggle("active", t===b));
+  modes.forEach(x=>document.getElementById("m-"+x).classList.toggle("hide", x!==m));
+  if(m==="calc") drawCalc();
+  if(m==="nets") drawNet();
+  if(m==="combo") drawCombo();
+});
+
+/* ---------- Rotation state (shared feel) ---------- */
+let rotY = 0.6, rotX = 0.42;
+
+function project(x,y,z, cx, cy, scale){
+  // rotate about Y then X, simple orthographic-ish with slight persp
+  let cosY=Math.cos(rotY), sinY=Math.sin(rotY);
+  let x1 = x*cosY - z*sinY;
+  let z1 = x*sinY + z*cosY;
+  let cosX=Math.cos(rotX), sinX=Math.sin(rotX);
+  let y1 = y*cosX - z1*sinX;
+  let z2 = y*sinX + z1*cosX;
+  const persp = 1/(1 + z2*0.0016);
+  return [cx + x1*scale*persp, cy - y1*scale*persp, z2];
+}
+
+/* ---------- CALCULATOR ---------- */
+const solidSel = document.getElementById("solidSel");
+const slidersBox = document.getElementById("sliders");
+const calcRes = document.getElementById("calcRes");
+const cCalc = document.getElementById("cCalc");
+
+const solidDefs = {
+  cube:      [["a","Side a",1,8,4]],
+  cuboid:    [["l","Length l",1,8,5],["b","Breadth b",1,8,3],["h","Height h",1,8,4]],
+  cylinder:  [["r","Radius r",1,5,3],["h","Height h",1,8,5]],
+  cone:      [["r","Radius r",1,5,3],["h","Height h",1,8,5]],
+  sphere:    [["r","Radius r",1,6,3]],
+  hemisphere:[["r","Radius r",1,6,3]]
+};
+let calcVals = {};
+
+function buildSliders(){
+  const def = solidDefs[solidSel.value];
+  slidersBox.innerHTML = "";
+  calcVals = {};
+  def.forEach(([k,label,mn,mx,dv])=>{
+    calcVals[k]=dv;
+    const lab=document.createElement("label"); lab.textContent=label; lab.htmlFor="sl_"+k;
+    const row=document.createElement("div"); row.className="row";
+    const inp=document.createElement("input");
+    inp.type="range"; inp.id="sl_"+k; inp.min=mn; inp.max=mx; inp.step=0.5; inp.value=dv;
+    const v=document.createElement("span"); v.className="val"; v.textContent=dv;
+    inp.addEventListener("input",()=>{ calcVals[k]=parseFloat(inp.value); v.textContent=fmt(calcVals[k]); computeCalc(); drawCalc(); });
+    row.appendChild(inp); row.appendChild(v);
+    slidersBox.appendChild(lab); slidersBox.appendChild(row);
+  });
+  computeCalc(); drawCalc();
+}
+
+function computeCalc(){
+  const s=solidSel.value, v=calcVals; let rows=[];
+  if(s==="cube"){const a=v.a;
+    rows=[["Lateral SA = 4a²",4*a*a,"unit²"],["Total SA = 6a²",6*a*a,"unit²"],["Volume = a³",a*a*a,"unit³"]];
+  }else if(s==="cuboid"){const {l,b,h}=v;
+    rows=[["Lateral SA = 2h(l+b)",2*h*(l+b),"unit²"],["Total SA = 2(lb+bh+hl)",2*(l*b+b*h+h*l),"unit²"],["Volume = lbh",l*b*h,"unit³"]];
+  }else if(s==="cylinder"){const {r,h}=v;
+    rows=[["CSA = 2πrh",2*PI*r*h,"unit²"],["TSA = 2πr(r+h)",2*PI*r*(r+h),"unit²"],["Volume = πr²h",PI*r*r*h,"unit³"]];
+  }else if(s==="cone"){const {r,h}=v; const l=Math.sqrt(r*r+h*h);
+    rows=[["slant l = √(r²+h²)",l,"unit"],["CSA = πrl",PI*r*l,"unit²"],["TSA = πr(r+l)",PI*r*(r+l),"unit²"],["Volume = ⅓πr²h",PI*r*r*h/3,"unit³"]];
+  }else if(s==="sphere"){const r=v.r;
+    rows=[["SA = 4πr²",4*PI*r*r,"unit²"],["Volume = 4⁄3·πr³",4/3*PI*r*r*r,"unit³"]];
+  }else if(s==="hemisphere"){const r=v.r;
+    rows=[["CSA = 2πr²",2*PI*r*r,"unit²"],["TSA = 3πr²",3*PI*r*r,"unit²"],["Volume = 2⁄3·πr³",2/3*PI*r*r*r,"unit³"]];
+  }
+  calcRes.innerHTML = rows.map(([lab,val,u])=>
+    `<div class="res"><span>${lab}</span><b>${fmt(val)} ${u}</b></div>`).join("");
+}
+
+/* drawing helpers for calculator */
+function clear(ctx,w,h){ctx.clearRect(0,0,w,h);}
+function poly(ctx,pts,fill,stroke){
+  ctx.beginPath();
+  pts.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  ctx.strokeStyle=stroke||"#0d1117";ctx.lineWidth=1.5;ctx.stroke();
+}
+function ellipse(ctx,cx,cy,rx,ry,fill,stroke){
+  ctx.beginPath(); ctx.ellipse(cx,cy,Math.abs(rx),Math.abs(ry),0,0,2*PI);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  ctx.strokeStyle=stroke||"#0d1117";ctx.lineWidth=1.5;ctx.stroke();
+}
+const C1="#4bd0c0", C2="#2f9a8d", C3="#38b3a4";
+
+function drawCalc(){
+  const ctx=cCalc.getContext("2d"); const w=cCalc.width,h=cCalc.height;
+  clear(ctx,w,h); const cx=w/2, cy=h/2, S=26;
+  const s=solidSel.value, v=calcVals;
+  if(s==="cube") drawBox(ctx,cx,cy,S,v.a,v.a,v.a);
+  else if(s==="cuboid") drawBox(ctx,cx,cy,S,v.l,v.h,v.b);
+  else if(s==="cylinder") drawCyl(ctx,cx,cy,S,v.r,v.h);
+  else if(s==="cone") drawCone(ctx,cx,cy,S,v.r,v.h);
+  else if(s==="sphere") drawSphere(ctx,cx,cy,S,v.r);
+  else if(s==="hemisphere") drawHemi(ctx,cx,cy,S,v.r);
+}
+function drawBox(ctx,cx,cy,S,lx,ly,lz){
+  const X=lx/2,Y=ly/2,Z=lz/2;
+  const V=[[-X,-Y,-Z],[X,-Y,-Z],[X,Y,-Z],[-X,Y,-Z],[-X,-Y,Z],[X,-Y,Z],[X,Y,Z],[-X,Y,Z]]
+    .map(p=>project(p[0],p[1],p[2],cx,cy,S));
+  const faces=[[0,1,2,3],[4,5,6,7],[0,4,7,3],[1,5,6,2],[3,2,6,7],[0,1,5,4]];
+  const order=faces.map(f=>({f,z:f.reduce((a,i)=>a+V[i][2],0)/4})).sort((a,b)=>a.z-b.z);
+  order.forEach((o,idx)=>{
+    poly(ctx,o.f.map(i=>V[i]), idx<3?C2:C1);
+  });
+}
+function drawCyl(ctx,cx,cy,S,r,hh){
+  const H=hh/2, seg=40;
+  function ringPt(a,y){const x=Math.cos(a)*r, z=Math.sin(a)*r; return project(x,y,z,cx,cy,S);}
+  // side quads
+  for(let i=0;i<seg;i++){
+    const a0=i/seg*2*PI, a1=(i+1)/seg*2*PI;
+    const p=[ringPt(a0,-H),ringPt(a1,-H),ringPt(a1,H),ringPt(a0,H)];
+    const shade = (Math.sin((a0+a1)/2 - rotY) )*0.5+0.5;
+    ctx.fillStyle = `rgb(${47+shade*30},${154+shade*60},${144+shade*50})`;
+    ctx.beginPath(); p.forEach((q,k)=>k?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])); ctx.closePath(); ctx.fill();
+  }
+  // top & bottom rings
+  const top=[],bot=[];
+  for(let i=0;i<=seg;i++){const a=i/seg*2*PI; top.push(ringPt(a,H)); bot.push(ringPt(a,-H));}
+  poly(ctx,top,C1); poly(ctx,bot,C2);
+}
+function drawCone(ctx,cx,cy,S,r,hh){
+  const seg=40, base=[]; const apex=project(0,hh/2,0,cx,cy,S);
+  for(let i=0;i<=seg;i++){const a=i/seg*2*PI; base.push(project(Math.cos(a)*r,-hh/2,Math.sin(a)*r,cx,cy,S));}
+  for(let i=0;i<seg;i++){
+    const shade=(Math.sin((i+0.5)/seg*2*PI - rotY))*0.5+0.5;
+    ctx.fillStyle=`rgb(${47+shade*35},${154+shade*65},${144+shade*55})`;
+    ctx.beginPath(); ctx.moveTo(apex[0],apex[1]); ctx.lineTo(base[i][0],base[i][1]); ctx.lineTo(base[i+1][0],base[i+1][1]); ctx.closePath(); ctx.fill();
+  }
+  poly(ctx,base,C2);
+}
+function drawSphere(ctx,cx,cy,S,r){
+  const R=r*S;
+  const g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.1,cx,cy,R);
+  g.addColorStop(0,"#7ee6da"); g.addColorStop(1,"#2f9a8d");
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,2*PI); ctx.fillStyle=g; ctx.fill();
+  ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5; ctx.stroke();
+  // equator + meridian ellipses for 3D feel
+  ctx.strokeStyle="rgba(13,17,23,.5)";
+  ellipse(ctx,cx,cy,R,R*Math.abs(Math.sin(rotX)),null,"rgba(13,17,23,.4)");
+  ellipse(ctx,cx,cy,R*Math.abs(Math.cos(rotY)),R,null,"rgba(13,17,23,.4)");
+}
+function drawHemi(ctx,cx,cy,S,r){
+  const R=r*S; const flatY = R*Math.abs(Math.sin(rotX));
+  const g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.1,cx,cy,R);
+  g.addColorStop(0,"#7ee6da"); g.addColorStop(1,"#2f9a8d");
+  ctx.beginPath(); ctx.arc(cx,cy+ (rotX>0?0:0),R,PI,2*PI);
+  ctx.ellipse(cx,cy,R,flatY,0,0,PI); ctx.closePath();
+  ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5; ctx.stroke();
+  ellipse(ctx,cx,cy,R,flatY,C2,"#0d1117");
+}
+
+/* rotation drag */
+(function(){
+  let dragging=false,lx=0,ly=0;
+  function start(x,y){dragging=true;lx=x;ly=y;}
+  function move(x,y){ if(!dragging)return; rotY+=(x-lx)*0.01; rotX+=(y-ly)*0.01;
+    rotX=Math.max(-1.3,Math.min(1.3,rotX)); lx=x;ly=y; drawCalc(); if(!document.getElementById("m-combo").classList.contains("hide"))drawCombo(); }
+  function end(){dragging=false;}
+  [cCalc,document.getElementById("cCombo")].forEach(cv=>{
+    cv.addEventListener("mousedown",e=>start(e.clientX,e.clientY));
+    cv.addEventListener("touchstart",e=>{start(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+    cv.addEventListener("touchmove",e=>{move(e.touches[0].clientX,e.touches[0].clientY); e.preventDefault();},{passive:false});
+    cv.addEventListener("touchend",end);
+  });
+  window.addEventListener("mousemove",e=>move(e.clientX,e.clientY));
+  window.addEventListener("mouseup",end);
+})();
+
+solidSel.addEventListener("change",buildSliders);
+
+/* ---------- NETS (fold animation) ---------- */
+const cNet=document.getElementById("cNet"), netSel=document.getElementById("netSel");
+const netFold=document.getElementById("netFold"), netPlay=document.getElementById("netPlay");
+const netRes=document.getElementById("netRes");
+let netAnim=null;
+
+function netInfo(){
+  const s=netSel.value;
+  if(s==="cube") return "A cube's net = 6 equal squares. Surface area = 6a².";
+  if(s==="cuboid") return "A cuboid's net = 3 pairs of rectangles. TSA = 2(lb+bh+hl).";
+  if(s==="cylinder") return "A cylinder unrolls into 2 circles + 1 rectangle (2πr × h). TSA = 2πr(r+h).";
+  if(s==="cone") return "A cone opens into a circle (base) + a sector of radius l. CSA = πrl.";
+}
+function updNetRes(){ netRes.innerHTML=`<div class="res"><span>${netInfo()}</span></div>`; }
+
+function drawNet(){
+  const ctx=cNet.getContext("2d"), w=cNet.width,h=cNet.height;
+  clear(ctx,w,h);
+  const t=netFold.value/100;             // 0 flat -> 1 folded
+  const s=netSel.value;
+  if(s==="cube"||s==="cuboid") drawBoxNet(ctx,w,h,t,s);
+  else if(s==="cylinder") drawCylNet(ctx,w,h,t);
+  else if(s==="cone") drawConeNet(ctx,w,h,t);
+}
+function drawBoxNet(ctx,w,h,t,kind){
+  // cross net of 6 faces; folding rotates the four side flaps + top up around edges
+  const cx=w/2, cy=h/2+20;
+  const a = kind==="cube"?58:56, b=kind==="cube"?58:40; // face sizes
+  // ease
+  const ang = t*PI/2;
+  // Draw using simple projection: base face center; sides tilt up
+  ctx.save(); ctx.translate(cx,cy);
+  const half=a/2;
+  function face(cxo,cyo,ww,hh,col){ ctx.fillStyle=col; ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.rect(cxo-ww/2,cyo-hh/2,ww,hh); ctx.fill(); ctx.stroke(); }
+  // bottom (stays)
+  face(0,0,a,a,C2);
+  // four sides fold up: their projected height shrinks by cos, offset grows
+  const sh = b*Math.cos(ang); // seen height when folding
+  const off = a/2 + b/2*Math.cos(ang);
+  const upShift = b/2*Math.sin(ang);
+  // left, right (width folds)
+  ctx.fillStyle=C1; ctx.strokeStyle="#0d1117";
+  // right
+  face(a/2 + (b/2)*Math.cos(ang), -upShift* (0), Math.max(2,sh), a, C1);
+  // left
+  face(-a/2 - (b/2)*Math.cos(ang), 0, Math.max(2,sh), a, C1);
+  // top-of-cross (back) and front fold along horizontal edges
+  face(0, -a/2 - (b/2)*Math.cos(ang), a, Math.max(2,sh), C3);
+  face(0, a/2 + (b/2)*Math.cos(ang), a, Math.max(2,sh), C3);
+  // lid appears as it closes
+  if(t>0.15){ ctx.globalAlpha=Math.min(1,(t-0.15)/0.6);
+    face(0,-upShift, a, a*Math.max(0.15,Math.cos(ang*0.6)), "#3fbfb0"); ctx.globalAlpha=1; }
+  ctx.restore();
+  ctx.fillStyle="#9aa7ba"; ctx.font="13px system-ui";
+  ctx.fillText(t<0.05?"Flat net (unfolded)": t>0.95?"Folded solid":"Folding…",16,24);
+}
+function drawCylNet(ctx,w,h,t){
+  const cx=w/2, cy=h/2;
+  // rectangle wraps into a cylinder: width 2πr, curls
+  const r=44, H=110;
+  ctx.fillStyle="#9aa7ba"; ctx.font="13px system-ui";
+  ctx.fillText(t<0.05?"Rectangle 2πr × h + two circles":t>0.95?"Rolled into cylinder":"Rolling…",16,24);
+  if(t<0.5){
+    // flat rectangle with two circles
+    const rw=2*PI*r*(1-t*1.4); const rwc=Math.max(20,rw);
+    ctx.fillStyle=C1; ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.rect(cx-rwc/2,cy-H/2,rwc,H); ctx.fill(); ctx.stroke();
+    ellipse(ctx,cx-rwc/2-r*0.6,cy,r*0.55,r*0.2,C2);
+    ellipse(ctx,cx+rwc/2+r*0.6,cy,r*0.55,r*0.2,C2);
+  } else {
+    // cylinder
+    const rr=r, ry=r*0.32;
+    for(let i=0;i<40;i++){const a0=i/40*2*PI,a1=(i+1)/40*2*PI;
+      const sh=(Math.sin((a0+a1)/2)*0.5+0.5);
+      ctx.fillStyle=`rgb(${47+sh*30},${154+sh*60},${144+sh*50})`;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(a0)*rr,cy-H/2+Math.sin(a0)*ry);
+      ctx.lineTo(cx+Math.cos(a1)*rr,cy-H/2+Math.sin(a1)*ry);
+      ctx.lineTo(cx+Math.cos(a1)*rr,cy+H/2+Math.sin(a1)*ry);
+      ctx.lineTo(cx+Math.cos(a0)*rr,cy+H/2+Math.sin(a0)*ry);
+      ctx.closePath(); ctx.fill();
+    }
+    ellipse(ctx,cx,cy-H/2,rr,ry,C1);
+    ellipse(ctx,cx,cy+H/2,rr,ry,C2);
+  }
+}
+function drawConeNet(ctx,w,h,t){
+  const cx=w/2, cy=h/2+10;
+  ctx.fillStyle="#9aa7ba"; ctx.font="13px system-ui";
+  ctx.fillText(t<0.05?"Sector (radius l) + base circle":t>0.95?"Curled into cone":"Curling…",16,24);
+  const l=120, r=42;
+  if(t<0.5){
+    // sector: angle = 2πr/l
+    const theta = 2*PI*r/l;
+    ctx.save(); ctx.translate(cx,cy-30);
+    ctx.fillStyle=C1; ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(0,0);
+    ctx.arc(0,0,l,-PI/2-theta/2,-PI/2+theta/2); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+    ellipse(ctx,cx,cy+90,r*0.7,r*0.24,C2);
+  } else {
+    // cone
+    const rr=r, ry=r*0.3, H=110;
+    const apex=[cx,cy-H/2-20];
+    for(let i=0;i<40;i++){const a0=i/40*2*PI,a1=(i+1)/40*2*PI;
+      const sh=(Math.sin((a0+a1)/2)*0.5+0.5);
+      ctx.fillStyle=`rgb(${47+sh*35},${154+sh*65},${144+sh*55})`;
+      ctx.beginPath(); ctx.moveTo(apex[0],apex[1]);
+      ctx.lineTo(cx+Math.cos(a0)*rr,cy+H/2+Math.sin(a0)*ry);
+      ctx.lineTo(cx+Math.cos(a1)*rr,cy+H/2+Math.sin(a1)*ry);
+      ctx.closePath(); ctx.fill();
+    }
+    ellipse(ctx,cx,cy+H/2,rr,ry,C2);
+  }
+}
+netFold.addEventListener("input",()=>{ stopNet(); drawNet(); });
+netSel.addEventListener("change",()=>{ updNetRes(); drawNet(); });
+function stopNet(){ if(netAnim){cancelAnimationFrame(netAnim);netAnim=null; netPlay.textContent="Fold up ▶";} }
+netPlay.addEventListener("click",()=>{
+  if(netAnim){ stopNet(); return; }
+  netPlay.textContent="Pause ❚❚";
+  let dir = (+netFold.value>=100)?-1:1;
+  if(+netFold.value>=100) netFold.value=0, dir=1;
+  const step=()=>{
+    if(document.hidden){ netAnim=requestAnimationFrame(step); return; } // pause on hidden
+    let v=+netFold.value + dir*1.4;
+    if(v>=100){v=100; netFold.value=v; drawNet(); stopNet(); return;}
+    netFold.value=v; drawNet(); netAnim=requestAnimationFrame(step);
+  };
+  netAnim=requestAnimationFrame(step);
+});
+
+/* ---------- COMBINED ---------- */
+const comboSel=document.getElementById("comboSel"), comboSliders=document.getElementById("comboSliders");
+const comboRes=document.getElementById("comboRes"), cCombo=document.getElementById("cCombo");
+const comboDefs = {
+  cylhemi:[["r","Radius r",1,4,2.5],["h","Cylinder height h",1,8,5]],
+  conecyl:[["r","Radius r",1,4,2.5],["hc","Cylinder height",1,7,4],["hk","Cone height",1,7,3]],
+  conehemi:[["r","Radius r",1,4,2.5],["hk","Cone height",1,8,5]]
+};
+let comboVals={};
+function buildCombo(){
+  const def=comboDefs[comboSel.value]; comboSliders.innerHTML=""; comboVals={};
+  def.forEach(([k,label,mn,mx,dv])=>{
+    comboVals[k]=dv;
+    const lab=document.createElement("label"); lab.textContent=label; lab.htmlFor="cs_"+k;
+    const row=document.createElement("div"); row.className="row";
+    const inp=document.createElement("input"); inp.type="range"; inp.id="cs_"+k; inp.min=mn;inp.max=mx;inp.step=0.5;inp.value=dv;
+    const v=document.createElement("span"); v.className="val"; v.textContent=dv;
+    inp.addEventListener("input",()=>{comboVals[k]=parseFloat(inp.value);v.textContent=fmt(comboVals[k]);computeCombo();drawCombo();});
+    row.appendChild(inp);row.appendChild(v);
+    comboSliders.appendChild(lab);comboSliders.appendChild(row);
+  });
+  computeCombo(); drawCombo();
+}
+function computeCombo(){
+  const s=comboSel.value, v=comboVals; let rows=[], TSA=0, VOL=0;
+  if(s==="cylhemi"){const {r,h}=v;
+    const cylCSA=2*PI*r*h, hemiCSA=2*PI*r*r, baseCirc=PI*r*r;
+    TSA=cylCSA+hemiCSA+baseCirc; VOL=PI*r*r*h + (2/3)*PI*r*r*r;
+    rows=[["Cylinder CSA = 2πrh",cylCSA],["Hemisphere CSA = 2πr²",hemiCSA],["Flat base circle = πr²",baseCirc],
+      ["Total SA",TSA,"unit²",true],["Volume = πr²h + ⅔πr³",VOL,"unit³",true]];
+  }else if(s==="conecyl"){const {r,hc,hk}=v; const l=Math.sqrt(r*r+hk*hk);
+    const coneCSA=PI*r*l, cylCSA=2*PI*r*hc, base=PI*r*r;
+    TSA=coneCSA+cylCSA+base; VOL=PI*r*r*hc + (1/3)*PI*r*r*hk;
+    rows=[["slant l = √(r²+hk²)",l,"unit"],["Cone CSA = πrl",coneCSA],["Cylinder CSA = 2πrh",cylCSA],["Bottom circle = πr²",base],
+      ["Total SA",TSA,"unit²",true],["Volume = πr²h + ⅓πr²hk",VOL,"unit³",true]];
+  }else if(s==="conehemi"){const {r,hk}=v; const l=Math.sqrt(r*r+hk*hk);
+    const coneCSA=PI*r*l, hemiCSA=2*PI*r*r;
+    TSA=coneCSA+hemiCSA; VOL=(1/3)*PI*r*r*hk + (2/3)*PI*r*r*r;
+    rows=[["slant l = √(r²+hk²)",l,"unit"],["Cone CSA = πrl",coneCSA],["Hemisphere CSA = 2πr²",hemiCSA],
+      ["Total SA",TSA,"unit²",true],["Volume = ⅓πr²hk + ⅔πr³",VOL,"unit³",true]];
+  }
+  comboRes.innerHTML=rows.map(r=>{
+    const u=r[2]|| "unit²"; const big=r[3];
+    return `<div class="res" style="${big?'border-color:var(--accent)':''}"><span>${r[0]}</span><b>${fmt(r[1])} ${u}</b></div>`;
+  }).join("");
+}
+function drawCombo(){
+  const ctx=cCombo.getContext("2d"), w=cCombo.width, h=cCombo.height; clear(ctx,w,h);
+  const cx=w/2, cy=h/2, S=24, s=comboSel.value, v=comboVals;
+  const rr=v.r*S, ry=rr*0.32;
+  if(s==="cylhemi"){
+    const H=v.h*S;
+    cylBody(ctx,cx,cy+ry, rr,ry,H);
+    // hemisphere cap on top
+    ctx.fillStyle=C1;
+    ctx.beginPath(); ctx.ellipse(cx,cy+ry-H, rr,ry,0,PI,2*PI); ctx.arc? null:null;
+    ctx.beginPath(); ctx.moveTo(cx-rr,cy+ry-H);
+    ctx.arc(cx,cy+ry-H,rr,PI,2*PI,false);
+    ctx.ellipse(cx,cy+ry-H,rr,ry,0,0,PI,true);
+    const g=ctx.createLinearGradient(cx-rr,0,cx+rr,0); g.addColorStop(0,C2);g.addColorStop(.5,"#5fd6c8");g.addColorStop(1,C2);
+    ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle="#0d1117"; ctx.stroke();
+    ellipse(ctx,cx,cy+ry-H,rr,ry,null,"rgba(13,17,23,.5)");
+  }else if(s==="conecyl"){
+    const Hc=v.hc*S, Hk=v.hk*S;
+    cylBody(ctx,cx,cy+ry, rr,ry,Hc);
+    // cone on top
+    const topY=cy+ry-Hc; const apex=[cx,topY-Hk];
+    ctx.fillStyle=C1;
+    ctx.beginPath(); ctx.moveTo(cx-rr,topY); ctx.lineTo(apex[0],apex[1]); ctx.lineTo(cx+rr,topY); ctx.closePath();
+    const g=ctx.createLinearGradient(cx-rr,0,cx+rr,0); g.addColorStop(0,C2);g.addColorStop(.5,"#5fd6c8");g.addColorStop(1,C2);
+    ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle="#0d1117"; ctx.stroke();
+    ellipse(ctx,cx,topY,rr,ry,null,"rgba(13,17,23,.5)");
+  }else if(s==="conehemi"){
+    const Hk=v.hk*S;
+    // hemisphere as base (flat up), cone above
+    const baseY=cy+40;
+    // hemisphere bowl (dome down)
+    ctx.beginPath(); ctx.moveTo(cx-rr,baseY); ctx.arc(cx,baseY,rr,PI,2*PI,false);
+    const g=ctx.createLinearGradient(cx-rr,0,cx+rr,0); g.addColorStop(0,C2);g.addColorStop(.5,"#5fd6c8");g.addColorStop(1,C2);
+    ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle="#0d1117"; ctx.stroke();
+    ellipse(ctx,cx,baseY,rr,ry,C3,"#0d1117");
+    // cone above
+    const apex=[cx,baseY-Hk];
+    ctx.beginPath(); ctx.moveTo(cx-rr,baseY); ctx.lineTo(apex[0],apex[1]); ctx.lineTo(cx+rr,baseY); ctx.closePath();
+    ctx.fillStyle=C1; ctx.fill(); ctx.strokeStyle="#0d1117"; ctx.stroke();
+  }
+}
+function cylBody(ctx,cx,bottomY,rr,ry,H){
+  const topY=bottomY-H;
+  const g=ctx.createLinearGradient(cx-rr,0,cx+rr,0); g.addColorStop(0,C2);g.addColorStop(.5,"#5fd6c8");g.addColorStop(1,C2);
+  ctx.fillStyle=g; ctx.strokeStyle="#0d1117"; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.rect(cx-rr,topY,2*rr,H); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx-rr,topY);ctx.lineTo(cx-rr,bottomY);ctx.moveTo(cx+rr,topY);ctx.lineTo(cx+rr,bottomY);ctx.stroke();
+  ellipse(ctx,cx,bottomY,rr,ry,C2);
+  ellipse(ctx,cx,topY,rr,ry,C1);
+}
+comboSel.addEventListener("change",buildCombo);
+
+/* ---------- QUIZ ---------- */
+const quizData=[
+  {q:"A cylinder has radius 7 cm and height 10 cm. Its curved surface area (π=22/7) is:",
+   opts:["440 cm²","308 cm²","154 cm²","220 cm²"],ans:0,
+   exp:"CSA = 2πrh = 2×(22/7)×7×10 = 440 cm²."},
+  {q:"A cone of radius 3 cm and height 4 cm has slant height and CSA of:",
+   opts:["l=5, CSA=15π","l=7, CSA=21π","l=5, CSA=12π","l=4, CSA=12π"],ans:0,
+   exp:"l=√(3²+4²)=5 cm, so CSA = πrl = π×3×5 = 15π cm²."},
+  {q:"The volume of a sphere of radius r is:",
+   opts:["4πr²","⅓πr³","4⁄3·πr³","2⁄3·πr³"],ans:2,
+   exp:"Volume of a sphere = 4⁄3·πr³ (4πr² is its surface area)."}
+];
+function buildQuiz(){
+  const box=document.getElementById("quizBox");
+  box.innerHTML = quizData.map((d,i)=>`
+    <div class="q" data-i="${i}">
+      <div><b>Q${i+1}.</b> ${d.q}</div>
+      <div class="opts">${d.opts.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join("")}</div>
+      <div class="exp" id="exp${i}">${d.exp}</div>
+    </div>`).join("");
+  box.querySelectorAll(".q").forEach(qEl=>{
+    const i=+qEl.dataset.i;
+    qEl.querySelectorAll(".opt").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        if(qEl.dataset.done) return; qEl.dataset.done="1";
+        const j=+btn.dataset.j, ans=quizData[i].ans;
+        qEl.querySelectorAll(".opt").forEach((b,k)=>{
+          if(k===ans) b.classList.add("correct");
+          else if(k===j) b.classList.add("wrong");
+        });
+        document.getElementById("exp"+i).classList.add("show");
+      });
+    });
+  });
+}
+
+/* pause any anim on hidden */
+document.addEventListener("visibilitychange",()=>{ /* net loop self-pauses via document.hidden */ });
+
+/* ---------- INIT ---------- */
+buildSliders();
+buildCombo();
+updNetRes(); drawNet();
+buildQuiz();
+</script>
+</body>
+</html>

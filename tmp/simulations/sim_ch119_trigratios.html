@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trigonometric Ratios Lab — NIOS Class 10, Ch 21</title>
+<style>
+  :root{
+    --bg:#0f131c;
+    --panel:#19202f;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#98a3bc;
+    --accent:#57d1c2;
+    --accent-soft:rgba(87,209,194,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 4px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hide{display:none!important}
+
+  .stage{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:14px;
+    touch-action:none;display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:12px 0}
+  .ctrl{flex:1 1 220px;min-width:180px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--accent);font-weight:700}
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131c;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f131c}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .card .name{font-size:.82rem;color:var(--muted)}
+  .card .val{font-size:1.12rem;font-weight:700;margin-top:2px}
+  .card .val small{color:var(--muted);font-weight:500;font-size:.72rem}
+  .card.accent{border-color:var(--accent)}
+  .card.accent .val{color:var(--accent)}
+
+  .mnem{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .mnem div{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.86rem}
+  .mnem b{color:var(--accent);font-size:1rem}
+
+  .idrow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  .idrow .lhs{font-size:.92rem}
+  .idrow .rhs{font-family:ui-monospace,Consolas,monospace;font-size:.95rem}
+  .idrow .rhs b{color:var(--good)}
+  .badge{font-size:.75rem;padding:2px 8px;border-radius:20px;border:1px solid var(--good);color:var(--good)}
+
+  .facts ul{list-style:none;margin-top:4px}
+  .facts li{padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+  .facts li:last-child{border-bottom:none}
+  .facts b{color:var(--accent)}
+  .facts code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-size:.85rem}
+
+  .quiz .q{margin-bottom:16px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opts button{display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 12px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .quiz .opts button:active{transform:scale(.99)}
+  .quiz .opts button.right{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:6px;min-height:1em}
+  .note{color:var(--muted);font-size:.85rem;margin-top:6px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.82rem;margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:4px;border-radius:2px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Trigonometric Ratios <span>Lab</span></h1>
+    <p>NIOS Class 10 Mathematics · Ch 21 — Trigonometric Ratios of an Acute Angle</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="ratios">1 · Six Ratios</button>
+    <button class="tab-btn" data-tab="similar">2 · Same θ, Any Size</button>
+    <button class="tab-btn" data-tab="ident">3 · Identities</button>
+  </div>
+
+  <!-- ============ MODE 1 ============ -->
+  <section id="ratios" class="mode">
+    <div class="panel">
+      <h2>Right triangle &amp; the six ratios</h2>
+      <canvas id="cv1" class="stage" width="640" height="380"></canvas>
+      <div class="legend">
+        <span><i style="background:#57d1c2"></i>opposite (opp)</span>
+        <span><i style="background:#ffb454"></i>adjacent (adj)</span>
+        <span><i style="background:#8ea2ff"></i>hypotenuse (hyp)</span>
+        <span>Drag the dot on the slope, or use the slider.</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Angle θ = <output id="thOut">30°</output></label>
+          <input type="range" id="thRange" min="5" max="85" step="1" value="30">
+        </div>
+      </div>
+      <div class="grid" id="ratioCards"></div>
+    </div>
+
+    <div class="panel">
+      <h2>SOH · CAH · TOA</h2>
+      <div class="mnem">
+        <div><b>SOH</b><br>sin θ = <b>O</b>pposite / <b>H</b>ypotenuse</div>
+        <div><b>CAH</b><br>cos θ = <b>A</b>djacent / <b>H</b>ypotenuse</div>
+        <div><b>TOA</b><br>tan θ = <b>O</b>pposite / <b>A</b>djacent</div>
+      </div>
+      <p class="note">Reciprocals: cosec θ = 1/sin θ, sec θ = 1/cos θ, cot θ = 1/tan θ.</p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2 ============ -->
+  <section id="similar" class="mode hide">
+    <div class="panel">
+      <h2>Ratios don't depend on size</h2>
+      <p class="note">Both triangles share the same acute angle θ but differ in size. Change θ and watch: the ratios stay identical, because similar triangles have proportional sides.</p>
+      <canvas id="cv2" class="stage" width="640" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Angle θ = <output id="thOut2">35°</output></label>
+          <input type="range" id="thRange2" min="5" max="85" step="1" value="35">
+        </div>
+      </div>
+      <div class="grid" id="simCards"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3 ============ -->
+  <section id="ident" class="mode hide">
+    <div class="panel">
+      <h2>Pythagorean identities (checked live)</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Angle θ = <output id="thOut3">40°</output></label>
+          <input type="range" id="thRange3" min="5" max="85" step="1" value="40">
+        </div>
+      </div>
+      <div id="idRows"></div>
+      <p class="note">Each identity is evaluated numerically from the current θ. The right-hand column is computed from live sin/cos/tan values — it always lands on the expected result.</p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel facts">
+    <h2>Facts panel</h2>
+    <ul>
+      <li><b>Six ratios</b> (angle θ in a right triangle): <code>sin=opp/hyp</code>, <code>cos=adj/hyp</code>, <code>tan=opp/adj</code>, <code>cosec=hyp/opp</code>, <code>sec=hyp/adj</code>, <code>cot=adj/opp</code>.</li>
+      <li><b>SOH-CAH-TOA</b> — Sin=Opp/Hyp, Cos=Adj/Hyp, Tan=Opp/Adj.</li>
+      <li><b>Reciprocal pairs</b> — sin&amp;cosec, cos&amp;sec, tan&amp;cot each multiply to 1.</li>
+      <li><b>Quotient</b> — <code>tan θ = sin θ / cos θ</code> and <code>cot θ = cos θ / sin θ</code>.</li>
+      <li><b>Pythagorean identities</b> — <code>sin²θ + cos²θ = 1</code>, <code>1 + tan²θ = sec²θ</code>, <code>1 + cot²θ = cosec²θ</code>.</li>
+      <li><b>Range</b> — for an acute angle, sin θ and cos θ lie between 0 and 1; opposite &amp; adjacent are named relative to θ.</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz">
+    <h2>Quick quiz (tap an option)</h2>
+    <div id="quizBox"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var DEG = Math.PI/180;
+  function f(x,n){ return Number(x).toFixed(n===undefined?4:n); }
+
+  /* ---------- Tabs ---------- */
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var modes = { ratios:document.getElementById('ratios'),
+                similar:document.getElementById('similar'),
+                ident:document.getElementById('ident') };
+  tabBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      tabBtns.forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      for(var k in modes){ modes[k].classList.add('hide'); }
+      modes[b.dataset.tab].classList.remove('hide');
+      // redraw the newly shown canvas so it sizes correctly
+      if(b.dataset.tab==='ratios') drawMode1();
+      if(b.dataset.tab==='similar') drawMode2();
+      if(b.dataset.tab==='ident') updateIdent();
+    });
+  });
+
+  /* ================= MODE 1 ================= */
+  var cv1 = document.getElementById('cv1'), ctx1 = cv1.getContext('2d');
+  var thRange = document.getElementById('thRange'), thOut = document.getElementById('thOut');
+  var ratioCards = document.getElementById('ratioCards');
+  var theta1 = 30; // degrees
+
+  function fitCanvas(cv){
+    var w = cv.parentElement.clientWidth - 2; // border
+    if(w < 300) w = 300;
+    var h = Math.max(300, Math.min(400, Math.round(w*0.62)));
+    var dpr = window.devicePixelRatio || 1;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+    var c = cv.getContext('2d');
+    c.setTransform(dpr,0,0,dpr,0,0);
+    return {w:w,h:h};
+  }
+
+  // geometry for mode 1: right angle at B; theta at A.
+  // A bottom-left, B bottom-right (right angle), C top-right.
+  function geom1(w,h){
+    var padL=54, padR=40, padT=30, padB=54;
+    var A = {x:padL, y:h-padB};
+    var maxW = w-padL-padR, maxH = h-padT-padB;
+    var t = theta1*DEG;
+    // choose adjacent length so triangle fits both bounds
+    var adj = maxW, opp = adj*Math.tan(t);
+    if(opp>maxH){ opp=maxH; adj=opp/Math.tan(t); }
+    var B = {x:A.x+adj, y:A.y};
+    var C = {x:B.x, y:B.y-opp};
+    var hyp = Math.hypot(adj,opp);
+    return {A:A,B:B,C:C,adj:adj,opp:opp,hyp:hyp};
+  }
+
+  function drawMode1(){
+    var d = fitCanvas(cv1); var w=d.w,h=d.h;
+    var c = ctx1;
+    c.clearRect(0,0,w,h);
+    var g = geom1(w,h);
+    // sides
+    c.lineWidth=4; c.lineCap='round';
+    // adjacent (A-B) orange
+    c.strokeStyle='#ffb454'; c.beginPath(); c.moveTo(g.A.x,g.A.y); c.lineTo(g.B.x,g.B.y); c.stroke();
+    // opposite (B-C) teal
+    c.strokeStyle='#57d1c2'; c.beginPath(); c.moveTo(g.B.x,g.B.y); c.lineTo(g.C.x,g.C.y); c.stroke();
+    // hypotenuse (A-C) blue
+    c.strokeStyle='#8ea2ff'; c.beginPath(); c.moveTo(g.A.x,g.A.y); c.lineTo(g.C.x,g.C.y); c.stroke();
+    // right-angle marker at B
+    c.strokeStyle='#98a3bc'; c.lineWidth=2;
+    var s=14;
+    c.strokeRect(g.B.x-s, g.B.y-s, s, s);
+    // angle arc at A
+    var t=theta1*DEG;
+    c.strokeStyle='#e9edf7'; c.lineWidth=2;
+    c.beginPath(); c.arc(g.A.x,g.A.y,30,-t,0); c.stroke();
+    // theta label
+    c.fillStyle='#e9edf7'; c.font='600 15px system-ui,sans-serif';
+    c.fillText('θ', g.A.x+36, g.A.y-10);
+    // side labels
+    c.font='600 13px system-ui,sans-serif';
+    c.fillStyle='#ffb454'; c.fillText('adjacent', (g.A.x+g.B.x)/2-26, g.A.y+22);
+    c.fillStyle='#57d1c2'; c.fillText('opposite', g.B.x+8, (g.B.y+g.C.y)/2);
+    c.fillStyle='#8ea2ff';
+    c.save(); c.translate((g.A.x+g.C.x)/2,(g.A.y+g.C.y)/2);
+    c.rotate(Math.atan2(g.C.y-g.A.y,g.C.x-g.A.x));
+    c.fillText('hypotenuse',-34,-8); c.restore();
+    // vertices
+    c.fillStyle='#98a3bc'; c.font='600 13px system-ui,sans-serif';
+    c.fillText('A',g.A.x-16,g.A.y+6); c.fillText('B',g.B.x+8,g.B.y+16); c.fillText('C',g.C.x+8,g.C.y-4);
+    // draggable handle on hypotenuse endpoint C
+    dragC = {x:g.C.x, y:g.C.y};
+    c.beginPath(); c.arc(g.C.x,g.C.y,10,0,7); c.fillStyle='#57d1c2'; c.fill();
+    c.lineWidth=3; c.strokeStyle='#0f131c'; c.stroke();
+    updateRatioCards();
+  }
+
+  function updateRatioCards(){
+    var t = theta1*DEG;
+    var s=Math.sin(t), co=Math.cos(t), ta=Math.tan(t);
+    var rows=[
+      ['sin θ','opp / hyp',s,true],
+      ['cos θ','adj / hyp',co,true],
+      ['tan θ','opp / adj',ta,true],
+      ['cosec θ','hyp / opp',1/s,false],
+      ['sec θ','hyp / adj',1/co,false],
+      ['cot θ','adj / opp',1/ta,false]
+    ];
+    ratioCards.innerHTML = rows.map(function(r){
+      return '<div class="card'+(r[3]?' accent':'')+'"><div class="name">'+r[0]+
+        ' <small>= '+r[1]+'</small></div><div class="val">'+f(r[2])+'</div></div>';
+    }).join('');
+  }
+
+  thRange.addEventListener('input',function(){
+    theta1 = +thRange.value; thOut.textContent = theta1+'°'; drawMode1();
+  });
+
+  // dragging: move point C -> changes theta based on adj/opp
+  var dragC=null, dragging1=false;
+  function ptFromEvent(cv,e){
+    var r=cv.getBoundingClientRect();
+    var cx = (e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    var cy = (e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    return {x:cx,y:cy};
+  }
+  function startDrag1(e){
+    if(!dragC) return;
+    var p=ptFromEvent(cv1,e);
+    if(Math.hypot(p.x-dragC.x,p.y-dragC.y)<28){ dragging1=true; e.preventDefault(); }
+  }
+  function moveDrag1(e){
+    if(!dragging1) return;
+    e.preventDefault();
+    var d = {w:cv1.clientWidth,h:cv1.clientHeight};
+    var g = geom1(d.w,d.h);
+    var p = ptFromEvent(cv1,e);
+    // opposite is vertical distance from B upward; adjacent fixed by A..B x
+    var opp = Math.max(6, g.A.y - p.y);
+    var adj = g.B.x - g.A.x;
+    var ang = Math.atan2(opp,adj)/DEG;
+    ang = Math.max(5,Math.min(85,ang));
+    theta1 = Math.round(ang);
+    thRange.value = theta1; thOut.textContent = theta1+'°';
+    drawMode1();
+  }
+  function endDrag1(){ dragging1=false; }
+  cv1.addEventListener('mousedown',startDrag1);
+  window.addEventListener('mousemove',moveDrag1);
+  window.addEventListener('mouseup',endDrag1);
+  cv1.addEventListener('touchstart',startDrag1,{passive:false});
+  cv1.addEventListener('touchmove',moveDrag1,{passive:false});
+  cv1.addEventListener('touchend',endDrag1);
+
+  /* ================= MODE 2 ================= */
+  var cv2=document.getElementById('cv2'), thRange2=document.getElementById('thRange2'),
+      thOut2=document.getElementById('thOut2'), simCards=document.getElementById('simCards');
+  var theta2=35;
+
+  function drawMode2(){
+    var d=fitCanvas(cv2); var w=d.w,h=d.h; var c=cv2.getContext('2d');
+    c.clearRect(0,0,w,h);
+    var t=theta2*DEG;
+    var baseY=h-46, ax=44;
+    // small triangle
+    function tri(adj,label,col){
+      var opp=adj*Math.tan(t);
+      var A={x:ax,y:baseY}, B={x:ax+adj,y:baseY}, C={x:ax+adj,y:baseY-opp};
+      c.lineWidth=3; c.lineCap='round';
+      c.strokeStyle='#ffb454'; c.beginPath();c.moveTo(A.x,A.y);c.lineTo(B.x,B.y);c.stroke();
+      c.strokeStyle='#57d1c2'; c.beginPath();c.moveTo(B.x,B.y);c.lineTo(C.x,C.y);c.stroke();
+      c.strokeStyle='#8ea2ff'; c.beginPath();c.moveTo(A.x,A.y);c.lineTo(C.x,C.y);c.stroke();
+      c.strokeStyle='#98a3bc'; c.lineWidth=2; c.strokeRect(B.x-10,B.y-10,10,10);
+      c.strokeStyle='#e9edf7'; c.beginPath();c.arc(A.x,A.y,22,-t,0);c.stroke();
+      c.fillStyle='#e9edf7'; c.font='600 13px system-ui'; c.fillText('θ',A.x+26,A.y-8);
+      c.fillStyle=col; c.font='600 12px system-ui'; c.fillText(label,A.x,baseY+22);
+      return {opp:opp,adj:adj,hyp:Math.hypot(adj,opp)};
+    }
+    var half=(w-70)/2;
+    var g1=tri(Math.min(half*0.62,150),'Triangle 1 (small)','#98a3bc');
+    ax = 44 + half + 26;
+    var g2=tri(Math.min(half*0.95,240),'Triangle 2 (large)','#98a3bc');
+    // cards comparing
+    var t2=theta2*DEG;
+    function card(n,v1,v2){
+      var eq = Math.abs(v1-v2)<1e-9;
+      return '<div class="card accent"><div class="name">'+n+'</div><div class="val">'+f(v1)+
+        ' <small>vs '+f(v2)+(eq?' ✓':'')+'</small></div></div>';
+    }
+    simCards.innerHTML =
+      card('sin θ', g1.opp/g1.hyp, g2.opp/g2.hyp)+
+      card('cos θ', g1.adj/g1.hyp, g2.adj/g2.hyp)+
+      card('tan θ', g1.opp/g1.adj, g2.opp/g2.adj)+
+      '<div class="card"><div class="name">Triangle 1 sides</div><div class="val" style="font-size:.92rem">'+
+        f(g1.adj,0)+', '+f(g1.opp,0)+', '+f(g1.hyp,0)+'</div></div>'+
+      '<div class="card"><div class="name">Triangle 2 sides</div><div class="val" style="font-size:.92rem">'+
+        f(g2.adj,0)+', '+f(g2.opp,0)+', '+f(g2.hyp,0)+'</div></div>'+
+      '<div class="card"><div class="name">Same angle θ</div><div class="val">'+theta2+'°</div></div>';
+  }
+  thRange2.addEventListener('input',function(){
+    theta2=+thRange2.value; thOut2.textContent=theta2+'°'; drawMode2();
+  });
+
+  /* ================= MODE 3 ================= */
+  var thRange3=document.getElementById('thRange3'), thOut3=document.getElementById('thOut3'),
+      idRows=document.getElementById('idRows');
+  var theta3=40;
+  function updateIdent(){
+    var t=theta3*DEG, s=Math.sin(t), co=Math.cos(t), ta=Math.tan(t), cot=1/ta;
+    var rows=[
+      ['sin²θ + cos²θ', s*s+co*co, 1],
+      ['1 + tan²θ', 1+ta*ta, 1/(co*co)],      // = sec²θ
+      ['1 + cot²θ', 1+cot*cot, 1/(s*s)],       // = cosec²θ
+      ['tan θ', ta, s/co],                     // = sinθ/cosθ
+      ['cot θ', cot, co/s]                      // = cosθ/sinθ
+    ];
+    var names=['= 1','= sec²θ','= cosec²θ','= sinθ / cosθ','= cosθ / sinθ'];
+    idRows.innerHTML = rows.map(function(r,i){
+      var ok = Math.abs(r[1]-r[2])<1e-9;
+      return '<div class="idrow"><div class="lhs"><b>'+r[0]+'</b> '+names[i]+'</div>'+
+        '<div class="rhs">'+f(r[1])+' = <b>'+f(r[2])+'</b> '+
+        '<span class="badge">'+(ok?'holds':'…')+'</span></div></div>';
+    }).join('');
+  }
+  thRange3.addEventListener('input',function(){
+    theta3=+thRange3.value; thOut3.textContent=theta3+'°'; updateIdent();
+  });
+
+  /* ================= QUIZ ================= */
+  var quiz=[
+    {q:'In a right triangle, which ratio equals opposite ÷ hypotenuse?',
+     opts:['cos θ','tan θ','sin θ','cot θ'], a:2,
+     e:'SOH: sin θ = Opposite / Hypotenuse.'},
+    {q:'If sin θ = 3/5 for an acute angle θ, what is cos θ?',
+     opts:['5/3','4/5','3/4','5/4'], a:1,
+     e:'sin²θ+cos²θ=1 ⇒ cos²θ=1−9/25=16/25 ⇒ cos θ = 4/5.'},
+    {q:'Which expression always equals sec²θ?',
+     opts:['1 − tan²θ','1 + tan²θ','tan²θ − 1','1 + cot²θ'], a:1,
+     e:'The Pythagorean identity: 1 + tan²θ = sec²θ.'}
+  ];
+  var quizBox=document.getElementById('quizBox');
+  quizBox.innerHTML = quiz.map(function(q,qi){
+    return '<div class="q" data-q="'+qi+'"><p>'+(qi+1)+'. '+q.q+'</p><div class="opts">'+
+      q.opts.map(function(o,oi){return '<button data-o="'+oi+'">'+o+'</button>';}).join('')+
+      '</div><div class="exp"></div></div>';
+  }).join('');
+  quizBox.querySelectorAll('.q').forEach(function(qEl){
+    var qi=+qEl.dataset.q, ans=quiz[qi].a, done=false;
+    var exp=qEl.querySelector('.exp');
+    qEl.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        if(done) return; done=true;
+        var oi=+btn.dataset.o;
+        qEl.querySelectorAll('button').forEach(function(b){
+          if(+b.dataset.o===ans) b.classList.add('right');
+        });
+        if(oi!==ans) btn.classList.add('wrong');
+        exp.textContent=(oi===ans?'Correct! ':'Not quite. ')+quiz[qi].e;
+      });
+    });
+  });
+
+  /* ---------- init ---------- */
+  drawMode1(); drawMode2(); updateIdent();
+  window.addEventListener('resize',function(){
+    drawMode1();
+    if(!modes.similar.classList.contains('hide')) drawMode2();
+  });
+})();
+</script>
+</body>
+</html>

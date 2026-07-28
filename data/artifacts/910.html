@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heights &amp; Distances Lab — Applications of Trigonometry (NIOS Class 10, Ch 23)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212a3f;
+    --ink:#e9edf7;
+    --muted:#98a2ba;
+    --accent:#57c9c0;
+    --accent-soft:rgba(87,201,192,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3550;
+    --sky:#243049;
+    --ground:#2b3a2f;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 30%;min-height:50px;min-width:100px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hidden{display:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:6px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--accent);font-weight:700}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .canvas-box{background:var(--sky);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--ink);margin-top:2px}
+  .stat .v small{font-size:.8rem;color:var(--muted);font-weight:600}
+
+  .formula{background:var(--panel2);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;
+    margin-top:12px;font-size:.95rem;color:var(--ink);line-height:1.7}
+  .formula b{color:var(--accent)}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 80px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .facts li{margin:6px 0 6px 18px;font-size:.92rem;color:var(--ink)}
+  .facts b{color:var(--accent)}
+  .note{color:var(--muted);font-size:.86rem;margin-top:6px}
+
+  .step{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px;font-size:.92rem}
+  .step .lbl{color:var(--accent);font-weight:700;font-size:.82rem}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin:6px 0;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:#c8f4d7}
+  .quiz .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:#ffd2d2}
+  .quiz .exp{font-size:.86rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Heights &amp; Distances <span>Lab</span></h1>
+    <p>NIOS Class 10 Mathematics · Chapter 23 — Some Applications of Trigonometry</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="elev">Angle of Elevation</button>
+    <button class="tab-btn" data-mode="depr">Angle of Depression</button>
+    <button class="tab-btn" data-mode="two">Two-Triangle Problem</button>
+  </div>
+
+  <!-- ELEVATION -->
+  <section class="panel mode" id="mode-elev">
+    <h2>Angle of Elevation</h2>
+    <p class="note">An observer on the ground looks UP at the top of a tower. The <b>line of sight</b> makes the angle of elevation θ with the horizontal. Height = distance × tan θ.</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Angle of elevation θ = <span class="val" id="e_ang_v">30°</span></label>
+        <input type="range" id="e_ang" min="5" max="80" step="1" value="30">
+      </div>
+      <div class="ctrl">
+        <label>Horizontal distance d = <span class="val" id="e_dist_v">30 m</span></label>
+        <input type="range" id="e_dist" min="5" max="60" step="1" value="30">
+      </div>
+    </div>
+    <div class="canvas-box"><canvas id="cvE" width="720" height="380"></canvas></div>
+    <div class="readout">
+      <div class="stat"><div class="k">tan θ</div><div class="v" id="e_tan">0.577</div></div>
+      <div class="stat"><div class="k">Height of tower</div><div class="v" id="e_h">17.32 <small>m</small></div></div>
+      <div class="stat"><div class="k">Line of sight</div><div class="v" id="e_los">34.64 <small>m</small></div></div>
+    </div>
+    <div class="formula">
+      In right triangle: <b>tan θ = opposite / adjacent = height / distance</b><br>
+      height = d · tan θ = <span id="e_calc">30 · tan 30° = 17.32 m</span>
+    </div>
+  </section>
+
+  <!-- DEPRESSION -->
+  <section class="panel mode hidden" id="mode-depr">
+    <h2>Angle of Depression</h2>
+    <p class="note">An observer at the top of a cliff of height h looks DOWN at a boat. The <b>angle of depression</b> α (below the horizontal) equals the angle of elevation from the boat — they are <b>alternate angles</b> across the horizontal parallels.</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Angle of depression α = <span class="val" id="d_ang_v">45°</span></label>
+        <input type="range" id="d_ang" min="10" max="80" step="1" value="45">
+      </div>
+      <div class="ctrl">
+        <label>Height of cliff h = <span class="val" id="d_h_v">40 m</span></label>
+        <input type="range" id="d_h" min="10" max="70" step="1" value="40">
+      </div>
+    </div>
+    <div class="canvas-box"><canvas id="cvD" width="720" height="380"></canvas></div>
+    <div class="readout">
+      <div class="stat"><div class="k">tan α</div><div class="v" id="d_tan">1.000</div></div>
+      <div class="stat"><div class="k">Horizontal distance</div><div class="v" id="d_dist">40.00 <small>m</small></div></div>
+      <div class="stat"><div class="k">Line of sight</div><div class="v" id="d_los">56.57 <small>m</small></div></div>
+    </div>
+    <div class="formula">
+      Angle of depression = angle of elevation from the boat (alternate angles).<br>
+      <b>tan α = h / distance</b>  ⟹  distance = h / tan α = <span id="d_calc">40 / tan 45° = 40.00 m</span>
+    </div>
+  </section>
+
+  <!-- TWO TRIANGLE -->
+  <section class="panel mode hidden" id="mode-two">
+    <h2>Two-Triangle Problem</h2>
+    <p class="note">Walking toward a tower, the angle of elevation of its top increases. Pick the two angles and the distance walked — the height and the near distance are found using tan at both points.</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Far angle θ₁ (point A)</label>
+        <div class="seg" id="t_a1">
+          <button data-v="30" class="on">30°</button>
+          <button data-v="45">45°</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <label>Near angle θ₂ (point B)</label>
+        <div class="seg" id="t_a2">
+          <button data-v="45">45°</button>
+          <button data-v="60" class="on">60°</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <label>Distance walked A→B = <span class="val" id="t_ab_v">40 m</span></label>
+        <input type="range" id="t_ab" min="10" max="80" step="1" value="40">
+      </div>
+    </div>
+    <div class="canvas-box"><canvas id="cvT" width="720" height="380"></canvas></div>
+    <div class="readout">
+      <div class="stat"><div class="k">Height of tower</div><div class="v" id="t_h">54.64 <small>m</small></div></div>
+      <div class="stat"><div class="k">Near distance BC</div><div class="v" id="t_bc">31.55 <small>m</small></div></div>
+      <div class="stat"><div class="k">Far distance AC</div><div class="v" id="t_ac">71.55 <small>m</small></div></div>
+    </div>
+    <div id="t_steps"></div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="panel">
+    <h2>Key Facts</h2>
+    <ul class="facts">
+      <li><b>Line of sight:</b> the straight line from the observer's eye to the object being viewed.</li>
+      <li><b>Angle of elevation:</b> the angle the line of sight makes with the horizontal when the object is <b>above</b> the observer (looking up).</li>
+      <li><b>Angle of depression:</b> the angle below the horizontal when the object is <b>below</b> the observer (looking down). It equals the angle of elevation from the object (alternate angles).</li>
+      <li><b>Choosing the ratio:</b> use <b>tan</b> when height &amp; horizontal distance are involved; <b>sin</b> with the line of sight (hypotenuse) &amp; opposite side; <b>cos</b> with hypotenuse &amp; adjacent side.</li>
+      <li><b>Special angles:</b> tan 30° = 1/√3 ≈ 0.577, tan 45° = 1, tan 60° = √3 ≈ 1.732.</li>
+    </ul>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel quiz" id="quiz">
+    <h2>Quick Quiz</h2>
+    <p class="note">Tap an option to check your answer.</p>
+    <div id="quizHost"></div>
+  </section>
+
+  <footer>Heights &amp; Distances Lab · self-contained interactive · NIOS Class 10 Maths Ch 23</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var DEG = Math.PI/180;
+  function tan(d){ return Math.tan(d*DEG); }
+  function fmt(x, n){ n = (n===undefined)?2:n; return (Math.round(x*Math.pow(10,n))/Math.pow(10,n)).toFixed(n); }
+
+  // ---------- tab switching ----------
+  var tabs = document.querySelectorAll('.tab-btn');
+  var modes = { elev:document.getElementById('mode-elev'),
+                depr:document.getElementById('mode-depr'),
+                two:document.getElementById('mode-two') };
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var m = t.getAttribute('data-mode');
+      for(var k in modes){ modes[k].classList.toggle('hidden', k!==m); }
+      if(m==='elev') drawElev();
+      else if(m==='depr') drawDepr();
+      else drawTwo();
+    });
+  });
+
+  // helper draw utilities
+  function line(ctx,x1,y1,x2,y2,col,w,dash){
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=w||2;
+    if(dash) ctx.setLineDash(dash); ctx.beginPath();
+    ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.restore();
+  }
+  function label(ctx,txt,x,y,col,size,align){
+    ctx.save(); ctx.fillStyle=col||'#e9edf7'; ctx.font='600 '+(size||14)+'px system-ui,sans-serif';
+    ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(txt,x,y); ctx.restore();
+  }
+  // draw an angle arc between two rays from vertex (v) toward points p and q
+  function angleArc(ctx,vx,vy,a0,a1,r,col){
+    ctx.save(); ctx.strokeStyle=col; ctx.lineWidth=2; ctx.beginPath();
+    ctx.arc(vx,vy,r,a0,a1,false); ctx.stroke(); ctx.restore();
+  }
+  function groundFill(ctx,W,H,gy){
+    ctx.fillStyle='#2b3a2f'; ctx.fillRect(0,gy,W,H-gy);
+    ctx.fillStyle='rgba(255,255,255,.05)';
+    for(var x=0;x<W;x+=26){ ctx.fillRect(x,gy,2,6); }
+  }
+
+  var ACC='#57c9c0', GOLD='#ffce6b', WHITE='#e9edf7', MUT='#98a2ba', RED='#ff9a9a';
+
+  // ================= ELEVATION =================
+  var eAng=document.getElementById('e_ang'), eDist=document.getElementById('e_dist');
+  var cvE=document.getElementById('cvE'), ctxE=cvE.getContext('2d');
+  function drawElev(){
+    var ang=+eAng.value, d=+eDist.value;
+    var t=tan(ang), h=d*t, los=d/Math.cos(ang*DEG);
+    document.getElementById('e_ang_v').textContent=ang+'°';
+    document.getElementById('e_dist_v').textContent=d+' m';
+    document.getElementById('e_tan').textContent=fmt(t,3);
+    document.getElementById('e_h').innerHTML=fmt(h,2)+' <small>m</small>';
+    document.getElementById('e_los').innerHTML=fmt(los,2)+' <small>m</small>';
+    document.getElementById('e_calc').textContent=d+' · tan '+ang+'° = '+fmt(h,2)+' m';
+
+    var W=cvE.width,H=cvE.height,gy=H-46;
+    ctxE.clearRect(0,0,W,H); groundFill(ctxE,W,H,gy);
+    // layout: observer at left, tower at right
+    var ox=90, tx=W-120;
+    var run=tx-ox;
+    // scale height so tower fits
+    var pxPerM_x=run/d;
+    var hpx=Math.min(h*pxPerM_x, gy-40);
+    // observer
+    ctxE.fillStyle=GOLD; ctxE.beginPath(); ctxE.arc(ox,gy-26,8,0,7); ctxE.fill();
+    line(ctxE,ox,gy-18,ox,gy,GOLD,4); label(ctxE,'observer',ox,gy+22,MUT,12);
+    // tower
+    line(ctxE,tx,gy,tx,gy-hpx,'#7c8bb0',10);
+    ctxE.fillStyle='#9fb0d6'; ctxE.fillRect(tx-8,gy-hpx-8,16,10);
+    // right triangle: horizontal base, vertical tower, line of sight
+    line(ctxE,ox,gy,tx,gy,WHITE,2,[6,5]);           // adjacent (distance)
+    line(ctxE,tx,gy,tx,gy-hpx,ACC,2);               // opposite (height)
+    line(ctxE,ox,gy-26,tx,gy-hpx,GOLD,2.5);         // line of sight from eye
+    line(ctxE,ox,gy,tx,gy-hpx,ACC,1.5,[3,4]);       // hypotenuse (base level)
+    // right-angle mark at tower base
+    ctxE.strokeStyle=WHITE; ctxE.lineWidth=1.5; ctxE.strokeRect(tx-14,gy-14,14,14);
+    // angle arc at observer
+    var a0=Math.atan2(0,1); var a1=Math.atan2(-(hpx),run);
+    angleArc(ctxE,ox,gy,a0,a1,42,GOLD);
+    label(ctxE,'θ='+ang+'°',ox+62,gy-16,GOLD,14,'left');
+    // labels
+    label(ctxE,'d = '+d+' m',(ox+tx)/2,gy+22,WHITE,13);
+    label(ctxE,'h = '+fmt(h,1)+' m',tx+14,gy-hpx/2,ACC,13,'left');
+  }
+  eAng.addEventListener('input',drawElev);
+  eDist.addEventListener('input',drawElev);
+
+  // ================= DEPRESSION =================
+  var dAng=document.getElementById('d_ang'), dH=document.getElementById('d_h');
+  var cvD=document.getElementById('cvD'), ctxD=cvD.getContext('2d');
+  function drawDepr(){
+    var ang=+dAng.value, h=+dH.value;
+    var t=tan(ang), dist=h/t, los=h/Math.sin(ang*DEG);
+    document.getElementById('d_ang_v').textContent=ang+'°';
+    document.getElementById('d_h_v').textContent=h+' m';
+    document.getElementById('d_tan').textContent=fmt(t,3);
+    document.getElementById('d_dist').innerHTML=fmt(dist,2)+' <small>m</small>';
+    document.getElementById('d_los').innerHTML=fmt(los,2)+' <small>m</small>';
+    document.getElementById('d_calc').textContent=h+' / tan '+ang+'° = '+fmt(dist,2)+' m';
+
+    var W=cvD.width,H=cvD.height;
+    var seaY=H-60;                 // water level
+    ctxD.clearRect(0,0,W,H);
+    // sea
+    ctxD.fillStyle='#1c3350'; ctxD.fillRect(0,seaY,W,H-seaY);
+    // cliff on the left
+    var cliffX=110;
+    var topY=60;                   // observer eye height (top of cliff)
+    var hpx=seaY-topY;             // cliff height in px = h metres
+    var pxPerM=hpx/h;
+    // cliff body
+    ctxD.fillStyle='#3a4a38'; ctxD.fillRect(0,topY,cliffX,seaY-topY);
+    ctxD.fillStyle='#4a5c46'; ctxD.fillRect(0,topY,cliffX,10);
+    // observer at cliff top
+    ctxD.fillStyle=GOLD; ctxD.beginPath(); ctxD.arc(cliffX-14,topY-8,7,0,7); ctxD.fill();
+    label(ctxD,'observer',cliffX-14,topY-24,MUT,12);
+    // boat position
+    var distPx=dist*pxPerM;
+    var boatX=Math.min(cliffX-14+distPx, W-40);
+    // horizontal reference at eye level
+    line(ctxD,cliffX-14,topY-8,W-20,topY-8,MUT,1.5,[6,5]);
+    label(ctxD,'horizontal',W-24,topY-20,MUT,11,'right');
+    // line of sight down to boat
+    line(ctxD,cliffX-14,topY-8,boatX,seaY,GOLD,2.5);
+    // vertical (cliff height) and base (horizontal distance) triangle
+    line(ctxD,cliffX-14,topY-8,cliffX-14,seaY,ACC,2);      // height
+    line(ctxD,cliffX-14,seaY,boatX,seaY,WHITE,2,[6,5]);     // distance along water
+    // right angle at foot of cliff
+    ctxD.strokeStyle=WHITE; ctxD.lineWidth=1.5; ctxD.strokeRect(cliffX-14,seaY-14,14,14);
+    // angle of depression arc at observer (between horizontal and line of sight)
+    var a0=Math.atan2(0,1);
+    var a1=Math.atan2(seaY-(topY-8), boatX-(cliffX-14));
+    angleArc(ctxD,cliffX-14,topY-8,a0,a1,46,GOLD);
+    label(ctxD,'α='+ang+'°',cliffX+40,topY+6,GOLD,14,'left');
+    // alternate angle at boat
+    var b0=Math.atan2(-(seaY-(topY-8)), -(boatX-(cliffX-14)));
+    var b1=Math.PI;
+    angleArc(ctxD,boatX,seaY,b1,b0,34,ACC);
+    label(ctxD,'α',boatX-38,seaY-16,ACC,13,'right');
+    // boat
+    ctxD.fillStyle='#e6a45c';
+    ctxD.beginPath(); ctxD.moveTo(boatX-16,seaY); ctxD.lineTo(boatX+16,seaY);
+    ctxD.lineTo(boatX+10,seaY+12); ctxD.lineTo(boatX-10,seaY+12); ctxD.closePath(); ctxD.fill();
+    line(ctxD,boatX,seaY,boatX,seaY-16,'#e6a45c',2);
+    // labels
+    label(ctxD,'h = '+h+' m',cliffX-24,(topY+seaY)/2,ACC,13,'right');
+    label(ctxD,'distance = '+fmt(dist,1)+' m',(cliffX-14+boatX)/2,seaY+22,WHITE,12);
+  }
+  dAng.addEventListener('input',drawDepr);
+  dH.addEventListener('input',drawDepr);
+
+  // ================= TWO-TRIANGLE =================
+  var tA1=1, tA2=1; // will store degrees
+  var t_a1=document.getElementById('t_a1'), t_a2=document.getElementById('t_a2');
+  var t_ab=document.getElementById('t_ab');
+  var cvT=document.getElementById('cvT'), ctxT=cvT.getContext('2d');
+  function segSetup(host, cb){
+    host.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        host.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on'); cb(+b.getAttribute('data-v'));
+      });
+    });
+  }
+  var A1=30, A2=60;
+  segSetup(t_a1,function(v){ A1=v; drawTwo(); });
+  segSetup(t_a2,function(v){ A2=v; drawTwo(); });
+  t_ab.addEventListener('input',drawTwo);
+
+  function drawTwo(){
+    // ensure near angle > far angle for a sensible scene
+    if(A2<=A1){ A2 = (A1===30)?45:60; // nudge
+      // reflect in the segmented control
+      t_a2.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', +x.getAttribute('data-v')===A2); });
+    }
+    var ab=+t_ab.value;
+    document.getElementById('t_ab_v').textContent=ab+' m';
+    // Geometry: observer walks from A to B toward tower base C. Height H.
+    // tan θ1 = H/AC ,  tan θ2 = H/BC ,  AC = BC + ab
+    // H/tanθ1 = H/tanθ2 + ab  => H(1/tanθ1 - 1/tanθ2)=ab
+    var t1=tan(A1), t2=tan(A2);
+    var H = ab / (1/t1 - 1/t2);
+    var BC = H/t2, AC = H/t1;
+    document.getElementById('t_h').innerHTML=fmt(H,2)+' <small>m</small>';
+    document.getElementById('t_bc').innerHTML=fmt(BC,2)+' <small>m</small>';
+    document.getElementById('t_ac').innerHTML=fmt(AC,2)+' <small>m</small>';
+
+    // steps
+    var steps=''+
+      '<div class="step"><span class="lbl">STEP 1 · set up</span><br>Let tower height = H, near foot distance BC = x. Then AC = x + '+ab+'.<br>'+
+      'tan '+A2+'° = H / x  and  tan '+A1+'° = H / (x + '+ab+').</div>'+
+      '<div class="step"><span class="lbl">STEP 2 · express H</span><br>'+
+      'H = x · tan '+A2+'° = x · '+fmt(t2,3)+' &nbsp;and&nbsp; H = (x + '+ab+') · tan '+A1+'° = (x + '+ab+') · '+fmt(t1,3)+'.</div>'+
+      '<div class="step"><span class="lbl">STEP 3 · solve for x (BC)</span><br>'+
+      'x · '+fmt(t2,3)+' = (x + '+ab+') · '+fmt(t1,3)+' &rArr; x = '+fmt(BC,2)+' m.</div>'+
+      '<div class="step"><span class="lbl">STEP 4 · height</span><br>'+
+      'H = BC · tan '+A2+'° = '+fmt(BC,2)+' · '+fmt(t2,3)+' = <b>'+fmt(H,2)+' m</b>.  Also AC = '+fmt(AC,2)+' m.</div>';
+    document.getElementById('t_steps').innerHTML=steps;
+
+    // draw
+    var W=cvT.width,Hc=cvT.height,gy=Hc-46;
+    ctxT.clearRect(0,0,W,Hc); groundFill(ctxT,W,Hc,gy);
+    var cx=W-90;            // tower base C at right
+    var leftPad=70;
+    var pxPerM=(cx-leftPad)/AC;
+    var hpx=Math.min(H*pxPerM, gy-40);
+    // if height scaling clipped, rescale everything by height limit
+    var scale=pxPerM;
+    if(H*pxPerM>gy-40){ scale=(gy-40)/H; }
+    var acPx=AC*scale, bcPx=BC*scale, hpx2=H*scale;
+    var Ax=cx-acPx, Bx=cx-bcPx;
+    // tower
+    line(ctxT,cx,gy,cx,gy-hpx2,'#7c8bb0',10);
+    ctxT.fillStyle='#9fb0d6'; ctxT.fillRect(cx-8,gy-hpx2-8,16,10);
+    // ground base line
+    line(ctxT,Ax,gy,cx,gy,WHITE,1.5,[6,5]);
+    // lines of sight
+    line(ctxT,Ax,gy,cx,gy-hpx2,GOLD,2);      // from A
+    line(ctxT,Bx,gy,cx,gy-hpx2,ACC,2);       // from B
+    // height
+    line(ctxT,cx,gy,cx,gy-hpx2,'#cfd8ec',1.5);
+    ctxT.strokeStyle=WHITE; ctxT.lineWidth=1.5; ctxT.strokeRect(cx-14,gy-14,14,14);
+    // observers
+    ctxT.fillStyle=GOLD; ctxT.beginPath(); ctxT.arc(Ax,gy-8,6,0,7); ctxT.fill();
+    ctxT.fillStyle=ACC; ctxT.beginPath(); ctxT.arc(Bx,gy-8,6,0,7); ctxT.fill();
+    label(ctxT,'A',Ax,gy+20,GOLD,13); label(ctxT,'B',Bx,gy+20,ACC,13); label(ctxT,'C',cx,gy+20,WHITE,13);
+    // angle arcs
+    angleArc(ctxT,Ax,gy,Math.atan2(0,1),Math.atan2(-hpx2,acPx),34,GOLD);
+    label(ctxT,A1+'°',Ax+40,gy-12,GOLD,13,'left');
+    angleArc(ctxT,Bx,gy,Math.atan2(0,1),Math.atan2(-hpx2,bcPx),26,ACC);
+    label(ctxT,A2+'°',Bx+30,gy-10,ACC,13,'left');
+    // measure labels
+    label(ctxT,'AB = '+ab+' m',(Ax+Bx)/2,gy+34,MUT,12);
+    label(ctxT,'H = '+fmt(H,1)+' m',cx+12,gy-hpx2/2,'#cfd8ec',12,'left');
+  }
+
+  // ================= QUIZ =================
+  var QUIZ=[
+    { q:'The angle of elevation of the top of a tower from a point 30 m from its base is 45°. The height of the tower is:',
+      opts:['15 m','30 m','30√3 m','60 m'], ans:1,
+      exp:'height = 30 · tan 45° = 30 · 1 = 30 m.' },
+    { q:'From the top of a 50 m cliff the angle of depression of a boat is 30°. How far is the boat from the foot of the cliff?',
+      opts:['50 m','50/√3 m','50√3 m','100 m'], ans:2,
+      exp:'tan 30° = 50 / d ⟹ d = 50 / tan30° = 50 · √3 = 50√3 m ≈ 86.6 m.' },
+    { q:'The angle of depression of an object equals the angle of elevation of the observer from that object because they are:',
+      opts:['vertically opposite angles','alternate angles (parallel horizontals)','complementary angles','right angles'], ans:1,
+      exp:'The two horizontal lines are parallel, so the depression and elevation angles are alternate interior angles — hence equal.' }
+  ];
+  var host=document.getElementById('quizHost');
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement('div'); d.className='q';
+    var p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; d.appendChild(p);
+    var exp=document.createElement('div'); exp.className='exp'; exp.textContent='Why: '+item.exp;
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=o;
+      b.addEventListener('click', function(){
+        if(d.getAttribute('data-done')) return;
+        d.setAttribute('data-done','1');
+        var btns=d.querySelectorAll('.opt');
+        btns[item.ans].classList.add('correct');
+        if(oi!==item.ans) b.classList.add('wrong');
+        exp.classList.add('show');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(exp); host.appendChild(d);
+  });
+
+  // initial render
+  drawElev();
+  drawDepr();
+  drawTwo();
+})();
+</script>
+</body>
+</html>

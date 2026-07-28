@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perimeter &amp; Area Lab — Plane Figures (NIOS Class 10, Ch 19)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#98a3bd;
+    --accent:#57d1c9;
+    --accent-soft:rgba(87,209,201,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:4px}
+  .ctrl .val{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:74px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:0 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .stage{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    display:block;touch-action:none}
+  .layout{display:flex;flex-wrap:wrap;gap:16px}
+  .layout .col{flex:1 1 300px;min-width:260px}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .stat{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--accent);margin-top:2px}
+  .stat .f{font-size:.78rem;color:var(--muted);margin-top:3px;font-family:ui-monospace,Consolas,monospace}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+    font-family:ui-monospace,Consolas,monospace;font-size:.86rem;margin-top:8px;overflow-x:auto}
+
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:6px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th{color:var(--accent);font-weight:600}
+  td.mono{font-family:ui-monospace,Consolas,monospace;color:var(--ink)}
+
+  .quiz-q{margin-bottom:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2)}
+  .quiz-q p.q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;margin:5px 0;padding:9px 12px;border:1px solid var(--line);
+    border-radius:10px;background:var(--panel);color:var(--ink);font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15);color:var(--bad)}
+  .explain{font-size:.84rem;color:var(--muted);margin-top:8px;display:none}
+  .explain.show{display:block}
+
+  .hidden{display:none}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  b.acc{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Perimeter &amp; Area <span>Lab</span></h1>
+    <p>NIOS Class 10 Mathematics — Ch 19: Perimeters and Areas of Plane Figures</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="calc">Shape calculator</button>
+    <button class="tab-btn" data-tab="tri">Triangle methods</button>
+    <button class="tab-btn" data-tab="comp">Sectors &amp; composites</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: SHAPE CALCULATOR ============ -->
+  <section id="calc" class="tabpanel">
+    <div class="panel">
+      <h2>Pick a plane figure</h2>
+      <div class="seg" id="shapeSeg">
+        <button class="on" data-shape="square">Square</button>
+        <button data-shape="rectangle">Rectangle</button>
+        <button data-shape="triangle">Triangle</button>
+        <button data-shape="parallelogram">Parallelogram</button>
+        <button data-shape="rhombus">Rhombus</button>
+        <button data-shape="trapezium">Trapezium</button>
+        <button data-shape="circle">Circle</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="col panel">
+        <h3>Dimensions (units)</h3>
+        <div id="calcControls"></div>
+      </div>
+      <div class="col panel">
+        <h3 id="calcTitle">Square</h3>
+        <canvas id="calcCanvas" class="stage" width="360" height="300"></canvas>
+        <div class="readout">
+          <div class="stat">
+            <div class="k">Perimeter / Circumference</div>
+            <div class="v" id="calcPerim">—</div>
+            <div class="f" id="calcPerimF"></div>
+          </div>
+          <div class="stat">
+            <div class="k">Area</div>
+            <div class="v" id="calcArea">—</div>
+            <div class="f" id="calcAreaF"></div>
+          </div>
+        </div>
+        <div class="note">Figure is drawn to scale; π ≈ 3.141592653589793.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: TRIANGLE METHODS ============ -->
+  <section id="tri" class="tabpanel hidden">
+    <div class="panel">
+      <h2>Two ways to find a triangle's area</h2>
+      <p class="note">Drag the three corners of the triangle. Both methods below are computed from the
+      same shape and must always agree.</p>
+    </div>
+    <div class="layout">
+      <div class="col panel">
+        <canvas id="triCanvas" class="stage" width="360" height="320"></canvas>
+        <div class="note">Grid squares = 1 unit. Drag any vertex A, B, C.</div>
+      </div>
+      <div class="col panel">
+        <h3>Side lengths &amp; height</h3>
+        <table>
+          <tr><th>Quantity</th><th>Value</th></tr>
+          <tr><td>a = BC</td><td class="mono" id="triA"></td></tr>
+          <tr><td>b = CA</td><td class="mono" id="triB"></td></tr>
+          <tr><td>c = AB</td><td class="mono" id="triC"></td></tr>
+          <tr><td>base (AB)</td><td class="mono" id="triBase"></td></tr>
+          <tr><td>height to AB</td><td class="mono" id="triH"></td></tr>
+        </table>
+        <div class="readout">
+          <div class="stat">
+            <div class="k">Method 1: ½ · base · height</div>
+            <div class="v" id="triArea1">—</div>
+            <div class="f" id="triArea1F"></div>
+          </div>
+          <div class="stat">
+            <div class="k">Method 2: Heron's formula</div>
+            <div class="v" id="triArea2">—</div>
+            <div class="f" id="triArea2F"></div>
+          </div>
+        </div>
+        <div class="formula" id="triHeron"></div>
+        <div class="note" id="triMatch"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: SECTORS & COMPOSITES ============ -->
+  <section id="comp" class="tabpanel hidden">
+    <div class="layout">
+      <div class="col panel">
+        <h2>Circular sector</h2>
+        <canvas id="secCanvas" class="stage" width="360" height="300"></canvas>
+        <div class="ctrl" style="margin-top:10px">
+          <label>Radius r = <span class="val" id="secRv">6</span> units</label>
+          <input type="range" id="secR" min="2" max="12" step="0.5" value="6">
+        </div>
+        <div class="ctrl">
+          <label>Angle θ = <span class="val" id="secAv">90</span>°</label>
+          <input type="range" id="secA" min="10" max="360" step="5" value="90">
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">Arc length = (θ/360)·2πr</div><div class="v" id="secArc">—</div><div class="f" id="secArcF"></div></div>
+          <div class="stat"><div class="k">Sector area = (θ/360)·πr²</div><div class="v" id="secArea">—</div><div class="f" id="secAreaF"></div></div>
+        </div>
+      </div>
+
+      <div class="col panel">
+        <h2>Composite: rectangle + semicircle</h2>
+        <canvas id="cmpCanvas" class="stage" width="360" height="300"></canvas>
+        <div class="ctrl" style="margin-top:10px">
+          <label>Rectangle length L = <span class="val" id="cmpLv">10</span> units</label>
+          <input type="range" id="cmpL" min="4" max="16" step="0.5" value="10">
+        </div>
+        <div class="ctrl">
+          <label>Rectangle width (= diameter) W = <span class="val" id="cmpWv">6</span> units</label>
+          <input type="range" id="cmpW" min="2" max="12" step="0.5" value="6">
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">Rectangle area = L·W</div><div class="v" id="cmpRA">—</div></div>
+          <div class="stat"><div class="k">Semicircle area = ½πr²</div><div class="v" id="cmpSA">—</div></div>
+          <div class="stat"><div class="k">Total area</div><div class="v" id="cmpTA">—</div></div>
+          <div class="stat"><div class="k">Perimeter (outline)</div><div class="v" id="cmpTP">—</div></div>
+        </div>
+        <div class="formula" id="cmpNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 4: FACTS & QUIZ ============ -->
+  <section id="facts" class="tabpanel hidden">
+    <div class="panel">
+      <h2>Formula reference</h2>
+      <table>
+        <tr><th>Figure</th><th>Perimeter / Circumference</th><th>Area</th></tr>
+        <tr><td>Square (side a)</td><td class="mono">4a</td><td class="mono">a²</td></tr>
+        <tr><td>Rectangle (l, b)</td><td class="mono">2(l + b)</td><td class="mono">l · b</td></tr>
+        <tr><td>Triangle (sides a,b,c)</td><td class="mono">a + b + c</td><td class="mono">½·base·height</td></tr>
+        <tr><td>Parallelogram (b, side s, h)</td><td class="mono">2(b + s)</td><td class="mono">base · height</td></tr>
+        <tr><td>Rhombus (side a, diags d₁,d₂)</td><td class="mono">4a</td><td class="mono">½·d₁·d₂</td></tr>
+        <tr><td>Trapezium (parallel a,b; legs; h)</td><td class="mono">sum of 4 sides</td><td class="mono">½·(a + b)·h</td></tr>
+        <tr><td>Circle (radius r)</td><td class="mono">2πr</td><td class="mono">πr²</td></tr>
+        <tr><td>Sector (radius r, angle θ)</td><td class="mono">arc = (θ/360)·2πr</td><td class="mono">(θ/360)·πr²</td></tr>
+      </table>
+      <div class="formula" style="margin-top:12px">Heron's formula:  s = (a + b + c) / 2 ,  Area = √[ s(s − a)(s − b)(s − c) ]</div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick quiz — tap an option</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+var PI = Math.PI;
+function fmt(x){ // tidy number
+  if(!isFinite(x)) return "—";
+  var r = Math.round(x*1000)/1000;
+  return (Math.abs(r-Math.round(r))<1e-9) ? String(Math.round(r)) : String(r);
+}
+
+/* ---------- Tabs ---------- */
+var tabBtns = document.querySelectorAll('.tab-btn');
+var panels = document.querySelectorAll('.tabpanel');
+tabBtns.forEach(function(b){
+  b.addEventListener('click', function(){
+    tabBtns.forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    var id = b.getAttribute('data-tab');
+    panels.forEach(function(p){ p.classList.toggle('hidden', p.id!==id); });
+    if(id==='tri') drawTri();
+    if(id==='comp'){ drawSec(); drawCmp(); }
+  });
+});
+
+/* =========================================================
+   MODE 1 — SHAPE CALCULATOR
+   ========================================================= */
+var curShape = 'square';
+var shapeDefs = {
+  square:        {title:'Square',        params:[{k:'a',label:'Side a',min:1,max:14,step:0.5,val:8}]},
+  rectangle:     {title:'Rectangle',     params:[{k:'l',label:'Length l',min:1,max:16,step:0.5,val:12},{k:'b',label:'Breadth b',min:1,max:12,step:0.5,val:7}]},
+  triangle:      {title:'Triangle (base & height)', params:[{k:'base',label:'Base',min:2,max:16,step:0.5,val:10},{k:'h',label:'Height',min:1,max:12,step:0.5,val:6},{k:'off',label:'Apex offset',min:-6,max:6,step:0.5,val:2}]},
+  parallelogram: {title:'Parallelogram', params:[{k:'b',label:'Base b',min:2,max:16,step:0.5,val:11},{k:'h',label:'Height h',min:1,max:11,step:0.5,val:6},{k:'s',label:'Slant side',min:1,max:12,step:0.5,val:7}]},
+  rhombus:       {title:'Rhombus',       params:[{k:'d1',label:'Diagonal d₁',min:2,max:14,step:0.5,val:10},{k:'d2',label:'Diagonal d₂',min:2,max:12,step:0.5,val:7}]},
+  trapezium:     {title:'Trapezium',     params:[{k:'a',label:'Parallel side a (top)',min:2,max:14,step:0.5,val:6},{k:'bb',label:'Parallel side b (bottom)',min:2,max:16,step:0.5,val:12},{k:'h',label:'Height h',min:1,max:11,step:0.5,val:6},{k:'off',label:'Top offset',min:-4,max:6,step:0.5,val:2}]},
+  circle:        {title:'Circle',        params:[{k:'r',label:'Radius r',min:1,max:9,step:0.5,val:6}]}
+};
+var calcState = {};
+
+var shapeSeg = document.getElementById('shapeSeg');
+shapeSeg.addEventListener('click', function(e){
+  var btn = e.target.closest('button'); if(!btn) return;
+  curShape = btn.getAttribute('data-shape');
+  Array.prototype.forEach.call(shapeSeg.children, function(x){x.classList.remove('on');});
+  btn.classList.add('on');
+  buildCalcControls();
+});
+
+function buildCalcControls(){
+  var def = shapeDefs[curShape];
+  document.getElementById('calcTitle').textContent = def.title;
+  var host = document.getElementById('calcControls');
+  host.innerHTML='';
+  calcState = {};
+  def.params.forEach(function(p){
+    calcState[p.k] = p.val;
+    var wrap = document.createElement('div'); wrap.className='ctrl';
+    var lab = document.createElement('label');
+    lab.innerHTML = p.label + ' = <span class="val">'+fmt(p.val)+'</span>';
+    var input = document.createElement('input');
+    input.type='range'; input.min=p.min; input.max=p.max; input.step=p.step; input.value=p.val;
+    input.addEventListener('input', function(){
+      calcState[p.k] = parseFloat(input.value);
+      lab.querySelector('.val').textContent = fmt(calcState[p.k]);
+      drawCalc();
+    });
+    wrap.appendChild(lab); wrap.appendChild(input);
+    host.appendChild(wrap);
+  });
+  drawCalc();
+}
+
+function calcCompute(){
+  var s = calcState, P=0, A=0, pf='', af='';
+  if(curShape==='square'){ P=4*s.a; A=s.a*s.a; pf='4·'+fmt(s.a); af=fmt(s.a)+'²'; }
+  else if(curShape==='rectangle'){ P=2*(s.l+s.b); A=s.l*s.b; pf='2·('+fmt(s.l)+'+'+fmt(s.b)+')'; af=fmt(s.l)+'·'+fmt(s.b); }
+  else if(curShape==='triangle'){
+    var base=s.base,h=s.h,off=s.off;
+    var c=Math.hypot(off,h);            // left side (0,0)->(off,h)
+    var b2=Math.hypot(base-off,h);      // right side (base,0)->(off,h)
+    P=base+c+b2; A=0.5*base*h;
+    pf='b + s₁ + s₂'; af='½·'+fmt(base)+'·'+fmt(h);
+  }
+  else if(curShape==='parallelogram'){ P=2*(s.b+s.s); A=s.b*s.h; pf='2·('+fmt(s.b)+'+'+fmt(s.s)+')'; af=fmt(s.b)+'·'+fmt(s.h); }
+  else if(curShape==='rhombus'){ var side=0.5*Math.hypot(s.d1,s.d2); P=4*side; A=0.5*s.d1*s.d2; pf='4·'+fmt(side); af='½·'+fmt(s.d1)+'·'+fmt(s.d2); }
+  else if(curShape==='trapezium'){
+    var a=s.a,bb=s.bb,h=s.h,off=s.off;
+    var left=Math.hypot(off,h);
+    var right=Math.hypot((bb)-(off+a),h);
+    P=a+bb+left+right; A=0.5*(a+bb)*h;
+    pf='a + b + legs'; af='½·('+fmt(a)+'+'+fmt(bb)+')·'+fmt(h);
+  }
+  else if(curShape==='circle'){ P=2*PI*s.r; A=PI*s.r*s.r; pf='2π·'+fmt(s.r); af='π·'+fmt(s.r)+'²'; }
+  return {P:P,A:A,pf:pf,af:af};
+}
+
+/* build unit->pixel scaled polygon points for drawing */
+function calcPoints(){
+  var s=calcState, pts=[];
+  if(curShape==='square'){ pts=[[0,0],[s.a,0],[s.a,s.a],[0,s.a]]; }
+  else if(curShape==='rectangle'){ pts=[[0,0],[s.l,0],[s.l,s.b],[0,s.b]]; }
+  else if(curShape==='triangle'){ pts=[[0,0],[s.base,0],[s.off,s.h]]; }
+  else if(curShape==='parallelogram'){ var dx=Math.sqrt(Math.max(0,s.s*s.s-s.h*s.h)); pts=[[0,0],[s.b,0],[s.b+dx,s.h],[dx,s.h]]; }
+  else if(curShape==='rhombus'){ pts=[[s.d1/2,0],[s.d1,s.d2/2],[s.d1/2,s.d2],[0,s.d2/2]]; }
+  else if(curShape==='trapezium'){ pts=[[0,0],[s.bb,0],[s.off+s.a,s.h],[s.off,s.h]]; }
+  return pts;
+}
+
+function drawCalc(){
+  var cv=document.getElementById('calcCanvas'), ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  var res=calcCompute();
+  document.getElementById('calcPerim').textContent=fmt(res.P)+(curShape==='circle'?' u':' u');
+  document.getElementById('calcArea').textContent=fmt(res.A)+' u²';
+  document.getElementById('calcPerimF').textContent='= '+res.pf+' = '+fmt(res.P);
+  document.getElementById('calcAreaF').textContent='= '+res.af+' = '+fmt(res.A);
+
+  var pad=34;
+  if(curShape==='circle'){
+    var r=calcState.r;
+    var scale=Math.min((W-2*pad)/(2*r),(H-2*pad)/(2*r));
+    var cx=W/2, cy=H/2;
+    ctx.strokeStyle='#57d1c9'; ctx.fillStyle='rgba(87,209,201,.14)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(cx,cy,r*scale,0,2*PI); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle='#98a3bd'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+r*scale,cy); ctx.stroke();
+    ctx.fillStyle='#e8ecf6'; ctx.font='13px system-ui';
+    ctx.fillText('r = '+fmt(r), cx+6, cy-6);
+    return;
+  }
+  var pts=calcPoints();
+  var xs=pts.map(function(p){return p[0];}), ys=pts.map(function(p){return p[1];});
+  var minX=Math.min.apply(null,xs),maxX=Math.max.apply(null,xs);
+  var minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+  var spanX=Math.max(1e-6,maxX-minX), spanY=Math.max(1e-6,maxY-minY);
+  var scale=Math.min((W-2*pad)/spanX,(H-2*pad)/spanY);
+  var ox=(W-spanX*scale)/2 - minX*scale;
+  var oy=(H-spanY*scale)/2 - minY*scale;
+  function tx(x){return ox+x*scale;}
+  function ty(y){return H-(oy+y*scale);}   // flip y up
+  ctx.strokeStyle='#57d1c9'; ctx.fillStyle='rgba(87,209,201,.14)'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  pts.forEach(function(p,i){ if(i===0) ctx.moveTo(tx(p[0]),ty(p[1])); else ctx.lineTo(tx(p[0]),ty(p[1])); });
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // vertices
+  ctx.fillStyle='#e8ecf6';
+  pts.forEach(function(p){ ctx.beginPath(); ctx.arc(tx(p[0]),ty(p[1]),3.5,0,2*PI); ctx.fill(); });
+}
+
+/* =========================================================
+   MODE 2 — TRIANGLE METHODS (draggable)
+   ========================================================= */
+var triCanvas=document.getElementById('triCanvas');
+var GRID=24, TORG={x:40,y:280};        // pixels per unit, origin
+var triPts=[{x:2,y:2},{x:11,y:2},{x:6,y:9}]; // A,B,C in units (A=0,B=1,C=2)
+function u2p(pt){ return {x:TORG.x+pt.x*GRID, y:TORG.y-pt.y*GRID}; }
+function p2u(px,py){ return {x:(px-TORG.x)/GRID, y:(TORG.y-py)/GRID}; }
+
+function drawTri(){
+  var ctx=triCanvas.getContext('2d'), W=triCanvas.width,H=triCanvas.height;
+  ctx.clearRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle='#2c3650'; ctx.lineWidth=1;
+  for(var gx=0;gx<=13;gx++){ var X=TORG.x+gx*GRID; if(X<W){ctx.beginPath();ctx.moveTo(X,20);ctx.lineTo(X,H-8);ctx.stroke();} }
+  for(var gy=0;gy<=11;gy++){ var Y=TORG.y-gy*GRID; if(Y>0){ctx.beginPath();ctx.moveTo(TORG.x,Y);ctx.lineTo(W-8,Y);ctx.stroke();} }
+  var A=triPts[0],B=triPts[1],C=triPts[2];
+  var pA=u2p(A),pB=u2p(B),pC=u2p(C);
+  // triangle
+  ctx.strokeStyle='#57d1c9'; ctx.fillStyle='rgba(87,209,201,.14)'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(pA.x,pA.y); ctx.lineTo(pB.x,pB.y); ctx.lineTo(pC.x,pC.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // height from C to line AB
+  var foot=footOnLine(C,A,B);
+  var pF=u2p(foot);
+  ctx.strokeStyle='#ffb454'; ctx.setLineDash([5,4]); ctx.lineWidth=1.8;
+  ctx.beginPath(); ctx.moveTo(pC.x,pC.y); ctx.lineTo(pF.x,pF.y); ctx.stroke(); ctx.setLineDash([]);
+  // vertices + labels
+  var labels=['A','B','C'];
+  [pA,pB,pC].forEach(function(p,i){
+    ctx.fillStyle=(i===dragIdx)?'#ffb454':'#e8ecf6';
+    ctx.beginPath(); ctx.arc(p.x,p.y,7,0,2*PI); ctx.fill();
+    ctx.fillStyle='#0f1320'; ctx.font='bold 11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(labels[i],p.x,p.y);
+  });
+  ctx.textAlign='start'; ctx.textBaseline='alphabetic';
+  computeTri(A,B,C,foot);
+}
+function footOnLine(P,A,B){
+  var vx=B.x-A.x, vy=B.y-A.y, wx=P.x-A.x, wy=P.y-A.y;
+  var t=(vx*wx+vy*wy)/(vx*vx+vy*vy);
+  return {x:A.x+t*vx, y:A.y+t*vy};
+}
+function computeTri(A,B,C,foot){
+  var a=Math.hypot(B.x-C.x,B.y-C.y);   // BC
+  var b=Math.hypot(C.x-A.x,C.y-A.y);   // CA
+  var c=Math.hypot(A.x-B.x,A.y-B.y);   // AB
+  var base=c;
+  var h=Math.hypot(C.x-foot.x,C.y-foot.y);
+  var area1=0.5*base*h;
+  var s=(a+b+c)/2;
+  var area2=Math.sqrt(Math.max(0,s*(s-a)*(s-b)*(s-c)));
+  document.getElementById('triA').textContent=fmt(a);
+  document.getElementById('triB').textContent=fmt(b);
+  document.getElementById('triC').textContent=fmt(c);
+  document.getElementById('triBase').textContent=fmt(base);
+  document.getElementById('triH').textContent=fmt(h);
+  document.getElementById('triArea1').textContent=fmt(area1)+' u²';
+  document.getElementById('triArea2').textContent=fmt(area2)+' u²';
+  document.getElementById('triArea1F').textContent='½·'+fmt(base)+'·'+fmt(h);
+  document.getElementById('triArea2F').textContent='s='+fmt(s);
+  document.getElementById('triHeron').textContent='√[ '+fmt(s)+'·('+fmt(s)+'−'+fmt(a)+')·('+fmt(s)+'−'+fmt(b)+')·('+fmt(s)+'−'+fmt(c)+') ] = '+fmt(area2);
+  var diff=Math.abs(area1-area2);
+  var m=document.getElementById('triMatch');
+  if(diff<1e-6){ m.innerHTML='<b class="acc">✓ Both methods agree:</b> area = '+fmt(area1)+' u².'; }
+  else { m.textContent='Difference: '+fmt(diff)+' u² (rounding only).'; }
+}
+var dragIdx=-1;
+function triPointerXY(e){
+  var rect=triCanvas.getBoundingClientRect();
+  var sx=triCanvas.width/rect.width, sy=triCanvas.height/rect.height;
+  var cx=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  var cy=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  return {x:cx*sx,y:cy*sy};
+}
+function triStart(e){
+  var p=triPointerXY(e);
+  for(var i=0;i<3;i++){ var pp=u2p(triPts[i]); if(Math.hypot(pp.x-p.x,pp.y-p.y)<18){dragIdx=i;break;} }
+  if(dragIdx>=0){ e.preventDefault(); drawTri(); }
+}
+function triMove(e){
+  if(dragIdx<0) return; e.preventDefault();
+  var p=triPointerXY(e); var u=p2u(p.x,p.y);
+  u.x=Math.max(0,Math.min(12.5,Math.round(u.x*2)/2));
+  u.y=Math.max(0,Math.min(10.5,Math.round(u.y*2)/2));
+  triPts[dragIdx]=u; drawTri();
+}
+function triEnd(){ dragIdx=-1; drawTri(); }
+triCanvas.addEventListener('mousedown',triStart);
+window.addEventListener('mousemove',triMove);
+window.addEventListener('mouseup',triEnd);
+triCanvas.addEventListener('touchstart',triStart,{passive:false});
+triCanvas.addEventListener('touchmove',triMove,{passive:false});
+triCanvas.addEventListener('touchend',triEnd);
+
+/* =========================================================
+   MODE 3 — SECTOR + COMPOSITE
+   ========================================================= */
+function drawSec(){
+  var r=parseFloat(document.getElementById('secR').value);
+  var th=parseFloat(document.getElementById('secA').value);
+  document.getElementById('secRv').textContent=fmt(r);
+  document.getElementById('secAv').textContent=fmt(th);
+  var cv=document.getElementById('secCanvas'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2,cy=H/2, R=Math.min(W,H)/2-30;
+  // faint full circle
+  ctx.strokeStyle='#2c3650'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,2*PI); ctx.stroke();
+  // sector (angle measured CCW from +x, drawn downward for canvas)
+  var a0=0, a1=th*PI/180;
+  ctx.fillStyle='rgba(87,209,201,.18)'; ctx.strokeStyle='#57d1c9'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,R,-a0,-a1,true);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#e8ecf6'; ctx.font='13px system-ui';
+  ctx.fillText('θ = '+fmt(th)+'°', cx+8, cy-8);
+  ctx.fillText('r = '+fmt(r), cx+R*0.4, cy+16);
+  var arc=(th/360)*2*PI*r;
+  var area=(th/360)*PI*r*r;
+  document.getElementById('secArc').textContent=fmt(arc)+' u';
+  document.getElementById('secArea').textContent=fmt(area)+' u²';
+  document.getElementById('secArcF').textContent='('+fmt(th)+'/360)·2π·'+fmt(r)+' = '+fmt(arc);
+  document.getElementById('secAreaF').textContent='('+fmt(th)+'/360)·π·'+fmt(r)+'² = '+fmt(area);
+}
+document.getElementById('secR').addEventListener('input',drawSec);
+document.getElementById('secA').addEventListener('input',drawSec);
+
+function drawCmp(){
+  var L=parseFloat(document.getElementById('cmpL').value);
+  var Wid=parseFloat(document.getElementById('cmpW').value);
+  document.getElementById('cmpLv').textContent=fmt(L);
+  document.getElementById('cmpWv').textContent=fmt(Wid);
+  var r=Wid/2;
+  var cv=document.getElementById('cmpCanvas'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  var pad=30;
+  var totalW=L+r;           // rectangle length + semicircle bulge
+  var scale=Math.min((W-2*pad)/totalW,(H-2*pad)/Wid);
+  var ox=(W-totalW*scale)/2, oy=(H-Wid*scale)/2;
+  var rx=ox, ry=oy, rw=L*scale, rh=Wid*scale;
+  // rectangle
+  ctx.fillStyle='rgba(87,209,201,.14)'; ctx.strokeStyle='#57d1c9'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.rect(rx,ry,rw,rh); ctx.fill(); ctx.stroke();
+  // semicircle on the right edge
+  var scx=rx+rw, scy=ry+rh/2, R=r*scale;
+  ctx.fillStyle='rgba(255,180,84,.16)'; ctx.strokeStyle='#ffb454';
+  ctx.beginPath(); ctx.arc(scx,scy,R,-PI/2,PI/2,false); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#e8ecf6'; ctx.font='12px system-ui';
+  ctx.fillText('L = '+fmt(L), rx+rw/2-16, ry-8);
+  ctx.fillText('W = '+fmt(Wid), rx+4, ry+rh/2);
+
+  var recA=L*Wid, semA=0.5*PI*r*r, tot=recA+semA;
+  // outline perimeter: 3 rectangle sides (2 lengths + 1 width) + semicircle arc πr
+  var per=2*L+Wid+PI*r;
+  document.getElementById('cmpRA').textContent=fmt(recA)+' u²';
+  document.getElementById('cmpSA').textContent=fmt(semA)+' u²';
+  document.getElementById('cmpTA').textContent=fmt(tot)+' u²';
+  document.getElementById('cmpTP').textContent=fmt(per)+' u';
+  document.getElementById('cmpNote').textContent=
+    'Total area = L·W + ½πr² = '+fmt(recA)+' + '+fmt(semA)+' = '+fmt(tot)+' u²   |   '+
+    'Perimeter = 2L + W + πr = '+fmt(per)+' u  (r = W/2 = '+fmt(r)+')';
+}
+document.getElementById('cmpL').addEventListener('input',drawCmp);
+document.getElementById('cmpW').addEventListener('input',drawCmp);
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+var quizData=[
+  {q:'A circular sector has radius 6 cm and central angle 60°. Its area is:',
+   opts:['6π cm²','12π cm²','36π cm²','3π cm²'], correct:0,
+   ex:'Area = (θ/360)·πr² = (60/360)·π·36 = (1/6)·36π = 6π cm².'},
+  {q:'A triangle has sides 13, 14, 15. Using Heron\'s formula (s = 21), its area is:',
+   opts:['84','80','91','168'], correct:0,
+   ex:'s = (13+14+15)/2 = 21. Area = √[21·8·7·6] = √7056 = 84 square units.'},
+  {q:'A shape is a rectangle 10×4 with a semicircle of diameter 4 on one short end. Total area (take π=3.14):',
+   opts:['40 + 2π','40 + 4π','20 + 2π','40 + 8π'], correct:0,
+   ex:'Rectangle = 40. r = 2, semicircle = ½π·2² = 2π. Total = 40 + 2π ≈ 46.28.'}
+];
+function buildQuiz(){
+  var host=document.getElementById('quiz'); host.innerHTML='';
+  quizData.forEach(function(item,qi){
+    var box=document.createElement('div'); box.className='quiz-q';
+    var p=document.createElement('p'); p.className='q'; p.textContent=(qi+1)+'. '+item.q; box.appendChild(p);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var btn=document.createElement('button'); btn.className='opt'; btn.textContent=opt;
+      btn.addEventListener('click',function(){
+        if(answered) return; answered=true;
+        if(oi===item.correct){ btn.classList.add('correct'); }
+        else{ btn.classList.add('wrong'); box.querySelectorAll('.opt')[item.correct].classList.add('correct'); }
+        box.querySelector('.explain').classList.add('show');
+      });
+      box.appendChild(btn);
+    });
+    var ex=document.createElement('div'); ex.className='explain'; ex.textContent='Why: '+item.ex; box.appendChild(ex);
+    host.appendChild(box);
+  });
+}
+
+/* init */
+buildCalcControls();
+buildQuiz();
+drawSec();
+drawCmp();
+</script>
+</body>
+</html>
