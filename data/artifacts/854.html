@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrition &amp; Health Lab — NIOS Class 12 Biology (Ch28)</title>
+<style>
+  :root{
+    --bg:#131a22; --panel:#1b2431; --panel2:#222e3d; --line:#31405420;
+    --border:#2c3a4c; --txt:#e7edf5; --muted:#95a6bb; --accent:#4fd1a6;
+    --accent-dim:#2f8f74; --warn:#f0a44c; --bad:#ef6a6a; --good:#4fd1a6;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5; font-size:15px; padding:14px;
+    -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  p.sub{color:var(--muted);margin:0 0 14px;font-size:.9rem}
+  .wrap{max-width:940px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .tab{
+    background:var(--panel);border:1px solid var(--border);color:var(--muted);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;min-width:120px;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent-dim)}
+  .tab.active{background:var(--accent);color:#0c1319;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:16px;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .mode{display:none}
+  .mode.active{display:block}
+  .grid{display:grid;gap:12px}
+  .g2{grid-template-columns:1fr 1fr}
+  @media(max-width:560px){.g2{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .small{font-size:.82rem;color:var(--muted)}
+  button.act{
+    background:var(--accent);color:#0c1319;border:none;padding:9px 14px;
+    border-radius:10px;font-weight:600;cursor:pointer;font-size:.88rem;
+  }
+  button.ghost{
+    background:transparent;border:1px solid var(--border);color:var(--txt);
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.88rem;
+  }
+  button:active{transform:translateY(1px)}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--panel);
+    border:1px solid var(--border);border-radius:999px;padding:7px 12px;
+    margin:4px;cursor:grab;font-size:.85rem;user-select:none;touch-action:manipulation;
+  }
+  .chip.sel{border-color:var(--accent);background:#1d3a30}
+  label{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
+  input[type=number],input[type=range]{width:100%}
+  input[type=number]{
+    background:var(--panel);border:1px solid var(--border);color:var(--txt);
+    border-radius:10px;padding:9px;font-size:1rem;
+  }
+  .facts{background:#16202b;border-left:3px solid var(--accent);border-radius:8px;
+    padding:10px 12px;font-size:.85rem;color:var(--muted)}
+  .facts b{color:var(--txt)}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
+  th{color:var(--accent);font-weight:600}
+  .plate-msg{font-size:.85rem;margin-top:8px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .q{margin-bottom:14px}
+  .opts{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+  .opt{
+    background:var(--panel2);border:1px solid var(--border);border-radius:10px;
+    padding:9px 12px;cursor:pointer;font-size:.88rem;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent-dim)}
+  .opt.correct{background:#1d3a30;border-color:var(--good)}
+  .opt.wrong{background:#3a1f22;border-color:var(--bad)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.75rem;font-weight:600}
+  .b-good{background:#1d3a30;color:var(--good)}
+  .b-warn{background:#3a2f1c;color:var(--warn)}
+  .b-bad{background:#3a1f22;color:var(--bad)}
+  select{background:var(--panel);border:1px solid var(--border);color:var(--txt);
+    border-radius:8px;padding:6px 8px;font-size:.85rem}
+  .match-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .match-row .name{flex:1 1 140px;font-size:.88rem}
+  .disclaimer{font-size:.78rem;color:var(--muted);margin-top:10px;font-style:italic}
+  svg{max-width:100%;height:auto;display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Nutrition &amp; Health Lab</h1>
+  <p class="sub">NIOS Class 12 Biology — Chapter 28: Nutrition and Health</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="diet">1 · Balanced Diet</button>
+    <button class="tab" data-mode="def">2 · Deficiency Diseases</button>
+    <button class="tab" data-mode="health">3 · Health &amp; Disorders</button>
+  </div>
+
+  <!-- ===================== MODE 1: BALANCED DIET ===================== -->
+  <section class="mode active" id="mode-diet">
+    <div class="panel">
+      <h2>Build a Balanced Plate</h2>
+      <p class="small">Tap the seven nutrient components to add them to your plate. A balanced diet supplies energy, building blocks and protective factors in the right proportion.</p>
+      <div id="nutrientChips"></div>
+      <div class="grid g2" style="margin-top:12px">
+        <div class="card">
+          <svg id="plateSvg" viewBox="0 0 200 200" aria-label="Balanced plate diagram"></svg>
+          <div class="plate-msg" id="plateMsg">Empty plate — add components.</div>
+        </div>
+        <div class="card">
+          <h2 style="font-size:.95rem">Selected component</h2>
+          <div id="nutrientInfo" class="small">Tap a chip to see its function, food sources and energy value.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Nutrient Reference &amp; Energy Note</h2>
+      <table>
+        <thead><tr><th>Nutrient</th><th>Main function</th><th>Energy (kcal/g)</th></tr></thead>
+        <tbody id="energyTable"></tbody>
+      </table>
+      <div class="facts" style="margin-top:12px">
+        <b>Energy note:</b> Carbohydrates and proteins yield ~4 kcal/g, fats ~9 kcal/g;
+        vitamins, minerals and water yield <b>no</b> energy but are essential regulators.
+        Fibre (roughly indigestible) adds bulk, aids bowel movement and gives negligible energy.
+        An average adult needs about 2000–2500 kcal/day depending on age, sex and activity.
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 2: DEFICIENCY ===================== -->
+  <section class="mode" id="mode-def">
+    <div class="panel">
+      <h2>Match Nutrient → Deficiency Disease</h2>
+      <p class="small">For each nutrient, choose the disorder caused by its deficiency, then check your answers.</p>
+      <div id="matchArea"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="act" id="checkMatch">Check answers</button>
+        <button class="ghost" id="resetMatch">Reset</button>
+        <span id="matchScore" class="small"></span>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Deficiency Quick-Reference</h2>
+      <table>
+        <thead><tr><th>Nutrient</th><th>Deficiency disease / sign</th></tr></thead>
+        <tbody id="defTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 3: HEALTH ===================== -->
+  <section class="mode" id="mode-health">
+    <div class="panel">
+      <h2>BMI Calculator</h2>
+      <p class="small">Body Mass Index = weight (kg) ÷ height² (m²). It screens for under- and over-nutrition.</p>
+      <div class="grid g2">
+        <div>
+          <label for="wt">Weight (kg)</label>
+          <input type="number" id="wt" value="60" min="1" max="300" step="0.5">
+          <label for="ht">Height (cm)</label>
+          <input type="number" id="ht" value="165" min="30" max="250" step="0.5">
+          <div class="row" style="margin-top:10px">
+            <button class="act" id="calcBmi">Calculate BMI</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;font-weight:700" id="bmiVal">—</div>
+          <div id="bmiCat" style="margin:6px 0"></div>
+          <svg id="bmiSvg" viewBox="0 0 260 46" aria-label="BMI scale"></svg>
+          <div class="small" id="bmiHint" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <p class="disclaimer">General educational information only — not a diagnosis or personalized medical advice.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Malnutrition, Obesity &amp; Healthy Living</h2>
+      <div class="grid g2">
+        <div class="card">
+          <b>Under-nutrition</b>
+          <p class="small">Too little energy/protein: leads to marasmus (energy + protein deficit, severe wasting) and kwashiorkor (protein deficit with oedema). Signs: low weight, stunting, weakness, poor immunity.</p>
+        </div>
+        <div class="card">
+          <b>Over-nutrition &amp; Obesity</b>
+          <p class="small">Excess energy stored as fat (BMI ≥ 30). Raises risk of type-2 diabetes, hypertension, heart disease and joint problems. Driven by high-calorie diets and low activity.</p>
+        </div>
+      </div>
+      <div class="facts" style="margin-top:12px">
+        <b>Healthy-lifestyle tips:</b> eat a balanced varied diet, prefer whole grains, fruits
+        &amp; vegetables; limit sugar, salt and trans-fats; drink adequate water; exercise ≥30 min/day;
+        maintain hygiene; get adequate sleep; avoid tobacco and alcohol.
+      </div>
+      <div class="facts" style="margin-top:12px;border-left-color:var(--warn)">
+        <b>Food adulteration:</b> deliberate lowering of food quality by adding cheap/harmful
+        substances (e.g. chalk in flour, water/starch in milk, argemone oil in mustard oil, metanil-yellow dye in turmeric).
+        It reduces nutritive value and can cause poisoning. Laws such as the <b>FSSAI</b> standards and simple home tests help detect it.
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ (shared) ===================== -->
+  <div class="panel">
+    <h2>Quick Quiz (3 questions)</h2>
+    <div id="quiz"></div>
+  </div>
+
+  <p class="disclaimer">This lab provides general educational content aligned to NIOS Biology and does not replace advice from a qualified doctor or dietitian.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- data ---------- */
+  var NUTRIENTS = [
+    {id:"carb", name:"Carbohydrates", color:"#f0a44c", kcal:"4",
+      fn:"Main and quickest source of energy.",
+      src:"Rice, wheat, bread, potato, sugar, fruits."},
+    {id:"prot", name:"Proteins", color:"#ef6a6a", kcal:"4",
+      fn:"Body-building: growth & repair of tissues; makes enzymes & hormones.",
+      src:"Pulses, milk, eggs, fish, meat, soybean, nuts."},
+    {id:"fat", name:"Fats", color:"#e8d24c", kcal:"9",
+      fn:"Concentrated energy store; insulation; carries fat-soluble vitamins.",
+      src:"Ghee, oils, butter, nuts, cheese."},
+    {id:"vit", name:"Vitamins", color:"#4fd1a6", kcal:"0",
+      fn:"Protective regulators of metabolism (A, B, C, D, E, K).",
+      src:"Fruits, green leafy vegetables, milk, sunlight (D)."},
+    {id:"min", name:"Minerals", color:"#6aa9ef", kcal:"0",
+      fn:"Regulate body functions; build bones/teeth (Ca), blood (Fe), thyroid (I).",
+      src:"Milk, leafy greens, iodised salt, fish, bananas."},
+    {id:"water", name:"Water", color:"#5ec8e0", kcal:"0",
+      fn:"Medium for reactions; transport; temperature control; ~70% of body.",
+      src:"Drinking water, fruits, vegetables, milk."},
+    {id:"fibre", name:"Fibre (roughage)", color:"#b08a5a", kcal:"0",
+      fn:"Indigestible bulk; aids digestion & prevents constipation.",
+      src:"Whole grains, salad, vegetables, fruit skins."}
+  ];
+
+  var DEF = [
+    {n:"Vitamin A", d:"Night blindness (& xerophthalmia)"},
+    {n:"Vitamin B1 (thiamine)", d:"Beriberi"},
+    {n:"Vitamin C", d:"Scurvy"},
+    {n:"Vitamin D", d:"Rickets (osteomalacia in adults)"},
+    {n:"Vitamin B12 / Iron", d:"Anaemia"},
+    {n:"Iodine", d:"Goitre"},
+    {n:"Protein / energy", d:"Kwashiorkor & Marasmus"}
+  ];
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.querySelectorAll(".mode").forEach(function(m){m.classList.remove("active");});
+      document.getElementById("mode-"+t.dataset.mode).classList.add("active");
+    });
+  });
+
+  /* ---------- Mode 1: chips + plate ---------- */
+  var chipWrap = document.getElementById("nutrientChips");
+  var selected = {};
+  NUTRIENTS.forEach(function(n){
+    var c = document.createElement("span");
+    c.className="chip"; c.textContent=n.name;
+    c.style.borderLeft="6px solid "+n.color;
+    c.addEventListener("click", function(){
+      selected[n.id] = !selected[n.id];
+      c.classList.toggle("sel", selected[n.id]);
+      showInfo(n);
+      drawPlate();
+    });
+    chipWrap.appendChild(c);
+  });
+
+  function showInfo(n){
+    document.getElementById("nutrientInfo").innerHTML =
+      "<b style='color:"+n.color+"'>"+n.name+"</b><br>"+
+      "<b>Function:</b> "+n.fn+"<br>"+
+      "<b>Sources:</b> "+n.src+"<br>"+
+      "<b>Energy:</b> "+n.kcal+" kcal/g";
+  }
+
+  function drawPlate(){
+    var svg = document.getElementById("plateSvg");
+    var chosen = NUTRIENTS.filter(function(n){return selected[n.id];});
+    var s = '<circle cx="100" cy="100" r="92" fill="#0e151d" stroke="#2c3a4c" stroke-width="2"/>';
+    if(chosen.length){
+      var cx=100, cy=100, r=80, start=-Math.PI/2, slice=2*Math.PI/chosen.length;
+      chosen.forEach(function(n,i){
+        var a0=start+i*slice, a1=a0+slice;
+        var x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0);
+        var x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+        s+='<path d="M'+cx+','+cy+' L'+x0.toFixed(1)+','+y0.toFixed(1)+
+           ' A'+r+','+r+' 0 0 1 '+x1.toFixed(1)+','+y1.toFixed(1)+' Z" fill="'+n.color+'" opacity="0.85"/>';
+      });
+    }
+    s+='<circle cx="100" cy="100" r="92" fill="none" stroke="#4fd1a6" stroke-width="1.5" opacity="0.4"/>';
+    svg.innerHTML=s;
+
+    var count = chosen.length, total = NUTRIENTS.length;
+    var msg = document.getElementById("plateMsg");
+    if(count===0){ msg.innerHTML="Empty plate — add components."; }
+    else if(count===total){
+      msg.innerHTML="<span class='badge b-good'>Balanced!</span> All 7 components present — energy, building blocks and protective factors covered.";
+    } else {
+      var missing = NUTRIENTS.filter(function(n){return !selected[n.id];}).map(function(n){return n.name;});
+      msg.innerHTML="<span class='badge b-warn'>"+count+"/"+total+" added</span> Still missing: "+missing.join(", ")+".";
+    }
+  }
+  drawPlate();
+
+  /* energy table */
+  var et = document.getElementById("energyTable");
+  NUTRIENTS.forEach(function(n){
+    et.innerHTML += "<tr><td><span style='color:"+n.color+"'>&#9679;</span> "+n.name+
+      "</td><td class='small'>"+n.fn+"</td><td>"+n.kcal+"</td></tr>";
+  });
+
+  /* ---------- Mode 2: matcher ---------- */
+  var options = DEF.map(function(d){return d.d;});
+  var matchArea = document.getElementById("matchArea");
+  function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+  function buildMatch(){
+    matchArea.innerHTML="";
+    document.getElementById("matchScore").textContent="";
+    var opts = shuffle(options);
+    DEF.forEach(function(d,i){
+      var row=document.createElement("div"); row.className="match-row";
+      var sel="<select data-i='"+i+"'><option value=''>— choose —</option>";
+      opts.forEach(function(o){ sel+="<option value=\""+o+"\">"+o+"</option>"; });
+      sel+="</select>";
+      row.innerHTML="<span class='name'><b>"+d.n+"</b> deficiency &rarr;</span>"+sel+
+        "<span class='mk small' data-mk='"+i+"'></span>";
+      matchArea.appendChild(row);
+    });
+  }
+  buildMatch();
+  document.getElementById("resetMatch").addEventListener("click", buildMatch);
+  document.getElementById("checkMatch").addEventListener("click", function(){
+    var sels = matchArea.querySelectorAll("select");
+    var score=0;
+    sels.forEach(function(s){
+      var i=+s.dataset.i, mk=matchArea.querySelector("[data-mk='"+i+"']");
+      if(s.value===DEF[i].d){ score++; mk.innerHTML="<span class='badge b-good'>&#10003;</span>"; }
+      else { mk.innerHTML="<span class='badge b-bad'>&#10007; "+DEF[i].d+"</span>"; }
+    });
+    document.getElementById("matchScore").textContent="Score: "+score+" / "+DEF.length;
+  });
+
+  /* def table */
+  var dt=document.getElementById("defTable");
+  DEF.forEach(function(d){ dt.innerHTML+="<tr><td>"+d.n+"</td><td>"+d.d+"</td></tr>"; });
+
+  /* ---------- Mode 3: BMI ---------- */
+  function bmiCategory(b){
+    if(b<18.5) return {t:"Underweight", cls:"b-warn", hint:"Below healthy range — may indicate under-nutrition."};
+    if(b<25)   return {t:"Normal (healthy)", cls:"b-good", hint:"Weight is in the healthy range."};
+    if(b<30)   return {t:"Overweight", cls:"b-warn", hint:"Above healthy range — watch diet & activity."};
+    return {t:"Obese", cls:"b-bad", hint:"BMI ≥ 30 — higher risk of metabolic disease."};
+  }
+  function drawBmiScale(b){
+    var svg=document.getElementById("bmiSvg");
+    // map BMI 15..40 to 10..250
+    var segs=[{x:10,w:34,c:"#f0a44c"},{x:44,w:88,c:"#4fd1a6"},{x:132,w:68,c:"#f0a44c"},{x:200,w:50,c:"#ef6a6a"}];
+    var s="";
+    segs.forEach(function(g){ s+='<rect x="'+g.x+'" y="16" width="'+g.w+'" height="12" fill="'+g.c+'" opacity="0.8"/>'; });
+    if(b){
+      var px = 10 + (Math.max(15,Math.min(40,b))-15)/(40-15)*240;
+      s+='<polygon points="'+(px-5)+',14 '+(px+5)+',14 '+px+',6" fill="#e7edf5"/>';
+      s+='<line x1="'+px+'" y1="14" x2="'+px+'" y2="30" stroke="#e7edf5" stroke-width="2"/>';
+    }
+    s+='<text x="10" y="42" fill="#95a6bb" font-size="7">15</text>';
+    s+='<text x="120" y="42" fill="#95a6bb" font-size="7">25</text>';
+    s+='<text x="235" y="42" fill="#95a6bb" font-size="7">40</text>';
+    svg.innerHTML=s;
+  }
+  function calcBmi(){
+    var w=parseFloat(document.getElementById("wt").value);
+    var hcm=parseFloat(document.getElementById("ht").value);
+    if(!(w>0)||!(hcm>0)){ document.getElementById("bmiVal").textContent="—"; return; }
+    var h=hcm/100;
+    var b=w/(h*h);
+    document.getElementById("bmiVal").textContent=b.toFixed(1);
+    var cat=bmiCategory(b);
+    document.getElementById("bmiCat").innerHTML="<span class='badge "+cat.cls+"'>"+cat.t+"</span>";
+    document.getElementById("bmiHint").textContent=cat.hint;
+    drawBmiScale(b);
+  }
+  document.getElementById("calcBmi").addEventListener("click", calcBmi);
+  document.getElementById("wt").addEventListener("input", calcBmi);
+  document.getElementById("ht").addEventListener("input", calcBmi);
+  calcBmi();
+
+  /* ---------- Quiz ---------- */
+  var QUIZ=[
+    {q:"Which vitamin deficiency causes scurvy?",
+     opts:["Vitamin A","Vitamin C","Vitamin D","Vitamin B12"], a:1},
+    {q:"A person is 1.70 m tall and weighs 72 kg. Their BMI category is approximately:",
+     opts:["Underweight","Normal","Overweight","Obese"], a:2},
+    {q:"Which deficiency leads to goitre (enlarged thyroid)?",
+     opts:["Iron","Calcium","Iodine","Vitamin D"], a:2}
+  ];
+  var quiz=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    d.innerHTML="<div><b>Q"+(qi+1)+".</b> "+item.q+"</div>";
+    var od=document.createElement("div"); od.className="opts";
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement("div"); b.className="opt"; b.textContent=o;
+      b.addEventListener("click", function(){
+        if(d.dataset.done) return;
+        d.dataset.done="1";
+        od.querySelectorAll(".opt").forEach(function(x,xi){
+          if(xi===item.a) x.classList.add("correct");
+          else if(xi===oi) x.classList.add("wrong");
+        });
+      });
+      od.appendChild(b);
+    });
+    d.appendChild(od);
+    quiz.appendChild(d);
+  });
+
+})();
+</script>
+</body>
+</html>

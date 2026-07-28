@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pollution Lab — NIOS Class 12 Biology (Ch27)</title>
+<style>
+  :root{
+    --bg:#0d1218; --panel:#141d27; --panel2:#1a2632; --line:#28394a;
+    --ink:#e8f0f7; --muted:#95acbf; --accent:#49c0e6; --accent2:#2f8fb4;
+    --warn:#f0a34a; --bad:#f0645a; --good:#54d69a;
+    --shadow:0 6px 20px rgba(0,0,0,.38); --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-text-size-adjust:100%;}
+  header{padding:18px 16px 8px;text-align:center}
+  h1{margin:0;font-size:clamp(20px,4vw,30px);letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .wrap{max-width:980px;margin:0 auto;padding:8px 12px 44px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600;
+    transition:.15s;min-height:40px;}
+  .tab:hover{border-color:var(--accent2)}
+  .tab.active{background:var(--accent);color:#052330;border-color:var(--accent)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    padding:16px;margin:12px 0;box-shadow:var(--shadow);}
+  .panel h2{margin:0 0 6px;font-size:18px;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:14px;color:var(--ink)}
+  .mode{display:none}
+  .mode.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 300px;min-width:0}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  button.btn,select,input[type=range]{font-family:inherit}
+  button.btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:13px;min-height:38px;font-weight:600;}
+  button.btn:hover{border-color:var(--accent)}
+  button.btn.on{background:var(--accent);color:#052330;border-color:var(--accent)}
+  select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 10px;border-radius:10px;font-size:13px;min-height:38px}
+  label.lbl{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  svg{display:block;width:100%;height:auto}
+  canvas{display:block;width:100%;border-radius:10px;background:#08101a}
+  .facts{background:var(--panel2);border-left:3px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+  .facts b{color:var(--ink)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+  .pcard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px;cursor:pointer;transition:.15s}
+  .pcard:hover{border-color:var(--accent)}
+  .pcard.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .pcard .t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px}
+  .pcard .d{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+  .detail{margin-top:12px;font-size:13px}
+  .detail table{width:100%;border-collapse:collapse;margin-top:6px}
+  .detail td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top;font-size:12.5px}
+  .detail td.k{color:var(--accent);white-space:nowrap;width:88px;font-weight:600}
+  .readout{font-size:13px;margin-top:8px}
+  .readout b{color:var(--ink)}
+  .big{font-size:22px;font-weight:800}
+  .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700}
+  .quiz .q{margin:14px 0;padding:12px;background:var(--panel2);border-radius:12px;border:1px solid var(--line)}
+  .quiz .qq{font-weight:600;font-size:14px;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:9px 11px;border-radius:9px;margin:6px 0;cursor:pointer;font-size:13px;min-height:38px}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--good);background:rgba(84,214,154,.14)}
+  .opt.wrong{border-color:var(--bad);background:rgba(240,100,90,.14)}
+  .expl{font-size:12.5px;color:var(--muted);margin-top:8px;display:none}
+  .expl.show{display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .binrow{display:flex;gap:10px;margin-top:12px}
+  .bin{flex:1;border:2px dashed var(--line);border-radius:12px;padding:10px;text-align:center;min-height:96px;transition:.15s}
+  .bin.over{border-color:var(--accent);background:var(--panel2)}
+  .bin h4{margin:0 0 6px;font-size:13px}
+  .items{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px;min-height:44px}
+  .item{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:12.5px;cursor:grab;user-select:none;touch-action:none}
+  .item.placed{opacity:.5;cursor:default}
+  .score{font-size:13px;margin-top:8px;font-weight:600}
+  .foot{color:var(--muted);font-size:11.5px;text-align:center;margin-top:18px}
+  @media(max-width:420px){.cards{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pollution Lab</h1>
+  <div class="sub">NIOS Class 12 Biology · Chapter 27 — Pollution · interactive explorer</div>
+</header>
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-m="types">1 · Types</button>
+    <button class="tab" data-m="cons">2 · Consequences</button>
+    <button class="tab" data-m="ctrl">3 · Control &amp; Solutions</button>
+  </div>
+
+  <!-- ============ MODE 1: TYPES ============ -->
+  <section class="mode active" id="m-types">
+    <div class="panel">
+      <h2>Types of Pollution</h2>
+      <div class="sub">Tap a card to see its major pollutants, sources and effects.</div>
+      <div class="cards" id="typeCards"></div>
+      <div class="detail" id="typeDetail"></div>
+    </div>
+    <div class="panel">
+      <h2>Air Quality Simulator</h2>
+      <div class="row">
+        <div class="col">
+          <label class="lbl">Vehicles / industry activity: <b id="actV">50</b>%</label>
+          <input type="range" id="act" min="0" max="100" value="50">
+          <label class="lbl">Green cover (trees, parks): <b id="grV">40</b>%</label>
+          <input type="range" id="green" min="0" max="100" value="40">
+          <label class="lbl">Wind dispersal: <b id="wnV">40</b>%</label>
+          <input type="range" id="wind" min="0" max="100" value="40">
+          <div class="readout">
+            AQI: <span class="big" id="aqi">—</span>
+            <span class="pill" id="aqiCat"></span><br>
+            PM2.5 ≈ <b id="pm">—</b> µg/m³ · CO₂ ≈ <b id="co2">—</b> ppm
+          </div>
+        </div>
+        <div class="col">
+          <canvas id="airCv" width="360" height="220" aria-label="Air quality haze"></canvas>
+        </div>
+      </div>
+      <div class="facts" id="airFact">Adjust the sliders to change the city's air.</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: CONSEQUENCES ============ -->
+  <section class="mode" id="m-cons">
+    <div class="panel">
+      <h2>Consequences of Pollution</h2>
+      <div class="controls" id="consTabs">
+        <button class="btn on" data-c="warm">Global warming</button>
+        <button class="btn" data-c="acid">Acid rain</button>
+        <button class="btn" data-c="ozone">Ozone hole</button>
+        <button class="btn" data-c="eutro">Eutrophication</button>
+        <button class="btn" data-c="biomag">Biomagnification</button>
+      </div>
+
+      <!-- Global warming -->
+      <div class="csub" id="c-warm">
+        <div class="row">
+          <div class="col">
+            <label class="lbl">Atmospheric CO₂: <b id="co2V">420</b> ppm</label>
+            <input type="range" id="co2s" min="280" max="1000" value="420">
+            <div class="readout">
+              Est. global temperature rise vs 1850: <span class="big" id="dT">—</span> °C
+              <span class="pill" id="dTcat"></span>
+            </div>
+            <div class="facts">Greenhouse gases (CO₂, CH₄, N₂O, CFCs, water vapour) trap outgoing
+              <b>infrared</b> radiation. More CO₂ → stronger trapping → warmer surface. The
+              pre-industrial baseline is <b>~280 ppm</b>; today it is above <b>420 ppm</b>.</div>
+          </div>
+          <div class="col"><svg id="warmSvg" viewBox="0 0 360 220"></svg></div>
+        </div>
+      </div>
+
+      <!-- Acid rain -->
+      <div class="csub" id="c-acid" style="display:none">
+        <div class="row">
+          <div class="col">
+            <label class="lbl">SO₂ + NOₓ emissions: <b id="soV">40</b>%</label>
+            <input type="range" id="sos" min="0" max="100" value="40">
+            <div class="readout">Rain pH: <span class="big" id="phV">—</span>
+              <span class="pill" id="phCat"></span></div>
+            <div class="facts">SO₂ and NOₓ react with atmospheric water to form <b>H₂SO₄</b> and
+              <b>HNO₃</b>. Clean rain is mildly acidic (pH ≈ 5.6 from dissolved CO₂); below that it is
+              <b>acid rain</b>, which leaches soil nutrients, damages leaves, acidifies lakes and
+              corrodes marble monuments (CaCO₃) — e.g. the Taj Mahal.</div>
+          </div>
+          <div class="col"><svg id="acidSvg" viewBox="0 0 360 220"></svg></div>
+        </div>
+      </div>
+
+      <!-- Ozone -->
+      <div class="csub" id="c-ozone" style="display:none">
+        <div class="row">
+          <div class="col">
+            <label class="lbl">CFC / halon emissions: <b id="cfcV">50</b>%</label>
+            <input type="range" id="cfcs" min="0" max="100" value="50">
+            <div class="readout">Stratospheric ozone: <span class="big" id="ozV">—</span>%
+              of natural · UV reaching ground: <b id="uvV">—</b></div>
+            <div class="facts">In the stratosphere, <b>chlorine</b> freed from CFCs by UV light
+              destroys ozone catalytically (one Cl atom breaks thousands of O₃ molecules). A thin
+              ozone layer lets more harmful <b>UV-B</b> through → skin cancer, cataracts, crop damage.
+              The <b>Montreal Protocol (1987)</b> phased out CFCs.</div>
+          </div>
+          <div class="col"><svg id="ozSvg" viewBox="0 0 360 220"></svg></div>
+        </div>
+      </div>
+
+      <!-- Eutrophication -->
+      <div class="csub" id="c-eutro" style="display:none">
+        <div class="row">
+          <div class="col">
+            <label class="lbl">Nutrient run-off (N, P from fertiliser/sewage): <b id="nutV">50</b>%</label>
+            <input type="range" id="nuts" min="0" max="100" value="50">
+            <div class="controls">
+              <button class="btn on" id="eutroPlay">Pause</button>
+              <span class="readout">Dissolved O₂: <b id="doV">—</b> mg/L
+                <span class="pill" id="doCat"></span></span>
+            </div>
+            <div class="facts">Excess N and P over-fertilise water → explosive <b>algal bloom</b>.
+              Algae die, bacteria decompose them and consume oxygen. The water becomes
+              <b>hypoxic</b> (a dead zone) and fish suffocate. This nutrient-driven ageing of a
+              water body is <b>eutrophication</b>.</div>
+          </div>
+          <div class="col"><canvas id="eutroCv" width="360" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Biomagnification -->
+      <div class="csub" id="c-biomag" style="display:none">
+        <div class="row">
+          <div class="col">
+            <label class="lbl">DDT in water: <b id="ddtV">0.003</b> ppm</label>
+            <input type="range" id="ddts" min="1" max="20" value="3">
+            <div class="readout">Top predator load: <span class="big" id="topV">—</span> ppm
+              <span class="pill" id="topCat"></span></div>
+            <div class="facts">Fat-soluble, non-biodegradable toxins (DDT, mercury, PCBs) are not
+              excreted. Their concentration <b>multiplies ~10× at each higher trophic level</b> —
+              <b>biomagnification</b>. Fish-eating birds accumulate the most; DDT thins egg shells and
+              crashed raptor populations, prompting its ban.</div>
+          </div>
+          <div class="col"><svg id="bioSvg" viewBox="0 0 360 240"></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: CONTROL ============ -->
+  <section class="mode" id="m-ctrl">
+    <div class="panel">
+      <h2>Control &amp; Solutions</h2>
+      <div class="cards" id="ctrlCards"></div>
+      <div class="detail" id="ctrlDetail"></div>
+    </div>
+    <div class="panel">
+      <h2>Waste Sorter</h2>
+      <div class="sub">Drag (or tap) each item into the correct bin.</div>
+      <div class="items" id="wasteItems"></div>
+      <div class="binrow">
+        <div class="bin" id="binBio" data-b="bio"><h4>♻ Biodegradable</h4>
+          <div class="items" id="dropBio"></div></div>
+        <div class="bin" id="binNon" data-b="non"><h4>🗑 Non-biodegradable</h4>
+          <div class="items" id="dropNon"></div></div>
+      </div>
+      <div class="score" id="wasteScore">Sorted 0 / 8 correctly.</div>
+      <button class="btn" id="wasteReset" style="margin-top:8px">Reset</button>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick Check — 3 questions</h2>
+    <div id="quizBox"></div>
+  </div>
+
+  <div class="foot">Estimates are simplified teaching models, not precise climate/AQI predictions.</div>
+</div>
+
+<script>
+"use strict";
+var running=true;
+document.addEventListener("visibilitychange",function(){running=!document.hidden;});
+
+/* ---------- tabs ---------- */
+var tabs=document.getElementById("tabs");
+tabs.addEventListener("click",function(e){
+  var b=e.target.closest(".tab"); if(!b)return;
+  [].forEach.call(tabs.children,function(t){t.classList.remove("active");});
+  b.classList.add("active");
+  var m=b.dataset.m;
+  ["types","cons","ctrl"].forEach(function(id){
+    document.getElementById("m-"+id).classList.toggle("active",id===m);
+  });
+});
+
+/* ================= MODE 1: TYPES ================= */
+var TYPES=[
+  {id:"air",name:"Air",col:"#8a9bb0",
+   pollutants:"CO, CO₂, SO₂, NOₓ, PM2.5/PM10, ozone, lead, hydrocarbons",
+   sources:"Vehicles, thermal power plants, industries, crop-residue burning, brick kilns",
+   effects:"Respiratory disease, asthma, smog, reduced visibility, acid rain, global warming"},
+  {id:"water",name:"Water",col:"#49c0e6",
+   pollutants:"Sewage, heavy metals (Hg, As, Pb), pesticides, oil, detergents, pathogens",
+   sources:"Domestic sewage, industrial effluents, agricultural run-off, oil spills",
+   effects:"Cholera, typhoid, hepatitis; fish kills; eutrophication; biomagnification"},
+  {id:"soil",name:"Soil",col:"#c79a5b",
+   pollutants:"Pesticides, fertilisers, plastics, industrial waste, heavy metals",
+   sources:"Agrochemicals, mining, landfills, e-waste, industrial dumping",
+   effects:"Loss of fertility, contaminated crops, groundwater pollution, reduced soil biota"},
+  {id:"noise",name:"Noise",col:"#b57edc",
+   pollutants:"Sound above ~85 dB (measured in decibels, dB)",
+   sources:"Traffic, factories, loudspeakers, aircraft, construction, crackers",
+   effects:"Hearing loss, hypertension, sleep loss, stress, poor concentration"},
+  {id:"thermal",name:"Thermal",col:"#f0a34a",
+   pollutants:"Heated water discharge; raised water temperature",
+   sources:"Power plants & industries using water as coolant",
+   effects:"Lower dissolved O₂, thermal shock to fish, disrupted breeding, algal shifts"},
+  {id:"radio",name:"Radioactive",col:"#f0645a",
+   pollutants:"Radioactive isotopes: Uranium, Strontium-90, Iodine-131, Cesium-137",
+   sources:"Nuclear tests, reactor accidents, mining, improper waste disposal",
+   effects:"Mutations, cancer, radiation sickness, genetic damage, long-lived contamination"}
+];
+var tc=document.getElementById("typeCards"), td=document.getElementById("typeDetail");
+TYPES.forEach(function(t,i){
+  var d=document.createElement("div"); d.className="pcard"+(i===0?" on":""); d.dataset.id=t.id;
+  d.innerHTML='<div class="t"><span class="dot" style="background:'+t.col+'"></span>'+t.name+'</div>'+
+              '<div class="d">'+t.pollutants.split(",").slice(0,2).join(",")+'…</div>';
+  tc.appendChild(d);
+});
+function showType(id){
+  var t=TYPES.filter(function(x){return x.id===id;})[0];
+  td.innerHTML='<table><tr><td class="k">Pollutants</td><td>'+t.pollutants+'</td></tr>'+
+    '<tr><td class="k">Sources</td><td>'+t.sources+'</td></tr>'+
+    '<tr><td class="k">Effects</td><td>'+t.effects+'</td></tr></table>';
+}
+tc.addEventListener("click",function(e){
+  var c=e.target.closest(".pcard"); if(!c)return;
+  [].forEach.call(tc.children,function(x){x.classList.remove("on");});
+  c.classList.add("on"); showType(c.dataset.id);
+});
+showType("air");
+
+/* ---- Air quality simulator ---- */
+var act=document.getElementById("act"),green=document.getElementById("green"),wind=document.getElementById("wind");
+var airCv=document.getElementById("airCv"),actx=airCv.getContext("2d");
+function aqiCategory(a){
+  if(a<=50)return["Good","#54d69a"];
+  if(a<=100)return["Satisfactory","#a7d84a"];
+  if(a<=200)return["Moderate","#f0c14a"];
+  if(a<=300)return["Poor","#f0a34a"];
+  if(a<=400)return["Very Poor","#f0645a"];
+  return["Severe","#c23b32"];
+}
+var haze=0;
+function computeAir(){
+  var a=+act.value,g=+green.value,w=+wind.value;
+  document.getElementById("actV").textContent=a;
+  document.getElementById("grV").textContent=g;
+  document.getElementById("wnV").textContent=w;
+  // simple model
+  var pm=Math.max(5, a*3.6 - g*1.2 - w*1.0 + 20);
+  var aqi=Math.round(Math.min(500, pm*1.3));
+  var co2=Math.round(400 + a*2.2 - g*0.9);
+  var cat=aqiCategory(aqi);
+  document.getElementById("aqi").textContent=aqi;
+  document.getElementById("pm").textContent=Math.round(pm);
+  document.getElementById("co2").textContent=co2;
+  var cp=document.getElementById("aqiCat"); cp.textContent=cat[0];
+  cp.style.background=cat[1]; cp.style.color="#0a1119";
+  haze=Math.min(1, aqi/380);
+  document.getElementById("airFact").innerHTML=
+    "India follows a 6-band <b>AQI</b>. High activity and low green cover push PM2.5 up; "+
+    "trees and wind disperse pollutants. Current air is <b style='color:"+cat[1]+"'>"+cat[0]+"</b>.";
+}
+var puff=[]; for(var i=0;i<26;i++)puff.push({x:Math.random()*360,y:60+Math.random()*120,r:14+Math.random()*22,s:.2+Math.random()*.5});
+function drawAir(){
+  actx.clearRect(0,0,360,220);
+  // sky gradient by haze
+  var g=actx.createLinearGradient(0,0,0,220);
+  g.addColorStop(0, mix("#2b6fb0","#8a7f5a",haze));
+  g.addColorStop(1, mix("#bfe0f2","#c9bda0",haze));
+  actx.fillStyle=g; actx.fillRect(0,0,360,220);
+  // sun
+  actx.fillStyle="rgba(255,230,140,"+(0.9-0.5*haze)+")";
+  actx.beginPath(); actx.arc(300,44,18,0,7); actx.fill();
+  // buildings
+  actx.fillStyle="#20303f";
+  var xs=[20,70,120,175,235,300];
+  xs.forEach(function(x,i){var h=60+((i*37)%70); actx.fillRect(x,170-h,40,h+50);});
+  // smoke stacks emitting
+  actx.fillStyle="#33404f"; actx.fillRect(150,90,14,80); actx.fillRect(250,100,14,70);
+  // haze puffs
+  puff.forEach(function(p){
+    p.x-= p.s*(0.3+ (+wind.value)/120); if(p.x< -30)p.x=390;
+    actx.fillStyle="rgba(120,110,95,"+(0.10+0.35*haze)+")";
+    actx.beginPath(); actx.arc(p.x,p.y,p.r,0,7); actx.fill();
+  });
+  // ground
+  actx.fillStyle="#17222d"; actx.fillRect(0,200,360,20);
+}
+function mix(c1,c2,t){
+  function h(c){return [parseInt(c.substr(1,2),16),parseInt(c.substr(3,2),16),parseInt(c.substr(5,2),16)];}
+  var a=h(c1),b=h(c2);
+  return "rgb("+Math.round(a[0]+(b[0]-a[0])*t)+","+Math.round(a[1]+(b[1]-a[1])*t)+","+Math.round(a[2]+(b[2]-a[2])*t)+")";
+}
+[act,green,wind].forEach(function(s){s.addEventListener("input",computeAir);});
+computeAir();
+
+/* ================= MODE 2: CONSEQUENCES ================= */
+var consTabs=document.getElementById("consTabs");
+consTabs.addEventListener("click",function(e){
+  var b=e.target.closest(".btn"); if(!b)return;
+  [].forEach.call(consTabs.children,function(x){x.classList.remove("on");});
+  b.classList.add("on");
+  var c=b.dataset.c;
+  ["warm","acid","ozone","eutro","biomag"].forEach(function(id){
+    document.getElementById("c-"+id).style.display=(id===c)?"block":"none";
+  });
+});
+
+/* --- Global warming --- */
+var co2s=document.getElementById("co2s"),warmSvg=document.getElementById("warmSvg");
+function warm(){
+  var ppm=+co2s.value; document.getElementById("co2V").textContent=ppm;
+  // log forcing: dF=5.35 ln(C/C0); dT = lambda*dF, lambda~0.8 K/(W/m2)
+  var dF=5.35*Math.log(ppm/280);
+  var dT=(0.8*dF); dT=Math.round(dT*100)/100;
+  document.getElementById("dT").textContent=dT.toFixed(2);
+  var cat,col;
+  if(dT<1.0){cat="safe";col="#54d69a";}
+  else if(dT<1.5){cat="Paris target";col="#a7d84a";}
+  else if(dT<2.5){cat="dangerous";col="#f0a34a";}
+  else{cat="catastrophic";col="#f0645a";}
+  var p=document.getElementById("dTcat"); p.textContent=cat; p.style.background=col;p.style.color="#0a1119";
+  // draw earth + trapped rays
+  var t=Math.min(1,dT/4);
+  var s='<defs></defs>';
+  s+='<rect x="0" y="0" width="360" height="220" rx="10" fill="#0a141d"/>';
+  s+='<text x="12" y="20" fill="#95acbf" font-size="11">Sun ☀</text>';
+  // atmosphere band
+  s+='<rect x="20" y="150" width="320" height="24" fill="'+mix("#2f8fb4","#f0645a",t)+'" opacity="0.5"/>';
+  s+='<text x="26" y="166" fill="#e8f0f7" font-size="10">greenhouse blanket</text>';
+  // earth surface
+  s+='<rect x="0" y="182" width="360" height="38" fill="'+mix("#2b6e4a","#8a5a2b",t)+'"/>';
+  // incoming sun ray
+  s+='<line x1="30" y1="26" x2="150" y2="182" stroke="#ffd45a" stroke-width="3"/>';
+  s+='<polygon points="150,182 143,170 156,172" fill="#ffd45a"/>';
+  // outgoing IR trapped (bounces)
+  for(var i=0;i<3+Math.round(t*4);i++){
+    var x=170+i*22;
+    s+='<line x1="'+x+'" y1="182" x2="'+(x+8)+'" y2="156" stroke="#f0645a" stroke-width="2" opacity="0.85"/>';
+    s+='<line x1="'+(x+8)+'" y1="156" x2="'+(x+16)+'" y2="182" stroke="#f0a34a" stroke-width="2" opacity="0.6"/>';
+  }
+  // thermometer
+  s+='<rect x="315" y="40" width="14" height="100" rx="7" fill="#16222d" stroke="#28394a"/>';
+  s+='<rect x="318" y="'+(130-Math.min(94,dT*30))+'" width="8" height="'+Math.min(94,dT*30+8)+'" rx="4" fill="'+col+'"/>';
+  s+='<circle cx="322" cy="142" r="9" fill="'+col+'"/>';
+  s+='<text x="292" y="34" fill="#95acbf" font-size="10">+'+dT.toFixed(1)+'°C</text>';
+  warmSvg.innerHTML=s;
+}
+co2s.addEventListener("input",warm); warm();
+
+/* --- Acid rain --- */
+var sos=document.getElementById("sos"),acidSvg=document.getElementById("acidSvg");
+function acid(){
+  var e=+sos.value; document.getElementById("soV").textContent=e;
+  // pH from 5.8 (clean-ish) down to 3.5
+  var ph=5.8 - (e/100)*2.3; ph=Math.round(ph*10)/10;
+  document.getElementById("phV").textContent=ph.toFixed(1);
+  var cat,col;
+  if(ph>=5.6){cat="near normal";col="#54d69a";}
+  else if(ph>=4.8){cat="acidic";col="#f0c14a";}
+  else if(ph>=4.0){cat="acid rain";col="#f0a34a";}
+  else{cat="strong acid rain";col="#f0645a";}
+  var p=document.getElementById("phCat");p.textContent=cat;p.style.background=col;p.style.color="#0a1119";
+  var dmg=Math.min(1,(5.6-ph)/2.1); if(dmg<0)dmg=0;
+  var s='<rect x="0" y="0" width="360" height="220" rx="10" fill="#0a141d"/>';
+  // cloud
+  s+='<ellipse cx="120" cy="40" rx="70" ry="24" fill="'+mix("#6b7a88","#5a4a4a",e/100)+'"/>';
+  s+='<text x="88" y="44" fill="#0a141d" font-size="11">SO₂ · NOₓ</text>';
+  // rain drops
+  for(var i=0;i<16;i++){var x=60+i*11+((i*13)%9); s+='<line x1="'+x+'" y1="60" x2="'+(x-6)+'" y2="'+(90+ (i*7)%40)+'" stroke="'+col+'" stroke-width="2" opacity="0.8"/>';}
+  // monument (marble) eroding
+  s+='<rect x="40" y="120" width="70" height="80" fill="'+mix("#dfe7ee","#8a8577",dmg)+'"/>';
+  s+='<polygon points="40,120 75,96 110,120" fill="'+mix("#cfd8e0","#7d786b",dmg)+'"/>';
+  s+='<circle cx="75" cy="150" r="'+(6+dmg*10)+'" fill="#0a141d" opacity="'+(dmg*0.6)+'"/>';
+  s+='<text x="34" y="214" fill="#95acbf" font-size="10">marble (CaCO₃)</text>';
+  // tree health
+  var green=mix("#2f7d3a","#7a5a20",dmg);
+  s+='<rect x="250" y="150" width="10" height="50" fill="#5a4326"/>';
+  s+='<circle cx="255" cy="140" r="'+(30-dmg*12)+'" fill="'+green+'"/>';
+  s+='<text x="228" y="214" fill="#95acbf" font-size="10">forest / crops</text>';
+  // ground water pH tint
+  s+='<rect x="0" y="200" width="360" height="20" fill="'+mix("#1b3a4a","#3a2a1b",dmg)+'"/>';
+  acidSvg.innerHTML=s;
+}
+sos.addEventListener("input",acid); acid();
+
+/* --- Ozone --- */
+var cfcs=document.getElementById("cfcs"),ozSvg=document.getElementById("ozSvg");
+function ozone(){
+  var c=+cfcs.value; document.getElementById("cfcV").textContent=c;
+  var oz=Math.round(100 - c*0.6); // % of natural ozone
+  var uv=Math.round(100 + c*1.4);
+  document.getElementById("ozV").textContent=oz;
+  document.getElementById("uvV").textContent=uv+"%";
+  var hole=(100-oz)/100;
+  var s='<rect x="0" y="0" width="360" height="220" rx="10" fill="#050a12"/>';
+  s+='<text x="12" y="18" fill="#95acbf" font-size="11">Stratosphere — ozone shield</text>';
+  // ozone band with a hole
+  s+='<rect x="20" y="60" width="320" height="30" rx="15" fill="#49c0e6" opacity="0.75"/>';
+  var hw=hole*220;
+  if(hw>4)s+='<rect x="'+(180-hw/2)+'" y="60" width="'+hw+'" height="30" rx="15" fill="#050a12"/>';
+  // sun UV rays
+  for(var i=0;i<9;i++){var x=40+i*36; var through=(Math.abs(x-180)<hw/2);
+    s+='<line x1="'+x+'" y1="20" x2="'+x+'" y2="'+(through?200:60)+'" stroke="'+(through?"#f0645a":"#f0c14a")+'" stroke-width="'+(through?3:2)+'" opacity="'+(through?0.95:0.5)+'"/>';}
+  // earth
+  s+='<rect x="0" y="196" width="360" height="24" fill="#20303f"/>';
+  s+='<text x="12" y="212" fill="#95acbf" font-size="10">surface: '+uv+'% UV load</text>';
+  // CFC molecules rising
+  for(var j=0;j<Math.round(c/12);j++){s+='<text x="'+(40+j*40)+'" y="150" fill="#b57edc" font-size="10">CFC↑</text>';}
+  ozSvg.innerHTML=s;
+}
+cfcs.addEventListener("input",ozone); ozone();
+
+/* --- Eutrophication (canvas anim) --- */
+var nuts=document.getElementById("nuts"),eCv=document.getElementById("eutroCv"),ex=eCv.getContext("2d");
+var eutroPlay=document.getElementById("eutroPlay"),eutroOn=true;
+eutroPlay.addEventListener("click",function(){eutroOn=!eutroOn;eutroPlay.textContent=eutroOn?"Pause":"Play";eutroPlay.classList.toggle("on",eutroOn);});
+var algae=[],bloom=0,fish=[];
+for(var i=0;i<3;i++)fish.push({x:Math.random()*320+20,y:120+Math.random()*70,d:Math.random()<.5?1:-1,alive:true});
+function eutroModel(){
+  var n=+nuts.value; document.getElementById("nutV").textContent=n;
+}
+nuts.addEventListener("input",eutroModel); eutroModel();
+function stepEutro(){
+  var n=+nuts.value/100;
+  var target=n; bloom+= (target-bloom)*0.02;
+  // dissolved oxygen falls as bloom & decomposition rise
+  var doo=Math.max(0.5, 9 - bloom*8.5);
+  document.getElementById("doV").textContent=doo.toFixed(1);
+  var cat,col;
+  if(doo>=6){cat="healthy";col="#54d69a";}
+  else if(doo>=4){cat="stressed";col="#f0c14a";}
+  else if(doo>=2){cat="hypoxic";col="#f0a34a";}
+  else{cat="dead zone";col="#f0645a";}
+  var p=document.getElementById("doCat");p.textContent=cat;p.style.background=col;p.style.color="#0a1119";
+  // spawn algae
+  var want=Math.round(bloom*70);
+  while(algae.length<want)algae.push({x:Math.random()*360,y:12+Math.random()*150,r:2+Math.random()*3,p:Math.random()*6});
+  while(algae.length>want)algae.pop();
+  // fish suffer
+  fish.forEach(function(f){ f.alive= doo>3.0; if(f.alive){f.x+=f.d*0.7; if(f.x<20||f.x>340)f.d*=-1;} });
+  drawEutro(doo,col);
+}
+function drawEutro(doo,col){
+  ex.clearRect(0,0,360,220);
+  // water gradient greener with bloom
+  var g=ex.createLinearGradient(0,0,0,220);
+  g.addColorStop(0, mix("#1a466b","#3a5f1a",bloom));
+  g.addColorStop(1, mix("#0d2c44","#243d10",bloom));
+  ex.fillStyle=g; ex.fillRect(0,0,360,220);
+  // algae
+  algae.forEach(function(a){a.p+=0.05; var yy=a.y+Math.sin(a.p)*1.5;
+    ex.fillStyle="rgba(120,200,90,0.85)"; ex.beginPath(); ex.arc(a.x,yy,a.r,0,7); ex.fill();});
+  // fish
+  fish.forEach(function(f){
+    ex.fillStyle=f.alive?"#e8f0f7":"#6b7a88";
+    ex.beginPath();
+    ex.ellipse(f.x,f.y,9,5,0,0,7); ex.fill();
+    ex.beginPath(); ex.moveTo(f.x-9*f.d,f.y); ex.lineTo(f.x-16*f.d,f.y-5); ex.lineTo(f.x-16*f.d,f.y+5); ex.closePath(); ex.fill();
+    if(!f.alive){ex.fillStyle="#0a141d";ex.beginPath();ex.arc(f.x+4*f.d,f.y-1,1.4,0,7);ex.fill();
+      ex.strokeStyle="#6b7a88";ex.beginPath();ex.moveTo(f.x+2*f.d,f.y-3);ex.lineTo(f.x+6*f.d,f.y+1);ex.stroke();}
+  });
+  // O2 bar
+  ex.fillStyle="#0a141d"; ex.fillRect(300,14,48,14);
+  ex.fillStyle=col; ex.fillRect(302,16,Math.max(2,doo/9*44),10);
+  ex.fillStyle="#e8f0f7"; ex.font="9px sans-serif"; ex.fillText("O₂ "+doo.toFixed(1),300,12);
+}
+
+/* --- Biomagnification --- */
+var ddts=document.getElementById("ddts"),bioSvg=document.getElementById("bioSvg");
+var LEVELS=[{n:"Water",f:1},{n:"Phytoplankton",f:10},{n:"Zooplankton",f:100},{n:"Small fish",f:1000},{n:"Large fish",f:5000},{n:"Fish-eating bird",f:25000}];
+function biomag(){
+  var base=(+ddts.value)/1000; // ppm in water, e.g. 0.003
+  document.getElementById("ddtV").textContent=base.toFixed(3);
+  var top=base*LEVELS[LEVELS.length-1].f;
+  document.getElementById("topV").textContent=top.toFixed(1);
+  var cat,col;
+  if(top<25){cat="low";col="#54d69a";}
+  else if(top<75){cat="harmful";col="#f0a34a";}
+  else{cat="lethal to birds";col="#f0645a";}
+  var p=document.getElementById("topCat");p.textContent=cat;p.style.background=col;p.style.color="#0a1119";
+  var s='<rect x="0" y="0" width="360" height="240" rx="10" fill="#0a141d"/>';
+  s+='<text x="12" y="16" fill="#95acbf" font-size="10">DDT concentration climbs ~10× per trophic level</text>';
+  LEVELS.forEach(function(L,i){
+    var conc=base*L.f;
+    var y=30+i*34;
+    var w=Math.min(250, 18+Math.log10(conc*1000+1)*40);
+    var t=Math.min(1,conc/100);
+    s+='<rect x="12" y="'+y+'" width="'+w+'" height="24" rx="6" fill="'+mix("#2f8fb4","#f0645a",t)+'"/>';
+    s+='<text x="18" y="'+(y+16)+'" fill="#eaf2f8" font-size="11">'+L.n+'</text>';
+    s+='<text x="'+(w+20)+'" y="'+(y+16)+'" fill="#95acbf" font-size="10">'+conc.toFixed(conc<1?3:1)+' ppm</text>';
+  });
+  bioSvg.innerHTML=s;
+}
+ddts.addEventListener("input",biomag); biomag();
+
+/* ================= MODE 3: CONTROL ================= */
+var CTRL=[
+  {id:"air",name:"Air control",col:"#8a9bb0",
+   how:"Catalytic converters & BS-VI fuel norms, electrostatic precipitators and scrubbers on chimneys, CNG/electric public transport, tall stacks for dispersal, ban on crop-residue burning."},
+  {id:"water",name:"Water control",col:"#49c0e6",
+   how:"Sewage & effluent treatment plants (STP/ETP) before discharge, no untreated dumping, constructed wetlands, Namami Gange type river clean-ups, rainwater harvesting."},
+  {id:"soil",name:"Soil & waste",col:"#c79a5b",
+   how:"3 R's — Reduce, Reuse, Recycle; composting & vermicomposting, sanitary landfills, ban on single-use plastic, integrated pest management, organic manure over agrochemicals."},
+  {id:"noise",name:"Noise control",col:"#b57edc",
+   how:"Silence zones near hospitals/schools, sound barriers & green belts, mufflers on vehicles, limits on loudspeaker dB and timings, restrictions on firecrackers."},
+  {id:"sust",name:"Sustainable living",col:"#54d69a",
+   how:"Renewable energy (solar, wind), afforestation, energy efficiency, public transport & cycling, environmental laws (EPA 1986), CPCB/SPCB monitoring, public awareness."}
+];
+var cc=document.getElementById("ctrlCards"),cd=document.getElementById("ctrlDetail");
+CTRL.forEach(function(t,i){
+  var d=document.createElement("div"); d.className="pcard"+(i===0?" on":""); d.dataset.id=t.id;
+  d.innerHTML='<div class="t"><span class="dot" style="background:'+t.col+'"></span>'+t.name+'</div>';
+  cc.appendChild(d);
+});
+function showCtrl(id){var t=CTRL.filter(function(x){return x.id===id;})[0];
+  cd.innerHTML='<table><tr><td class="k">Measures</td><td>'+t.how+'</td></tr></table>';}
+cc.addEventListener("click",function(e){var c=e.target.closest(".pcard");if(!c)return;
+  [].forEach.call(cc.children,function(x){x.classList.remove("on");});c.classList.add("on");showCtrl(c.dataset.id);});
+showCtrl("air");
+
+/* ---- Waste sorter (drag + tap) ---- */
+var WASTE=[
+  {n:"Banana peel",b:"bio"},{n:"Paper",b:"bio"},{n:"Vegetable scraps",b:"bio"},{n:"Cotton cloth",b:"bio"},
+  {n:"Plastic bottle",b:"non"},{n:"Glass jar",b:"non"},{n:"Aluminium can",b:"non"},{n:"Styrofoam",b:"non"}
+];
+var wItems=document.getElementById("wasteItems"),dropBio=document.getElementById("dropBio"),dropNon=document.getElementById("dropNon");
+var wScore=document.getElementById("wasteScore"),selItem=null,correct=0,placed=0;
+function buildWaste(){
+  wItems.innerHTML="";dropBio.innerHTML="";dropNon.innerHTML="";correct=0;placed=0;selItem=null;
+  var order=WASTE.slice().sort(function(){return Math.random()-0.5;});
+  order.forEach(function(w){
+    var el=document.createElement("div");el.className="item";el.textContent=w.n;el.dataset.b=w.b;el.draggable=true;
+    el.addEventListener("dragstart",function(ev){ev.dataTransfer.setData("text",w.b);ev.dataTransfer.setData("id",w.n);dragEl=el;});
+    el.addEventListener("click",function(){
+      if(el.classList.contains("placed"))return;
+      [].forEach.call(wItems.children,function(x){x.style.outline="";});
+      if(selItem===el){selItem=null;el.style.outline="";}
+      else{selItem=el;el.style.outline="2px solid var(--accent)";}
+    });
+    wItems.appendChild(el);
+  });
+  updScore();
+}
+var dragEl=null;
+function place(el,binName){
+  if(!el||el.classList.contains("placed"))return;
+  var right=el.dataset.b===binName;
+  el.classList.add("placed"); el.style.outline="";
+  el.style.borderColor=right?"var(--good)":"var(--bad)";
+  (binName==="bio"?dropBio:dropNon).appendChild(el);
+  placed++; if(right)correct++;
+  selItem=null; updScore();
+}
+function updScore(){
+  wScore.textContent="Sorted "+correct+" / "+WASTE.length+" correctly."+(placed===WASTE.length?(correct===WASTE.length?" 🎉 Perfect!":" Try Reset to improve."):"");
+}
+[["binBio","bio"],["binNon","non"]].forEach(function(pair){
+  var bin=document.getElementById(pair[0]);
+  bin.addEventListener("dragover",function(ev){ev.preventDefault();bin.classList.add("over");});
+  bin.addEventListener("dragleave",function(){bin.classList.remove("over");});
+  bin.addEventListener("drop",function(ev){ev.preventDefault();bin.classList.remove("over");place(dragEl,pair[1]);dragEl=null;});
+  bin.addEventListener("click",function(){if(selItem)place(selItem,pair[1]);});
+});
+document.getElementById("wasteReset").addEventListener("click",buildWaste);
+buildWaste();
+
+/* ================= QUIZ ================= */
+var QUIZ=[
+  {q:"In biomagnification, where is the concentration of a non-biodegradable toxin like DDT highest?",
+   opts:["In water","In producers (algae)","In primary consumers","In the top predator"],a:3,
+   e:"Fat-soluble toxins are not excreted and multiply ~10× per trophic level, so the top carnivore accumulates the most."},
+  {q:"Eutrophication ultimately harms aquatic animals mainly because it causes:",
+   opts:["A rise in dissolved oxygen","Depletion of dissolved oxygen","Cooling of the water","An increase in water pH forever"],a:1,
+   e:"Nutrient enrichment → algal bloom → decomposition by bacteria consumes O₂, creating hypoxic dead zones that suffocate fish."},
+  {q:"Acid rain is chiefly caused by atmospheric:",
+   opts:["CO₂ and CH₄","SO₂ and NOₓ","CFCs and halons","O₃ and O₂"],a:1,
+   e:"SO₂ and NOₓ form H₂SO₄ and HNO₃ with rainwater, lowering rain pH below the normal ~5.6."}
+];
+var qb=document.getElementById("quizBox");
+QUIZ.forEach(function(item,qi){
+  var d=document.createElement("div");d.className="q";
+  var h='<div class="qq">'+(qi+1)+". "+item.q+'</div>';
+  item.opts.forEach(function(o,oi){h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';});
+  h+='<div class="expl" id="expl'+qi+'"></div>';
+  d.innerHTML=h; qb.appendChild(d);
+});
+qb.addEventListener("click",function(e){
+  var b=e.target.closest(".opt"); if(!b)return;
+  var qi=+b.dataset.q, oi=+b.dataset.o, item=QUIZ[qi];
+  var parent=b.parentNode;
+  if(parent.dataset.done)return; parent.dataset.done="1";
+  [].forEach.call(parent.querySelectorAll(".opt"),function(op){
+    var i=+op.dataset.o; op.disabled=true;
+    if(i===item.a)op.classList.add("correct");
+    else if(i===oi)op.classList.add("wrong");
+  });
+  var ex=document.getElementById("expl"+qi);
+  ex.innerHTML=(oi===item.a?"✓ Correct. ":"✗ ")+item.e;
+  ex.classList.add("show");
+});
+
+/* ================= ANIMATION LOOP ================= */
+var last=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(!running)return;
+  if(ts-last<33)return; last=ts;
+  // only animate what is visible
+  if(document.getElementById("m-types").classList.contains("active")) drawAir();
+  if(document.getElementById("m-cons").classList.contains("active") &&
+     document.getElementById("c-eutro").style.display!=="none" && eutroOn) stepEutro();
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

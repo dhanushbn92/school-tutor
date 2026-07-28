@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Diseases Lab - NIOS Class 12 Biology Ch29</title>
+<style>
+  :root{
+    --accent:#5eb8a8;
+    --accent-dark:#3f9384;
+    --bg:#12181d;
+    --panel:#1b232b;
+    --panel2:#232e37;
+    --ink:#e7edf2;
+    --muted:#9fb0bd;
+    --line:#31404b;
+    --good:#54c39a;
+    --bad:#e8797a;
+    --warn:#e5b567;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1c2731,#11171c 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.4rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);
+    border:2px solid transparent;padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08110f;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.1rem;margin:2px 0 10px;}
+  h3{font-size:.98rem;margin:0 0 6px;}
+  .lead{color:var(--muted);font-size:.9rem;margin:0 0 14px;}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:7px 13px;border-radius:20px;cursor:pointer;font-size:.84rem;font-weight:600;transition:.15s;}
+  .chip:hover{color:var(--ink);}
+  .chip.on{background:var(--accent);color:#08110f;border-color:var(--accent-dark);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;
+    padding:14px;transition:.15s;position:relative;overflow:hidden;}
+  .card:hover{border-color:var(--accent-dark);transform:translateY(-2px);}
+  .card .emoji{font-size:1.7rem;line-height:1;}
+  .card h3{margin:6px 0 2px;font-size:1rem;}
+  .badge{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;
+    text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
+  .b-bact{background:#33414f;color:#8fd0ff;}
+  .b-viral{background:#4a3346;color:#f0a6d6;}
+  .b-prot{background:#3f4229;color:#e5d17a;}
+  .b-fung{background:#2f4436;color:#8fe0b0;}
+  .b-helm{background:#432f2f;color:#f0a6a6;}
+  .row{font-size:.83rem;margin:5px 0;color:var(--muted);}
+  .row b{color:var(--ink);font-weight:600;}
+  .tag{display:inline-block;background:#2a3641;color:#bcd0dd;font-size:.72rem;
+    padding:2px 7px;border-radius:8px;margin:2px 3px 0 0;}
+  .facts{background:linear-gradient(135deg,#20303a,#1a2830);border:1px solid var(--line);
+    border-radius:14px;padding:13px 15px;margin-top:4px;}
+  .facts h3{color:var(--accent);}
+  .facts p{font-size:.86rem;margin:6px 0;color:#cdd9e2;}
+  .btn{background:var(--accent);color:#08110f;border:none;padding:9px 16px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  /* matching game */
+  .match-wrap{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 280px;min-width:260px;}
+  .drag{background:var(--panel2);border:1px solid var(--line);border-radius:11px;
+    padding:10px 12px;margin-bottom:9px;cursor:pointer;font-size:.87rem;transition:.15s;
+    display:flex;align-items:center;gap:8px;}
+  .drag:hover{border-color:var(--accent-dark);}
+  .drag.sel{border-color:var(--accent);background:#243c3a;}
+  .drag.done{opacity:.55;pointer-events:none;}
+  .drop{background:#182028;border:2px dashed var(--line);border-radius:11px;padding:11px 12px;
+    margin-bottom:9px;font-size:.87rem;min-height:46px;transition:.15s;}
+  .drop.sel{border-color:var(--accent);}
+  .drop .filled{display:inline-block;background:var(--accent);color:#08110f;font-weight:600;
+    font-size:.8rem;padding:2px 8px;border-radius:8px;margin:2px 4px 0 0;}
+  .drop .filled.wrong{background:var(--bad);}
+  .drop .filled.right{background:var(--good);}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  /* quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:12px;}
+  .q p.qtext{font-weight:600;margin:0 0 10px;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:#182028;border:1px solid var(--line);
+    color:var(--ink);padding:9px 12px;border-radius:9px;margin-bottom:7px;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent-dark);}
+  .opt.correct{background:#204034;border-color:var(--good);color:#c9f0dd;}
+  .opt.wrong{background:#3d2529;border-color:var(--bad);color:#f2c9cb;}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:7px;display:none;}
+  .expl.show{display:block;}
+  .score{font-weight:700;color:var(--accent);margin-top:6px;}
+  .note{font-size:.78rem;color:var(--muted);margin-top:10px;font-style:italic;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.two-col{grid-template-columns:1fr;}}
+  .cmp{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel2);}
+  .cmp h3{color:var(--accent);}
+  .cmp ul{margin:6px 0 0;padding-left:18px;font-size:.83rem;color:#cdd9e2;}
+  .cmp li{margin:3px 0;}
+  .status{font-size:.85rem;font-weight:600;margin-left:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>&#129440; Human Diseases Lab</h1>
+    <p>NIOS Class 12 Biology &mdash; Ch29: Some Common Human Diseases. Explore pathogens, transmission, and lifestyle diseases.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="explore">Infectious Diseases</button>
+    <button class="tab" data-tab="transmit">Transmission Modes</button>
+    <button class="tab" data-tab="lifestyle">Lifestyle Diseases</button>
+    <button class="tab" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ EXPLORE ============ -->
+  <section class="panel" id="tab-explore">
+    <h2>Infectious Disease Explorer</h2>
+    <p class="lead">Filter by pathogen type. Each card shows the causative agent, how it spreads, key symptoms, and prevention.</p>
+    <div class="filter-row" id="filters">
+      <span class="chip on" data-f="all">All</span>
+      <span class="chip" data-f="bacterial">&#129440; Bacterial</span>
+      <span class="chip" data-f="viral">&#129440; Viral</span>
+      <span class="chip" data-f="protozoan">&#129440; Protozoan</span>
+      <span class="chip" data-f="fungal">&#129440; Fungal</span>
+      <span class="chip" data-f="helminthic">&#129440; Helminthic</span>
+    </div>
+    <div class="grid" id="cardGrid"></div>
+    <div class="facts" style="margin-top:14px;">
+      <h3>&#128161; Did you know?</h3>
+      <p id="factText"></p>
+      <button class="btn ghost" id="nextFact">Next fact &rarr;</button>
+    </div>
+  </section>
+
+  <!-- ============ TRANSMISSION ============ -->
+  <section class="panel hidden" id="tab-transmit">
+    <h2>Transmission Modes &mdash; Matching Game</h2>
+    <p class="lead">Tap a disease on the left, then tap the transmission route it belongs to. Diseases can share a route.</p>
+    <div class="match-wrap">
+      <div class="col">
+        <h3>Diseases</h3>
+        <div id="diseaseList"></div>
+      </div>
+      <div class="col">
+        <h3>Routes of spread</h3>
+        <div id="routeList"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn" id="checkMatch">Check answers</button>
+      <button class="btn ghost" id="resetMatch">Reset</button>
+      <span class="status" id="matchStatus"></span>
+    </div>
+
+    <div class="facts" style="margin-top:16px;">
+      <h3>&#129439; Mosquito vector life-cycle (malaria &amp; dengue)</h3>
+      <svg viewBox="0 0 640 150" role="img" aria-label="Mosquito life cycle stages">
+        <defs>
+          <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#5eb8a8"/>
+          </marker>
+        </defs>
+        <g font-family="sans-serif" font-size="12" fill="#cdd9e2" text-anchor="middle">
+          <rect x="10" y="45" width="110" height="60" rx="10" fill="#232e37" stroke="#31404b"/>
+          <text x="65" y="70" font-size="20">&#129370;</text>
+          <text x="65" y="92">Egg (water)</text>
+          <rect x="150" y="45" width="110" height="60" rx="10" fill="#232e37" stroke="#31404b"/>
+          <text x="205" y="70" font-size="20">&#128005;</text>
+          <text x="205" y="92">Larva</text>
+          <rect x="290" y="45" width="110" height="60" rx="10" fill="#232e37" stroke="#31404b"/>
+          <text x="345" y="70" font-size="20">&#127807;</text>
+          <text x="345" y="92">Pupa</text>
+          <rect x="430" y="45" width="110" height="60" rx="10" fill="#232e37" stroke="#31404b"/>
+          <text x="485" y="70" font-size="20">&#129439;</text>
+          <text x="485" y="92">Adult mosquito</text>
+          <line x1="122" y1="75" x2="146" y2="75" stroke="#5eb8a8" stroke-width="2" marker-end="url(#arw)"/>
+          <line x1="262" y1="75" x2="286" y2="75" stroke="#5eb8a8" stroke-width="2" marker-end="url(#arw)"/>
+          <line x1="402" y1="75" x2="426" y2="75" stroke="#5eb8a8" stroke-width="2" marker-end="url(#arw)"/>
+          <path d="M540,60 C600,20 600,120 545,95" fill="none" stroke="#5eb8a8" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arw)"/>
+          <text x="600" y="130" font-size="10.5" fill="#9fb0bd">bites &amp; lays eggs</text>
+        </g>
+      </svg>
+      <p style="font-size:.83rem;color:#cdd9e2;margin-top:4px;">
+        Female <b>Anopheles</b> mosquitoes transmit malaria (<i>Plasmodium</i>); female <b>Aedes aegypti</b> transmit dengue virus. Both breed in stagnant water &mdash; the first three stages are aquatic. Control focuses on eliminating breeding sites and preventing bites.</p>
+    </div>
+  </section>
+
+  <!-- ============ LIFESTYLE ============ -->
+  <section class="panel hidden" id="tab-lifestyle">
+    <h2>Non-infectious &amp; Lifestyle Diseases</h2>
+    <p class="lead">These are non-communicable &mdash; not caused by pathogens and not passed person to person. They arise from genetics, diet, and lifestyle.</p>
+
+    <div class="two-col" style="margin-bottom:14px;">
+      <div class="cmp">
+        <h3>Communicable (infectious)</h3>
+        <ul>
+          <li>Caused by pathogens: bacteria, viruses, protozoa, fungi, worms</li>
+          <li>Spread person-to-person or by vectors/water/air</li>
+          <li>Often acute; many are preventable by vaccines/hygiene</li>
+          <li>e.g. TB, cholera, malaria, influenza, COVID-19</li>
+        </ul>
+      </div>
+      <div class="cmp">
+        <h3>Non-communicable (lifestyle)</h3>
+        <ul>
+          <li>Caused by genetics, diet, inactivity, tobacco, stress</li>
+          <li>Do NOT spread between people</li>
+          <li>Usually chronic, developing over years</li>
+          <li>e.g. diabetes, hypertension, cancer, heart disease</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid" id="lifeGrid"></div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel hidden" id="tab-quiz">
+    <h2>Quick Quiz &mdash; 3 questions</h2>
+    <p class="lead">Choose an answer to reveal whether it is correct and read the explanation.</p>
+    <div id="quizBox"></div>
+    <div class="score" id="quizScore"></div>
+    <button class="btn ghost" id="resetQuiz" style="margin-top:8px;">Reset quiz</button>
+    <p class="note">General educational information only &mdash; not medical advice.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA: infectious diseases ----------
+  var diseases = [
+    {name:"Tuberculosis (TB)", type:"bacterial", emoji:"🫁", label:"Bacterial",
+      pathogen:"Mycobacterium tuberculosis (bacterium)",
+      transmit:"Airborne droplets (coughing/sneezing)",
+      symptoms:"Persistent cough >2 weeks, fever, night sweats, weight loss, blood in sputum",
+      prevent:"BCG vaccine, DOTS treatment, ventilation, covering coughs",
+      routes:["air"]},
+    {name:"Cholera", type:"bacterial", emoji:"💧", label:"Bacterial",
+      pathogen:"Vibrio cholerae (bacterium)",
+      transmit:"Contaminated water and food",
+      symptoms:"Severe watery diarrhoea, vomiting, rapid dehydration",
+      prevent:"Safe drinking water, sanitation, ORS, oral cholera vaccine",
+      routes:["water"]},
+    {name:"Typhoid", type:"bacterial", emoji:"🍽️", label:"Bacterial",
+      pathogen:"Salmonella typhi (bacterium)",
+      transmit:"Contaminated water and food (faecal-oral)",
+      symptoms:"Sustained high fever, headache, abdominal pain, rose spots",
+      prevent:"Hygiene, safe water, typhoid vaccine",
+      routes:["water"]},
+    {name:"Common cold", type:"viral", emoji:"🤧", label:"Viral",
+      pathogen:"Rhinoviruses (virus)",
+      transmit:"Air/droplets and hand contact",
+      symptoms:"Runny nose, sneezing, sore throat, mild fever",
+      prevent:"Hand washing, avoid close contact when ill",
+      routes:["air","contact"]},
+    {name:"Influenza (flu)", type:"viral", emoji:"🤒", label:"Viral",
+      pathogen:"Influenza virus (virus)",
+      transmit:"Airborne droplets",
+      symptoms:"High fever, body aches, cough, fatigue, sore throat",
+      prevent:"Annual flu vaccine, hand hygiene, masks",
+      routes:["air"]},
+    {name:"Dengue", type:"viral", emoji:"🦟", label:"Viral",
+      pathogen:"Dengue virus (virus)",
+      transmit:"Bite of Aedes aegypti mosquito (vector)",
+      symptoms:"High fever, severe joint/muscle pain, rash, low platelets",
+      prevent:"Remove stagnant water, repellents, nets; no routine cure",
+      routes:["vector"]},
+    {name:"COVID-19", type:"viral", emoji:"🦠", label:"Viral",
+      pathogen:"SARS-CoV-2 (coronavirus)",
+      transmit:"Respiratory droplets and aerosols",
+      symptoms:"Fever, dry cough, tiredness, loss of taste/smell, breathlessness",
+      prevent:"Vaccines, masks, distancing, ventilation, hand hygiene",
+      routes:["air"]},
+    {name:"AIDS (HIV)", type:"viral", emoji:"🎀", label:"Viral",
+      pathogen:"Human Immunodeficiency Virus (retrovirus)",
+      transmit:"Body fluids: unsafe sex, infected blood, mother-to-child",
+      symptoms:"Weakened immunity, recurrent infections, weight loss (over years)",
+      prevent:"Safe sex, screened blood, sterile needles, ART; NOT casual contact",
+      routes:["fluid"]},
+    {name:"Hepatitis B", type:"viral", emoji:"🟡", label:"Viral",
+      pathogen:"Hepatitis B virus (virus)",
+      transmit:"Blood and body fluids (B); Hep A/E via water",
+      symptoms:"Jaundice, fatigue, nausea, dark urine, liver damage",
+      prevent:"Hepatitis B vaccine, screened blood, sterile needles",
+      routes:["fluid"]},
+    {name:"Malaria", type:"protozoan", emoji:"🦟", label:"Protozoan",
+      pathogen:"Plasmodium (protozoan parasite)",
+      transmit:"Bite of female Anopheles mosquito (vector)",
+      symptoms:"Cyclic fever with chills, sweating, headache, anaemia",
+      prevent:"Mosquito nets, repellents, drain stagnant water, antimalarials",
+      routes:["vector"]},
+    {name:"Amoebiasis", type:"protozoan", emoji:"💩", label:"Protozoan",
+      pathogen:"Entamoeba histolytica (protozoan)",
+      transmit:"Contaminated water/food (faecal-oral)",
+      symptoms:"Abdominal pain, dysentery (blood/mucus in stool), cramps",
+      prevent:"Safe water, wash hands, wash raw vegetables",
+      routes:["water"]},
+    {name:"Ringworm", type:"fungal", emoji:"🍄", label:"Fungal",
+      pathogen:"Dermatophytes (fungi: Trichophyton, etc.)",
+      transmit:"Skin contact, shared towels/combs, moist areas",
+      symptoms:"Ring-shaped red itchy patches on skin, scalp, nails",
+      prevent:"Keep skin dry, avoid sharing personal items, antifungal cream",
+      routes:["contact"]},
+    {name:"Ascariasis", type:"helminthic", emoji:"🐛", label:"Helminthic",
+      pathogen:"Ascaris lumbricoides (roundworm)",
+      transmit:"Ingesting eggs from contaminated food/water/soil",
+      symptoms:"Abdominal pain, poor nutrition, intestinal blockage in heavy load",
+      prevent:"Sanitation, wash hands/food, deworming medicine",
+      routes:["water"]}
+  ];
+
+  // ---------- DATA: facts ----------
+  var facts = [
+    "TB is caused by a bacterium with a waxy cell wall, making it slow-growing and hard to treat — hence the long DOTS course.",
+    "Only the female mosquito bites and transmits disease; she needs a blood meal to develop her eggs.",
+    "HIV does NOT spread through hugging, sharing food, or mosquito bites — only through specific body fluids.",
+    "Oral Rehydration Solution (ORS), a simple salt-sugar-water mix, has saved millions of lives from cholera dehydration.",
+    "Vaccines work by training your immune system using a harmless piece or weakened form of a pathogen.",
+    "Dengue's 'breakbone fever' name comes from the intense joint and muscle pain it causes.",
+    "Ringworm is not a worm at all — it is a fungal infection named for its ring-shaped rash."
+  ];
+
+  // ---------- DATA: lifestyle ----------
+  var lifestyle = [
+    {name:"Diabetes mellitus", emoji:"🩸",
+      cause:"Type 1: little/no insulin (autoimmune). Type 2: insulin resistance linked to obesity, poor diet, inactivity, genetics.",
+      effect:"High blood glucose; damages eyes, kidneys, nerves, blood vessels.",
+      prevent:"Balanced diet, regular exercise, healthy weight, avoid excess sugar; medication/insulin as needed."},
+    {name:"Hypertension", emoji:"🩹",
+      cause:"Persistently high blood pressure from excess salt, obesity, stress, smoking, alcohol, genetics.",
+      effect:"Silent risk factor for stroke, heart attack, kidney failure.",
+      prevent:"Reduce salt, exercise, manage weight/stress, limit alcohol, monitor BP."},
+    {name:"Cancer", emoji:"🎗️",
+      cause:"Uncontrolled cell division from mutations — tobacco, radiation, carcinogens, some viruses, heredity.",
+      effect:"Tumours that invade tissues and spread (metastasis).",
+      prevent:"Avoid tobacco, healthy diet, limit UV/radiation, screening, HPV/HepB vaccines."},
+    {name:"Cardiovascular disease", emoji:"❤️",
+      cause:"Fatty deposits (atherosclerosis) in arteries from high cholesterol, smoking, inactivity, diabetes.",
+      effect:"Reduced blood flow — angina, heart attack, heart failure.",
+      prevent:"Low-fat diet, exercise, no smoking, control BP/sugar/cholesterol."}
+  ];
+
+  // ---------- DATA: routes ----------
+  var routes = [
+    {id:"air", label:"💨 Air / droplets"},
+    {id:"water", label:"💧 Water / food"},
+    {id:"vector", label:"🦟 Vector (mosquito)"},
+    {id:"contact", label:"🤝 Skin contact"},
+    {id:"fluid", label:"🩸 Body fluids"}
+  ];
+  var routeLabelMap = {air:"Air/droplets", water:"Water/food", vector:"Mosquito vector", contact:"Skin contact", fluid:"Body fluids"};
+
+  // ---------- DATA: quiz ----------
+  var quiz = [
+    {q:"Which pathogen type causes malaria?",
+     opts:["Bacterium","Virus","Protozoan (Plasmodium)","Fungus"],
+     ans:2,
+     expl:"Malaria is caused by the protozoan Plasmodium, transmitted by the female Anopheles mosquito."},
+    {q:"Cholera and typhoid are mainly spread through:",
+     opts:["Mosquito bites","Contaminated water and food","Airborne droplets","Skin contact"],
+     ans:1,
+     expl:"Both are faecal-oral diseases spread by contaminated water/food; safe water and sanitation prevent them."},
+    {q:"Which of the following is a non-communicable (lifestyle) disease?",
+     opts:["Tuberculosis","Dengue","Diabetes","Ringworm"],
+     ans:2,
+     expl:"Diabetes is non-communicable — it does not spread between people and is linked to genetics and lifestyle."}
+  ];
+
+  // ---------- helpers ----------
+  function el(tag, cls, html){var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e;}
+  function badgeClass(t){return {bacterial:"b-bact",viral:"b-viral",protozoan:"b-prot",fungal:"b-fung",helminthic:"b-helm"}[t];}
+
+  // ---------- TABS ----------
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      ["explore","transmit","lifestyle","quiz"].forEach(function(id){
+        document.getElementById("tab-"+id).classList.add("hidden");
+      });
+      document.getElementById("tab-"+t.dataset.tab).classList.remove("hidden");
+    });
+  });
+
+  // ---------- render cards ----------
+  var grid = document.getElementById("cardGrid");
+  function renderCards(filter){
+    grid.innerHTML="";
+    diseases.forEach(function(d){
+      if(filter!=="all" && d.type!==filter) return;
+      var c = el("div","card");
+      var tags = d.routes.map(function(r){return '<span class="tag">'+routeLabelMap[r]+'</span>';}).join("");
+      c.innerHTML =
+        '<div class="emoji">'+d.emoji+'</div>'+
+        '<span class="badge '+badgeClass(d.type)+'">'+d.label+'</span>'+
+        '<h3>'+d.name+'</h3>'+
+        '<div class="row"><b>Pathogen:</b> '+d.pathogen+'</div>'+
+        '<div class="row"><b>Spreads by:</b> '+d.transmit+'</div>'+
+        '<div class="row"><b>Symptoms:</b> '+d.symptoms+'</div>'+
+        '<div class="row"><b>Prevention:</b> '+d.prevent+'</div>'+
+        '<div>'+tags+'</div>';
+      grid.appendChild(c);
+    });
+  }
+  renderCards("all");
+
+  var chips = document.querySelectorAll("#filters .chip");
+  chips.forEach(function(ch){
+    ch.addEventListener("click", function(){
+      chips.forEach(function(x){x.classList.remove("on");});
+      ch.classList.add("on");
+      renderCards(ch.dataset.f);
+    });
+  });
+
+  // ---------- facts ----------
+  var factIdx = 0, factText = document.getElementById("factText");
+  factText.textContent = facts[0];
+  document.getElementById("nextFact").addEventListener("click", function(){
+    factIdx = (factIdx+1) % facts.length;
+    factText.textContent = facts[factIdx];
+  });
+
+  // ---------- transmission matching ----------
+  var matchDiseases = [
+    {name:"Tuberculosis", route:"air"},
+    {name:"Cholera", route:"water"},
+    {name:"Malaria", route:"vector"},
+    {name:"Ringworm", route:"contact"},
+    {name:"AIDS (HIV)", route:"fluid"},
+    {name:"Influenza", route:"air"},
+    {name:"Dengue", route:"vector"}
+  ];
+  var dList = document.getElementById("diseaseList");
+  var rList = document.getElementById("routeList");
+  var selDisease = null;
+  var assign = {}; // route id -> array of {name,route}
+
+  function buildMatch(){
+    dList.innerHTML=""; rList.innerHTML=""; assign={}; selDisease=null;
+    document.getElementById("matchStatus").textContent="";
+    matchDiseases.forEach(function(d,i){
+      var row = el("div","drag", "🧫 "+d.name);
+      row.dataset.idx=i;
+      row.addEventListener("click", function(){
+        if(row.classList.contains("done")) return;
+        dList.querySelectorAll(".drag").forEach(function(x){x.classList.remove("sel");});
+        row.classList.add("sel");
+        selDisease = {el:row, data:d, idx:i};
+      });
+      dList.appendChild(row);
+    });
+    routes.forEach(function(r){
+      assign[r.id]=[];
+      var box = el("div","drop");
+      box.dataset.route=r.id;
+      box.innerHTML = '<b>'+r.label+'</b><div class="slot"></div>';
+      box.addEventListener("click", function(){
+        if(!selDisease) return;
+        assign[r.id].push(selDisease.data);
+        selDisease.el.classList.add("done");
+        selDisease.el.classList.remove("sel");
+        var slot = box.querySelector(".slot");
+        var chip = el("span","filled", selDisease.data.name);
+        chip.dataset.route = selDisease.data.route;
+        slot.appendChild(chip);
+        selDisease=null;
+      });
+      rList.appendChild(box);
+    });
+  }
+  buildMatch();
+
+  document.getElementById("checkMatch").addEventListener("click", function(){
+    var correct=0, total=0;
+    rList.querySelectorAll(".drop").forEach(function(box){
+      var route = box.dataset.route;
+      box.querySelectorAll(".filled").forEach(function(chip){
+        total++;
+        if(chip.dataset.route===route){chip.classList.add("right"); correct++;}
+        else {chip.classList.add("wrong");}
+      });
+    });
+    var placed = matchDiseases.length;
+    var st = document.getElementById("matchStatus");
+    if(total<placed){
+      st.style.color="#e5b567";
+      st.textContent = correct+"/"+placed+" correct — place all diseases first.";
+    } else if(correct===placed){
+      st.style.color="#54c39a";
+      st.textContent = "✅ All "+placed+" correct! Well done.";
+    } else {
+      st.style.color="#e8797a";
+      st.textContent = correct+"/"+placed+" correct. Red chips are misplaced — reset to retry.";
+    }
+  });
+  document.getElementById("resetMatch").addEventListener("click", buildMatch);
+
+  // ---------- lifestyle cards ----------
+  var lifeGrid = document.getElementById("lifeGrid");
+  lifestyle.forEach(function(d){
+    var c = el("div","card");
+    c.innerHTML =
+      '<div class="emoji">'+d.emoji+'</div>'+
+      '<h3>'+d.name+'</h3>'+
+      '<div class="row"><b>Cause:</b> '+d.cause+'</div>'+
+      '<div class="row"><b>Effect:</b> '+d.effect+'</div>'+
+      '<div class="row"><b>Prevention:</b> '+d.prevent+'</div>';
+    lifeGrid.appendChild(c);
+  });
+
+  // ---------- quiz ----------
+  var quizBox = document.getElementById("quizBox");
+  var answered = {};
+  function buildQuiz(){
+    quizBox.innerHTML=""; answered={};
+    document.getElementById("quizScore").textContent="";
+    quiz.forEach(function(item, qi){
+      var q = el("div","q");
+      var html = '<p class="qtext">'+(qi+1)+'. '+item.q+'</p>';
+      q.innerHTML = html;
+      item.opts.forEach(function(opt, oi){
+        var b = el("button","opt", opt);
+        b.addEventListener("click", function(){
+          if(answered[qi]!==undefined) return;
+          answered[qi]=oi;
+          var btns = q.querySelectorAll(".opt");
+          btns.forEach(function(x,ix){
+            if(ix===item.ans) x.classList.add("correct");
+            else if(ix===oi) x.classList.add("wrong");
+          });
+          q.querySelector(".expl").classList.add("show");
+          updateScore();
+        });
+        q.appendChild(b);
+      });
+      q.appendChild(el("div","expl", "💡 "+item.expl));
+      quizBox.appendChild(q);
+    });
+  }
+  function updateScore(){
+    var right=0, done=0;
+    for(var k in answered){ done++; if(answered[k]===quiz[k].ans) right++; }
+    var s = document.getElementById("quizScore");
+    s.textContent = "Score: "+right+"/"+quiz.length + (done===quiz.length? " — quiz complete!":"");
+  }
+  buildQuiz();
+  document.getElementById("resetQuiz").addEventListener("click", buildQuiz);
+
+})();
+</script>
+</body>
+</html>

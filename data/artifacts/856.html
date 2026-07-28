@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biotechnology Lab - NIOS Class 12 Biology (Ch30)</title>
+<style>
+  :root{
+    --accent:#3dd4a7;
+    --accent-2:#2bb98d;
+    --bg:#0e1622;
+    --panel:#172233;
+    --panel-2:#1e2c40;
+    --ink:#e6edf6;
+    --muted:#9fb0c6;
+    --line:#2c3c54;
+    --good:#3dd4a7;
+    --bad:#ef7a7a;
+    --dna1:#6fb1ff;
+    --dna2:#ffd166;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#152238,#0e1622);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);
+    border:1px solid var(--line);padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08221a;background:var(--accent);border-color:var(--accent-2);}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 8px;}
+  h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  p.lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .row{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 320px;min-width:280px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  .btn{
+    background:var(--accent);color:#08221a;border:none;padding:10px 16px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.9rem;transition:.15s;
+    min-height:40px;
+  }
+  .btn:hover{background:var(--accent-2);}
+  .btn:disabled{opacity:.4;cursor:default;}
+  .btn.ghost{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  .stepbox{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-top:12px;min-height:78px;
+  }
+  .stepbox b{color:var(--accent);}
+  .steplist{list-style:none;padding:0;margin:0;font-size:.85rem;}
+  .steplist li{padding:6px 8px;border-radius:8px;color:var(--muted);margin-bottom:3px;}
+  .steplist li.on{background:rgba(61,212,167,.14);color:var(--ink);font-weight:600;}
+  .steplist li.done{color:var(--good);}
+  .facts{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .facts h3{margin-top:0;}
+  .facts ul{margin:0;padding-left:18px;font-size:.85rem;color:var(--muted);}
+  .facts li{margin-bottom:6px;}
+  .facts li b{color:var(--ink);}
+  .pill{display:inline-block;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:999px;padding:3px 10px;font-size:.75rem;color:var(--muted);margin:2px 4px 2px 0;}
+  .quiz{margin-top:4px;}
+  .q{margin-bottom:16px;padding:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:6px;
+    cursor:pointer;font-size:.88rem;transition:.12s;min-height:40px;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(61,212,167,.18);border-color:var(--good);color:#d6ffef;}
+  .opt.wrong{background:rgba(239,122,122,.16);border-color:var(--bad);color:#ffdede;}
+  .qa{font-size:.82rem;color:var(--muted);margin-top:6px;display:none;}
+  .qa.show{display:block;}
+  .tag{font-size:.72rem;color:var(--muted);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:6px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:12px;height:12px;border-radius:3px;display:inline-block;}
+  .metric{font-size:.85rem;color:var(--muted);margin-top:8px;}
+  .metric b{color:var(--accent);font-size:1.05rem;}
+  .modebtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .modebtns .btn{flex:1 1 auto;}
+  .note{font-size:.8rem;color:var(--muted);border-left:3px solid var(--accent);
+    padding:6px 10px;background:var(--panel-2);border-radius:0 8px 8px 0;margin-top:10px;}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;padding:10px 0 20px;}
+  .appcard{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;transition:.15s;}
+  .appcard:hover{border-color:var(--accent);}
+  .appcard h3{margin:0 0 4px;}
+  .appcard p{margin:0;font-size:.83rem;color:var(--muted);}
+  .appcard.open p{color:var(--ink);}
+  @media(max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Biotechnology Lab</h1>
+    <p>NIOS Class 12 Biology - Chapter 30: Biotechnology. Explore recombinant DNA technology, lab tools, and real-world applications.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="rdna">1. Genetic Engineering (rDNA)</button>
+    <button class="tab" data-tab="tools">2. Tools &amp; Techniques</button>
+    <button class="tab" data-tab="apps">3. Applications</button>
+    <button class="tab" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ TAB 1: rDNA ============ -->
+  <section class="panel" id="tab-rdna">
+    <h2>Recombinant DNA Technology: Making Human Insulin</h2>
+    <p class="lead">Follow the five steps used to make a genetically engineered bacterium that produces human insulin.</p>
+    <div class="row">
+      <div class="col">
+        <svg id="rdnaSvg" viewBox="0 0 400 300" aria-label="Recombinant DNA animation"></svg>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--dna1)"></i>Donor DNA (human)</span>
+          <span><i class="sw" style="background:var(--dna2)"></i>Insulin gene</span>
+          <span><i class="sw" style="background:#c98bff"></i>Plasmid vector</span>
+        </div>
+      </div>
+      <div class="col">
+        <ol class="steplist" id="rdnaSteps">
+          <li data-s="0">1. Isolate DNA - extract the insulin gene from a human cell.</li>
+          <li data-s="1">2. Cut - a restriction enzyme (EcoRI) cuts at its recognition site, leaving sticky ends.</li>
+          <li data-s="2">3. Insert - cut the plasmid with the same enzyme; DNA ligase joins the gene into the vector.</li>
+          <li data-s="3">4. Transform - the recombinant plasmid is taken up by a host bacterium (E. coli).</li>
+          <li data-s="4">5. Express &amp; multiply - bacteria divide and the gene is expressed, producing insulin.</li>
+        </ol>
+        <div class="stepbox" id="rdnaMsg">Press <b>Next Step</b> to begin building a recombinant plasmid.</div>
+        <div class="controls">
+          <button class="btn" id="rdnaNext">Next Step</button>
+          <button class="btn ghost" id="rdnaReset">Reset</button>
+        </div>
+        <div class="note">A <b>restriction enzyme</b> recognises a specific palindromic sequence (EcoRI cuts G&#8595;AATTC) and leaves single-stranded "sticky ends" that base-pair with any DNA cut by the same enzyme. <b>DNA ligase</b> seals the sugar-phosphate backbone.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: Tools ============ -->
+  <section class="panel hidden" id="tab-tools">
+    <h2>Tools &amp; Techniques</h2>
+    <div class="modebtns">
+      <button class="btn" data-tool="pcr" id="mPcr">PCR</button>
+      <button class="btn ghost" data-tool="gel" id="mGel">Gel Electrophoresis</button>
+    </div>
+
+    <!-- PCR -->
+    <div id="toolPcr">
+      <p class="lead">Polymerase Chain Reaction amplifies DNA. Each thermal cycle has three steps and <b>doubles</b> the number of copies.</p>
+      <div class="row">
+        <div class="col">
+          <svg id="pcrSvg" viewBox="0 0 400 220" aria-label="PCR animation"></svg>
+        </div>
+        <div class="col">
+          <div class="stepbox" id="pcrMsg">Ready. Run one cycle to see denaturation, annealing and extension.</div>
+          <div class="metric">Cycle: <b id="pcrCycle">0</b> &nbsp; Copies of target: <b id="pcrCopies">1</b></div>
+          <div class="controls">
+            <button class="btn" id="pcrRun">Run 1 Cycle</button>
+            <button class="btn ghost" id="pcrReset">Reset</button>
+          </div>
+          <div class="note"><b>Denaturation (~94&deg;C):</b> strands separate. <b>Annealing (~55&deg;C):</b> primers bind the template. <b>Extension (~72&deg;C):</b> heat-stable <i>Taq</i> polymerase adds nucleotides. n cycles give up to 2<sup>n</sup> copies.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GEL -->
+    <div id="toolGel" class="hidden">
+      <p class="lead">Gel electrophoresis separates DNA fragments by size. An electric field pulls the negatively charged DNA toward the positive electrode; <b>smaller fragments move faster/farther</b>.</p>
+      <div class="row">
+        <div class="col">
+          <svg id="gelSvg" viewBox="0 0 400 240" aria-label="Gel electrophoresis animation"></svg>
+        </div>
+        <div class="col">
+          <div class="stepbox" id="gelMsg">Turn on the power to run the DNA fragments through the gel.</div>
+          <div class="controls">
+            <button class="btn" id="gelRun">Power On</button>
+            <button class="btn ghost" id="gelReset">Reset</button>
+          </div>
+          <div class="note">Lane loaded with fragments of 3000, 1500, 800 and 300 base pairs. The DNA ladder (left) gives reference sizes. Bands are visualised with a dye under UV light.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: Applications ============ -->
+  <section class="panel hidden" id="tab-apps">
+    <h2>Applications of Biotechnology</h2>
+    <p class="lead">Tap a card to learn how biotechnology is used. Accuracy and biosafety matter in every field.</p>
+    <div class="row">
+      <div class="col">
+        <div class="appcard" data-app="med">
+          <h3>Medicine</h3>
+          <p>Tap to expand</p>
+        </div>
+        <div class="appcard" data-app="agri">
+          <h3>Agriculture</h3>
+          <p>Tap to expand</p>
+        </div>
+        <div class="appcard" data-app="ind">
+          <h3>Industry</h3>
+          <p>Tap to expand</p>
+        </div>
+        <div class="appcard" data-app="eth">
+          <h3>Biosafety &amp; Ethics</h3>
+          <p>Tap to expand</p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="facts">
+          <h3>Facts Panel</h3>
+          <ul>
+            <li><b>Insulin:</b> Recombinant human insulin (Humulin, 1982) was the first rDNA drug - safer than animal insulin.</li>
+            <li><b>Vaccines:</b> Hepatitis B vaccine uses a surface antigen made by engineered yeast (a subunit/recombinant vaccine).</li>
+            <li><b>Gene therapy:</b> A correct gene is delivered (often by a viral vector) to treat inherited disorders such as SCID (ADA deficiency).</li>
+            <li><b>Bt cotton:</b> Carries the <i>cry</i> gene from <i>Bacillus thuringiensis</i>, which makes a protein toxic to bollworm larvae but safe for humans.</li>
+            <li><b>Golden Rice:</b> Engineered to make beta-carotene (pro-vitamin A) in the grain.</li>
+            <li><b>Industry:</b> Engineered microbes make enzymes, antibiotics, organic acids and biofuels.</li>
+            <li><b>Biosafety:</b> India's GEAC regulates GM organisms; concerns include gene flow, biodiversity and ethics.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel hidden" id="tab-quiz">
+    <h2>Check Your Understanding</h2>
+    <p class="lead">Three questions. Click an option to reveal the answer.</p>
+    <div class="quiz" id="quiz"></div>
+    <div class="metric">Score: <b id="score">0</b> / 3</div>
+  </section>
+
+  <footer>Biotechnology Lab &middot; Self-contained interactive &middot; NIOS Class 12 Biology Ch30</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs){var e=document.createElementNS(SVGNS,tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  function txt(x,y,s,cls,size){var t=el("text",{x:x,y:y,"text-anchor":"middle","font-size":size||11,fill:"#e6edf6"});if(cls)t.setAttribute("class",cls);t.textContent=s;return t;}
+
+  /* ---------------- Tabs ---------------- */
+  var tabs=document.getElementById("tabs");
+  var panels={rdna:"tab-rdna",tools:"tab-tools",apps:"tab-apps",quiz:"tab-quiz"};
+  tabs.addEventListener("click",function(e){
+    var b=e.target.closest(".tab"); if(!b) return;
+    for(var t of tabs.querySelectorAll(".tab")) t.classList.remove("active");
+    b.classList.add("active");
+    for(var k in panels) document.getElementById(panels[k]).classList.add("hidden");
+    document.getElementById(panels[b.dataset.tab]).classList.remove("hidden");
+  });
+
+  /* ---------------- rDNA animation ---------------- */
+  var rSvg=document.getElementById("rdnaSvg");
+  var rMsg=document.getElementById("rdnaMsg");
+  var rStepEls=document.querySelectorAll("#rdnaSteps li");
+  var rStep=-1, rAnim=null;
+  var rMessages=[
+    "<b>Step 1 - Isolate DNA.</b> The insulin gene (yellow) sits inside a long strand of human DNA extracted from a cell.",
+    "<b>Step 2 - Cut with restriction enzyme.</b> EcoRI recognises G&#8595;AATTC and cuts, releasing the gene with sticky ends.",
+    "<b>Step 3 - Ligation.</b> The plasmid vector is opened by the same enzyme; DNA ligase joins the gene into the plasmid, forming recombinant DNA.",
+    "<b>Step 4 - Transformation.</b> The recombinant plasmid enters a host bacterium (E. coli).",
+    "<b>Step 5 - Expression.</b> The bacteria multiply and read the gene, mass-producing human insulin."
+  ];
+
+  function drawRdna(){
+    while(rSvg.firstChild) rSvg.removeChild(rSvg.firstChild);
+    var g=el("g");rSvg.appendChild(g);
+    // Stage 0/1: donor DNA strand with gene
+    if(rStep<=1){
+      var bar=el("rect",{x:40,y:60,width:320,height:26,rx:6,fill:"#243247",stroke:"var(--line)"});g.appendChild(bar);
+      // segments
+      g.appendChild(el("rect",{x:44,y:63,width:110,height:20,rx:4,fill:"var(--dna1)"}));
+      var gene=el("rect",{x:158,y:63,width:84,height:20,rx:4,fill:"var(--dna2)"});g.appendChild(gene);
+      g.appendChild(el("rect",{x:246,y:63,width:110,height:20,rx:4,fill:"var(--dna1)"}));
+      g.appendChild(txt(200,78,"insulin gene",null,10)).setAttribute("fill","#3a2c00");
+      if(rStep===1){
+        // scissors marks
+        g.appendChild(txt(154,55,"✂",null,16));
+        g.appendChild(txt(246,55,"✂",null,16));
+        g.appendChild(txt(200,120,"cut sites (EcoRI: G↓AATTC)",null,10)).setAttribute("fill","var(--muted)");
+      } else {
+        g.appendChild(txt(200,120,"Human donor DNA",null,10)).setAttribute("fill","var(--muted)");
+      }
+    }
+    // Stage 2: plasmid + gene ligation
+    if(rStep===2){
+      var cx=200,cy=150,rr=70;
+      var ring=el("circle",{cx:cx,cy:cy,r:rr,fill:"none",stroke:"#c98bff","stroke-width":16});g.appendChild(ring);
+      // inserted gene arc (yellow) at top
+      var arc=el("path",{d:"M "+(cx-40)+" "+(cy-rr+2)+" A "+rr+" "+rr+" 0 0 1 "+(cx+40)+" "+(cy-rr+2),fill:"none",stroke:"var(--dna2)","stroke-width":16,"stroke-linecap":"round"});g.appendChild(arc);
+      g.appendChild(txt(cx,cy+4,"recombinant",null,11));
+      g.appendChild(txt(cx,cy+18,"plasmid",null,11));
+      g.appendChild(txt(cx,cy-rr-8,"insulin gene ligated in",null,10)).setAttribute("fill","var(--dna2)");
+    }
+    // Stage 3: transformation into bacterium
+    if(rStep===3){
+      var bact=el("ellipse",{cx:200,cy:150,rx:130,ry:60,fill:"#1d3a30",stroke:"var(--good)","stroke-width":2});g.appendChild(bact);
+      var pl=el("circle",{cx:200,cy:150,r:34,fill:"none",stroke:"#c98bff","stroke-width":10});g.appendChild(pl);
+      var arc2=el("path",{d:"M 178 121 A 34 34 0 0 1 222 121",fill:"none",stroke:"var(--dna2)","stroke-width":10,"stroke-linecap":"round"});g.appendChild(arc2);
+      g.appendChild(txt(200,235,"E. coli host with recombinant plasmid",null,10)).setAttribute("fill","var(--muted)");
+      // chromosome squiggle
+      g.appendChild(el("path",{d:"M 120 170 q 20 -14 40 0 t 40 0 t 40 0",fill:"none",stroke:"var(--good)","stroke-width":2,opacity:.6}));
+    }
+    // Stage 4: multiply + insulin
+    if(rStep===4){
+      var pos=[[110,110],[210,100],[300,130],[150,190],[260,195]];
+      for(var i=0;i<pos.length;i++){
+        var b=el("ellipse",{cx:pos[i][0],cy:pos[i][1],rx:44,ry:22,fill:"#1d3a30",stroke:"var(--good)","stroke-width":2});g.appendChild(b);
+        g.appendChild(el("circle",{cx:pos[i][0],cy:pos[i][1],r:8,fill:"none",stroke:"#c98bff","stroke-width":3}));
+      }
+      // insulin dots emitted
+      for(var j=0;j<8;j++){
+        var d=el("circle",{cx:60+j*40,cy:250,r:6,fill:"var(--dna2)"});
+        var an=el("animate",{attributeName:"cy",values:"250;235;250",dur:(1.2+j*0.1)+"s",repeatCount:"indefinite"});
+        d.appendChild(an);g.appendChild(d);
+      }
+      g.appendChild(txt(200,285,"Bacteria divide and secrete human insulin",null,10)).setAttribute("fill","var(--dna2)");
+    }
+    if(rStep===-1){
+      g.appendChild(txt(200,150,"Recombinant DNA Technology",null,13)).setAttribute("fill","var(--accent)");
+      g.appendChild(txt(200,175,"Press Next Step to begin",null,11)).setAttribute("fill","var(--muted)");
+    }
+  }
+  function updRdnaSteps(){
+    rStepEls.forEach(function(li){
+      var s=+li.dataset.s;
+      li.classList.remove("on","done");
+      if(s<rStep) li.classList.add("done");
+      else if(s===rStep) li.classList.add("on");
+    });
+  }
+  document.getElementById("rdnaNext").addEventListener("click",function(){
+    if(rStep<4){rStep++;rMsg.innerHTML=rMessages[rStep];drawRdna();updRdnaSteps();}
+  });
+  document.getElementById("rdnaReset").addEventListener("click",function(){
+    rStep=-1;rMsg.innerHTML="Press <b>Next Step</b> to begin building a recombinant plasmid.";drawRdna();updRdnaSteps();
+  });
+  drawRdna();
+
+  /* ---------------- Tools: mode switch ---------------- */
+  var toolPcr=document.getElementById("toolPcr"), toolGel=document.getElementById("toolGel");
+  var mPcr=document.getElementById("mPcr"), mGel=document.getElementById("mGel");
+  mPcr.addEventListener("click",function(){toolPcr.classList.remove("hidden");toolGel.classList.add("hidden");mPcr.classList.remove("ghost");mGel.classList.add("ghost");});
+  mGel.addEventListener("click",function(){toolGel.classList.remove("hidden");toolPcr.classList.add("hidden");mGel.classList.remove("ghost");mPcr.classList.add("ghost");});
+
+  /* ---------------- PCR ---------------- */
+  var pSvg=document.getElementById("pcrSvg");
+  var pMsg=document.getElementById("pcrMsg");
+  var pCycleEl=document.getElementById("pcrCycle"), pCopiesEl=document.getElementById("pcrCopies");
+  var pCycle=0, pBusy=false, pTimers=[];
+  function clearTimers(){pTimers.forEach(clearTimeout);pTimers=[];}
+  function T(fn,ms){var id=setTimeout(fn,ms);pTimers.push(id);}
+
+  function drawPcr(phase,copies){
+    while(pSvg.firstChild) pSvg.removeChild(pSvg.firstChild);
+    var g=el("g");pSvg.appendChild(g);
+    var label={0:"Ready",1:"1. Denaturation ~94°C",2:"2. Annealing ~55°C",3:"3. Extension ~72°C"}[phase];
+    g.appendChild(txt(200,20,label,null,12)).setAttribute("fill","var(--accent)");
+    // show up to a handful of duplexes representing copies
+    var n=Math.min(copies,4);
+    var startY=55, gap=42;
+    for(var i=0;i<n;i++){
+      var y=startY+i*gap;
+      if(phase===1){ // separated single strands
+        g.appendChild(el("line",{x1:60,y1:y-6,x2:340,y2:y-6,stroke:"var(--dna1)","stroke-width":5,"stroke-linecap":"round"}));
+        g.appendChild(el("line",{x1:60,y1:y+6,x2:340,y2:y+6,stroke:"var(--dna2)","stroke-width":5,"stroke-linecap":"round"}));
+      } else if(phase===2){ // primers annealing
+        g.appendChild(el("line",{x1:60,y1:y-6,x2:340,y2:y-6,stroke:"var(--dna1)","stroke-width":5,"stroke-linecap":"round"}));
+        g.appendChild(el("line",{x1:60,y1:y+6,x2:340,y2:y+6,stroke:"var(--dna2)","stroke-width":5,"stroke-linecap":"round"}));
+        g.appendChild(el("rect",{x:60,y:y-9,width:36,height:6,rx:2,fill:"#ff9f45"}));
+        g.appendChild(el("rect",{x:304,y:y+3,width:36,height:6,rx:2,fill:"#ff9f45"}));
+      } else { // duplex (phase 0 or 3)
+        g.appendChild(el("rect",{x:60,y:y-7,width:280,height:14,rx:5,fill:"#243247",stroke:"var(--line)"}));
+        g.appendChild(el("line",{x1:64,y1:y,x2:336,y2:y,stroke:"var(--dna1)","stroke-width":3,"stroke-dasharray":"6 4"}));
+      }
+    }
+    if(copies>4) g.appendChild(txt(200,210,"... "+copies+" copies total",null,11)).setAttribute("fill","var(--muted)");
+    if(phase===2) g.appendChild(txt(200,205,"orange = primers",null,10)).setAttribute("fill","var(--muted)");
+  }
+  function runPcrCycle(){
+    if(pBusy) return; pBusy=true;
+    document.getElementById("pcrRun").disabled=true;
+    pMsg.innerHTML="<b>Denaturation:</b> heat to ~94°C, the double helix separates into two single strands.";
+    drawPcr(1,pCycle>0?Math.pow(2,pCycle):1);
+    T(function(){
+      pMsg.innerHTML="<b>Annealing:</b> cool to ~55°C, short primers base-pair with the target sequence.";
+      drawPcr(2,pCycle>0?Math.pow(2,pCycle):1);
+    },1100);
+    T(function(){
+      pMsg.innerHTML="<b>Extension:</b> at ~72°C, Taq polymerase builds new complementary strands - copies double.";
+      pCycle++;
+      var c=Math.pow(2,pCycle);
+      pCycleEl.textContent=pCycle; pCopiesEl.textContent=c;
+      drawPcr(3,c);
+    },2200);
+    T(function(){pBusy=false;document.getElementById("pcrRun").disabled=false;},3300);
+  }
+  document.getElementById("pcrRun").addEventListener("click",runPcrCycle);
+  document.getElementById("pcrReset").addEventListener("click",function(){
+    clearTimers();pBusy=false;document.getElementById("pcrRun").disabled=false;
+    pCycle=0;pCycleEl.textContent="0";pCopiesEl.textContent="1";
+    pMsg.innerHTML="Ready. Run one cycle to see denaturation, annealing and extension.";
+    drawPcr(0,1);
+  });
+  drawPcr(0,1);
+
+  /* ---------------- Gel electrophoresis ---------------- */
+  var gSvg=document.getElementById("gelSvg");
+  var gMsg=document.getElementById("gelMsg");
+  var gAnim=null, gT0=0, gRunning=false, gProgress=0;
+  // fragments: size(bp) -> speed factor (smaller = faster/farther)
+  var fragments=[{bp:3000},{bp:1500},{bp:800},{bp:300}];
+  var ladder=[3000,2000,1500,1000,800,500,300];
+  var GEL_X=120, GEL_W=250, GEL_Y=40, GEL_H=170, WELL_Y=48;
+
+  function fragDist(bp,p){
+    // migration inversely related to log(size); p in 0..1
+    var maxRun=GEL_H-24;
+    var norm=(Math.log(3000)-Math.log(bp))/(Math.log(3000)-Math.log(200));
+    return p*maxRun*(0.28+0.72*norm);
+  }
+  function drawGel(p,powered){
+    while(gSvg.firstChild) gSvg.removeChild(gSvg.firstChild);
+    var g=el("g");gSvg.appendChild(g);
+    // electrodes
+    g.appendChild(txt(60,30,"− (cathode)",null,10)).setAttribute("fill","var(--muted)");
+    g.appendChild(txt(200,30,"well",null,10)).setAttribute("fill","var(--muted)");
+    g.appendChild(txt(200,230,"+ (anode)  → DNA migrates down",null,10)).setAttribute("fill",powered?"var(--accent)":"var(--muted)");
+    // gel block
+    g.appendChild(el("rect",{x:GEL_X,y:GEL_Y,width:GEL_W,height:GEL_H,rx:8,fill:"#122031",stroke:"var(--line)"}));
+    // ladder lane (left)
+    for(var i=0;i<ladder.length;i++){
+      var yy=GEL_Y+8+fragDist(ladder[i],1);
+      g.appendChild(el("rect",{x:GEL_X-58,y:yy,width:44,height:5,rx:2,fill:"#5a6b84"}));
+      g.appendChild(txt(GEL_X-36,yy-3,ladder[i]+"",null,8)).setAttribute("fill","var(--muted)");
+    }
+    g.appendChild(txt(GEL_X-36,GEL_Y-4,"ladder",null,9)).setAttribute("fill","var(--muted)");
+    // sample lane bands
+    for(var f=0;f<fragments.length;f++){
+      var d=fragDist(fragments[f].bp,p);
+      var y=GEL_Y+8+d;
+      var band=el("rect",{x:GEL_X+GEL_W/2-40,y:y,width:80,height:6,rx:3,fill:"var(--dna2)"});
+      g.appendChild(band);
+      if(p>0.15) g.appendChild(txt(GEL_X+GEL_W/2+72,y+4,fragments[f].bp+" bp",null,8)).setAttribute("fill","var(--muted)");
+    }
+    g.appendChild(txt(GEL_X+GEL_W/2,GEL_Y-4,"sample",null,9)).setAttribute("fill","var(--muted)");
+  }
+  function gelFrame(ts){
+    if(!gRunning) return;
+    if(!gT0) gT0=ts;
+    gProgress=Math.min(1,(ts-gT0)/3200);
+    drawGel(gProgress,true);
+    if(gProgress<1){ gAnim=requestAnimationFrame(gelFrame); }
+    else { gRunning=false; gMsg.innerHTML="<b>Run complete.</b> Fragments separated by size: the 300 bp band travelled farthest, the 3000 bp band stayed near the well."; }
+  }
+  document.getElementById("gelRun").addEventListener("click",function(){
+    if(gRunning) return;
+    gRunning=true;gT0=0;gProgress=0;
+    gMsg.innerHTML="<b>Power on.</b> The electric field drives negatively charged DNA toward the + electrode; smaller fragments move faster.";
+    gAnim=requestAnimationFrame(gelFrame);
+  });
+  document.getElementById("gelReset").addEventListener("click",function(){
+    gRunning=false; if(gAnim) cancelAnimationFrame(gAnim);
+    gProgress=0; gMsg.innerHTML="Turn on the power to run the DNA fragments through the gel.";
+    drawGel(0,false);
+  });
+  drawGel(0,false);
+
+  /* ---------------- Applications cards ---------------- */
+  var appData={
+    med:"<b>Medicine.</b> Recombinant human insulin, human growth hormone, clotting factors and interferons are produced in engineered microbes. Recombinant/subunit vaccines (e.g. Hepatitis B) use a single antigen made by yeast. Gene therapy delivers a healthy gene (often via a viral vector) to correct disorders such as ADA-SCID.",
+    agri:"<b>Agriculture.</b> Genetically modified (GM) crops carry useful genes. <i>Bt cotton</i> contains the <i>cry</i> gene from <i>Bacillus thuringiensis</i>; it makes a protein toxic to bollworm larvae, reducing pesticide use. Golden Rice makes pro-vitamin A. Other traits: herbicide tolerance, drought and pest resistance, longer shelf life.",
+    ind:"<b>Industry.</b> Engineered microbes and enzymes are used to make antibiotics, organic acids, amino acids, biofuels (ethanol), detergent enzymes and food products. Fermentation at large scale in bioreactors is central to industrial biotechnology.",
+    eth:"<b>Biosafety &amp; Ethics.</b> Benefits must be balanced against risks: possible gene flow to wild relatives, effects on non-target organisms and biodiversity, allergen concerns, and socio-economic and ethical issues (patenting, access). In India the <b>GEAC</b> reviews and regulates the release of genetically engineered organisms."
+  };
+  document.querySelectorAll(".appcard").forEach(function(card){
+    card.addEventListener("click",function(){
+      var open=card.classList.contains("open");
+      if(open){card.classList.remove("open");card.querySelector("p").innerHTML="Tap to expand";}
+      else{card.classList.add("open");card.querySelector("p").innerHTML=appData[card.dataset.app];}
+    });
+  });
+
+  /* ---------------- Quiz ---------------- */
+  var quizData=[
+    {q:"Which enzyme is used to CUT DNA at a specific recognition sequence in recombinant DNA technology?",
+     opts:["DNA ligase","Restriction endonuclease","DNA polymerase","Helicase"],a:1,
+     e:"Restriction endonucleases (e.g. EcoRI) recognise specific palindromic sequences and cut DNA, leaving sticky ends. Ligase joins fragments."},
+    {q:"During PCR, what happens in the DENATURATION step?",
+     opts:["Primers bind the template","The two DNA strands separate on heating (~94°C)","Taq polymerase extends new strands","DNA is loaded into a gel"],a:1,
+     e:"Denaturation at ~94°C breaks hydrogen bonds so the double helix separates into single strands, ready for primers to anneal."},
+    {q:"Bt cotton is resistant to bollworm because it carries a gene from:",
+     opts:["A virus","Bacillus thuringiensis (the cry gene)","Human cells","Agrobacterium only"],a:1,
+     e:"Bt cotton carries the cry gene from the bacterium Bacillus thuringiensis, whose protein is toxic to bollworm larvae but harmless to humans."}
+  ];
+  var quizBox=document.getElementById("quiz"), scoreEl=document.getElementById("score");
+  var answered=[], score=0;
+  quizData.forEach(function(item,qi){
+    answered[qi]=false;
+    var div=document.createElement("div");div.className="q";
+    var html="<p>"+(qi+1)+". "+item.q+"</p>";
+    quizBox.appendChild(div);
+    div.innerHTML=html;
+    item.opts.forEach(function(op,oi){
+      var b=document.createElement("button");b.className="opt";b.innerHTML=op;
+      b.addEventListener("click",function(){
+        if(answered[qi]) return;
+        answered[qi]=true;
+        var btns=div.querySelectorAll(".opt");
+        btns.forEach(function(bb,ix){ if(ix===item.a) bb.classList.add("correct"); });
+        if(oi!==item.a) b.classList.add("wrong"); else score++;
+        scoreEl.textContent=score;
+        ans.classList.add("show");
+      });
+      div.appendChild(b);
+    });
+    var ans=document.createElement("div");ans.className="qa";
+    ans.innerHTML="<b>Answer:</b> "+item.opts[item.a]+". "+item.e;
+    div.appendChild(ans);
+  });
+
+  /* ---------------- Pause animations when hidden ---------------- */
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){
+      clearTimers(); pBusy=false; document.getElementById("pcrRun").disabled=false;
+      if(gRunning){ gRunning=false; if(gAnim) cancelAnimationFrame(gAnim); }
+    }
+  });
+})();
+</script>
+</body>
+</html>

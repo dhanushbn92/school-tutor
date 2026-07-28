@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Immunobiology Lab — NIOS Class 12 Biology (Ch31)</title>
+<style>
+  :root{
+    --bg:#0f1720;--panel:#16212e;--panel2:#1c2a3a;--ink:#e8eef5;--muted:#9fb2c6;
+    --accent:#38d9c4;--accent-dim:#1f7a70;--line:#26374b;--warn:#f0a860;--danger:#e86a6a;
+    --good:#5fce8a;--radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.5;font-size:15px;-webkit-text-size-adjust:100%;
+  }
+  header{padding:16px 16px 6px}
+  h1{font-size:1.28rem;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.86rem;margin:0}
+  .wrap{max-width:960px;margin:0 auto;padding:0 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .tab{
+    flex:1 1 auto;min-width:120px;padding:10px 12px;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);border-radius:12px;cursor:pointer;
+    font-size:.86rem;font-weight:600;text-align:center;transition:.15s;
+  }
+  .tab[aria-selected="true"]{background:var(--accent-dim);color:#fff;border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 8px}
+  .mode{display:none}
+  .mode.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:14px}
+  .col{flex:1 1 300px;min-width:0}
+  svg{display:block;width:100%;height:auto;background:#0b131c;border-radius:12px;border:1px solid var(--line)}
+  .ctrls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+  button.btn{
+    background:var(--accent-dim);color:#fff;border:1px solid var(--accent);
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;
+    min-height:40px;
+  }
+  button.btn.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+  button.btn:active{transform:translateY(1px)}
+  .facts{background:var(--panel2);border-left:3px solid var(--accent);padding:10px 12px;border-radius:10px;font-size:.85rem}
+  .facts ul{margin:6px 0 0;padding-left:18px}
+  .facts li{margin:4px 0}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+  .status{font-size:.82rem;color:var(--muted);margin-top:6px;min-height:1.2em}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:600;margin:2px 4px 2px 0;border:1px solid var(--line)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+  .cmp{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--panel2);font-size:.82rem}
+  .cmp b{color:var(--accent)}
+  label.sl{font-size:.8rem;color:var(--muted);display:block;margin:8px 0 2px}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  /* quiz */
+  .quiz .q{margin:14px 0;padding:12px;background:var(--panel2);border-radius:10px}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.9rem}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:9px 11px;border-radius:9px;margin:5px 0;cursor:pointer;font-size:.85rem;min-height:40px}
+  .opt.correct{border-color:var(--good);background:rgba(95,206,138,.15)}
+  .opt.wrong{border-color:var(--danger);background:rgba(232,106,106,.15)}
+  .expl{font-size:.8rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;padding:10px}
+  .kbd{font-size:.72rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap" style="padding-bottom:0">
+    <h1>🧬 Immunobiology Lab</h1>
+    <p class="sub">NIOS Class 12 Biology · Chapter 31 — Immunobiology: An Introduction</p>
+  </div>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist" aria-label="Simulation modes">
+    <button class="tab" role="tab" aria-selected="true" data-mode="m1">1 · Lines of Defence</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="m2">2 · Immune Response</button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="m3">3 · Vaccination &amp; Immunity</button>
+  </div>
+
+  <!-- ================= MODE 1 ================= -->
+  <section class="mode active" id="m1" role="tabpanel">
+    <div class="panel">
+      <h2>Innate vs Adaptive — the three lines of defence</h2>
+      <div class="row">
+        <div class="col">
+          <svg id="svg1" viewBox="0 0 480 300" aria-label="Pathogen invasion and defence animation"></svg>
+          <div class="legend">
+            <span><span class="dot" style="background:#e86a6a"></span>Pathogen (antigen)</span>
+            <span><span class="dot" style="background:#7aa9ff"></span>Phagocyte / macrophage</span>
+            <span><span class="dot" style="background:#38d9c4"></span>Adaptive cell (B / T)</span>
+          </div>
+          <div class="ctrls">
+            <button class="btn" id="m1inject">Inject pathogens</button>
+            <button class="btn ghost" id="m1play">Pause</button>
+            <button class="btn ghost" id="m1reset">Reset</button>
+          </div>
+          <div class="status" id="m1status">Press "Inject pathogens" to watch the body's defences respond.</div>
+        </div>
+        <div class="col">
+          <div class="facts">
+            <b>The three lines of defence</b>
+            <ul>
+              <li><b>1st — Barriers (innate, non-specific):</b> skin, mucus, cilia, tears &amp; saliva (lysozyme), and stomach acid (pH ~1.5–2) keep most microbes out.</li>
+              <li><b>2nd — Innate cellular:</b> if breached, <b>phagocytes</b> (neutrophils, macrophages) engulf microbes; <b>inflammation</b> (redness, heat, swelling) and fever slow spread. Fast but non-specific, no memory.</li>
+              <li><b>3rd — Adaptive (specific):</b> lymphocytes (<b>B</b> &amp; <b>T</b> cells) recognise a specific antigen, mount a tailored attack, and form <b>memory cells</b>. Slower first time, but remembers.</li>
+            </ul>
+          </div>
+          <div style="margin-top:10px" class="grid2">
+            <div class="cmp"><b>Innate</b><br>Present from birth · fast (mins–hrs) · non-specific · <i>no memory</i></div>
+            <div class="cmp"><b>Adaptive</b><br>Develops after exposure · slower (days) · highly specific · <i>has memory</i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 2 ================= -->
+  <section class="mode" id="m2" role="tabpanel">
+    <div class="panel">
+      <h2>The Immune Response — humoral &amp; cell-mediated</h2>
+      <div class="row">
+        <div class="col">
+          <svg id="svg2" viewBox="0 0 480 300" aria-label="Antibody binding a specific antigen"></svg>
+          <div class="ctrls">
+            <button class="btn" id="m2anti">Release antibodies</button>
+            <button class="btn ghost" id="m2shape">Change antigen shape</button>
+            <button class="btn ghost" id="m2reset2">Reset</button>
+          </div>
+          <div class="status" id="m2status">Y-shaped antibodies bind only the antigen whose shape matches — antigen–antibody specificity (lock &amp; key).</div>
+          <div class="legend">
+            <span><span class="dot" style="background:#38d9c4"></span>Antibody (Y-shape)</span>
+            <span><span class="dot" style="background:#e86a6a"></span>Matching antigen</span>
+            <span><span class="dot" style="background:#8a6ad0"></span>Non-matching antigen</span>
+          </div>
+        </div>
+        <div class="col">
+          <div class="facts">
+            <b>Two arms of adaptive immunity</b>
+            <ul>
+              <li><b>Humoral (antibody-mediated):</b> <b>B-cells</b> activate → become <b>plasma cells</b> that secrete <b>antibodies</b> (immunoglobulins). Antibodies neutralise/agglutinate free antigens &amp; toxins in blood &amp; lymph.</li>
+              <li><b>Cell-mediated:</b> <b>Helper T-cells (T<sub>H</sub>)</b> coordinate the response; <b>Cytotoxic T-cells (T<sub>C</sub>)</b> kill infected/cancerous cells directly.</li>
+              <li><b>Memory cells</b> persist after the infection clears → the basis of long-term immunity.</li>
+            </ul>
+          </div>
+          <div style="margin-top:10px">
+            <b style="font-size:.9rem">Primary vs Secondary response</b>
+            <svg id="svg2b" viewBox="0 0 480 220" aria-label="Primary and secondary antibody response graph"></svg>
+            <div class="ctrls">
+              <button class="btn" id="m2dose1">1st exposure</button>
+              <button class="btn" id="m2dose2">2nd exposure</button>
+              <button class="btn ghost" id="m2graphreset">Reset graph</button>
+            </div>
+            <div class="status" id="m2gstatus">Second exposure: memory cells give a <b>faster, larger, longer-lasting</b> antibody response.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 3 ================= -->
+  <section class="mode" id="m3" role="tabpanel">
+    <div class="panel">
+      <h2>Vaccination &amp; Types of Immunity</h2>
+      <div class="row">
+        <div class="col">
+          <svg id="svg3" viewBox="0 0 480 240" aria-label="Antibody level after vaccine doses"></svg>
+          <div class="ctrls">
+            <button class="btn" id="m3dose">Give vaccine dose</button>
+            <button class="btn ghost" id="m3booster">Add booster</button>
+            <button class="btn ghost" id="m3reset3">Reset</button>
+          </div>
+          <div class="status" id="m3status">A vaccine carries harmless antigen (killed/attenuated microbe, or a protein/mRNA). It trains B &amp; T cells and builds memory — <b>without</b> causing disease.</div>
+          <div class="legend">
+            <span>Protective threshold ⋯⋯ · Doses build lasting, above-threshold immunity.</span>
+          </div>
+        </div>
+        <div class="col">
+          <div class="facts">
+            <b>Types of immunity</b>
+            <div class="grid2" style="margin-top:8px">
+              <div class="cmp"><b>Active</b> — body makes its own antibodies.<br><span class="pill">Natural</span>after real infection<br><span class="pill">Artificial</span>after a vaccine<br><i>Slow onset, long-lasting, has memory.</i></div>
+              <div class="cmp"><b>Passive</b> — ready-made antibodies received.<br><span class="pill">Natural</span>mother→baby (placenta, colostrum/breast milk)<br><span class="pill">Artificial</span>antiserum / antivenom injection<br><i>Instant, short-lived, no memory.</i></div>
+            </div>
+          </div>
+          <div class="facts" style="margin-top:10px;border-left-color:var(--warn)">
+            <b>When immunity misfires</b>
+            <ul>
+              <li><b>Allergy (hypersensitivity):</b> over-reaction to a harmless allergen (pollen, dust) — IgE &amp; histamine cause sneezing, itching; severe cases → anaphylaxis.</li>
+              <li><b>Autoimmunity:</b> immune system attacks the body's <i>own</i> cells — e.g. rheumatoid arthritis, type-1 diabetes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick check — 3 questions</h2>
+    <div class="status" id="quizscore">Tap an option to answer. Correct answers reveal an explanation.</div>
+    <div id="quizbody"></div>
+  </div>
+
+  <footer>Educational simulation · all graphics are SVG, no external resources · animation pauses when the tab is hidden.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;              // global animation gate
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+  });
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs){
+    var e = document.createElementNS(NS, tag);
+    if(attrs){for(var k in attrs){ e.setAttribute(k, attrs[k]); }}
+    return e;
+  }
+  function clear(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+  /* ---------------- Tabs ---------------- */
+  var tabs = document.querySelectorAll(".tab");
+  var modes = document.querySelectorAll(".mode");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      t.setAttribute("aria-selected","true");
+      var id = t.getAttribute("data-mode");
+      modes.forEach(function(m){ m.classList.toggle("active", m.id===id); });
+    });
+  });
+
+  /* ================= MODE 1 : lines of defence ================= */
+  var svg1 = document.getElementById("svg1");
+  var m1status = document.getElementById("m1status");
+  var m1playing = true;
+  var pathogens = [], phago = [], adaptive = [];
+  var m1t = 0;
+
+  function m1build(){
+    clear(svg1);
+    // Skin barrier line
+    svg1.appendChild(el("rect",{x:0,y:0,width:480,height:44,fill:"#123",opacity:"0.6"}));
+    var g = el("g",{});
+    var skin = el("rect",{x:0,y:38,width:480,height:8,fill:"#c98b5a"});
+    svg1.appendChild(skin);
+    var t1 = el("text",{x:8,y:22,fill:"#9fb2c6","font-size":"11"});
+    t1.textContent = "1st line: skin · mucus · acid barriers";
+    svg1.appendChild(t1);
+    var t2 = el("text",{x:8,y:66,fill:"#9fb2c6","font-size":"11"});
+    t2.textContent = "Internal tissue — innate & adaptive cells patrol";
+    svg1.appendChild(t2);
+    // resident phagocytes
+    phago = [];
+    for(var i=0;i<3;i++){
+      phago.push({x:80+i*150, y:150+ (i%2)*40, vx:0, vy:0, r:15, busy:0, target:null});
+    }
+    adaptive = [];
+    pathogens = [];
+    drawM1();
+  }
+
+  function spawnPathogens(){
+    for(var i=0;i<6;i++){
+      pathogens.push({x:40+Math.random()*400, y:-10-Math.random()*40, vy:0.4+Math.random()*0.5, vx:(Math.random()-0.5)*0.4, r:7, alive:true, crossed:false});
+    }
+    m1status.textContent = "Pathogens breach the barrier → phagocytes engulf them (innate). Adaptive B/T cells arrive to finish specific ones.";
+    // recruit adaptive cells after a delay
+    setTimeout(function(){
+      for(var i=0;i<2;i++){
+        adaptive.push({x:Math.random()<0.5?-10:490, y:200+Math.random()*40, r:12, target:null});
+      }
+    }, 1600);
+  }
+
+  function drawM1(){
+    // redraw dynamic layer only: rebuild from scratch each frame is fine at this scale
+    clear(svg1);
+    svg1.appendChild(el("rect",{x:0,y:0,width:480,height:44,fill:"#0e2033"}));
+    svg1.appendChild(el("rect",{x:0,y:38,width:480,height:8,fill:"#c98b5a"}));
+    // subtle barrier hatch
+    for(var hx=0;hx<480;hx+=18){
+      svg1.appendChild(el("line",{x1:hx,y1:38,x2:hx+9,y2:46,stroke:"#a9744a","stroke-width":"2",opacity:"0.6"}));
+    }
+    var t1 = el("text",{x:8,y:20,fill:"#9fb2c6","font-size":"11"}); t1.textContent="1st line: skin · mucus · stomach acid"; svg1.appendChild(t1);
+    var t2 = el("text",{x:8,y:66,fill:"#6f88a3","font-size":"10"}); t2.textContent="2nd line: phagocytes + inflammation   |   3rd line: adaptive B/T cells"; svg1.appendChild(t2);
+
+    // pathogens
+    pathogens.forEach(function(p){
+      if(!p.alive) return;
+      var c = el("circle",{cx:p.x,cy:p.y,r:p.r,fill:"#e86a6a",stroke:"#8a2b2b","stroke-width":"1.5"});
+      svg1.appendChild(c);
+      // spikes
+      for(var a=0;a<6;a++){
+        var ang=a/6*Math.PI*2;
+        svg1.appendChild(el("line",{x1:p.x+Math.cos(ang)*p.r,y1:p.y+Math.sin(ang)*p.r,
+          x2:p.x+Math.cos(ang)*(p.r+3),y2:p.y+Math.sin(ang)*(p.r+3),stroke:"#8a2b2b","stroke-width":"1.5"}));
+      }
+    });
+    // phagocytes
+    phago.forEach(function(f){
+      var col = f.busy>0 ? "#a9c4ff" : "#7aa9ff";
+      svg1.appendChild(el("circle",{cx:f.x,cy:f.y,r:f.r,fill:col,opacity:"0.85",stroke:"#3d5fa0","stroke-width":"2"}));
+      // pseudopod wobble
+      svg1.appendChild(el("circle",{cx:f.x+Math.sin(m1t/8+f.x)*4,cy:f.y-8,r:4,fill:col,opacity:"0.6"}));
+      if(f.busy>0){
+        var m=el("text",{x:f.x-3,y:f.y+4,fill:"#123","font-size":"10"}); m.textContent="●"; svg1.appendChild(m);
+      }
+    });
+    // adaptive cells
+    adaptive.forEach(function(d){
+      svg1.appendChild(el("circle",{cx:d.x,cy:d.y,r:d.r,fill:"#38d9c4",opacity:"0.9",stroke:"#1f7a70","stroke-width":"2"}));
+      var yy=el("text",{x:d.x-4,y:d.y+4,fill:"#08302b","font-size":"11","font-weight":"bold"}); yy.textContent="Y"; svg1.appendChild(yy);
+    });
+  }
+
+  function m1step(){
+    m1t++;
+    // move pathogens
+    pathogens.forEach(function(p){
+      if(!p.alive) return;
+      p.y += p.vy; p.x += p.vx;
+      if(p.x<8||p.x>472) p.vx*=-1;
+      if(!p.crossed && p.y>46){ p.crossed=true; }
+    });
+    // phagocytes chase nearest alive crossed pathogen
+    phago.forEach(function(f){
+      var best=null, bd=1e9;
+      pathogens.forEach(function(p){
+        if(p.alive && p.crossed){
+          var d=(p.x-f.x)*(p.x-f.x)+(p.y-f.y)*(p.y-f.y);
+          if(d<bd){bd=d;best=p;}
+        }
+      });
+      if(best){
+        var dx=best.x-f.x, dy=best.y-f.y, dist=Math.sqrt(dx*dx+dy*dy)||1;
+        f.x+=dx/dist*1.5; f.y+=dy/dist*1.5;
+        if(dist<f.r+best.r){ best.alive=false; f.busy=30; }
+      } else {
+        // patrol
+        f.x+=Math.sin(m1t/40+f.y)*0.6; f.y+=Math.cos(m1t/50+f.x)*0.4;
+        f.y=Math.max(90,Math.min(250,f.y)); f.x=Math.max(20,Math.min(460,f.x));
+      }
+      if(f.busy>0) f.busy--;
+    });
+    // adaptive cells hunt any remaining crossed pathogens (specific mop-up)
+    adaptive.forEach(function(d){
+      var best=null, bd=1e9;
+      pathogens.forEach(function(p){
+        if(p.alive && p.crossed){
+          var q=(p.x-d.x)*(p.x-d.x)+(p.y-d.y)*(p.y-d.y);
+          if(q<bd){bd=q;best=p;}
+        }
+      });
+      if(best){
+        var dx=best.x-d.x, dy=best.y-d.y, dist=Math.sqrt(dx*dx+dy*dy)||1;
+        d.x+=dx/dist*1.2; d.y+=dy/dist*1.2;
+        if(dist<d.r+best.r) best.alive=false;
+      } else {
+        d.x+=Math.sin(m1t/30)*0.5;
+      }
+    });
+    var remain = pathogens.filter(function(p){return p.alive;}).length;
+    if(pathogens.length && remain===0){
+      m1status.textContent = "Infection cleared. Adaptive cells leave behind memory cells — a faster response next time.";
+    }
+    drawM1();
+  }
+
+  document.getElementById("m1inject").addEventListener("click", spawnPathogens);
+  document.getElementById("m1reset").addEventListener("click", function(){ m1build(); m1status.textContent="Reset. Press \"Inject pathogens\" to begin."; });
+  document.getElementById("m1play").addEventListener("click", function(){
+    m1playing=!m1playing; this.textContent=m1playing?"Pause":"Play";
+  });
+
+  /* ================= MODE 2 : antibody specificity ================= */
+  var svg2 = document.getElementById("svg2");
+  var m2status = document.getElementById("m2status");
+  var antibodies=[], antigens=[], m2shapeIdx=0, m2t=0;
+  var shapeNames=["triangle","square","hexagon"];
+
+  function antigenPath(cx,cy,shape,size,col){
+    var g=el("g",{});
+    var s=size;
+    if(shape==="triangle"){
+      g.appendChild(el("polygon",{points:(cx)+","+(cy-s)+" "+(cx-s)+","+(cy+s*0.7)+" "+(cx+s)+","+(cy+s*0.7),fill:col,stroke:"#000","stroke-width":"1",opacity:"0.9"}));
+    } else if(shape==="square"){
+      g.appendChild(el("rect",{x:cx-s,y:cy-s,width:s*2,height:s*2,rx:2,fill:col,stroke:"#000","stroke-width":"1",opacity:"0.9"}));
+    } else {
+      var pts="";
+      for(var i=0;i<6;i++){var a=i/6*Math.PI*2 - Math.PI/2; pts+=(cx+Math.cos(a)*s)+","+(cy+Math.sin(a)*s)+" ";}
+      g.appendChild(el("polygon",{points:pts,fill:col,stroke:"#000","stroke-width":"1",opacity:"0.9"}));
+    }
+    return g;
+  }
+
+  function m2build(){
+    antibodies=[]; antigens=[];
+    m2render();
+    m2status.textContent="Antibody's binding site matches ONE antigen shape. Press \"Release antibodies\".";
+  }
+
+  function drawAntibody(x,y,angle,bound){
+    // Y-shape: stem + two arms with notches
+    var g=el("g",{transform:"translate("+x+","+y+") rotate("+angle+")"});
+    var col=bound?"#5fce8a":"#38d9c4";
+    g.appendChild(el("line",{x1:0,y1:0,x2:0,y2:16,stroke:col,"stroke-width":"4","stroke-linecap":"round"})); // stem
+    g.appendChild(el("line",{x1:0,y1:0,x2:-11,y2:-13,stroke:col,"stroke-width":"4","stroke-linecap":"round"})); // arm L
+    g.appendChild(el("line",{x1:0,y1:0,x2:11,y2:-13,stroke:col,"stroke-width":"4","stroke-linecap":"round"})); // arm R
+    // binding tips
+    g.appendChild(el("circle",{cx:-11,cy:-13,r:3,fill:"#0b131c",stroke:col,"stroke-width":"1.5"}));
+    g.appendChild(el("circle",{cx:11,cy:-13,r:3,fill:"#0b131c",stroke:col,"stroke-width":"1.5"}));
+    return g;
+  }
+
+  function m2render(){
+    clear(svg2);
+    var lbl=el("text",{x:10,y:18,fill:"#9fb2c6","font-size":"11"}); lbl.textContent="Target antigen shape: "+shapeNames[m2shapeIdx]+" (only matching antibodies bind)"; svg2.appendChild(lbl);
+    // target antigens (matching) in centre band
+    antigens.forEach(function(a){
+      var col = a.match? "#e86a6a" : "#8a6ad0";
+      svg2.appendChild(antigenPath(a.x,a.y,a.shape,10,col));
+      if(a.boundBy){
+        // draw the bound antibody sitting on it
+        svg2.appendChild(drawAntibody(a.x,a.y-13,180,true));
+      }
+    });
+    antibodies.forEach(function(ab){
+      if(ab.bound) return;
+      svg2.appendChild(drawAntibody(ab.x,ab.y,ab.angle,false));
+    });
+  }
+
+  function releaseAntibodies(){
+    // place a mix of antigens: matching (target shape) + distractors
+    antigens=[];
+    for(var i=0;i<4;i++){
+      antigens.push({x:90+i*90, y:150, shape:shapeNames[m2shapeIdx], match:true, boundBy:false});
+    }
+    // distractor antigens
+    for(var j=0;j<2;j++){
+      var other=(m2shapeIdx+1+j)%3;
+      antigens.push({x:140+j*160, y:230, shape:shapeNames[other], match:false, boundBy:false});
+    }
+    // antibodies enter from top, all specific to target shape
+    antibodies=[];
+    for(var k=0;k<6;k++){
+      antibodies.push({x:40+k*70, y:-20-Math.random()*40, angle:0, bound:false, vy:1+Math.random()});
+    }
+    m2status.textContent="Antibodies drift down and bind ONLY the matching "+shapeNames[m2shapeIdx]+" antigens (lock-and-key specificity). Purple non-matching antigens are ignored.";
+    m2render();
+  }
+
+  function m2step(){
+    m2t++;
+    var moving=false;
+    antibodies.forEach(function(ab){
+      if(ab.bound) return;
+      moving=true;
+      // find nearest unbound matching antigen
+      var best=null, bd=1e9;
+      antigens.forEach(function(a){
+        if(a.match && !a.boundBy){
+          var d=(a.x-ab.x)*(a.x-ab.x)+(a.y-13-ab.y)*(a.y-13-ab.y);
+          if(d<bd){bd=d;best=a;}
+        }
+      });
+      if(best){
+        var dx=best.x-ab.x, dy=(best.y-13)-ab.y, dist=Math.sqrt(dx*dx+dy*dy)||1;
+        ab.x+=dx/dist*2; ab.y+=dy/dist*2;
+        ab.angle=180;
+        if(dist<6){ ab.bound=true; best.boundBy=true; }
+      } else {
+        ab.y+=ab.vy; if(ab.y>320) ab.y=-20;
+      }
+    });
+    if(antibodies.length && !moving){
+      var allbound = antigens.filter(function(a){return a.match;}).every(function(a){return a.boundBy;});
+      if(allbound) m2status.textContent="All matching antigens neutralised & flagged for destruction. Antigen–antibody binding is highly specific.";
+    }
+    m2render();
+  }
+
+  document.getElementById("m2anti").addEventListener("click", releaseAntibodies);
+  document.getElementById("m2shape").addEventListener("click", function(){
+    m2shapeIdx=(m2shapeIdx+1)%3; m2build();
+  });
+  document.getElementById("m2reset2").addEventListener("click", m2build);
+
+  /* ------- primary vs secondary response graph ------- */
+  var svg2b=document.getElementById("svg2b");
+  var g2 = {t:0, points:[], phase:0, target:0, level:0, base:5};
+  // We'll animate an antibody-titre curve across a time axis.
+  var GW=480, GH=220, GX0=44, GY0=190, GX1=464, GY1=24;
+
+  function graphAxes(svg,titleY,xLabel){
+    // axes
+    svg.appendChild(el("line",{x1:GX0,y1:GY0,x2:GX1,y2:GY0,stroke:"#3a4d63","stroke-width":"1.5"}));
+    svg.appendChild(el("line",{x1:GX0,y1:GY0,x2:GX0,y2:GY1,stroke:"#3a4d63","stroke-width":"1.5"}));
+    var yl=el("text",{x:8,y:GY1+40,fill:"#9fb2c6","font-size":"10",transform:"rotate(-90 12,"+ (GY1+40) +")"});
+    yl.textContent="Antibody level"; svg.appendChild(yl);
+    var xl=el("text",{x:GX1-70,y:GY0+16,fill:"#9fb2c6","font-size":"10"}); xl.textContent=xLabel; svg.appendChild(xl);
+  }
+
+  var m2curve=[]; // {x,y} in data space 0..1
+  var m2anim = {running:false, i:0};
+  function m2graphReset(){
+    m2curve=[]; m2anim.running=false; m2anim.i=0;
+    drawGraph2([],[]);
+    document.getElementById("m2gstatus").innerHTML="Give a 1st then a 2nd exposure to compare the response curves.";
+  }
+
+  // Precompute a two-hump curve; reveal progressively.
+  var fullCurve=[];
+  (function(){
+    for(var i=0;i<=200;i++){
+      var x=i/200; // time 0..1
+      // primary hump around x=0.18 (after lag), secondary around x=0.62 (bigger, faster)
+      function hump(center,amp,width,lag){
+        if(x<lag) return 0;
+        var d=(x-center)/width;
+        return amp*Math.exp(-d*d);
+      }
+      var primary=hump(0.22,0.32,0.10,0.10);
+      var secondary=hump(0.60,0.92,0.09,0.52);
+      fullCurve.push({x:x, y:Math.min(1, primary+secondary)});
+    }
+  })();
+
+  function dataToPx(pt){
+    return { X: GX0 + pt.x*(GX1-GX0), Y: GY0 - pt.y*(GY0-GY1) };
+  }
+  function drawGraph2(reveal, markers){
+    clear(svg2b);
+    graphAxes(svg2b, 0, "time →");
+    // exposure markers
+    var m1x=GX0+0.10*(GX1-GX0), m2x=GX0+0.52*(GX1-GX0);
+    if(markers.indexOf(1)>=0){
+      svg2b.appendChild(el("line",{x1:m1x,y1:GY0,x2:m1x,y2:GY1,stroke:"#f0a860","stroke-dasharray":"3 3","stroke-width":"1"}));
+      var a=el("text",{x:m1x-6,y:GY1+2,fill:"#f0a860","font-size":"9"}); a.textContent="1st"; svg2b.appendChild(a);
+    }
+    if(markers.indexOf(2)>=0){
+      svg2b.appendChild(el("line",{x1:m2x,y1:GY0,x2:m2x,y2:GY1,stroke:"#f0a860","stroke-dasharray":"3 3","stroke-width":"1"}));
+      var b=el("text",{x:m2x-8,y:GY1+2,fill:"#f0a860","font-size":"9"}); b.textContent="2nd"; svg2b.appendChild(b);
+    }
+    if(reveal.length>1){
+      var d="M";
+      reveal.forEach(function(pt,idx){
+        var p=dataToPx(pt); d+= (idx?" L":"")+p.X.toFixed(1)+" "+p.Y.toFixed(1);
+      });
+      svg2b.appendChild(el("path",{d:d,fill:"none",stroke:"#38d9c4","stroke-width":"2.5"}));
+    }
+  }
+
+  var m2markers=[];
+  function m2runGraph(uptoX, marker){
+    if(m2markers.indexOf(marker)<0) m2markers.push(marker);
+    m2anim.running=true;
+    m2anim.targetX=uptoX;
+  }
+  function m2graphStep(){
+    if(!m2anim.running) return;
+    // advance revealed index until fullCurve x reaches targetX
+    var idx=m2curve.length;
+    if(idx<=fullCurve.length && fullCurve[idx] && fullCurve[idx].x<=m2anim.targetX){
+      m2curve.push(fullCurve[idx]);
+      drawGraph2(m2curve, m2markers);
+    } else {
+      m2anim.running=false;
+    }
+  }
+  document.getElementById("m2dose1").addEventListener("click", function(){
+    m2markers=[1];
+    // reset curve to start of primary
+    m2curve=[];
+    m2runGraph(0.42, 1);
+    document.getElementById("m2gstatus").innerHTML="<b>Primary response:</b> a lag (~days) while B-cells activate, then a small, slow rise — and some cells become <b>memory cells</b>.";
+  });
+  document.getElementById("m2dose2").addEventListener("click", function(){
+    // continue curve to include secondary
+    m2runGraph(1.0, 2);
+    document.getElementById("m2gstatus").innerHTML="<b>Secondary response:</b> memory cells trigger a <b>faster, much larger, longer-lasting</b> antibody surge — the principle behind boosters.";
+  });
+  document.getElementById("m2graphreset").addEventListener("click", m2graphReset);
+
+  /* ================= MODE 3 : vaccination titre ================= */
+  var svg3=document.getElementById("svg3");
+  var m3status=document.getElementById("m3status");
+  var VW=480, VH=240, VX0=44, VY0=200, VX1=466, VY1=26;
+  var m3doses=[];   // list of dose times (data x)
+  var m3curve=[];   // revealed px points {x,y data}
+  var m3anim={running:false};
+  var m3full=[];    // full curve given current doses
+  var m3threshold=0.42;
+
+  function m3recompute(){
+    m3full=[];
+    for(var i=0;i<=240;i++){
+      var x=i/240;
+      var y=0;
+      m3doses.forEach(function(dt,k){
+        if(x<dt.time) return;
+        var amp = dt.booster? 0.85 : 0.4 + k*0.08;
+        var rise = 0.06; // time to peak
+        var peak = dt.time+rise;
+        var val;
+        if(x<peak){ val = amp*((x-dt.time)/rise); }
+        else {
+          // decay
+          val = amp*Math.exp(-(x-peak)*4.5*(dt.booster?0.5:1));
+        }
+        y+=val;
+      });
+      m3full.push({x:x,y:Math.min(1,y)});
+    }
+  }
+  function m3d2px(pt){ return {X:VX0+pt.x*(VX1-VX0), Y:VY0-pt.y*(VY0-VY1)}; }
+  function m3draw(){
+    clear(svg3);
+    // axes
+    svg3.appendChild(el("line",{x1:VX0,y1:VY0,x2:VX1,y2:VY0,stroke:"#3a4d63","stroke-width":"1.5"}));
+    svg3.appendChild(el("line",{x1:VX0,y1:VY0,x2:VX0,y2:VY1,stroke:"#3a4d63","stroke-width":"1.5"}));
+    var yl=el("text",{x:10,y:130,fill:"#9fb2c6","font-size":"10",transform:"rotate(-90 12,130)"}); yl.textContent="Antibody titre"; svg3.appendChild(yl);
+    var xl=el("text",{x:VX1-40,y:VY0+16,fill:"#9fb2c6","font-size":"10"}); xl.textContent="time →"; svg3.appendChild(xl);
+    // threshold
+    var ty=VY0-m3threshold*(VY0-VY1);
+    svg3.appendChild(el("line",{x1:VX0,y1:ty,x2:VX1,y2:ty,stroke:"#5fce8a","stroke-dasharray":"4 4","stroke-width":"1.2"}));
+    var tl=el("text",{x:VX0+4,y:ty-4,fill:"#5fce8a","font-size":"9"}); tl.textContent="protective threshold"; svg3.appendChild(tl);
+    // dose markers
+    m3doses.forEach(function(dt){
+      var mx=VX0+dt.time*(VX1-VX0);
+      svg3.appendChild(el("line",{x1:mx,y1:VY0,x2:mx,y2:VY1,stroke:"#f0a860","stroke-dasharray":"3 3","stroke-width":"1"}));
+      svg3.appendChild(el("polygon",{points:(mx-4)+","+(VY0+4)+" "+(mx+4)+","+(VY0+4)+" "+mx+","+(VY0-2),fill:"#f0a860"}));
+      var lb=el("text",{x:mx-6,y:VY1-2,fill:"#f0a860","font-size":"8"}); lb.textContent=dt.booster?"boost":"dose"; svg3.appendChild(lb);
+    });
+    // curve
+    if(m3curve.length>1){
+      var d="M";
+      m3curve.forEach(function(pt,idx){var p=m3d2px(pt); d+=(idx?" L":"")+p.X.toFixed(1)+" "+p.Y.toFixed(1);});
+      svg3.appendChild(el("path",{d:d,fill:"none",stroke:"#38d9c4","stroke-width":"2.5"}));
+    }
+  }
+  function m3addDose(booster){
+    var t = m3doses.length===0 ? 0.06 : m3doses[m3doses.length-1].time + 0.30;
+    if(t>0.9){ m3status.textContent="Timeline full — reset to explore a new schedule."; return; }
+    m3doses.push({time:t, booster:booster});
+    m3recompute();
+    m3anim.running=true;
+    if(booster) m3status.innerHTML="<b>Booster:</b> the secondary response spikes antibodies higher and they decay more slowly — durable protection above the threshold.";
+    else m3status.innerHTML="<b>Vaccine dose:</b> antigen trains B & T cells; titre rises above the protective threshold, then slowly wanes.";
+  }
+  function m3reset(){ m3doses=[]; m3curve=[]; m3full=[]; m3anim.running=false; m3draw(); m3status.textContent="A vaccine trains immunity without disease. Give a dose to begin."; }
+  function m3step(){
+    if(!m3anim.running) return;
+    var idx=m3curve.length;
+    if(m3full[idx]){ m3curve.push(m3full[idx]); m3draw(); }
+    // when a new dose changes the whole curve we redraw the trailing part
+    if(idx>=m3full.length){ m3anim.running=false; }
+  }
+  // when a dose is added mid-curve, keep already-revealed prefix but update tail:
+  function m3syncCurveToFull(){
+    // clamp existing revealed points to recomputed values (same x indices)
+    for(var i=0;i<m3curve.length;i++){ if(m3full[i]) m3curve[i]=m3full[i]; }
+  }
+  document.getElementById("m3dose").addEventListener("click", function(){ m3addDose(false); m3syncCurveToFull(); });
+  document.getElementById("m3booster").addEventListener("click", function(){ if(m3doses.length===0){m3addDose(false);} else {m3addDose(true);} m3syncCurveToFull(); });
+  document.getElementById("m3reset3").addEventListener("click", m3reset);
+
+  /* ================= main loop ================= */
+  var frame=0;
+  function loop(){
+    frame++;
+    if(running){
+      // Mode 1 animates ~30fps effect by updating every 2 frames
+      if(m1playing && (frame%2===0)) m1step();
+      m2step();
+      m2graphStep();
+      m3step();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* ================= QUIZ ================= */
+  var quizData=[
+    {
+      q:"1. Which feature is unique to ADAPTIVE (not innate) immunity?",
+      opts:["Physical skin barrier","Immunological memory & antigen-specificity","Phagocytosis by macrophages","Stomach acid killing microbes"],
+      correct:1,
+      expl:"Adaptive immunity is specific to a particular antigen and forms memory cells, giving a faster/stronger secondary response. Innate defences (barriers, phagocytes, acid) are fast but non-specific with no memory."
+    },
+    {
+      q:"2. A newborn receives antibodies through the placenta and breast milk. This is:",
+      opts:["Active natural immunity","Active artificial immunity","Passive natural immunity","Passive artificial immunity"],
+      correct:2,
+      expl:"Ready-made antibodies transferred mother→baby = PASSIVE immunity, and because it happens naturally (not via injection) it is NATURAL. Passive immunity is immediate but short-lived with no memory."
+    },
+    {
+      q:"3. Why does a booster (second) dose of a vaccine work better than the first?",
+      opts:["It uses a live, dangerous pathogen","Memory cells trigger a faster, larger, longer-lasting response","It bypasses B and T cells entirely","Antibodies are injected directly into the blood"],
+      correct:1,
+      expl:"The first dose creates memory B and T cells. On the second exposure these memory cells mount the SECONDARY response — quicker, higher antibody titre, and longer-lasting — the reason boosters strengthen immunity."
+    }
+  ];
+  var qbody=document.getElementById("quizbody");
+  var answered=0, correctCount=0;
+  quizData.forEach(function(item,qi){
+    var wrap=document.createElement("div"); wrap.className="q";
+    var p=document.createElement("p"); p.textContent=item.q; wrap.appendChild(p);
+    var expl=document.createElement("div"); expl.className="expl"; expl.textContent="✔ "+item.expl;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.type="button"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(wrap.getAttribute("data-done")) return;
+        wrap.setAttribute("data-done","1");
+        answered++;
+        var btns=wrap.querySelectorAll(".opt");
+        btns.forEach(function(x,xi){
+          if(xi===item.correct) x.classList.add("correct");
+          x.disabled=true;
+        });
+        if(oi===item.correct){ correctCount++; }
+        else { b.classList.add("wrong"); }
+        expl.classList.add("show");
+        document.getElementById("quizscore").textContent="Score: "+correctCount+" / "+answered+" answered"+(answered===quizData.length?" — quiz complete!":"");
+      });
+      wrap.appendChild(b);
+    });
+    wrap.appendChild(expl);
+    qbody.appendChild(wrap);
+  });
+
+  /* init */
+  m1build();
+  m2build();
+  m2graphReset();
+  m3reset();
+  loop();
+})();
+</script>
+</body>
+</html>
