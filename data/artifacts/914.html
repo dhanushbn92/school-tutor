@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>प्रेरणा Explorer &amp; Match Game | Prerana</title>
+<style>
+  :root{
+    --accent:#f5b13d;
+    --accent-soft:#2e2a3f;
+    --accent-dark:#ffca6b;
+    --bg1:#171426;
+    --bg2:#221d38;
+    --panel:#231f36;
+    --panel2:#2a2540;
+    --ink:#eee9f7;
+    --muted:#a49dc0;
+    --good:#4ad4a0;
+    --good-soft:#1e3a34;
+    --bad:#ff6b8a;
+    --bad-soft:#3a2130;
+    --line:#3a3454;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.4rem,5vw,2rem);
+    margin:0 0 4px;
+    color:var(--accent-dark);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.8rem,7vw,2.6rem);color:var(--accent);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:1px solid var(--line);cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);border-color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#241c07;border-color:var(--accent);box-shadow:0 4px 16px rgba(245,177,61,.35);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    border:1px solid var(--line);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Verse Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.45rem,5.8vw,2.05rem);
+    line-height:1.8;
+    text-align:center;
+    color:var(--accent-dark);
+    margin-bottom:6px;
+  }
+  .verse-source{text-align:center;color:var(--accent);font-size:.8rem;letter-spacing:.03em;margin-bottom:10px;}
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.95rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.15rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#2c5148;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#241c07;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+    border:1px solid var(--line);
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel2);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.35rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(245,177,61,.22);}
+  .word-item.done,.mean-item.done{
+    border-color:#2c5148;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2c5148;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.3rem,5vw,1.7rem);
+    text-align:center;line-height:1.8;color:var(--accent-dark);
+    background:var(--panel2);border-radius:14px;padding:16px;margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .blank{
+    display:inline-block;min-width:70px;border-bottom:3px dashed var(--accent);
+    color:var(--accent);font-weight:700;
+  }
+  .blank.filled{border-bottom-style:solid;}
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+  .opt-btn{
+    font-family:var(--deva);font-size:1.3rem;
+    border:2px solid var(--line);background:var(--panel2);border-radius:12px;
+    padding:10px 18px;cursor:pointer;color:var(--accent-dark);font-weight:600;transition:.15s;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2c5148;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">प्रेरणा</div>
+    <h1>Prerana &mdash; Explorer &amp; Match Game</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 2 &middot; Verses on Inspiration &amp; Perseverance</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">Verse Explorer</button>
+    <button class="tab-btn" data-mode="match">Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">Fill the Verse</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse Explorer</h2>
+      <p class="mode-sub">Read each verse, its word meanings, translation, and the inspiration it gives.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Fill the Verse Quiz</h2>
+      <p class="mode-sub">Choose the correct missing word to complete each verse.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Sanskrit verses &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA ---------------- */
+var VERSES = [
+  {
+    deva: "उत्साहो बलवानार्य नास्त्युत्साहात्परं बलम्। सोत्साहस्य हि लोकेषु न किञ्चिदपि दुर्लभम्॥",
+    source: "Valmiki Ramayana",
+    translit: "utsāho balavān ārya nāsty utsāhāt paraṁ balam; sotsāhasya hi lokeṣu na kiñcid api durlabham",
+    words: [
+      {w:"उत्साहः", m:"enthusiasm / zeal"},
+      {w:"बलवान्", m:"powerful / strong"},
+      {w:"दुर्लभम्", m:"hard to attain"},
+      {w:"लोकेषु", m:"in the worlds"}
+    ],
+    trans: "Enthusiasm is strength, O noble one; there is no power greater than enthusiasm. For a person full of zeal, nothing in the world is beyond reach.",
+    moral: "Zeal and enthusiasm are our greatest strength — with them, nothing is impossible."
+  },
+  {
+    deva: "प्रारभ्यते न खलु विघ्नभयेन नीचैः प्रारभ्य विघ्नविहता विरमन्ति मध्याः। विघ्नैः पुनः पुनरपि प्रतिहन्यमानाः प्रारब्धमुत्तमजना न परित्यजन्ति॥",
+    source: "Bhartṛhari, Nīti Śataka",
+    translit: "prārabhyate na khalu vighnabhayena nīcaiḥ prārabhya vighnavihatā viramanti madhyāḥ; vighnaiḥ punaḥ punar api pratihanyamānāḥ prārabdham uttamajanā na parityajanti",
+    words: [
+      {w:"विघ्न", m:"obstacle"},
+      {w:"नीचैः", m:"by the low / base"},
+      {w:"उत्तमजनाः", m:"noble people"},
+      {w:"परित्यजन्ति", m:"they abandon"}
+    ],
+    trans: "The base never begin a task for fear of obstacles; the mediocre begin but stop when troubles strike. But the noble, though struck by obstacles again and again, never abandon what they have begun.",
+    moral: "Do not fear obstacles or quit halfway — the truly great persevere to the very end."
+  },
+  {
+    deva: "उद्यमेन हि सिध्यन्ति कार्याणि न मनोरथैः। न हि सुप्तस्य सिंहस्य प्रविशन्ति मुखे मृगाः॥",
+    source: "Hitopadeśa / Pañcatantra",
+    translit: "udyamena hi sidhyanti kāryāṇi na manorathaiḥ; na hi suptasya siṁhasya praviśanti mukhe mṛgāḥ",
+    words: [
+      {w:"उद्यमेन", m:"by effort"},
+      {w:"कार्याणि", m:"tasks / works"},
+      {w:"सुप्तस्य", m:"of the sleeping"},
+      {w:"सिंहस्य", m:"of the lion"}
+    ],
+    trans: "Tasks are accomplished by effort, not by mere wishes. Deer do not walk into the mouth of a sleeping lion.",
+    moral: "Even the strong must act — success comes to those who make the effort, not to the idle dreamer."
+  },
+  {
+    deva: "उद्यमः साहसं धैर्यं बुद्धिः शक्तिः पराक्रमः। षडेते यत्र वर्तन्ते तत्र देवः सहायकृत्॥",
+    source: "Hitopadeśa",
+    translit: "udyamaḥ sāhasaṁ dhairyaṁ buddhiḥ śaktiḥ parākramaḥ; ṣaḍ ete yatra vartante tatra devaḥ sahāyakṛt",
+    words: [
+      {w:"उद्यमः", m:"effort / diligence"},
+      {w:"साहसम्", m:"boldness / courage"},
+      {w:"धैर्यम्", m:"patience / steadfastness"},
+      {w:"पराक्रमः", m:"valour / prowess"}
+    ],
+    trans: "Effort, courage, patience, intelligence, strength, and valour — where these six are present, there God himself gives help.",
+    moral: "Fortune favours those who cultivate effort and courage; help follows the one who strives."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-source">&mdash; '+v.source+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">Inspiration</div>'+v.moral+'</div>';
+  verseCount.textContent = "Verse "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"उत्साहः", m:"enthusiasm"},
+  {w:"बलम्", m:"strength"},
+  {w:"विघ्न", m:"obstacle"},
+  {w:"उद्यमेन", m:"by effort"},
+  {w:"सिंहस्य", m:"of the lion"},
+  {w:"धैर्यम्", m:"patience"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    before:"उत्साहो बलवानार्य नास्त्युत्साहात्परं ", blank:"बलम्", after:"।",
+    options:["बलम्","धनम्","सुखम्"], answer:"बलम्",
+    explain:"<b>नास्ति उत्साहात् परं बलम्</b> — there is no strength (बलम्) greater than enthusiasm."
+  },
+  {
+    before:"उद्यमेन हि सिध्यन्ति ", blank:"कार्याणि", after:" न मनोरथैः।",
+    options:["कार्याणि","पुष्पाणि","वचनानि"], answer:"कार्याणि",
+    explain:"<b>उद्यमेन हि सिध्यन्ति कार्याणि</b> — tasks (कार्याणि) are accomplished by effort, not by wishes."
+  },
+  {
+    before:"उद्यमः साहसं ", blank:"धैर्यं", after:" बुद्धिः शक्तिः पराक्रमः।",
+    options:["धैर्यं","धनं","क्रोधं"], answer:"धैर्यं",
+    explain:"<b>उद्यमः साहसं धैर्यं</b> — effort, courage, and patience (धैर्यं) are among the six qualities that draw help."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  — उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o){
+    return '<button class="opt-btn" data-opt="'+o+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.before+'<span class="blank" id="blankSpot">____</span>'+q.after+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = el.dataset.opt;
+  var blankSpot = document.getElementById("blankSpot");
+  blankSpot.textContent = q.answer;
+  blankSpot.classList.add("filled");
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    if(b.dataset.opt === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "Correct! " : "Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

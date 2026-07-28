@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>प्राणस्य श्रेष्ठत्वम् | Supremacy of Prana — Learning Game</title>
+<style>
+  :root{
+    --accent:#3fb6a8;
+    --accent-soft:#e0f5f2;
+    --accent-dark:#1f8a7e;
+    --bg:#0f1720;
+    --panel:#182430;
+    --panel-2:#1f2f3c;
+    --ink:#e7eef1;
+    --muted:#9fb2b8;
+    --good:#4fd6a0;
+    --good-soft:#153b31;
+    --bad:#ff6b81;
+    --bad-soft:#3a1c24;
+    --line:#2b3d49;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#1c2b38 0%,#0f1720 60%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:14px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6vw,2.4rem);color:var(--accent);}
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:2px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 15px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#06231f;box-shadow:0 4px 14px rgba(63,182,168,.35);}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Story Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:16px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5vw,1.85rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;color:var(--ink);
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#245a49;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#06231f;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.96rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:#123;box-shadow:0 0 0 3px rgba(63,182,168,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#245a49;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.9;
+  }
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:rgba(63,182,168,.12);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #245a49;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.5vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--accent);
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .quiz-en{text-align:center;color:var(--muted);font-size:.92rem;margin-bottom:16px;}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:600;transition:.15s;
+    text-align:left;font-size:.98rem;
+  }
+  .opt-btn .deva{font-family:var(--deva);color:var(--accent);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#245a49;background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .deva{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">प्राणस्य श्रेष्ठत्वम्</div>
+    <h1>The Supremacy of Prana (Life-Breath)</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 5 &middot; Upanishadic Dialogue</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story / Dialogue Explorer</h2>
+      <p class="mode-sub">Follow the dialogue where the vital breath proves itself chief among the faculties.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer three questions on the story and its moral. Explanations reveal after each answer.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Retold from the Prāṇa-saṁvāda of the Upaniṣads (public domain) &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE 1 DATA: STORY CARDS ---------------- */
+var VERSES = [
+  {
+    deva: "एकदा इन्द्रियाणि श्रेष्ठताविषये विवदन्ते स्म।",
+    translit: "ekadā indriyāṇi śreṣṭhatā-viṣaye vivadante sma",
+    words: [
+      {w:"इन्द्रियाणि", m:"the senses / faculties"},
+      {w:"श्रेष्ठता", m:"supremacy / being greatest"},
+      {w:"विवदन्ते", m:"they argue / dispute"}
+    ],
+    trans: "Once the faculties argued over which of them was the greatest.",
+    moral: "The vital powers within the body each claimed to be the most important."
+  },
+  {
+    deva: "तानि प्रजापतिम् उपगम्य अपृच्छन् — अस्माकं कः श्रेष्ठः?",
+    translit: "tāni prajāpatim upagamya apṛcchan — asmākaṁ kaḥ śreṣṭhaḥ?",
+    words: [
+      {w:"प्रजापतिम्", m:"to Prajapati (the Lord of creatures)"},
+      {w:"उपगम्य", m:"having approached"},
+      {w:"अपृच्छन्", m:"they asked"},
+      {w:"कः", m:"who"}
+    ],
+    trans: "They approached Prajapati and asked, \"Who among us is the greatest?\"",
+    moral: "Unable to settle the matter themselves, they sought a wise judge."
+  },
+  {
+    deva: "सः अवदत् — यस्मिन् उत्क्रान्ते शरीरं पापिष्ठं भवति, सः श्रेष्ठः।",
+    translit: "saḥ avadat — yasmin utkrānte śarīraṁ pāpiṣṭhaṁ bhavati, saḥ śreṣṭhaḥ",
+    words: [
+      {w:"उत्क्रान्ते", m:"when (it) departs / goes out"},
+      {w:"शरीरम्", m:"the body"},
+      {w:"पापिष्ठम्", m:"most wretched / worst off"},
+      {w:"श्रेष्ठः", m:"the greatest"}
+    ],
+    trans: "He said, \"The one whose departure leaves the body worst off is the greatest.\"",
+    moral: "The true test of importance is what happens when a power leaves the body."
+  },
+  {
+    deva: "वाक् उदक्रामत्। संवत्सरं प्रोष्य आगत्य अपृच्छत् — कथम् अजीवत?",
+    translit: "vāk udakrāmat; saṁvatsaraṁ proṣya āgatya apṛcchat — katham ajīvata?",
+    words: [
+      {w:"वाक्", m:"speech"},
+      {w:"उदक्रामत्", m:"went out / departed"},
+      {w:"संवत्सरम्", m:"for a year"},
+      {w:"अजीवत", m:"you lived"}
+    ],
+    trans: "Speech departed, stayed away a year, returned and asked, \"How did you live without me?\"",
+    moral: "Though speech was gone, the body still survived — like a mute person who still lives."
+  },
+  {
+    deva: "एवं चक्षुः श्रोत्रं मनः च क्रमेण उदक्रामन्, तथापि शरीरम् अजीवत्।",
+    translit: "evaṁ cakṣuḥ śrotraṁ manaḥ ca krameṇa udakrāman, tathāpi śarīram ajīvat",
+    words: [
+      {w:"चक्षुः", m:"the eye"},
+      {w:"श्रोत्रम्", m:"the ear"},
+      {w:"मनः", m:"the mind"},
+      {w:"तथापि", m:"even then / still"}
+    ],
+    trans: "In the same way the eye, ear and mind each departed, yet the body still lived on.",
+    moral: "Blind, deaf or mindless the body endured — none of these was truly indispensable."
+  },
+  {
+    deva: "अथ प्राणः उत्क्रमितुम् ऐच्छत्, तदा सर्वाणि इन्द्रियाणि व्यथितानि अभवन्।",
+    translit: "atha prāṇaḥ utkramitum aicchat, tadā sarvāṇi indriyāṇi vyathitāni abhavan",
+    words: [
+      {w:"अथ", m:"then / now"},
+      {w:"प्राणः", m:"the vital breath / life-force"},
+      {w:"उत्क्रमितुम्", m:"to depart"},
+      {w:"व्यथितानि", m:"agitated / distressed"}
+    ],
+    trans: "Then the vital breath began to depart, and at once all the faculties grew distressed.",
+    moral: "As प्राण stirred to leave, it uprooted the others — a horse pulling up its tethering pegs."
+  },
+  {
+    deva: "तानि प्राणम् अस्तुवन् — त्वम् एव नः श्रेष्ठः, मा उत्क्रमीः इति।",
+    translit: "tāni prāṇam astuvan — tvam eva naḥ śreṣṭhaḥ, mā utkramīḥ iti",
+    words: [
+      {w:"अस्तुवन्", m:"they praised"},
+      {w:"त्वम् एव", m:"you alone"},
+      {w:"नः", m:"of us / our"},
+      {w:"मा उत्क्रमीः", m:"do not depart"}
+    ],
+    trans: "They praised the breath: \"You alone are our greatest — please do not depart!\"",
+    moral: "Recognising प्राण as chief, the faculties yielded and asked it to stay.",
+    isFinal: true
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  var moralLabel = v.isFinal ? "Moral of the Story" : "In the Story";
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थः &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">'+moralLabel+'</div>'+v.moral+'</div>';
+  verseCount.textContent = "Card "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"प्राणः", m:"life-breath"},
+  {w:"वाक्", m:"speech"},
+  {w:"चक्षुः", m:"eye"},
+  {w:"श्रोत्रम्", m:"ear"},
+  {w:"मनः", m:"mind"},
+  {w:"शरीरम्", m:"body"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"When speech, the eye, the ear and the mind each departed in turn, what happened to the body?",
+    options:[
+      {t:"It died at once", d:""},
+      {t:"It still lived on (like a mute, blind, deaf or dull person)", d:""},
+      {t:"It became the greatest faculty", d:""}
+    ],
+    answer:1,
+    explain:"The body kept living without each of them — a mute (मूकः), blind (अन्धः), deaf (बधिरः) or dull person still survives. So none of these proved indispensable."
+  },
+  {
+    q:"Why did the faculties finally accept प्राण (the vital breath) as the greatest?",
+    options:[
+      {t:"Because प्राण spoke the loudest", d:""},
+      {t:"Because Prajapati favoured it", d:""},
+      {t:"Because when प्राण began to leave, it uprooted all the others and the body could not function", d:""}
+    ],
+    answer:2,
+    explain:"As <b>प्राणः</b> prepared to depart it stirred all the faculties (व्यथितानि अभवन्). The body cannot function once the life-breath leaves, so प्राण is truly श्रेष्ठः."
+  },
+  {
+    q:"What is the central moral of the प्राण dialogue?",
+    options:[
+      {t:"प्राण is chief, and the faculties must cooperate under it", d:""},
+      {t:"Speech is more useful than breathing", d:""},
+      {t:"The senses should compete with one another", d:""}
+    ],
+    answer:0,
+    explain:"The vital breath (<b>प्राणः</b>) is the chief upon which all the senses depend; the faculties work best cooperating together, not competing for supremacy."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-opt="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-en">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.opt,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b,i){
+    b.disabled = true;
+    if(i === q.answer) b.classList.add("correct");
+    else if(i === chosen) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
