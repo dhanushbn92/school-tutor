@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trig Identities &amp; Transformations Lab — NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#141a24;
+    --panel:#1d2633;
+    --panel2:#232f3f;
+    --ink:#e8eef6;
+    --muted:#9fb0c4;
+    --accent:#f5a742;
+    --accent2:#4fb3ff;
+    --grid:#2c3a4d;
+    --axis:#5b6f88;
+    --ok:#5ad19a;
+    --line1:#f5a742;
+    --line2:#4fb3ff;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.5;
+    padding:14px;
+    -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:.1em 0 .1em}
+  h2{font-size:1.05rem;margin:.2em 0 .5em;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:12px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--grid);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    user-select:none;-webkit-tap-highlight-color:transparent;
+  }
+  .tab.active{background:var(--accent);color:#20160a;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--grid);border-radius:var(--radius);
+    padding:14px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:pan-y}
+  .ctrl{margin:10px 0}
+  .ctrl label{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:4px;color:var(--muted)}
+  .ctrl label b{color:var(--ink);font-variant-numeric:tabular-nums}
+  input[type=range]{
+    width:100%;height:30px;-webkit-appearance:none;appearance:none;background:transparent;margin:0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:6px;background:var(--grid);border-radius:4px}
+  input[type=range]::-moz-range-track{height:6px;background:var(--grid);border-radius:4px}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;
+    background:var(--accent);margin-top:-8px;cursor:pointer;border:2px solid #20160a;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #20160a;
+  }
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{
+    background:var(--panel2);border:1px solid var(--grid);border-radius:10px;
+    padding:7px 11px;font-size:.85rem;flex:1 1 120px;min-width:110px;
+  }
+  .chip span{display:block;color:var(--muted);font-size:.75rem}
+  .chip b{font-size:1.05rem;color:var(--accent2);font-variant-numeric:tabular-nums}
+  select{
+    width:100%;padding:10px;border-radius:10px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--grid);font-size:.95rem;
+  }
+  .eq{
+    background:var(--panel2);border:1px dashed var(--grid);border-radius:10px;
+    padding:10px 12px;margin-top:10px;font-size:.95rem;font-family:"Cambria Math",Georgia,serif;
+  }
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .facts ul{margin:.3em 0;padding-left:1.1em}
+  .facts li{margin:.28em 0;font-size:.9rem}
+  .facts code{background:var(--panel2);padding:2px 6px;border-radius:6px;color:var(--accent);font-family:"Cambria Math",Consolas,monospace}
+  .match{font-weight:600}
+  .match.ok{color:var(--ok)}
+  details.q{
+    background:var(--panel2);border:1px solid var(--grid);border-radius:12px;padding:12px;margin:10px 0;
+  }
+  details.q summary{cursor:pointer;font-weight:600;font-size:.95rem;list-style:none}
+  details.q summary::-webkit-details-marker{display:none}
+  details.q summary::before{content:"▸ ";color:var(--accent)}
+  details.q[open] summary::before{content:"▾ "}
+  .opt{margin:6px 0 2px;font-size:.9rem;color:var(--muted)}
+  .ans{margin-top:8px;padding:8px 10px;background:rgba(90,209,154,.12);border-left:3px solid var(--ok);border-radius:8px;font-size:.9rem}
+  .foot{color:var(--muted);font-size:.78rem;text-align:center;margin-top:8px}
+  @media(min-width:720px){
+    .split{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;align-items:start}
+  }
+</style>
+</head>
+<body>
+<h1>Trig Identities &amp; Transformations Lab</h1>
+<div class="sub">NIOS Class 12 Mathematics · Ch 4 — Trigonometric Functions-II</div>
+
+<div class="tabs" role="tablist">
+  <div class="tab active" data-view="wave">Wave Transformer</div>
+  <div class="tab" data-view="ident">Identity Verifier</div>
+  <div class="tab" data-view="sum">Sum / Compound Angles</div>
+  <div class="tab" data-view="facts">Facts &amp; Quiz</div>
+</div>
+
+<!-- ============ WAVE ============ -->
+<section class="view active" id="wave">
+  <div class="split">
+    <div class="panel">
+      <h2>y = A·sin(Bx + C) + D</h2>
+      <canvas id="cwave" width="640" height="360" aria-label="Sine wave graph"></canvas>
+      <div class="legend"><span><i style="background:var(--line1)"></i>your wave</span><span><i style="background:var(--axis)"></i>base sin x</span></div>
+    </div>
+    <div class="panel">
+      <div class="ctrl">
+        <label>Amplitude A <b id="vA">2.0</b></label>
+        <input id="sA" type="range" min="-4" max="4" step="0.1" value="2">
+      </div>
+      <div class="ctrl">
+        <label>B (frequency) <b id="vB">1.0</b></label>
+        <input id="sB" type="range" min="0.25" max="4" step="0.05" value="1">
+      </div>
+      <div class="ctrl">
+        <label>Phase C (rad) <b id="vC">0.00</b></label>
+        <input id="sC" type="range" min="-3.14" max="3.14" step="0.05" value="0">
+      </div>
+      <div class="ctrl">
+        <label>Vertical shift D <b id="vD">0.0</b></label>
+        <input id="sD" type="range" min="-3" max="3" step="0.1" value="0">
+      </div>
+      <div class="readout">
+        <div class="chip"><span>Amplitude |A|</span><b id="rAmp">2.00</b></div>
+        <div class="chip"><span>Period 2π/B</span><b id="rPer">6.28</b></div>
+        <div class="chip"><span>Phase shift −C/B</span><b id="rPh">0.00</b></div>
+        <div class="chip"><span>Midline y=</span><b id="rMid">0.0</b></div>
+      </div>
+      <div class="eq" id="eqWave">y = 2.0·sin(1.0x + 0.00) + 0.0</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IDENTITY ============ -->
+<section class="view" id="ident">
+  <div class="split">
+    <div class="panel">
+      <h2>Both sides overlap when the identity is true</h2>
+      <canvas id="cident" width="640" height="360" aria-label="Identity comparison graph"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--line1)"></i>Left side (LHS)</span>
+        <span><i style="background:var(--line2)"></i>Right side (RHS)</span>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Choose an identity</h2>
+      <select id="selId">
+        <option value="pyth">sin²x + cos²x = 1</option>
+        <option value="dsin">sin 2x = 2 sin x cos x</option>
+        <option value="dcos">cos 2x = 1 − 2 sin²x</option>
+        <option value="dcos2">cos 2x = 2 cos²x − 1</option>
+        <option value="prod">2 sin x cos x = sin 2x (product→sum)</option>
+      </select>
+      <div class="eq" id="eqId"></div>
+      <div class="readout">
+        <div class="chip"><span>LHS at x=0.7</span><b id="idL">—</b></div>
+        <div class="chip"><span>RHS at x=0.7</span><b id="idR">—</b></div>
+        <div class="chip"><span>Match?</span><b id="idM" class="match">—</b></div>
+      </div>
+      <p class="sub" style="margin-top:10px">The orange curve is drawn thick; the blue curve is drawn dashed on top. If they land exactly together at every x, the identity holds for all x.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SUM ============ -->
+<section class="view" id="sum">
+  <div class="split">
+    <div class="panel">
+      <h2>Angles A and B on the unit circle</h2>
+      <canvas id="csum" width="640" height="360" aria-label="Unit circle for compound angles"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--line1)"></i>A</span>
+        <span><i style="background:var(--line2)"></i>B</span>
+        <span><i style="background:var(--ok)"></i>A+B</span>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctrl">
+        <label>Angle A <b id="vAd">30°</b></label>
+        <input id="sAd" type="range" min="0" max="180" step="1" value="30">
+      </div>
+      <div class="ctrl">
+        <label>Angle B <b id="vBd">45°</b></label>
+        <input id="sBd" type="range" min="0" max="180" step="1" value="45">
+      </div>
+      <div class="eq" id="eqSum"></div>
+      <div class="readout">
+        <div class="chip"><span>sin(A+B) direct</span><b id="sD1">—</b></div>
+        <div class="chip"><span>sinAcosB+cosAsinB</span><b id="sF1">—</b></div>
+      </div>
+      <div class="readout">
+        <div class="chip"><span>cos(A+B) direct</span><b id="cD1">—</b></div>
+        <div class="chip"><span>cosAcosB−sinAsinB</span><b id="cF1">—</b></div>
+      </div>
+      <div class="readout">
+        <div class="chip"><span>Formulas match?</span><b id="sumM" class="match">—</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACTS & QUIZ ============ -->
+<section class="view" id="facts">
+  <div class="panel facts">
+    <h2>Key facts to remember</h2>
+    <ul>
+      <li>For <code>y = A·sin(Bx+C)+D</code>: amplitude = <code>|A|</code>, period = <code>2π/B</code>, phase shift = <code>−C/B</code>, midline <code>y=D</code>.</li>
+      <li>Pythagorean: <code>sin²x + cos²x = 1</code>, <code>1+tan²x = sec²x</code>, <code>1+cot²x = cosec²x</code>.</li>
+      <li>Sum: <code>sin(A±B) = sinA cosB ± cosA sinB</code>.</li>
+      <li>Sum: <code>cos(A±B) = cosA cosB ∓ sinA sinB</code>.</li>
+      <li>Double angle: <code>sin2x = 2 sinx cosx</code>, <code>cos2x = 1−2sin²x = 2cos²x−1 = cos²x−sin²x</code>.</li>
+      <li>Tangent: <code>tan2x = 2tanx/(1−tan²x)</code>.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <h2>Quick quiz — tap to reveal</h2>
+    <details class="q">
+      <summary>1. For y = 3·sin(2x) the period is…</summary>
+      <div class="opt">a) 2π &nbsp; b) π &nbsp; c) 4π &nbsp; d) π/2</div>
+      <div class="ans"><b>b) π.</b> Period = 2π/B = 2π/2 = π. Amplitude here is 3.</div>
+    </details>
+    <details class="q">
+      <summary>2. sin 2x equals…</summary>
+      <div class="opt">a) 2 sin x &nbsp; b) sin²x − cos²x &nbsp; c) 2 sin x cos x &nbsp; d) 1 − 2cos²x</div>
+      <div class="ans"><b>c) 2 sin x cos x</b> — the double-angle identity for sine.</div>
+    </details>
+    <details class="q">
+      <summary>3. If A = 60°, B = 30°, then cos(A+B) = ?</summary>
+      <div class="opt">a) 1 &nbsp; b) 0 &nbsp; c) ½ &nbsp; d) √3/2</div>
+      <div class="ans"><b>b) 0.</b> A+B = 90°, and cos 90° = 0. Check: cosAcosB−sinAsinB = ½·(√3/2) − (√3/2)·½ = 0.</div>
+    </details>
+  </div>
+</section>
+
+<div class="foot">Vanilla JS · canvas · offline · NIOS Class 12 Mathematics</div>
+
+<script>
+(function(){
+  "use strict";
+  var TAU = Math.PI*2;
+
+  /* ---- tab switching ---- */
+  var tabs = document.querySelectorAll('.tab');
+  var views = document.querySelectorAll('.view');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      views.forEach(function(v){v.classList.remove('active');});
+      t.classList.add('active');
+      document.getElementById(t.dataset.view).classList.add('active');
+      redrawAll();
+    });
+  });
+
+  /* ---- shared canvas helper: math -> pixel via x in [xmin,xmax], y in [ymin,ymax] ---- */
+  function setupHiDPI(cv){
+    var dpr = window.devicePixelRatio||1;
+    var w = cv.clientWidth||cv.width;
+    var h = w*360/640;
+    cv.width = Math.round(w*dpr);
+    cv.height = Math.round(h*dpr);
+    cv.style.height = h+'px';
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx:ctx,w:w,h:h};
+  }
+
+  function drawGraph(cv, opts){
+    var d = setupHiDPI(cv);
+    var ctx=d.ctx, W=d.w, H=d.h;
+    var xmin=opts.xmin, xmax=opts.xmax, ymin=opts.ymin, ymax=opts.ymax;
+    var pad=8;
+    function X(x){ return pad + (x-xmin)/(xmax-xmin)*(W-2*pad); }
+    function Y(y){ return H-pad - (y-ymin)/(ymax-ymin)*(H-2*pad); }
+    ctx.clearRect(0,0,W,H);
+    // grid
+    ctx.strokeStyle=getCss('--grid'); ctx.lineWidth=1;
+    ctx.beginPath();
+    var gxStep = opts.gxStep || (Math.PI/2);
+    for(var gx=Math.ceil(xmin/gxStep)*gxStep; gx<=xmax+1e-9; gx+=gxStep){
+      ctx.moveTo(X(gx),pad); ctx.lineTo(X(gx),H-pad);
+    }
+    for(var gy=Math.ceil(ymin); gy<=ymax+1e-9; gy+=1){
+      ctx.moveTo(pad,Y(gy)); ctx.lineTo(W-pad,Y(gy));
+    }
+    ctx.stroke();
+    // axes
+    ctx.strokeStyle=getCss('--axis'); ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad,Y(0)); ctx.lineTo(W-pad,Y(0));
+    ctx.moveTo(X(0),pad); ctx.lineTo(X(0),H-pad);
+    ctx.stroke();
+    // plot each curve
+    opts.curves.forEach(function(cu){
+      ctx.strokeStyle=cu.color;
+      ctx.lineWidth=cu.width||2;
+      if(cu.dash){ctx.setLineDash(cu.dash);}else{ctx.setLineDash([]);}
+      ctx.beginPath();
+      var first=true;
+      var N=260;
+      for(var i=0;i<=N;i++){
+        var x=xmin+(xmax-xmin)*i/N;
+        var y=cu.f(x);
+        if(!isFinite(y)){first=true;continue;}
+        var py=Y(Math.max(ymin-1,Math.min(ymax+1,y)));
+        if(first){ctx.moveTo(X(x),py);first=false;}else{ctx.lineTo(X(x),py);}
+      }
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    return {X:X,Y:Y,ctx:ctx,W:W,H:H};
+  }
+
+  function getCss(v){
+    return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#888';
+  }
+
+  /* =========================================================
+     MODE 1 — WAVE
+  ========================================================= */
+  var sA=el('sA'),sB=el('sB'),sC=el('sC'),sD=el('sD');
+  function el(id){return document.getElementById(id);}
+
+  function drawWave(){
+    var A=+sA.value,B=+sB.value,C=+sC.value,D=+sD.value;
+    el('vA').textContent=A.toFixed(1);
+    el('vB').textContent=B.toFixed(2);
+    el('vC').textContent=C.toFixed(2);
+    el('vD').textContent=D.toFixed(1);
+    el('rAmp').textContent=Math.abs(A).toFixed(2);
+    el('rPer').textContent=(TAU/B).toFixed(2);
+    el('rPh').textContent=(-C/B).toFixed(2);
+    el('rMid').textContent=D.toFixed(1);
+    el('eqWave').textContent='y = '+A.toFixed(1)+'·sin('+B.toFixed(2)+'x '+(C>=0?'+ ':'− ')+Math.abs(C).toFixed(2)+') '+(D>=0?'+ ':'− ')+Math.abs(D).toFixed(1);
+    drawGraph(el('cwave'),{
+      xmin:-TAU, xmax:TAU, ymin:-6, ymax:6, gxStep:Math.PI/2,
+      curves:[
+        {f:function(x){return Math.sin(x);}, color:getCss('--axis'), width:1.5, dash:[4,4]},
+        {f:function(x){return A*Math.sin(B*x+C)+D;}, color:getCss('--line1'), width:3}
+      ]
+    });
+  }
+  [sA,sB,sC,sD].forEach(function(s){s.addEventListener('input',drawWave);});
+
+  /* =========================================================
+     MODE 2 — IDENTITY
+  ========================================================= */
+  var IDS = {
+    pyth:{
+      eq:'sin²x + cos²x = 1',
+      lhs:function(x){return Math.sin(x)*Math.sin(x)+Math.cos(x)*Math.cos(x);},
+      rhs:function(x){return 1;},
+      lbl:'sin²x+cos²x', rlbl:'1'
+    },
+    dsin:{
+      eq:'sin 2x = 2 sin x cos x',
+      lhs:function(x){return Math.sin(2*x);},
+      rhs:function(x){return 2*Math.sin(x)*Math.cos(x);}
+    },
+    dcos:{
+      eq:'cos 2x = 1 − 2 sin²x',
+      lhs:function(x){return Math.cos(2*x);},
+      rhs:function(x){return 1-2*Math.sin(x)*Math.sin(x);}
+    },
+    dcos2:{
+      eq:'cos 2x = 2 cos²x − 1',
+      lhs:function(x){return Math.cos(2*x);},
+      rhs:function(x){return 2*Math.cos(x)*Math.cos(x)-1;}
+    },
+    prod:{
+      eq:'2 sin x cos x = sin 2x',
+      lhs:function(x){return 2*Math.sin(x)*Math.cos(x);},
+      rhs:function(x){return Math.sin(2*x);}
+    }
+  };
+  var selId=el('selId');
+  function drawIdent(){
+    var id=IDS[selId.value];
+    el('eqId').textContent=id.eq;
+    var xs=0.7;
+    var L=id.lhs(xs), R=id.rhs(xs);
+    el('idL').textContent=L.toFixed(3);
+    el('idR').textContent=R.toFixed(3);
+    var m=el('idM');
+    if(Math.abs(L-R)<1e-9){m.textContent='YES ✓';m.className='match ok';}
+    else{m.textContent='no';m.className='match';}
+    drawGraph(el('cident'),{
+      xmin:-TAU, xmax:TAU, ymin:-2.2, ymax:2.2, gxStep:Math.PI/2,
+      curves:[
+        {f:id.lhs, color:getCss('--line1'), width:4},
+        {f:id.rhs, color:getCss('--line2'), width:2, dash:[6,5]}
+      ]
+    });
+  }
+  selId.addEventListener('change',drawIdent);
+
+  /* =========================================================
+     MODE 3 — SUM / COMPOUND
+  ========================================================= */
+  var sAd=el('sAd'),sBd=el('sBd');
+  function drawSum(){
+    var Ad=+sAd.value, Bd=+sBd.value;
+    var A=Ad*Math.PI/180, B=Bd*Math.PI/180;
+    el('vAd').textContent=Ad+'°';
+    el('vBd').textContent=Bd+'°';
+    var sinDirect=Math.sin(A+B);
+    var sinForm=Math.sin(A)*Math.cos(B)+Math.cos(A)*Math.sin(B);
+    var cosDirect=Math.cos(A+B);
+    var cosForm=Math.cos(A)*Math.cos(B)-Math.sin(A)*Math.sin(B);
+    el('sD1').textContent=sinDirect.toFixed(4);
+    el('sF1').textContent=sinForm.toFixed(4);
+    el('cD1').textContent=cosDirect.toFixed(4);
+    el('cF1').textContent=cosForm.toFixed(4);
+    var m=el('sumM');
+    if(Math.abs(sinDirect-sinForm)<1e-9 && Math.abs(cosDirect-cosForm)<1e-9){
+      m.textContent='YES ✓ (both)';m.className='match ok';
+    }else{m.textContent='no';m.className='match';}
+    el('eqSum').textContent='A+B = '+(Ad+Bd)+'°  ·  sin(A+B) = sinAcosB + cosAsinB';
+    drawUnitCircle(el('csum'),A,B);
+  }
+  sAd.addEventListener('input',drawSum);
+  sBd.addEventListener('input',drawSum);
+
+  function drawUnitCircle(cv,A,B){
+    var d=setupHiDPI(cv);
+    var ctx=d.ctx,W=d.w,H=d.h;
+    var cx=W/2, cy=H/2, R=Math.min(W,H)/2-24;
+    ctx.clearRect(0,0,W,H);
+    // grid axes
+    ctx.strokeStyle=getCss('--grid');ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(8,cy);ctx.lineTo(W-8,cy);ctx.moveTo(cx,8);ctx.lineTo(cx,H-8);ctx.stroke();
+    // circle
+    ctx.strokeStyle=getCss('--axis');ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(cx,cy,R,0,TAU);ctx.stroke();
+    function ray(ang,col,lw){
+      ctx.strokeStyle=col;ctx.lineWidth=lw;
+      ctx.beginPath();ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+R*Math.cos(ang),cy-R*Math.sin(ang));ctx.stroke();
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.arc(cx+R*Math.cos(ang),cy-R*Math.sin(ang),4,0,TAU);ctx.fill();
+    }
+    ray(A,getCss('--line1'),2);
+    ray(B,getCss('--line2'),2);
+    ray(A+B,getCss('--ok'),3);
+    // arc for A+B
+    ctx.strokeStyle=getCss('--ok');ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx,cy,26,0,-(A+B),true);ctx.stroke();
+    ctx.fillStyle=getCss('--muted');ctx.font='12px system-ui';
+    ctx.fillText('A+B',cx+30,cy-14);
+  }
+
+  /* ---- redraw dispatcher (needed because canvas sizes need layout) ---- */
+  function redrawAll(){
+    if(document.getElementById('wave').classList.contains('active')) drawWave();
+    if(document.getElementById('ident').classList.contains('active')) drawIdent();
+    if(document.getElementById('sum').classList.contains('active')) drawSum();
+  }
+
+  window.addEventListener('resize', function(){ redrawAll(); });
+
+  // initial paint
+  drawWave(); drawIdent(); drawSum();
+})();
+</script>
+</body>
+</html>

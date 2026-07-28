@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relations &amp; Functions Lab — NIOS Class 12 Maths (Ch 2)</title>
+<style>
+  :root{
+    --bg:#12151c; --panel:#1b1f2a; --panel2:#232838; --line:#2f3648;
+    --ink:#e7ecf5; --muted:#9aa6bd; --accent:#4fd1c5; --accent-dim:#2f6f69;
+    --good:#57d38c; --bad:#f2708a; --warn:#f4c15a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%,#1a2030,#12151c 60%);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  .wrap{max-width:920px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    flex:1 1 auto;min-width:120px;text-align:center;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:10px 8px;border-radius:12px;font-size:.9rem;font-weight:600;
+    transition:.15s;user-select:none;
+  }
+  .tab.active{background:var(--accent-dim);border-color:var(--accent);color:#eafffb}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 8px}
+  .view{display:none}
+  .view.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 280px;min-width:0}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+  svg{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+  .ctl{margin:10px 0}
+  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  select,button{
+    font:inherit;color:var(--ink);background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+  }
+  select{width:100%}
+  button{cursor:pointer;transition:.15s;font-weight:600}
+  button:hover{border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .btn-accent{background:var(--accent-dim);border-color:var(--accent);color:#eafffb}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .val{color:var(--accent);font-weight:700}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin:8px 0;font-size:.9rem}
+  .stat b{color:var(--accent)}
+  .verdict{font-weight:700;padding:8px 12px;border-radius:10px;display:inline-block;margin-top:6px}
+  .v-good{background:rgba(87,211,140,.14);color:var(--good);border:1px solid var(--good)}
+  .v-bad{background:rgba(242,112,138,.14);color:var(--bad);border:1px solid var(--bad)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;
+    padding:4px 10px;font-size:.8rem}
+  .facts details{background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;margin:6px 0;padding:2px 10px}
+  .facts summary{cursor:pointer;font-weight:600;padding:8px 0}
+  .facts p{margin:2px 0 10px;color:var(--muted);font-size:.88rem}
+  .quiz-q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin:10px 0}
+  .quiz-q p{margin:0 0 8px;font-weight:600}
+  .opt{display:block;width:100%;text-align:left;margin:5px 0;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer}
+  .opt.correct{border-color:var(--good);background:rgba(87,211,140,.12);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(242,112,138,.12);color:var(--bad)}
+  .explain{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .explain.show{display:block}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:6px}
+  .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+  @media(max-width:420px){h1{font-size:1.15rem}.tab{min-width:100px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Relations &amp; Functions Lab</h1>
+  <div class="sub">NIOS Class 12 Mathematics · Chapter 2 — Relations and Functions&nbsp;I</div>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" role="tab" tabindex="0" data-view="map">1 · Relation &amp; Mapping</div>
+    <div class="tab" role="tab" tabindex="0" data-view="graph">2 · Function Grapher</div>
+    <div class="tab" role="tab" tabindex="0" data-view="types">3 · Types of Functions</div>
+    <div class="tab" role="tab" tabindex="0" data-view="learn">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ============ VIEW 1: RELATION AS MAPPING ============ -->
+  <section class="view active" id="view-map">
+    <div class="panel">
+      <h2>Relation as a mapping</h2>
+      <p class="sub" style="margin:0 0 8px">Tap an element in <b>A</b>, then an element in <b>B</b> to draw / remove an arrow. A relation is a <b>function</b> only if every element of A points to <b>exactly one</b> element of B.</p>
+      <div class="row">
+        <div class="col">
+          <svg id="mapSvg" viewBox="0 0 360 300" aria-label="Mapping diagram between set A and set B"></svg>
+          <div class="legend">Set A = domain source · Set B = codomain. <span class="swatch" style="background:var(--accent)"></span>selected</div>
+        </div>
+        <div class="col">
+          <div class="btnrow">
+            <button id="mapClear">Clear arrows</button>
+            <button id="mapFn" class="btn-accent">Load a function</button>
+            <button id="mapRel">Load a non-function</button>
+          </div>
+          <div class="stat" id="mapVerdict">Draw some arrows to test.</div>
+          <div class="stat">Domain (used A): <b id="mapDom">—</b></div>
+          <div class="stat">Codomain (all B): <b id="mapCod">{q, r, s, t}</b></div>
+          <div class="stat">Range (hit B): <b id="mapRan">—</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: FUNCTION GRAPHER ============ -->
+  <section class="view" id="view-graph">
+    <div class="panel">
+      <h2>Function grapher</h2>
+      <div class="row">
+        <div class="col">
+          <canvas id="graphCanvas" width="440" height="440"></canvas>
+          <div class="legend"><span class="swatch" style="background:var(--accent)"></span>y = f(x)
+            <span class="swatch" style="background:var(--warn);margin-left:10px"></span>vertical line test</div>
+        </div>
+        <div class="col">
+          <div class="ctl">
+            <label for="fnType">Function family</label>
+            <select id="fnType">
+              <option value="lin">Linear · y = a·x + b</option>
+              <option value="quad" selected>Quadratic · y = a·x² + b·x + c</option>
+              <option value="cubic">Cubic · y = a·x³ + b·x + c</option>
+              <option value="abs">Modulus · y = a·|x| + c</option>
+              <option value="recip">Reciprocal · y = a/x</option>
+            </select>
+          </div>
+          <div class="ctl" id="ctlA">
+            <label>a = <span class="val" id="vA">1</span></label>
+            <input type="range" id="pA" min="-3" max="3" step="0.1" value="1">
+          </div>
+          <div class="ctl" id="ctlB">
+            <label>b = <span class="val" id="vB">0</span></label>
+            <input type="range" id="pB" min="-5" max="5" step="0.5" value="0">
+          </div>
+          <div class="ctl" id="ctlC">
+            <label>c = <span class="val" id="vC">0</span></label>
+            <input type="range" id="pC" min="-5" max="5" step="0.5" value="0">
+          </div>
+          <div class="btnrow">
+            <button id="vltBtn" class="btn-accent">Run vertical-line test</button>
+          </div>
+          <div class="stat">Equation: <b id="eqTxt">y = x²</b></div>
+          <div class="stat">Domain: <b id="domTxt">ℝ</b></div>
+          <div class="stat">Range: <b id="ranTxt">[0, ∞)</b></div>
+          <div class="stat" id="vltTxt">Vertical-line test: a graph is a function if every vertical line meets it at most once.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: TYPES OF FUNCTIONS ============ -->
+  <section class="view" id="view-types">
+    <div class="panel">
+      <h2>Types of functions</h2>
+      <p class="sub" style="margin:0 0 8px">Tap an element of A then B to set/replace where it maps. Every element of A always has exactly one image here (so it stays a function). The lab classifies it live.</p>
+      <div class="row">
+        <div class="col">
+          <svg id="typeSvg" viewBox="0 0 360 300" aria-label="Classification mapping diagram"></svg>
+        </div>
+        <div class="col">
+          <div class="btnrow">
+            <button id="tOneOne" class="btn-accent">Make one-one</button>
+            <button id="tOnto">Make onto</button>
+            <button id="tBij">Make bijective</button>
+          </div>
+          <div class="stat">One-one (injective): <b id="cInj">—</b></div>
+          <div class="stat">Onto (surjective): <b id="cSur">—</b></div>
+          <div class="stat">Bijective: <b id="cBij">—</b></div>
+          <div id="typeVerdict"></div>
+          <div class="stat" style="margin-top:12px">
+            <b>Composition g∘f:</b> if f: A→B and g: B→C, then (g∘f)(x)=g(f(x)).
+            <div class="hint" id="compTxt">Set A={1,2,3}, B={p,q,r}. With g fixed as p→7, q→8, r→9, tracking g∘f below.</div>
+            <div class="chips" id="compChips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: FACTS + QUIZ ============ -->
+  <section class="view" id="view-learn">
+    <div class="panel facts">
+      <h2>Key facts</h2>
+      <details open><summary>Relation</summary><p>A <b>relation</b> R from set A to set B is any subset of the cartesian product A×B. It simply pairs some elements of A with some of B — no restriction on how many.</p></details>
+      <details><summary>Function</summary><p>A <b>function</b> f: A→B is a special relation in which <b>every</b> element of A is paired with <b>exactly one</b> element of B. No element of A may be left out, and none may have two images.</p></details>
+      <details><summary>Domain, Codomain, Range</summary><p><b>Domain</b> = set A (all inputs). <b>Codomain</b> = set B (the declared target set). <b>Range</b> = the subset of B that is actually reached, i.e. { f(x) : x ∈ A }. Always range ⊆ codomain.</p></details>
+      <details><summary>One-one (injective)</summary><p>f is <b>one-one</b> if distinct inputs give distinct outputs: f(x₁)=f(x₂) ⟹ x₁=x₂. No two arrows land on the same element of B.</p></details>
+      <details><summary>Onto (surjective)</summary><p>f is <b>onto</b> if every element of the codomain B is an image of some element of A — i.e. range = codomain. No element of B is left unhit.</p></details>
+      <details><summary>Bijective &amp; composition</summary><p>A function that is both one-one and onto is <b>bijective</b>; only bijections have an inverse f⁻¹. <b>Composition</b>: (g∘f)(x)=g(f(x)), applying f first, then g.</p></details>
+    </div>
+
+    <div class="panel">
+      <h2>Quick quiz</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var tabs=document.querySelectorAll('.tab');
+var views={map:'view-map',graph:'view-graph',types:'view-types',learn:'view-learn'};
+function activate(name){
+  tabs.forEach(function(t){t.classList.toggle('active',t.dataset.view===name);});
+  Object.keys(views).forEach(function(k){
+    document.getElementById(views[k]).classList.toggle('active',k===name);
+  });
+  if(name==='graph') drawGraph();
+}
+tabs.forEach(function(t){
+  t.addEventListener('click',function(){activate(t.dataset.view);});
+  t.addEventListener('keydown',function(e){
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();activate(t.dataset.view);}
+  });
+});
+
+/* ========================================================= */
+/* VIEW 1 — RELATION / MAPPING                                */
+/* ========================================================= */
+var A1=['1','2','3','4'], B1=['q','r','s','t'];
+var SVGNS='http://www.w3.org/2000/svg';
+var mapArrows=[]; // {a:index, b:index}
+var mapSel=null;  // selected A index
+var mapSvg=document.getElementById('mapSvg');
+
+function ovalLayout(items,cx){
+  // returns array of {x,y} node centers along a vertical oval at x=cx
+  var top=55, gap=(230-0)/(items.length+ (items.length>1?0:1));
+  var n=items.length, ys=[];
+  var span=200, start=45;
+  for(var i=0;i<n;i++){ys.push(start + (span*(i+0.5)/n));}
+  return ys.map(function(y){return {x:cx,y:y};});
+}
+var posA=ovalLayout(A1,95), posB=ovalLayout(B1,265);
+
+function buildMap(svg,setA,setB,pA,pB,arrows,selIdx,onA,onB){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  function oval(cx,label){
+    var e=document.createElementNS(SVGNS,'ellipse');
+    e.setAttribute('cx',cx);e.setAttribute('cy',150);
+    e.setAttribute('rx',52);e.setAttribute('ry',128);
+    e.setAttribute('fill','none');
+    e.setAttribute('stroke','#3b455c');e.setAttribute('stroke-width','1.5');
+    svg.appendChild(e);
+    var tx=document.createElementNS(SVGNS,'text');
+    tx.setAttribute('x',cx);tx.setAttribute('y',30);
+    tx.setAttribute('text-anchor','middle');tx.setAttribute('fill','#9aa6bd');
+    tx.setAttribute('font-size','15');tx.setAttribute('font-weight','700');
+    tx.textContent=label;svg.appendChild(tx);
+  }
+  oval(95,'A');oval(265,'B');
+  // marker
+  var defs=document.createElementNS(SVGNS,'defs');
+  defs.innerHTML='<marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#4fd1c5"/></marker>';
+  svg.appendChild(defs);
+  // arrows
+  arrows.forEach(function(ar){
+    var p=pA[ar.a],q=pB[ar.b];
+    var ln=document.createElementNS(SVGNS,'line');
+    ln.setAttribute('x1',p.x+16);ln.setAttribute('y1',p.y);
+    ln.setAttribute('x2',q.x-18);ln.setAttribute('y2',q.y);
+    ln.setAttribute('stroke','#4fd1c5');ln.setAttribute('stroke-width','2.2');
+    ln.setAttribute('marker-end','url(#ah)');
+    svg.appendChild(ln);
+  });
+  function node(items,pos,side){
+    items.forEach(function(lab,i){
+      var g=document.createElementNS(SVGNS,'g');
+      g.style.cursor='pointer';
+      var c=document.createElementNS(SVGNS,'circle');
+      c.setAttribute('cx',pos[i].x);c.setAttribute('cy',pos[i].y);
+      c.setAttribute('r',15);
+      var selected=(side==='A'&&selIdx===i);
+      c.setAttribute('fill',selected?'#4fd1c5':'#232838');
+      c.setAttribute('stroke',selected?'#eafffb':'#3b455c');
+      c.setAttribute('stroke-width','2');
+      var t=document.createElementNS(SVGNS,'text');
+      t.setAttribute('x',pos[i].x);t.setAttribute('y',pos[i].y+5);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('fill',selected?'#12151c':'#e7ecf5');
+      t.setAttribute('font-size','14');t.setAttribute('font-weight','700');
+      t.textContent=lab;
+      g.appendChild(c);g.appendChild(t);
+      g.addEventListener('click',function(){side==='A'?onA(i):onB(i);});
+      svg.appendChild(g);
+    });
+  }
+  node(setA,pA,'A');node(setB,pB,'B');
+}
+
+function renderMap(){
+  buildMap(mapSvg,A1,B1,posA,posB,mapArrows,mapSel,
+    function(i){mapSel=(mapSel===i?null:i);renderMap();},
+    function(j){
+      if(mapSel===null) return;
+      // toggle arrow from mapSel to j
+      var idx=mapArrows.findIndex(function(ar){return ar.a===mapSel&&ar.b===j;});
+      if(idx>=0) mapArrows.splice(idx,1);
+      else mapArrows.push({a:mapSel,b:j});
+      renderMap();
+    });
+  updateMapStats();
+}
+function updateMapStats(){
+  // domain = A elements with >=1 arrow; check function property
+  var used={}, counts={}, ranSet={};
+  mapArrows.forEach(function(ar){
+    used[ar.a]=true; counts[ar.a]=(counts[ar.a]||0)+1; ranSet[ar.b]=true;
+  });
+  var domList=A1.filter(function(_,i){return used[i];});
+  var ranList=B1.filter(function(_,i){return ranSet[i];});
+  document.getElementById('mapDom').textContent=domList.length?'{'+domList.join(', ')+'}':'∅';
+  document.getElementById('mapRan').textContent=ranList.length?'{'+ranList.join(', ')+'}':'∅';
+  var vd=document.getElementById('mapVerdict');
+  if(mapArrows.length===0){vd.innerHTML='Draw some arrows to test.';return;}
+  var allCovered=A1.every(function(_,i){return used[i];});
+  var single=A1.every(function(_,i){return (counts[i]||0)<=1;});
+  if(allCovered&&single){
+    vd.innerHTML='<span class="verdict v-good">✓ This is a FUNCTION</span><div class="hint">Every element of A has exactly one image in B.</div>';
+  } else {
+    var why=[];
+    if(!allCovered) why.push('some element of A has no image');
+    if(!single) why.push('some element of A has two or more images');
+    vd.innerHTML='<span class="verdict v-bad">✗ Relation, not a function</span><div class="hint">'+why.join('; ')+'.</div>';
+  }
+}
+document.getElementById('mapClear').onclick=function(){mapArrows=[];mapSel=null;renderMap();};
+document.getElementById('mapFn').onclick=function(){
+  mapArrows=[{a:0,b:0},{a:1,b:1},{a:2,b:1},{a:3,b:3}];mapSel=null;renderMap();};
+document.getElementById('mapRel').onclick=function(){
+  mapArrows=[{a:0,b:0},{a:0,b:1},{a:1,b:2}];mapSel=null;renderMap();};
+
+/* ========================================================= */
+/* VIEW 2 — FUNCTION GRAPHER                                  */
+/* ========================================================= */
+var cv=document.getElementById('graphCanvas'), cx2=cv.getContext('2d');
+var W=cv.width, H=cv.height, RANGE=6; // x,y in [-6,6]
+var vltAnim=null;
+function X2px(x){return (x+RANGE)/(2*RANGE)*W;}
+function Y2px(y){return H-(y+RANGE)/(2*RANGE)*H;}
+function px2X(px){return px/W*2*RANGE-RANGE;}
+
+function fdef(){return document.getElementById('fnType').value;}
+function pv(id){return parseFloat(document.getElementById(id).value);}
+function fx(x){
+  var a=pv('pA'),b=pv('pB'),c=pv('pC'),t=fdef();
+  if(t==='lin')  return a*x+b;
+  if(t==='quad') return a*x*x+b*x+c;
+  if(t==='cubic')return a*x*x*x+b*x+c;
+  if(t==='abs')  return a*Math.abs(x)+c;
+  if(t==='recip')return x===0?null:a/x;
+  return 0;
+}
+function fmt(n){var r=Math.round(n*100)/100;return (r===0?0:r).toString();}
+
+function drawGraph(vltX){
+  cx2.clearRect(0,0,W,H);
+  cx2.fillStyle='#232838';cx2.fillRect(0,0,W,H);
+  // grid
+  cx2.strokeStyle='#2a3145';cx2.lineWidth=1;
+  for(var g=-RANGE;g<=RANGE;g++){
+    cx2.beginPath();cx2.moveTo(X2px(g),0);cx2.lineTo(X2px(g),H);cx2.stroke();
+    cx2.beginPath();cx2.moveTo(0,Y2px(g));cx2.lineTo(W,Y2px(g));cx2.stroke();
+  }
+  // axes
+  cx2.strokeStyle='#54607a';cx2.lineWidth=1.6;
+  cx2.beginPath();cx2.moveTo(0,Y2px(0));cx2.lineTo(W,Y2px(0));cx2.stroke();
+  cx2.beginPath();cx2.moveTo(X2px(0),0);cx2.lineTo(X2px(0),H);cx2.stroke();
+  cx2.fillStyle='#9aa6bd';cx2.font='11px system-ui';
+  cx2.fillText('x',W-12,Y2px(0)-6);cx2.fillText('y',X2px(0)+6,12);
+  for(var k=-RANGE+1;k<=RANGE-1;k++){ if(k===0)continue;
+    cx2.fillText(k, X2px(k)-3, Y2px(0)+13);
+    cx2.fillText(k, X2px(0)+5, Y2px(k)+3);
+  }
+  // curve
+  cx2.strokeStyle='#4fd1c5';cx2.lineWidth=2.6;
+  cx2.beginPath();var pen=false;
+  for(var px=0;px<=W;px++){
+    var x=px2X(px), y=fx(x);
+    if(y===null||!isFinite(y)||y>50||y<-50){pen=false;continue;}
+    var py=Y2px(y);
+    if(py<-1000||py>2000){pen=false;continue;}
+    if(!pen){cx2.moveTo(px,py);pen=true;}else{cx2.lineTo(px,py);}
+  }
+  cx2.stroke();
+  // vertical line test line
+  if(vltX!==undefined){
+    var lpx=X2px(vltX);
+    cx2.strokeStyle='#f4c15a';cx2.lineWidth=1.8;
+    cx2.beginPath();cx2.moveTo(lpx,0);cx2.lineTo(lpx,H);cx2.stroke();
+    var yy=fx(vltX);
+    if(yy!==null&&isFinite(yy)&&Math.abs(yy)<=RANGE){
+      cx2.fillStyle='#f4c15a';cx2.beginPath();
+      cx2.arc(lpx,Y2px(yy),5,0,7);cx2.fill();
+    }
+  }
+  updateGraphInfo();
+}
+
+function updateGraphInfo(){
+  var a=pv('pA'),b=pv('pB'),c=pv('pC'),t=fdef();
+  var eq,dom,ran;
+  function term(co,vr){ // format co*vr
+    if(co===0) return '';
+    var s=(co<0?' − ':' + ')+Math.abs(co)+vr;
+    return s;
+  }
+  if(t==='lin'){
+    eq='y = '+fmt(a)+'x'+term(b,'');
+    dom='ℝ (all real x)';
+    ran = a===0 ? '{'+fmt(b)+'} (constant)' : 'ℝ';
+  } else if(t==='quad'){
+    eq='y = '+fmt(a)+'x²'+term(b,'x')+term(c,'');
+    dom='ℝ';
+    if(a===0){ ran = b===0?'{'+fmt(c)+'}':'ℝ'; }
+    else{
+      var vy=c-b*b/(4*a); // vertex y
+      ran = a>0 ? '['+fmt(vy)+', ∞)' : '(−∞, '+fmt(vy)+']';
+    }
+  } else if(t==='cubic'){
+    eq='y = '+fmt(a)+'x³'+term(b,'x')+term(c,'');
+    dom='ℝ'; ran = a===0 ? (b===0?'{'+fmt(c)+'}':'ℝ') : 'ℝ';
+  } else if(t==='abs'){
+    eq='y = '+fmt(a)+'|x|'+term(c,'');
+    dom='ℝ';
+    ran = a===0 ? '{'+fmt(c)+'}' : (a>0 ? '['+fmt(c)+', ∞)' : '(−∞, '+fmt(c)+']');
+  } else { // recip
+    eq='y = '+fmt(a)+'/x';
+    dom='ℝ \\ {0}  (x ≠ 0)';
+    ran = a===0 ? '{0}' : 'ℝ \\ {0}  (y ≠ 0)';
+  }
+  document.getElementById('eqTxt').innerHTML=eq.replace(/^y = \s*\+\s*/,'y = ');
+  document.getElementById('domTxt').textContent=dom;
+  document.getElementById('ranTxt').textContent=ran;
+}
+
+function syncControls(){
+  var t=fdef();
+  var showB=(t==='lin'||t==='quad'||t==='cubic');
+  var showC=(t==='quad'||t==='cubic'||t==='abs');
+  document.getElementById('ctlB').style.display=showB?'block':'none';
+  document.getElementById('ctlC').style.display=showC?'block':'none';
+}
+['pA','pB','pC'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    document.getElementById('v'+id.charAt(1)).textContent=fmt(pv(id));
+    drawGraph();
+  });
+});
+document.getElementById('fnType').addEventListener('change',function(){
+  syncControls();drawGraph();
+});
+document.getElementById('vltBtn').addEventListener('click',function(){
+  if(vltAnim){clearInterval(vltAnim);vltAnim=null;}
+  var x=-RANGE;
+  document.getElementById('vltTxt').innerHTML='Vertical-line test running… each yellow line meets the curve at most once ⟹ it is a function.';
+  vltAnim=setInterval(function(){
+    drawGraph(x); x+=0.25;
+    if(x>RANGE){clearInterval(vltAnim);vltAnim=null;
+      var t=fdef();
+      var msg = (t==='recip')
+        ? 'Passes the test (x=0 excluded): a function on ℝ\\{0}.'
+        : 'Passes the vertical-line test ⟹ this graph is a function.';
+      document.getElementById('vltTxt').innerHTML='✓ '+msg;
+      drawGraph();
+    }
+  },40);
+});
+
+/* ========================================================= */
+/* VIEW 3 — TYPES OF FUNCTIONS                                */
+/* ========================================================= */
+var A3=['1','2','3'], B3=['p','q','r'];
+var posA3=ovalLayout(A3,95), posB3=ovalLayout(B3,265);
+var typeSvg=document.getElementById('typeSvg');
+var typeMap=[0,1,2]; // image index in B for each A element (always defined)
+var typeSelA=null;
+var gMap={p:'7',q:'8',r:'9'}; // g: B->C for composition
+
+function renderType(){
+  var arrows=typeMap.map(function(b,a){return {a:a,b:b};});
+  buildMap(typeSvg,A3,B3,posA3,posB3,arrows,typeSelA,
+    function(i){typeSelA=(typeSelA===i?null:i);renderType();},
+    function(j){ if(typeSelA===null)return; typeMap[typeSelA]=j; typeSelA=null; renderType();});
+  classify();
+}
+function classify(){
+  var imgs=typeMap.slice();
+  var distinct=new Set(imgs).size===imgs.length; // injective
+  var onto=new Set(imgs).size===B3.length;       // surjective (|A|=|B|)
+  var bij=distinct&&onto;
+  function tag(ok){return ok?'<span style="color:var(--good)">Yes ✓</span>':'<span style="color:var(--bad)">No ✗</span>';}
+  document.getElementById('cInj').innerHTML=tag(distinct);
+  document.getElementById('cSur').innerHTML=tag(onto);
+  document.getElementById('cBij').innerHTML=tag(bij);
+  var vd=document.getElementById('typeVerdict');
+  var label = bij?'Bijective (one-one &amp; onto)':(distinct?'One-one only':(onto?'Onto only':'Neither one-one nor onto'));
+  vd.innerHTML='<div class="verdict '+(bij?'v-good':'v-bad')+'" style="margin-top:8px">'+label+'</div>';
+  // composition g∘f  (A -> B via f, B -> C via g)
+  var chips=document.getElementById('compChips');
+  chips.innerHTML='';
+  A3.forEach(function(a,i){
+    var bimg=B3[typeMap[i]];
+    var cimg=gMap[bimg];
+    var s=document.createElement('span');
+    s.className='chip';
+    s.innerHTML='(g∘f)('+a+') = g('+bimg+') = '+cimg;
+    chips.appendChild(s);
+  });
+}
+document.getElementById('tOneOne').onclick=function(){typeMap=[2,0,1];typeSelA=null;renderType();};
+document.getElementById('tOnto').onclick=function(){typeMap=[0,1,2];typeSelA=null;renderType();};
+document.getElementById('tBij').onclick=function(){typeMap=[0,1,2];typeSelA=null;renderType();};
+// a "not one-one / not onto" default to start with something non-trivial:
+typeMap=[0,0,1];
+
+/* ========================================================= */
+/* VIEW 4 — QUIZ                                              */
+/* ========================================================= */
+var QUIZ=[
+  {q:'A relation f: A→B is a function only when…',
+   opts:['some element of A maps to one element of B',
+         'every element of A maps to exactly one element of B',
+         'every element of B is used',
+         'the range equals the codomain'],
+   ans:1,
+   ex:'By definition each input in the domain A must have one and only one image in B.'},
+  {q:'For f: ℝ→ℝ, f(x)=x², what is the range?',
+   opts:['ℝ','[0, ∞)','(−∞, 0]','ℝ \\ {0}'],
+   ans:1,
+   ex:'x² is never negative and reaches every value ≥ 0, so the range is [0, ∞).'},
+  {q:'A function that is both one-one and onto is called…',
+   opts:['injective only','surjective only','bijective','constant'],
+   ans:2,
+   ex:'One-one (injective) + onto (surjective) = bijective; only bijections have an inverse.'}
+];
+function buildQuiz(){
+  var box=document.getElementById('quiz');
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='quiz-q';
+    var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;d.appendChild(p);
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement('button');b.className='opt';b.textContent=o;
+      b.onclick=function(){
+        if(d.dataset.done)return;
+        d.dataset.done='1';
+        var btns=d.querySelectorAll('.opt');
+        btns[item.ans].classList.add('correct');
+        if(oi!==item.ans) b.classList.add('wrong');
+        d.querySelector('.explain').classList.add('show');
+      };
+      d.appendChild(b);
+    });
+    var ex=document.createElement('div');ex.className='explain';
+    ex.textContent='Why: '+item.ex;d.appendChild(ex);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- init ---------- */
+renderMap();
+syncControls();
+drawGraph();
+renderType();
+buildQuiz();
+</script>
+</body>
+</html>

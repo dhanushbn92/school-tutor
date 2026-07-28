@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trigonometry Lab - NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#172033; --panel2:#1e2942; --line:#2b3752;
+    --ink:#e8eef7; --muted:#93a2bd; --accent:#4fd1c5; --accent2:#f6a94a;
+    --good:#57d38c; --bad:#f47174;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px;
+  }
+  h1{font-size:1.4rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:11px;cursor:pointer;font-size:.9rem;
+    font-weight:600;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent);color:#06231f;border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  .grid{display:grid;gap:14px}
+  @media(min-width:720px){.grid.two{grid-template-columns:1fr 1fr}}
+  canvas{display:block;width:100%;height:auto;background:var(--panel2);border-radius:12px;touch-action:none}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}
+  label{font-size:.85rem;color:var(--muted)}
+  input[type=range]{flex:1;min-width:140px;accent-color:var(--accent);height:26px}
+  input[type=number]{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:7px 9px;width:90px;font-size:.9rem;
+  }
+  .stat{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+  .stat:last-child{border-bottom:none}
+  .stat b{color:var(--accent);font-variant-numeric:tabular-nums}
+  .chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:20px;padding:4px 11px;font-size:.8rem;margin:3px 4px 0 0}
+  .chip.on{background:var(--accent);color:#06231f;border-color:var(--accent);font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:.85rem}
+  th,td{border:1px solid var(--line);padding:7px 6px;text-align:center;font-variant-numeric:tabular-nums}
+  th{background:var(--panel2);color:var(--accent)}
+  .btn{background:var(--accent);color:#06231f;border:none;border-radius:10px;
+    padding:9px 14px;font-weight:700;cursor:pointer;font-size:.88rem}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .facts p{margin:.4rem 0;font-size:.88rem}
+  .facts h3{margin:.7rem 0 .2rem;color:var(--accent2);font-size:.98rem}
+  .q{margin-bottom:14px}
+  .q p{font-weight:600;margin:.2rem 0 .5rem}
+  .opt{display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:9px;padding:9px 12px;margin:6px 0;cursor:pointer;font-size:.88rem;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(87,211,140,.18);border-color:var(--good)}
+  .opt.wrong{background:rgba(244,113,116,.16);border-color:var(--bad)}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .legend{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .legend span{display:inline-block;margin-right:12px}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:middle;margin-right:4px}
+  .quad-note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .astc{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px;font-size:.78rem}
+  .astc div{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px;text-align:center}
+  .astc div.hl{border-color:var(--accent);background:rgba(79,209,197,.15)}
+  .astc b{color:var(--accent2)}
+  .mut{color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<h1>Trigonometry Lab</h1>
+<div class="sub">NIOS Class 12 Mathematics &middot; Chapter 3: Trigonometric Functions-I</div>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-view="circle">Unit Circle</button>
+  <button class="tab" data-view="graphs">Graphs</button>
+  <button class="tab" data-view="convert">Angles &amp; Values</button>
+  <button class="tab" data-view="facts">Facts</button>
+  <button class="tab" data-view="quiz">Quiz</button>
+</div>
+
+<!-- ===== UNIT CIRCLE ===== -->
+<section class="view active" id="v-circle">
+  <div class="grid two">
+    <div class="panel">
+      <canvas id="ucanvas" width="440" height="440" aria-label="Interactive unit circle"></canvas>
+      <div class="legend">Drag the point on the circle, or use the slider below.</div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <label for="angSlider" style="width:100%">Angle &theta;</label>
+        <input type="range" id="angSlider" min="0" max="360" step="1" value="30">
+      </div>
+      <div class="row">
+        <input type="number" id="angNum" min="0" max="360" step="1" value="30"><label>degrees</label>
+      </div>
+      <div class="stat"><span>&theta; (degrees)</span><b id="sDeg">30&deg;</b></div>
+      <div class="stat"><span>&theta; (radians)</span><b id="sRad">0.5236 (&pi;/6)</b></div>
+      <div class="stat"><span>cos &theta; (x)</span><b id="sCos">0.8660</b></div>
+      <div class="stat"><span>sin &theta; (y)</span><b id="sSin">0.5000</b></div>
+      <div class="stat"><span>tan &theta;</span><b id="sTan">0.5774</b></div>
+      <div class="stat"><span>Quadrant</span><b id="sQuad">I</b></div>
+      <div class="stat"><span>Reference angle</span><b id="sRef">30&deg;</b></div>
+      <div class="astc" id="astcBox">
+        <div id="a2">Q2 (90-180)<br><b>Sin +</b></div>
+        <div id="a1">Q1 (0-90)<br><b>All +</b></div>
+        <div id="a3">Q3 (180-270)<br><b>Tan +</b></div>
+        <div id="a4">Q4 (270-360)<br><b>Cos +</b></div>
+      </div>
+      <div class="quad-note">ASTC rule &mdash; <i>All Silver Tea Cups</i>: which ratio is positive per quadrant.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GRAPHS ===== -->
+<section class="view" id="v-graphs">
+  <div class="panel">
+    <div class="row">
+      <span class="chip on" data-fn="sin" id="cSin">sin</span>
+      <span class="chip on" data-fn="cos" id="cCos">cos</span>
+      <span class="chip" data-fn="tan" id="cTan">tan</span>
+      <button class="btn ghost" id="playBtn" style="margin-left:auto">&#9654; Play</button>
+    </div>
+    <div class="row">
+      <label for="gSlider" style="width:70px">&theta;</label>
+      <input type="range" id="gSlider" min="0" max="360" step="1" value="30">
+      <b id="gLabel" style="color:var(--accent);width:70px;text-align:right">30&deg;</b>
+    </div>
+    <canvas id="gcanvas" width="680" height="360" aria-label="Trigonometric graphs"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#4fd1c5"></i>sin &theta;</span>
+      <span><i class="dot" style="background:#f6a94a"></i>cos &theta;</span>
+      <span><i class="dot" style="background:#c98bff"></i>tan &theta;</span>
+    </div>
+    <div class="mut" style="margin-top:6px">
+      Period of sin &amp; cos = 360&deg; (2&pi;); amplitude = 1. Period of tan = 180&deg; (&pi;);
+      tan has vertical asymptotes at 90&deg; and 270&deg; (dashed lines).
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONVERT & VALUES ===== -->
+<section class="view" id="v-convert">
+  <div class="grid two">
+    <div class="panel">
+      <h3 style="margin-top:0;color:var(--accent2)">Degree &harr; Radian converter</h3>
+      <div class="row">
+        <input type="number" id="degIn" value="45" step="1"><label>degrees</label>
+      </div>
+      <div class="stat"><span>= radians</span><b id="radOut">0.7854</b></div>
+      <div class="stat"><span>= exact</span><b id="radExact">&pi;/4</b></div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:12px 0">
+      <div class="row">
+        <input type="number" id="radIn" value="1.0472" step="0.0001"><label>radians</label>
+      </div>
+      <div class="stat"><span>= degrees</span><b id="degOut">60&deg;</b></div>
+      <p class="mut" style="margin-top:12px">
+        radians = degrees &times; &pi;/180 &nbsp;&middot;&nbsp; degrees = radians &times; 180/&pi;
+      </p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0;color:var(--accent2)">Standard values</h3>
+      <div style="overflow-x:auto">
+      <table>
+        <tr><th>&theta;</th><th>rad</th><th>sin</th><th>cos</th><th>tan</th></tr>
+        <tr><td>0&deg;</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+        <tr><td>30&deg;</td><td>&pi;/6</td><td>1/2</td><td>&radic;3/2</td><td>1/&radic;3</td></tr>
+        <tr><td>45&deg;</td><td>&pi;/4</td><td>1/&radic;2</td><td>1/&radic;2</td><td>1</td></tr>
+        <tr><td>60&deg;</td><td>&pi;/3</td><td>&radic;3/2</td><td>1/2</td><td>&radic;3</td></tr>
+        <tr><td>90&deg;</td><td>&pi;/2</td><td>1</td><td>0</td><td>&infin;</td></tr>
+        <tr><td>180&deg;</td><td>&pi;</td><td>0</td><td>-1</td><td>0</td></tr>
+        <tr><td>270&deg;</td><td>3&pi;/2</td><td>-1</td><td>0</td><td>&infin;</td></tr>
+        <tr><td>360&deg;</td><td>2&pi;</td><td>0</td><td>1</td><td>0</td></tr>
+      </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FACTS ===== -->
+<section class="view" id="v-facts">
+  <div class="panel facts">
+    <h3>Definitions (unit circle)</h3>
+    <p>On a circle of radius 1 centred at the origin, a point at angle &theta; (measured anticlockwise from
+    the positive x-axis) has coordinates <b>(cos &theta;, sin &theta;)</b>.</p>
+    <p><b>tan &theta; = sin &theta; / cos &theta;</b> &mdash; the slope of the radius line. It is undefined
+    when cos &theta; = 0 (at 90&deg; and 270&deg;).</p>
+    <h3>Radian measure</h3>
+    <p>One radian is the angle subtended at the centre by an arc equal in length to the radius.
+    A full turn = 2&pi; radians = 360&deg;, so <b>&pi; rad = 180&deg;</b>.</p>
+    <h3>Period &amp; amplitude</h3>
+    <p>sin and cos repeat every 360&deg; (2&pi;) &mdash; their <b>period</b> is 2&pi; and <b>amplitude</b> is 1,
+    so values stay in [-1, 1]. tan repeats every 180&deg; (&pi;).</p>
+    <h3>Signs by quadrant (ASTC)</h3>
+    <p><b>A</b>ll positive in QI, <b>S</b>in positive in QII, <b>T</b>an positive in QIII,
+    <b>C</b>os positive in QIV &mdash; remember "All Silver Tea Cups".</p>
+    <h3>Reference angle</h3>
+    <p>The acute angle between the terminal side and the x-axis. Ratios of &theta; equal those of the
+    reference angle, up to the sign given by ASTC.</p>
+  </div>
+</section>
+
+<!-- ===== QUIZ ===== -->
+<section class="view" id="v-quiz">
+  <div class="panel" id="quizBox"></div>
+</section>
+
+<script>
+"use strict";
+(function(){
+  var TAU = Math.PI*2, D2R = Math.PI/180, R2D = 180/Math.PI;
+  function fmt(x){ if(!isFinite(x)) return "∞"; return (Math.round(x*10000)/10000).toFixed(4); }
+
+  /* ---- tab switching ---- */
+  var tabs = document.querySelectorAll('.tab');
+  var views = { circle:document.getElementById('v-circle'), graphs:document.getElementById('v-graphs'),
+                convert:document.getElementById('v-convert'), facts:document.getElementById('v-facts'),
+                quiz:document.getElementById('v-quiz') };
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active')});
+      t.classList.add('active');
+      for(var k in views) views[k].classList.remove('active');
+      views[t.dataset.view].classList.add('active');
+      Object.keys(views).forEach(function(k){views[k].classList.remove('active')});
+      views[t.dataset.view].classList.add('active');
+      if(t.dataset.view==='circle') drawCircle();
+      if(t.dataset.view==='graphs') drawGraphs();
+    });
+  });
+
+  /* ---- shared angle (degrees) ---- */
+  var theta = 30;
+
+  /* ---- radian exact labels ---- */
+  var exactRad = {0:"0",30:"π/6",45:"π/4",60:"π/3",90:"π/2",
+    120:"2π/3",135:"3π/4",150:"5π/6",180:"π",210:"7π/6",
+    225:"5π/4",240:"4π/3",270:"3π/2",300:"5π/3",315:"7π/4",
+    330:"11π/6",360:"2π"};
+
+  /* ============ UNIT CIRCLE ============ */
+  var uc = document.getElementById('ucanvas'), uctx = uc.getContext('2d');
+  var angSlider = document.getElementById('angSlider'), angNum = document.getElementById('angNum');
+
+  function quadOf(d){ d=((d%360)+360)%360; if(d<90)return 1; if(d<180)return 2; if(d<270)return 3; return 4; }
+  function refOf(d){ d=((d%360)+360)%360; if(d<=90)return d; if(d<=180)return 180-d; if(d<=270)return d-180; return 360-d; }
+
+  function drawCircle(){
+    var w=uc.width, h=uc.height, cx=w/2, cy=h/2, R=Math.min(w,h)*0.38;
+    uctx.clearRect(0,0,w,h);
+    // axes
+    uctx.strokeStyle="#2b3752"; uctx.lineWidth=1;
+    uctx.beginPath(); uctx.moveTo(14,cy); uctx.lineTo(w-14,cy); uctx.moveTo(cx,14); uctx.lineTo(cx,h-14); uctx.stroke();
+    // circle
+    uctx.strokeStyle="#3a4a6b"; uctx.lineWidth=2;
+    uctx.beginPath(); uctx.arc(cx,cy,R,0,TAU); uctx.stroke();
+    var rad = theta*D2R, x = Math.cos(rad), y = Math.sin(rad);
+    var px = cx + x*R, py = cy - y*R;
+    // angle arc
+    uctx.strokeStyle="#f6a94a"; uctx.lineWidth=3;
+    uctx.beginPath(); uctx.arc(cx,cy,26,0,-rad,rad>0); uctx.stroke();
+    // projections
+    uctx.setLineDash([5,4]); uctx.strokeStyle="#4fd1c5"; uctx.lineWidth=1.5;
+    uctx.beginPath(); uctx.moveTo(px,py); uctx.lineTo(px,cy); uctx.stroke(); // to x-axis (sin)
+    uctx.strokeStyle="#f6a94a";
+    uctx.beginPath(); uctx.moveTo(px,py); uctx.lineTo(cx,py); uctx.stroke(); // to y-axis (cos)
+    uctx.setLineDash([]);
+    // cos segment on x-axis
+    uctx.strokeStyle="#f6a94a"; uctx.lineWidth=4;
+    uctx.beginPath(); uctx.moveTo(cx,cy); uctx.lineTo(px,cy); uctx.stroke();
+    // sin segment
+    uctx.strokeStyle="#4fd1c5";
+    uctx.beginPath(); uctx.moveTo(px,cy); uctx.lineTo(px,py); uctx.stroke();
+    // radius
+    uctx.strokeStyle="#e8eef7"; uctx.lineWidth=2;
+    uctx.beginPath(); uctx.moveTo(cx,cy); uctx.lineTo(px,py); uctx.stroke();
+    // point
+    uctx.fillStyle="#4fd1c5";
+    uctx.beginPath(); uctx.arc(px,py,7,0,TAU); uctx.fill();
+    uctx.strokeStyle="#06231f"; uctx.lineWidth=2; uctx.stroke();
+    // coord label
+    uctx.fillStyle="#e8eef7"; uctx.font="13px system-ui";
+    var lbl="("+fmt(x)+", "+fmt(y)+")";
+    var tx = px + (x>=0?10:-10-uctx.measureText(lbl).width), ty = py + (y>=0?-10:18);
+    uctx.fillText(lbl, tx, ty);
+    // quadrant labels
+    uctx.fillStyle="#5f6f8d"; uctx.font="12px system-ui";
+    uctx.fillText("I", cx+R*0.5, cy-R*0.55);
+    uctx.fillText("II", cx-R*0.58, cy-R*0.55);
+    uctx.fillText("III", cx-R*0.62, cy+R*0.62);
+    uctx.fillText("IV", cx+R*0.52, cy+R*0.62);
+  }
+
+  function updateCircle(){
+    var d = ((theta%360)+360)%360;
+    var rad = d*D2R;
+    document.getElementById('sDeg').textContent = d.toFixed(0)+"°";
+    var exact = exactRad[d] ? " ("+exactRad[d]+")" : "";
+    document.getElementById('sRad').textContent = fmt(rad)+exact;
+    document.getElementById('sCos').textContent = fmt(Math.cos(rad));
+    document.getElementById('sSin').textContent = fmt(Math.sin(rad));
+    var c=Math.cos(rad);
+    document.getElementById('sTan').textContent = Math.abs(c)<1e-9 ? "∞ (undef)" : fmt(Math.sin(rad)/c);
+    var q = quadOf(d);
+    document.getElementById('sQuad').textContent = ["","I","II","III","IV"][q];
+    document.getElementById('sRef').textContent = refOf(d).toFixed(0)+"°";
+    ['a1','a2','a3','a4'].forEach(function(id,i){
+      document.getElementById(id).classList.toggle('hl', (i+1)===q);
+    });
+    drawCircle();
+  }
+
+  function setTheta(d, from){
+    theta = d;
+    var r = ((d%360)+360)%360;
+    if(from!=='slider'){ angSlider.value = Math.round(r); }
+    if(from!=='num'){ angNum.value = Math.round(r); }
+    updateCircle();
+    // keep graphs view in sync
+    document.getElementById('gSlider').value = Math.round(r);
+    document.getElementById('gLabel').textContent = Math.round(r)+"°";
+  }
+
+  angSlider.addEventListener('input', function(){ setTheta(+angSlider.value,'slider'); });
+  angNum.addEventListener('input', function(){ var v=+angNum.value; if(isNaN(v))return; setTheta(v,'num'); });
+
+  // drag on circle
+  function circlePos(e){
+    var rect = uc.getBoundingClientRect();
+    var sx = uc.width/rect.width, sy = uc.height/rect.height;
+    var pt = e.touches ? e.touches[0] : e;
+    return { x:(pt.clientX-rect.left)*sx, y:(pt.clientY-rect.top)*sy };
+  }
+  var dragging=false;
+  function startDrag(e){ dragging=true; moveDrag(e); e.preventDefault(); }
+  function moveDrag(e){
+    if(!dragging) return;
+    var p=circlePos(e), cx=uc.width/2, cy=uc.height/2;
+    var ang = Math.atan2(-(p.y-cy), p.x-cx)*R2D;
+    ang=((ang%360)+360)%360;
+    setTheta(Math.round(ang),'drag');
+    e.preventDefault();
+  }
+  function endDrag(){ dragging=false; }
+  uc.addEventListener('mousedown',startDrag); uc.addEventListener('mousemove',moveDrag);
+  window.addEventListener('mouseup',endDrag);
+  uc.addEventListener('touchstart',startDrag,{passive:false});
+  uc.addEventListener('touchmove',moveDrag,{passive:false});
+  uc.addEventListener('touchend',endDrag);
+
+  /* ============ GRAPHS ============ */
+  var gc = document.getElementById('gcanvas'), gctx = gc.getContext('2d');
+  var show = { sin:true, cos:true, tan:false };
+  var chips = document.querySelectorAll('.chip');
+  chips.forEach(function(ch){
+    ch.addEventListener('click', function(){
+      show[ch.dataset.fn] = !show[ch.dataset.fn];
+      ch.classList.toggle('on', show[ch.dataset.fn]);
+      drawGraphs();
+    });
+  });
+
+  function drawGraphs(){
+    var w=gc.width, h=gc.height, padL=36, padR=14, padT=14, padB=26;
+    var gw=w-padL-padR, gh=h-padT-padB, midY=padT+gh/2;
+    gctx.clearRect(0,0,w,h);
+    function X(deg){ return padL + (deg/360)*gw; }
+    function Y(v){ return midY - v*(gh/2)/1.15; } // scale so |1| fits with margin
+    // grid verticals every 45
+    gctx.strokeStyle="#22304a"; gctx.lineWidth=1; gctx.fillStyle="#5f6f8d"; gctx.font="10px system-ui";
+    for(var d=0; d<=360; d+=45){
+      gctx.beginPath(); gctx.moveTo(X(d),padT); gctx.lineTo(X(d),padT+gh); gctx.stroke();
+      gctx.fillText(d+"°", X(d)-9, h-10);
+    }
+    // horizontal grid at -1,0,1
+    [-1,0,1].forEach(function(v){
+      gctx.strokeStyle = v===0 ? "#3a4a6b" : "#22304a";
+      gctx.beginPath(); gctx.moveTo(padL,Y(v)); gctx.lineTo(padL+gw,Y(v)); gctx.stroke();
+      gctx.fillStyle="#5f6f8d"; gctx.fillText(v.toString(), 6, Y(v)+3);
+    });
+    // tan asymptotes
+    if(show.tan){
+      gctx.setLineDash([4,4]); gctx.strokeStyle="#6b4a8a"; gctx.lineWidth=1;
+      [90,270].forEach(function(d){ gctx.beginPath(); gctx.moveTo(X(d),padT); gctx.lineTo(X(d),padT+gh); gctx.stroke(); });
+      gctx.setLineDash([]);
+    }
+    function plot(fn,color){
+      gctx.strokeStyle=color; gctx.lineWidth=2.2; gctx.beginPath();
+      var pen=false;
+      for(var d=0; d<=360; d+=1){
+        var v = fn(d*D2R);
+        if(!isFinite(v) || Math.abs(v)>2.2){ pen=false; continue; }
+        var xx=X(d), yy=Y(v);
+        if(!pen){ gctx.moveTo(xx,yy); pen=true; } else gctx.lineTo(xx,yy);
+      }
+      gctx.stroke();
+    }
+    if(show.sin) plot(Math.sin,"#4fd1c5");
+    if(show.cos) plot(Math.cos,"#f6a94a");
+    if(show.tan) plot(function(r){return Math.tan(r);},"#c98bff");
+    // moving marker
+    var md = ((theta%360)+360)%360, mrad=md*D2R;
+    gctx.strokeStyle="#e8eef7"; gctx.lineWidth=1; gctx.setLineDash([3,3]);
+    gctx.beginPath(); gctx.moveTo(X(md),padT); gctx.lineTo(X(md),padT+gh); gctx.stroke();
+    gctx.setLineDash([]);
+    function mark(fn,color){
+      var v=fn(mrad); if(!isFinite(v)||Math.abs(v)>2.2) return;
+      gctx.fillStyle=color; gctx.beginPath(); gctx.arc(X(md),Y(v),4.5,0,TAU); gctx.fill();
+      gctx.strokeStyle="#0e1420"; gctx.lineWidth=1.5; gctx.stroke();
+    }
+    if(show.sin) mark(Math.sin,"#4fd1c5");
+    if(show.cos) mark(Math.cos,"#f6a94a");
+    if(show.tan) mark(function(r){return Math.tan(r);},"#c98bff");
+  }
+
+  var gSlider=document.getElementById('gSlider');
+  gSlider.addEventListener('input', function(){ setTheta(+gSlider.value,'graph'); drawGraphs(); });
+
+  /* play animation */
+  var playing=false, rafId=null, last=0;
+  var playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click', function(){
+    playing=!playing;
+    playBtn.innerHTML = playing ? "&#10073;&#10073; Pause" : "&#9654; Play";
+    if(playing){ last=performance.now(); rafId=requestAnimationFrame(step); }
+    else if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+  });
+  function step(now){
+    if(!playing) return;
+    if(document.hidden){ rafId=requestAnimationFrame(step); last=now; return; }
+    var dt=(now-last)/1000; last=now;
+    var nd = (((theta + dt*60)%360)+360)%360; // 60 deg/sec
+    setTheta(Math.round(nd*10)/10,'anim');
+    drawGraphs();
+    rafId=requestAnimationFrame(step);
+  }
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden && rafId){ cancelAnimationFrame(rafId); rafId=null; }
+    else if(!document.hidden && playing){ last=performance.now(); rafId=requestAnimationFrame(step); }
+  });
+
+  /* ============ CONVERTER ============ */
+  var degIn=document.getElementById('degIn'), radOut=document.getElementById('radOut'),
+      radExact=document.getElementById('radExact'), radIn=document.getElementById('radIn'),
+      degOut=document.getElementById('degOut');
+  function nearestExact(deg){
+    var d=((deg%360)+360)%360, r=Math.round(d);
+    return exactRad[r] && Math.abs(d-r)<0.5 ? exactRad[r] : "—";
+  }
+  function convDeg(){
+    var d=+degIn.value; if(isNaN(d)){return;}
+    radOut.textContent = fmt(d*D2R);
+    radExact.textContent = nearestExact(d);
+  }
+  function convRad(){
+    var r=+radIn.value; if(isNaN(r)){return;}
+    degOut.textContent = (Math.round(r*R2D*100)/100)+"°";
+  }
+  degIn.addEventListener('input',convDeg);
+  radIn.addEventListener('input',convRad);
+  convDeg(); convRad();
+
+  /* ============ QUIZ ============ */
+  var quiz=[
+    { q:"What are the coordinates of the point on the unit circle at θ = 60°?",
+      opts:["(√3/2, 1/2)","(1/2, √3/2)","(1/2, 1/2)","(√3/2, √3/2)"], a:1,
+      e:"Point = (cos60°, sin60°) = (1/2, √3/2)." },
+    { q:"In which quadrant is only the cosine ratio positive?",
+      opts:["Quadrant I","Quadrant II","Quadrant III","Quadrant IV"], a:3,
+      e:"ASTC: Cos is positive in Quadrant IV (270°–360°)." },
+    { q:"The value of tanθ is undefined at which angles in [0°,360°]?",
+      opts:["0° and 180°","90° and 270°","45° and 135°","180° and 360°"], a:1,
+      e:"tanθ = sinθ/cosθ is undefined where cosθ = 0, i.e. at 90° and 270°." }
+  ];
+  var qbox=document.getElementById('quizBox');
+  quiz.forEach(function(item,qi){
+    var div=document.createElement('div'); div.className='q';
+    var p=document.createElement('p'); p.textContent=(qi+1)+". "+item.q; div.appendChild(p);
+    item.opts.forEach(function(opt,oi){
+      var o=document.createElement('div'); o.className='opt'; o.textContent=opt;
+      o.addEventListener('click', function(){
+        if(div.dataset.done) return;
+        div.dataset.done="1";
+        var kids=div.querySelectorAll('.opt');
+        kids[item.a].classList.add('correct');
+        if(oi!==item.a) o.classList.add('wrong');
+        ex.style.display='block';
+      });
+      div.appendChild(o);
+    });
+    var ex=document.createElement('div'); ex.className='expl'; ex.textContent="→ "+item.e;
+    div.appendChild(ex);
+    qbox.appendChild(div);
+  });
+
+  /* init */
+  setTheta(30,'init');
+  drawGraphs();
+})();
+</script>
+</body>
+</html>

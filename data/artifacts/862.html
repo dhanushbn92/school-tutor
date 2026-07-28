@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle Solver Lab — Sides & Angles of a Triangle (NIOS Class 12, Ch 5)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#57c4ff;
+    --accent-soft:rgba(87,196,255,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:4px 0 6px}
+  .view{display:none}
+  .view.active{display:block}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;touch-action:none}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+
+  .grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 90px;min-width:80px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .stat.sideA .v{color:#ff9d6e}
+  .stat.sideB .v{color:#6ee0a0}
+  .stat.sideC .v{color:#8db4ff}
+
+  .checkline{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--panel2);
+    border:1px solid var(--line);font-size:.92rem}
+  .checkline b{color:var(--accent)}
+  .ok{color:var(--good)}
+  .no{color:var(--bad)}
+
+  .ratios{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .ratio{flex:1 1 120px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px;text-align:center}
+  .ratio .lab{font-size:.78rem;color:var(--muted)}
+  .ratio .val{font-size:1.1rem;font-weight:700;color:var(--accent);margin-top:3px}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 70px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .fields{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+  .field{flex:1 1 130px;min-width:120px}
+  .field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:5px}
+  .field input{width:100%;height:44px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;color:var(--ink);font-size:1rem;padding:0 10px}
+  .field input:focus{outline:none;border-color:var(--accent)}
+  .field input:disabled{opacity:.4}
+
+  .btn{margin-top:14px;min-height:48px;padding:0 18px;border:1px solid var(--accent);
+    background:var(--accent-soft);color:var(--accent);border-radius:12px;font-size:1rem;
+    font-weight:700;cursor:pointer;touch-action:manipulation}
+  .btn:active{transform:scale(.98)}
+
+  .result{margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--panel2);
+    border:1px solid var(--line);font-size:.94rem;white-space:pre-wrap}
+  .result.err{border-color:var(--bad);color:var(--bad)}
+
+  .facts p{margin:6px 0;font-size:.9rem}
+  .facts code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+    padding:1px 6px;color:var(--accent);font-size:.9rem}
+
+  .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .q:first-child{border-top:none;padding-top:0;margin-top:0}
+  .q p{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;margin:6px 0;min-height:44px;padding:8px 12px;
+    border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;
+    font-size:.92rem;cursor:pointer;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Triangle Solver <span>Lab</span></h1>
+    <p>NIOS Class 12 Maths · Ch 5 — Relation between Sides and Angles of a Triangle</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tri">Triangle</button>
+    <button class="tab-btn" data-tab="sine">Sine Rule</button>
+    <button class="tab-btn" data-tab="cos">Cosine Rule</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ INTERACTIVE TRIANGLE ============ -->
+  <section class="view active" id="view-tri">
+    <div class="panel">
+      <h2>Interactive Triangle</h2>
+      <canvas id="cv" width="640" height="420"></canvas>
+      <p class="hint">Drag the vertices A, B, C (mouse or touch). Sides are named opposite their vertex:
+        side <b>a</b> = BC, <b>b</b> = CA, <b>c</b> = AB.</p>
+
+      <div class="grid">
+        <div class="stat sideA"><div class="k">side a (BC)</div><div class="v" id="dA">–</div></div>
+        <div class="stat sideB"><div class="k">side b (CA)</div><div class="v" id="dB">–</div></div>
+        <div class="stat sideC"><div class="k">side c (AB)</div><div class="v" id="dC">–</div></div>
+      </div>
+      <div class="grid">
+        <div class="stat"><div class="k">angle A</div><div class="v" id="aA">–</div></div>
+        <div class="stat"><div class="k">angle B</div><div class="v" id="aB">–</div></div>
+        <div class="stat"><div class="k">angle C</div><div class="v" id="aC">–</div></div>
+      </div>
+
+      <div class="checkline">Angle sum: <b id="asum">–</b> &nbsp; <span id="asumchk"></span></div>
+      <div class="checkline">Area = ½·a·b·sin C = <b id="area">–</b> &nbsp;·&nbsp; Circumradius R = <b id="Rval">–</b></div>
+    </div>
+  </section>
+
+  <!-- ============ SINE RULE ============ -->
+  <section class="view" id="view-sine">
+    <div class="panel">
+      <h2>Sine Rule</h2>
+      <p class="facts"><code>a/sin A = b/sin B = c/sin C = 2R</code></p>
+      <p class="hint">Live ratios for the triangle in the Triangle tab — all three stay equal (to 2R):</p>
+      <div class="ratios">
+        <div class="ratio"><div class="lab">a / sin A</div><div class="val" id="rA">–</div></div>
+        <div class="ratio"><div class="lab">b / sin B</div><div class="val" id="rB">–</div></div>
+        <div class="ratio"><div class="lab">c / sin C</div><div class="val" id="rC">–</div></div>
+        <div class="ratio"><div class="lab">2R</div><div class="val" id="r2R">–</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Sine-Rule Solver</h2>
+      <h3>Choose the known case</h3>
+      <div class="seg" id="sineCase">
+        <button data-c="AAS" class="on">AAS</button>
+        <button data-c="ASA">ASA</button>
+        <button data-c="SSA">SSA</button>
+      </div>
+      <div class="fields" id="sineFields"></div>
+      <button class="btn" id="sineSolve">Solve</button>
+      <div class="result" id="sineResult" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- ============ COSINE RULE ============ -->
+  <section class="view" id="view-cos">
+    <div class="panel">
+      <h2>Cosine Rule</h2>
+      <p class="facts"><code>c² = a² + b² − 2ab·cos C</code></p>
+      <p class="hint">Use it when the sine rule is not enough: two sides + included angle (SAS) or all three sides (SSS).</p>
+    </div>
+
+    <div class="panel">
+      <h2>Cosine-Rule Solver</h2>
+      <div class="seg" id="cosCase">
+        <button data-c="SAS" class="on">SAS</button>
+        <button data-c="SSS">SSS</button>
+      </div>
+      <div class="fields" id="cosFields"></div>
+      <button class="btn" id="cosSolve">Solve</button>
+      <div class="result" id="cosResult" style="display:none"></div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section class="view" id="view-facts">
+    <div class="panel facts">
+      <h2>Key Formulas</h2>
+      <p><b>Sine rule:</b> <code>a/sin A = b/sin B = c/sin C = 2R</code></p>
+      <p><b>Cosine rule:</b> <code>a² = b² + c² − 2bc·cos A</code></p>
+      <p>equivalently <code>cos A = (b² + c² − a²) / (2bc)</code></p>
+      <p><b>Angle sum:</b> <code>A + B + C = 180°</code></p>
+      <p><b>Area:</b> <code>½·ab·sin C = ½·bc·sin A = ½·ca·sin B</code></p>
+      <p><b>Heron's formula:</b> <code>Area = √(s(s−a)(s−b)(s−c))</code>, where <code>s = (a+b+c)/2</code></p>
+      <p><b>Projection:</b> <code>a = b·cos C + c·cos B</code></p>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <p class="hint" style="text-align:center">Angles in degrees. Values rounded for display; computation uses full precision.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DEG = 180/Math.PI;
+
+  /* ---------- tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var views = document.querySelectorAll(".view");
+  tabBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      views.forEach(function(v){v.classList.remove("active");});
+      document.getElementById("view-"+b.dataset.tab).classList.add("active");
+    });
+  });
+
+  /* ---------- interactive triangle ---------- */
+  var cv = document.getElementById("cv");
+  var ctx = cv.getContext("2d");
+  var W = cv.width, H = cv.height;
+  // vertices in canvas coords
+  var V = {
+    A:{x:120, y:330},
+    B:{x:520, y:330},
+    C:{x:300, y:90}
+  };
+  var COL = {A:"#ff9d6e", B:"#6ee0a0", C:"#8db4ff"};
+  var drag = null;
+
+  function dist(p,q){ return Math.hypot(p.x-q.x, p.y-q.y); }
+
+  function pointerPos(e){
+    var r = cv.getBoundingClientRect();
+    var sx = cv.width / r.width, sy = cv.height / r.height;
+    var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+    return {x: cx*sx, y: cy*sy};
+  }
+  function hit(p){
+    var best=null, bd=32;
+    ["A","B","C"].forEach(function(k){
+      var d = dist(p, V[k]);
+      if(d < bd){ bd=d; best=k; }
+    });
+    return best;
+  }
+  function startDrag(e){
+    var p = pointerPos(e);
+    drag = hit(p);
+    if(drag) e.preventDefault();
+  }
+  function moveDrag(e){
+    if(!drag) return;
+    e.preventDefault();
+    var p = pointerPos(e);
+    p.x = Math.max(20, Math.min(W-20, p.x));
+    p.y = Math.max(20, Math.min(H-20, p.y));
+    V[drag] = p;
+    render();
+  }
+  function endDrag(){ drag=null; }
+
+  cv.addEventListener("mousedown", startDrag);
+  window.addEventListener("mousemove", moveDrag);
+  window.addEventListener("mouseup", endDrag);
+  cv.addEventListener("touchstart", startDrag, {passive:false});
+  cv.addEventListener("touchmove", moveDrag, {passive:false});
+  cv.addEventListener("touchend", endDrag);
+
+  function fmt(x,d){ return (Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toFixed(d); }
+
+  function compute(){
+    // side lengths (canvas px used as generic units)
+    var a = dist(V.B, V.C); // BC, opposite A
+    var b = dist(V.C, V.A); // CA, opposite B
+    var c = dist(V.A, V.B); // AB, opposite C
+    // angles via cosine rule
+    var A = Math.acos(clamp((b*b + c*c - a*a)/(2*b*c)));
+    var B = Math.acos(clamp((a*a + c*c - b*b)/(2*a*c)));
+    var C = Math.acos(clamp((a*a + b*b - c*c)/(2*a*b)));
+    return {a:a,b:b,c:c,A:A,B:B,C:C};
+  }
+  function clamp(x){ return Math.max(-1, Math.min(1, x)); }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    // triangle fill + edges
+    ctx.beginPath();
+    ctx.moveTo(V.A.x, V.A.y);
+    ctx.lineTo(V.B.x, V.B.y);
+    ctx.lineTo(V.C.x, V.C.y);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(87,196,255,.10)";
+    ctx.fill();
+
+    // colored edges: a=BC, b=CA, c=AB
+    edge(V.B, V.C, COL.A);
+    edge(V.C, V.A, COL.B);
+    edge(V.A, V.B, COL.C);
+
+    // vertices
+    ["A","B","C"].forEach(function(k){
+      ctx.beginPath();
+      ctx.arc(V[k].x, V[k].y, 11, 0, 2*Math.PI);
+      ctx.fillStyle = COL[k];
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#10141f";
+      ctx.stroke();
+      ctx.fillStyle = "#e8ecf6";
+      ctx.font = "bold 18px system-ui, sans-serif";
+      var off = labelOffset(k);
+      ctx.fillText(k, V[k].x+off.x, V[k].y+off.y);
+    });
+
+    updateStats(compute());
+  }
+  function edge(p,q,col){
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+    ctx.lineWidth = 4; ctx.strokeStyle = col; ctx.stroke();
+  }
+  function labelOffset(k){
+    // push label outward from centroid
+    var cx=(V.A.x+V.B.x+V.C.x)/3, cy=(V.A.y+V.B.y+V.C.y)/3;
+    var dx=V[k].x-cx, dy=V[k].y-cy, m=Math.hypot(dx,dy)||1;
+    return {x: dx/m*16 - 6, y: dy/m*16 + 6};
+  }
+
+  function updateStats(t){
+    document.getElementById("dA").textContent = fmt(t.a,1);
+    document.getElementById("dB").textContent = fmt(t.b,1);
+    document.getElementById("dC").textContent = fmt(t.c,1);
+    document.getElementById("aA").textContent = fmt(t.A*DEG,1)+"°";
+    document.getElementById("aB").textContent = fmt(t.B*DEG,1)+"°";
+    document.getElementById("aC").textContent = fmt(t.C*DEG,1)+"°";
+
+    var sum = (t.A+t.B+t.C)*DEG;
+    document.getElementById("asum").textContent = fmt(sum,1)+"°";
+    var chk = document.getElementById("asumchk");
+    chk.innerHTML = Math.abs(sum-180)<0.05
+      ? '<span class="ok">= 180° &#10003;</span>'
+      : '<span class="no">rounding drift</span>';
+
+    var area = 0.5*t.a*t.b*Math.sin(t.C);
+    document.getElementById("area").textContent = fmt(area,1)+" u²";
+    // circumradius R = a/(2 sinA)
+    var R = t.a/(2*Math.sin(t.A));
+    document.getElementById("Rval").textContent = fmt(R,1);
+
+    // sine-rule live ratios
+    document.getElementById("rA").textContent = fmt(t.a/Math.sin(t.A),1);
+    document.getElementById("rB").textContent = fmt(t.b/Math.sin(t.B),1);
+    document.getElementById("rC").textContent = fmt(t.c/Math.sin(t.C),1);
+    document.getElementById("r2R").textContent = fmt(2*R,1);
+  }
+
+  /* ---------- sine-rule solver ---------- */
+  var sineCase = "AAS";
+  var sineFieldDefs = {
+    AAS: [ {id:"sA",lab:"Angle A (°)"},{id:"sB",lab:"Angle B (°)"},{id:"sa",lab:"Side a"} ],
+    ASA: [ {id:"sA",lab:"Angle A (°)"},{id:"sB",lab:"Angle B (°)"},{id:"sc",lab:"Side c (between A,B)"} ],
+    SSA: [ {id:"sA",lab:"Angle A (°)"},{id:"sa",lab:"Side a (opp A)"},{id:"sb",lab:"Side b"} ]
+  };
+  function buildSineFields(){
+    var box = document.getElementById("sineFields");
+    box.innerHTML = "";
+    sineFieldDefs[sineCase].forEach(function(f){
+      var d = document.createElement("div"); d.className="field";
+      d.innerHTML = '<label>'+f.lab+'</label><input type="number" step="any" id="'+f.id+'">';
+      box.appendChild(d);
+    });
+  }
+  document.querySelectorAll("#sineCase button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#sineCase button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      sineCase = b.dataset.c;
+      buildSineFields();
+      document.getElementById("sineResult").style.display="none";
+    });
+  });
+  function val(id){ var e=document.getElementById(id); return e?parseFloat(e.value):NaN; }
+  function showRes(elId, text, err){
+    var e=document.getElementById(elId);
+    e.style.display="block";
+    e.className = "result"+(err?" err":"");
+    e.textContent = text;
+  }
+
+  document.getElementById("sineSolve").addEventListener("click", function(){
+    try{
+      var out="";
+      if(sineCase==="AAS"){
+        var A=val("sA"), B=val("sB"), a=val("sa");
+        if(!(A>0&&B>0&&a>0)) throw 0;
+        if(A+B>=180) throw "A + B must be < 180°.";
+        var C=180-A-B;
+        var k = a/Math.sin(A/DEG);           // = 2R
+        var b = k*Math.sin(B/DEG);
+        var c = k*Math.sin(C/DEG);
+        out="Angle C = "+fmt(C,2)+"°\n"+
+            "Side b = "+fmt(b,3)+"\n"+
+            "Side c = "+fmt(c,3)+"\n"+
+            "2R = a/sin A = "+fmt(k,3);
+      } else if(sineCase==="ASA"){
+        var A=val("sA"), B=val("sB"), c=val("sc");
+        if(!(A>0&&B>0&&c>0)) throw 0;
+        if(A+B>=180) throw "A + B must be < 180°.";
+        var C=180-A-B;
+        var k = c/Math.sin(C/DEG);
+        var a = k*Math.sin(A/DEG);
+        var b = k*Math.sin(B/DEG);
+        out="Angle C = "+fmt(C,2)+"°\n"+
+            "Side a = "+fmt(a,3)+"\n"+
+            "Side b = "+fmt(b,3)+"\n"+
+            "2R = c/sin C = "+fmt(k,3);
+      } else { // SSA (ambiguous)
+        var A=val("sA"), a=val("sa"), b=val("sb");
+        if(!(A>0&&a>0&&b>0)) throw 0;
+        var sinB = b*Math.sin(A/DEG)/a;
+        if(sinB>1+1e-9){ showRes("sineResult","No triangle: sin B = "+fmt(sinB,3)+" > 1 (side a too short).",true); return; }
+        sinB = Math.min(1,sinB);
+        var B1 = Math.asin(sinB)*DEG;
+        var lines=[];
+        [B1, 180-B1].forEach(function(B){
+          if(B>0 && A+B<180){
+            var C=180-A-B;
+            var c=a*Math.sin(C/DEG)/Math.sin(A/DEG);
+            lines.push("• B = "+fmt(B,2)+"°, C = "+fmt(C,2)+"°, c = "+fmt(c,3));
+          }
+        });
+        out = (lines.length>1 ? "Ambiguous case — two triangles:\n" : "One triangle:\n") + lines.join("\n");
+      }
+      showRes("sineResult", out, false);
+    }catch(err){
+      showRes("sineResult", typeof err==="string"?err:"Enter valid positive numbers in every field.", true);
+    }
+  });
+
+  /* ---------- cosine-rule solver ---------- */
+  var cosCase="SAS";
+  var cosFieldDefs = {
+    SAS: [ {id:"cA_a",lab:"Side a"},{id:"cA_b",lab:"Side b"},{id:"cA_C",lab:"Angle C (°, between a,b)"} ],
+    SSS: [ {id:"cB_a",lab:"Side a"},{id:"cB_b",lab:"Side b"},{id:"cB_c",lab:"Side c"} ]
+  };
+  function buildCosFields(){
+    var box=document.getElementById("cosFields");
+    box.innerHTML="";
+    cosFieldDefs[cosCase].forEach(function(f){
+      var d=document.createElement("div"); d.className="field";
+      d.innerHTML='<label>'+f.lab+'</label><input type="number" step="any" id="'+f.id+'">';
+      box.appendChild(d);
+    });
+  }
+  document.querySelectorAll("#cosCase button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#cosCase button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      cosCase=b.dataset.c;
+      buildCosFields();
+      document.getElementById("cosResult").style.display="none";
+    });
+  });
+
+  document.getElementById("cosSolve").addEventListener("click", function(){
+    try{
+      var out="";
+      if(cosCase==="SAS"){
+        var a=val("cA_a"), b=val("cA_b"), C=val("cA_C");
+        if(!(a>0&&b>0&&C>0)) throw 0;
+        if(C>=180) throw "Angle C must be < 180°.";
+        var Cr=C/DEG;
+        var c=Math.sqrt(a*a + b*b - 2*a*b*Math.cos(Cr));
+        var A=Math.acos(clamp((b*b+c*c-a*a)/(2*b*c)))*DEG;
+        var B=180-A-C;
+        var area=0.5*a*b*Math.sin(Cr);
+        out="Side c = "+fmt(c,3)+"  (c² = a² + b² − 2ab·cos C)\n"+
+            "Angle A = "+fmt(A,2)+"°\n"+
+            "Angle B = "+fmt(B,2)+"°\n"+
+            "Area = ½·ab·sin C = "+fmt(area,3);
+      } else { // SSS
+        var a=val("cB_a"), b=val("cB_b"), c=val("cB_c");
+        if(!(a>0&&b>0&&c>0)) throw 0;
+        if(a+b<=c || b+c<=a || a+c<=b) throw "Triangle inequality fails: longest side ≥ sum of the other two.";
+        var A=Math.acos(clamp((b*b+c*c-a*a)/(2*b*c)))*DEG;
+        var B=Math.acos(clamp((a*a+c*c-b*b)/(2*a*c)))*DEG;
+        var C=180-A-B;
+        var s=(a+b+c)/2;
+        var area=Math.sqrt(s*(s-a)*(s-b)*(s-c));
+        out="Angle A = "+fmt(A,2)+"°\n"+
+            "Angle B = "+fmt(B,2)+"°\n"+
+            "Angle C = "+fmt(C,2)+"°\n"+
+            "s = "+fmt(s,3)+"\n"+
+            "Area (Heron) = "+fmt(area,3);
+      }
+      showRes("cosResult", out, false);
+    }catch(err){
+      showRes("cosResult", typeof err==="string"?err:"Enter valid positive numbers in every field.", true);
+    }
+  });
+
+  /* ---------- quiz ---------- */
+  var QUIZ = [
+    {
+      q:"In any triangle, a/sin A equals:",
+      opts:["R","2R","R/2","a·sin A"],
+      correct:1,
+      expl:"The sine rule gives a/sin A = b/sin B = c/sin C = 2R, where R is the circumradius."
+    },
+    {
+      q:"For a triangle with b = 5, c = 7 and included angle A = 60°, a² equals:",
+      opts:["25 + 49 − 35","25 + 49 + 35","25 + 49 − 70","74"],
+      correct:0,
+      expl:"a² = b² + c² − 2bc·cos A = 25 + 49 − 2·5·7·cos60° = 25 + 49 − 70·½ = 25 + 49 − 35 = 39."
+    },
+    {
+      q:"The area of a triangle can be written as:",
+      opts:["½·ab·cos C","½·ab·sin C","ab·sin C","2ab·sin C"],
+      correct:1,
+      expl:"Area = ½·ab·sin C (product of two sides times the sine of the included angle, halved)."
+    }
+  ];
+  var quizBox = document.getElementById("quiz");
+  QUIZ.forEach(function(item, qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    var ex=document.createElement("div"); ex.className="expl"; ex.textContent="Explanation: "+item.expl;
+    item.opts.forEach(function(text, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=text;
+      b.addEventListener("click", function(){
+        if(d.dataset.done) return;
+        d.dataset.done="1";
+        var btns=d.querySelectorAll(".opt");
+        btns[item.correct].classList.add("correct");
+        if(oi!==item.correct) b.classList.add("wrong");
+        ex.classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(ex);
+    quizBox.appendChild(d);
+  });
+
+  /* ---------- init ---------- */
+  buildSineFields();
+  buildCosFields();
+  render();
+})();
+</script>
+</body>
+</html>
