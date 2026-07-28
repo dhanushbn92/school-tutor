@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>वाचां मण्डनं सत्यम् | The Ethics of Speech</title>
+<style>
+  :root{
+    --accent:#e0913a;
+    --accent-soft:#fbeed7;
+    --accent-dark:#b56a1c;
+    --bg:#1c1a24;
+    --panel:#26232f;
+    --panel-2:#2e2a38;
+    --ink:#eee9f2;
+    --muted:#a49dae;
+    --good:#4bbf87;
+    --good-soft:#1f3a2f;
+    --bad:#e5688a;
+    --bad-soft:#3a2028;
+    --line:#3a3547;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(165deg,#1c1a24 0%,#241f2e 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6vw,2.4rem);color:var(--accent);}
+  header.top h1{
+    font-size:clamp(1.15rem,4.5vw,1.7rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#1c1a24;box-shadow:0 4px 14px rgba(224,145,58,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.28);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Verse Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:10px;}
+  .verse-src{text-align:center;color:var(--accent-dark);font-size:.82rem;font-weight:700;margin-bottom:10px;}
+  .verse-card{background:var(--panel-2);border-radius:18px;padding:20px 18px;border:1px solid var(--line);}
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,4.8vw,1.75rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .verse-translit{text-align:center;font-style:italic;color:var(--muted);font-size:.92rem;margin-bottom:16px;}
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:.88rem;}
+  .shabda-chip b{font-family:var(--deva);font-size:1.05rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .box{background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);font-size:.93rem;}
+  .anvaya-box .txt{font-family:var(--deva);font-size:1.02rem;color:var(--ink);}
+  .moral-box{background:var(--good-soft);border-color:#2e5443;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#1c1a24;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--accent-soft);color:var(--accent-dark);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:#3a2f1c;box-shadow:0 0 0 3px rgba(224,145,58,.25);}
+  .word-item.done,.mean-item.done{border-color:#2e5443;background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.93rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);color:var(--accent-dark);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2e5443;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-q-text{font-size:1rem;margin-bottom:14px;line-height:1.55;}
+  .quiz-q-text .deva{font-family:var(--deva);color:var(--accent);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    text-align:left;border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;font-size:.95rem;transition:.15s;
+  }
+  .opt-btn .deva{font-family:var(--deva);color:var(--accent);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2e5443;background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .deva{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">वाचां मण्डनं सत्यम्</div>
+    <h1>Truth is the Ornament of Speech</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 4 &middot; The Ethics &amp; Beauty of Speech</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Verse Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse Explorer &middot; श्लोक-अन्वेषणम्</h2>
+      <p class="mode-sub">Explore each verse: Devanagari, transliteration, word-meanings, prose order (अन्वय), translation, and message.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-src" id="verseSrc"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; पूर्व</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">अग्रे &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game &middot; शब्दार्थ-मेलनम्</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to pair them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 साधु! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">MCQ Quiz &middot; प्रश्नोत्तरम्</h2>
+      <p class="mode-sub">Answer questions on the verses and the ethics of speech. Explanations reveal after each choice.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Sanskrit verses (Bhartrhari, Manusmriti, Bhagavadgita, Chanakya, Subhashitani) &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: VERSES ---------------- */
+var VERSES = [
+  {
+    src: "भर्तृहरि · नीतिशतक",
+    deva: "केयूराणि न भूषयन्ति पुरुषं हारा न चन्द्रोज्ज्वला<br>न स्नानं न विलेपनं न कुसुमं नालङ्कृता मूर्धजाः।<br>वाण्येका समलङ्करोति पुरुषं या संस्कृता धार्यते<br>क्षीयन्ते खलु भूषणानि सततं वाग्भूषणं भूषणम्॥",
+    translit: "keyūrāṇi na bhūṣayanti puruṣaṁ hārā na candrojjvalā / na snānaṁ na vilepanaṁ na kusumaṁ nālaṅkṛtā mūrdhajāḥ / vāṇyekā samalaṅkaroti puruṣaṁ yā saṁskṛtā dhāryate / kṣīyante khalu bhūṣaṇāni satataṁ vāgbhūṣaṇaṁ bhūṣaṇam",
+    words: [
+      {w:"केयूराणि", m:"armlets"},
+      {w:"भूषयन्ति", m:"adorn"},
+      {w:"वाणी", m:"speech / voice"},
+      {w:"संस्कृता", m:"refined, cultivated"},
+      {w:"क्षीयन्ते", m:"wear out / perish"},
+      {w:"वाग्भूषणम्", m:"the ornament of speech"}
+    ],
+    anvaya: "केयूराणि पुरुषं न भूषयन्ति, चन्द्रोज्ज्वलाः हाराः न (भूषयन्ति)... या संस्कृता वाणी धार्यते सा एका पुरुषं समलङ्करोति। भूषणानि सततं क्षीयन्ते, वाग्भूषणं (एव) भूषणम्।",
+    trans: "Armlets do not adorn a man, nor moon-bright necklaces, nor bathing, nor ointment, nor flowers, nor dressed hair. Refined speech alone truly adorns a person. All other ornaments wear away; the ornament of speech is the (real) ornament.",
+    moral: "Fine clothes and jewels fade, but cultured, well-chosen speech is a lasting ornament that reveals a person's true worth."
+  },
+  {
+    src: "मनुस्मृति ४.१३८",
+    deva: "सत्यं ब्रूयात् प्रियं ब्रूयात् न ब्रूयात् सत्यमप्रियम्।<br>प्रियं च नानृतं ब्रूयात् एष धर्मः सनातनः॥",
+    translit: "satyaṁ brūyāt priyaṁ brūyāt na brūyāt satyam apriyam / priyaṁ ca nānṛtaṁ brūyāt eṣa dharmaḥ sanātanaḥ",
+    words: [
+      {w:"सत्यम्", m:"truth"},
+      {w:"ब्रूयात्", m:"one should speak"},
+      {w:"प्रियम्", m:"pleasant, kind"},
+      {w:"अप्रियम्", m:"unpleasant"},
+      {w:"अनृतम्", m:"falsehood, untruth"},
+      {w:"सनातनः", m:"eternal, timeless"}
+    ],
+    anvaya: "सत्यं ब्रूयात्, प्रियं ब्रूयात्, अप्रियं सत्यं न ब्रूयात्, प्रियं च अनृतं न ब्रूयात् — एष सनातनः धर्मः।",
+    trans: "Speak the truth, speak what is pleasant; do not speak a truth that is unpleasant. Nor speak a pleasant falsehood — this is the eternal law (dharma).",
+    moral: "The ideal of speech unites truth with kindness: be honest yet gentle, and never lie merely to please. Truth and sweetness together are dharma."
+  },
+  {
+    src: "भगवद्गीता १७.१५",
+    deva: "अनुद्वेगकरं वाक्यं सत्यं प्रियहितं च यत्।<br>स्वाध्यायाभ्यसनं चैव वाङ्मयं तप उच्यते॥",
+    translit: "anudvegakaraṁ vākyaṁ satyaṁ priyahitaṁ ca yat / svādhyāyābhyasanaṁ caiva vāṅmayaṁ tapa ucyate",
+    words: [
+      {w:"अनुद्वेगकरम्", m:"not causing agitation"},
+      {w:"वाक्यम्", m:"speech, statement"},
+      {w:"सत्यम्", m:"true"},
+      {w:"प्रियहितम्", m:"pleasant and beneficial"},
+      {w:"स्वाध्याय", m:"self-study of scripture"},
+      {w:"वाङ्मयं तपः", m:"austerity of speech"}
+    ],
+    anvaya: "यत् वाक्यम् अनुद्वेगकरं सत्यं प्रियहितं च (भवति), स्वाध्याय-अभ्यसनं च — (तत्) वाङ्मयं तपः उच्यते।",
+    trans: "Speech that causes no distress, that is true, pleasant and beneficial, together with the regular study of scripture — this is called the austerity (tapas) of speech.",
+    moral: "Krishna defines four marks of good speech: it must not agitate, must be true, pleasant, and beneficial. Disciplining the tongue is itself a spiritual austerity."
+  },
+  {
+    src: "चाणक्यनीति",
+    deva: "प्रियवाक्यप्रदानेन सर्वे तुष्यन्ति जन्तवः।<br>तस्मात्तदेव वक्तव्यं वचने का दरिद्रता॥",
+    translit: "priyavākyapradānena sarve tuṣyanti jantavaḥ / tasmāt tad eva vaktavyaṁ vacane kā daridratā",
+    words: [
+      {w:"प्रियवाक्य", m:"pleasant / kind words"},
+      {w:"प्रदानेन", m:"by giving, offering"},
+      {w:"तुष्यन्ति", m:"are pleased"},
+      {w:"जन्तवः", m:"living beings"},
+      {w:"वक्तव्यम्", m:"should be spoken"},
+      {w:"दरिद्रता", m:"poverty, miserliness"}
+    ],
+    anvaya: "प्रियवाक्य-प्रदानेन सर्वे जन्तवः तुष्यन्ति; तस्मात् तत् एव वक्तव्यम्; वचने का दरिद्रता?",
+    trans: "By the gift of kind words, all living beings are pleased. Therefore one should speak only such words — why be miserly in speech?",
+    moral: "Kind words cost nothing yet delight everyone. Since sweetness of speech is a gift we can always afford, there is no reason to be stingy with it."
+  },
+  {
+    src: "सुभाषितम्",
+    deva: "काकः कृष्णः पिकः कृष्णः को भेदः पिककाकयोः।<br>वसन्तसमये प्राप्ते काकः काकः पिकः पिकः॥",
+    translit: "kākaḥ kṛṣṇaḥ pikaḥ kṛṣṇaḥ ko bhedaḥ pikakākayoḥ / vasantasamaye prāpte kākaḥ kākaḥ pikaḥ pikaḥ",
+    words: [
+      {w:"काकः", m:"crow"},
+      {w:"पिकः", m:"cuckoo (koel)"},
+      {w:"कृष्णः", m:"black"},
+      {w:"भेदः", m:"difference"},
+      {w:"वसन्तसमये", m:"in the spring season"},
+      {w:"प्राप्ते", m:"when it arrives"}
+    ],
+    anvaya: "काकः कृष्णः, पिकः (अपि) कृष्णः; पिक-काकयोः कः भेदः? वसन्तसमये प्राप्ते (सति) काकः काकः, पिकः पिकः (इति ज्ञायते)।",
+    trans: "The crow is black, the cuckoo is black too — what is the difference between them? But when spring arrives, the crow remains a crow and the cuckoo a cuckoo (revealed by their voices).",
+    moral: "Two people may look alike, but their speech reveals their true nature. Sweet speech, like the koel's song, distinguishes the noble from the harsh."
+  },
+  {
+    src: "सुभाषितम्",
+    deva: "संरोहति अग्निना दग्धं वनं परशुना हतम्।<br>वाचा दुरुक्तं बीभत्सं न संरोहति वाक्क्षतम्॥",
+    translit: "saṁrohati agninā dagdhaṁ vanaṁ paraśunā hatam / vācā duruktaṁ bībhatsaṁ na saṁrohati vākkṣatam",
+    words: [
+      {w:"संरोहति", m:"grows again, heals"},
+      {w:"दग्धम्", m:"burnt"},
+      {w:"परशुना", m:"by an axe"},
+      {w:"दुरुक्तम्", m:"harshly spoken words"},
+      {w:"वाक्क्षतम्", m:"a wound caused by speech"},
+      {w:"बीभत्सम्", m:"disgusting, cruel"}
+    ],
+    anvaya: "अग्निना दग्धं परशुना हतं (च) वनं संरोहति; (परन्तु) वाचा दुरुक्तं बीभत्सं वाक्क्षतं न संरोहति।",
+    trans: "A forest burnt by fire and felled by an axe grows again; but a cruel wound inflicted by harsh words never heals.",
+    moral: "Physical wounds heal, but the injury of a harsh word can last a lifetime. This is why restraint and gentleness in speech matter so deeply."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var verseSrc = document.getElementById("verseSrc");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="box anvaya-box"><div class="block-label">अन्वय &middot; Prose Order</div><div class="txt">'+v.anvaya+'</div></div>'+
+    '<div class="box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="box moral-box"><div class="block-label">Message &middot; सन्देशः</div>'+v.moral+'</div>';
+  verseCount.textContent = "Verse "+(vIndex+1)+" of "+VERSES.length;
+  verseSrc.textContent = v.src;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"वाक्", m:"speech"},
+  {w:"सत्यम्", m:"truth"},
+  {w:"प्रियम्", m:"pleasant / dear"},
+  {w:"मण्डनम्", m:"ornament"},
+  {w:"हितम्", m:"beneficial"},
+  {w:"मौनम्", m:"silence"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q: 'According to Manusmriti (<span class="deva">सत्यं ब्रूयात् प्रियं ब्रूयात्...</span>), which one should a person NOT speak?',
+    options: [
+      'A pleasant truth (<span class="deva">प्रियं सत्यम्</span>)',
+      'An unpleasant truth (<span class="deva">सत्यम् अप्रियम्</span>)',
+      'A beneficial word (<span class="deva">हितं वचनम्</span>)',
+      'A gentle word (<span class="deva">मृदु वचनम्</span>)'
+    ],
+    answer: 1,
+    explain: 'The verse says <b>न ब्रूयात् सत्यमप्रियम्</b> — do not speak a truth that is unpleasant (hurtful). Truth should be joined with kindness, and one should also never speak a pleasant falsehood.'
+  },
+  {
+    q: 'In Bhartrhari’s verse ending <span class="deva">वाग्भूषणं भूषणम्</span>, what is called the one true, lasting ornament of a person?',
+    options: [
+      'Golden armlets (<span class="deva">केयूराणि</span>)',
+      'Moon-bright necklaces (<span class="deva">हाराः</span>)',
+      'Refined speech (<span class="deva">संस्कृता वाणी</span>)',
+      'Fragrant flowers (<span class="deva">कुसुमम्</span>)'
+    ],
+    answer: 2,
+    explain: 'Bhartrhari says jewels and adornments <b>क्षीयन्ते</b> (wear away), but <b>संस्कृता वाणी</b> — refined, cultivated speech — alone truly adorns a person and endures.'
+  },
+  {
+    q: 'The Bhagavadgita (17.15) describes the austerity of speech (<span class="deva">वाङ्मयं तपः</span>). Which set of qualities does it require?',
+    options: [
+      'Loud, clever, and frequent',
+      'Non-agitating, true, pleasant, and beneficial (<span class="deva">अनुद्वेगकरं सत्यं प्रियहितम्</span>)',
+      'Formal, poetic, and ancient',
+      'Silent and unspoken only'
+    ],
+    answer: 1,
+    explain: 'Krishna lists speech that is <b>अनुद्वेगकरम्</b> (causing no distress), <b>सत्यम्</b> (true), and <b>प्रियहितम्</b> (pleasant and beneficial). Disciplining speech in this way is itself a spiritual austerity.'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q-text">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b, i){
+    b.disabled = true;
+    if(i === q.answer) b.classList.add("correct");
+    else if(i === chosen) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

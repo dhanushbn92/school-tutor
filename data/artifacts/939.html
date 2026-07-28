@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>अतिलोभः न कर्तव्यः | Atilobhah — A Sanskrit Greed Fable</title>
+<style>
+  :root{
+    --accent:#e7b24d;
+    --accent-soft:rgba(231,178,77,.14);
+    --accent-dark:#f2c774;
+    --bg:#191622;
+    --panel:#241f30;
+    --ink:#ece8f5;
+    --muted:#9a94b0;
+    --good:#4bcf9a;
+    --good-soft:rgba(75,207,154,.14);
+    --bad:#ff6b81;
+    --bad-soft:rgba(255,107,129,.14);
+    --line:#372f47;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#191622 0%,#221a2c 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.5vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent-dark);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--accent);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#211a10;box-shadow:0 4px 14px rgba(231,178,77,.35);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .kind-tag{
+    display:inline-block;font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;
+    font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:12px;
+    background:var(--accent-soft);color:var(--accent-dark);border:1px solid var(--line);
+  }
+  .verse-card{
+    background:rgba(255,255,255,.03);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+    text-align:center;
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,5vw,1.75rem);
+    line-height:1.85;
+    color:var(--accent-dark);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;justify-content:center;}
+  .shabda-chip{
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box,.anvaya-box{
+    background:rgba(255,255,255,.03);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;text-align:left;
+  }
+  .anvaya-box .deva-in{font-family:var(--deva);color:var(--accent-dark);}
+  .moral-box{background:var(--good-soft);border-color:rgba(75,207,154,.3);}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#211a10;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:rgba(255,255,255,.03);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(231,178,77,.2);}
+  .word-item.done,.mean-item.done{
+    border-color:rgba(75,207,154,.4);background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid rgba(75,207,154,.35);
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-stem{
+    font-size:1.02rem;line-height:1.6;
+    background:var(--accent-soft);border:1px solid var(--line);
+    border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;
+  }
+  .quiz-stem .deva-in{font-family:var(--deva);color:var(--accent-dark);font-size:1.15rem;}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:1rem;text-align:left;
+    border:2px solid var(--line);background:rgba(255,255,255,.03);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+  }
+  .opt-btn .deva-in{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:rgba(75,207,154,.5);background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">अतिलोभः न कर्तव्यः</div>
+    <h1>Atilobhah Na Kartavyah — Excessive Greed Must Not Be Indulged</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 5 &middot; A Panchatantra Fable on लोभ &amp; सन्तोष</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story &amp; Verse Explorer</h2>
+      <p class="mode-sub">Follow the tale of the greedy jackal, then read three verses on greed and contentment.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer three questions on the fable and its moral. Explanations reveal after each choice.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Retold from the Panchatantra / Hitopadesha &middot; Public-domain verses &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: story cards + verse cards ---------------- */
+var CARDS = [
+  {
+    kind:"Story · 1",
+    deva:"एकस्मिन् वने कश्चित् व्याधः मृगयार्थं गतः। तेन बाणेन एकः मृगः हतः।",
+    translit:"ekasmin vane kaścit vyādhaḥ mṛgayārthaṁ gataḥ; tena bāṇena ekaḥ mṛgaḥ hataḥ.",
+    words:[
+      {w:"वनम्", m:"forest"},
+      {w:"व्याधः", m:"hunter"},
+      {w:"मृगयार्थम्", m:"for hunting"},
+      {w:"मृगः", m:"deer"},
+      {w:"हतः", m:"was killed"}
+    ],
+    trans:"In a forest a certain hunter went out to hunt. With an arrow he killed a deer."
+  },
+  {
+    kind:"Story · 2",
+    deva:"मृगं नीत्वा गच्छन् सः एकं शूकरं दृष्टवान्। शूकरं बाणेन अविध्यत्, परन्तु क्रुद्धः शूकरः अपि तं व्याधं दंष्ट्रया अहन्। उभौ मृतौ।",
+    translit:"mṛgaṁ nītvā gacchan saḥ ekaṁ śūkaraṁ dṛṣṭavān; śūkaraṁ bāṇena avidhyat, parantu kruddhaḥ śūkaraḥ api taṁ vyādhaṁ daṁṣṭrayā ahan; ubhau mṛtau.",
+    words:[
+      {w:"शूकरः", m:"boar"},
+      {w:"अविध्यत्", m:"shot / pierced"},
+      {w:"दंष्ट्रया", m:"with the tusk"},
+      {w:"अहन्", m:"killed"},
+      {w:"उभौ मृतौ", m:"both died"}
+    ],
+    trans:"Carrying the deer along, he saw a boar. He shot the boar, but the enraged boar too struck the hunter with its tusk. Both died."
+  },
+  {
+    kind:"Story · 3",
+    deva:"तस्मिन् स्थले एकः क्षुधितः गोमायुः आगच्छत्। सः तत्र बहु मांसं दृष्ट्वा अतीव अहृष्यत्।",
+    translit:"tasmin sthale ekaḥ kṣudhitaḥ gomāyuḥ āgacchat; saḥ tatra bahu māṁsaṁ dṛṣṭvā atīva ahṛṣyat.",
+    words:[
+      {w:"क्षुधितः", m:"hungry"},
+      {w:"गोमायुः", m:"jackal"},
+      {w:"बहु", m:"much"},
+      {w:"मांसम्", m:"meat / flesh"},
+      {w:"अहृष्यत्", m:"rejoiced"}
+    ],
+    trans:"To that spot came a hungry jackal. Seeing so much meat there, he rejoiced greatly."
+  },
+  {
+    kind:"Story · 4",
+    deva:"लोभेन सः अचिन्तयत् — \"एतत् सर्वं मांसं क्रमेण खादिष्यामि। अधुना प्रथमं धनुषः ज्यां खादामि।\"",
+    translit:"lobhena saḥ acintayat — \"etat sarvaṁ māṁsaṁ krameṇa khādiṣyāmi; adhunā prathamaṁ dhanuṣaḥ jyāṁ khādāmi.\"",
+    words:[
+      {w:"लोभेन", m:"out of greed"},
+      {w:"क्रमेण", m:"gradually"},
+      {w:"धनुषः", m:"of the bow"},
+      {w:"ज्याम्", m:"the bowstring"},
+      {w:"खादामि", m:"I (will) eat"}
+    ],
+    trans:"Out of greed he thought: \"I shall eat all this meat little by little. For now, let me first gnaw the string of the bow.\""
+  },
+  {
+    kind:"Story · 5",
+    deva:"यदा सः ज्यां अखादत्, तदा ज्या छिन्ना। धनुः वेगेन प्रसृतम्। तस्य कोटिः गोमायोः मुखं भित्त्वा प्राणान् अहरत्। एवम् अतिलोभेन सः मृतः।",
+    translit:"yadā saḥ jyāṁ akhādat, tadā jyā chinnā; dhanuḥ vegena prasṛtam; tasya koṭiḥ gomāyoḥ mukhaṁ bhitvā prāṇān aharat; evam atilobhena saḥ mṛtaḥ.",
+    words:[
+      {w:"छिन्ना", m:"snapped / cut"},
+      {w:"वेगेन", m:"with force"},
+      {w:"कोटिः", m:"tip / end"},
+      {w:"भित्त्वा", m:"having pierced"},
+      {w:"प्राणान् अहरत्", m:"took (his) life"}
+    ],
+    trans:"When he chewed the string, it snapped. The bow sprang out with force; its tip pierced the jackal's mouth and took his life. Thus, through excessive greed, he died.",
+    moral:"The jackal already had a feast before him, yet greed made him grab for more — and that grasping cost him everything."
+  },
+  {
+    kind:"Verse · 1",
+    deva:"अतिलोभो न कर्तव्यो लोभं नैव परित्यजेत्।\nअतिलोभाभिभूतस्य चक्रं भ्रमति मस्तके॥",
+    translit:"atilobho na kartavyo lobhaṁ naiva parityajet;\natilobhābhibhūtasya cakraṁ bhramati mastake.",
+    words:[
+      {w:"अतिलोभः", m:"excessive greed"},
+      {w:"न कर्तव्यः", m:"should not be done"},
+      {w:"नैव परित्यजेत्", m:"nor abandon all desire"},
+      {w:"अभिभूतस्य", m:"of one overcome"},
+      {w:"चक्रम्", m:"wheel (of torment)"},
+      {w:"मस्तके", m:"on the head"}
+    ],
+    anvaya:"अतिलोभः न कर्तव्यः, लोभं न एव परित्यजेत्; अतिलोभ-अभिभूतस्य मस्तके चक्रं भ्रमति।",
+    trans:"One should not be excessively greedy, yet one need not renounce all wants either; upon the head of the man overpowered by excessive greed, the wheel keeps spinning.",
+    moral:"A measure of ambition is natural, but unchecked greed brings its own turning wheel of suffering. (Panchatantra — the tale of the wheel-bearer.)"
+  },
+  {
+    kind:"Verse · 2",
+    deva:"लोभात् क्रोधः प्रभवति लोभात् कामः प्रजायते।\nलोभान्मोहश्च नाशश्च लोभः पापस्य कारणम्॥",
+    translit:"lobhāt krodhaḥ prabhavati lobhāt kāmaḥ prajāyate;\nlobhān mohaśca nāśaśca lobhaḥ pāpasya kāraṇam.",
+    words:[
+      {w:"लोभात्", m:"from greed"},
+      {w:"क्रोधः", m:"anger"},
+      {w:"प्रभवति", m:"arises"},
+      {w:"कामः", m:"desire"},
+      {w:"मोहः", m:"delusion"},
+      {w:"नाशः", m:"destruction"},
+      {w:"पापस्य कारणम्", m:"the cause of sin"}
+    ],
+    anvaya:"लोभात् क्रोधः प्रभवति, लोभात् कामः प्रजायते, लोभात् मोहः च नाशः च (भवतः); लोभः पापस्य कारणम् (अस्ति)।",
+    trans:"From greed anger arises; from greed desire is born; from greed come delusion and destruction. Greed is the root of sin.",
+    moral:"Greed is the seed of every vice — anger, craving, confusion and ruin all sprout from it."
+  },
+  {
+    kind:"Verse · 3",
+    deva:"सन्तोषामृततृप्तानां यत्सुखं शान्तचेतसाम्।\nन च तद्धनलुब्धानामितश्चेतश्च धावताम्॥",
+    translit:"santoṣāmṛta-tṛptānāṁ yat sukhaṁ śānta-cetasām;\nna ca tad dhana-lubdhānām itaścetaśca dhāvatām.",
+    words:[
+      {w:"सन्तोष", m:"contentment"},
+      {w:"अमृत", m:"nectar"},
+      {w:"तृप्तानाम्", m:"of the satisfied"},
+      {w:"शान्तचेतसाम्", m:"of the peaceful-minded"},
+      {w:"धनलुब्धानाम्", m:"of the wealth-greedy"},
+      {w:"इतश्चेतश्च", m:"here and there"},
+      {w:"धावताम्", m:"of those running"}
+    ],
+    anvaya:"सन्तोष-अमृत-तृप्तानां शान्तचेतसां यत् सुखम् (अस्ति), तत् इतः च ततः च धावतां धनलुब्धानां न (भवति)।",
+    trans:"The happiness of the peaceful-minded who are satisfied by the nectar of contentment is not found among the wealth-greedy who keep running about here and there.",
+    moral:"Contentment gives a calm joy that restless wealth-chasing can never buy. (Attributed to Bhartṛhari's Vairāgya-śatakam.)"
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderVerse(){
+  var v = CARDS[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+esc(x.m)+'</span></span>';
+  }).join("");
+  var devaHtml = esc(v.deva).replace(/\n/g,"<br>");
+  var html =
+    '<span class="kind-tag">'+esc(v.kind)+'</span>'+
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+esc(v.translit)+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>';
+  if(v.anvaya){
+    html += '<div class="anvaya-box"><div class="block-label">अन्वयः &middot; Prose Order</div>'+
+            '<span class="deva-in">'+esc(v.anvaya)+'</span></div>';
+  }
+  html += '<div class="trans-box"><div class="block-label">Translation</div>'+esc(v.trans)+'</div>';
+  if(v.moral){
+    html += '<div class="moral-box"><div class="block-label">'+(v.kind.indexOf("Verse")===0?"Moral":"Note")+'</div>'+esc(v.moral)+'</div>';
+  }
+  verseCard.innerHTML = html;
+  verseCount.textContent = "Card "+(vIndex+1)+" of "+CARDS.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===CARDS.length-1);
+  var d = "";
+  for(var i=0;i<CARDS.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<CARDS.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"लोभः", m:"greed"},
+  {w:"सन्तोषः", m:"contentment"},
+  {w:"धनम्", m:"wealth"},
+  {w:"अति", m:"excessive"},
+  {w:"विनाशः", m:"destruction"},
+  {w:"तृष्णा", m:"craving"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+esc(p.m)+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    stem:'In the fable, what did the greedy jackal (<span class="deva-in">गोमायुः</span>) try to eat <b>first</b>, before the meat?',
+    options:[
+      {t:'The string of the bow (<span class="deva-in">धनुषः ज्या</span>)', ok:true},
+      {t:'The flesh of the deer (<span class="deva-in">मृगमांसम्</span>)', ok:false},
+      {t:'The flesh of the boar (<span class="deva-in">शूकरमांसम्</span>)', ok:false}
+    ],
+    explain:"He wanted to save the meat for later and greedily gnawed the bowstring first. When it snapped, the bow sprang and its tip pierced his mouth — <b>अतिलोभेन सः मृतः</b>."
+  },
+  {
+    stem:'What is the meaning of the word <span class="deva-in">सन्तोषः</span>?',
+    options:[
+      {t:'Contentment', ok:true},
+      {t:'Greed', ok:false},
+      {t:'Anger', ok:false}
+    ],
+    explain:"<b>सन्तोषः</b> means contentment. Verse 3 praises the calm joy of those satisfied by the nectar of contentment (<b>सन्तोषामृततृप्तानाम्</b>), unlike the restless greedy."
+  },
+  {
+    stem:'According to the verse <span class="deva-in">लोभात् क्रोधः प्रभवति...</span>, greed (<span class="deva-in">लोभः</span>) is called what?',
+    options:[
+      {t:'The cause of sin (<span class="deva-in">पापस्य कारणम्</span>)', ok:true},
+      {t:'The cause of happiness (<span class="deva-in">सुखस्य कारणम्</span>)', ok:false},
+      {t:'The cause of dharma (<span class="deva-in">धर्मस्य कारणम्</span>)', ok:false}
+    ],
+    explain:"The verse ends <b>लोभः पापस्य कारणम्</b> — greed is the root of sin, since anger, desire, delusion and destruction all arise from it."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-stem">'+q.stem+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var i = parseInt(b.dataset.i, 10);
+    if(q.options[i].ok) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

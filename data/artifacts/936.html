@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>यदि जानासि तद् वद | Yadi Janasi Tad Vada — Knowledge &amp; Speech</title>
+<style>
+  :root{
+    --accent:#e0a458;
+    --accent-soft:#3a3020;
+    --accent-dark:#f4c07a;
+    --bg:#181510;
+    --panel:#221d16;
+    --panel2:#2b2418;
+    --ink:#f0e9dc;
+    --muted:#b6a98f;
+    --good:#7fd6a0;
+    --good-soft:#233327;
+    --bad:#e88a8a;
+    --bad-soft:#3a2323;
+    --line:#3a3226;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(165deg,#181510 0%,#221d16 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:840px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:16px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6.5vw,2.5rem);color:var(--accent-dark);line-height:1.3;}
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:4px 0;
+    color:var(--accent);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel2);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#221d16;box-shadow:0 4px 14px rgba(224,164,88,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Story ---- */
+  .story-intro{
+    background:var(--accent-soft);border-radius:14px;padding:14px 16px;
+    font-size:.94rem;margin-bottom:16px;border:1px solid var(--line);
+  }
+  .dlg{margin-bottom:14px;}
+  .dlg-line{
+    background:var(--panel2);border-radius:14px;padding:12px 14px;
+    border:1px solid var(--line);margin-bottom:8px;
+  }
+  .dlg-line.guru{border-left:4px solid var(--accent);}
+  .dlg-line.pandit{border-left:4px solid var(--bad);}
+  .dlg-line.boy{border-left:4px solid var(--good);}
+  .speaker{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;margin-bottom:4px;}
+  .dlg-deva{font-family:var(--deva);font-size:1.2rem;color:var(--ink);line-height:1.6;}
+  .dlg-tr{font-style:italic;color:var(--muted);font-size:.85rem;margin-top:3px;}
+  .dlg-en{color:var(--ink);font-size:.9rem;margin-top:3px;}
+
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{background:var(--accent-soft);border-radius:18px;padding:20px 18px;border:1px solid var(--line);}
+  .verse-deva{
+    font-family:var(--deva);font-size:clamp(1.3rem,5vw,1.85rem);
+    line-height:1.75;text-align:center;color:var(--accent-dark);margin-bottom:6px;
+  }
+  .verse-translit{text-align:center;font-style:italic;color:var(--muted);font-size:.92rem;margin-bottom:16px;}
+  .block-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;margin-bottom:6px;}
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:.9rem;}
+  .shabda-chip b{font-family:var(--deva);font-size:1.08rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box,.anvaya-box{
+    background:var(--panel2);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.94rem;
+  }
+  .anvaya-box .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .moral-box{background:var(--good-soft);border-color:#2f4d38;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#221d16;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--accent-soft);color:var(--accent-dark);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;padding:12px 8px;margin-bottom:10px;
+    background:var(--panel2);font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(224,164,88,.2);}
+  .word-item.done,.mean-item.done{border-color:#2f4d38;background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2f4d38;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-q{
+    font-size:1.02rem;line-height:1.6;background:var(--accent-soft);
+    border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid var(--line);
+  }
+  .quiz-q .deva-inline{font-family:var(--deva);color:var(--accent-dark);font-size:1.15rem;}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    text-align:left;border:2px solid var(--line);background:var(--panel2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;font-size:.95rem;transition:.15s;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2f4d38;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">यदि जानासि तद् वद</div>
+    <h1>Yadi Jānāsi Tad Vada — "If you know, then speak"</h1>
+    <p>NIOS Class 12 Sanskrit · Chapter 2 · True Knowledge vs. Empty Boasting</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="story">📜 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY + VERSES ============ -->
+  <section class="mode active" id="story">
+    <div class="panel">
+      <h2 class="mode-title">Story: The Boastful Pandit</h2>
+      <p class="mode-sub">A learned-sounding scholar is gently humbled by a village boy — read the dialogue, then explore the verses.</p>
+      <div class="story-intro">
+        A famous पण्डित (pandit) travels village to village boasting of his learning. One evening he meets a simple गोपालकः (cowherd boy). The pandit, proud of his big words, decides to test — and mock — the boy. But the boy answers with quiet, practical wisdom. The theme: <b>यदि जानासि तद् वद</b> — speak only what you truly know; empty boasting is not knowledge.
+      </div>
+
+      <div class="dlg">
+        <div class="dlg-line pandit">
+          <div class="speaker">पण्डितः · The Pandit</div>
+          <div class="dlg-deva">बालक! अहं सर्वशास्त्राणि जानामि। किं त्वं किमपि जानासि?</div>
+          <div class="dlg-tr">bālaka! ahaṁ sarva-śāstrāṇi jānāmi. kiṁ tvaṁ kim api jānāsi?</div>
+          <div class="dlg-en">"Boy! I know all the scriptures. Do you know anything at all?"</div>
+        </div>
+        <div class="dlg-line boy">
+          <div class="speaker">गोपालकः · The Cowherd Boy</div>
+          <div class="dlg-deva">आर्य! अहम् अल्पं जानामि। यदि जानामि तदेव वदामि, न मृषा।</div>
+          <div class="dlg-tr">ārya! aham alpaṁ jānāmi. yadi jānāmi tad eva vadāmi, na mṛṣā.</div>
+          <div class="dlg-en">"Sir, I know little. What I know, that alone I say — never falsely."</div>
+        </div>
+        <div class="dlg-line pandit">
+          <div class="speaker">पण्डितः · The Pandit</div>
+          <div class="dlg-deva">तर्हि वद — केन विना जीवनं न सम्भवति?</div>
+          <div class="dlg-tr">tarhi vada — kena vinā jīvanaṁ na sambhavati?</div>
+          <div class="dlg-en">"Then tell me — without what is life not possible?"</div>
+        </div>
+        <div class="dlg-line boy">
+          <div class="speaker">गोपालकः · The Cowherd Boy</div>
+          <div class="dlg-deva">जलेन विना, आर्य। जलम् एव जीवनम्। एतत् अहं प्रतिदिनं पश्यामि।</div>
+          <div class="dlg-tr">jalena vinā, ārya. jalam eva jīvanam. etat ahaṁ pratidinaṁ paśyāmi.</div>
+          <div class="dlg-en">"Without water, sir. Water itself is life — this I see every day."</div>
+        </div>
+        <div class="dlg-line guru">
+          <div class="speaker">पण्डितः → नम्रः · The Pandit, humbled</div>
+          <div class="dlg-deva">साधु बालक! तव अल्पं ज्ञानं सत्यम्। मम बहु वचनं तु मदमात्रम्। विद्या विनयं ददाति — इदम् अद्य अवगच्छामि।</div>
+          <div class="dlg-tr">sādhu bālaka! tava alpaṁ jñānaṁ satyam. mama bahu vacanaṁ tu mada-mātram. vidyā vinayaṁ dadāti — idam adya avagacchāmi.</div>
+          <div class="dlg-en">"Well said, boy! Your little knowledge is true; my many words were mere pride. Knowledge gives humility — today I understand this."</div>
+        </div>
+      </div>
+
+      <div class="block-label">🪔 Moral of the Dialogue</div>
+      <div class="moral-box" style="margin-top:6px;">
+        Real knowledge is shown in truthful, useful speech — not in a flood of proud words. <b style="font-family:var(--deva);color:var(--good);">यदि जानासि तद् वद</b>: speak when you truly know, stay humble when you do not.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="mode-title">Verse Explorer</h2>
+      <p class="mode-sub">Authentic public-domain सुभाषितानि on knowledge and speech, with शब्दार्थ, अन्वय &amp; moral.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to pair them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 साधु! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Three questions on the dialogue and the verses. Pick an answer to reveal the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Sanskrit सुभाषितानि · Original dialogue in simple Sanskrit · Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- VERSE DATA ---------------- */
+var VERSES = [
+  {
+    deva: "विद्या विवादाय धनं मदाय शक्तिः परेषां परिपीडनाय।<br>खलस्य साधोर्विपरीतमेतद् ज्ञानाय दानाय च रक्षणाय॥",
+    translit: "vidyā vivādāya dhanaṁ madāya śaktiḥ pareṣāṁ paripīḍanāya; khalasya sādhor viparītam etad jñānāya dānāya ca rakṣaṇāya",
+    words: [
+      {w:"विद्या", m:"knowledge, learning"},
+      {w:"विवादाय", m:"for quarrel / argument"},
+      {w:"मदाय", m:"for pride / arrogance"},
+      {w:"खलस्य", m:"of a wicked person"},
+      {w:"साधोः", m:"of a good person"},
+      {w:"विपरीतम्", m:"the opposite"}
+    ],
+    anvaya: '<span class="deva-inline">खलस्य</span> (for the wicked) विद्या → विवादाय, धनं → मदाय, शक्तिः → परेषां परिपीडनाय; <span class="deva-inline">साधोः</span> (for the good) एतद् विपरीतम् → ज्ञानाय, दानाय, रक्षणाय च।',
+    trans: "For the wicked, learning is for quarrel, wealth for arrogance, power for harming others; for the good, these very things are the opposite — for knowledge, for charity, and for protecting others.",
+    moral: "The same knowledge, wealth and power become good or bad depending on the person. True learning should lead to wisdom and humility, not empty argument and pride."
+  },
+  {
+    deva: "आत्मनो मुखदोषेण बध्यन्ते शुकसारिकाः।<br>बकास्तत्र न बध्यन्ते मौनं सर्वार्थसाधनम्॥",
+    translit: "ātmano mukha-doṣeṇa badhyante śuka-sārikāḥ; bakās tatra na badhyante maunaṁ sarvārtha-sādhanam",
+    words: [
+      {w:"आत्मनः", m:"of oneself, one's own"},
+      {w:"मुखदोषेण", m:"by the fault of the mouth (speech)"},
+      {w:"बध्यन्ते", m:"are caught / bound"},
+      {w:"शुकसारिकाः", m:"parrots and mynah birds"},
+      {w:"बकाः", m:"cranes (silent birds)"},
+      {w:"मौनम्", m:"silence"}
+    ],
+    anvaya: 'शुकसारिकाः <span class="deva-inline">आत्मनः मुखदोषेण</span> बध्यन्ते; बकाः तत्र न बध्यन्ते; <span class="deva-inline">मौनं सर्वार्थसाधनम्</span> (silence accomplishes all aims)।',
+    trans: "Parrots and mynahs are caught because of the fault of their own mouths (their chatter); cranes are not caught there. Silence is the means of accomplishing all purposes.",
+    moral: "Needless talk brings trouble; those who speak only when needed stay safe. Guard your speech — say the right thing at the right time, and know when silence is wiser."
+  },
+  {
+    deva: "सत्यं ब्रूयात् प्रियं ब्रूयात् न ब्रूयात् सत्यमप्रियम्।<br>प्रियं च नानृतं ब्रूयात् एष धर्मः सनातनः॥",
+    translit: "satyaṁ brūyāt priyaṁ brūyāt na brūyāt satyam apriyam; priyaṁ ca nānṛtaṁ brūyāt eṣa dharmaḥ sanātanaḥ",
+    words: [
+      {w:"सत्यम्", m:"the truth"},
+      {w:"ब्रूयात्", m:"one should speak"},
+      {w:"प्रियम्", m:"what is pleasant / kind"},
+      {w:"अप्रियम्", m:"unpleasant, hurtful"},
+      {w:"अनृतम्", m:"untruth, falsehood"},
+      {w:"सनातनः", m:"eternal, ancient"}
+    ],
+    anvaya: '<span class="deva-inline">सत्यं ब्रूयात्, प्रियं ब्रूयात्</span>; सत्यम् अप्रियं न ब्रूयात्; प्रियं च <span class="deva-inline">अनृतं न ब्रूयात्</span>; एष सनातनः धर्मः।',
+    trans: "Speak the truth, speak what is pleasant; do not speak an unpleasant truth, and do not speak a pleasant falsehood — this is the eternal law (dharma).",
+    moral: "Speech should be both true and kind. Do not wound others with harsh truth, and never flatter with lies. This balance of truth and kindness is timeless dharma — the heart of 'यदि जानासि तद् वद'."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: VERSE EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ · Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="anvaya-box"><div class="block-label">अन्वय · Prose Order</div>'+v.anvaya+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">Moral</div>'+v.moral+'</div>';
+  verseCount.textContent = "Verse "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"विद्या", m:"knowledge"},
+  {w:"मदः", m:"pride / arrogance"},
+  {w:"मौनम्", m:"silence"},
+  {w:"सत्यम्", m:"truth"},
+  {w:"अप्रियम्", m:"unpleasant"},
+  {w:"जलम्", m:"water"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched! साधु!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'In the dialogue, why does the cowherd boy say <span class="deva-inline">जलम् एव जीवनम्</span> ("water itself is life")?',
+    options:[
+      'Because he has read all the scriptures like the pandit',
+      'Because he speaks only from what he truly sees and knows each day',
+      'Because he wants to argue and defeat the pandit',
+      'Because the pandit told him the right answer'
+    ],
+    answer:1,
+    explain:'The boy follows <b>यदि जानासि तद् वद</b> — he answers from his own daily experience (<b>प्रतिदिनं पश्यामि</b>), speaking only what he truly knows, not borrowed or boastful words.'
+  },
+  {
+    q:'The verse <span class="deva-inline">विद्या विवादाय धनं मदाय...</span> teaches that knowledge and wealth:',
+    options:[
+      'Are always harmful and should be avoided',
+      'Turn to quarrel and pride in the wicked, but to wisdom and charity in the good',
+      'Belong only to pandits and scholars',
+      'Are the same for every person'
+    ],
+    answer:1,
+    explain:'For the <b>खल</b> (wicked), <b>विद्या विवादाय, धनं मदाय</b>; for the <b>साधु</b> (good), the very same become <b>ज्ञानाय, दानाय, रक्षणाय</b>. The person decides whether learning brings pride or humility.'
+  },
+  {
+    q:'According to <span class="deva-inline">सत्यं ब्रूयात् प्रियं ब्रूयात्...</span>, one should NOT speak:',
+    options:[
+      'The truth, ever',
+      'Anything pleasant',
+      'An unpleasant truth, nor a pleasant falsehood',
+      'To elders or teachers'
+    ],
+    answer:2,
+    explain:'The eternal dharma: <b>न ब्रूयात् सत्यम् अप्रियम्</b> (do not speak hurtful truth) and <b>प्रियं च न अनृतं ब्रूयात्</b> (do not speak pleasant lies). Speech must be both true and kind.'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i, 10);
+    if(bi === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
