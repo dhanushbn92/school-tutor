@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>करुणापरा हि साधवः | Karuna Learning Game</title>
+<style>
+  :root{
+    --accent:#e08a3c;
+    --accent-soft:#f8ecdb;
+    --accent-dark:#b3611c;
+    --bg:#1e1a24;
+    --panel:#2a2530;
+    --panel-2:#332c3c;
+    --ink:#f2ece4;
+    --muted:#b3a9bd;
+    --good:#5fca9a;
+    --good-soft:#24382f;
+    --bad:#e57389;
+    --bad-soft:#3a2530;
+    --line:#403748;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1e1a24 0%,#241e2b 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.6vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--accent);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#25202b;box-shadow:0 4px 12px rgba(224,138,60,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.30);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Story / Verse Explorer ---- */
+  .seg{
+    display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .seg-btn{
+    border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    padding:6px 14px;border-radius:999px;cursor:pointer;font-size:.82rem;font-weight:600;
+  }
+  .seg-btn.active{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .card-tag{
+    display:inline-block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:10px;
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,5vw,1.8rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.95rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#2f5745;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#25202b;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);box-shadow:0 0 0 3px rgba(224,138,60,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#2f5745;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);color:var(--accent-dark);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2f5745;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.1rem,4.4vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--accent);
+    background:var(--accent-soft);color:var(--accent-dark);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .q-text{font-size:1.02rem;margin-bottom:14px;line-height:1.55;}
+  .q-text .deva{font-family:var(--deva);color:var(--accent);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:1rem;text-align:left;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+  }
+  .opt-btn .deva{font-family:var(--deva);color:var(--accent);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2f5745;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.15rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">करुणापरा हि साधवः</div>
+    <h1>Karunapara Hi Sadhavah &middot; The Compassionate Sages</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 13 &middot; King Shibi &amp; the Dove</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY + VERSES ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story &amp; Verse Explorer</h2>
+      <p class="mode-sub">Follow King Shibi&rsquo;s tale of compassion, then read verses on करुणा (compassion) and परोपकार (helping others).</p>
+      <div class="seg">
+        <button class="seg-btn active" data-seg="story">🕊️ The Story</button>
+        <button class="seg-btn" data-seg="verse">🪷 Verses</button>
+      </div>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer questions on the story, the verses, and their moral. Read the explanation after each.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Sanskrit &middot; The Shibi legend (Mahabharata) &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: STORY CARDS ---------------- */
+var STORY = [
+  {
+    tag:"Card 1 · परिचयः (Introduction)",
+    deva:"पुरा शिबिः नाम राजा आसीत्। सः अतीव दयालुः धार्मिकः च आसीत्।",
+    translit:"purā śibiḥ nāma rājā āsīt. saḥ atīva dayāluḥ dhārmikaḥ ca āsīt.",
+    words:[
+      {w:"पुरा", m:"long ago"},
+      {w:"राजा", m:"king"},
+      {w:"दयालुः", m:"compassionate"},
+      {w:"धार्मिकः", m:"righteous"}
+    ],
+    trans:"Long ago there was a king named Shibi. He was very compassionate and righteous.",
+    moral:"A true king is known not by power, but by his kindness (दया)."
+  },
+  {
+    tag:"Card 2 · कपोतस्य आगमनम् (The Dove Arrives)",
+    deva:"एकदा भीतः कपोतः राज्ञः अङ्के अपतत्। श्येनात् त्रातुम् सः शरणम् अयाचत।",
+    translit:"ekadā bhītaḥ kapotaḥ rājñaḥ aṅke apatat. śyenāt trātum saḥ śaraṇam ayācata.",
+    words:[
+      {w:"कपोतः", m:"dove"},
+      {w:"श्येनात्", m:"from the hawk"},
+      {w:"शरणम्", m:"refuge / shelter"},
+      {w:"अयाचत", m:"asked / begged"}
+    ],
+    trans:"One day a frightened dove fell into the king's lap. To be saved from a hawk, it begged for refuge.",
+    moral:"One who seeks shelter (शरणागत) must always be protected."
+  },
+  {
+    tag:"Card 3 · श्येनस्य वादः (The Hawk's Claim)",
+    deva:"श्येनः अवदत् — “अयम् कपोतः मम आहारः। एनम् मह्यम् देहि, राजन्।”",
+    translit:"śyenaḥ avadat — “ayam kapotaḥ mama āhāraḥ. enam mahyam dehi, rājan.”",
+    words:[
+      {w:"श्येनः", m:"hawk"},
+      {w:"आहारः", m:"food"},
+      {w:"देहि", m:"give"},
+      {w:"राजन्", m:"O king"}
+    ],
+    trans:"The hawk said: “This dove is my food. Give it to me, O king.”",
+    moral:"Every creature has needs; a wise judge must weigh both sides fairly."
+  },
+  {
+    tag:"Card 4 · राज्ञः निश्चयः (The King's Resolve)",
+    deva:"राजा अवदत् — “शरणागतम् न त्यजामि। तव आहारार्थम् स्वमांसम् दास्यामि।”",
+    translit:"rājā avadat — “śaraṇāgatam na tyajāmi. tava āhārārtham svamāṁsam dāsyāmi.”",
+    words:[
+      {w:"शरणागतम्", m:"one who has sought refuge"},
+      {w:"न त्यजामि", m:"I do not abandon"},
+      {w:"स्वमांसम्", m:"my own flesh"},
+      {w:"दास्यामि", m:"I will give"}
+    ],
+    trans:"The king said: “I will not abandon one who has sought refuge. For your food I will give my own flesh.”",
+    moral:"Compassion means being ready to sacrifice one's own comfort for another."
+  },
+  {
+    tag:"Card 5 · त्यागः (The Sacrifice)",
+    deva:"राजा तुलायाम् कपोतस्य तुल्यम् स्वमांसम् आरोपयत्। सः पीडाम् अगणयत्।",
+    translit:"rājā tulāyām kapotasya tulyam svamāṁsam āropayat. saḥ pīḍām agaṇayat.",
+    words:[
+      {w:"तुलायाम्", m:"on the balance / scale"},
+      {w:"तुल्यम्", m:"equal (in weight)"},
+      {w:"आरोपयत्", m:"placed"},
+      {w:"अगणयत्", m:"did not count / ignored"}
+    ],
+    trans:"The king placed on the scale his own flesh equal to the dove's weight. He paid no heed to the pain.",
+    moral:"A great soul values dharma and another's life above his own body."
+  },
+  {
+    tag:"Card 6 · देवपरीक्षा (The Gods' Test)",
+    deva:"वस्तुतः श्येनः कपोतः च देवौ आस्ताम्। तौ राज्ञः करुणाम् अपूजयताम्।",
+    translit:"vastutaḥ śyenaḥ kapotaḥ ca devau āstām. tau rājñaḥ karuṇām apūjayatām.",
+    words:[
+      {w:"वस्तुतः", m:"in truth"},
+      {w:"देवौ", m:"two gods"},
+      {w:"करुणाम्", m:"compassion"},
+      {w:"अपूजयताम्", m:"honoured / praised"}
+    ],
+    trans:"In truth, the hawk and the dove were two gods (Indra and Agni). They honoured the king's compassion.",
+    moral:"करुणापरा हि साधवः — the virtuous are indeed full of compassion, and dharma always triumphs."
+  }
+];
+
+/* ---------------- DATA: VERSES ---------------- */
+var VERSES = [
+  {
+    tag:"Verse 1 · परोपकारः (Selfless Service)",
+    deva:"परोपकाराय फलन्ति वृक्षाः परोपकाराय वहन्ति नद्यः।\nपरोपकाराय दुहन्ति गावः परोपकारार्थमिदं शरीरम्॥",
+    translit:"paropakārāya phalanti vṛkṣāḥ paropakārāya vahanti nadyaḥ;\nparopakārāya duhanti gāvaḥ paropakārārtham idaṁ śarīram",
+    words:[
+      {w:"परोपकाराय", m:"for helping others"},
+      {w:"फलन्ति", m:"bear fruit"},
+      {w:"वहन्ति", m:"flow"},
+      {w:"शरीरम्", m:"this body"}
+    ],
+    trans:"Trees bear fruit for others; rivers flow for others; cows give milk for others — this body too is meant for the good of others.",
+    moral:"All of nature lives to serve; a human life is truly fulfilled through परोपकार (service to others)."
+  },
+  {
+    tag:"Verse 2 · पुण्यम् एवं पापम् (Merit and Sin)",
+    deva:"अष्टादशपुराणेषु व्यासस्य वचनद्वयम्।\nपरोपकारः पुण्याय पापाय परपीडनम्॥",
+    translit:"aṣṭādaśapurāṇeṣu vyāsasya vacanadvayam;\nparopakāraḥ puṇyāya pāpāya parapīḍanam",
+    words:[
+      {w:"पुराणेषु", m:"in the Puranas"},
+      {w:"पुण्याय", m:"leads to merit"},
+      {w:"पापाय", m:"leads to sin"},
+      {w:"परपीडनम्", m:"harming others"}
+    ],
+    trans:"In all eighteen Puranas, Vyasa gave two teachings: helping others leads to merit; harming others leads to sin.",
+    moral:"The whole essence of dharma: do good to others, and never cause them pain."
+  },
+  {
+    tag:"Verse 3 · समदृष्टिः (Seeing All as Equal)",
+    deva:"मातृवत् परदारेषु परद्रव्येषु लोष्टवत्।\nआत्मवत् सर्वभूतेषु यः पश्यति स पण्डितः॥",
+    translit:"mātṛvat paradāreṣu paradravyeṣu loṣṭavat;\nātmavat sarvabhūteṣu yaḥ paśyati sa paṇḍitaḥ",
+    words:[
+      {w:"मातृवत्", m:"like one's mother"},
+      {w:"लोष्टवत्", m:"like a clod of earth"},
+      {w:"आत्मवत्", m:"like one's own self"},
+      {w:"सर्वभूतेषु", m:"in all beings"}
+    ],
+    trans:"One who sees others' wives as a mother, others' wealth as a lump of clay, and all beings as his own self — he is truly wise.",
+    moral:"True wisdom is compassion: treating every being as you would treat yourself."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: STORY + VERSES ---------------- */
+var curSet = STORY;
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+var segBtns = document.querySelectorAll(".seg-btn");
+
+segBtns.forEach(function(b){
+  b.addEventListener("click", function(){
+    segBtns.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    curSet = (b.dataset.seg === "verse") ? VERSES : STORY;
+    vIndex = 0;
+    renderVerse();
+  });
+});
+
+function renderVerse(){
+  var v = curSet[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  var devaHtml = v.deva.split("\n").join("<br>");
+  var translitHtml = v.translit.split("\n").join("<br>");
+  verseCard.innerHTML =
+    '<span class="card-tag">'+v.tag+'</span>'+
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+translitHtml+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">Moral</div>'+v.moral+'</div>';
+  var label = (curSet === STORY) ? "Card" : "Verse";
+  verseCount.textContent = label+" "+(vIndex+1)+" of "+curSet.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===curSet.length-1);
+  var d = "";
+  for(var i=0;i<curSet.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<curSet.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"करुणा", m:"compassion"},
+  {w:"साधुः", m:"virtuous person"},
+  {w:"कपोतः", m:"dove"},
+  {w:"श्येनः", m:"hawk"},
+  {w:"शरणम्", m:"refuge"},
+  {w:"परोपकारः", m:"helping others"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'Which creature sought refuge in King Shibi’s lap, and from whom?',
+    verse:"कपोतः vs श्येनः",
+    options:[
+      {t:'A <span class="deva">कपोतः</span> (dove), fleeing a <span class="deva">श्येनः</span> (hawk)', ok:true},
+      {t:'A <span class="deva">श्येनः</span> (hawk), fleeing a <span class="deva">कपोतः</span> (dove)', ok:false},
+      {t:'A <span class="deva">गौः</span> (cow), fleeing a <span class="deva">व्याघ्रः</span> (tiger)', ok:false}
+    ],
+    explain:'The frightened <b>कपोतः</b> (dove) fell into the king’s lap begging <b>शरणम्</b> (refuge) from the pursuing <b>श्येनः</b> (hawk). Protecting the शरणागत (refuge-seeker) is the heart of the tale.'
+  },
+  {
+    q:'What did King Shibi offer so the hawk would not go hungry?',
+    verse:"स्वमांसम्",
+    options:[
+      {t:'His kingdom and treasure', ok:false},
+      {t:'His own flesh (<span class="deva">स्वमांसम्</span>), equal to the dove’s weight', ok:true},
+      {t:'Another, larger dove', ok:false}
+    ],
+    explain:'The king said “<b>शरणागतम् न त्यजामि</b>” — I will not abandon one who seeks refuge — and weighed out his own <b>स्वमांसम्</b> (flesh) on the balance, ignoring the pain. Compassion ready for self-sacrifice.'
+  },
+  {
+    q:'The verse <span class="deva">परोपकारः पुण्याय पापाय परपीडनम्</span> teaches that…',
+    verse:"परोपकारः पुण्याय पापाय परपीडनम्",
+    options:[
+      {t:'Helping others brings merit; harming others brings sin', ok:true},
+      {t:'Wealth brings happiness; poverty brings sorrow', ok:false},
+      {t:'Only kings can practise dharma', ok:false}
+    ],
+    explain:'Vyasa’s two-line summary of all the Puranas: <b>परोपकारः पुण्याय</b> (service to others = merit) and <b>पापाय परपीडनम्</b> (hurting others = sin). This is exactly the करुणा Shibi lived by — <b>करुणापरा हि साधवः</b>, the virtuous are full of compassion.'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.verse+'</div>'+
+    '<div class="q-text">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i,10);
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

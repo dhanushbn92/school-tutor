@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ईशः क्व अस्ति &middot; Where is God? | Sanskrit Learning Game</title>
+<style>
+  :root{
+    --accent:#e0a53c;
+    --accent-soft:#3a3320;
+    --accent-dark:#f2c368;
+    --bg:#181622;
+    --panel:#221f30;
+    --panel-2:#2b2740;
+    --ink:#ece9f5;
+    --muted:#a49fbb;
+    --good:#4fd39a;
+    --good-soft:#1f3a2e;
+    --bad:#f2718c;
+    --bad-soft:#3a2028;
+    --line:#38344c;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(165deg,#181622 0%,#211c2e 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6.5vw,2.5rem);color:var(--accent-dark);line-height:1.3;}
+  header.top h1{
+    font-size:clamp(1.1rem,4.2vw,1.6rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#1a1508;box-shadow:0 4px 14px rgba(224,165,60,.35);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  .seg{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+  .seg-btn{
+    border:1px solid var(--line);background:var(--panel-2);color:var(--muted);
+    padding:7px 13px;border-radius:999px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .seg-btn:hover{color:var(--accent-dark);}
+  .seg-btn.active{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+
+  /* ---- Card Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .card-tag{
+    display:inline-block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:3px 10px;border-radius:999px;margin-bottom:12px;font-weight:700;
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.35rem,5.2vw,1.95rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent-dark);
+    margin-bottom:8px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .speaker{
+    font-size:.78rem;font-weight:700;color:var(--accent);
+    text-align:center;margin-bottom:4px;letter-spacing:.03em;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.88rem;color:var(--ink);
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.08rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.94rem;
+  }
+  .trans-box .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .moral-box{background:var(--good-soft);border-color:#2c5343;}
+  .moral-box .block-label{color:var(--good);}
+  .src-note{font-size:.78rem;color:var(--muted);text-align:center;margin-top:6px;font-style:italic;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#1a1508;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.28rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(224,165,60,.2);}
+  .word-item.done,.mean-item.done{
+    border-color:#2c5343;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2c5343;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.6vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--accent-dark);
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:14px;
+  }
+  .q-text{font-size:1rem;margin-bottom:14px;color:var(--ink);}
+  .opt-col{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+    text-align:left;font-size:.95rem;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2c5343;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;color:var(--ink);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;line-height:1.6;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">ईशः क्व अस्ति?</div>
+    <h1>Where is God? &middot; The Divine Dwells Everywhere</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 15 &middot; Ishah Kva Asti</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story &amp; Verse Explorer</h2>
+      <p class="mode-sub">A guru-shishya dialogue on God's omnipresence, followed by classical verses. Read each card, its word meanings, and its meaning.</p>
+      <div class="seg">
+        <button class="seg-btn active" data-deck="story">🌱 The Dialogue</button>
+        <button class="seg-btn" data-deck="verse">🕉️ Classical Verses</button>
+      </div>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer questions on the dialogue and verses, then reveal the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Verses from the Isha Upanishad &amp; Bhagavad Gita (public domain).<br>
+    Word meanings simplified for learners &middot; Secular-educational, cultural context.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: STORY DECK ---------------- */
+/* A short retold guru-shishya dialogue (in simple Sanskrit) on omnipresence,
+   built around the classic "salt dissolved in water" idea from the
+   Chandogya Upanishad (Uddalaka & Shvetaketu). Retold, not a direct quote. */
+var STORY = [
+  {
+    tag:"संवादः 1 · Dialogue",
+    speaker:"शिष्यः · The Student",
+    deva:"गुरो, ईशः क्व अस्ति? अहं तं द्रष्टुम् इच्छामि।",
+    translit:"guro, īśaḥ kva asti? ahaṁ taṁ draṣṭum icchāmi.",
+    words:[
+      {w:"गुरो", m:"O teacher (address)"},
+      {w:"ईशः", m:"the Lord / God"},
+      {w:"क्व", m:"where"},
+      {w:"द्रष्टुम्", m:"to see"},
+      {w:"इच्छामि", m:"I wish"}
+    ],
+    trans:"O teacher, where is God? I wish to see Him.",
+    moral:"The student begins with a natural question: if God exists, where can He be found?"
+  },
+  {
+    tag:"संवादः 2 · Dialogue",
+    speaker:"गुरुः · The Teacher",
+    deva:"वत्स, इदम् उदकं गृहाण, तत्र लवणं क्षिप।",
+    translit:"vatsa, idam udakaṁ gṛhāṇa, tatra lavaṇaṁ kṣipa.",
+    words:[
+      {w:"वत्स", m:"dear child"},
+      {w:"उदकम्", m:"water"},
+      {w:"गृहाण", m:"take / hold"},
+      {w:"लवणम्", m:"salt"},
+      {w:"क्षिप", m:"put / drop"}
+    ],
+    trans:"Dear child, take this water and drop some salt into it.",
+    moral:"Instead of a lecture, the teacher gives a simple experiment with water and salt."
+  },
+  {
+    tag:"संवादः 3 · Dialogue",
+    speaker:"गुरुः · The Teacher",
+    deva:"श्वः लवणं दर्शय। किं तत् पश्यसि? न दृश्यते, किन्तु आस्वादय।",
+    translit:"śvaḥ lavaṇaṁ darśaya. kiṁ tat paśyasi? na dṛśyate, kintu āsvādaya.",
+    words:[
+      {w:"श्वः", m:"tomorrow / next day"},
+      {w:"दर्शय", m:"show"},
+      {w:"पश्यसि", m:"you see"},
+      {w:"न दृश्यते", m:"is not seen"},
+      {w:"आस्वादय", m:"taste (it)"}
+    ],
+    trans:"The next day: show me the salt. Do you see it? It is not seen — but taste the water.",
+    moral:"The salt has vanished from sight, yet every drop of water is salty. It is present, though invisible."
+  },
+  {
+    tag:"संवादः 4 · Dialogue",
+    speaker:"गुरुः · The Teacher",
+    deva:"यथा लवणं जले व्याप्तम्, तथा ईशः सर्वत्र, सर्वभूतेषु च वसति।",
+    translit:"yathā lavaṇaṁ jale vyāptam, tathā īśaḥ sarvatra, sarvabhūteṣu ca vasati.",
+    words:[
+      {w:"यथा", m:"just as"},
+      {w:"व्याप्तम्", m:"pervaded / spread"},
+      {w:"तथा", m:"so too"},
+      {w:"सर्वत्र", m:"everywhere"},
+      {w:"सर्वभूतेषु", m:"in all beings"},
+      {w:"वसति", m:"dwells"}
+    ],
+    trans:"Just as salt pervades the water, so too God dwells everywhere and within all beings.",
+    moral:"God is not in one place to be 'seen' — the Divine pervades all creation, unseen yet present in everything."
+  },
+  {
+    tag:"संवादः 5 · Dialogue",
+    speaker:"गुरुः · The Teacher",
+    deva:"तस्मात् सर्वेषु भूतेषु सेवया एव ईशं पूजय।",
+    translit:"tasmāt sarveṣu bhūteṣu sevayā eva īśaṁ pūjaya.",
+    words:[
+      {w:"तस्मात्", m:"therefore"},
+      {w:"सर्वेषु", m:"in all"},
+      {w:"भूतेषु", m:"beings / creatures"},
+      {w:"सेवया", m:"through service"},
+      {w:"पूजय", m:"worship"}
+    ],
+    trans:"Therefore, worship God through service to all beings.",
+    moral:"The dialogue's heart: if God lives in all, then serving others and seeing the Divine in all creation is the truest worship."
+  }
+];
+
+/* ---------------- DATA: CLASSICAL VERSES (public domain) ---------------- */
+var VERSES = [
+  {
+    tag:"Isha Upanishad · 1",
+    source:"— Isha Upanishad, mantra 1",
+    deva:"ईशावास्यमिदं सर्वं यत्किञ्च जगत्यां जगत्।\nतेन त्यक्तेन भुञ्जीथा मा गृधः कस्यस्विद्धनम्॥",
+    translit:"īśāvāsyam idaṁ sarvaṁ yat kiñca jagatyāṁ jagat |\ntena tyaktena bhuñjīthā mā gṛdhaḥ kasya svid dhanam ||",
+    words:[
+      {w:"ईशावास्यम्", m:"pervaded / enveloped by the Lord"},
+      {w:"इदं सर्वम्", m:"all this"},
+      {w:"जगत्", m:"world / that which moves"},
+      {w:"त्यक्तेन", m:"by renunciation / letting go"},
+      {w:"भुञ्जीथाः", m:"you should enjoy / sustain yourself"},
+      {w:"मा गृधः", m:"do not covet"},
+      {w:"धनम्", m:"wealth"}
+    ],
+    trans:"All this — whatever moves in this moving world — is pervaded by the Lord. Enjoy it through renunciation; do not covet anyone's wealth.",
+    moral:"The very first mantra answers 'where is God?' — everything is filled with the Divine. So live with detachment and without greed."
+  },
+  {
+    tag:"Bhagavad Gita · 9.29",
+    source:"— Bhagavad Gita 9.29",
+    deva:"समोऽहं सर्वभूतेषु न मे द्वेष्योऽस्ति न प्रियः।\nये भजन्ति तु मां भक्त्या मयि ते तेषु चाप्यहम्॥",
+    translit:"samo'haṁ sarvabhūteṣu na me dveṣyo'sti na priyaḥ |\nye bhajanti tu māṁ bhaktyā mayi te teṣu cāpy aham ||",
+    words:[
+      {w:"समः", m:"equal / the same"},
+      {w:"अहम्", m:"I"},
+      {w:"सर्वभूतेषु", m:"among all beings"},
+      {w:"द्वेष्यः", m:"hateful / disliked"},
+      {w:"प्रियः", m:"dear / favoured"},
+      {w:"भजन्ति", m:"worship / are devoted"},
+      {w:"भक्त्या", m:"with devotion"}
+    ],
+    trans:"I am the same in all beings; none is hateful or dear to me. But those who worship me with devotion are in me, and I too am in them.",
+    moral:"The Divine dwells equally in every being, without favouritism — reinforcing that God is present in all, near to the devoted."
+  },
+  {
+    tag:"Bhagavad Gita · 6.29",
+    source:"— Bhagavad Gita 6.29",
+    deva:"सर्वभूतस्थमात्मानं सर्वभूतानि चात्मनि।\nईक्षते योगयुक्तात्मा सर्वत्र समदर्शनः॥",
+    translit:"sarvabhūtastham ātmānaṁ sarvabhūtāni cātmani |\nīkṣate yogayuktātmā sarvatra samadarśanaḥ ||",
+    words:[
+      {w:"सर्वभूतस्थम्", m:"present in all beings"},
+      {w:"आत्मानम्", m:"the Self"},
+      {w:"सर्वभूतानि", m:"all beings"},
+      {w:"ईक्षते", m:"sees / perceives"},
+      {w:"योगयुक्तात्मा", m:"one united through yoga"},
+      {w:"समदर्शनः", m:"seeing equally / evenly"}
+    ],
+    trans:"One whose mind is steadied in yoga sees the Self in all beings and all beings in the Self, viewing everything with an equal eye.",
+    moral:"True realization is seeing the same Divine everywhere — the same equal vision the teacher pointed to in the salt-and-water lesson."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var currentDeck = STORY;
+var deckName = "story";
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+var segBtns = document.querySelectorAll(".seg-btn");
+
+segBtns.forEach(function(b){
+  b.addEventListener("click", function(){
+    segBtns.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    deckName = b.dataset.deck;
+    currentDeck = (deckName === "verse") ? VERSES : STORY;
+    vIndex = 0;
+    renderVerse();
+  });
+});
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderVerse(){
+  var v = currentDeck[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+esc(x.m)+'</span></span>';
+  }).join("");
+  var devaHtml = esc(v.deva).replace(/\n/g,"<br>");
+  var speaker = v.speaker ? '<div class="speaker">'+esc(v.speaker)+'</div>' : "";
+  var source = v.source ? '<div class="src-note">'+esc(v.source)+'</div>' : "";
+  verseCard.innerHTML =
+    '<span class="card-tag">'+esc(v.tag)+'</span>'+
+    speaker+
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+esc(v.translit)+'</div>'+
+    source+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+esc(v.trans)+'</div>'+
+    '<div class="moral-box"><div class="block-label">Meaning &amp; Reflection</div>'+esc(v.moral)+'</div>';
+  var label = (deckName === "verse") ? "Verse " : "Card ";
+  verseCount.textContent = label+(vIndex+1)+" of "+currentDeck.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===currentDeck.length-1);
+  var d = "";
+  for(var i=0;i<currentDeck.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<currentDeck.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"ईशः", m:"the Lord / God"},
+  {w:"सर्वम्", m:"everything"},
+  {w:"जगत्", m:"world"},
+  {w:"सर्वभूतेषु", m:"in all beings"},
+  {w:"अन्तः", m:"within"},
+  {w:"सेवा", m:"service"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+esc(p.m)+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"In the teacher's lesson, what does the salt dissolved in water represent?",
+    options:[
+      "That God is present everywhere, though unseen — like salt spread through water",
+      "That God can only be found in temples",
+      "That water is holier than other things"
+    ],
+    answer:0,
+    explain:"Just as <b>लवणम्</b> (salt) pervades every drop of water yet cannot be seen, God pervades all creation — present everywhere, invisible to the eye."
+  },
+  {
+    q:"The Isha Upanishad's first mantra begins ईशावास्यमिदं सर्वम्. What does it teach?",
+    options:[
+      "Only some rare places are holy",
+      "All this — the whole moving world — is pervaded by the Lord",
+      "One should gather as much wealth as possible"
+    ],
+    answer:1,
+    explain:"<b>ईशावास्यमिदं सर्वम्</b> means all this is enveloped by the Lord. It also advises <b>मा गृधः</b> — do not covet — living with detachment, not greed."
+  },
+  {
+    q:"According to the dialogue and the Gita verse समोऽहं सर्वभूतेषु, what is the truest way to worship God?",
+    options:[
+      "By seeing the Divine in all beings and serving others (सेवा)",
+      "By avoiding all other people",
+      "By worshipping only one's own family"
+    ],
+    answer:0,
+    explain:"If God dwells equally <b>सर्वभूतेषु</b> (in all beings), then <b>सेवया</b> — service to all — and seeing the Divine in every being is the highest worship."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-opt="'+i+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="q-text">'+esc(q.q)+'</div>'+
+    '<div class="opt-col">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.opt, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b,i){
+    b.disabled = true;
+    if(i === q.answer) b.classList.add("correct");
+    else if(i === chosen) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
