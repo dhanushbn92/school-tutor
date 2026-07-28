@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Differentiation Lab — Differentiation (NIOS Class 12, Ch 26)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#5ad1c7;
+    --accent-soft:rgba(90,209,199,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffb454;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .view{display:none}
+  .view.active{display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:150px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:64px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+
+  .btn{min-height:44px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;padding:8px 16px;touch-action:manipulation}
+  .btn.accent{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.98)}
+
+  canvas{width:100%;height:auto;display:block;background:#0c1018;border:1px solid var(--line);border-radius:12px;touch-action:none}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 120px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .v.good{color:var(--good)} .v.bad{color:var(--bad)} .v.acc{color:var(--accent)}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:16px;height:4px;border-radius:2px;display:inline-block}
+
+  table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left}
+  th{background:var(--panel2);color:var(--accent);font-weight:600}
+  code,.mono{font-family:"Segoe UI Mono",Consolas,monospace;background:var(--panel2);
+    padding:1px 6px;border-radius:6px;color:#ffd7a0}
+
+  .facts li{margin:6px 0 6px 18px;font-size:.9rem}
+  .facts b{color:var(--accent)}
+
+  details{border:1px solid var(--line);border-radius:12px;padding:0;margin-bottom:10px;background:var(--panel2)}
+  details summary{padding:12px 14px;cursor:pointer;font-weight:600;list-style:none;font-size:.94rem}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  details .ans{padding:0 14px 12px;color:var(--muted);font-size:.9rem}
+  details .ans b{color:var(--good)}
+
+  .example{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+  .example .step{margin:4px 0;font-size:.92rem}
+  .example .step .op{color:var(--accent);font-weight:600}
+  .hint{color:var(--muted);font-size:.85rem;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Differentiation <span>Lab</span></h1>
+    <p>NIOS Class 12 Mathematics · Ch 26 — the derivative as slope, f &amp; f&prime; together, and the rules.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="slope">1 · Slope of Tangent</button>
+    <button class="tab-btn" data-tab="ff">2 · f and f&prime;</button>
+    <button class="tab-btn" data-tab="rules">3 · Rules Calculator</button>
+  </div>
+
+  <!-- ============ MODE 1: SLOPE ============ -->
+  <section class="view active" id="view-slope">
+    <div class="panel">
+      <h2>Derivative as the slope of the tangent</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Function f(x)</label>
+          <div class="seg" id="slopeFns"></div>
+        </div>
+        <div class="ctrl">
+          <label>Point x = <output id="xOut">1.00</output></label>
+          <input type="range" id="xSlide" min="-3" max="3" step="0.01" value="1">
+        </div>
+      </div>
+      <canvas id="slopeCanvas" width="880" height="440" aria-label="Function with tangent line"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--accent)"></i> f(x)</span>
+        <span><i class="swatch" style="background:var(--warn)"></i> tangent (slope f&prime;)</span>
+        <span><i class="swatch" style="background:var(--bad)"></i> secant</span>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">f(x)</div><div class="v" id="fVal">—</div></div>
+        <div class="stat"><div class="k">slope f&prime;(x)</div><div class="v acc" id="dVal">—</div></div>
+        <div class="stat"><div class="k">step h</div><div class="v" id="hVal">—</div></div>
+        <div class="stat"><div class="k">secant slope</div><div class="v" id="secVal">—</div></div>
+      </div>
+      <div class="controls" style="margin-top:14px">
+        <button class="btn accent" id="animBtn">▶ Animate secant → tangent</button>
+        <div class="ctrl" style="flex:1 1 220px">
+          <label>Manual h = <output id="hOut">1.00</output></label>
+          <input type="range" id="hSlide" min="0.01" max="2" step="0.01" value="1">
+        </div>
+      </div>
+      <p class="hint">First principles: f&prime;(x) = lim<sub>h→0</sub> [ f(x+h) − f(x) ] / h. As h shrinks the red secant rotates onto the orange tangent, and its slope approaches f&prime;(x).</p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: f and f' ============ -->
+  <section class="view" id="view-ff">
+    <div class="panel">
+      <h2>f(x) and its derivative f&prime;(x)</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Function f(x)</label>
+          <div class="seg" id="ffFns"></div>
+        </div>
+        <div class="ctrl">
+          <label>Point x = <output id="x2Out">0.60</output></label>
+          <input type="range" id="x2Slide" min="-3" max="3" step="0.01" value="0.6">
+        </div>
+      </div>
+      <canvas id="ffCanvas" width="880" height="440" aria-label="Function and its derivative"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--accent)"></i> f(x)</span>
+        <span><i class="swatch" style="background:var(--warn)"></i> f&prime;(x)</span>
+        <span><i class="swatch" style="background:var(--bad)"></i> f&prime;=0 (turning pts)</span>
+      </div>
+      <div class="readout">
+        <div class="stat"><div class="k">f(x)</div><div class="v" id="f2Val">—</div></div>
+        <div class="stat"><div class="k">f&prime;(x)</div><div class="v acc" id="d2Val">—</div></div>
+        <div class="stat"><div class="k">behaviour</div><div class="v" id="behVal">—</div></div>
+      </div>
+      <p class="hint">Where f&prime; &gt; 0 the curve <b style="color:var(--good)">rises</b>; where f&prime; &lt; 0 it <b style="color:var(--bad)">falls</b>; where f&prime; = 0 you sit at a turning point (max, min, or inflexion).</p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: RULES ============ -->
+  <section class="view" id="view-rules">
+    <div class="panel">
+      <h2>Rules calculator</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Choose a rule</label>
+          <div class="seg" id="ruleSeg"></div>
+        </div>
+      </div>
+      <div id="ruleBody"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Standard derivatives (memorise these)</h3>
+      <table>
+        <thead><tr><th>f(x)</th><th>f&prime;(x)</th><th>note</th></tr></thead>
+        <tbody>
+          <tr><td>c (constant)</td><td>0</td><td>flat line</td></tr>
+          <tr><td>xⁿ</td><td>n·x<sup>n−1</sup></td><td>power rule</td></tr>
+          <tr><td>x</td><td>1</td><td>n = 1</td></tr>
+          <tr><td>√x = x<sup>1/2</sup></td><td>1 / (2√x)</td><td>n = ½</td></tr>
+          <tr><td>1/x = x<sup>−1</sup></td><td>−1 / x²</td><td>n = −1</td></tr>
+          <tr><td>eˣ</td><td>eˣ</td><td>its own derivative</td></tr>
+          <tr><td>ln x</td><td>1 / x</td><td>x &gt; 0</td></tr>
+          <tr><td>sin x</td><td>cos x</td><td>x in radians</td></tr>
+          <tr><td>cos x</td><td>−sin x</td><td>x in radians</td></tr>
+          <tr><td>tan x</td><td>sec² x</td><td>x in radians</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel facts">
+    <h2>Key facts</h2>
+    <ul>
+      <li><b>First principles:</b> f&prime;(x) = lim<sub>h→0</sub> [f(x+h) − f(x)] / h — the limit of the secant slope.</li>
+      <li><b>Power rule:</b> d/dx (xⁿ) = n·x<sup>n−1</sup> for any real n.</li>
+      <li><b>Constant multiple &amp; sum:</b> d/dx [a·f ± b·g] = a·f&prime; ± b·g&prime;.</li>
+      <li><b>Product rule:</b> (uv)&prime; = u&prime;v + uv&prime;.</li>
+      <li><b>Quotient rule:</b> (u/v)&prime; = (u&prime;v − uv&prime;) / v².</li>
+      <li><b>Chain rule:</b> d/dx f(g(x)) = f&prime;(g(x))·g&prime;(x) — "derivative of outer × derivative of inner".</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <details>
+      <summary>Q1. If f(x) = x³, what is f&prime;(2)?</summary>
+      <div class="ans">f&prime;(x) = 3x². So f&prime;(2) = 3·(2²) = <b>12</b>.</div>
+    </details>
+    <details>
+      <summary>Q2. At a local maximum of a smooth curve, the derivative f&prime; is…</summary>
+      <div class="ans">…equal to <b>0</b>. The tangent is horizontal; f&prime; changes from positive (rising) to negative (falling).</div>
+    </details>
+    <details>
+      <summary>Q3. Differentiate y = (2x + 1)⁵ using the chain rule.</summary>
+      <div class="ans">Outer u⁵ → 5u⁴; inner (2x+1) → 2. So dy/dx = 5(2x+1)⁴·2 = <b>10(2x + 1)⁴</b>.</div>
+    </details>
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:.8rem;margin-top:8px">Differentiation Lab · self-contained · NIOS Class 12 Ch 26</p>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- function library ----------
+  // Each: label, f(x), f'(x) exact, pretty derivative string, x-range for autoscale
+  var FNS = [
+    { id:"quad", label:"x²",       f:function(x){return x*x;},              d:function(x){return 2*x;},            dstr:"2x" },
+    { id:"cube", label:"x³ − 3x",  f:function(x){return x*x*x-3*x;},        d:function(x){return 3*x*x-3;},        dstr:"3x² − 3" },
+    { id:"sin",  label:"sin x",    f:function(x){return Math.sin(x);},      d:function(x){return Math.cos(x);},    dstr:"cos x" },
+    { id:"exp",  label:"eˣ⁄²",     f:function(x){return Math.exp(x/2);},    d:function(x){return 0.5*Math.exp(x/2);}, dstr:"½·eˣ⁄²" }
+  ];
+
+  // ---------- shared plot helper ----------
+  function makePlot(canvas){
+    var ctx = canvas.getContext("2d");
+    // logical coordinate window
+    var xmin=-3.4, xmax=3.4, ymin=-4, ymax=4;
+    function setY(a,b){ymin=a;ymax=b;}
+    function W(){return canvas.width;} function H(){return canvas.height;}
+    function px(x){return (x-xmin)/(xmax-xmin)*W();}
+    function py(y){return H()-(y-ymin)/(ymax-ymin)*H();}
+    function ix(pxv){return xmin+pxv/W()*(xmax-xmin);} // inverse: pixel->x
+    function clear(){ctx.clearRect(0,0,W(),H());ctx.fillStyle="#0c1018";ctx.fillRect(0,0,W(),H());}
+    function grid(){
+      ctx.lineWidth=1;
+      ctx.strokeStyle="#1c2436";
+      var i;
+      for(i=Math.ceil(xmin);i<=xmax;i++){ctx.beginPath();ctx.moveTo(px(i),0);ctx.lineTo(px(i),H());ctx.stroke();}
+      for(i=Math.ceil(ymin);i<=ymax;i++){ctx.beginPath();ctx.moveTo(0,py(i));ctx.lineTo(W(),py(i));ctx.stroke();}
+      // axes
+      ctx.strokeStyle="#3a4a6a";ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.moveTo(0,py(0));ctx.lineTo(W(),py(0));ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px(0),0);ctx.lineTo(px(0),H());ctx.stroke();
+      // labels
+      ctx.fillStyle="#6b7896";ctx.font="12px system-ui";
+      for(i=Math.ceil(xmin);i<=xmax;i++){ if(i!==0){ctx.fillText(String(i),px(i)+2,py(0)-4);} }
+      for(i=Math.ceil(ymin);i<=ymax;i++){ if(i!==0){ctx.fillText(String(i),px(0)+4,py(i)-2);} }
+    }
+    function curve(fn,color,width){
+      ctx.strokeStyle=color;ctx.lineWidth=width||2.4;ctx.beginPath();
+      var started=false, N=W();
+      for(var p=0;p<=N;p++){
+        var x=ix(p), y=fn(x);
+        if(!isFinite(y)||y>ymax+50||y<ymin-50){started=false;continue;}
+        var Y=py(y);
+        if(!started){ctx.moveTo(p,Y);started=true;} else ctx.lineTo(p,Y);
+      }
+      ctx.stroke();
+    }
+    function line(x1,y1,x2,y2,color,width,dash){
+      ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width||2;
+      if(dash)ctx.setLineDash(dash);
+      ctx.beginPath();ctx.moveTo(px(x1),py(y1));ctx.lineTo(px(x2),py(y2));ctx.stroke();ctx.restore();
+    }
+    function dot(x,y,color,r){
+      ctx.fillStyle=color;ctx.beginPath();ctx.arc(px(x),py(y),r||6,0,7);ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle="#0c1018";ctx.stroke();
+    }
+    return {ctx:ctx,clear:clear,grid:grid,curve:curve,line:line,dot:dot,
+            px:px,py:py,ix:ix,setY:setY,
+            get xmin(){return xmin;},get xmax(){return xmax;},
+            get ymin(){return ymin;},get ymax(){return ymax;},W:W,H:H};
+  }
+
+  // ---------- segmented button builder ----------
+  function buildSeg(container, items, initial, onSel){
+    container.innerHTML="";
+    items.forEach(function(it,idx){
+      var b=document.createElement("button");
+      b.innerHTML=it.label; b.dataset.i=idx;
+      if(idx===initial)b.classList.add("on");
+      b.addEventListener("click",function(){
+        Array.prototype.forEach.call(container.children,function(c){c.classList.remove("on");});
+        b.classList.add("on"); onSel(idx);
+      });
+      container.appendChild(b);
+    });
+  }
+
+  function fmt(v){ if(!isFinite(v))return "—"; return (Math.round(v*1000)/1000).toFixed(2); }
+
+  // ================= MODE 1: SLOPE =================
+  var sPlot = makePlot(document.getElementById("slopeCanvas"));
+  var sFn = FNS[0];
+  var sX = 1, sH = 1, animating=false, animH=2, rafId=null;
+
+  buildSeg(document.getElementById("slopeFns"),FNS,0,function(i){sFn=FNS[i];drawSlope();});
+  var xSlide=document.getElementById("xSlide"), hSlide=document.getElementById("hSlide");
+  xSlide.addEventListener("input",function(){sX=parseFloat(xSlide.value);document.getElementById("xOut").textContent=fmt(sX);drawSlope();});
+  hSlide.addEventListener("input",function(){ if(animating)stopAnim(); sH=parseFloat(hSlide.value);document.getElementById("hOut").textContent=fmt(sH);drawSlope();});
+
+  // drag point on canvas
+  var sCanvas=document.getElementById("slopeCanvas");
+  function canvasX(evt){
+    var r=sCanvas.getBoundingClientRect();
+    var cx=(evt.touches?evt.touches[0].clientX:evt.clientX)-r.left;
+    var scale=sCanvas.width/r.width;
+    return sPlot.ix(cx*scale);
+  }
+  var dragging=false;
+  function startDrag(e){dragging=true;moveDrag(e);e.preventDefault();}
+  function moveDrag(e){ if(!dragging)return; var x=canvasX(e); x=Math.max(-3,Math.min(3,x)); sX=x; xSlide.value=x; document.getElementById("xOut").textContent=fmt(sX); drawSlope(); e.preventDefault();}
+  function endDrag(){dragging=false;}
+  sCanvas.addEventListener("mousedown",startDrag); sCanvas.addEventListener("mousemove",moveDrag);
+  window.addEventListener("mouseup",endDrag);
+  sCanvas.addEventListener("touchstart",startDrag,{passive:false}); sCanvas.addEventListener("touchmove",moveDrag,{passive:false});
+  sCanvas.addEventListener("touchend",endDrag);
+
+  function autoScaleY(plot,fn){
+    var lo=Infinity,hi=-Infinity;
+    for(var x=plot.xmin;x<=plot.xmax;x+=0.05){var y=fn(x);if(isFinite(y)){if(y<lo)lo=y;if(y>hi)hi=y;}}
+    if(!isFinite(lo)){lo=-2;hi=2;}
+    var pad=(hi-lo)*0.15+0.5; plot.setY(lo-pad,hi+pad);
+  }
+
+  function drawSlope(){
+    autoScaleY(sPlot,sFn.f);
+    sPlot.clear(); sPlot.grid();
+    sPlot.curve(sFn.f, getComputedStyle(document.documentElement).getPropertyValue('--accent'), 2.6);
+    var fx=sFn.f(sX), slope=sFn.d(sX);
+    // tangent: y = fx + slope*(x - sX)
+    var tan=function(x){return fx+slope*(x-sX);};
+    sPlot.line(sPlot.xmin,tan(sPlot.xmin),sPlot.xmax,tan(sPlot.xmax),"#ffb454",2.2);
+    // secant using current h
+    var h = animating?animH:sH;
+    var fxh=sFn.f(sX+h);
+    var sec=(fxh-fx)/h;
+    var secf=function(x){return fx+sec*(x-sX);};
+    sPlot.line(sPlot.xmin,secf(sPlot.xmin),sPlot.xmax,secf(sPlot.xmax),"#ff7b7b",1.8,[7,5]);
+    sPlot.dot(sX,fx,"#ffffff",6);
+    sPlot.dot(sX+h,fxh,"#ff7b7b",5);
+    // readouts
+    document.getElementById("fVal").textContent=fmt(fx);
+    document.getElementById("dVal").textContent=fmt(slope);
+    document.getElementById("hVal").textContent=fmt(h);
+    document.getElementById("secVal").textContent=fmt(sec);
+  }
+
+  // secant -> tangent animation
+  var animBtn=document.getElementById("animBtn");
+  function stopAnim(){animating=false;animBtn.textContent="▶ Animate secant → tangent";if(rafId)cancelAnimationFrame(rafId);rafId=null;}
+  function startAnim(){animating=true;animH=2;animBtn.textContent="⏸ Pause";stepAnim();}
+  function stepAnim(){
+    if(!animating)return;
+    if(document.hidden){ rafId=requestAnimationFrame(stepAnim); return; }
+    animH*=0.965;
+    if(animH<0.012){ animH=2; } // loop back out so learner can watch again
+    drawSlope();
+    rafId=requestAnimationFrame(stepAnim);
+  }
+  animBtn.addEventListener("click",function(){ if(animating)stopAnim(); else startAnim(); });
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden && animating){ /* resume handled in loop */ } });
+
+  // ================= MODE 2: f and f' =================
+  var fPlot = makePlot(document.getElementById("ffCanvas"));
+  var f2Fn = FNS[1];
+  var f2X = 0.6;
+  buildSeg(document.getElementById("ffFns"),FNS,1,function(i){f2Fn=FNS[i];drawFF();});
+  var x2Slide=document.getElementById("x2Slide");
+  x2Slide.addEventListener("input",function(){f2X=parseFloat(x2Slide.value);document.getElementById("x2Out").textContent=fmt(f2X);drawFF();});
+
+  function drawFF(){
+    // scale to include both f and f'
+    var lo=Infinity,hi=-Infinity;
+    for(var x=fPlot.xmin;x<=fPlot.xmax;x+=0.05){
+      var a=f2Fn.f(x),b=f2Fn.d(x);
+      [a,b].forEach(function(v){if(isFinite(v)){if(v<lo)lo=v;if(v>hi)hi=v;}});
+    }
+    if(!isFinite(lo)){lo=-3;hi=3;}
+    var pad=(hi-lo)*0.12+0.5; fPlot.setY(lo-pad,hi+pad);
+    fPlot.clear(); fPlot.grid();
+    fPlot.curve(f2Fn.f,"#5ad1c7",2.6);
+    fPlot.curve(f2Fn.d,"#ffb454",2.2);
+    // mark f'=0 zero crossings of derivative on the f curve
+    var prev=f2Fn.d(fPlot.xmin), px0=fPlot.xmin;
+    for(var xx=fPlot.xmin+0.02;xx<=fPlot.xmax;xx+=0.02){
+      var cur=f2Fn.d(xx);
+      if(isFinite(cur)&&isFinite(prev)&&prev*cur<0){
+        // linear interpolate zero
+        var zx=px0-prev*(xx-px0)/(cur-prev);
+        fPlot.dot(zx,f2Fn.f(zx),"#ff7b7b",5);
+      }
+      prev=cur;px0=xx;
+    }
+    // current point
+    var fx=f2Fn.f(f2X),dx=f2Fn.d(f2X);
+    fPlot.dot(f2X,fx,"#ffffff",6);
+    fPlot.dot(f2X,dx,"#ffb454",5);
+    document.getElementById("f2Val").textContent=fmt(fx);
+    var dv=document.getElementById("d2Val");dv.textContent=fmt(dx);
+    var beh=document.getElementById("behVal");
+    if(Math.abs(dx)<0.03){beh.textContent="turning pt";beh.className="v";}
+    else if(dx>0){beh.textContent="increasing ↑";beh.className="v good";}
+    else{beh.textContent="decreasing ↓";beh.className="v bad";}
+  }
+
+  // ================= MODE 3: RULES =================
+  var RULES=[
+    {label:"Power xⁿ", body:function(){return (
+      '<div class="example"><div class="step"><span class="op">Rule</span> &nbsp;d/dx(xⁿ) = n·x<sup>n−1</sup></div>'+
+      '<div class="step"><span class="op">Ex 1</span> &nbsp;f = x⁵ &rarr; f&prime; = 5x⁴</div>'+
+      '<div class="step"><span class="op">Ex 2</span> &nbsp;f = x<sup>−2</sup> = 1/x² &rarr; f&prime; = −2x<sup>−3</sup> = −2/x³</div>'+
+      '<div class="step"><span class="op">Ex 3</span> &nbsp;f = √x = x<sup>1/2</sup> &rarr; f&prime; = ½x<sup>−1/2</sup> = 1/(2√x)</div>'+
+      '<p class="hint">Bring the power down as a multiplier, then subtract 1 from the power.</p></div>');}},
+    {label:"Sum / const", body:function(){return (
+      '<div class="example"><div class="step"><span class="op">Rule</span> &nbsp;d/dx[a·f ± b·g] = a·f&prime; ± b·g&prime;</div>'+
+      '<div class="step"><span class="op">Ex 1</span> &nbsp;f = 3x⁴ + 7x − 5 &rarr; f&prime; = 12x³ + 7</div>'+
+      '<div class="step"><span class="op">Ex 2</span> &nbsp;f = 2sin x − x² &rarr; f&prime; = 2cos x − 2x</div>'+
+      '<p class="hint">Differentiate term by term; the derivative of a constant is 0.</p></div>');}},
+    {label:"Product uv", body:function(){return (
+      '<div class="example"><div class="step"><span class="op">Rule</span> &nbsp;(uv)&prime; = u&prime;v + uv&prime;</div>'+
+      '<div class="step"><span class="op">Ex</span> &nbsp;f = x²·sin x,&nbsp; u = x² (u&prime;=2x), v = sin x (v&prime;=cos x)</div>'+
+      '<div class="step">&nbsp; f&prime; = 2x·sin x + x²·cos x</div>'+
+      '<p class="hint">"First times derivative of second, plus second times derivative of first."</p></div>');}},
+    {label:"Quotient u/v", body:function(){return (
+      '<div class="example"><div class="step"><span class="op">Rule</span> &nbsp;(u/v)&prime; = (u&prime;v − uv&prime;) / v²</div>'+
+      '<div class="step"><span class="op">Ex</span> &nbsp;f = x / (x+1),&nbsp; u = x (u&prime;=1), v = x+1 (v&prime;=1)</div>'+
+      '<div class="step">&nbsp; f&prime; = [1·(x+1) − x·1] / (x+1)² = 1 / (x+1)²</div>'+
+      '<p class="hint">"Low d-high minus high d-low, over low squared."</p></div>');}},
+    {label:"Chain f(g)", body:function(){return (
+      '<div class="example"><div class="step"><span class="op">Rule</span> &nbsp;d/dx f(g(x)) = f&prime;(g(x))·g&prime;(x)</div>'+
+      '<div class="step"><span class="op">Ex 1</span> &nbsp;y = (3x + 2)⁴ &rarr; dy/dx = 4(3x+2)³·3 = 12(3x+2)³</div>'+
+      '<div class="step"><span class="op">Ex 2</span> &nbsp;y = sin(x²) &rarr; dy/dx = cos(x²)·2x = 2x·cos(x²)</div>'+
+      '<p class="hint">Differentiate the outer function, keep the inner, then multiply by the derivative of the inner.</p></div>');}}
+  ];
+  var ruleBody=document.getElementById("ruleBody");
+  buildSeg(document.getElementById("ruleSeg"),RULES,0,function(i){ruleBody.innerHTML=RULES[i].body();});
+  ruleBody.innerHTML=RULES[0].body();
+
+  // ================= TABS =================
+  var tabBtns=document.querySelectorAll(".tab-btn");
+  Array.prototype.forEach.call(tabBtns,function(btn){
+    btn.addEventListener("click",function(){
+      Array.prototype.forEach.call(tabBtns,function(b){b.classList.remove("active");});
+      btn.classList.add("active");
+      var t=btn.dataset.tab;
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      document.getElementById("view-"+t).classList.add("active");
+      if(t==="slope")drawSlope(); else if(t==="ff")drawFF();
+      if(t!=="slope"&&animating)stopAnim();
+    });
+  });
+
+  // init
+  document.getElementById("xOut").textContent=fmt(sX);
+  document.getElementById("hOut").textContent=fmt(sH);
+  document.getElementById("x2Out").textContent=fmt(f2X);
+  drawSlope();
+  drawFF();
+})();
+</script>
+</body>
+</html>

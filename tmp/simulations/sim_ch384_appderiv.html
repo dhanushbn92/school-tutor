@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applications of Derivatives Lab — NIOS Class 12 Maths (Ch 29)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#1a2032;
+    --panel2:#232b40;
+    --ink:#e9edf8;
+    --muted:#9aa5bd;
+    --accent:#7bd88f;
+    --accent-soft:rgba(123,216,143,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffce6b;
+    --blue:#59c2ff;
+    --line:#2d3750;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 30%;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px;color:var(--ink)}
+  .hide{display:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:150px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--accent);font-weight:600}
+
+  select{width:100%;min-height:44px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;padding:0 10px;font-size:.95rem}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:none}
+
+  .stat{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .chip{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+  .chip .k{font-size:.74rem;color:var(--muted)}
+  .chip .v{font-size:1.02rem;font-weight:700;margin-top:2px}
+  .v.good{color:var(--good)} .v.bad{color:var(--bad)} .v.warn{color:var(--warn)} .v.acc{color:var(--accent)} .v.blue{color:var(--blue)}
+
+  .verdict{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel2);font-size:.92rem}
+  .verdict b{color:var(--accent)}
+  .eqn{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:.9rem;color:var(--blue)}
+
+  .facts{font-size:.86rem}
+  .facts li{margin:5px 0 5px 18px}
+  .facts code{background:var(--panel2);padding:1px 5px;border-radius:6px;color:var(--warn)}
+  .facts h3{margin-top:10px}
+
+  .quiz .q{margin-bottom:14px}
+  .quiz .q p{font-weight:600;margin-bottom:6px}
+  .quiz .opts button{display:block;width:100%;text-align:left;margin:5px 0;min-height:42px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    padding:8px 12px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.16);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{font-size:.83rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:14px;height:4px;border-radius:2px;display:inline-block}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Applications of Derivatives</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch 29 — Application of Derivatives</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="extrema">Increasing / Extrema</button>
+    <button class="tab-btn" data-tab="tangent">Tangent &amp; Normal</button>
+    <button class="tab-btn" data-tab="optim">Optimization</button>
+  </div>
+
+  <!-- ============ EXTREMA ============ -->
+  <section id="extrema" class="tab">
+    <div class="panel">
+      <h2>Increasing / Decreasing &amp; Extrema</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Function f(x)</label>
+          <select id="ex-fn">
+            <option value="cubic">f(x) = x³ − 3x</option>
+            <option value="quart">f(x) = x⁴ − 2x²</option>
+            <option value="quad">f(x) = x² − 4x + 3</option>
+            <option value="cubic2">f(x) = x³ − 6x² + 9x</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Test point x = <span class="val" id="ex-tVal">0.0</span></label>
+          <input type="range" id="ex-t" min="-2.5" max="2.5" step="0.05" value="0">
+        </div>
+      </div>
+      <canvas id="ex-cv" width="880" height="440"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--accent)"></i> f(x)</span>
+        <span><i class="swatch" style="background:var(--blue)"></i> f′(x)</span>
+        <span><i class="swatch" style="background:var(--warn)"></i> f″(x)</span>
+        <span><i class="swatch" style="background:rgba(95,214,139,.5)"></i> increasing band</span>
+        <span><i class="swatch" style="background:rgba(255,123,123,.5)"></i> decreasing band</span>
+      </div>
+      <div class="stat">
+        <div class="chip"><div class="k">f(x) at test</div><div class="v acc" id="ex-fx">0</div></div>
+        <div class="chip"><div class="k">f′(x)</div><div class="v blue" id="ex-fpx">0</div></div>
+        <div class="chip"><div class="k">Behaviour</div><div class="v" id="ex-beh">—</div></div>
+      </div>
+      <div class="verdict" id="ex-verdict"></div>
+    </div>
+  </section>
+
+  <!-- ============ TANGENT & NORMAL ============ -->
+  <section id="tangent" class="tab hide">
+    <div class="panel">
+      <h2>Tangent &amp; Normal Lines</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Function f(x)</label>
+          <select id="tn-fn">
+            <option value="parab">f(x) = x²</option>
+            <option value="cubic">f(x) = x³ − 3x</option>
+            <option value="sqrt">f(x) = √(x+4)</option>
+            <option value="recip">f(x) = 4 / x</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Point x₀ = <span class="val" id="tn-xVal">1.0</span> (drag on curve too)</label>
+          <input type="range" id="tn-x" min="-2.5" max="2.5" step="0.05" value="1">
+        </div>
+      </div>
+      <canvas id="tn-cv" width="880" height="440"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--accent)"></i> f(x)</span>
+        <span><i class="swatch" style="background:var(--blue)"></i> tangent</span>
+        <span><i class="swatch" style="background:var(--warn)"></i> normal</span>
+      </div>
+      <div class="stat">
+        <div class="chip"><div class="k">Point (x₀, y₀)</div><div class="v acc" id="tn-pt">—</div></div>
+        <div class="chip"><div class="k">Slope f′(x₀)</div><div class="v blue" id="tn-m">—</div></div>
+      </div>
+      <div class="verdict" id="tn-eq"></div>
+    </div>
+  </section>
+
+  <!-- ============ OPTIMIZATION ============ -->
+  <section id="optim" class="tab hide">
+    <div class="panel">
+      <h2>Optimization Problem</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Problem</label>
+          <select id="op-prob">
+            <option value="box">Open box: cut squares of side x from a 24×24 sheet</option>
+            <option value="rect">Rectangle of fixed perimeter P = 40</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Variable x = <span class="val" id="op-xVal">4.0</span></label>
+          <input type="range" id="op-x" min="0.1" max="11.9" step="0.05" value="4">
+        </div>
+      </div>
+      <canvas id="op-cv" width="880" height="440"></canvas>
+      <div class="stat">
+        <div class="chip"><div class="k" id="op-k1">Volume V(x)</div><div class="v acc" id="op-v1">0</div></div>
+        <div class="chip"><div class="k" id="op-k2">V′(x)</div><div class="v blue" id="op-v2">0</div></div>
+        <div class="chip"><div class="k">Optimum at x =</div><div class="v warn" id="op-v3">0</div></div>
+        <div class="chip"><div class="k" id="op-k4">Max value</div><div class="v good" id="op-v4">0</div></div>
+      </div>
+      <div class="verdict" id="op-verdict"></div>
+      <p class="note"><b>Related rates:</b> if x changes with time t, the chain rule gives the rate of the objective:
+        dV/dt = V′(x)·(dx/dt). At the optimum V′(x)=0, so a small change in x barely changes V — the graph is flat there.</p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel facts">
+    <h2>Key Facts</h2>
+    <h3>Increasing / Decreasing test</h3>
+    <ul>
+      <li>If <code>f′(x) &gt; 0</code> on an interval, f is <b>increasing</b> there.</li>
+      <li>If <code>f′(x) &lt; 0</code> on an interval, f is <b>decreasing</b> there.</li>
+    </ul>
+    <h3>First derivative test (local extrema)</h3>
+    <ul>
+      <li>At a critical point where <code>f′(c)=0</code>: if f′ changes <b>+ → −</b> it is a local <b>maximum</b>; if <b>− → +</b> a local <b>minimum</b>.</li>
+    </ul>
+    <h3>Second derivative test</h3>
+    <ul>
+      <li>If <code>f′(c)=0</code> and <code>f″(c) &lt; 0</code> → local <b>maximum</b>; if <code>f″(c) &gt; 0</code> → local <b>minimum</b>.</li>
+      <li>A <b>point of inflection</b> is where concavity changes: <code>f″(x)=0</code> with a sign change.</li>
+    </ul>
+    <h3>Tangent &amp; normal at (x₀, y₀)</h3>
+    <ul>
+      <li>Tangent slope = <code>f′(x₀)</code>; normal slope = <code>−1 / f′(x₀)</code> (normal ⟂ tangent).</li>
+      <li>Tangent: <code>y − y₀ = f′(x₀)(x − x₀)</code>.</li>
+    </ul>
+    <h3>Optimization</h3>
+    <ul>
+      <li>Write the quantity as a function of one variable, set <code>f′(x)=0</code>, solve, then test with f′ or f″.</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick Quiz</h2>
+    <div class="q" data-a="1">
+      <p>1. For f(x) = x³ − 3x, at which x is there a local maximum?</p>
+      <div class="opts">
+        <button>x = 1</button>
+        <button>x = −1</button>
+        <button>x = 0</button>
+        <button>x = 3</button>
+      </div>
+      <div class="exp">f′(x)=3x²−3=0 → x=±1. f″(x)=6x; f″(−1)=−6&lt;0, so x=−1 is a local maximum.</div>
+    </div>
+    <div class="q" data-a="2">
+      <p>2. The slope of the normal to a curve at a point where f′(x₀)=2 is:</p>
+      <div class="opts">
+        <button>2</button>
+        <button>−2</button>
+        <button>−1/2</button>
+        <button>1/2</button>
+      </div>
+      <div class="exp">Normal slope = −1/f′(x₀) = −1/2.</div>
+    </div>
+    <div class="q" data-a="0">
+      <p>3. Cutting squares of side x from a 24×24 sheet, the box volume is maximum at:</p>
+      <div class="opts">
+        <button>x = 4</button>
+        <button>x = 6</button>
+        <button>x = 12</button>
+        <button>x = 2</button>
+      </div>
+      <div class="exp">V=x(24−2x)²; V′=12(x−4)(x−12)=0 → x=4 (x=12 gives V=0). Max at x=4.</div>
+    </div>
+  </div>
+
+  <p class="note">All simulations run offline — no external resources. Maths is exact; graphs are sampled numerically.</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var tabBtns=document.querySelectorAll(".tab-btn");
+var tabs=document.querySelectorAll(".tab");
+tabBtns.forEach(function(b){
+  b.addEventListener("click",function(){
+    tabBtns.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    var id=b.getAttribute("data-tab");
+    tabs.forEach(function(t){t.classList.toggle("hide",t.id!==id);});
+    if(id==="extrema") drawEx();
+    else if(id==="tangent") drawTn();
+    else if(id==="optim") drawOp();
+  });
+});
+
+/* ---------- helpers ---------- */
+function fmt(v,d){ if(!isFinite(v)) return "∞"; d=(d===undefined)?2:d;
+  var s=v.toFixed(d); if(s==="-0.00"||s==="-0.0"||s==="-0") s=Math.abs(v).toFixed(d); return s; }
+
+/* generic axis-mapped plotter on a canvas */
+function makeMap(cv,xmin,xmax,ymin,ymax,pad){
+  pad=pad||34;
+  var W=cv.width,H=cv.height;
+  return {
+    W:W,H:H,pad:pad,xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,
+    px:function(x){return pad+(x-xmin)/(xmax-xmin)*(W-2*pad);},
+    py:function(y){return H-pad-(y-ymin)/(ymax-ymin)*(H-2*pad);}
+  };
+}
+function drawGrid(ctx,m){
+  ctx.clearRect(0,0,m.W,m.H);
+  ctx.lineWidth=1;
+  ctx.strokeStyle="#2d3750";
+  ctx.fillStyle="#6b7793";
+  ctx.font="11px system-ui";
+  var i,x,y;
+  for(i=Math.ceil(m.xmin);i<=Math.floor(m.xmax);i++){
+    ctx.globalAlpha=(i===0)?0.9:0.35;
+    ctx.beginPath();ctx.moveTo(m.px(i),m.pad);ctx.lineTo(m.px(i),m.H-m.pad);ctx.stroke();
+  }
+  for(i=Math.ceil(m.ymin);i<=Math.floor(m.ymax);i++){
+    ctx.globalAlpha=(i===0)?0.9:0.35;
+    ctx.beginPath();ctx.moveTo(m.pad,m.py(i));ctx.lineTo(m.W-m.pad,m.py(i));ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  // axis labels
+  ctx.fillText("x",m.W-m.pad+6,m.py(0)+4);
+  ctx.fillText("y",m.px(0)+6,m.pad-4);
+}
+function plotFn(ctx,m,fn,color,width){
+  ctx.strokeStyle=color;ctx.lineWidth=width||2.4;ctx.beginPath();
+  var first=true,N=440,i,x,y,py;
+  for(i=0;i<=N;i++){
+    x=m.xmin+(m.xmax-m.xmin)*i/N;
+    y=fn(x);
+    if(!isFinite(y)||y>m.ymax+50||y<m.ymin-50){first=true;continue;}
+    py=m.py(y);
+    if(first){ctx.moveTo(m.px(x),py);first=false;}else ctx.lineTo(m.px(x),py);
+  }
+  ctx.stroke();
+}
+
+/* ================= EXTREMA ================= */
+var exFns={
+  cubic:{ f:function(x){return x*x*x-3*x;}, fp:function(x){return 3*x*x-3;}, fpp:function(x){return 6*x;},
+    crit:[{x:-1,type:"max"},{x:1,type:"min"}], infl:[0], name:"x³ − 3x" },
+  quart:{ f:function(x){return x*x*x*x-2*x*x;}, fp:function(x){return 4*x*x*x-4*x;}, fpp:function(x){return 12*x*x-4;},
+    crit:[{x:-1,type:"min"},{x:0,type:"max"},{x:1,type:"min"}], infl:[-0.5774,0.5774], name:"x⁴ − 2x²" },
+  quad:{ f:function(x){return x*x-4*x+3;}, fp:function(x){return 2*x-4;}, fpp:function(x){return 2;},
+    crit:[{x:2,type:"min"}], infl:[], name:"x² − 4x + 3" },
+  cubic2:{ f:function(x){return x*x*x-6*x*x+9*x;}, fp:function(x){return 3*x*x-12*x+9;}, fpp:function(x){return 6*x-12;},
+    crit:[{x:1,type:"max"},{x:3,type:"min"}], infl:[2], name:"x³ − 6x² + 9x" }
+};
+var exCv=document.getElementById("ex-cv"),exCtx=exCv.getContext("2d");
+var exSel=document.getElementById("ex-fn"),exT=document.getElementById("ex-t");
+function exRange(key){
+  if(key==="quad") return {xmin:-1,xmax:5,ymin:-2,ymax:8};
+  if(key==="cubic2") return {xmin:-1,xmax:5,ymin:-2,ymax:6};
+  if(key==="quart") return {xmin:-2,xmax:2,ymin:-2,ymax:4};
+  return {xmin:-3,xmax:3,ymin:-4,ymax:4};
+}
+function drawEx(){
+  var key=exSel.value,F=exFns[key],r=exRange(key);
+  // adapt slider range to function domain
+  exT.min=r.xmin; exT.max=r.xmax; exT.step=0.05;
+  var t=parseFloat(exT.value);
+  if(t<r.xmin){t=r.xmin;exT.value=t;} if(t>r.xmax){t=r.xmax;exT.value=t;}
+  var m=makeMap(exCv,r.xmin,r.xmax,r.ymin,r.ymax);
+  drawGrid(exCtx,m);
+  // increasing/decreasing bands (sampled from f')
+  var N=300,i,x,py0=m.py(0);
+  for(i=0;i<N;i++){
+    x=r.xmin+(r.xmax-r.xmin)*(i+0.5)/N;
+    var up=F.fp(x)>0;
+    exCtx.fillStyle=up?"rgba(95,214,139,.10)":"rgba(255,123,123,.10)";
+    var x0=m.px(r.xmin+(r.xmax-r.xmin)*i/N), x1=m.px(r.xmin+(r.xmax-r.xmin)*(i+1)/N);
+    exCtx.fillRect(x0,m.pad,x1-x0,m.H-2*m.pad);
+  }
+  plotFn(exCtx,m,F.fpp,"#ffce6b",1.6);
+  plotFn(exCtx,m,F.fp,"#59c2ff",1.8);
+  plotFn(exCtx,m,F.f,"#7bd88f",2.8);
+  // critical points
+  F.crit.forEach(function(c){
+    if(c.x<r.xmin||c.x>r.xmax) return;
+    var yy=F.f(c.x);
+    exCtx.fillStyle=c.type==="max"?"#ff7b7b":"#5fd68b";
+    exCtx.beginPath();exCtx.arc(m.px(c.x),m.py(yy),6,0,7);exCtx.fill();
+    exCtx.fillStyle="#e9edf8";exCtx.font="11px system-ui";
+    exCtx.fillText(c.type==="max"?"max":"min",m.px(c.x)-9,m.py(yy)-10);
+  });
+  // inflection points
+  F.infl.forEach(function(ix){
+    if(ix<r.xmin||ix>r.xmax) return;
+    var yy=F.f(ix);
+    exCtx.strokeStyle="#ffce6b";exCtx.lineWidth=2;
+    exCtx.beginPath();exCtx.arc(m.px(ix),m.py(yy),5,0,7);exCtx.stroke();
+  });
+  // test point marker
+  var fx=F.f(t),fpx=F.fp(t);
+  exCtx.strokeStyle="#e9edf8";exCtx.globalAlpha=.5;exCtx.lineWidth=1;
+  exCtx.beginPath();exCtx.moveTo(m.px(t),m.pad);exCtx.lineTo(m.px(t),m.H-m.pad);exCtx.stroke();
+  exCtx.globalAlpha=1;
+  exCtx.fillStyle="#ffffff";
+  exCtx.beginPath();exCtx.arc(m.px(t),m.py(fx),5.5,0,7);exCtx.fill();
+
+  document.getElementById("ex-tVal").textContent=fmt(t,2);
+  document.getElementById("ex-fx").textContent=fmt(fx,2);
+  document.getElementById("ex-fpx").textContent=fmt(fpx,2);
+  var beh=document.getElementById("ex-beh");
+  if(Math.abs(fpx)<0.02){beh.textContent="f′≈0 (critical)";beh.className="v warn";}
+  else if(fpx>0){beh.textContent="increasing ↑";beh.className="v good";}
+  else{beh.textContent="decreasing ↓";beh.className="v bad";}
+  // verdict text
+  var critTxt=F.crit.map(function(c){return "x="+fmt(c.x,2)+" ("+c.type+")";}).join(", ");
+  var inflTxt=F.infl.length?F.infl.map(function(v){return "x="+fmt(v,2);}).join(", "):"none in view";
+  document.getElementById("ex-verdict").innerHTML=
+    "<b>f(x) = "+F.name+"</b><br>"+
+    "Critical points (f′=0): "+critTxt+"<br>"+
+    "Points of inflection (f″=0): "+inflTxt+"<br>"+
+    "At x="+fmt(t,2)+": f′="+fmt(fpx,2)+" → "+(Math.abs(fpx)<0.02?"critical point":(fpx>0?"increasing":"decreasing"))+".";
+}
+exSel.addEventListener("change",drawEx);
+exT.addEventListener("input",drawEx);
+
+/* ================= TANGENT & NORMAL ================= */
+var tnFns={
+  parab:{ f:function(x){return x*x;}, fp:function(x){return 2*x;}, name:"x²", r:{xmin:-3,xmax:3,ymin:-2,ymax:8} },
+  cubic:{ f:function(x){return x*x*x-3*x;}, fp:function(x){return 3*x*x-3;}, name:"x³ − 3x", r:{xmin:-3,xmax:3,ymin:-4,ymax:4} },
+  sqrt:{ f:function(x){return Math.sqrt(x+4);}, fp:function(x){return 0.5/Math.sqrt(x+4);}, name:"√(x+4)", r:{xmin:-3.5,xmax:5,ymin:-1,ymax:4} },
+  recip:{ f:function(x){return 4/x;}, fp:function(x){return -4/(x*x);}, name:"4 / x", r:{xmin:-6,xmax:6,ymin:-6,ymax:6} }
+};
+var tnCv=document.getElementById("tn-cv"),tnCtx=tnCv.getContext("2d");
+var tnSel=document.getElementById("tn-fn"),tnX=document.getElementById("tn-x");
+function tnClampX(F,x){
+  var r=F.r,eps=(r.xmax-r.xmin)*0.02;
+  if(F.name==="4 / x"){ if(Math.abs(x)<0.4) x=(x<0?-0.4:0.4); }
+  if(F.name==="√(x+4)"){ if(x<r.xmin+0.05) x=r.xmin+0.05; }
+  if(x<r.xmin) x=r.xmin; if(x>r.xmax) x=r.xmax;
+  return x;
+}
+function drawTn(){
+  var F=tnFns[tnSel.value],r=F.r;
+  tnX.min=r.xmin; tnX.max=r.xmax; tnX.step=0.05;
+  var x0=tnClampX(F,parseFloat(tnX.value));
+  var m=makeMap(tnCv,r.xmin,r.xmax,r.ymin,r.ymax);
+  drawGrid(tnCtx,m);
+  plotFn(tnCtx,m,F.f,"#7bd88f",2.8);
+  var y0=F.f(x0),mm=F.fp(x0);
+  // tangent line y = y0 + mm(x-x0)
+  tnCtx.strokeStyle="#59c2ff";tnCtx.lineWidth=2;tnCtx.beginPath();
+  tnCtx.moveTo(m.px(r.xmin),m.py(y0+mm*(r.xmin-x0)));
+  tnCtx.lineTo(m.px(r.xmax),m.py(y0+mm*(r.xmax-x0)));
+  tnCtx.stroke();
+  // normal line slope -1/mm
+  tnCtx.strokeStyle="#ffce6b";tnCtx.lineWidth=2;tnCtx.beginPath();
+  if(Math.abs(mm)<1e-6){ // horizontal tangent → vertical normal
+    tnCtx.moveTo(m.px(x0),m.pad);tnCtx.lineTo(m.px(x0),m.H-m.pad);
+  } else {
+    var nm=-1/mm;
+    tnCtx.moveTo(m.px(r.xmin),m.py(y0+nm*(r.xmin-x0)));
+    tnCtx.lineTo(m.px(r.xmax),m.py(y0+nm*(r.xmax-x0)));
+  }
+  tnCtx.stroke();
+  // point
+  tnCtx.fillStyle="#ffffff";tnCtx.beginPath();tnCtx.arc(m.px(x0),m.py(y0),6,0,7);tnCtx.fill();
+  tnCtx.strokeStyle="#0f1320";tnCtx.lineWidth=2;tnCtx.stroke();
+
+  document.getElementById("tn-xVal").textContent=fmt(x0,2);
+  document.getElementById("tn-pt").textContent="("+fmt(x0,2)+", "+fmt(y0,2)+")";
+  document.getElementById("tn-m").textContent=fmt(mm,3);
+  // equations
+  var tanEq, normEq;
+  var b=y0-mm*x0;
+  tanEq="y = "+fmt(mm,3)+"x "+(b>=0?"+ ":"− ")+fmt(Math.abs(b),3);
+  if(Math.abs(mm)<1e-6){
+    normEq="x = "+fmt(x0,3)+"  (vertical)";
+  } else {
+    var nm=-1/mm, nb=y0-nm*x0;
+    normEq="y = "+fmt(nm,3)+"x "+(nb>=0?"+ ":"− ")+fmt(Math.abs(nb),3);
+  }
+  document.getElementById("tn-eq").innerHTML=
+    "<b>f(x) = "+F.name+"</b> at x₀ = "+fmt(x0,2)+"<br>"+
+    "Tangent slope f′(x₀) = "+fmt(mm,3)+"<br>"+
+    "<span class='eqn'>Tangent: "+tanEq+"</span><br>"+
+    "<span class='eqn'>Normal: "+normEq+"</span>";
+}
+tnSel.addEventListener("change",drawTn);
+tnX.addEventListener("input",drawTn);
+// drag on curve
+function tnPointer(evt){
+  var rect=tnCv.getBoundingClientRect();
+  var cx=(evt.touches?evt.touches[0].clientX:evt.clientX)-rect.left;
+  var F=tnFns[tnSel.value],r=F.r;
+  var scale=tnCv.width/rect.width;
+  var pad=34;
+  var xval=r.xmin+((cx*scale)-pad)/(tnCv.width-2*pad)*(r.xmax-r.xmin);
+  xval=tnClampX(F,xval);
+  tnX.value=xval;
+  drawTn();
+}
+var tnDrag=false;
+tnCv.addEventListener("mousedown",function(e){tnDrag=true;tnPointer(e);});
+window.addEventListener("mousemove",function(e){if(tnDrag)tnPointer(e);});
+window.addEventListener("mouseup",function(){tnDrag=false;});
+tnCv.addEventListener("touchstart",function(e){tnDrag=true;tnPointer(e);e.preventDefault();},{passive:false});
+tnCv.addEventListener("touchmove",function(e){if(tnDrag)tnPointer(e);e.preventDefault();},{passive:false});
+tnCv.addEventListener("touchend",function(){tnDrag=false;});
+
+/* ================= OPTIMIZATION ================= */
+var opCv=document.getElementById("op-cv"),opCtx=opCv.getContext("2d");
+var opProb=document.getElementById("op-prob"),opX=document.getElementById("op-x");
+function drawOp(){
+  var prob=opProb.value,x=parseFloat(opX.value);
+  if(prob==="box"){
+    opX.min=0.1; opX.max=11.9; opX.step=0.05;
+    if(x>11.9){x=11.9;opX.value=x;}
+    drawBox(x);
+  } else {
+    opX.min=0.1; opX.max=19.9; opX.step=0.05;
+    if(x>19.9 || x<0.1){ if(parseFloat(opX.value)>19.9){x=19.9;opX.value=x;} }
+    drawRect(x);
+  }
+}
+function drawBox(x){
+  // sheet 24x24, box: base (24-2x) square, height x. V = x(24-2x)^2
+  var V=function(t){return t*(24-2*t)*(24-2*t);};
+  var Vp=function(t){return 12*t*t-192*t+576;}; // derivative: (24-2x)^2 + x*2*(24-2x)*(-2)
+  var vx=V(x),vpx=Vp(x);
+  // plot V(x) for x in [0,12]
+  var m=makeMap(opCv,0,12,0,1200);
+  drawGrid2(opCtx,m,"x (cut, cm)","V (cm³)",2,200);
+  // curve
+  opCtx.strokeStyle="#7bd88f";opCtx.lineWidth=2.8;opCtx.beginPath();
+  var i,t,first=true;
+  for(i=0;i<=300;i++){t=12*i/300;var yy=V(t);if(first){opCtx.moveTo(m.px(t),m.py(yy));first=false;}else opCtx.lineTo(m.px(t),m.py(yy));}
+  opCtx.stroke();
+  // optimum x=4
+  var optX=4,optV=V(4);
+  opCtx.fillStyle="#ffce6b";opCtx.beginPath();opCtx.arc(m.px(optX),m.py(optV),6,0,7);opCtx.fill();
+  opCtx.fillStyle="#e9edf8";opCtx.font="11px system-ui";opCtx.fillText("max V="+Math.round(optV),m.px(optX)-30,m.py(optV)-12);
+  // current point
+  opCtx.strokeStyle="#e9edf8";opCtx.globalAlpha=.45;opCtx.beginPath();opCtx.moveTo(m.px(x),m.pad);opCtx.lineTo(m.px(x),m.H-m.pad);opCtx.stroke();opCtx.globalAlpha=1;
+  opCtx.fillStyle="#ffffff";opCtx.beginPath();opCtx.arc(m.px(x),m.py(vx),5.5,0,7);opCtx.fill();
+  // mini box sketch top-right
+  drawBoxSketch(x);
+
+  document.getElementById("op-k1").textContent="Volume V(x)";
+  document.getElementById("op-v1").textContent=fmt(vx,1)+" cm³";
+  document.getElementById("op-k2").textContent="V′(x)";
+  document.getElementById("op-v2").textContent=fmt(vpx,1);
+  document.getElementById("op-v3").textContent="4 cm";
+  document.getElementById("op-k4").textContent="Max volume";
+  document.getElementById("op-v4").textContent=fmt(optV,0)+" cm³";
+  document.getElementById("op-verdict").innerHTML=
+    "<b>Open box from a 24×24 cm sheet</b><br>"+
+    "<span class='eqn'>V(x) = x(24 − 2x)²</span><br>"+
+    "<span class='eqn'>V′(x) = 12x² − 192x + 576 = 12(x−4)(x−12)</span><br>"+
+    "Set V′=0 → x = 4 or x = 12. Since x=12 gives base 0, the maximum is at "+
+    "<b>x = 4 cm</b>, V = 1024 cm³ (V″(4) = 24·4 − 192 = −96 &lt; 0 ✓).";
+}
+function drawBoxSketch(x){
+  // small isometric-ish rectangle showing base (24-2x) and height x, at top-right of canvas
+  var bx=opCv.width-190, by=60, s=140/24; // scale
+  var base=(24-2*x), h=x;
+  opCtx.save();
+  opCtx.strokeStyle="#59c2ff";opCtx.lineWidth=1.6;opCtx.fillStyle="rgba(89,194,255,.10)";
+  var bw=base*s, hh=h*s;
+  opCtx.fillRect(bx,by,bw,bw*0.5);
+  opCtx.strokeRect(bx,by,bw,bw*0.5);
+  opCtx.fillStyle="#9aa5bd";opCtx.font="10px system-ui";
+  opCtx.fillText("base "+fmt(base,1),bx,by-6);
+  opCtx.fillText("height x="+fmt(h,1),bx,by+bw*0.5+14);
+  opCtx.restore();
+}
+function drawRect(x){
+  // perimeter 40 => 2(x+y)=40 => y=20-x. Area A=x(20-x). max at x=10.
+  var A=function(t){return t*(20-t);};
+  var Ap=function(t){return 20-2*t;};
+  var ax=A(x),apx=Ap(x);
+  var m=makeMap(opCv,0,20,0,120);
+  drawGrid2(opCtx,m,"x (side, m)","A (m²)",2,20);
+  opCtx.strokeStyle="#7bd88f";opCtx.lineWidth=2.8;opCtx.beginPath();
+  var i,t,first=true;
+  for(i=0;i<=300;i++){t=20*i/300;var yy=A(t);if(first){opCtx.moveTo(m.px(t),m.py(yy));first=false;}else opCtx.lineTo(m.px(t),m.py(yy));}
+  opCtx.stroke();
+  var optX=10,optA=A(10);
+  opCtx.fillStyle="#ffce6b";opCtx.beginPath();opCtx.arc(m.px(optX),m.py(optA),6,0,7);opCtx.fill();
+  opCtx.fillStyle="#e9edf8";opCtx.font="11px system-ui";opCtx.fillText("max A="+optA,m.px(optX)-24,m.py(optA)-12);
+  opCtx.strokeStyle="#e9edf8";opCtx.globalAlpha=.45;opCtx.beginPath();opCtx.moveTo(m.px(x),m.pad);opCtx.lineTo(m.px(x),m.H-m.pad);opCtx.stroke();opCtx.globalAlpha=1;
+  opCtx.fillStyle="#ffffff";opCtx.beginPath();opCtx.arc(m.px(x),m.py(ax),5.5,0,7);opCtx.fill();
+  // rectangle sketch
+  var bx=opCv.width-190,by=50,s=5;
+  var w=x*s, hgt=(20-x)*s;
+  opCtx.strokeStyle="#59c2ff";opCtx.lineWidth=1.6;opCtx.fillStyle="rgba(89,194,255,.10)";
+  opCtx.fillRect(bx,by,w,hgt);opCtx.strokeRect(bx,by,w,hgt);
+  opCtx.fillStyle="#9aa5bd";opCtx.font="10px system-ui";
+  opCtx.fillText("x="+fmt(x,1),bx+w/2-10,by+hgt+13);
+  opCtx.fillText("y="+fmt(20-x,1),bx+w+4,by+hgt/2);
+
+  document.getElementById("op-k1").textContent="Area A(x)";
+  document.getElementById("op-v1").textContent=fmt(ax,1)+" m²";
+  document.getElementById("op-k2").textContent="A′(x)";
+  document.getElementById("op-v2").textContent=fmt(apx,1);
+  document.getElementById("op-v3").textContent="10 m";
+  document.getElementById("op-k4").textContent="Max area";
+  document.getElementById("op-v4").textContent=optA+" m²";
+  document.getElementById("op-verdict").innerHTML=
+    "<b>Rectangle with perimeter 40 m</b><br>"+
+    "<span class='eqn'>y = 20 − x,  A(x) = x(20 − x)</span><br>"+
+    "<span class='eqn'>A′(x) = 20 − 2x = 0 → x = 10</span><br>"+
+    "Max area at <b>x = 10 m, y = 10 m</b> (a square), A = 100 m². A″ = −2 &lt; 0 ✓.";
+}
+function drawGrid2(ctx,m,xlab,ylab,xstep,ystep){
+  ctx.clearRect(0,0,m.W,m.H);
+  ctx.lineWidth=1;ctx.strokeStyle="#2d3750";ctx.fillStyle="#6b7793";ctx.font="10px system-ui";
+  var i;
+  for(i=Math.ceil(m.xmin/xstep)*xstep;i<=m.xmax;i+=xstep){
+    ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(m.px(i),m.pad);ctx.lineTo(m.px(i),m.H-m.pad);ctx.stroke();
+    ctx.globalAlpha=1;ctx.fillText(String(i),m.px(i)-4,m.H-m.pad+13);
+  }
+  for(i=Math.ceil(m.ymin/ystep)*ystep;i<=m.ymax;i+=ystep){
+    ctx.globalAlpha=.3;ctx.beginPath();ctx.moveTo(m.pad,m.py(i));ctx.lineTo(m.W-m.pad,m.py(i));ctx.stroke();
+    ctx.globalAlpha=1;ctx.fillText(String(i),4,m.py(i)+3);
+  }
+  ctx.fillStyle="#9aa5bd";ctx.font="11px system-ui";
+  ctx.fillText(xlab,m.W-m.pad-40,m.H-8);
+  ctx.fillText(ylab,m.pad+4,m.pad-6);
+}
+opProb.addEventListener("change",function(){opX.value=opProb.value==="box"?4:10;drawOp();});
+opX.addEventListener("input",drawOp);
+
+/* ================= QUIZ ================= */
+document.querySelectorAll(".quiz .q").forEach(function(q){
+  var ans=parseInt(q.getAttribute("data-a"),10);
+  var btns=q.querySelectorAll(".opts button");
+  var exp=q.querySelector(".exp");
+  btns.forEach(function(b,idx){
+    b.addEventListener("click",function(){
+      btns.forEach(function(x){x.disabled=false;});
+      btns.forEach(function(x){x.classList.remove("correct","wrong");});
+      btns[ans].classList.add("correct");
+      if(idx!==ans) b.classList.add("wrong");
+      exp.classList.add("show");
+    });
+  });
+});
+
+/* initial render */
+drawEx();
+drawTn();
+drawOp();
+</script>
+</body>
+</html>

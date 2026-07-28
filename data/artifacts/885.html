@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exp &amp; Log Derivatives Lab — NIOS Class 12 Maths (Ch28)</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#161f2e; --panel2:#1d283a;
+    --line:#2a3750; --ink:#e7edf6; --muted:#9fb0c6; --accent:#5ad1c8;
+    --accent-d:#2fa89f; --warn:#f2b45a; --grid:#243248; --curve1:#5ad1c8;
+    --curve2:#f2865e; --curve3:#a78bfa; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:16px}
+  header h1{font-size:1.35rem;margin:.2rem 0}
+  header p{color:var(--muted);margin:.2rem 0 1rem;font-size:.92rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;min-width:120px;text-align:center;transition:.15s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent);color:#08201e;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{font-size:1.05rem;margin:.1rem 0 .6rem}
+  .mode{display:none}
+  .mode.active{display:block}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border-radius:12px;border:1px solid var(--line);touch-action:pan-y}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px}
+  .ctl{flex:1 1 200px;min-width:160px}
+  .ctl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .ctl .val{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select{
+    width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:8px;font-size:.9rem
+  }
+  .readout{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-top:12px;font-size:.9rem
+  }
+  .readout .eq{font-family:"Cambria Math",Georgia,serif;font-size:1.02rem}
+  .k{color:var(--accent);font-weight:600}
+  .k2{color:var(--curve2);font-weight:600}
+  .k3{color:var(--curve3);font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:14px;height:4px;border-radius:2px;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+  .facts{font-size:.9rem}
+  .facts table{width:100%;border-collapse:collapse}
+  .facts td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  .facts td:first-child{color:var(--muted);white-space:nowrap;width:42%}
+  .facts .eq{font-family:"Cambria Math",Georgia,serif;color:var(--ink)}
+  .steps{font-family:"Cambria Math",Georgia,serif;font-size:.98rem;line-height:2}
+  .steps div{padding:4px 0;border-bottom:1px dashed var(--line)}
+  .quiz .q{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .quiz .q:last-child{border-bottom:none}
+  .quiz p{margin:.2rem 0 .5rem;font-weight:600}
+  .opt{
+    display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:9px 11px;margin:6px 0;cursor:pointer;font-size:.9rem;transition:.12s
+  }
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#14392f;border-color:var(--accent);color:#c9f7ef}
+  .opt.wrong{background:#3a1f20;border-color:#c9605e;color:#f6c9c8}
+  .explain{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .explain.show{display:block}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.88rem}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin:8px 0 20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Exp &amp; Log Derivatives Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch28 — Differentiation of Exponential and Logarithmic Functions</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-m="0">1 · eˣ &amp; aˣ</div>
+    <div class="tab" data-m="1">2 · ln x &amp; logₐx</div>
+    <div class="tab" data-m="2">3 · Chain &amp; log diff.</div>
+  </div>
+
+  <!-- MODE 0 -->
+  <section class="mode active" id="mode0">
+    <div class="panel">
+      <h2>eˣ is its own derivative</h2>
+      <canvas id="cv0" width="900" height="480" aria-label="Plot of exponential and its derivative"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--curve1)"></i> y = f(x)</span>
+        <span><i class="dot" style="background:var(--curve2)"></i> f&#39;(x) (derivative)</span>
+        <span><i class="dot" style="background:var(--curve3)"></i> tangent at x = a</span>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label>Base a = <span class="val" id="v_base">e ≈ 2.718</span></label>
+          <input type="range" id="s_base" min="1.2" max="4" step="0.05" value="2.718">
+        </div>
+        <div class="ctl">
+          <label>Tangent point x = a = <span class="val" id="v_pt0">1.00</span></label>
+          <input type="range" id="s_pt0" min="-2.5" max="2.5" step="0.05" value="1">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="eq" id="r0a"></div>
+        <div class="eq" id="r0b" style="margin-top:6px"></div>
+        <div class="note">Set the base to <b>e</b> and the orange derivative curve sits exactly on the teal curve —
+          slope of the tangent equals the height of the point. For a general base, the derivative is stretched by ln a.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE 1 -->
+  <section class="mode" id="mode1">
+    <div class="panel">
+      <h2>Logarithm derivatives &amp; the inverse reflection</h2>
+      <canvas id="cv1" width="900" height="480" aria-label="Plot of logarithm and its derivative"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--curve1)"></i> y = logₐx</span>
+        <span><i class="dot" style="background:var(--curve2)"></i> derivative 1/(x ln a)</span>
+        <span><i class="dot" style="background:var(--curve3)"></i> y = aˣ (inverse)</span>
+        <span><i class="dot" style="background:var(--muted)"></i> line y = x</span>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label>Base a = <span class="val" id="v_base1">e ≈ 2.718</span></label>
+          <input type="range" id="s_base1" min="1.2" max="6" step="0.05" value="2.718">
+        </div>
+        <div class="ctl">
+          <label>Point x = <span class="val" id="v_pt1">1.50</span></label>
+          <input type="range" id="s_pt1" min="0.2" max="6" step="0.05" value="1.5">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="eq" id="r1a"></div>
+        <div class="eq" id="r1b" style="margin-top:6px"></div>
+        <div class="note">y = aˣ and y = logₐx are mirror images across the dashed line y = x.
+          The natural log is special: d/dx(ln x) = 1/x exactly (no ln-factor).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE 2 -->
+  <section class="mode" id="mode2">
+    <div class="panel">
+      <h2>Chain rule &amp; logarithmic differentiation</h2>
+      <div class="ctl" style="max-width:360px">
+        <label>Example</label>
+        <select id="ex_sel">
+          <option value="0">y = e^(3x)  →  chain rule</option>
+          <option value="1">y = e^(x²)  →  chain rule</option>
+          <option value="2">y = ln(x² + 1)  →  chain rule</option>
+          <option value="3">y = xˣ  →  logarithmic differentiation</option>
+          <option value="4">y = x^(sin x)  →  logarithmic differentiation</option>
+        </select>
+      </div>
+      <div class="steps panel" id="steps" style="margin-top:12px;background:var(--panel2)"></div>
+      <canvas id="cv2" width="900" height="440" aria-label="Function with numerical-derivative check"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--curve1)"></i> y = f(x)</span>
+        <span><i class="dot" style="background:var(--curve2)"></i> f&#39;(x) exact formula</span>
+        <span><i class="dot" style="background:var(--curve3)"></i> numerical derivative (dots)</span>
+      </div>
+      <div class="controls">
+        <div class="ctl">
+          <label>Check point x = <span class="val" id="v_pt2">1.00</span></label>
+          <input type="range" id="s_pt2" min="0.1" max="3" step="0.02" value="1">
+        </div>
+      </div>
+      <div class="readout eq" id="r2"></div>
+      <div class="note">The purple dots are computed by the difference quotient
+        [f(x+h) − f(x−h)] / 2h with h = 0.001. They land on the orange exact-derivative curve — a live sanity check.</div>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <div class="grid2">
+    <div class="panel facts">
+      <h2>Facts panel — key derivatives</h2>
+      <table>
+        <tr><td>d/dx (eˣ)</td><td class="eq">= eˣ</td></tr>
+        <tr><td>d/dx (aˣ), a &gt; 0</td><td class="eq">= aˣ · ln a</td></tr>
+        <tr><td>d/dx (ln x), x &gt; 0</td><td class="eq">= 1 / x</td></tr>
+        <tr><td>d/dx (logₐx)</td><td class="eq">= 1 / (x · ln a)</td></tr>
+        <tr><td>d/dx (e^(g(x)))</td><td class="eq">= e^(g(x)) · g&#39;(x)</td></tr>
+        <tr><td>d/dx (ln(g(x)))</td><td class="eq">= g&#39;(x) / g(x)</td></tr>
+        <tr><td>Log differentiation</td><td class="eq">ln y = ln f ⇒ y&#39;/y = (ln f)&#39;</td></tr>
+      </table>
+      <div class="note">Use logarithmic differentiation whenever the variable appears in both base and exponent
+        (like xˣ) or for long products/quotients: take ln of both sides, differentiate, then multiply by y.</div>
+    </div>
+
+    <div class="panel quiz">
+      <h2>Quick quiz (tap an option)</h2>
+      <div class="q" data-correct="1">
+        <p>1. What is d/dx (5ˣ)?</p>
+        <span class="opt">5ˣ</span>
+        <span class="opt">5ˣ · ln 5</span>
+        <span class="opt">x · 5ˣ⁻¹</span>
+        <div class="explain">aˣ differentiates to aˣ·ln a, so d/dx(5ˣ) = 5ˣ ln 5.</div>
+      </div>
+      <div class="q" data-correct="2">
+        <p>2. What is d/dx (log₁₀ x)?</p>
+        <span class="opt">1/x</span>
+        <span class="opt">ln 10 / x</span>
+        <span class="opt">1/(x · ln 10)</span>
+        <div class="explain">d/dx(logₐx) = 1/(x ln a), so with a = 10 it is 1/(x ln 10).</div>
+      </div>
+      <div class="q" data-correct="0">
+        <p>3. For y = xˣ, y&#39; equals:</p>
+        <span class="opt">xˣ (ln x + 1)</span>
+        <span class="opt">x · xˣ⁻¹</span>
+        <span class="opt">xˣ · ln x</span>
+        <div class="explain">ln y = x ln x ⇒ y&#39;/y = ln x + 1 ⇒ y&#39; = xˣ(ln x + 1).</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Self-contained interactive · exact exp/log derivatives · redraws on input.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var E = Math.E, LN = Math.log;
+
+  // ---------- tab switching ----------
+  var tabs = document.querySelectorAll(".tab");
+  var modes = document.querySelectorAll(".mode");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      modes.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      modes[+t.dataset.m].classList.add("active");
+      // redraw the newly shown mode
+      if(t.dataset.m==="0") draw0();
+      if(t.dataset.m==="1") draw1();
+      if(t.dataset.m==="2") draw2();
+    });
+  });
+
+  // ---------- shared plot helpers ----------
+  function makePlot(cv, xmin, xmax, ymin, ymax){
+    var ctx = cv.getContext("2d");
+    var W = cv.width, H = cv.height, pad = 40;
+    function X(x){ return pad + (x - xmin)/(xmax - xmin)*(W - 2*pad); }
+    function Y(y){ return H - pad - (y - ymin)/(ymax - ymin)*(H - 2*pad); }
+    function clear(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = "#1d283a"; ctx.fillRect(0,0,W,H);
+      // grid
+      ctx.strokeStyle = "#243248"; ctx.lineWidth = 1;
+      ctx.fillStyle = "#6b7d96"; ctx.font = "12px sans-serif";
+      var gx = niceStep(xmin,xmax), gy = niceStep(ymin,ymax);
+      for(var x=Math.ceil(xmin/gx)*gx; x<=xmax+1e-9; x+=gx){
+        ctx.beginPath(); ctx.moveTo(X(x),Y(ymin)); ctx.lineTo(X(x),Y(ymax)); ctx.stroke();
+      }
+      for(var y=Math.ceil(ymin/gy)*gy; y<=ymax+1e-9; y+=gy){
+        ctx.beginPath(); ctx.moveTo(X(xmin),Y(y)); ctx.lineTo(X(xmax),Y(y)); ctx.stroke();
+      }
+      // axes
+      ctx.strokeStyle = "#4a5d78"; ctx.lineWidth = 1.5;
+      if(ymin<0&&ymax>0){ ctx.beginPath(); ctx.moveTo(X(xmin),Y(0)); ctx.lineTo(X(xmax),Y(0)); ctx.stroke(); }
+      if(xmin<0&&xmax>0){ ctx.beginPath(); ctx.moveTo(X(0),Y(ymin)); ctx.lineTo(X(0),Y(ymax)); ctx.stroke(); }
+      // tick labels
+      ctx.fillStyle="#8397b0";
+      for(var xl=Math.ceil(xmin/gx)*gx; xl<=xmax+1e-9; xl+=gx){
+        if(Math.abs(xl)<1e-9) continue;
+        ctx.fillText(fmt(xl), X(xl)-6, Y(ymin<0&&ymax>0?0:ymin)+14);
+      }
+      for(var yl=Math.ceil(ymin/gy)*gy; yl<=ymax+1e-9; yl+=gy){
+        if(Math.abs(yl)<1e-9) continue;
+        ctx.fillText(fmt(yl), X(xmin<0&&xmax>0?0:xmin)+4, Y(yl)-3);
+      }
+    }
+    function plot(fn, color, width){
+      ctx.strokeStyle = color; ctx.lineWidth = width||2.2; ctx.beginPath();
+      var started=false, N=600;
+      for(var i=0;i<=N;i++){
+        var x = xmin + (xmax-xmin)*i/N, y = fn(x);
+        if(!isFinite(y)||y>ymax*6||y<ymin*6){ started=false; continue; }
+        var px=X(x), py=Y(y);
+        if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    }
+    function dots(fn, color){
+      ctx.fillStyle=color;
+      for(var i=0;i<=28;i++){
+        var x = xmin + (xmax-xmin)*i/28, y=fn(x);
+        if(!isFinite(y)||y>ymax||y<ymin) continue;
+        ctx.beginPath(); ctx.arc(X(x),Y(y),2.6,0,7); ctx.fill();
+      }
+    }
+    function point(x,y,color,r){
+      ctx.fillStyle=color; ctx.beginPath(); ctx.arc(X(x),Y(y),r||5,0,7); ctx.fill();
+    }
+    function segment(x1,y1,x2,y2,color,w){
+      ctx.strokeStyle=color; ctx.lineWidth=w||2; ctx.beginPath();
+      ctx.moveTo(X(x1),Y(y1)); ctx.lineTo(X(x2),Y(y2)); ctx.stroke();
+    }
+    return {ctx:ctx,X:X,Y:Y,clear:clear,plot:plot,dots:dots,point:point,segment:segment,
+            xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax};
+  }
+  function niceStep(a,b){
+    var r=(b-a)/6, p=Math.pow(10,Math.floor(Math.log(r)/Math.LN10)), f=r/p;
+    var s = f<1.5?1:f<3?2:f<7?5:10;
+    return s*p;
+  }
+  function fmt(v){ return Math.abs(v)<1e-9?"0":(Math.abs(v)>=100||Math.abs(v)<0.01?v.toPrecision(2):(+v.toFixed(2)).toString()); }
+
+  // ================= MODE 0 : e^x & a^x =================
+  var s_base=document.getElementById("s_base"), s_pt0=document.getElementById("s_pt0");
+  function draw0(){
+    var a=+s_base.value, aptx=+s_pt0.value;
+    var isE = Math.abs(a-E)<0.02;
+    document.getElementById("v_base").textContent = isE ? "e ≈ 2.718" : a.toFixed(2);
+    document.getElementById("v_pt0").textContent = aptx.toFixed(2);
+    var cv=document.getElementById("cv0");
+    var p=makePlot(cv,-2.5,2.5,-1,9);
+    p.clear();
+    var f  = function(x){ return Math.pow(a,x); };            // a^x
+    var fp = function(x){ return Math.pow(a,x)*LN(a); };      // a^x ln a
+    p.plot(f,  getComputedStyle(document.documentElement).getPropertyValue("--curve1")||"#5ad1c8", 2.6);
+    p.plot(fp, "#f2865e", 2.6);
+    // tangent at x=apt : y = f(apt) + fp(apt)(x-apt)
+    var fa=f(aptx), sa=fp(aptx);
+    p.segment(p.xmin, fa+sa*(p.xmin-aptx), p.xmax, fa+sa*(p.xmax-aptx), "#a78bfa", 1.8);
+    p.point(aptx, fa, "#a78bfa", 5);
+    // readouts
+    var r0a=document.getElementById("r0a"), r0b=document.getElementById("r0b");
+    if(isE){
+      r0a.innerHTML = "d/dx(eˣ) = <span class='k'>eˣ</span>. At x = "+aptx.toFixed(2)+
+        ":  slope = height = <span class='k'>"+fa.toFixed(3)+"</span>.";
+      r0b.innerHTML = "The teal curve and its orange derivative coincide — that is what makes e special.";
+    } else {
+      r0a.innerHTML = "d/dx("+a.toFixed(2)+"ˣ) = "+a.toFixed(2)+"ˣ · ln "+a.toFixed(2)+
+        " = "+a.toFixed(2)+"ˣ · <span class='k2'>"+LN(a).toFixed(3)+"</span>.";
+      r0b.innerHTML = "At x = "+aptx.toFixed(2)+":  f = <span class='k'>"+fa.toFixed(3)+
+        "</span>,  slope f&#39; = <span class='k2'>"+sa.toFixed(3)+"</span>  (ratio slope/f = ln a = "+LN(a).toFixed(3)+").";
+    }
+  }
+  s_base.addEventListener("input",draw0);
+  s_pt0.addEventListener("input",draw0);
+
+  // ================= MODE 1 : ln x & log_a x =================
+  var s_base1=document.getElementById("s_base1"), s_pt1=document.getElementById("s_pt1");
+  function draw1(){
+    var a=+s_base1.value, ptx=+s_pt1.value;
+    var isE=Math.abs(a-E)<0.02;
+    document.getElementById("v_base1").textContent=isE?"e ≈ 2.718":a.toFixed(2);
+    document.getElementById("v_pt1").textContent=ptx.toFixed(2);
+    var cv=document.getElementById("cv1");
+    var p=makePlot(cv,-1,6,-3,6);
+    p.clear();
+    var loga=function(x){ return x>0?LN(x)/LN(a):NaN; };     // log_a x
+    var dloga=function(x){ return x>0?1/(x*LN(a)):NaN; };    // 1/(x ln a)
+    var expa=function(x){ return Math.pow(a,x); };           // a^x  (inverse)
+    // y=x reference
+    p.plot(function(x){return x;}, "#6b7d96", 1.3);
+    p.plot(expa, "#a78bfa", 2.2);
+    p.plot(loga, "#5ad1c8", 2.6);
+    p.plot(dloga,"#f2865e", 2.4);
+    // point + derivative segment on log curve
+    var ly=loga(ptx), sl=dloga(ptx);
+    p.point(ptx,ly,"#5ad1c8",5);
+    var r1a=document.getElementById("r1a"), r1b=document.getElementById("r1b");
+    if(isE){
+      r1a.innerHTML="d/dx(ln x) = <span class='k2'>1/x</span>. At x = "+ptx.toFixed(2)+
+        ":  ln x = <span class='k'>"+ly.toFixed(3)+"</span>,  slope = 1/x = <span class='k2'>"+sl.toFixed(3)+"</span>.";
+      r1b.innerHTML="ln x is the inverse of eˣ (purple) — reflect either across y = x to get the other.";
+    } else {
+      r1a.innerHTML="d/dx(log₍"+a.toFixed(2)+"₎ x) = 1/(x · ln "+a.toFixed(2)+").  At x = "+ptx.toFixed(2)+
+        ":  value = <span class='k'>"+ly.toFixed(3)+"</span>,  slope = <span class='k2'>"+sl.toFixed(3)+"</span>.";
+      r1b.innerHTML="log₍a₎x is the inverse of aˣ (purple); they mirror across y = x.";
+    }
+  }
+  s_base1.addEventListener("input",draw1);
+  s_pt1.addEventListener("input",draw1);
+
+  // ================= MODE 2 : chain & log diff =================
+  var examples=[
+    { // e^(3x)
+      f:function(x){return Math.exp(3*x);},
+      fp:function(x){return 3*Math.exp(3*x);},
+      title:"y = e^(3x)   (chain rule)",
+      steps:["Let u = g(x) = 3x, so y = e^u.",
+             "d/dx(e^u) = e^u · u&#39;   (chain rule).",
+             "u&#39; = d/dx(3x) = 3.",
+             "y&#39; = e^(3x) · 3 = 3 e^(3x)."],
+      view:[-1,1,-1,9]
+    },
+    { // e^(x^2)
+      f:function(x){return Math.exp(x*x);},
+      fp:function(x){return 2*x*Math.exp(x*x);},
+      title:"y = e^(x²)   (chain rule)",
+      steps:["Let u = x², so y = e^u.",
+             "d/dx(e^u) = e^u · u&#39;.",
+             "u&#39; = 2x.",
+             "y&#39; = e^(x²) · 2x = 2x e^(x²)."],
+      view:[-1.6,1.6,-2,9]
+    },
+    { // ln(x^2+1)
+      f:function(x){return LN(x*x+1);},
+      fp:function(x){return 2*x/(x*x+1);},
+      title:"y = ln(x² + 1)   (chain rule)",
+      steps:["Let u = x² + 1 &gt; 0, so y = ln u.",
+             "d/dx(ln u) = u&#39; / u.",
+             "u&#39; = 2x.",
+             "y&#39; = 2x / (x² + 1)."],
+      view:[-3,3,-1,3]
+    },
+    { // x^x
+      f:function(x){return Math.pow(x,x);},
+      fp:function(x){return Math.pow(x,x)*(LN(x)+1);},
+      title:"y = xˣ ,  x &gt; 0   (logarithmic differentiation)",
+      steps:["Take ln of both sides:  ln y = ln(xˣ) = x ln x.",
+             "Differentiate:  y&#39;/y = 1·ln x + x·(1/x) = ln x + 1.",
+             "Multiply by y = xˣ:",
+             "y&#39; = xˣ (ln x + 1)."],
+      view:[0.05,2.2,-1,5]
+    },
+    { // x^(sin x)
+      f:function(x){return Math.pow(x,Math.sin(x));},
+      fp:function(x){return Math.pow(x,Math.sin(x))*(Math.cos(x)*LN(x)+Math.sin(x)/x);},
+      title:"y = x^(sin x) ,  x &gt; 0   (logarithmic differentiation)",
+      steps:["ln y = sin x · ln x.",
+             "y&#39;/y = cos x · ln x + sin x · (1/x)   (product rule).",
+             "Multiply by y = x^(sin x):",
+             "y&#39; = x^(sin x) [ cos x · ln x + (sin x)/x ]."],
+      view:[0.05,3,-0.5,3]
+    }
+  ];
+  var ex_sel=document.getElementById("ex_sel"), s_pt2=document.getElementById("s_pt2");
+  function draw2(){
+    var ex=examples[+ex_sel.value], ptx=+s_pt2.value;
+    document.getElementById("v_pt2").textContent=ptx.toFixed(2);
+    // steps
+    var box=document.getElementById("steps");
+    var html="<div style='border:none;color:#5ad1c8;font-weight:600'>"+ex.title+"</div>";
+    ex.steps.forEach(function(s){ html+="<div>"+s+"</div>"; });
+    box.innerHTML=html;
+    // numerical derivative
+    var h=0.001;
+    var num=function(x){ return (ex.f(x+h)-ex.f(x-h))/(2*h); };
+    var v=ex.view;
+    var cv=document.getElementById("cv2");
+    var p=makePlot(cv,v[0],v[1],v[2],v[3]);
+    p.clear();
+    p.plot(ex.f,"#5ad1c8",2.6);
+    p.plot(ex.fp,"#f2865e",2.4);
+    p.dots(num,"#a78bfa");
+    // check-point marker on derivative
+    var exact=ex.fp(ptx), approx=num(ptx);
+    if(isFinite(exact)) p.point(ptx,exact,"#f2865e",5);
+    document.getElementById("r2").innerHTML =
+      "At x = "+ptx.toFixed(2)+":  exact f&#39; = <span class='k2'>"+exact.toFixed(4)+
+      "</span>,  numerical f&#39; = <span class='k3'>"+approx.toFixed(4)+
+      "</span>  (difference "+Math.abs(exact-approx).toExponential(1)+").";
+  }
+  ex_sel.addEventListener("change",draw2);
+  s_pt2.addEventListener("input",draw2);
+
+  // ================= QUIZ =================
+  document.querySelectorAll(".quiz .q").forEach(function(q){
+    var correct=+q.dataset.correct;
+    var opts=q.querySelectorAll(".opt");
+    var exp=q.querySelector(".explain");
+    opts.forEach(function(o,i){
+      o.addEventListener("click",function(){
+        opts.forEach(function(x){x.classList.remove("correct","wrong");});
+        opts[correct].classList.add("correct");
+        if(i!==correct) o.classList.add("wrong");
+        exp.classList.add("show");
+      });
+    });
+  });
+
+  // initial draws
+  draw0(); draw1(); draw2();
+})();
+</script>
+</body>
+</html>

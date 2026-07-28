@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Derivatives of Trig Functions Lab — NIOS Class 12 Maths Ch27</title>
+<style>
+  :root{
+    --bg:#141a24;--panel:#1c2431;--panel2:#232d3d;--ink:#e7edf5;--muted:#9fb0c4;
+    --accent:#5ad1c5;--accent-dim:#2f6f68;--line:#33415a;--good:#63d68a;--warn:#f2b45e;
+    --f:#5ad1c5;--df:#f2955e;--radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px}
+  header h1{font-size:1.35rem;margin:0 0 4px}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    min-height:40px;
+  }
+  .tab.active{background:var(--accent-dim);color:var(--ink);border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{margin:0 0 10px;font-size:1.05rem;color:var(--accent)}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:none}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .control{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);min-width:130px;flex:1}
+  select,button{
+    font:inherit;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:9px 11px;min-height:40px;cursor:pointer;
+  }
+  input[type=range]{width:100%;accent-color:var(--accent);height:34px}
+  button.act{background:var(--accent-dim);border-color:var(--accent)}
+  button:active{transform:translateY(1px)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;margin-top:10px;color:var(--muted)}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+  .readout{background:var(--panel2);border-radius:10px;padding:10px 12px;margin-top:12px;font-size:.9rem}
+  .readout b{color:var(--ink)}
+  code{background:#0f141d;padding:1px 6px;border-radius:6px;color:var(--accent);font-size:.9em}
+  table{width:100%;border-collapse:collapse;font-size:.92rem}
+  th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600}
+  tr.pick{cursor:pointer}
+  tr.pick:hover td{background:var(--panel2)}
+  tr.pick.sel td{background:var(--accent-dim)}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .fact{background:var(--panel2);border-radius:10px;padding:9px 11px;font-size:.9rem}
+  .fact code{background:#0f141d}
+  .ex{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .ex button{flex:1;min-width:120px}
+  .quiz .q{margin-bottom:14px;background:var(--panel2);border-radius:12px;padding:12px}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .quiz .opt{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;font-size:.9rem}
+  .quiz .opt.correct{background:#1c3a29;border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:#3a2020;border-color:#e06b6b;color:#f0a0a0}
+  .quiz .reveal{font-size:.86rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .reveal.show{display:block}
+  .hint{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .hidden{display:none}
+  @media(max-width:520px){.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Derivatives of Trig Functions Lab</h1>
+    <p>NIOS Class 12 Mathematics &middot; Ch27 — Differentiation of Trigonometric Functions</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="visual">1 &middot; f and f&prime; visual</button>
+    <button class="tab" data-mode="table">2 &middot; Standard derivatives</button>
+    <button class="tab" data-mode="chain">3 &middot; Chain rule</button>
+  </div>
+
+  <!-- MODE 1 -->
+  <section id="m-visual">
+    <div class="panel">
+      <h2>Slope of the tangent = value of the derivative</h2>
+      <canvas id="cv1" width="900" height="420"></canvas>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--f)"></span>f(x)</span>
+        <span><span class="swatch" style="background:var(--df)"></span>f&prime;(x)</span>
+        <span><span class="swatch" style="background:#f2d15e"></span>tangent at x = a</span>
+      </div>
+      <div class="controls">
+        <label class="control">Function f(x)
+          <select id="fn1">
+            <option value="sin">sin x</option>
+            <option value="cos">cos x</option>
+            <option value="tan">tan x</option>
+            <option value="cosec">cosec x</option>
+            <option value="sec">sec x</option>
+            <option value="cot">cot x</option>
+          </select>
+        </label>
+        <label class="control">Tangent point a = <span id="aval">0.80</span>
+          <input type="range" id="a1" min="-6.2" max="6.2" step="0.02" value="0.8">
+        </label>
+      </div>
+      <div class="readout" id="ro1"></div>
+      <p class="hint">Drag the slider (or the canvas) to move the tangent. Notice the yellow tangent's steepness always equals the orange f&prime; value at the same x.</p>
+    </div>
+  </section>
+
+  <!-- MODE 2 -->
+  <section id="m-table" class="hidden">
+    <div class="panel">
+      <h2>Standard derivatives — tap a row to plot both</h2>
+      <table>
+        <thead><tr><th>f(x)</th><th>f&prime;(x) = d/dx</th></tr></thead>
+        <tbody id="tbl"></tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <canvas id="cv2" width="900" height="380"></canvas>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--f)"></span><span id="lf2">sin x</span></span>
+        <span><span class="swatch" style="background:var(--df)"></span><span id="ldf2">cos x</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE 3 -->
+  <section id="m-chain" class="hidden">
+    <div class="panel">
+      <h2>Chain rule with trig</h2>
+      <p style="font-size:.92rem;color:var(--muted);margin:0 0 10px">
+        <code>d/dx[ sin(g(x)) ] = cos(g(x)) &middot; g&prime;(x)</code> — the analytic derivative (orange) is
+        checked against a numerical derivative (dashed) so you can trust it.
+      </p>
+      <div class="ex">
+        <button class="act" data-ex="0">sin(2x)</button>
+        <button data-ex="1">cos(x&sup2;)</button>
+        <button data-ex="2">tan(3x)</button>
+      </div>
+      <canvas id="cv3" width="900" height="380"></canvas>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--f)"></span>f(x)</span>
+        <span><span class="swatch" style="background:var(--df)"></span>f&prime;(x) analytic</span>
+        <span><span class="swatch" style="background:#f2d15e"></span>numerical check</span>
+      </div>
+      <div class="readout" id="ro3"></div>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <div class="panel">
+    <h2>Facts panel — six standard derivatives &amp; the chain rule</h2>
+    <div class="facts">
+      <div class="fact"><code>d/dx sin x = cos x</code></div>
+      <div class="fact"><code>d/dx cos x = &minus;sin x</code></div>
+      <div class="fact"><code>d/dx tan x = sec&sup2; x</code></div>
+      <div class="fact"><code>d/dx cot x = &minus;cosec&sup2; x</code></div>
+      <div class="fact"><code>d/dx sec x = sec x tan x</code></div>
+      <div class="fact"><code>d/dx cosec x = &minus;cosec x cot x</code></div>
+      <div class="fact" style="grid-column:1/-1"><b>Chain rule:</b> <code>d/dx f(g(x)) = f&prime;(g(x)) &middot; g&prime;(x)</code>. E.g. <code>d/dx sin(2x) = 2cos(2x)</code>, <code>d/dx cos(x&sup2;) = &minus;2x&middot;sin(x&sup2;)</code>.</div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz — tap an option, then reveal</h2>
+    <div class="q" data-a="1">
+      <div><b>Q1.</b> What is <code>d/dx (cos x)</code> ?</div>
+      <div class="opts">
+        <div class="opt">sin x</div>
+        <div class="opt">&minus;sin x</div>
+        <div class="opt">sec&sup2; x</div>
+      </div>
+      <div class="reveal">Correct: <b>&minus;sin x</b>. The slope of cos x is the negative of sin x.</div>
+    </div>
+    <div class="q" data-a="2">
+      <div><b>Q2.</b> What is <code>d/dx (tan x)</code> ?</div>
+      <div class="opts">
+        <div class="opt">&minus;cosec&sup2; x</div>
+        <div class="opt">sec x tan x</div>
+        <div class="opt">sec&sup2; x</div>
+      </div>
+      <div class="reveal">Correct: <b>sec&sup2; x</b>. Since tan x = sin x / cos x, the quotient rule gives sec&sup2; x.</div>
+    </div>
+    <div class="q" data-a="0">
+      <div><b>Q3.</b> Using the chain rule, <code>d/dx sin(2x)</code> = ?</div>
+      <div class="opts">
+        <div class="opt">2 cos(2x)</div>
+        <div class="opt">cos(2x)</div>
+        <div class="opt">2 sin(2x)</div>
+      </div>
+      <div class="reveal">Correct: <b>2 cos(2x)</b>. Outer derivative cos(2x) times inner derivative g&prime;(x)=2.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var TAU=Math.PI*2;
+
+  // ---------- function library ----------
+  function safe(v){ return (isFinite(v)&&Math.abs(v)<1e4)?v:NaN; }
+  var LIB={
+    sin:{ f:function(x){return Math.sin(x);}, d:function(x){return Math.cos(x);}, dname:"cos x" },
+    cos:{ f:function(x){return Math.cos(x);}, d:function(x){return -Math.sin(x);}, dname:"−sin x" },
+    tan:{ f:function(x){return safe(Math.tan(x));}, d:function(x){var c=Math.cos(x); return safe(1/(c*c));}, dname:"sec² x" },
+    cosec:{ f:function(x){var s=Math.sin(x); return safe(1/s);}, d:function(x){var s=Math.sin(x),c=Math.cos(x); return safe(-c/(s*s));}, dname:"−cosec x cot x" },
+    sec:{ f:function(x){var c=Math.cos(x); return safe(1/c);}, d:function(x){var c=Math.cos(x),s=Math.sin(x); return safe(s/(c*c));}, dname:"sec x tan x" },
+    cot:{ f:function(x){var s=Math.sin(x); return safe(Math.cos(x)/s);}, d:function(x){var s=Math.sin(x); return safe(-1/(s*s));}, dname:"−cosec² x" }
+  };
+  var FLABEL={sin:"sin x",cos:"cos x",tan:"tan x",cosec:"cosec x",sec:"sec x",cot:"cot x"};
+
+  var css=getComputedStyle(document.documentElement);
+  var C_F=css.getPropertyValue('--f').trim()||'#5ad1c5';
+  var C_DF=css.getPropertyValue('--df').trim()||'#f2955e';
+  var C_LINE=css.getPropertyValue('--line').trim()||'#33415a';
+  var C_MUTED=css.getPropertyValue('--muted').trim()||'#9fb0c4';
+  var C_TAN='#f2d15e';
+
+  // ---------- generic plotter ----------
+  function Plot(cv, opts){
+    this.cv=cv; this.ctx=cv.getContext('2d');
+    this.xmin=opts.xmin; this.xmax=opts.xmax;
+    this.ymin=opts.ymin; this.ymax=opts.ymax;
+  }
+  Plot.prototype.px=function(x){ return (x-this.xmin)/(this.xmax-this.xmin)*this.cv.width; };
+  Plot.prototype.py=function(y){ return this.cv.height-(y-this.ymin)/(this.ymax-this.ymin)*this.cv.height; };
+  Plot.prototype.axes=function(){
+    var ctx=this.ctx,w=this.cv.width,h=this.cv.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle=C_LINE; ctx.lineWidth=1;
+    // vertical gridlines every pi/2
+    ctx.beginPath();
+    var step=Math.PI/2;
+    for(var gx=Math.ceil(this.xmin/step)*step; gx<=this.xmax; gx+=step){
+      var X=this.px(gx); ctx.moveTo(X,0); ctx.lineTo(X,h);
+    }
+    for(var gy=Math.ceil(this.ymin); gy<=this.ymax; gy+=1){
+      var Y=this.py(gy); ctx.moveTo(0,Y); ctx.lineTo(w,Y);
+    }
+    ctx.stroke();
+    // axes
+    ctx.strokeStyle=C_MUTED; ctx.lineWidth=1.4;
+    ctx.beginPath();
+    ctx.moveTo(0,this.py(0)); ctx.lineTo(w,this.py(0));
+    ctx.moveTo(this.px(0),0); ctx.lineTo(this.px(0),h);
+    ctx.stroke();
+  };
+  Plot.prototype.curve=function(fn,color,dash){
+    var ctx=this.ctx,w=this.cv.width;
+    ctx.strokeStyle=color; ctx.lineWidth=2.4;
+    ctx.setLineDash(dash||[]);
+    ctx.beginPath();
+    var pen=false;
+    for(var i=0;i<=w;i++){
+      var x=this.xmin+(i/w)*(this.xmax-this.xmin);
+      var y=fn(x);
+      if(!isFinite(y)){ pen=false; continue; }
+      var Y=this.py(y);
+      if(Y< -50 || Y>this.cv.height+50){ pen=false; continue; }
+      if(!pen){ ctx.moveTo(this.px(x),Y); pen=true; } else { ctx.lineTo(this.px(x),Y); }
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  };
+  Plot.prototype.dot=function(x,y,color){
+    var ctx=this.ctx; ctx.fillStyle=color;
+    ctx.beginPath(); ctx.arc(this.px(x),this.py(y),5,0,TAU); ctx.fill();
+  };
+
+  // ============ MODE 1 ============
+  var cv1=document.getElementById('cv1');
+  var p1=new Plot(cv1,{xmin:-TAU,xmax:TAU,ymin:-3.2,ymax:3.2});
+  var fn1=document.getElementById('fn1'), a1=document.getElementById('a1');
+  var aval=document.getElementById('aval'), ro1=document.getElementById('ro1');
+
+  function draw1(){
+    var key=fn1.value, L=LIB[key], a=parseFloat(a1.value);
+    aval.textContent=a.toFixed(2);
+    p1.axes();
+    p1.curve(L.f,C_F);
+    p1.curve(L.d,C_DF);
+    var ya=L.f(a), slope=L.d(a);
+    if(isFinite(ya)&&isFinite(slope)){
+      // tangent line y = ya + slope*(x-a), drawn over a short span
+      var ctx=p1.ctx; ctx.strokeStyle=C_TAN; ctx.lineWidth=2.2;
+      ctx.beginPath();
+      var span=1.6/Math.max(1,Math.min(4,Math.abs(slope)/1.5+0.5));
+      var x0=a-span, x1=a+span;
+      ctx.moveTo(p1.px(x0),p1.py(ya+slope*(x0-a)));
+      ctx.lineTo(p1.px(x1),p1.py(ya+slope*(x1-a)));
+      ctx.stroke();
+      p1.dot(a,ya,C_TAN);
+      p1.dot(a,slope,C_DF);
+    }
+    var sTxt=isFinite(slope)?slope.toFixed(3):"undefined";
+    ro1.innerHTML="At x = <b>"+a.toFixed(2)+"</b>: slope of "+FLABEL[key]+" = <b>"+sTxt+
+      "</b> &nbsp;=&nbsp; f&prime;(x) = "+L.dname+" = <b>"+sTxt+"</b>. The tangent slope matches the orange derivative value.";
+  }
+  fn1.addEventListener('change',draw1);
+  a1.addEventListener('input',draw1);
+  // drag on canvas to move a
+  function canvasToA(ev){
+    var r=cv1.getBoundingClientRect();
+    var cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+    var frac=cx/r.width;
+    var x=p1.xmin+frac*(p1.xmax-p1.xmin);
+    x=Math.max(-6.2,Math.min(6.2,x));
+    a1.value=x.toFixed(2); draw1();
+  }
+  var dragging=false;
+  cv1.addEventListener('mousedown',function(e){dragging=true;canvasToA(e);});
+  window.addEventListener('mousemove',function(e){if(dragging)canvasToA(e);});
+  window.addEventListener('mouseup',function(){dragging=false;});
+  cv1.addEventListener('touchstart',function(e){dragging=true;canvasToA(e);e.preventDefault();},{passive:false});
+  cv1.addEventListener('touchmove',function(e){if(dragging){canvasToA(e);e.preventDefault();}},{passive:false});
+  cv1.addEventListener('touchend',function(){dragging=false;});
+
+  // ============ MODE 2 ============
+  var ROWS=[
+    ["sin x","cos x","sin"],
+    ["cos x","−sin x","cos"],
+    ["tan x","sec² x","tan"],
+    ["cot x","−cosec² x","cot"],
+    ["sec x","sec x tan x","sec"],
+    ["cosec x","−cosec x cot x","cosec"]
+  ];
+  var tbl=document.getElementById('tbl');
+  var cv2=document.getElementById('cv2');
+  var p2=new Plot(cv2,{xmin:-TAU,xmax:TAU,ymin:-3.2,ymax:3.2});
+  var lf2=document.getElementById('lf2'), ldf2=document.getElementById('ldf2');
+  ROWS.forEach(function(r,i){
+    var tr=document.createElement('tr');
+    tr.className='pick'+(i===0?' sel':'');
+    tr.innerHTML='<td>'+r[0]+'</td><td>'+r[1]+'</td>';
+    tr.addEventListener('click',function(){
+      Array.prototype.forEach.call(tbl.children,function(c){c.classList.remove('sel');});
+      tr.classList.add('sel'); draw2(r[2],r[0],r[1]);
+    });
+    tbl.appendChild(tr);
+  });
+  function draw2(key,fl,dl){
+    var L=LIB[key];
+    p2.axes(); p2.curve(L.f,C_F); p2.curve(L.d,C_DF);
+    lf2.textContent=fl; ldf2.textContent=dl;
+  }
+
+  // ============ MODE 3 ============
+  var EX=[
+    {name:"sin(2x)", f:function(x){return Math.sin(2*x);}, d:function(x){return 2*Math.cos(2*x);},
+     txt:"f(x)=sin(2x). Here g(x)=2x, g′(x)=2, so d/dx = cos(2x)·2 = <b>2cos(2x)</b>.", ymin:-2.4,ymax:2.4},
+    {name:"cos(x²)", f:function(x){return Math.cos(x*x);}, d:function(x){return -2*x*Math.sin(x*x);},
+     txt:"f(x)=cos(x²). Here g(x)=x², g′(x)=2x, so d/dx = −sin(x²)·2x = <b>−2x·sin(x²)</b>.", ymin:-5.2,ymax:5.2},
+    {name:"tan(3x)", f:function(x){var c=Math.cos(3*x);return safe(Math.tan(3*x));}, d:function(x){var c=Math.cos(3*x);return safe(3/(c*c));},
+     txt:"f(x)=tan(3x). Here g(x)=3x, g′(x)=3, so d/dx = sec²(3x)·3 = <b>3sec²(3x)</b>.", ymin:-4,ymax:4}
+  ];
+  var cv3=document.getElementById('cv3'), ro3=document.getElementById('ro3');
+  function numDeriv(f,x){ var h=1e-4; return (f(x+h)-f(x-h))/(2*h); }
+  function draw3(idx){
+    var e=EX[idx];
+    var p3=new Plot(cv3,{xmin:-TAU,xmax:TAU,ymin:e.ymin,ymax:e.ymax});
+    p3.axes();
+    p3.curve(e.f,C_F);
+    p3.curve(e.d,C_DF);
+    p3.curve(function(x){return numDeriv(e.f,x);},C_TAN,[6,5]);
+    // max mismatch sample
+    var maxErr=0;
+    for(var x=-6;x<=6;x+=0.05){
+      var an=e.d(x), nu=numDeriv(e.f,x);
+      if(isFinite(an)&&isFinite(nu)&&Math.abs(an)<50) maxErr=Math.max(maxErr,Math.abs(an-nu));
+    }
+    ro3.innerHTML=e.txt+" <br>Numerical check: dashed curve overlaps the analytic derivative (max difference ≈ "+maxErr.toFixed(4)+").";
+  }
+  var exBtns=document.querySelectorAll('.ex button');
+  Array.prototype.forEach.call(exBtns,function(b){
+    b.addEventListener('click',function(){
+      Array.prototype.forEach.call(exBtns,function(x){x.classList.remove('act');});
+      b.classList.add('act'); draw3(parseInt(b.getAttribute('data-ex'),10));
+    });
+  });
+
+  // ============ QUIZ ============
+  Array.prototype.forEach.call(document.querySelectorAll('#quiz .q'),function(q){
+    var ans=parseInt(q.getAttribute('data-a'),10);
+    var opts=q.querySelectorAll('.opt');
+    var reveal=q.querySelector('.reveal');
+    Array.prototype.forEach.call(opts,function(opt,i){
+      opt.addEventListener('click',function(){
+        Array.prototype.forEach.call(opts,function(o){o.classList.remove('correct','wrong');});
+        opts[ans].classList.add('correct');
+        if(i!==ans) opt.classList.add('wrong');
+        reveal.classList.add('show');
+      });
+    });
+  });
+
+  // ============ TABS ============
+  var sections={visual:document.getElementById('m-visual'),table:document.getElementById('m-table'),chain:document.getElementById('m-chain')};
+  Array.prototype.forEach.call(document.querySelectorAll('#tabs .tab'),function(t){
+    t.addEventListener('click',function(){
+      Array.prototype.forEach.call(document.querySelectorAll('#tabs .tab'),function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var m=t.getAttribute('data-mode');
+      for(var k in sections){ sections[k].classList.toggle('hidden',k!==m); }
+      if(m==='visual') draw1();
+      else if(m==='table') draw2('sin','sin x','cos x');
+      else if(m==='chain') draw3(0);
+    });
+  });
+
+  // init
+  draw1();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integration Lab — NIOS Class 12 Maths (Ch30)</title>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#17212e; --panel2:#1e2a3a; --ink:#e6edf5;
+    --muted:#93a4b8; --accent:#4dd0a7; --accent-dim:#2f7d66; --line:#2a3a4d;
+    --grid:#22303f; --curve:#4dd0a7; --rect:#4dd0a7; --area:#ffb454;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem; margin:0 0 2px}
+  .sub{color:var(--muted); font-size:.85rem; margin-bottom:12px}
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+  .tab{
+    background:var(--panel); color:var(--ink); border:1px solid var(--line);
+    padding:9px 13px; border-radius:11px; cursor:pointer; font-size:.9rem;
+    touch-action:manipulation;
+  }
+  .tab.active{background:var(--accent); color:#062018; border-color:var(--accent); font-weight:600}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin-bottom:14px;
+  }
+  .panel h2{font-size:1.05rem; margin:0 0 10px; color:var(--accent)}
+  .hidden{display:none}
+  canvas{width:100%; height:auto; display:block; background:var(--panel2); border-radius:12px; touch-action:none}
+  .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:10px 0}
+  .ctrl{display:flex; flex-direction:column; gap:4px; min-width:140px; flex:1}
+  .ctrl label{font-size:.8rem; color:var(--muted)}
+  input[type=range]{width:100%; accent-color:var(--accent); height:26px}
+  select,button.mini{
+    background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    border-radius:9px; padding:8px 10px; font-size:.88rem; touch-action:manipulation;
+  }
+  .seg{display:inline-flex; gap:6px; flex-wrap:wrap}
+  .seg button{
+    background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    border-radius:9px; padding:8px 12px; font-size:.85rem; cursor:pointer; touch-action:manipulation;
+  }
+  .seg button.on{background:var(--accent); color:#062018; border-color:var(--accent); font-weight:600}
+  .readout{background:var(--panel2); border:1px solid var(--line); border-radius:11px; padding:11px; font-size:.9rem}
+  .readout b{color:var(--accent)}
+  .grid2{display:grid; grid-template-columns:1fr; gap:10px}
+  @media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
+  .intcard{
+    background:var(--panel2); border:1px solid var(--line); border-radius:12px;
+    padding:12px; cursor:pointer; touch-action:manipulation;
+  }
+  .intcard .q{font-size:1.02rem; color:var(--ink)}
+  .intcard .a{margin-top:8px; color:var(--accent); font-size:1.02rem; display:none}
+  .intcard.open .a{display:block}
+  .intcard .hint{color:var(--muted); font-size:.72rem; margin-top:6px}
+  .mono{font-family:"Cambria Math","Times New Roman",Georgia,serif}
+  .facts li{margin-bottom:7px}
+  .facts b{color:var(--accent)}
+  .worked{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:10px}
+  .worked h3{margin:0 0 6px; font-size:.95rem; color:var(--accent)}
+  .step{margin:3px 0; font-size:.92rem}
+  .quiz .q{font-weight:600; margin-bottom:8px}
+  .opt{
+    display:block; width:100%; text-align:left; background:var(--panel2); color:var(--ink);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:6px 0;
+    cursor:pointer; font-size:.9rem; touch-action:manipulation;
+  }
+  .opt.correct{background:var(--accent-dim); border-color:var(--accent); color:#eafff7}
+  .opt.wrong{background:#5a2530; border-color:#a3454f}
+  .explain{font-size:.85rem; color:var(--muted); margin-top:6px; display:none}
+  .explain.show{display:block}
+  sup{font-size:.7em}
+  .kbd{color:var(--accent)}
+</style>
+</head>
+<body>
+  <h1>Integration Lab</h1>
+  <div class="sub">NIOS Class 12 Mathematics · Chapter 30 — Integration</div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-t="anti">1 · Anti-derivative</button>
+    <button class="tab" data-t="area">2 · Area (Riemann sums)</button>
+    <button class="tab" data-t="tech">3 · Techniques</button>
+    <button class="tab" data-t="facts">Facts</button>
+    <button class="tab" data-t="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: ANTI-DERIVATIVE ============ -->
+  <section id="anti">
+    <div class="panel">
+      <h2>Integration reverses differentiation</h2>
+      <p style="font-size:.92rem;margin:0 0 8px">
+        If <span class="mono">d/dx [ F(x) ] = f(x)</span>, then <span class="mono">∫ f(x) dx = F(x) + C</span>.
+        The <b class="kbd">+C</b> appears because every curve shifted vertically has the <b class="kbd">same slope</b>.
+        Tap a standard integral below to reveal it.
+      </p>
+      <div class="grid2" id="intCards"></div>
+    </div>
+
+    <div class="panel">
+      <h2>The “+C” family — parallel curves, one slope</h2>
+      <p style="font-size:.88rem;margin:0 0 8px;color:var(--muted)">
+        All these curves are anti-derivatives of the <b style="color:var(--area)">same</b> function.
+        At the tick position their tangents are exactly parallel — the value of C only slides the curve up or down.
+      </p>
+      <canvas id="famCanvas" width="640" height="360"></canvas>
+      <div class="row">
+        <div class="ctrl">
+          <label>Base anti-derivative F(x)</label>
+          <select id="famFn">
+            <option value="x2">F(x)=x² / 2  (so f=x)</option>
+            <option value="sin">F(x)=−cos x  (so f=sin x)</option>
+            <option value="exp">F(x)=eˣ  (so f=eˣ)</option>
+            <option value="cube">F(x)=x³/3  (so f=x²)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Slope shown at x = <span id="famXlab">1.0</span></label>
+          <input id="famX" type="range" min="-2.4" max="2.4" step="0.05" value="1">
+        </div>
+      </div>
+      <div class="readout">
+        Common slope at x = <b><span id="famX2">1.00</span></b> is
+        f(x) = <b><span id="famSlope">1.00</span></b>. Each dashed tangent has this identical gradient.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: RIEMANN ============ -->
+  <section id="area" class="hidden">
+    <div class="panel">
+      <h2>Area under a curve — Riemann sums</h2>
+      <canvas id="riCanvas" width="640" height="380"></canvas>
+      <div class="row">
+        <div class="ctrl">
+          <label>Function f(x)</label>
+          <select id="riFn">
+            <option value="sq">f(x) = x²</option>
+            <option value="lin">f(x) = x + 1</option>
+            <option value="sin">f(x) = sin x</option>
+            <option value="exp">f(x) = eˣ</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Lower limit a = <span id="aLab">0.0</span></label>
+          <input id="riA" type="range" min="-3" max="2.5" step="0.1" value="0">
+        </div>
+        <div class="ctrl">
+          <label>Upper limit b = <span id="bLab">2.0</span></label>
+          <input id="riB" type="range" min="-2.5" max="3" step="0.1" value="2">
+        </div>
+      </div>
+      <div class="row">
+        <div class="ctrl">
+          <label>Rectangles n = <span id="nLab">6</span></label>
+          <input id="riN" type="range" min="1" max="120" step="1" value="6">
+        </div>
+        <div class="ctrl">
+          <label>Sample point</label>
+          <div class="seg" id="riRule">
+            <button data-r="left">Left</button>
+            <button data-r="mid" class="on">Midpoint</button>
+            <button data-r="right">Right</button>
+          </div>
+        </div>
+      </div>
+      <div class="readout">
+        Riemann sum (n=<b><span id="nOut">6</span></b>): <b><span id="sumOut">0</span></b>
+        &nbsp;·&nbsp; True integral ∫<sub>a</sub><sup>b</sup> f dx = <b><span id="trueOut">0</span></b>
+        &nbsp;·&nbsp; Error: <b><span id="errOut">0</span></b><br>
+        <span style="color:var(--muted);font-size:.85rem">Drag <b>n</b> up — the approximation converges to the exact area.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: TECHNIQUES ============ -->
+  <section id="tech" class="hidden">
+    <div class="panel">
+      <h2>Basic techniques</h2>
+      <div class="worked">
+        <h3>Substitution (u-substitution)</h3>
+        <p class="step">Reverses the chain rule. Let <span class="mono">u = g(x)</span>, so <span class="mono">du = g′(x) dx</span>.</p>
+        <p class="step"><b>Rule:</b> <span class="mono">∫ f(g(x))·g′(x) dx = ∫ f(u) du</span></p>
+        <p class="step" style="color:var(--muted)"><b>Worked:</b> evaluate <span class="mono">∫ 2x·(x²+1)³ dx</span></p>
+        <p class="step">• Let <span class="mono">u = x²+1</span> ⟹ <span class="mono">du = 2x dx</span>.</p>
+        <p class="step">• Integral becomes <span class="mono">∫ u³ du = u⁴/4 + C</span>.</p>
+        <p class="step">• Back-substitute: <span class="mono">= (x²+1)⁴ / 4 + C</span>.</p>
+      </div>
+      <div class="worked">
+        <h3>Integration by parts</h3>
+        <p class="step">Reverses the product rule.</p>
+        <p class="step"><b>Rule:</b> <span class="mono">∫ u dv = u·v − ∫ v du</span></p>
+        <p class="step" style="color:var(--muted)"><b>Worked:</b> evaluate <span class="mono">∫ x·eˣ dx</span></p>
+        <p class="step">• Choose <span class="mono">u = x</span> (⟹ <span class="mono">du = dx</span>) and <span class="mono">dv = eˣ dx</span> (⟹ <span class="mono">v = eˣ</span>).</p>
+        <p class="step">• Apply: <span class="mono">x·eˣ − ∫ eˣ dx</span>.</p>
+        <p class="step">• <span class="mono">= x·eˣ − eˣ + C = eˣ(x − 1) + C</span>.</p>
+        <p class="step" style="color:var(--muted)">Tip (LIATE): pick <span class="mono">u</span> as the earliest of Log, Inverse-trig, Algebraic, Trig, Exponential.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <section id="facts" class="hidden">
+    <div class="panel">
+      <h2>Facts panel</h2>
+      <ul class="facts" style="padding-left:18px;font-size:.92rem">
+        <li><b>Anti-derivative:</b> integration undoes differentiation. If F′=f then ∫f dx = F + C.</li>
+        <li><b>Power rule:</b> <span class="mono">∫ xⁿ dx = xⁿ⁺¹/(n+1) + C</span> for <span class="mono">n ≠ −1</span>.</li>
+        <li><b>The n = −1 case:</b> <span class="mono">∫ (1/x) dx = ln|x| + C</span>.</li>
+        <li><b>Exponential:</b> <span class="mono">∫ eˣ dx = eˣ + C</span>; &nbsp;<span class="mono">∫ aˣ dx = aˣ/ln a + C</span>.</li>
+        <li><b>Trig:</b> <span class="mono">∫ sin x dx = −cos x + C</span>, &nbsp;<span class="mono">∫ cos x dx = sin x + C</span>, &nbsp;<span class="mono">∫ sec²x dx = tan x + C</span>.</li>
+        <li><b>Constant &amp; sum:</b> <span class="mono">∫ k·f dx = k∫f dx</span>; &nbsp;<span class="mono">∫(f±g)dx = ∫f dx ± ∫g dx</span>.</li>
+        <li><b>The “+C”:</b> the constant of integration — infinitely many parallel anti-derivatives share one slope function.</li>
+        <li><b>Area interpretation:</b> the definite integral <span class="mono">∫<sub>a</sub><sup>b</sup> f dx</span> is the signed area between the curve and the x-axis; area below the axis counts negative.</li>
+        <li><b>Fundamental Theorem:</b> <span class="mono">∫<sub>a</sub><sup>b</sup> f dx = F(b) − F(a)</span>, where F is any anti-derivative of f.</li>
+        <li><b>Convergence:</b> as the number of rectangles n → ∞, the Riemann sum → the exact definite integral.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="hidden">
+    <div class="panel quiz" id="quizBox"></div>
+  </section>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var sections = ["anti","area","tech","facts","quiz"];
+document.getElementById("tabs").addEventListener("click", function(e){
+  var b = e.target.closest(".tab"); if(!b) return;
+  var t = b.getAttribute("data-t");
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active", x===b);});
+  sections.forEach(function(s){ document.getElementById(s).classList.toggle("hidden", s!==t); });
+  if(t==="anti") drawFamily();
+  if(t==="area") drawRiemann();
+});
+
+/* ---------- Mode 1: standard integrals cards ---------- */
+var integrals = [
+  {q:"∫ xⁿ dx", a:"xⁿ⁺¹/(n+1) + C  (n ≠ −1)"},
+  {q:"∫ 1 dx", a:"x + C"},
+  {q:"∫ x dx", a:"x²/2 + C"},
+  {q:"∫ (1/x) dx", a:"ln|x| + C"},
+  {q:"∫ eˣ dx", a:"eˣ + C"},
+  {q:"∫ aˣ dx", a:"aˣ/ln a + C"},
+  {q:"∫ sin x dx", a:"−cos x + C"},
+  {q:"∫ cos x dx", a:"sin x + C"},
+  {q:"∫ sec²x dx", a:"tan x + C"},
+  {q:"∫ 1/√(1−x²) dx", a:"sin⁻¹ x + C"},
+  {q:"∫ 1/(1+x²) dx", a:"tan⁻¹ x + C"},
+  {q:"∫ k dx", a:"kx + C"}
+];
+(function(){
+  var host = document.getElementById("intCards");
+  integrals.forEach(function(it){
+    var d = document.createElement("div");
+    d.className = "intcard";
+    d.innerHTML = '<div class="q mono">'+it.q+'</div>'+
+                  '<div class="a mono">= '+it.a+'</div>'+
+                  '<div class="hint">tap to reveal</div>';
+    d.addEventListener("click", function(){ d.classList.toggle("open"); });
+    host.appendChild(d);
+  });
+})();
+
+/* ---------- Mode 1: +C family canvas ---------- */
+var famCanvas = document.getElementById("famCanvas");
+var famCtx = famCanvas.getContext("2d");
+var famDefs = {
+  x2:  {F:function(x){return x*x/2;},      f:function(x){return x;}},
+  sin: {F:function(x){return -Math.cos(x);}, f:function(x){return Math.sin(x);}},
+  exp: {F:function(x){return Math.exp(x);},  f:function(x){return Math.exp(x);}},
+  cube:{F:function(x){return x*x*x/3;},      f:function(x){return x*x;}}
+};
+function drawFamily(){
+  var W=famCanvas.width, H=famCanvas.height, ctx=famCtx;
+  ctx.clearRect(0,0,W,H);
+  var xmin=-2.6,xmax=2.6,ymin=-3.2,ymax=3.2;
+  function px(x){return (x-xmin)/(xmax-xmin)*W;}
+  function py(y){return H-(y-ymin)/(ymax-ymin)*H;}
+  // grid
+  ctx.strokeStyle="#22303f"; ctx.lineWidth=1;
+  for(var gx=-2;gx<=2;gx++){ctx.beginPath();ctx.moveTo(px(gx),0);ctx.lineTo(px(gx),H);ctx.stroke();}
+  for(var gy=-3;gy<=3;gy++){ctx.beginPath();ctx.moveTo(0,py(gy));ctx.lineTo(W,py(gy));ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#4a5c72"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,py(0));ctx.lineTo(W,py(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px(0),0);ctx.lineTo(px(0),H);ctx.stroke();
+
+  var key=document.getElementById("famFn").value;
+  var D=famDefs[key];
+  var x0=parseFloat(document.getElementById("famX").value);
+  var slope=D.f(x0);
+  document.getElementById("famXlab").textContent=x0.toFixed(1);
+  document.getElementById("famX2").textContent=x0.toFixed(2);
+  document.getElementById("famSlope").textContent=slope.toFixed(2);
+
+  var Cs=[-2,-1,0,1,2];
+  Cs.forEach(function(C,i){
+    ctx.strokeStyle = C===0 ? "#4dd0a7" : "rgba(77,208,167,0.45)";
+    ctx.lineWidth = C===0 ? 2.4 : 1.4;
+    ctx.beginPath();
+    var first=true;
+    for(var i2=0;i2<=W;i2++){
+      var x=xmin+(i2/W)*(xmax-xmin);
+      var y=D.F(x)+C;
+      if(y<ymin-1||y>ymax+1){first=true;continue;}
+      var Y=py(y);
+      if(first){ctx.moveTo(px(x),Y);first=false;} else ctx.lineTo(px(x),Y);
+    }
+    ctx.stroke();
+    // tangent segment at x0
+    var y0=D.F(x0)+C;
+    if(y0>ymin-0.5&&y0<ymax+0.5){
+      var dx=0.7;
+      ctx.strokeStyle="#ffb454"; ctx.lineWidth=1.6; ctx.setLineDash([5,4]);
+      ctx.beginPath();
+      ctx.moveTo(px(x0-dx),py(y0-slope*dx));
+      ctx.lineTo(px(x0+dx),py(y0+slope*dx));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle="#ffb454";
+      ctx.beginPath();ctx.arc(px(x0),py(y0),3,0,7);ctx.fill();
+    }
+  });
+  // x0 marker
+  ctx.strokeStyle="rgba(255,180,84,0.35)"; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(px(x0),0);ctx.lineTo(px(x0),H);ctx.stroke();
+}
+document.getElementById("famFn").addEventListener("change",drawFamily);
+document.getElementById("famX").addEventListener("input",drawFamily);
+
+/* ---------- Mode 2: Riemann ---------- */
+var riCanvas=document.getElementById("riCanvas");
+var riCtx=riCanvas.getContext("2d");
+var riFns={
+  sq:  {f:function(x){return x*x;},        F:function(x){return x*x*x/3;}},
+  lin: {f:function(x){return x+1;},        F:function(x){return x*x/2+x;}},
+  sin: {f:function(x){return Math.sin(x);},F:function(x){return -Math.cos(x);}},
+  exp: {f:function(x){return Math.exp(x);},F:function(x){return Math.exp(x);}}
+};
+var riRule="mid";
+document.getElementById("riRule").addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(!b) return;
+  riRule=b.getAttribute("data-r");
+  document.querySelectorAll("#riRule button").forEach(function(x){x.classList.toggle("on",x===b);});
+  drawRiemann();
+});
+["riFn","riA","riB","riN"].forEach(function(id){
+  document.getElementById(id).addEventListener("input",drawRiemann);
+});
+function drawRiemann(){
+  var W=riCanvas.width,H=riCanvas.height,ctx=riCtx;
+  ctx.clearRect(0,0,W,H);
+  var key=document.getElementById("riFn").value;
+  var D=riFns[key];
+  var a=parseFloat(document.getElementById("riA").value);
+  var b=parseFloat(document.getElementById("riB").value);
+  var n=parseInt(document.getElementById("riN").value,10);
+  document.getElementById("aLab").textContent=a.toFixed(1);
+  document.getElementById("bLab").textContent=b.toFixed(1);
+  document.getElementById("nLab").textContent=n;
+  document.getElementById("nOut").textContent=n;
+  if(b<a){var t=a;a=b;b=t;}
+
+  // view window
+  var xmin=-3.3,xmax=3.3;
+  // dynamic y based on function over window
+  var ymax=1,ymin=-1;
+  for(var s=0;s<=200;s++){
+    var xx=xmin+(s/200)*(xmax-xmin);
+    var yy=D.f(xx);
+    if(yy>ymax)ymax=yy; if(yy<ymin)ymin=yy;
+  }
+  ymax=Math.min(ymax,12)*1.1; ymin=Math.max(ymin,-6)*1.1;
+  if(ymax-ymin<2){ymax+=1;ymin-=1;}
+  function px(x){return (x-xmin)/(xmax-xmin)*W;}
+  function py(y){return H-(y-ymin)/(ymax-ymin)*H;}
+
+  // grid
+  ctx.strokeStyle="#22303f"; ctx.lineWidth=1;
+  for(var gx=-3;gx<=3;gx++){ctx.beginPath();ctx.moveTo(px(gx),0);ctx.lineTo(px(gx),H);ctx.stroke();}
+  // axes
+  ctx.strokeStyle="#4a5c72"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,py(0));ctx.lineTo(W,py(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px(0),0);ctx.lineTo(px(0),H);ctx.stroke();
+
+  // rectangles
+  var dx=(b-a)/n;
+  var sum=0;
+  for(var i=0;i<n;i++){
+    var xl=a+i*dx, xr=xl+dx;
+    var xs = riRule==="left"?xl : riRule==="right"?xr : (xl+xr)/2;
+    var h=D.f(xs);
+    sum+=h*dx;
+    var top=py(h), base=py(0);
+    var X=px(xl), Wr=px(xr)-px(xl);
+    ctx.fillStyle = h>=0 ? "rgba(77,208,167,0.28)" : "rgba(255,120,120,0.25)";
+    ctx.fillRect(X, Math.min(top,base), Wr, Math.abs(base-top));
+    ctx.strokeStyle="rgba(77,208,167,0.7)"; ctx.lineWidth=1;
+    ctx.strokeRect(X, Math.min(top,base), Wr, Math.abs(base-top));
+  }
+  // curve
+  ctx.strokeStyle="#ffb454"; ctx.lineWidth=2.4;
+  ctx.beginPath(); var first=true;
+  for(var j=0;j<=W;j++){
+    var x=xmin+(j/W)*(xmax-xmin);
+    var y=D.f(x);
+    if(y<ymin-2||y>ymax+2){first=true;continue;}
+    var Y=py(y);
+    if(first){ctx.moveTo(px(x),Y);first=false;} else ctx.lineTo(px(x),Y);
+  }
+  ctx.stroke();
+  // a,b markers
+  ctx.strokeStyle="#e6edf5"; ctx.lineWidth=1.2; ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(px(a),0);ctx.lineTo(px(a),H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px(b),0);ctx.lineTo(px(b),H);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle="#e6edf5"; ctx.font="12px sans-serif";
+  ctx.fillText("a",px(a)-3,H-4); ctx.fillText("b",px(b)-3,H-4);
+
+  var truth=D.F(b)-D.F(a);
+  document.getElementById("sumOut").textContent=sum.toFixed(4);
+  document.getElementById("trueOut").textContent=truth.toFixed(4);
+  document.getElementById("errOut").textContent=Math.abs(truth-sum).toFixed(4);
+}
+
+/* ---------- Quiz ---------- */
+var quiz=[
+  {
+    q:"1. Evaluate ∫ x³ dx.",
+    opts:["3x² + C","x⁴/4 + C","x⁴ + C","4x⁴ + C"],
+    correct:1,
+    ex:"Power rule: ∫xⁿ dx = xⁿ⁺¹/(n+1)+C. Here n=3 ⟹ x⁴/4 + C."
+  },
+  {
+    q:"2. What is ∫ (1/x) dx ?",
+    opts:["−1/x² + C","ln|x| + C","x⁰ + C","1 + C"],
+    correct:1,
+    ex:"The power rule fails at n=−1; instead ∫(1/x)dx = ln|x| + C."
+  },
+  {
+    q:"3. As the number of rectangles n in a Riemann sum increases, the approximation…",
+    opts:["diverges to infinity","stays constant","converges to the exact definite integral","becomes the derivative"],
+    correct:2,
+    ex:"Finer partitions shrink the error; the sum tends to ∫ₐᵇ f dx as n→∞."
+  }
+];
+(function(){
+  var host=document.getElementById("quizBox");
+  host.innerHTML='<h2 style="color:var(--accent);font-size:1.05rem;margin:0 0 4px">Quick check (3 questions)</h2>';
+  quiz.forEach(function(item,qi){
+    var block=document.createElement("div");
+    block.style.margin="14px 0";
+    var qd=document.createElement("div"); qd.className="q mono"; qd.textContent=item.q;
+    block.appendChild(qd);
+    item.opts.forEach(function(opt,oi){
+      var btn=document.createElement("button");
+      btn.className="opt mono"; btn.textContent=opt;
+      btn.addEventListener("click",function(){
+        if(block.getAttribute("data-done")) return;
+        block.setAttribute("data-done","1");
+        var kids=block.querySelectorAll(".opt");
+        kids[item.correct].classList.add("correct");
+        if(oi!==item.correct) btn.classList.add("wrong");
+        block.querySelector(".explain").classList.add("show");
+      });
+      block.appendChild(btn);
+    });
+    var ex=document.createElement("div"); ex.className="explain"; ex.textContent="Why: "+item.ex;
+    block.appendChild(ex);
+    host.appendChild(block);
+  });
+})();
+
+/* initial draws */
+drawFamily();
+drawRiemann();
+</script>
+</body>
+</html>
