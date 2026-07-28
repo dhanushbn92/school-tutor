@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>विरहकातरं तपोवनम् | Tapovanam Verse Explorer &amp; Game</title>
+<style>
+  :root{
+    --accent:#7a5cff;
+    --accent-soft:#ece7ff;
+    --accent-dark:#5a3fd6;
+    --bg:#14121f;
+    --panel:#211d33;
+    --panel-2:#2b263f;
+    --ink:#ece9f7;
+    --muted:#a7a1c4;
+    --good:#4fd6a0;
+    --good-soft:#1e3b31;
+    --bad:#ff6f8b;
+    --bad-soft:#3b1f29;
+    --line:#3a3454;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#241f3a 0%,#14121f 60%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.4rem);color:#c9baff;}
+  header.top h1{
+    font-size:clamp(1.2rem,4.4vw,1.7rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:#fff;}
+  .tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(122,92,255,.45);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:#c9baff;}
+  .mode-sub{color:var(--muted);font-size:.86rem;margin:0 0 16px;}
+
+  /* ---- Verse Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.83rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,4.6vw,1.7rem);
+    line-height:1.85;
+    text-align:center;
+    color:#d8ccff;
+    margin-bottom:8px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.9rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+    color:#b8a6ff;font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.88rem;color:var(--ink);
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.05rem;color:#d8ccff;}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.93rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#2f5c4a;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#fff;
+    padding:11px 18px;border-radius:12px;font-weight:600;font-size:.93rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--panel-2);color:#c9baff;border:1px solid var(--line);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:#d8ccff;font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:#332b52;box-shadow:0 0 0 3px rgba(122,92,255,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#2f5c4a;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.9;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.93rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:#c9baff;
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;
+  }
+  .btn-outline:hover{background:#2b2447;}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2f5c4a;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.4vw,1.5rem);
+    text-align:center;line-height:1.75;color:#d8ccff;
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .quiz-question{
+    font-size:1rem;text-align:center;margin-bottom:14px;color:var(--ink);font-weight:600;
+  }
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+  .opt-btn{
+    font-size:.98rem;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:11px 18px;cursor:pointer;color:var(--ink);font-weight:600;transition:.15s;
+    max-width:100%;
+  }
+  .opt-btn .deva{font-family:var(--deva);font-size:1.1rem;color:#d8ccff;}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2f5c4a;background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .deva{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn.incorrect .deva{color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;color:var(--ink);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:#d8ccff;}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.83rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:#c9baff;margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">विरहकातरं तपोवनम्</div>
+    <h1>Virahakataram Tapovanam &middot; The Grieving Hermitage</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 8 &middot; from Kalidasa's अभिज्ञानशाकुन्तलम् (Act 4)</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Verse Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse Explorer</h2>
+      <p class="mode-sub">Sage Kanva sends his foster-daughter Shakuntala to her husband's home; the whole hermitage grieves at the parting. Read each verse, its word-meanings, translation and inner feeling.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शोभनम्! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer questions on the scene, the verses and the theme of separation (विरहः).</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain verses from Kalidasa's अभिज्ञानशाकुन्तलम्, Act 4 &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: authentic Abhijnanashakuntalam Act 4 verses ---------------- */
+var VERSES = [
+  {
+    deva: "यास्यत्यद्य शकुन्तलेति हृदयं संस्पृष्टमुत्कण्ठया\nकण्ठः स्तम्भितबाष्पवृत्तिकलुषश्चिन्ताजडं दर्शनम्।\nवैक्लव्यं मम तावदीदृशमिदं स्नेहादरण्यौकसः\nपीड्यन्ते गृहिणः कथं नु तनयाविश्लेषदुःखैर्नवैः॥",
+    translit: "yāsyaty adya śakuntaleti hṛdayaṁ saṁspṛṣṭam utkaṇṭhayā; kaṇṭhaḥ stambhita-bāṣpa-vṛtti-kaluṣaś cintā-jaḍaṁ darśanam; vaiklavyaṁ mama tāvad īdṛśam idaṁ snehād araṇyaukasaḥ; pīḍyante gṛhiṇaḥ kathaṁ nu tanayā-viśleṣa-duḥkhair navaiḥ",
+    words: [
+      {w:"यास्यति", m:"will go / depart"},
+      {w:"अद्य", m:"today"},
+      {w:"हृदयम्", m:"heart"},
+      {w:"उत्कण्ठया", m:"with longing / anxiety"},
+      {w:"अरण्यौकसः", m:"of a forest-dweller"},
+      {w:"तनया", m:"daughter"},
+      {w:"विश्लेष", m:"separation"}
+    ],
+    trans: "“Shakuntala will leave today” — the very thought grips my heart with longing; my throat is choked, holding back tears; my sight is dulled with grief. If even I, a forest-dweller, am so shaken by mere affection, how much more must householders be tormented by the fresh sorrow of parting with a daughter!",
+    moral: "Sage Kanva, though a detached ascetic, is overwhelmed. If a hermit feels this pain, ordinary parents suffer far more when a daughter leaves home — विरह (separation) spares no one."
+  },
+  {
+    deva: "उद्गलितदर्भकवला मृग्यः परित्यक्तनर्तना मयूराः।\nअपसृतपाण्डुपत्रा मुञ्चन्त्यश्रूणीव लताः॥",
+    translit: "udgalita-darbha-kavalā mṛgyaḥ parityakta-nartanā mayūrāḥ; apasṛta-pāṇḍu-patrā muñcanty aśrūṇīva latāḥ",
+    words: [
+      {w:"उद्गलित", m:"dropped / fallen out"},
+      {w:"दर्भकवलाः", m:"mouthfuls of darbha grass"},
+      {w:"मृग्यः", m:"the does (female deer)"},
+      {w:"परित्यक्तनर्तनाः", m:"having given up dancing"},
+      {w:"मयूराः", m:"the peacocks"},
+      {w:"पाण्डुपत्रा", m:"pale (yellow) leaves"},
+      {w:"मुञ्चन्ति", m:"shed / release"},
+      {w:"लताः", m:"the creepers"}
+    ],
+    trans: "The does let the grass drop from their mouths; the peacocks give up their dancing; and the creepers, casting off their pale leaves, seem to shed tears — all of nature grieves as Shakuntala departs.",
+    moral: "Kalidasa paints the whole tapovana sharing the sorrow. Deer, peacocks and vines all mourn — nature and human feeling become one in grief. This is the heart of “the grieving hermitage”."
+  },
+  {
+    deva: "पातुं न प्रथमं व्यवस्यति जलं युष्मास्वपीतेषु या\nनादत्ते प्रियमण्डनापि भवतां स्नेहेन या पल्लवम्।\nआद्ये वः कुसुमप्रसूतिसमये यस्या भवत्युत्सवः\nसेयं याति शकुन्तला पतिगृहं सर्वैरनुज्ञायताम्॥",
+    translit: "pātuṁ na prathamaṁ vyavasyati jalaṁ yuṣmāsv apīteṣu yā; nādatte priya-maṇḍanāpi bhavatāṁ snehena yā pallavam; ādye vaḥ kusuma-prasūti-samaye yasyā bhavaty utsavaḥ; seyaṁ yāti śakuntalā pati-gṛhaṁ sarvair anujñāyatām",
+    words: [
+      {w:"पातुम्", m:"to drink"},
+      {w:"जलम्", m:"water"},
+      {w:"प्रियमण्डना", m:"fond of ornaments"},
+      {w:"पल्लवम्", m:"a tender shoot / leaf"},
+      {w:"कुसुम", m:"flower"},
+      {w:"उत्सवः", m:"festival / celebration"},
+      {w:"पतिगृहम्", m:"husband's home"},
+      {w:"अनुज्ञायताम्", m:"let her be given leave"}
+    ],
+    trans: "She who would never drink water first while you trees remained unwatered; who, though fond of adornment, would not out of love pluck even one tender leaf of yours; for whom your first blossoming was a festival — this same Shakuntala now goes to her husband's home; may you all give her leave.",
+    moral: "Kanva addresses the trees Shakuntala raised as her own children. Her tender care for every plant shows a bond of love between human and nature — now she asks the forest's blessing to depart."
+  },
+  {
+    deva: "शुश्रूषस्व गुरून् कुरु प्रियसखीवृत्तिं सपत्नीजने\nभर्तुर्विप्रकृतापि रोषणतया मा स्म प्रतीपं गमः।\nभूयिष्ठं भव दक्षिणा परिजने भाग्येष्वनुत्सेकिनी\nयान्त्येवं गृहिणीपदं युवतयो वामाः कुलस्याधयः॥",
+    translit: "śuśrūṣasva gurūn kuru priya-sakhī-vṛttiṁ sapatnī-jane; bhartur viprakṛtāpi roṣaṇatayā mā sma pratīpaṁ gamaḥ; bhūyiṣṭhaṁ bhava dakṣiṇā parijane bhāgyeṣv anutsekinī; yānty evaṁ gṛhiṇī-padaṁ yuvatayo vāmāḥ kulasyādhayaḥ",
+    words: [
+      {w:"शुश्रूषस्व", m:"serve / wait upon"},
+      {w:"गुरून्", m:"elders / superiors"},
+      {w:"सपत्नीजने", m:"towards co-wives"},
+      {w:"भर्तुः", m:"of the husband"},
+      {w:"दक्षिणा", m:"courteous / kind"},
+      {w:"परिजने", m:"towards attendants"},
+      {w:"गृहिणीपदम्", m:"the rank of a housewife"},
+      {w:"आधयः", m:"afflictions / ruin"}
+    ],
+    trans: "Serve your elders; treat your co-wives as dear friends; even if wronged by your husband, never turn against him in anger. Be very courteous to the servants and not vain in good fortune. Young women who conduct themselves thus attain the honoured rank of a housewife; the wayward ones are a curse to the family.",
+    moral: "Kanva's parting advice (उपदेश) to Shakuntala. Beyond the grief, he gives timeless counsel on patience, humility and grace — the ideal of a gentle, dutiful woman in his age."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+esc(x.m)+'</span></span>';
+  }).join("");
+  var devaHtml = esc(v.deva).replace(/\n/g,"<br>");
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+esc(v.translit)+'</div>'+
+    '<div class="block-label">शब्दार्थः &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+esc(v.trans)+'</div>'+
+    '<div class="moral-box"><div class="block-label">भावः &middot; Feeling / Meaning</div>'+esc(v.moral)+'</div>';
+  verseCount.textContent = "Verse "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"तपोवनम्", m:"penance-grove / hermitage forest"},
+  {w:"विरहः", m:"separation"},
+  {w:"लता", m:"creeper / vine"},
+  {w:"मृगः", m:"deer"},
+  {w:"आश्रमः", m:"hermitage"},
+  {w:"शकुन्तला", m:"Shakuntala"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+esc(p.m)+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"In this scene, who is sending Shakuntala away, and to where?",
+    verse:"",
+    options:[
+      {t:"Sage <span class='deva'>कण्वः</span> (Kanva) sends her to her husband's home", ok:true},
+      {t:"King Dushyanta sends her back to the forest", ok:false},
+      {t:"Her friends send her to the city market", ok:false}
+    ],
+    explain:"Sage <b>कण्वः</b>, Shakuntala's foster-father, sends her to her husband King Dushyanta's home (<b>पतिगृहम्</b>). The whole hermitage grieves at her departure."
+  },
+  {
+    q:"In the verse “उद्गलितदर्भकवला मृग्यः...”, how does nature show its sorrow?",
+    verse:"उद्गलितदर्भकवला मृग्यः परित्यक्तनर्तना मयूराः।\nअपसृतपाण्डुपत्रा मुञ्चन्त्यश्रूणीव लताः॥",
+    options:[
+      {t:"Does drop their grass, peacocks stop dancing, creepers shed pale leaves like tears", ok:true},
+      {t:"The rivers flood and the mountains tremble", ok:false},
+      {t:"The trees bear sudden new fruit and flowers", ok:false}
+    ],
+    explain:"The does (<b>मृग्यः</b>) let grass fall from their mouths, the peacocks (<b>मयूराः</b>) stop dancing, and the creepers (<b>लताः</b>) shed pale leaves “like tears” (<b>अश्रूणि इव</b>). Nature mirrors the human grief of separation."
+  },
+  {
+    q:"What is the central theme (भावः) of “विरहकातरं तपोवनम्”?",
+    verse:"",
+    options:[
+      {t:"The sorrow of separation (विरहः) felt by all — people and nature alike", ok:true},
+      {t:"A joyful festival celebrating a wedding", ok:false},
+      {t:"A debate between two scholars about duty", ok:false}
+    ],
+    explain:"The title means “the hermitage distressed by separation.” Its theme is <b>विरहः</b> (separation): even the sage weeps, and the deer, peacocks and creepers of the <b>तपोवनम्</b> grieve as Shakuntala leaves. Kalidasa unites human and natural sorrow."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var verseHtml = q.verse ? '<div class="quiz-verse">'+esc(q.verse).replace(/\n/g,"<br>")+'</div>' : '';
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    verseHtml +
+    '<div class="quiz-question">'+esc(q.q)+'</div>'+
+    '<div class="opt-row" style="flex-direction:column;align-items:stretch;">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    var bi = parseInt(b.dataset.i,10);
+    b.disabled = true;
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

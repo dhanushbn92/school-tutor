@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>रचनाकौशलम् Builder | Sanskrit Composition Game</title>
+<style>
+  :root{
+    --accent:#e0762d;
+    --accent-soft:#fdeee0;
+    --accent-dark:#b85a17;
+    --bg:#211d1a;
+    --panel:#2c2724;
+    --panel-2:#352f2b;
+    --ink:#f2ece5;
+    --muted:#b3a89d;
+    --good:#4bbf8a;
+    --good-soft:#1f3a30;
+    --bad:#e06a7f;
+    --bad-soft:#3a2229;
+    --line:#42392f;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#211d1a 0%,#2a231d 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,5vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--ink);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 15px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#211d1a;box-shadow:0 4px 14px rgba(224,118,45,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.30);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+
+  /* ---- Sentence Builder ---- */
+  .prog{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .eng-prompt{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;text-align:center;font-size:1.05rem;margin-bottom:8px;
+  }
+  .eng-prompt .lbl{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+  .build-zone{
+    min-height:60px;border:2px dashed var(--line);border-radius:14px;
+    padding:12px;margin:12px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+    justify-content:center;background:rgba(0,0,0,.12);
+  }
+  .build-zone.empty::before{content:"अत्र स्पृशत — tap tiles below to build here";color:var(--muted);font-size:.85rem;}
+  .tile-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px;}
+  .tile{
+    font-family:var(--deva);font-size:1.3rem;font-weight:600;
+    border:2px solid var(--line);background:var(--panel-2);color:var(--ink);
+    border-radius:12px;padding:9px 14px;cursor:pointer;transition:.15s;
+    -webkit-tap-highlight-color:transparent;user-select:none;
+  }
+  .tile:hover{border-color:var(--accent);}
+  .tile:active{transform:scale(.95);}
+  .tile.placed{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dark);}
+  .tile.used{opacity:.25;pointer-events:none;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#211d1a;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:rgba(224,118,45,.12);}
+  .feedback{min-height:22px;text-align:center;font-weight:600;margin:10px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .answer-box{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-top:10px;font-size:.92rem;
+  }
+  .answer-box.show{display:block;}
+  .answer-box .correct-sen{font-family:var(--deva);font-size:1.35rem;color:var(--good);text-align:center;margin-bottom:6px;}
+  .answer-box .note{color:var(--muted);font-size:.88rem;}
+  .answer-box .note b{color:var(--accent);font-family:var(--deva);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .shake{animation:shake .35s;}
+
+  /* ---- Vibhakti / Sandhi ---- */
+  .subtabs{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+  .subtab{
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    padding:7px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.85rem;
+  }
+  .subtab.active{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+  .vib-item,.sandhi-item{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;margin-bottom:12px;
+  }
+  .vib-word{font-family:var(--deva);font-size:1.4rem;color:var(--ink);text-align:center;margin-bottom:4px;}
+  .vib-role{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .vib-opts,.sandhi-opts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .vib-opt{
+    font-family:var(--deva);font-size:1.05rem;
+    border:2px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:10px;padding:8px 14px;cursor:pointer;transition:.15s;font-weight:600;
+  }
+  .vib-opt:hover{border-color:var(--accent);}
+  .vib-opt.correct{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .vib-opt.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .vib-opt:disabled{cursor:default;}
+  .sandhi-q{font-family:var(--deva);font-size:1.3rem;text-align:center;margin-bottom:4px;color:var(--ink);}
+  .sandhi-rule{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:10px;}
+  .vib-explain{
+    display:none;margin-top:10px;font-size:.88rem;color:var(--muted);
+    background:var(--panel);border-radius:10px;padding:10px 12px;border:1px solid var(--line);
+  }
+  .vib-explain.show{display:block;}
+  .vib-explain b{color:var(--accent);font-family:var(--deva);}
+
+  /* ---- Quiz ---- */
+  .quiz-q{
+    font-family:var(--deva);font-size:clamp(1.2rem,4.5vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--ink);
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:6px;
+  }
+  .quiz-q.eng{font-family:inherit;font-size:1.05rem;}
+  .quiz-tag{text-align:center;color:var(--muted);font-size:.78rem;margin-bottom:12px;}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:11px 16px;cursor:pointer;color:var(--ink);font-weight:600;transition:.15s;
+    text-align:left;font-size:1rem;
+  }
+  .opt-btn.deva{font-family:var(--deva);font-size:1.15rem;}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;color:var(--muted);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .tile{font-size:1.15rem;padding:8px 11px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">रचनाकौशलम्</div>
+    <h1>Sanskrit Composition Builder</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 11 &middot; Rachanakaushalam</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="build">🧱 Sentence Builder</button>
+    <button class="tab-btn" data-mode="grammar">🔤 Vibhakti &amp; Sandhi</button>
+    <button class="tab-btn" data-mode="quiz">🔁 Translate-it</button>
+  </div>
+
+  <!-- ============ MODE 1: SENTENCE BUILDER ============ -->
+  <section class="mode active" id="build">
+    <div class="panel">
+      <h2 class="mode-title">Sentence Builder &middot; वाक्यरचना</h2>
+      <p class="mode-sub">Read the English sentence, then tap the Devanagari tiles in the correct order to build the Sanskrit sentence.</p>
+      <div class="prog" id="buildProg"></div>
+      <div class="eng-prompt" id="engPrompt"></div>
+      <div class="build-zone empty" id="buildZone"></div>
+      <div class="tile-bank" id="tileBank"></div>
+      <div class="feedback" id="buildFeedback">&nbsp;</div>
+      <div class="btn-row">
+        <button class="btn-outline" id="clearBtn">↺ Clear</button>
+        <button class="nav-btn" id="checkBtn">✓ Check</button>
+        <button class="btn-outline" id="revealBtn">👁 Show answer</button>
+      </div>
+      <div class="answer-box" id="answerBox"></div>
+      <div class="btn-row">
+        <button class="nav-btn" id="nextSen" style="display:none;">Next sentence &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: VIBHAKTI / SANDHI ============ -->
+  <section class="mode" id="grammar">
+    <div class="panel">
+      <h2 class="mode-title">Vibhakti &amp; Sandhi &middot; विभक्ति-सन्धि</h2>
+      <p class="mode-sub">Switch between the two mini-drills below.</p>
+      <div class="subtabs">
+        <button class="subtab active" data-sub="vib">कारक &middot; Vibhakti</button>
+        <button class="subtab" data-sub="sandhi">सन्धि &middot; Sandhi</button>
+      </div>
+      <div id="vibWrap"></div>
+      <div id="sandhiWrap" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: TRANSLATE QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Translate-it Quiz &middot; अनुवादः</h2>
+      <p class="mode-sub">Pick the correct translation, then read the explanation.</p>
+      <div class="quiz-tag" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Standard Sanskrit grammar &middot; Built for NIOS learners</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ================= MODE SWITCH ================= */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+
+/* ================= MODE 1: SENTENCE BUILDER ================= */
+/* Each sentence: eng prompt, ordered tokens (correct order), and a grammar note. */
+var SENTENCES = [
+  {
+    eng:"The boy reads a book.",
+    tokens:["बालकः","पुस्तकं","पठति"],
+    note:"<b>बालकः</b> is कर्ता (subject) in प्रथमा विभक्ति. <b>पुस्तकं</b> is कर्म (object) in द्वितीया विभक्ति. The verb <b>पठति</b> (reads) comes last — the usual Sanskrit order is Subject–Object–Verb."
+  },
+  {
+    eng:"Rama goes to the forest.",
+    tokens:["रामः","वनं","गच्छति"],
+    note:"<b>रामः</b> = कर्ता (प्रथमा). <b>वनं</b> takes द्वितीया विभक्ति because it is the destination of motion (कर्म of गम्). <b>गच्छति</b> = goes."
+  },
+  {
+    eng:"The girl eats a fruit.",
+    tokens:["बालिका","फलं","खादति"],
+    note:"<b>बालिका</b> is a feminine आकारान्त noun; its प्रथमा form is बालिका (no visarga). <b>फलं</b> = कर्म in द्वितीया. <b>खादति</b> = eats."
+  },
+  {
+    eng:"Students go to school.",
+    tokens:["छात्राः","विद्यालयं","गच्छन्ति"],
+    note:"<b>छात्राः</b> is plural कर्ता (प्रथमा बहुवचन). Because the subject is plural, the verb is <b>गच्छन्ति</b> (they go). <b>विद्यालयं</b> = द्वितीया (destination)."
+  },
+  {
+    eng:"Hari drinks water with a friend.",
+    tokens:["हरिः","मित्रेण","जलं","पिबति"],
+    note:"<b>हरिः</b> = कर्ता. <b>मित्रेण</b> is तृतीया विभक्ति meaning 'with a friend' (सह/instrument sense). <b>जलं</b> = कर्म (द्वितीया). <b>पिबति</b> = drinks."
+  }
+];
+
+var sIndex = 0;
+var built = [];   // array of tile-bank indices placed, in order
+var sAnswered = false;
+var buildProg = document.getElementById("buildProg");
+var engPrompt = document.getElementById("engPrompt");
+var buildZone = document.getElementById("buildZone");
+var tileBank = document.getElementById("tileBank");
+var buildFeedback = document.getElementById("buildFeedback");
+var answerBox = document.getElementById("answerBox");
+var nextSen = document.getElementById("nextSen");
+var bankOrder = [];
+
+function renderBuild(){
+  var s = SENTENCES[sIndex];
+  sAnswered = false;
+  built = [];
+  buildProg.textContent = "Sentence "+(sIndex+1)+" of "+SENTENCES.length;
+  engPrompt.innerHTML = '<span class="lbl">English</span>'+s.eng;
+  buildFeedback.textContent = " ";
+  buildFeedback.className = "feedback";
+  answerBox.classList.remove("show");
+  nextSen.style.display = "none";
+  bankOrder = shuffle(s.tokens.map(function(t,i){return i;}));
+  drawZone();
+  drawBank();
+}
+function drawBank(){
+  var s = SENTENCES[sIndex];
+  tileBank.innerHTML = bankOrder.map(function(origIdx){
+    var used = built.indexOf(origIdx) !== -1;
+    return '<button class="tile'+(used?" used":"")+'" data-idx="'+origIdx+'">'+s.tokens[origIdx]+'</button>';
+  }).join("");
+  tileBank.querySelectorAll(".tile").forEach(function(el){
+    el.addEventListener("click", function(){
+      if(sAnswered) return;
+      var idx = parseInt(el.dataset.idx,10);
+      if(built.indexOf(idx)!==-1) return;
+      built.push(idx);
+      drawZone(); drawBank();
+    });
+  });
+}
+function drawZone(){
+  var s = SENTENCES[sIndex];
+  if(built.length===0){
+    buildZone.classList.add("empty");
+    buildZone.innerHTML = "";
+    return;
+  }
+  buildZone.classList.remove("empty");
+  buildZone.innerHTML = built.map(function(origIdx,pos){
+    return '<button class="tile placed" data-pos="'+pos+'">'+s.tokens[origIdx]+'</button>';
+  }).join("");
+  buildZone.querySelectorAll(".tile").forEach(function(el){
+    el.addEventListener("click", function(){
+      if(sAnswered) return;
+      var pos = parseInt(el.dataset.pos,10);
+      built.splice(pos,1);
+      drawZone(); drawBank();
+    });
+  });
+}
+function checkBuild(){
+  if(sAnswered) return;
+  var s = SENTENCES[sIndex];
+  if(built.length !== s.tokens.length){
+    buildFeedback.textContent = "Use all the tiles first — तिलानि योजयत!";
+    buildFeedback.className = "feedback bad";
+    buildZone.classList.add("shake");
+    setTimeout(function(){buildZone.classList.remove("shake");},350);
+    return;
+  }
+  var ok = true;
+  for(var i=0;i<built.length;i++){ if(built[i]!==i){ok=false;break;} }
+  if(ok){
+    buildFeedback.textContent = "✓ सम्यक्! Correct order.";
+    buildFeedback.className = "feedback good";
+    showAnswer(true);
+  } else {
+    buildFeedback.textContent = "✗ Not quite — check the word order.";
+    buildFeedback.className = "feedback bad";
+    buildZone.classList.add("shake");
+    setTimeout(function(){buildZone.classList.remove("shake");},350);
+  }
+}
+function showAnswer(won){
+  sAnswered = true;
+  var s = SENTENCES[sIndex];
+  var sen = s.tokens.join(" ") + "।";
+  answerBox.innerHTML =
+    '<div class="block-label">Correct Sentence</div>'+
+    '<div class="correct-sen">'+sen+'</div>'+
+    '<div class="note"><span class="block-label">कारक / विभक्ति note</span>'+s.note+'</div>';
+  answerBox.classList.add("show");
+  nextSen.style.display = (sIndex < SENTENCES.length-1) ? "inline-block" : "none";
+  if(!won){
+    buildFeedback.textContent = "Here is the correct sentence 👇";
+    buildFeedback.className = "feedback";
+  }
+  // lock tiles
+  tileBank.querySelectorAll(".tile").forEach(function(el){el.classList.add("used");});
+}
+document.getElementById("clearBtn").addEventListener("click", function(){
+  if(sAnswered) return;
+  built = []; drawZone(); drawBank();
+  buildFeedback.textContent = " "; buildFeedback.className="feedback";
+});
+document.getElementById("checkBtn").addEventListener("click", checkBuild);
+document.getElementById("revealBtn").addEventListener("click", function(){ showAnswer(false); });
+nextSen.addEventListener("click", function(){
+  if(sIndex < SENTENCES.length-1){ sIndex++; renderBuild(); }
+});
+renderBuild();
+
+/* ================= MODE 2: VIBHAKTI / SANDHI ================= */
+var VIB = [
+  {word:"बालकः पुस्तकं पठति।", target:"बालकः", role:"'बालकः' — what is its कारक role?",
+   opts:["कर्ता (प्रथमा)","कर्म (द्वितीया)","करण (तृतीया)"], answer:"कर्ता (प्रथमा)",
+   explain:"<b>बालकः</b> does the action of reading, so it is the <b>कर्ता</b> and takes <b>प्रथमा विभक्ति</b>."},
+  {word:"बालकः पुस्तकं पठति।", target:"पुस्तकं", role:"'पुस्तकं' — what is its कारक role?",
+   opts:["कर्ता (प्रथमा)","कर्म (द्वितीया)","सम्प्रदान (चतुर्थी)"], answer:"कर्म (द्वितीया)",
+   explain:"The book is what is being read — the object of the action — so <b>पुस्तकं</b> is <b>कर्म</b> in <b>द्वितीया विभक्ति</b>."},
+  {word:"सः हस्तेन लिखति।", target:"हस्तेन", role:"'हस्तेन' (by the hand) — which कारक?",
+   opts:["करण (तृतीया)","अपादान (पञ्चमी)","अधिकरण (सप्तमी)"], answer:"करण (तृतीया)",
+   explain:"The hand is the instrument used to write. The instrument (साधन) takes <b>करण कारक</b> in <b>तृतीया विभक्ति</b>."},
+  {word:"छात्रः गुरवे नमति।", target:"गुरवे", role:"'गुरवे' (to the guru) — which कारक?",
+   opts:["सम्प्रदान (चतुर्थी)","कर्म (द्वितीया)","सम्बन्ध (षष्ठी)"], answer:"सम्प्रदान (चतुर्थी)",
+   explain:"The one to whom something is given or offered (here, salutation) is <b>सम्प्रदान</b>, taking <b>चतुर्थी विभक्ति</b>."}
+];
+var SANDHI = [
+  {a:"राम",b:"आलयः",result:"रामालयः",rule:"अ + आ = आ (दीर्घ सन्धि / सवर्णदीर्घ)",
+   opts:["रामालयः","रामाआलयः","रामैलयः"], answer:"रामालयः",
+   explain:"Short <b>अ</b> (in राम) + long <b>आ</b> (in आलयः) combine into a single long <b>आ</b> → <b>रामालयः</b>. This is सवर्णदीर्घ सन्धि."},
+  {a:"सूर्य",b:"उदयः",result:"सूर्योदयः",rule:"अ + उ = ओ (गुण सन्धि)",
+   opts:["सूर्योदयः","सूर्युदयः","सूर्यौदयः"], answer:"सूर्योदयः",
+   explain:"<b>अ</b> + <b>उ</b> becomes <b>ओ</b> by गुण सन्धि → सूर्य + उदयः = <b>सूर्योदयः</b> (sunrise)."},
+  {a:"देव",b:"इन्द्रः",result:"देवेन्द्रः",rule:"अ + इ = ए (गुण सन्धि)",
+   opts:["देवेन्द्रः","देविन्द्रः","देवैन्द्रः"], answer:"देवेन्द्रः",
+   explain:"<b>अ</b> + <b>इ</b> becomes <b>ए</b> by गुण सन्धि → देव + इन्द्रः = <b>देवेन्द्रः</b>."},
+  {a:"गज",b:"इन्द्रः",result:"गजेन्द्रः",rule:"अ + इ = ए (गुण सन्धि)",
+   opts:["गजेन्द्रः","गजैन्द्रः","गजिन्द्रः"], answer:"गजेन्द्रः",
+   explain:"Again <b>अ</b> + <b>इ</b> = <b>ए</b> → गज + इन्द्रः = <b>गजेन्द्रः</b> (lord of elephants)."}
+];
+
+var vibWrap = document.getElementById("vibWrap");
+var sandhiWrap = document.getElementById("sandhiWrap");
+
+function buildVib(){
+  vibWrap.innerHTML = VIB.map(function(q,i){
+    var opts = shuffle(q.opts).map(function(o){
+      return '<button class="vib-opt" data-i="'+i+'" data-o="'+o+'">'+o+'</button>';
+    }).join("");
+    return '<div class="vib-item">'+
+      '<div class="vib-word">'+q.word+'</div>'+
+      '<div class="vib-role">'+q.role+'</div>'+
+      '<div class="vib-opts">'+opts+'</div>'+
+      '<div class="vib-explain" id="vibEx'+i+'"></div>'+
+    '</div>';
+  }).join("");
+  vibWrap.querySelectorAll(".vib-opt").forEach(function(el){
+    el.addEventListener("click", function(){
+      var i = parseInt(el.dataset.i,10);
+      var q = VIB[i];
+      var group = el.parentNode;
+      if(group.dataset.done) return;
+      group.dataset.done = "1";
+      group.querySelectorAll(".vib-opt").forEach(function(b){
+        b.disabled = true;
+        if(b.dataset.o === q.answer) b.classList.add("correct");
+        else if(b===el) b.classList.add("incorrect");
+      });
+      var ex = document.getElementById("vibEx"+i);
+      ex.innerHTML = (el.dataset.o===q.answer ? "✓ Correct! " : "✗ ") + q.explain;
+      ex.classList.add("show");
+    });
+  });
+}
+function buildSandhi(){
+  sandhiWrap.innerHTML = SANDHI.map(function(q,i){
+    var opts = shuffle(q.opts).map(function(o){
+      return '<button class="vib-opt" data-i="'+i+'" data-o="'+o+'">'+o+'</button>';
+    }).join("");
+    return '<div class="sandhi-item">'+
+      '<div class="sandhi-q">'+q.a+' + '+q.b+' = ?</div>'+
+      '<div class="sandhi-rule">Rule: '+q.rule+'</div>'+
+      '<div class="sandhi-opts">'+opts+'</div>'+
+      '<div class="vib-explain" id="sanEx'+i+'"></div>'+
+    '</div>';
+  }).join("");
+  sandhiWrap.querySelectorAll(".vib-opt").forEach(function(el){
+    el.addEventListener("click", function(){
+      var i = parseInt(el.dataset.i,10);
+      var q = SANDHI[i];
+      var group = el.parentNode;
+      if(group.dataset.done) return;
+      group.dataset.done = "1";
+      group.querySelectorAll(".vib-opt").forEach(function(b){
+        b.disabled = true;
+        if(b.dataset.o === q.answer) b.classList.add("correct");
+        else if(b===el) b.classList.add("incorrect");
+      });
+      var ex = document.getElementById("sanEx"+i);
+      ex.innerHTML = (el.dataset.o===q.answer ? "✓ Correct! " : "✗ ") + q.explain;
+      ex.classList.add("show");
+    });
+  });
+}
+buildVib();
+buildSandhi();
+
+document.querySelectorAll(".subtab").forEach(function(st){
+  st.addEventListener("click", function(){
+    document.querySelectorAll(".subtab").forEach(function(x){x.classList.remove("active");});
+    st.classList.add("active");
+    if(st.dataset.sub==="vib"){ vibWrap.style.display=""; sandhiWrap.style.display="none"; }
+    else { vibWrap.style.display="none"; sandhiWrap.style.display=""; }
+  });
+});
+
+/* ================= MODE 3: TRANSLATE QUIZ ================= */
+var QUIZ = [
+  {
+    q:"बालकः जलं पिबति।", deva:true, engOpts:false,
+    prompt:"Choose the correct English translation:",
+    options:["The boy drinks water.","The boy sees water.","The water drinks the boy."],
+    answer:"The boy drinks water.",
+    explain:"<b>बालकः</b> (boy, कर्ता) + <b>जलं</b> (water, कर्म द्वितीया) + <b>पिबति</b> (drinks) = 'The boy drinks water.'"
+  },
+  {
+    q:"\"The teacher teaches the students.\"", deva:false, engOpts:true,
+    prompt:"Choose the correct Sanskrit sentence:",
+    options:["शिक्षकः छात्रान् पाठयति।","छात्राः शिक्षकं पाठयति।","शिक्षकः छात्रेभ्यः पठति।"],
+    answer:"शिक्षकः छात्रान् पाठयति।",
+    explain:"<b>शिक्षकः</b> = कर्ता (प्रथमा). <b>छात्रान्</b> = कर्म (द्वितीया बहुवचन, 'the students'). <b>पाठयति</b> = teaches (causative). So: शिक्षकः छात्रान् पाठयति।"
+  },
+  {
+    q:"सा उद्याने पुष्पाणि पश्यति।", deva:true, engOpts:false,
+    prompt:"Choose the correct English translation:",
+    options:["She sees flowers in the garden.","She waters flowers in the garden.","They see a garden of flowers."],
+    answer:"She sees flowers in the garden.",
+    explain:"<b>सा</b> (she) + <b>उद्याने</b> (in the garden, अधिकरण सप्तमी) + <b>पुष्पाणि</b> (flowers, कर्म) + <b>पश्यति</b> (sees) = 'She sees flowers in the garden.'"
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o){
+    var cls = q.engOpts ? "opt-btn deva" : "opt-btn";
+    return '<button class="'+cls+'" data-opt="'+encodeURIComponent(o)+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q'+(q.deva?"":" eng")+'">'+q.q+'</div>'+
+    '<div class="quiz-tag">'+q.prompt+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = decodeURIComponent(el.dataset.opt);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var val = decodeURIComponent(b.dataset.opt);
+    if(val === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

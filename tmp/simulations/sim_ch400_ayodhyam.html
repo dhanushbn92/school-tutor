@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>अयोध्यां प्रत्यागमनम् | Rama's Return to Ayodhya</title>
+<style>
+  :root{
+    --accent:#e8913a;
+    --accent-soft:#3a2c1c;
+    --accent-bright:#f6a94e;
+    --bg:#1c1710;
+    --panel:#26201a;
+    --panel-2:#2f2820;
+    --ink:#f3ead9;
+    --muted:#b6a483;
+    --good:#5fbf87;
+    --good-soft:#22331f;
+    --bad:#e06a7a;
+    --bad-soft:#3a2028;
+    --line:#413628;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1c1710 0%,#241b12 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,5vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent-bright);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--accent-bright);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-bright);}
+  .tab-btn.active{background:var(--accent);color:#20180f;box-shadow:0 4px 12px rgba(232,145,58,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-bright);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Story Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--accent-soft);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .card-tag{
+    display:inline-block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:#20180f;background:var(--accent-bright);border-radius:999px;
+    padding:3px 12px;font-weight:700;margin-bottom:12px;
+  }
+  .card-tag.verse-tag{background:var(--good);}
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5.2vw,1.85rem);
+    line-height:1.7;
+    text-align:center;
+    color:var(--accent-bright);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent-bright);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel-2);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .trans-box .en{color:var(--ink);}
+  .moral-box{background:var(--good-soft);border-color:#31502f;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#20180f;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-bright);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-bright);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+    border:1px solid var(--line);
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent-bright);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(232,145,58,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#31502f;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-bright);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #31502f;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.5vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--accent-bright);
+    background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:14px;
+    border:1px solid var(--line);
+  }
+  .opt-col{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:1rem;text-align:left;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+  }
+  .opt-btn .deva{font-family:var(--deva);color:var(--accent-bright);font-size:1.15rem;}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#31502f;background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .deva{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;color:var(--ink);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-bright);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-bright);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">अयोध्यां प्रत्यागमनम्</div>
+    <h1>Rama's Return to Ayodhya</h1>
+    <p>NIOS Class 10 Sanskrit &middot; Chapter 7 &middot; रामायणम् (Ramayana)</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story Explorer &middot; कथा</h2>
+      <p class="mode-sub">Follow Rama's homecoming card by card — read simple Sanskrit, transliteration, English, and word meanings.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game &middot; शब्दार्थ</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz &middot; प्रश्नोत्तराणि</h2>
+      <p class="mode-sub">Answer questions about the story and verses, then reveal the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Retold in simple Sanskrit from the public-domain रामायणम् &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE 1 DATA: STORY CARDS ---------------- */
+var CARDS = [
+  {
+    type:"story", tag:"कथा 1",
+    deva:"रामः चतुर्दश वर्षाणि वनवासम् अकरोत्।",
+    translit:"rāmaḥ caturdaśa varṣāṇi vanavāsam akarot",
+    words:[
+      {w:"रामः", m:"Rama"},
+      {w:"चतुर्दश", m:"fourteen"},
+      {w:"वर्षाणि", m:"years"},
+      {w:"वनवासम्", m:"forest-dwelling / exile"}
+    ],
+    trans:"Rama lived in the forest in exile for fourteen years.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 2",
+    deva:"वनवासस्य अवधौ समाप्ते सः अयोध्यां प्रति अगच्छत्।",
+    translit:"vanavāsasya avadhau samāpte saḥ ayodhyāṁ prati agacchat",
+    words:[
+      {w:"अवधौ", m:"period / term (locative)"},
+      {w:"समाप्ते", m:"being completed"},
+      {w:"अयोध्याम्", m:"to Ayodhya"},
+      {w:"अगच्छत्", m:"he went"}
+    ],
+    trans:"When the term of exile was completed, he set out toward Ayodhya.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 3",
+    deva:"सीता लक्ष्मणः च तेन सह पुष्पकविमानेन आगच्छन्।",
+    translit:"sītā lakṣmaṇaḥ ca tena saha puṣpaka-vimānena āgacchan",
+    words:[
+      {w:"सीता", m:"Sita"},
+      {w:"लक्ष्मणः", m:"Lakshmana"},
+      {w:"सह", m:"along with"},
+      {w:"विमानेन", m:"by the aerial chariot (Pushpaka)"}
+    ],
+    trans:"Sita and Lakshmana came along with him by the Pushpaka aerial chariot.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 4",
+    deva:"भरतः नन्दिग्रामे रामस्य पादुके पूजयन् प्रतीक्षते स्म।",
+    translit:"bharataḥ nandigrāme rāmasya pāduke pūjayan pratīkṣate sma",
+    words:[
+      {w:"भरतः", m:"Bharata"},
+      {w:"पादुके", m:"the (pair of) sandals"},
+      {w:"पूजयन्", m:"worshipping"},
+      {w:"प्रतीक्षते स्म", m:"was waiting"}
+    ],
+    trans:"Bharata was waiting at Nandigrama, worshipping Rama's sandals on the throne.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 5",
+    deva:"अयोध्यायाः प्रजाः रामस्य आगमनेन अतीव आनन्दिताः अभवन्।",
+    translit:"ayodhyāyāḥ prajāḥ rāmasya āgamanena atīva ānanditāḥ abhavan",
+    words:[
+      {w:"प्रजाः", m:"the people / subjects"},
+      {w:"आगमनेन", m:"by the arrival"},
+      {w:"अतीव", m:"very much"},
+      {w:"आनन्दिताः", m:"delighted / joyful"}
+    ],
+    trans:"The people of Ayodhya became greatly joyful at Rama's arrival.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 6",
+    deva:"नगरं ध्वजैः तोरणैः दीपैः च अलङ्कृतम् आसीत्।",
+    translit:"nagaraṁ dhvajaiḥ toraṇaiḥ dīpaiḥ ca alaṅkṛtam āsīt",
+    words:[
+      {w:"नगरम्", m:"the city"},
+      {w:"ध्वजैः", m:"with flags"},
+      {w:"दीपैः", m:"with lamps"},
+      {w:"अलङ्कृतम्", m:"decorated"}
+    ],
+    trans:"The city was decorated with flags, festive arches, and lamps.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 7",
+    deva:"ततः वसिष्ठः रामस्य राज्याभिषेकम् अकरोत्।",
+    translit:"tataḥ vasiṣṭhaḥ rāmasya rājyābhiṣekam akarot",
+    words:[
+      {w:"ततः", m:"then"},
+      {w:"वसिष्ठः", m:"(the sage) Vasishtha"},
+      {w:"राज्याभिषेकम्", m:"royal coronation"},
+      {w:"अकरोत्", m:"performed / did"}
+    ],
+    trans:"Then the sage Vasishtha performed Rama's royal coronation.",
+    moral:null
+  },
+  {
+    type:"story", tag:"कथा 8",
+    deva:"रामः धर्मेण प्रजाः अपालयत्; तत् राज्यं रामराज्यम् इति प्रसिद्धम्।",
+    translit:"rāmaḥ dharmeṇa prajāḥ apālayat; tat rājyaṁ rāmarājyam iti prasiddham",
+    words:[
+      {w:"धर्मेण", m:"with righteousness"},
+      {w:"अपालयत्", m:"protected / ruled"},
+      {w:"राज्यम्", m:"kingdom / rule"},
+      {w:"प्रसिद्धम्", m:"famous / well-known"}
+    ],
+    trans:"Rama ruled the people with righteousness; that reign became famous as 'Rama-Rajya'.",
+    moral:"The joy of homecoming and just, righteous kingship (Rama-Rajya) is the ideal of dharma — a ruler who serves his people wins their love."
+  },
+  {
+    type:"verse", tag:"श्लोकः 1 · Valmiki Ramayana",
+    deva:"रामो विग्रहवान् धर्मः साधुः सत्यपराक्रमः।\nराजा सर्वस्य लोकस्य देवानामिव वासवः॥",
+    translit:"rāmo vigrahavān dharmaḥ sādhuḥ satya-parākramaḥ; rājā sarvasya lokasya devānām iva vāsavaḥ",
+    words:[
+      {w:"विग्रहवान् धर्मः", m:"righteousness embodied (dharma in a form)"},
+      {w:"साधुः", m:"virtuous / good"},
+      {w:"सत्यपराक्रमः", m:"truthful in valour"},
+      {w:"वासवः", m:"Indra (lord of the gods)"}
+    ],
+    trans:"Rama is righteousness embodied — virtuous, valiant in truth; king of the whole world, like Indra among the gods.",
+    moral:"This famous verse praises Rama as dharma itself — the model of a righteous king."
+  },
+  {
+    type:"verse", tag:"श्लोकः 2 · Prayer to Rama",
+    deva:"आपदामपहर्तारं दातारं सर्वसम्पदाम्।\nलोकाभिरामं श्रीरामं भूयो भूयो नमाम्यहम्॥",
+    translit:"āpadām apahartāraṁ dātāraṁ sarva-sampadām; lokābhirāmaṁ śrī-rāmaṁ bhūyo bhūyo namāmy aham",
+    words:[
+      {w:"आपदाम् अपहर्तारम्", m:"remover of troubles"},
+      {w:"दातारम्", m:"giver / bestower"},
+      {w:"सर्वसम्पदाम्", m:"of all prosperity"},
+      {w:"नमामि अहम्", m:"I bow / salute"}
+    ],
+    trans:"To the remover of troubles, the giver of all prosperity, the delight of the world, Shri Rama — again and again I bow.",
+    moral:"A well-loved prayer showing why Rama's return brings joy: he removes sorrow and grants welfare to all."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: STORY EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderCard(){
+  var v = CARDS[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+esc(x.m)+'</span></span>';
+  }).join("");
+  var devaHtml = esc(v.deva).replace(/\n/g,"<br>");
+  var tagCls = (v.type==="verse") ? "card-tag verse-tag" : "card-tag";
+  var moralHtml = v.moral
+    ? '<div class="moral-box"><div class="block-label">'+(v.type==="verse"?"Note":"Moral / Theme")+'</div>'+esc(v.moral)+'</div>'
+    : '';
+  verseCard.innerHTML =
+    '<span class="'+tagCls+'">'+v.tag+'</span>'+
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+esc(v.translit)+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">English</div><span class="en">'+esc(v.trans)+'</span></div>'+
+    moralHtml;
+  verseCount.textContent = "Card "+(vIndex+1)+" of "+CARDS.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===CARDS.length-1);
+  var d = "";
+  for(var i=0;i<CARDS.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderCard();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<CARDS.length-1){vIndex++;renderCard();} });
+renderCard();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"अयोध्या", m:"Ayodhya (the city)"},
+  {w:"राज्याभिषेकः", m:"royal coronation"},
+  {w:"वनवासः", m:"forest exile"},
+  {w:"प्रजाः", m:"the people / subjects"},
+  {w:"आगमनम्", m:"arrival / coming"},
+  {w:"आनन्दः", m:"joy / bliss"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+esc(p.m)+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"How many years did Rama live in exile before returning to Ayodhya?",
+    qDeva:"रामः कति वर्षाणि वनवासम् अकरोत्?",
+    options:[
+      {t:"<span class='deva'>चतुर्दश (14)</span> वर्षाणि", correct:true},
+      {t:"<span class='deva'>दश (10)</span> वर्षाणि", correct:false},
+      {t:"<span class='deva'>द्वादश (12)</span> वर्षाणि", correct:false}
+    ],
+    explain:"<b>चतुर्दश वर्षाणि</b> — Rama completed fourteen years of forest exile, and only then returned to Ayodhya."
+  },
+  {
+    q:"Who performed Rama's royal coronation (राज्याभिषेकः)?",
+    qDeva:"रामस्य राज्याभिषेकं कः अकरोत्?",
+    options:[
+      {t:"The sage <span class='deva'>वसिष्ठः</span> (Vasishtha)", correct:true},
+      {t:"His brother <span class='deva'>भरतः</span> (Bharata)", correct:false},
+      {t:"<span class='deva'>हनुमान्</span> (Hanuman)", correct:false}
+    ],
+    explain:"<b>वसिष्ठः</b> — the royal preceptor Vasishtha performed Rama's coronation, after which his righteous reign (रामराज्यम्) began."
+  },
+  {
+    q:"In the verse 'रामो विग्रहवान् धर्मः...', Rama is described as which of these?",
+    qDeva:"'रामो विग्रहवान् धर्मः' — अत्र रामः कीदृशः उच्यते?",
+    options:[
+      {t:"Righteousness embodied (<span class='deva'>विग्रहवान् धर्मः</span>)", correct:true},
+      {t:"A wealthy merchant (<span class='deva'>धनिकः वणिक्</span>)", correct:false},
+      {t:"A forest hunter (<span class='deva'>व्याधः</span>)", correct:false}
+    ],
+    explain:"<b>विग्रहवान् धर्मः</b> means 'dharma taken a bodily form'. The verse praises Rama as the very embodiment of righteousness, like Indra among the gods."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.qDeva+'</div>'+
+    '<p style="margin:0 0 12px;color:var(--ink);font-weight:600;">'+esc(q.q)+'</p>'+
+    '<div class="opt-col">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i,10);
+    if(q.options[bi].correct) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].correct) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].correct ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
