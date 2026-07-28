@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Transport Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --bg:#0e1620; --panel:#16202c; --panel2:#1d2937; --line:#2a3a4c;
+    --txt:#dde7f1; --muted:#8ba0b6; --accent:#5ec8a0; --accent-soft:#5ec8a022;
+    --gold:#e8b24c; --xy:#7ea8e0; --ph:#e0a24c; --leaf:#4e9c6a; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.5;padding:14px;-webkit-text-size-adjust:100%}
+  header{max-width:960px;margin:0 auto 8px}
+  h1{font-size:1.35rem;font-weight:700}
+  .sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+  main{max-width:960px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;font-size:.9rem;cursor:pointer;
+    transition:.15s;flex:1 1 auto;min-width:120px;text-align:center}
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  .view{display:none}
+  .view.active{display:block}
+  h2{font-size:1.05rem;margin-bottom:4px}
+  .hint{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  .lab{display:flex;flex-direction:column;gap:14px}
+  @media(min-width:760px){.lab{flex-direction:row}.svg-box{flex:1 1 52%}.ctrl-box{flex:1 1 48%}}
+  .svg-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation}
+  .lbl{font-size:11px;fill:var(--txt);font-family:system-ui,sans-serif}
+  .lblm{font-size:9.5px;fill:var(--muted);font-family:system-ui,sans-serif}
+  .ctrl-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .ctrl-box h3{font-size:1rem;color:var(--accent);margin-bottom:10px}
+  .row{margin-bottom:14px}
+  .row label{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:5px}
+  .row label b{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:6px;background:var(--line);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+  input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg)}
+  .togg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .togg button{flex:1 1 auto;min-width:90px;background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:8px 10px;border-radius:10px;font-size:.82rem;cursor:pointer;transition:.15s}
+  .togg button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+  .readout{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.85rem;margin-top:6px}
+  .readout .big{font-size:1.5rem;font-weight:700;color:var(--gold)}
+  .readout .u{color:var(--muted);font-size:.8rem}
+  .note{font-size:.8rem;color:var(--muted);margin-top:10px;padding-left:16px;position:relative}
+  .note::before{content:"\25B8";position:absolute;left:0;color:var(--accent)}
+  .legend{font-size:.76rem;color:var(--muted);margin-top:10px;display:flex;flex-wrap:wrap;gap:12px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:4px}
+  .facts h3{font-size:.95rem;color:var(--gold);margin-bottom:8px}
+  .facts ul{list-style:none}
+  .facts li{font-size:.86rem;padding:6px 0 6px 18px;position:relative;border-top:1px solid var(--line)}
+  .facts li:first-child{border-top:none}
+  .facts li::before{content:"\25B8";position:absolute;left:0;color:var(--accent)}
+  .facts b{color:var(--txt)}
+  .quiz .q{border-top:1px solid var(--line);padding:14px 0}
+  .quiz .q:first-of-type{border-top:none}
+  .quiz .qtxt{font-weight:600;font-size:.94rem;margin-bottom:9px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);padding:9px 12px;border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:.88rem;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .opt.wrong{border-color:#c96f5a;background:#c96f5a22;color:#e79b8c}
+  .opt:disabled{cursor:default}
+  .expl{font-size:.83rem;color:var(--muted);margin-top:4px;display:none}
+  .expl.show{display:block}
+  .score{margin-top:10px;font-weight:600;color:var(--accent);font-size:.9rem}
+  footer{max-width:960px;margin:16px auto 0;color:var(--muted);font-size:.75rem;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Plant Transport Lab</h1>
+  <div class="sub">NIOS Class 12 Biology &middot; Ch 8 &mdash; Absorption, Transport &amp; Water Loss in Plants</div>
+</header>
+<main>
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="ascent">1 &middot; Water Ascent</button>
+    <button class="tab" data-view="trans">2 &middot; Transpiration</button>
+    <button class="tab" data-view="phloem">3 &middot; Translocation</button>
+    <button class="tab" data-view="quiz">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ VIEW 1: ASCENT OF SAP ============ -->
+  <section class="view active" id="v-ascent">
+    <div class="panel">
+      <h2>Water Absorption &amp; Ascent of Sap</h2>
+      <p class="hint">Water enters root hairs by osmosis and rises through the xylem to the leaves. Adjust the driving forces and watch the transpiration stream.</p>
+      <div class="lab">
+        <div class="svg-box">
+          <svg id="svgA" viewBox="0 0 320 380" aria-label="Plant showing water rising in xylem"></svg>
+          <div class="legend">
+            <span><i style="background:var(--xy)"></i>Water in xylem</span>
+            <span><i style="background:var(--accent)"></i>Root hair / soil water</span>
+          </div>
+        </div>
+        <div class="ctrl-box">
+          <h3>Driving forces</h3>
+          <div class="row">
+            <label>Root pressure <b id="rpV">40%</b></label>
+            <input type="range" id="rp" min="0" max="100" value="40">
+          </div>
+          <div class="row">
+            <label>Transpiration pull (cohesion&ndash;tension) <b id="tpV">60%</b></label>
+            <input type="range" id="tp" min="0" max="100" value="60">
+          </div>
+          <div class="row">
+            <label>Soil water availability <b id="swV">70%</b></label>
+            <input type="range" id="sw" min="0" max="100" value="70">
+          </div>
+          <div class="readout">
+            Sap ascent speed &nbsp;<span class="big" id="speedA">1.0</span><span class="u"> relative</span>
+            <div id="wpNote" style="margin-top:6px;color:var(--muted)"></div>
+          </div>
+          <div class="note">Water potential (&Psi;) drives osmosis: soil &Psi; is higher than root-cell &Psi;, so water flows <b>in</b>. Transpiration pull creates the most negative &Psi; at the leaves &mdash; the main force lifting water in tall plants.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: TRANSPIRATION ============ -->
+  <section class="view" id="v-trans">
+    <div class="panel">
+      <h2>Transpiration &amp; Stomata</h2>
+      <p class="hint">Most water absorbed is lost as vapour through stomata. Set the environment and toggle the guard cells to see how the rate changes.</p>
+      <div class="lab">
+        <div class="svg-box">
+          <svg id="svgT" viewBox="0 0 320 300" aria-label="Leaf stoma with guard cells"></svg>
+          <div class="legend">
+            <span><i style="background:var(--leaf)"></i>Guard cells</span>
+            <span><i style="background:var(--xy)"></i>Water vapour</span>
+          </div>
+        </div>
+        <div class="ctrl-box">
+          <h3>Environmental factors</h3>
+          <div class="togg">
+            <button id="stomBtn" class="on">Stomata: OPEN</button>
+          </div>
+          <div class="row">
+            <label>Light intensity <b id="ltV">70%</b></label>
+            <input type="range" id="lt" min="0" max="100" value="70">
+          </div>
+          <div class="row">
+            <label>Temperature <b id="teV">28 &deg;C</b></label>
+            <input type="range" id="te" min="5" max="45" value="28">
+          </div>
+          <div class="row">
+            <label>Humidity <b id="huV">40%</b></label>
+            <input type="range" id="hu" min="0" max="100" value="40">
+          </div>
+          <div class="row">
+            <label>Wind speed <b id="wiV">30%</b></label>
+            <input type="range" id="wi" min="0" max="100" value="30">
+          </div>
+          <div class="readout">
+            Transpiration rate &nbsp;<span class="big" id="rateT">1.0</span><span class="u"> relative</span>
+          </div>
+          <div class="note">High light &amp; temperature and wind <b>raise</b> the rate; high humidity <b>lowers</b> it. Closed stomata (e.g. at night or in drought) nearly stop water loss.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: TRANSLOCATION ============ -->
+  <section class="view" id="v-phloem">
+    <div class="panel">
+      <h2>Translocation in Phloem (Pressure&ndash;Flow)</h2>
+      <p class="hint">Sugar made in leaves (source) is loaded into phloem, drawing in water by osmosis; the pressure pushes sap toward growing or storage regions (sink).</p>
+      <div class="lab">
+        <div class="svg-box">
+          <svg id="svgP" viewBox="0 0 320 340" aria-label="Source to sink sugar flow in phloem"></svg>
+          <div class="legend">
+            <span><i style="background:var(--xy)"></i>Xylem: water &uarr;</span>
+            <span><i style="background:var(--ph)"></i>Phloem: food &darr;&uarr;</span>
+          </div>
+        </div>
+        <div class="ctrl-box">
+          <h3>Mass-flow controls</h3>
+          <div class="togg">
+            <button id="srcBtn" class="on">Source: LEAF (top)</button>
+          </div>
+          <div class="row">
+            <label>Photosynthesis / loading rate <b id="phV">70%</b></label>
+            <input type="range" id="ph" min="0" max="100" value="70">
+          </div>
+          <div class="readout">
+            Phloem flow &nbsp;<span class="big" id="rateP">1.0</span><span class="u"> relative</span>
+            <div id="flowNote" style="margin-top:6px;color:var(--muted)"></div>
+          </div>
+          <div class="note"><b>Xylem</b> carries water &amp; minerals <b>upward only</b> (dead, hollow vessels). <b>Phloem</b> carries sugars from source to sink &mdash; <b>up or down</b> (living sieve tubes with companion cells). Switch the source to a storage root to reverse the flow.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: FACTS + QUIZ ============ -->
+  <section class="view" id="v-quiz">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="facts">
+        <ul>
+          <li><b>Osmosis:</b> net movement of water across a semipermeable membrane from higher to lower water potential; root hairs absorb soil water this way.</li>
+          <li><b>Water potential (&Psi;):</b> the free energy of water; pure water = 0, solutions are negative. Water moves from high &Psi; to low &Psi;.</li>
+          <li><b>Cohesion&ndash;tension:</b> water molecules stick together (cohesion) and to xylem walls (adhesion); transpiration pull lifts an unbroken water column up the xylem.</li>
+          <li><b>Root pressure:</b> a positive push from the roots (best seen as guttation at night); it aids ascent but cannot alone raise water in tall trees.</li>
+          <li><b>Stomata:</b> pores flanked by guard cells; they open when turgid (K&#8314; and water enter) and close when flaccid, regulating gas exchange and water loss.</li>
+          <li><b>Translocation:</b> transport of food (sucrose) in phloem by the pressure-flow (mass-flow) mechanism, from source to sink, bidirectionally.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p class="hint">Pick an answer &mdash; the correct choice and reason are revealed on click.</p>
+      <div class="quiz" id="quiz"></div>
+      <div class="score" id="score"></div>
+    </div>
+  </section>
+</main>
+<footer>Interactive study aid &middot; diagrams are schematic, not to scale.</footer>
+
+<script>
+(function(){
+  "use strict";
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs,parent){
+    var e=document.createElementNS(SVGNS,tag);
+    if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);
+    if(parent)parent.appendChild(e);
+    return e;
+  }
+  function clamp(v,a,b){return v<a?a:v>b?b:v;}
+
+  /* ---------- tab switching ---------- */
+  var tabs=document.querySelectorAll(".tab"), views=document.querySelectorAll(".view");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      views.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.getElementById("v-"+t.dataset.view).classList.add("active");
+    });
+  });
+
+  /* ================= VIEW 1: ASCENT ================= */
+  var svgA=document.getElementById("svgA");
+  // draw plant skeleton
+  (function(){
+    // ground
+    el("rect",{x:0,y:300,width:320,height:80,fill:"#20303f"},svgA);
+    el("line",{x1:0,y1:300,x2:320,y2:300,stroke:"#2f4457","stroke-width":2},svgA);
+    // roots
+    el("path",{d:"M160 300 L150 340 M160 300 L172 335 M150 340 L140 360 M172 335 L184 358 M160 300 L160 345",
+      stroke:"#8a6b4a","stroke-width":4,fill:"none","stroke-linecap":"round"},svgA);
+    // root hairs (osmosis zone)
+    for(var i=0;i<7;i++){
+      var rx=130+i*8, ry=326+((i%3)*6);
+      el("line",{x1:rx,y1:ry,x2:rx-7,y2:ry-3,stroke:"var(--accent)","stroke-width":1.4},svgA);
+    }
+    // stem outline
+    el("rect",{x:150,y:110,width:20,height:190,rx:6,fill:"#2c4a3a",stroke:"#3c6a52","stroke-width":1.5},svgA);
+    // xylem channel (inside stem) - the tube water rises in
+    el("rect",{x:156,y:110,width:8,height:200,rx:4,fill:"#12202c"},svgA);
+    // leaves
+    el("path",{d:"M160 150 C120 130 100 150 92 168 C120 176 150 168 160 150 Z",fill:"var(--leaf)",stroke:"#3c6a52"},svgA);
+    el("path",{d:"M160 130 C200 110 220 130 228 148 C200 156 170 148 160 130 Z",fill:"var(--leaf)",stroke:"#3c6a52"},svgA);
+    el("path",{d:"M160 112 C130 92 108 96 96 108 C124 122 152 122 160 112 Z",fill:"var(--leaf)",stroke:"#3c6a52"},svgA);
+    // labels
+    el("text",{x:236,y:150,class:"lblm"},svgA).textContent="leaves";
+    el("text",{x:176,y:210,class:"lblm"},svgA).textContent="xylem";
+    el("text",{x:186,y:334,class:"lblm"},svgA).textContent="root hairs";
+    el("text",{x:12,y:294,class:"lblm"},svgA).textContent="soil water (high Ψ)";
+  })();
+  // water droplets rising in xylem channel (y from 306 -> 116)
+  var dropsA=[], NA=9;
+  for(var i=0;i<NA;i++){
+    var c=el("circle",{cx:160,cy:0,r:2.6,fill:"var(--xy)"},svgA);
+    dropsA.push({node:c,p:i/NA});
+  }
+  var rp=document.getElementById("rp"),tp=document.getElementById("tp"),sw=document.getElementById("sw");
+  var rpV=document.getElementById("rpV"),tpV=document.getElementById("tpV"),swV=document.getElementById("swV");
+  var speedA=document.getElementById("speedA"),wpNote=document.getElementById("wpNote");
+  var stateA={speed:1};
+  function updA(){
+    rpV.textContent=rp.value+"%"; tpV.textContent=tp.value+"%"; swV.textContent=sw.value+"%";
+    var soil=sw.value/100;
+    // transpiration pull dominates; root pressure adds a little; soil gates supply
+    var raw=(0.65*(tp.value/100)+0.35*(rp.value/100));
+    var sp=raw*(0.3+0.7*soil);
+    stateA.speed=clamp(sp,0,1.4);
+    speedA.textContent=(stateA.speed).toFixed(2);
+    var msg;
+    if(soil<0.2) msg="Dry soil: low Ψ gap → little water enters roots.";
+    else if(tp.value>rp.value) msg="Transpiration pull dominates (main lifting force).";
+    else msg="Root pressure contributing a positive push.";
+    wpNote.textContent=msg;
+  }
+  rp.oninput=tp.oninput=sw.oninput=updA; updA();
+
+  /* ================= VIEW 2: TRANSPIRATION ================= */
+  var svgT=document.getElementById("svgT");
+  var guardTop,guardBot,poreOpen=true;
+  (function(){
+    el("rect",{x:0,y:0,width:320,height:300,fill:"none"},svgT);
+    // leaf slab cross-section
+    el("rect",{x:20,y:60,width:280,height:150,rx:14,fill:"#24402f",stroke:"#3c6a52","stroke-width":1.5},svgT);
+    el("text",{x:26,y:52,class:"lbl"},svgT).textContent="Leaf under-surface (stoma close-up)";
+    // guard cells (two kidney shapes) around a central pore ~ (160,150)
+    guardTop=el("path",{d:"",fill:"var(--leaf)",stroke:"#2f5a40","stroke-width":2},svgT);
+    guardBot=el("path",{d:"",fill:"var(--leaf)",stroke:"#2f5a40","stroke-width":2},svgT);
+    el("text",{x:108,y:150,class:"lblm"},svgT).textContent="guard";
+    el("text",{x:108,y:162,class:"lblm"},svgT).textContent="cells";
+    el("text",{x:176,y:150,class:"lblm"},svgT).textContent="stomatal pore";
+  })();
+  function drawStoma(g){ // g = pore gap 0..1
+    var cx=160, cy=150, rx=34, ry=12, gap=6+g*22;
+    // top guard cell curves above pore
+    guardTop.setAttribute("d",
+      "M "+(cx-rx)+" "+cy+" C "+(cx-rx)+" "+(cy-24)+" "+(cx+rx)+" "+(cy-24)+" "+(cx+rx)+" "+cy+
+      " C "+(cx+rx*0.6)+" "+(cy-gap*0.5)+" "+(cx-rx*0.6)+" "+(cy-gap*0.5)+" "+(cx-rx)+" "+cy+" Z");
+    guardBot.setAttribute("d",
+      "M "+(cx-rx)+" "+cy+" C "+(cx-rx)+" "+(cy+24)+" "+(cx+rx)+" "+(cy+24)+" "+(cx+rx)+" "+cy+
+      " C "+(cx+rx*0.6)+" "+(cy+gap*0.5)+" "+(cx-rx*0.6)+" "+(cy+gap*0.5)+" "+(cx-rx)+" "+cy+" Z");
+  }
+  // vapour particles rising from pore
+  var vaps=[], NV=14;
+  for(var i=0;i<NV;i++){
+    var c=el("circle",{cx:160,cy:150,r:2.2,fill:"var(--xy)","fill-opacity":0.0},svgT);
+    vaps.push({node:c,p:Math.random(),x:0,drift:0});
+  }
+  var lt=document.getElementById("lt"),te=document.getElementById("te"),hu=document.getElementById("hu"),wi=document.getElementById("wi");
+  var ltV=document.getElementById("ltV"),teV=document.getElementById("teV"),huV=document.getElementById("huV"),wiV=document.getElementById("wiV");
+  var rateT=document.getElementById("rateT"),stomBtn=document.getElementById("stomBtn");
+  var stateT={rate:1};
+  stomBtn.onclick=function(){
+    poreOpen=!poreOpen;
+    stomBtn.textContent="Stomata: "+(poreOpen?"OPEN":"CLOSED");
+    stomBtn.classList.toggle("on",poreOpen);
+    updT();
+  };
+  function updT(){
+    ltV.textContent=lt.value+"%"; teV.textContent=te.value+" °C"; huV.textContent=hu.value+"%"; wiV.textContent=wi.value+"%";
+    var L=lt.value/100, T=(te.value-5)/40, H=hu.value/100, W=wi.value/100;
+    var r=(0.35*L+0.30*T+0.20*W)+0.15; // base drivers
+    r=r*(1-0.75*H);                     // humidity suppresses
+    if(!poreOpen) r*=0.06;              // closed stomata
+    stateT.rate=clamp(r,0,1.5);
+    rateT.textContent=stateT.rate.toFixed(2);
+  }
+  lt.oninput=te.oninput=hu.oninput=wi.oninput=updT; updT();
+
+  /* ================= VIEW 3: TRANSLOCATION ================= */
+  var svgP=document.getElementById("svgP");
+  (function(){
+    el("rect",{x:0,y:300,width:320,height:40,fill:"#20303f"},svgP);
+    // stem with two side-by-side vessels
+    el("rect",{x:120,y:40,width:80,height:262,rx:10,fill:"#213445",stroke:"#33506a"},svgP);
+    // xylem tube (left)
+    el("rect",{x:134,y:44,width:20,height:254,rx:6,fill:"#12202c"},svgP);
+    el("text",{x:120,y:34,class:"lblm"},svgP).textContent="xylem";
+    // phloem tube (right) with sieve plates
+    el("rect",{x:166,y:44,width:20,height:254,rx:6,fill:"#2a2213"},svgP);
+    el("text",{x:170,y:34,class:"lblm"},svgP).textContent="phloem";
+    for(var y=70;y<300;y+=26){ el("line",{x1:166,y1:y,x2:186,y2:y,stroke:"#4a3a1c","stroke-width":1.4},svgP); }
+    // leaf (source, top)
+    el("path",{d:"M160 60 C110 40 84 60 74 82 C112 94 150 84 160 60 Z",fill:"var(--leaf)",stroke:"#3c6a52"},svgP);
+    // storage root (bottom, alt source/sink)
+    el("ellipse",{cx:160,cy:316,rx:26,ry:16,fill:"#8a6b4a",stroke:"#6a5038"},svgP);
+    document.getElementById("srcLbl_top")||el("text",{id:"topTag",x:200,y:70,class:"lblm"},svgP).textContent="leaf";
+    el("text",{x:190,y:320,class:"lblm"},svgP).textContent="storage root";
+  })();
+  // xylem drops (always up)
+  var xdr=[],NX=8;
+  for(var i=0;i<NX;i++){ xdr.push({node:el("circle",{cx:144,cy:0,r:2.6,fill:"var(--xy)"},svgP),p:i/NX}); }
+  // phloem drops (direction depends on source)
+  var pdr=[],NP=8;
+  for(var i=0;i<NP;i++){ pdr.push({node:el("circle",{cx:176,cy:0,r:2.8,fill:"var(--ph)"},svgP),p:i/NP}); }
+  var phS=document.getElementById("ph"),phV=document.getElementById("phV"),rateP=document.getElementById("rateP");
+  var srcBtn=document.getElementById("srcBtn"),flowNote=document.getElementById("flowNote");
+  var srcTop=true, stateP={rate:1};
+  srcBtn.onclick=function(){
+    srcTop=!srcTop;
+    srcBtn.textContent="Source: "+(srcTop?"LEAF (top)":"ROOT (bottom)");
+    srcBtn.classList.toggle("on",true);
+    updP();
+  };
+  function updP(){
+    phV.textContent=phS.value+"%";
+    stateP.rate=clamp(phS.value/100*1.4+0.1,0,1.5);
+    rateP.textContent=stateP.rate.toFixed(2);
+    flowNote.textContent=srcTop
+      ? "Sugar loaded at leaf → phloem sap flows DOWN to root sink."
+      : "Stored sugar mobilised → phloem sap flows UP to shoot sink.";
+  }
+  phS.oninput=updP; updP();
+
+  /* ================= ANIMATION LOOP ================= */
+  var last=performance.now();
+  function frame(now){
+    var dt=Math.min(0.05,(now-last)/1000); last=now;
+    // View 1 drops
+    var vA=stateA.speed*0.25;
+    for(var i=0;i<dropsA.length;i++){
+      var d=dropsA[i]; d.p-=vA*dt; if(d.p<0)d.p+=1;
+      var y=306-d.p*190; // bottom to top
+      d.node.setAttribute("cy",y);
+      d.node.setAttribute("fill-opacity",clamp(stateA.speed,0.15,1));
+    }
+    // View 2 stoma + vapour
+    var target=poreOpen?1:0.04;
+    drawStoma._g=(drawStoma._g==null?target:drawStoma._g+(target-drawStoma._g)*Math.min(1,dt*6));
+    drawStoma(drawStoma._g);
+    var vT=stateT.rate;
+    for(var i=0;i<vaps.length;i++){
+      var p=vaps[i]; p.p-=(0.15+vT*0.35)*dt;
+      if(p.p<0){ p.p+=1; p.drift=(Math.random()-0.5); }
+      var yy=150-p.p*118;
+      var xx=160+p.drift*40*p.p + (wi.value/100)*30*p.p;
+      p.node.setAttribute("cx",xx);
+      p.node.setAttribute("cy",yy);
+      p.node.setAttribute("fill-opacity", (vT*0.9)*(1-p.p));
+      p.node.setAttribute("r", 2.2+p.p*1.4);
+    }
+    // View 3 flows
+    var vX=0.28;
+    for(var i=0;i<xdr.length;i++){
+      var d=xdr[i]; d.p-=vX*dt; if(d.p<0)d.p+=1;
+      d.node.setAttribute("cy",296-d.p*250); // up
+    }
+    var vP=stateP.rate*0.24;
+    for(var i=0;i<pdr.length;i++){
+      var d=pdr[i]; d.p-=vP*dt; if(d.p<0)d.p+=1;
+      var yy=srcTop ? (48+d.p*246) : (296-d.p*250);
+      d.node.setAttribute("cy",yy);
+    }
+    raf=requestAnimationFrame(frame);
+  }
+  var raf=requestAnimationFrame(frame);
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){ if(raf)cancelAnimationFrame(raf); raf=null; }
+    else if(!raf){ last=performance.now(); raf=requestAnimationFrame(frame); }
+  });
+
+  /* ================= QUIZ ================= */
+  var QS=[
+    {q:"Which force is chiefly responsible for lifting water up a tall tree?",
+     o:["Root pressure","Transpiration pull (cohesion–tension)","Active pumping by xylem cells","Gravity"],
+     a:1,e:"Transpiration at the leaves creates tension; cohesive water columns are pulled up the xylem."},
+    {q:"Water enters root hair cells because the water potential of soil water is:",
+     o:["Lower than that of the root cell sap","Equal to the root cell sap","Higher than that of the root cell sap","Always zero"],
+     a:2,e:"Water moves from higher Ψ (soil) to lower Ψ (cell sap) by osmosis."},
+    {q:"Compared with xylem, phloem transport is distinctive because it:",
+     o:["Carries only water","Moves substances in one direction only","Uses dead, hollow cells","Moves food from source to sink, in either direction"],
+     a:3,e:"Phloem carries sugars bidirectionally between sources and sinks via living sieve tubes (pressure-flow)."}
+  ];
+  var quiz=document.getElementById("quiz"),scoreEl=document.getElementById("score"),answered=0,correct=0;
+  QS.forEach(function(item,qi){
+    var wrap=document.createElement("div"); wrap.className="q";
+    var qt=document.createElement("div"); qt.className="qtxt"; qt.textContent=(qi+1)+". "+item.q; wrap.appendChild(qt);
+    var done=false;
+    item.o.forEach(function(txt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=txt;
+      b.onclick=function(){
+        if(done)return; done=true; answered++;
+        var opts=wrap.querySelectorAll(".opt");
+        opts.forEach(function(x){x.disabled=true;});
+        opts[item.a].classList.add("correct");
+        if(oi===item.a){correct++;} else {b.classList.add("wrong");}
+        ex.classList.add("show");
+        scoreEl.textContent="Score: "+correct+" / "+answered;
+      };
+      wrap.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="expl"; ex.textContent="→ "+item.e; wrap.appendChild(ex);
+    quiz.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>

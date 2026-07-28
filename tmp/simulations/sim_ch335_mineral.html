@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mineral Nutrition Lab - NIOS Class 12 Biology (Ch 9)</title>
+<style>
+  :root{
+    --accent:#7bd389;
+    --accent-dark:#4fae63;
+    --bg:#101a16;
+    --panel:#182521;
+    --panel2:#1f302a;
+    --ink:#e7f0ea;
+    --muted:#9db3a8;
+    --line:#2a3d35;
+    --good:#7bd389;
+    --bad:#e88b7d;
+    --warn:#e6c86a;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2b24,#101a16);
+    color:var(--ink);line-height:1.55;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:2px solid transparent;padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#0c1512;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:2px 0 10px;}
+  h3{font-size:.98rem;margin:14px 0 8px;color:var(--accent);}
+  p.lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .btn{background:var(--accent);color:#0c1512;border:none;padding:9px 15px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  /* element cards */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:.82rem;color:var(--muted);}
+  .dot{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:5px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;}
+  .el{background:var(--panel2);border:1.5px solid var(--line);border-radius:12px;
+    padding:8px 4px;text-align:center;cursor:pointer;transition:.12s;}
+  .el:hover{transform:translateY(-2px);border-color:var(--accent);}
+  .el.macro{border-left:4px solid var(--accent);}
+  .el.micro{border-left:4px solid var(--warn);}
+  .el.sel{outline:2px solid var(--accent);}
+  .el .sym{font-size:1.15rem;font-weight:800;}
+  .el .nm{font-size:.62rem;color:var(--muted);line-height:1.1;}
+  .info{margin-top:12px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:14px;min-height:70px;}
+  .info .tag{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;
+    border-radius:20px;margin-right:6px;}
+  .tag.mac{background:rgba(123,211,137,.18);color:var(--accent);}
+  .tag.mic{background:rgba(230,200,106,.18);color:var(--warn);}
+  .info dl{margin:8px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.86rem;}
+  .info dt{color:var(--muted);font-weight:600;}
+  /* deficiency sim */
+  .simrow{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .simcol{flex:1 1 260px;min-width:240px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 12px;}
+  .chip{background:var(--panel2);border:1.5px solid var(--line);border-radius:20px;
+    padding:7px 13px;cursor:pointer;font-weight:600;font-size:.85rem;transition:.12s;color:var(--ink);}
+  .chip:hover{border-color:var(--accent);}
+  .chip.on{background:var(--accent);color:#0c1512;border-color:var(--accent-dark);}
+  .symptom{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;font-size:.88rem;margin-top:8px;}
+  .symptom b{color:var(--accent);}
+  .match-line{font-size:.85rem;margin-top:8px;}
+  .match-line.ok{color:var(--good);}
+  .match-line.no{color:var(--bad);}
+  /* uptake */
+  ul.tips{margin:6px 0;padding-left:18px;font-size:.88rem;}
+  ul.tips li{margin-bottom:6px;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.two{grid-template-columns:1fr;}}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .box h4{margin:0 0 6px;font-size:.9rem;color:var(--accent);}
+  .facts{background:linear-gradient(160deg,#1d2f28,#182521);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;font-size:.86rem;margin-top:12px;}
+  .facts b{color:var(--accent);}
+  /* quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:12px;}
+  .q p{margin:0 0 9px;font-weight:600;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1.5px solid var(--line);
+    border-radius:9px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.86rem;color:var(--ink);transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(123,211,137,.2);border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:rgba(232,139,125,.16);border-color:var(--bad);color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none;}
+  .expl.show{display:block;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 22px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Mineral Nutrition Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 9 Nutrition in Plants &mdash; Mineral Nutrition</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-t="els">1 &middot; Essential Elements</button>
+    <button class="tab" data-t="def">2 &middot; Deficiency Simulator</button>
+    <button class="tab" data-t="up">3 &middot; Uptake &amp; Criteria</button>
+    <button class="tab" data-t="quiz">Quiz</button>
+  </div>
+
+  <!-- ELEMENTS -->
+  <section class="panel" id="els">
+    <h2>Essential Elements &mdash; roles &amp; deficiency</h2>
+    <p class="lead">Plants need 17 essential elements. Besides C, H, O (from air &amp; water), 13 mineral elements come from the soil. Tap a tile to see its function and the symptom of its deficiency.</p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--accent)"></span>Macronutrient (needed in large amounts, &gt;10 mmol/kg dry matter)</span>
+      <span><span class="dot" style="background:var(--warn)"></span>Micronutrient / trace (needed in tiny amounts)</span>
+    </div>
+    <div class="grid" id="elGrid"></div>
+    <div class="info" id="elInfo">
+      <span style="color:var(--muted);font-size:.88rem;">Select an element above to read its role and deficiency symptom.</span>
+    </div>
+  </section>
+
+  <!-- DEFICIENCY SIM -->
+  <section class="panel hidden" id="def">
+    <h2>Deficiency Simulator</h2>
+    <p class="lead">Remove an element from the nutrient solution and watch the plant express the classic deficiency symptom. Then test yourself: can you match a symptom back to its element?</p>
+    <div class="chips" id="defChips"></div>
+    <div class="simrow">
+      <div class="simcol">
+        <svg id="plantSvg" viewBox="0 0 260 300" aria-label="plant"></svg>
+      </div>
+      <div class="simcol">
+        <div class="symptom" id="defText">Full nutrient solution supplied &mdash; the plant is healthy and green. Remove an element to see its symptom.</div>
+        <h3>Match the symptom</h3>
+        <p class="lead" id="matchQ" style="margin-bottom:6px;"></p>
+        <div class="chips" id="matchChips"></div>
+        <div class="match-line" id="matchRes"></div>
+        <button class="btn ghost" id="newMatch" style="margin-top:6px;">New symptom &rarr;</button>
+      </div>
+    </div>
+    <div class="facts">
+      <b>Mobility matters:</b> deficiency of <i>mobile</i> elements (N, P, K, Mg) shows first in <b>older</b> leaves, because the plant retranslocates them to young growing tissue. <i>Immobile</i> elements (Ca, Fe, S, B, Cu) show symptoms first in <b>young</b> leaves and growing tips.
+    </div>
+  </section>
+
+  <!-- UPTAKE -->
+  <section class="panel hidden" id="up">
+    <h2>Uptake &amp; the Criteria of Essentiality</h2>
+    <p class="lead">How do roots take up mineral ions, and how do scientists decide an element is truly "essential"?</p>
+
+    <h3>How minerals are absorbed</h3>
+    <div class="two">
+      <div class="box">
+        <h4>Passive absorption</h4>
+        <p style="margin:0;font-size:.86rem;">Ions move <b>down</b> their electrochemical gradient into root epidermis/cortex without direct ATP use &mdash; by diffusion, ion channels and mass flow in water. Fast, non-selective, no metabolic energy.</p>
+      </div>
+      <div class="box">
+        <h4>Active absorption</h4>
+        <p style="margin:0;font-size:.86rem;">Ions are pumped <b>against</b> the gradient using energy from ATP (via H<sup>+</sup>-ATPase and carrier proteins). Selective, saturable, needs respiration &mdash; blocked by low O<sub>2</sub> or metabolic poisons.</p>
+      </div>
+    </div>
+    <div class="facts">
+      <b>The Casparian strip</b> in the endodermis blocks the apoplast pathway, forcing ions through the symplast &mdash; letting the root select which ions reach the xylem for transport to the shoot.
+    </div>
+
+    <h3>Criteria of essentiality (Arnon &amp; Stout)</h3>
+    <ul class="tips">
+      <li><b>Necessity:</b> the plant cannot complete its life cycle (grow, flower, set seed) without the element.</li>
+      <li><b>Specificity:</b> the requirement is specific &mdash; no other element can fully replace it.</li>
+      <li><b>Direct role:</b> the element is directly involved in metabolism (a structural part of a molecule or an enzyme activator), not just correcting soil chemistry.</li>
+    </ul>
+
+    <h3>Hydroponics</h3>
+    <p style="font-size:.88rem;margin:4px 0;">Growing plants in a soil-free, aerated nutrient solution of known composition. By leaving out one element at a time, researchers identified which elements are essential and what deficiency each causes &mdash; this is how the essential-element list was built and how deficiency symptoms were catalogued.</p>
+    <div class="facts">
+      <b>Functional roles at a glance:</b> N &amp; S build amino acids/proteins; P builds ATP, nucleic acids &amp; membranes; K activates enzymes &amp; controls stomata/osmosis; Ca is a middle-lamella (pectate) and signalling component; Mg is the central atom of chlorophyll; Fe, Cu, Mo are cofactors in electron transport &amp; nitrogen metabolism.
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel hidden" id="quiz">
+    <h2>Quick Quiz</h2>
+    <p class="lead">Three questions &mdash; tap an option to check your answer.</p>
+    <div id="quizWrap"></div>
+  </section>
+
+  <footer>Mineral Nutrition Lab &middot; self-contained interactive &middot; NIOS Class 12 Biology</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- element data ---------- */
+var ELEMENTS = [
+  {s:"N", n:"Nitrogen", type:"macro", role:"Component of amino acids, proteins, nucleic acids, chlorophyll and many coenzymes.", def:"Chlorosis (uniform yellowing) of OLDER leaves first; stunted growth. Mobile element.", mob:"mobile"},
+  {s:"P", n:"Phosphorus", type:"macro", role:"Part of ATP, nucleic acids, phospholipids of membranes; central to energy transfer.", def:"Dark green to PURPLE/red tint on older leaves and stems; poor root and flower development.", mob:"mobile"},
+  {s:"K", n:"Potassium", type:"macro", role:"Enzyme activator; maintains turgor, osmotic balance and stomatal opening/closing.", def:"Scorched, brown, dry MARGINS of older leaves (marginal necrosis); weak stems.", mob:"mobile"},
+  {s:"Ca", n:"Calcium", type:"macro", role:"Forms calcium pectate in the middle lamella of the cell wall; second messenger in signalling.", def:"Death of growing tips and young leaves; distorted, hooked new growth. Immobile.", mob:"immobile"},
+  {s:"Mg", n:"Magnesium", type:"macro", role:"Central atom of the chlorophyll molecule; activates many enzymes (e.g. of respiration).", def:"Interveinal chlorosis (yellow between GREEN veins) of older leaves. Mobile.", mob:"mobile"},
+  {s:"S", n:"Sulphur", type:"macro", role:"Present in amino acids cysteine & methionine, proteins, coenzyme A and some vitamins.", def:"Chlorosis of YOUNG leaves first (unlike N); overall pale plant. Fairly immobile.", mob:"immobile"},
+  {s:"Fe", n:"Iron", type:"micro", role:"Cofactor in cytochromes & ferredoxin (electron transport); needed to synthesise chlorophyll.", def:"Interveinal chlorosis of YOUNG leaves (veins stay green). Immobile.", mob:"immobile"},
+  {s:"Mn", n:"Manganese", type:"micro", role:"Activates enzymes of respiration & N metabolism; splits water in photosynthesis (PS II).", def:"Interveinal chlorosis with small dead spots on younger leaves.", mob:"immobile"},
+  {s:"Zn", n:"Zinc", type:"micro", role:"Activator of enzymes; required for auxin (IAA) synthesis via tryptophan.", def:"Stunted growth, small distorted leaves ('little leaf'), shortened internodes.", mob:"immobile"},
+  {s:"Cu", n:"Copper", type:"micro", role:"Cofactor in oxidase enzymes (e.g. plastocyanin) of electron transport.", def:"Dieback of shoot tips; dark, twisted young leaves. Immobile.", mob:"immobile"},
+  {s:"B", n:"Boron", type:"micro", role:"Needed for Ca uptake/use, cell-wall synthesis, pollen germination and sugar transport.", def:"Death of growing points; brittle, deformed young tissue; poor flower/fruit set.", mob:"immobile"},
+  {s:"Mo", n:"Molybdenum", type:"micro", role:"Cofactor of nitrate reductase and nitrogenase &mdash; central to nitrogen metabolism.", def:"Pale mottled leaves; 'whiptail' in crucifers; nitrogen-deficiency-like symptoms.", mob:"immobile"},
+  {s:"Cl", n:"Chlorine", type:"micro", role:"With Na & K maintains osmotic balance; involved in water-splitting in photosynthesis.", def:"Wilting, chlorosis and bronzing; reduced root growth.", mob:"mobile"}
+];
+
+/* ---------- tabs ---------- */
+var tabs = document.querySelectorAll('.tab');
+var sections = {els:byId('els'), def:byId('def'), up:byId('up'), quiz:byId('quiz')};
+tabs.forEach(function(t){
+  t.addEventListener('click', function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    for(var k in sections){ sections[k].classList.add('hidden'); }
+    sections[t.dataset.t].classList.remove('hidden');
+  });
+});
+function byId(i){return document.getElementById(i);}
+
+/* ---------- elements grid ---------- */
+var grid = byId('elGrid'), elInfo = byId('elInfo');
+ELEMENTS.forEach(function(e,i){
+  var d = document.createElement('div');
+  d.className = 'el ' + e.type;
+  d.innerHTML = '<div class="sym">'+e.s+'</div><div class="nm">'+e.n+'</div>';
+  d.addEventListener('click', function(){
+    document.querySelectorAll('.el').forEach(function(x){x.classList.remove('sel');});
+    d.classList.add('sel');
+    showEl(e);
+  });
+  grid.appendChild(d);
+});
+function showEl(e){
+  var tagCls = e.type==='macro' ? 'mac' : 'mic';
+  var tagTxt = e.type==='macro' ? 'Macronutrient' : 'Micronutrient';
+  elInfo.innerHTML =
+    '<span class="tag '+tagCls+'">'+tagTxt+'</span>'+
+    '<b style="font-size:1rem;">'+e.n+' ('+e.s+')</b>'+
+    '<dl>'+
+      '<dt>Role</dt><dd>'+e.role+'</dd>'+
+      '<dt>Deficiency</dt><dd>'+e.def+'</dd>'+
+      '<dt>Mobility</dt><dd>'+e.mob+' &mdash; symptoms first in '+(e.mob==='mobile'?'older':'younger')+' leaves</dd>'+
+    '</dl>';
+}
+
+/* ---------- deficiency simulator ---------- */
+/* visual profiles keyed by element */
+var DEF = {
+  none:{title:"Healthy plant", where:"", desc:"Full nutrient solution &mdash; the plant is healthy and deep green.", leaf:"#4fae63", vein:"#2f7d43", extra:"none"},
+  N:{title:"Nitrogen (N) removed", where:"older leaves", desc:"Uniform <b>yellowing (chlorosis)</b> of older, lower leaves; overall stunting. N is mobile, so it moves to young leaves.", leaf:"#e6d36a", vein:"#e6d36a", extra:"none"},
+  P:{title:"Phosphorus (P) removed", where:"older leaves & stems", desc:"Older leaves turn dark green then develop a <b>purple / red</b> tint; roots and flowering are poor.", leaf:"#6a4d8a", vein:"#3f2f5a", extra:"none"},
+  K:{title:"Potassium (K) removed", where:"leaf margins", desc:"<b>Scorched, brown, dry margins</b> (marginal necrosis) on older leaves; weak stems.", leaf:"#5aa06a", vein:"#2f7d43", extra:"margin"},
+  Mg:{title:"Magnesium (Mg) removed", where:"between veins, older leaves", desc:"<b>Interveinal chlorosis</b> &mdash; yellow between still-green veins &mdash; on older leaves (Mg is the core of chlorophyll).", leaf:"#e6d36a", vein:"#2f7d43", extra:"veins"},
+  Fe:{title:"Iron (Fe) removed", where:"between veins, young leaves", desc:"<b>Interveinal chlorosis of the youngest leaves</b> (veins stay green). Fe is immobile, so new growth suffers first.", leaf:"#eae08a", vein:"#3f7d43", extra:"veins"},
+  Ca:{title:"Calcium (Ca) removed", where:"growing tips", desc:"<b>Death of growing tips</b> and young leaves; new growth is distorted and hooked. Ca is immobile.", leaf:"#5aa06a", vein:"#2f7d43", extra:"tip"}
+};
+
+var defChips = byId('defChips'), defText = byId('defText'), plantSvg = byId('plantSvg');
+var order = ["none","N","P","K","Mg","Fe","Ca"];
+var cur = "none";
+order.forEach(function(k){
+  var c = document.createElement('button');
+  c.className = 'chip' + (k==='none'?' on':'');
+  c.textContent = k==='none' ? 'Full solution' : 'Remove '+k;
+  c.addEventListener('click', function(){
+    defChips.querySelectorAll('.chip').forEach(function(x){x.classList.remove('on');});
+    c.classList.add('on');
+    cur = k;
+    renderPlant(k);
+  });
+  defChips.appendChild(c);
+});
+
+function renderPlant(k){
+  var d = DEF[k];
+  defText.innerHTML = '<b>'+d.title+'</b><br>'+d.desc;
+  var leaf = d.leaf, vein = d.vein;
+  var s = '';
+  // pot
+  s += '<rect x="95" y="250" width="70" height="40" rx="6" fill="#3a2c22"/>';
+  s += '<rect x="88" y="242" width="84" height="16" rx="4" fill="#4a382b"/>';
+  // stem
+  var stemCol = (k==='Ca') ? '#8a9a5a' : '#3f7d43';
+  s += '<path d="M130 250 L130 70" stroke="'+stemCol+'" stroke-width="7" fill="none" stroke-linecap="round"/>';
+  // leaves: pairs. lower = older, upper = younger
+  // helper builds a leaf
+  function leafPath(cx,cy,dir,scale,fill,veinFill,drawVeins,scorch){
+    var w = 55*scale, h = 26*scale, ex = dir*w;
+    var g = '<g>';
+    g += '<path d="M'+cx+' '+cy+' Q'+(cx+ex*0.5)+' '+(cy-h)+' '+(cx+ex)+' '+cy+' Q'+(cx+ex*0.5)+' '+(cy+h)+' '+cx+' '+cy+' Z" fill="'+fill+'" stroke="#2b3d30" stroke-width="1"/>';
+    // midrib
+    g += '<path d="M'+cx+' '+cy+' L'+(cx+ex)+' '+cy+'" stroke="'+veinFill+'" stroke-width="2" fill="none"/>';
+    if(drawVeins){
+      for(var vi=1;vi<=3;vi++){
+        var px = cx+ex*(vi/4);
+        g += '<path d="M'+px+' '+cy+' L'+(px+ex*0.1)+' '+(cy-h*0.55)+'" stroke="'+veinFill+'" stroke-width="1.4" fill="none"/>';
+        g += '<path d="M'+px+' '+cy+' L'+(px+ex*0.1)+' '+(cy+h*0.55)+'" stroke="'+veinFill+'" stroke-width="1.4" fill="none"/>';
+      }
+    }
+    if(scorch){
+      // brown scorched margin
+      g += '<path d="M'+cx+' '+cy+' Q'+(cx+ex*0.5)+' '+(cy-h)+' '+(cx+ex)+' '+cy+' Q'+(cx+ex*0.5)+' '+(cy+h)+' '+cx+' '+cy+' Z" fill="none" stroke="#7a4a2a" stroke-width="4" stroke-linejoin="round"/>';
+    }
+    return g+'</g>';
+  }
+  // older leaves (lower) affected for mobile-element deficiencies (N,P,K,Mg)
+  var mobileDef = (k==='N'||k==='P'||k==='K'||k==='Mg');
+  var youngDef = (k==='Fe'||k==='Ca');
+  var healthy = '#4fae63', hvein = '#2f7d43';
+  var scorchLow = (d.extra==='margin');
+  var veinsLow = (d.extra==='veins' && mobileDef);
+  // lower pair (older)
+  s += leafPath(130,210, -1, 1.1, mobileDef?leaf:healthy, mobileDef?vein:hvein, mobileDef&&d.extra==='veins', scorchLow&&mobileDef);
+  s += leafPath(130,210,  1, 1.1, mobileDef?leaf:healthy, mobileDef?vein:hvein, mobileDef&&d.extra==='veins', scorchLow&&mobileDef);
+  // middle pair
+  s += leafPath(130,160, -1, 1.0, mobileDef?leaf:healthy, mobileDef?vein:hvein, mobileDef&&d.extra==='veins', scorchLow&&mobileDef);
+  s += leafPath(130,160,  1, 1.0, mobileDef?leaf:healthy, mobileDef?vein:hvein, mobileDef&&d.extra==='veins', scorchLow&&mobileDef);
+  // upper pair (younger) affected for immobile (Fe)
+  var upLeaf = youngDef && k==='Fe' ? leaf : healthy;
+  var upVein = youngDef && k==='Fe' ? vein : hvein;
+  s += leafPath(130,112, -1, 0.85, upLeaf, upVein, k==='Fe', false);
+  s += leafPath(130,112,  1, 0.85, upLeaf, upVein, k==='Fe', false);
+  // growing tip
+  if(k==='Ca'){
+    s += '<path d="M130 70 q-6 -14 -2 -24" stroke="#6a5a3a" stroke-width="6" fill="none" stroke-linecap="round"/>';
+    s += '<circle cx="126" cy="46" r="6" fill="#5a4a2a"/>';
+    s += '<text x="150" y="46" fill="#e88b7d" font-size="10">dead tip</text>';
+  } else {
+    s += '<circle cx="130" cy="60" r="8" fill="'+(youngDef?upLeaf:healthy)+'" stroke="#2b3d30"/>';
+  }
+  plantSvg.innerHTML = s;
+}
+renderPlant('none');
+
+/* ---------- match the symptom game ---------- */
+var matchQ = byId('matchQ'), matchChips = byId('matchChips'), matchRes = byId('matchRes');
+var MATCH = [
+  {sym:"Uniform yellowing of the oldest, lower leaves with general stunting.", ans:"N"},
+  {sym:"Purple / reddish tint on older leaves and stems; poor rooting.", ans:"P"},
+  {sym:"Brown scorched dry margins on older leaves.", ans:"K"},
+  {sym:"Yellow between green veins on OLDER leaves.", ans:"Mg"},
+  {sym:"Yellow between green veins on the YOUNGEST leaves.", ans:"Fe"},
+  {sym:"Death of the growing tip; distorted new growth.", ans:"Ca"}
+];
+var matchOpts = ["N","P","K","Mg","Fe","Ca"];
+var curMatch = null;
+function newMatch(){
+  curMatch = MATCH[Math.floor(Math.random()*MATCH.length)];
+  matchQ.innerHTML = 'Symptom: <i>"'+curMatch.sym+'"</i> &mdash; which element is deficient?';
+  matchRes.textContent = '';
+  matchRes.className = 'match-line';
+  matchChips.innerHTML = '';
+  matchOpts.forEach(function(o){
+    var c = document.createElement('button');
+    c.className = 'chip';
+    c.textContent = o;
+    c.addEventListener('click', function(){
+      if(o === curMatch.ans){
+        matchRes.textContent = 'Correct! '+o+' deficiency causes that symptom.';
+        matchRes.className = 'match-line ok';
+      } else {
+        matchRes.textContent = 'Not quite — that is '+o+'. Try again or reveal with a new symptom.';
+        matchRes.className = 'match-line no';
+      }
+    });
+    matchChips.appendChild(c);
+  });
+}
+byId('newMatch').addEventListener('click', newMatch);
+newMatch();
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  {q:"A plant shows yellowing that starts in its OLDEST leaves. This points to a deficiency of a mobile element such as:",
+   opts:["Iron (Fe)","Nitrogen (N)","Calcium (Ca)","Boron (B)"], a:1,
+   e:"Mobile elements (N, P, K, Mg) are retranslocated to young tissue, so their deficiency shows first in older leaves. Fe, Ca and B are immobile and affect young leaves/tips."},
+  {q:"Which element is the central atom of the chlorophyll molecule?",
+   opts:["Manganese","Magnesium","Molybdenum","Iron"], a:1,
+   e:"Magnesium (Mg) sits at the centre of every chlorophyll molecule; its deficiency causes interveinal chlorosis of older leaves. Iron is needed to make chlorophyll but is not part of it."},
+  {q:"Active absorption of mineral ions by roots differs from passive absorption because it:",
+   opts:["Occurs only in dead cells","Moves ions down their gradient","Requires ATP/metabolic energy and is selective","Needs no oxygen"], a:2,
+   e:"Active absorption pumps ions AGAINST their electrochemical gradient using ATP; it is selective and depends on respiration, so it is blocked by low oxygen or metabolic poisons."}
+];
+var qw = byId('quizWrap');
+QUIZ.forEach(function(item,qi){
+  var div = document.createElement('div');
+  div.className = 'q';
+  var h = '<p>'+(qi+1)+'. '+item.q+'</p>';
+  div.innerHTML = h;
+  var answered = false;
+  item.opts.forEach(function(op,oi){
+    var b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = op;
+    b.addEventListener('click', function(){
+      if(answered) return;
+      answered = true;
+      if(oi === item.a){ b.classList.add('correct'); }
+      else {
+        b.classList.add('wrong');
+        div.querySelectorAll('.opt')[item.a].classList.add('correct');
+      }
+      div.querySelector('.expl').classList.add('show');
+    });
+    div.appendChild(b);
+  });
+  var ex = document.createElement('div');
+  ex.className = 'expl';
+  ex.textContent = item.e;
+  div.appendChild(ex);
+  qw.appendChild(div);
+});
+</script>
+</body>
+</html>

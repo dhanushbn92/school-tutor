@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photosynthesis Lab — NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#152420; --panel2:#1b2e28; --line:#274038;
+    --ink:#e7f2ec; --muted:#94b0a5; --accent:#3fd28b; --accent-dim:#237a54;
+    --warn:#ffcf6b;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%, #16241f, var(--bg)) fixed;
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:.1rem 0 .2rem}
+  h2{font-size:1.05rem;margin:.2rem 0 .5rem;color:var(--accent)}
+  p{margin:.4rem 0}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:.6rem}
+  .wrap{max-width:960px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:.6rem 0 1rem}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:.5rem .8rem;border-radius:999px;cursor:pointer;font-size:.85rem;
+    flex:1 1 auto;min-width:120px;text-align:center;transition:.15s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent-dim);border-color:var(--accent);color:#eafff4;font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:720px){.grid.two{grid-template-columns:1.3fr .9fr}}
+  svg{display:block;width:100%;height:auto;background:#0c1512;border-radius:12px;border:1px solid var(--line)}
+  canvas{display:block;width:100%;background:#0c1512;border-radius:12px;border:1px solid var(--line)}
+  .facts{font-size:.85rem}
+  .facts li{margin:.35rem 0}
+  .controls label{display:block;font-size:.82rem;color:var(--muted);margin:.7rem 0 .2rem}
+  .controls .val{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .btn{
+    background:var(--accent-dim);border:1px solid var(--accent);color:#eafff4;
+    padding:.45rem .8rem;border-radius:10px;cursor:pointer;font-size:.85rem;margin:.3rem .3rem .3rem 0;
+  }
+  .btn:hover{background:var(--accent)}
+  .btn.ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:999px;padding:.15rem .55rem;font-size:.72rem;color:var(--muted);margin:.15rem .2rem 0 0}
+  .eq{font-size:1rem;text-align:center;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:.7rem;margin:.5rem 0;overflow-x:auto}
+  .eq b{color:var(--accent)}
+  .eq .arrow{color:var(--warn)}
+  .quiz .q{margin:.9rem 0}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);padding:.5rem .7rem;border-radius:10px;margin:.3rem 0;cursor:pointer;font-size:.85rem;
+  }
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:#12402c;border-color:var(--accent);color:#d6ffe9}
+  .quiz .opt.wrong{background:#3a1d1d;border-color:#c25b5b;color:#ffd7d7}
+  .quiz .exp{font-size:.8rem;color:var(--muted);margin:.3rem 0 0;display:none}
+  .quiz .exp.show{display:block}
+  .legend{font-size:.75rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+  .legend span{display:inline-flex;align-items:center;gap:.3rem}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .note{font-size:.78rem;color:var(--muted);background:var(--panel2);border:1px dashed var(--line);
+    border-radius:10px;padding:.5rem .6rem;margin:.5rem 0}
+  .rowbtns{margin-top:.4rem}
+  .kpi{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+  .kpi div{flex:1 1 90px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;text-align:center}
+  .kpi .n{font-size:1.1rem;font-weight:700;color:var(--accent)}
+  .kpi .l{font-size:.7rem;color:var(--muted)}
+  footer{color:var(--muted);font-size:.72rem;text-align:center;margin:1rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Photosynthesis Lab</h1>
+  <div class="sub">NIOS Class 12 Biology · Chapter 11 — explore the chloroplast, light &amp; dark reactions, and limiting factors.</div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="overview">1 · Chloroplast</button>
+    <button class="tab" data-view="light">2 · Light Reactions</button>
+    <button class="tab" data-view="calvin">3 · Calvin Cycle</button>
+    <button class="tab" data-view="rate">4 · Rate Factors</button>
+    <button class="tab" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ VIEW 1: OVERVIEW ============ -->
+  <section class="view active" id="overview">
+    <div class="grid two">
+      <div class="panel">
+        <h2>The Chloroplast</h2>
+        <svg viewBox="0 0 460 320" role="img" aria-label="Labelled chloroplast diagram">
+          <!-- outer -->
+          <ellipse cx="230" cy="160" rx="205" ry="120" fill="#123322" stroke="#2f6b47" stroke-width="3"/>
+          <ellipse cx="230" cy="160" rx="192" ry="108" fill="none" stroke="#1d4d31" stroke-width="2"/>
+          <text x="18" y="40" fill="#9fe6bf" font-size="12">Outer &amp; inner membrane</text>
+          <line x1="70" y1="45" x2="70" y2="66" stroke="#9fe6bf" stroke-width="1"/>
+          <!-- stroma -->
+          <text x="300" y="250" fill="#7fd6a4" font-size="13">Stroma</text>
+          <text x="298" y="266" fill="#6aa588" font-size="10">(Calvin cycle)</text>
+          <!-- grana stacks -->
+          <g id="grana"></g>
+          <!-- lamella connecting -->
+          <line x1="150" y1="150" x2="310" y2="150" stroke="#2f8f5c" stroke-width="3" opacity=".5"/>
+          <text x="150" y="120" fill="#bfeed3" font-size="12">Granum (thylakoid stack)</text>
+          <line x1="175" y1="126" x2="175" y2="140" stroke="#bfeed3" stroke-width="1"/>
+          <text x="300" y="100" fill="#bfeed3" font-size="12">Thylakoid</text>
+          <line x1="322" y1="106" x2="300" y2="132" stroke="#bfeed3" stroke-width="1"/>
+        </svg>
+        <div class="legend">
+          <span><i class="dot" style="background:#3fd28b"></i>Thylakoid membrane — light reactions</span>
+          <span><i class="dot" style="background:#123322;border:1px solid #2f6b47"></i>Stroma — Calvin cycle</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Overall Reaction</h2>
+        <div class="eq">
+          6 <b>CO₂</b> + 6 <b>H₂O</b>
+          <span class="arrow">──[ light + chlorophyll ]──▶</span><br>
+          <b>C₆H₁₂O₆</b> + 6 <b>O₂</b>
+        </div>
+        <div class="note">Water is the electron donor; the O₂ released comes from <b>splitting of water</b> (photolysis), not from CO₂.</div>
+        <ul class="facts">
+          <li><b>Light reactions</b> — on the <i>thylakoid membranes</i>. Convert light energy → chemical energy (ATP + NADPH); release O₂.</li>
+          <li><b>Dark reactions (Calvin cycle)</b> — in the <i>stroma</i>. Use ATP + NADPH to fix CO₂ into glucose. "Dark" = does not need light directly.</li>
+          <li>Photosynthetic pigment: <b>chlorophyll a</b> (P680, P700) plus accessory pigments (chlorophyll b, carotenoids).</li>
+        </ul>
+        <div class="rowbtns">
+          <span class="pill">Autotrophic</span><span class="pill">Endergonic</span>
+          <span class="pill">O₂ from H₂O</span><span class="pill">Reduces CO₂</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: LIGHT REACTIONS ============ -->
+  <section class="view" id="light">
+    <div class="grid two">
+      <div class="panel">
+        <h2>Light Reactions — Z-scheme</h2>
+        <canvas id="zcanvas" width="600" height="380"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:#ffe066"></i>Photon</span>
+          <span><i class="dot" style="background:#7fd6ff"></i>Electron (e⁻)</span>
+          <span><i class="dot" style="background:#ff8fb0"></i>O₂ from water</span>
+          <span><i class="dot" style="background:#3fd28b"></i>ATP / NADPH</span>
+        </div>
+        <div class="rowbtns">
+          <button class="btn" id="lightPlay">Pause</button>
+          <button class="btn ghost" id="lightReset">Reset counters</button>
+        </div>
+        <div class="kpi">
+          <div><div class="n" id="kO2">0</div><div class="l">O₂ released</div></div>
+          <div><div class="n" id="kATP">0</div><div class="l">ATP made</div></div>
+          <div><div class="n" id="kNADPH">0</div><div class="l">NADPH made</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>What is happening</h2>
+        <ul class="facts">
+          <li><b>Photolysis at PSII:</b> 2H₂O → 4H⁺ + 4e⁻ + O₂. Water is split, releasing oxygen and replacing electrons lost by P680.</li>
+          <li><b>PSII (P680)</b> absorbs light, energised e⁻ passes down the electron transport chain (plastoquinone → cytochrome b6f → plastocyanin), pumping H⁺ to build a proton gradient.</li>
+          <li><b>Photophosphorylation:</b> H⁺ flows back through <b>ATP synthase</b> → <b>ATP</b> (non-cyclic).</li>
+          <li><b>PSI (P700)</b> re-energises the e⁻, which reduces NADP⁺ → <b>NADPH</b> via ferredoxin &amp; NADP reductase.</li>
+          <li>Net products powering the Calvin cycle: <b>ATP</b> + <b>NADPH</b>; by-product <b>O₂</b>.</li>
+        </ul>
+        <div class="note">Cyclic photophosphorylation uses PSI alone to make extra ATP (no NADPH, no O₂).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: CALVIN CYCLE ============ -->
+  <section class="view" id="calvin">
+    <div class="grid two">
+      <div class="panel">
+        <h2>Calvin Cycle (stroma)</h2>
+        <canvas id="calvinCanvas" width="480" height="420"></canvas>
+        <div class="rowbtns">
+          <button class="btn" id="calvinPlay">Pause</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot" style="background:#ffcf6b"></i>Carbon atom</span>
+          <span><i class="dot" style="background:#3fd28b"></i>ATP / NADPH used</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Three stages</h2>
+        <ul class="facts">
+          <li><b>1. Carboxylation:</b> CO₂ + <b>RuBP</b> (5C) → 2 × <b>3-PGA</b> (3C), catalysed by <b>RuBisCO</b> — the most abundant enzyme on Earth.</li>
+          <li><b>2. Reduction:</b> 3-PGA is phosphorylated by <b>ATP</b> and reduced by <b>NADPH</b> to form <b>G3P</b> (triose phosphate).</li>
+          <li><b>3. Regeneration:</b> most G3P regenerates RuBP (using ATP); some G3P leaves to build <b>glucose</b>.</li>
+          <li>Six turns fix 6 CO₂ and yield one glucose (using 18 ATP + 12 NADPH).</li>
+        </ul>
+        <div class="note"><b>C3 vs C4:</b> In C3 plants CO₂ is fixed directly by RuBisCO (first product 3C 3-PGA). C4 plants (maize, sugarcane) first fix CO₂ into a 4C acid (oxaloacetate) via <b>PEP carboxylase</b> in mesophyll cells, then release CO₂ to RuBisCO in bundle-sheath cells — reducing wasteful photorespiration.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: RATE FACTORS ============ -->
+  <section class="view" id="rate">
+    <div class="grid two">
+      <div class="panel">
+        <h2>Rate of Photosynthesis</h2>
+        <canvas id="rateCanvas" width="560" height="340"></canvas>
+        <div class="kpi">
+          <div><div class="n" id="rateNow">—</div><div class="l">Relative rate</div></div>
+          <div><div class="n" id="limFactor">—</div><div class="l">Limiting factor</div></div>
+        </div>
+      </div>
+      <div class="panel controls">
+        <h2>Adjust the factors</h2>
+        <label>Light intensity: <span class="val" id="lightVal">50</span>%</label>
+        <input type="range" id="sLight" min="0" max="100" value="50">
+        <label>CO₂ concentration: <span class="val" id="co2Val">50</span>%</label>
+        <input type="range" id="sCO2" min="0" max="100" value="50">
+        <label>Temperature: <span class="val" id="tempVal">25</span> °C</label>
+        <input type="range" id="sTemp" min="0" max="50" value="25">
+        <div class="note">Each factor can be <b>limiting</b>. The rate follows the factor in shortest supply (Blackman's law of limiting factors). Temperature acts through enzymes: rate rises to ~25–35 °C, then falls as enzymes (RuBisCO) denature.</div>
+        <ul class="facts">
+          <li>Low light → light-limited (flat CO₂/temp won't help).</li>
+          <li>Saturating light → CO₂ often becomes limiting.</li>
+          <li>Very high temperature → rate drops sharply (denaturation).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 5: QUIZ ============ -->
+  <section class="view" id="quiz">
+    <div class="panel quiz" id="quizPanel">
+      <h2>Quick Check (3 questions)</h2>
+      <p class="sub">Tap an option to reveal the answer.</p>
+    </div>
+  </section>
+
+  <footer>Photosynthesis Lab · self-contained interactive · biology per NIOS senior-secondary syllabus.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tab switching ---------- */
+  var tabs = document.querySelectorAll('.tab');
+  var views = document.querySelectorAll('.view');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      views.forEach(function(v){v.classList.remove('active');});
+      t.classList.add('active');
+      document.getElementById(t.dataset.view).classList.add('active');
+    });
+  });
+
+  /* ---------- Overview: draw grana stacks ---------- */
+  (function(){
+    var g = document.getElementById('grana');
+    if(!g) return;
+    var ns='http://www.w3.org/2000/svg';
+    var stacks=[[150,170],[205,185],[260,168],[300,200]];
+    stacks.forEach(function(s){
+      for(var i=0;i<5;i++){
+        var r=document.createElementNS(ns,'rect');
+        r.setAttribute('x',s[0]); r.setAttribute('y',s[1]-i*8);
+        r.setAttribute('width',42); r.setAttribute('height',6);
+        r.setAttribute('rx',3);
+        r.setAttribute('fill', i%2? '#2f8f5c':'#3fd28b');
+        r.setAttribute('opacity','0.9');
+        g.appendChild(r);
+      }
+    });
+  })();
+
+  /* ---------- Animation registry with pause on hidden ---------- */
+  var animators = []; // {tick, running}
+  function loop(){
+    if(!document.hidden){
+      for(var i=0;i<animators.length;i++){
+        var a=animators[i];
+        if(a.running) a.tick();
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ================= LIGHT REACTIONS — Z-scheme ================= */
+  (function(){
+    var cv=document.getElementById('zcanvas');
+    if(!cv) return;
+    var ctx=cv.getContext('2d');
+    var W=cv.width, H=cv.height;
+    var counts={o2:0,atp:0,nadph:0};
+    var kO2=document.getElementById('kO2'),kATP=document.getElementById('kATP'),kNADPH=document.getElementById('kNADPH');
+
+    // Z-scheme node positions (energy vs progress)
+    var P680={x:150,y:250}, P680s={x:200,y:90};   // excited P680
+    var cyt={x:300,y:180};
+    var P700={x:380,y:210}, P700s={x:430,y:60};    // excited P700
+    var nadp={x:540,y:120};
+    var water={x:60,y:300}, atpNode={x:300,y:300};
+
+    var particles=[]; // moving electrons/photons
+    var t=0;
+    function spawnCycle(){
+      // photon into PSII
+      particles.push({type:'photon',path:[{x:80,y:30},P680],p:0,sp:0.02});
+    }
+    var timer=0;
+
+    function drawNode(x,y,label,color){
+      ctx.beginPath();ctx.arc(x,y,16,0,7);ctx.fillStyle=color;ctx.fill();
+      ctx.strokeStyle='#0c1512';ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle='#e7f2ec';ctx.font='11px system-ui';ctx.textAlign='center';
+      ctx.fillText(label,x,y+30);
+    }
+    function line(a,b,color,dash){
+      ctx.beginPath();ctx.setLineDash(dash||[]);ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();ctx.setLineDash([]);
+    }
+
+    var api={running:true,tick:function(){
+      t++;timer++;
+      if(timer>70){timer=0;spawnCycle();}
+      ctx.clearRect(0,0,W,H);
+      // axis label
+      ctx.fillStyle='#5f7d70';ctx.font='11px system-ui';ctx.textAlign='left';
+      ctx.fillText('▲ energy of electron',10,20);
+      ctx.textAlign='right';ctx.fillText('reaction progress ▶',W-10,H-8);
+
+      // connecting transport lines
+      line(P680,P680s,'#44685a');
+      line(P680s,cyt,'#44685a');
+      line(cyt,P700,'#44685a');
+      line(P700,P700s,'#44685a');
+      line(P700s,nadp,'#44685a');
+      line(water,P680,'#6b3d4d',[4,4]);
+      line(cyt,atpNode,'#2f6b47',[3,3]);
+
+      // nodes
+      drawNode(water.x,water.y,'H₂O → O₂','#ff8fb0');
+      drawNode(P680.x,P680.y,'PSII P680','#4a90d9');
+      drawNode(cyt.x,cyt.y,'Cyt b6f','#8b7fd6');
+      drawNode(P700.x,P700.y,'PSI P700','#4ad6c0');
+      drawNode(nadp.x,nadp.y,'NADP⁺→NADPH','#3fd28b');
+      drawNode(atpNode.x,atpNode.y,'ATP synthase','#3fd28b');
+
+      // move particles along their path
+      for(var i=particles.length-1;i>=0;i--){
+        var pt=particles[i];
+        pt.p+=pt.sp;
+        var seg=pt.path;
+        var a=seg[0], b=seg[1];
+        var x=a.x+(b.x-a.x)*pt.p, y=a.y+(b.y-a.y)*pt.p;
+        ctx.beginPath();ctx.arc(x,y,pt.type==='photon'?5:4,0,7);
+        ctx.fillStyle=pt.type==='photon'?'#ffe066':'#7fd6ff';ctx.fill();
+        if(pt.p>=1){
+          // advance stage
+          if(pt.type==='photon'){
+            // water splits, electron excited
+            counts.o2+=0; // count on split event below
+            particles.splice(i,1);
+            // splitting event: release O2 + electron to P680s
+            counts.o2++;kO2.textContent=counts.o2;
+            particles.push({type:'e',path:[P680,P680s],p:0,sp:0.03});
+          } else {
+            // electron path chaining
+            var last=seg[1];
+            if(last===P680s){particles.push({type:'e',path:[P680s,cyt],p:0,sp:0.03});}
+            else if(last===cyt){counts.atp++;kATP.textContent=counts.atp;particles.push({type:'e',path:[cyt,P700],p:0,sp:0.03});}
+            else if(last===P700){particles.push({type:'e',path:[P700,P700s],p:0,sp:0.03});}
+            else if(last===P700s){particles.push({type:'e',path:[P700s,nadp],p:0,sp:0.03});}
+            else if(last===nadp){counts.nadph++;kNADPH.textContent=counts.nadph;}
+            particles.splice(i,1);
+          }
+        }
+      }
+      // cap particle count
+      if(particles.length>40) particles.splice(0,particles.length-40);
+    }};
+    animators.push(api);
+
+    document.getElementById('lightPlay').addEventListener('click',function(){
+      api.running=!api.running;this.textContent=api.running?'Pause':'Play';
+    });
+    document.getElementById('lightReset').addEventListener('click',function(){
+      counts.o2=counts.atp=counts.nadph=0;kO2.textContent=0;kATP.textContent=0;kNADPH.textContent=0;
+    });
+  })();
+
+  /* ================= CALVIN CYCLE ================= */
+  (function(){
+    var cv=document.getElementById('calvinCanvas');
+    if(!cv) return;
+    var ctx=cv.getContext('2d');
+    var W=cv.width,H=cv.height,cx=W/2,cy=H/2-10,R=120;
+    var ang=0;
+    // stage labels around cycle
+    var stages=[
+      {a:-Math.PI/2,t:'CO₂ + RuBP (5C)',s:'Carboxylation · RuBisCO'},
+      {a:Math.PI/6,t:'2 × 3-PGA (3C)',s:''},
+      {a:Math.PI*5/6,t:'G3P (triose-P)',s:'Reduction · ATP + NADPH'}
+    ];
+    var molecule={a:-Math.PI/2}; // marker travelling
+    var api={running:true,tick:function(){
+      ang+=0.012; molecule.a+=0.02;
+      ctx.clearRect(0,0,W,H);
+      // ring
+      ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.strokeStyle='#274038';ctx.lineWidth=18;ctx.stroke();
+      // rotating gradient dashes to show flow
+      ctx.beginPath();
+      ctx.arc(cx,cy,R,ang,ang+0.5);ctx.strokeStyle='#3fd28b';ctx.lineWidth=18;ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx,cy,R,ang+Math.PI,ang+Math.PI+0.5);ctx.strokeStyle='#2f8f5c';ctx.lineWidth=18;ctx.stroke();
+
+      // centre label
+      ctx.fillStyle='#3fd28b';ctx.font='bold 15px system-ui';ctx.textAlign='center';
+      ctx.fillText('Calvin',cx,cy-6);ctx.fillText('Cycle',cx,cy+12);
+
+      // stage nodes
+      stages.forEach(function(st){
+        var x=cx+Math.cos(st.a)*R, y=cy+Math.sin(st.a)*R;
+        ctx.beginPath();ctx.arc(x,y,10,0,7);ctx.fillStyle='#ffcf6b';ctx.fill();
+        ctx.fillStyle='#e7f2ec';ctx.font='bold 11px system-ui';
+        var ty=y+(Math.sin(st.a)>0?26:-16);
+        ctx.fillText(st.t,x,ty);
+        if(st.s){ctx.fillStyle='#94b0a5';ctx.font='10px system-ui';ctx.fillText(st.s,x,ty+13);}
+      });
+
+      // travelling carbon marker
+      var mx=cx+Math.cos(molecule.a)*R, my=cy+Math.sin(molecule.a)*R;
+      ctx.beginPath();ctx.arc(mx,my,7,0,7);ctx.fillStyle='#fff';ctx.fill();
+      ctx.strokeStyle='#ffcf6b';ctx.lineWidth=2;ctx.stroke();
+
+      // inputs / outputs arrows
+      ctx.fillStyle='#7fd6a4';ctx.font='11px system-ui';ctx.textAlign='left';
+      ctx.fillText('CO₂ in ▶',10,26);
+      ctx.fillStyle='#3fd28b';
+      ctx.fillText('ATP + NADPH (from light reactions)',10,H-24);
+      ctx.fillStyle='#ffd76b';ctx.textAlign='right';
+      ctx.fillText('◀ Glucose out',W-10,26);
+      // regeneration note
+      ctx.fillStyle='#94b0a5';ctx.textAlign='center';ctx.font='10px system-ui';
+      ctx.fillText('Regeneration of RuBP (uses ATP)',cx,H-6);
+    }};
+    animators.push(api);
+    document.getElementById('calvinPlay').addEventListener('click',function(){
+      api.running=!api.running;this.textContent=api.running?'Pause':'Play';
+    });
+  })();
+
+  /* ================= RATE FACTORS ================= */
+  (function(){
+    var cv=document.getElementById('rateCanvas');
+    if(!cv) return;
+    var ctx=cv.getContext('2d');
+    var W=cv.width,H=cv.height;
+    var sLight=document.getElementById('sLight'),sCO2=document.getElementById('sCO2'),sTemp=document.getElementById('sTemp');
+    var lightVal=document.getElementById('lightVal'),co2Val=document.getElementById('co2Val'),tempVal=document.getElementById('tempVal');
+    var rateNow=document.getElementById('rateNow'),limFactor=document.getElementById('limFactor');
+
+    // temperature factor: bell-ish, optimum ~30C, denature >40
+    function tempFactor(T){
+      if(T<=0) return 0;
+      if(T<=30) return T/30;                    // rise to optimum
+      if(T<=45) return 1-(T-30)/15*0.9;         // decline
+      return Math.max(0,0.1-(T-45)/50);         // denatured
+    }
+    // saturating response for light & CO2 (Michaelis-like)
+    function sat(x){ x=x/100; return x/(x+0.35); } // 0..~0.74 -> scaled
+
+    function computeRate(){
+      var L=+sLight.value, C=+sCO2.value, T=+sTemp.value;
+      var fL=sat(L), fC=sat(C), fT=tempFactor(T);
+      // limiting: min of light & CO2 responses, then scaled by temperature (enzymes)
+      var fLim=Math.min(fL,fC);
+      var rate=fLim*fT;
+      // identify limiting factor
+      var lim;
+      if(fT<fL && fT<fC && T>35) lim='Temperature (heat)';
+      else if(fT<0.3 && T<15) lim='Temperature (cold)';
+      else if(fL<=fC) lim='Light';
+      else lim='CO₂';
+      return {rate:rate, lim:lim, L:L,C:C,T:T,fL:fL,fC:fC,fT:fT};
+    }
+
+    function draw(){
+      lightVal.textContent=sLight.value;
+      co2Val.textContent=sCO2.value;
+      tempVal.textContent=sTemp.value;
+      var r=computeRate();
+      rateNow.textContent=(r.rate*135).toFixed(0);
+      limFactor.textContent=r.lim;
+
+      ctx.clearRect(0,0,W,H);
+      var pad=42, gx0=pad, gy0=H-30, gw=W-pad-20, gh=H-60;
+      // axes
+      ctx.strokeStyle='#274038';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(gx0,20);ctx.lineTo(gx0,gy0);ctx.lineTo(W-14,gy0);ctx.stroke();
+      ctx.fillStyle='#94b0a5';ctx.font='11px system-ui';ctx.textAlign='center';
+      ctx.fillText('light intensity ▶',gx0+gw/2,H-8);
+      ctx.save();ctx.translate(14,20+gh/2);ctx.rotate(-Math.PI/2);
+      ctx.fillText('rate ▶',0,0);ctx.restore();
+
+      // curve: rate vs light, holding current CO2 & temp
+      var C=+sCO2.value, T=+sTemp.value, fT=tempFactor(T), fC=sat(C);
+      ctx.beginPath();
+      for(var px=0;px<=100;px++){
+        var fL=sat(px);
+        var rate=Math.min(fL,fC)*fT;
+        var X=gx0+ (px/100)*gw;
+        var Y=gy0 - rate*gh/0.75; // scale (max ~0.74)
+        if(px===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+      }
+      ctx.strokeStyle='#3fd28b';ctx.lineWidth=2.5;ctx.stroke();
+
+      // plateau reference (CO2/temp ceiling)
+      var ceil=fC*fT;
+      var cY=gy0-ceil*gh/0.75;
+      ctx.setLineDash([5,5]);ctx.strokeStyle='#ffcf6b';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(gx0,cY);ctx.lineTo(W-14,cY);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#ffcf6b';ctx.textAlign='left';ctx.font='10px system-ui';
+      ctx.fillText('ceiling set by CO₂ & temperature',gx0+6,cY-4);
+
+      // current operating point
+      var L=+sLight.value, fL=sat(L), curRate=Math.min(fL,fC)*fT;
+      var pX=gx0+(L/100)*gw, pY=gy0-curRate*gh/0.75;
+      ctx.beginPath();ctx.arc(pX,pY,6,0,7);ctx.fillStyle='#fff';ctx.fill();
+      ctx.strokeStyle='#3fd28b';ctx.lineWidth=2;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(pX,gy0);ctx.lineTo(pX,pY);ctx.strokeStyle='#2f6b47';ctx.setLineDash([2,3]);ctx.stroke();ctx.setLineDash([]);
+    }
+    [sLight,sCO2,sTemp].forEach(function(s){s.addEventListener('input',draw);});
+    draw();
+  })();
+
+  /* ================= QUIZ ================= */
+  (function(){
+    var data=[
+      {q:'In non-cyclic photophosphorylation, the oxygen released comes from:',
+       o:['Carbon dioxide','Water (photolysis)','Glucose','ATP'],c:1,
+       e:'O₂ is produced when water is split (photolysis) at PSII, supplying electrons to P680.'},
+      {q:'The enzyme that fixes CO₂ onto RuBP in the Calvin cycle is:',
+       o:['PEP carboxylase','ATP synthase','RuBisCO','Ferredoxin'],c:2,
+       e:'RuBisCO (ribulose-1,5-bisphosphate carboxylase/oxygenase) catalyses carboxylation of RuBP.'},
+      {q:'A plant in bright light shows no rise in rate when CO₂ is increased at first, then rate climbs. This shows CO₂ was:',
+       o:['A catalyst','The limiting factor','A product','Denatured'],c:1,
+       e:'By the law of limiting factors, when light is saturating the rate is capped by CO₂ — the factor in shortest supply.'}
+    ];
+    var panel=document.getElementById('quizPanel');
+    data.forEach(function(item,qi){
+      var box=document.createElement('div');box.className='q';
+      var h=document.createElement('p');h.innerHTML='<b>Q'+(qi+1)+'.</b> '+item.q;box.appendChild(h);
+      var exp=document.createElement('div');exp.className='exp';exp.textContent='✔ '+item.e;
+      item.o.forEach(function(opt,oi){
+        var b=document.createElement('button');b.className='opt';b.textContent=opt;
+        b.addEventListener('click',function(){
+          var btns=box.querySelectorAll('.opt');
+          btns.forEach(function(x){x.disabled=true;});
+          if(oi===item.c){b.classList.add('correct');}
+          else{b.classList.add('wrong');btns[item.c].classList.add('correct');}
+          exp.classList.add('show');
+        });
+        box.appendChild(b);
+      });
+      box.appendChild(exp);
+      panel.appendChild(box);
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>

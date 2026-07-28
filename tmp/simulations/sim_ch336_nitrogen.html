@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nitrogen Metabolism Lab — NIOS Biology Ch10</title>
+<style>
+  :root{
+    --bg:#0e1518; --panel:#152026; --panel2:#1b2b32; --edge:#26404a;
+    --ink:#e7f2ef; --mut:#9db4b3; --accent:#3fd6a4; --accent-d:#1f8f6d;
+    --warn:#e0b24a; --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%,#173038 0,var(--bg) 60%);
+    color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:.1em 0 .1em}
+  .sub{color:var(--mut);font-size:.85rem;margin-bottom:12px}
+  .wrap{max-width:940px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+  .tab{
+    background:var(--panel);color:var(--ink);border:1px solid var(--edge);
+    padding:9px 13px;border-radius:12px;cursor:pointer;font-size:.86rem;
+    min-height:40px;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:linear-gradient(180deg,var(--accent-d),#166b52);border-color:var(--accent);color:#fff;font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:14px;box-shadow:var(--shadow);margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  .stage{width:100%;height:auto;display:block;border-radius:12px;background:#0c1417;border:1px solid var(--edge)}
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 300px;min-width:0}
+  .info{
+    background:var(--panel2);border:1px solid var(--edge);border-radius:12px;
+    padding:12px;font-size:.9rem;min-height:120px;
+  }
+  .info h3{margin:.1em 0 .4em;color:var(--accent);font-size:1.02rem}
+  .info .eq{font-family:ui-monospace,Consolas,monospace;background:#0c1417;padding:7px 9px;border-radius:8px;display:inline-block;margin:5px 0;font-size:.82rem;border:1px solid var(--edge)}
+  .btns{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+  button.ctl{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--edge);
+    border-radius:10px;padding:8px 12px;cursor:pointer;font-size:.83rem;min-height:38px;
+  }
+  button.ctl:hover{border-color:var(--accent)}
+  button.ctl.on{background:var(--accent-d);border-color:var(--accent);color:#fff}
+  .facts{font-size:.86rem}
+  .facts li{margin:5px 0}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.76rem;color:var(--mut);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .quiz .q{margin:12px 0;padding:12px;background:var(--panel2);border:1px solid var(--edge);border-radius:12px}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;margin:6px 0;padding:9px 11px;
+    background:#0f1a1f;border:1px solid var(--edge);border-radius:9px;color:var(--ink);
+    cursor:pointer;font-size:.85rem;min-height:40px;
+  }
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:#12402f;border-color:var(--accent)}
+  .quiz .opt.wrong{background:#4a1f22;border-color:#e06b6b}
+  .quiz .exp{margin-top:8px;font-size:.82rem;color:var(--mut);display:none}
+  .quiz .exp.show{display:block}
+  .hint{color:var(--mut);font-size:.8rem;margin-top:6px}
+  .pill{display:inline-block;background:#0c1417;border:1px solid var(--edge);border-radius:20px;padding:3px 10px;font-size:.74rem;color:var(--mut);margin:2px 3px}
+  @media (max-width:420px){ h1{font-size:1.15rem} .tab{flex:1 1 auto;text-align:center} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Nitrogen Metabolism Lab</h1>
+  <div class="sub">NIOS Class 12 Biology · Ch 10 — Nitrogen fixation, assimilation &amp; the nitrogen cycle</div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="cycle">1 · Nitrogen Cycle</button>
+    <button class="tab" data-view="fix">2 · Biological N-Fixation</button>
+    <button class="tab" data-view="assim">3 · Assimilation</button>
+    <button class="tab" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ VIEW 1: CYCLE ============ -->
+  <section class="view active" id="v-cycle">
+    <div class="panel">
+      <div class="row">
+        <div class="col" style="flex:2 1 420px">
+          <svg class="stage" id="cycleSvg" viewBox="0 0 560 420" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated nitrogen cycle">
+            <!-- sky / soil bands -->
+            <rect x="0" y="0" width="560" height="180" fill="#0d1a22"/>
+            <rect x="0" y="180" width="560" height="240" fill="#10201a"/>
+            <line x1="0" y1="180" x2="560" y2="180" stroke="#26404a" stroke-width="1"/>
+            <text x="14" y="26" fill="#9db4b3" font-size="12">Atmosphere · N₂ (78%)</text>
+            <text x="14" y="204" fill="#9db4b3" font-size="12">Soil</text>
+
+            <!-- N2 pool -->
+            <g class="node" data-step="fix" tabindex="0">
+              <circle cx="90" cy="70" r="34" fill="#16323b" stroke="#3fd6a4" stroke-width="2"/>
+              <text x="90" y="66" text-anchor="middle" fill="#e7f2ef" font-size="15" font-weight="700">N₂</text>
+              <text x="90" y="84" text-anchor="middle" fill="#9db4b3" font-size="9">atmospheric</text>
+            </g>
+            <!-- lightning glyph -->
+            <path d="M300 26 l-10 26 h12 l-9 30 26 -38 h-12 z" fill="#e0b24a" opacity=".85"/>
+            <text x="330" y="52" fill="#e0b24a" font-size="9">lightning</text>
+
+            <!-- Ammonia -->
+            <g class="node" data-step="nitrif" tabindex="0">
+              <circle cx="150" cy="250" r="32" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.6"/>
+              <text x="150" y="248" text-anchor="middle" fill="#e7f2ef" font-size="13" font-weight="700">NH₃/NH₄⁺</text>
+              <text x="150" y="264" text-anchor="middle" fill="#9db4b3" font-size="8.5">ammonia</text>
+            </g>
+            <!-- Nitrite -->
+            <g class="node" data-step="nitrif" tabindex="0">
+              <circle cx="290" cy="300" r="28" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.6"/>
+              <text x="290" y="298" text-anchor="middle" fill="#e7f2ef" font-size="13" font-weight="700">NO₂⁻</text>
+              <text x="290" y="314" text-anchor="middle" fill="#9db4b3" font-size="8.5">nitrite</text>
+            </g>
+            <!-- Nitrate -->
+            <g class="node" data-step="assimil" tabindex="0">
+              <circle cx="420" cy="250" r="30" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.6"/>
+              <text x="420" y="248" text-anchor="middle" fill="#e7f2ef" font-size="13" font-weight="700">NO₃⁻</text>
+              <text x="420" y="264" text-anchor="middle" fill="#9db4b3" font-size="8.5">nitrate</text>
+            </g>
+            <!-- Plant/organic N -->
+            <g class="node" data-step="ammon" tabindex="0">
+              <circle cx="470" cy="120" r="30" fill="#16323b" stroke="#3fd6a4" stroke-width="1.6"/>
+              <text x="470" y="118" text-anchor="middle" fill="#e7f2ef" font-size="12" font-weight="700">Org-N</text>
+              <text x="470" y="134" text-anchor="middle" fill="#9db4b3" font-size="8">proteins</text>
+            </g>
+            <!-- Denitrification back to N2 -->
+            <g class="node" data-step="denit" tabindex="0">
+              <circle cx="90" cy="330" r="26" fill="#16323b" stroke="#e0b24a" stroke-width="1.6"/>
+              <text x="90" y="328" text-anchor="middle" fill="#e7f2ef" font-size="12" font-weight="700">N₂↑</text>
+              <text x="90" y="344" text-anchor="middle" fill="#9db4b3" font-size="8">lost</text>
+            </g>
+
+            <!-- arrows (paths) -->
+            <g fill="none" stroke-width="2.4" stroke-linecap="round">
+              <path id="pFix" data-step="fix" d="M104 100 C120 160 130 200 138 220" stroke="#3fd6a4"/>
+              <path id="pNi1" data-step="nitrif" d="M182 258 C220 272 245 284 264 292" stroke="#3fd6a4"/>
+              <path id="pNi2" data-step="nitrif" d="M316 296 C350 286 375 272 392 262" stroke="#3fd6a4"/>
+              <path id="pAss" data-step="assimil" d="M436 224 C458 190 468 165 470 152" stroke="#3fd6a4"/>
+              <path id="pAmm" data-step="ammon" d="M448 142 C360 210 260 250 178 250" stroke="#7fd0ff"/>
+              <path id="pDen" data-step="denit" d="M270 322 C200 350 140 342 116 336" stroke="#e0b24a"/>
+              <path id="pDen2" data-step="denit" d="M84 306 C82 250 84 180 90 108" stroke="#e0b24a" stroke-dasharray="4 5"/>
+            </g>
+            <!-- moving particle -->
+            <circle id="mover" r="5.5" fill="#fff"></circle>
+
+            <text x="230" y="150" fill="#3fd6a4" font-size="10">fixation</text>
+            <text x="215" y="330" fill="#e0b24a" font-size="10">denitrification (Pseudomonas)</text>
+            <text x="300" y="200" fill="#7fd0ff" font-size="10">ammonification</text>
+          </svg>
+          <div class="legend">
+            <span><span class="dot" style="background:#3fd6a4"></span>oxidation / uptake</span>
+            <span><span class="dot" style="background:#7fd0ff"></span>ammonification (decay)</span>
+            <span><span class="dot" style="background:#e0b24a"></span>denitrification / loss</span>
+          </div>
+          <div class="btns">
+            <button class="ctl on" id="playBtn">⏸ Pause</button>
+            <button class="ctl" id="stepBtn">Step ▸</button>
+          </div>
+          <div class="hint">Tap any circle or arrow to read the step. The white dot follows the cycle.</div>
+        </div>
+        <div class="col">
+          <div class="info" id="cycleInfo">
+            <h3>The Nitrogen Cycle</h3>
+            <p>Nitrogen is needed for amino acids, proteins, nucleic acids, ATP and chlorophyll. Atmospheric N₂ is inert, so it must be <b>fixed</b> before life can use it.</p>
+            <p class="hint">Select a step to see the organisms and reactions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: FIXATION ============ -->
+  <section class="view" id="v-fix">
+    <div class="panel">
+      <div class="row">
+        <div class="col" style="flex:2 1 420px">
+          <svg class="stage" id="fixSvg" viewBox="0 0 560 420" role="img" aria-label="Legume root nodule and nitrogenase">
+            <rect x="0" y="0" width="560" height="130" fill="#0d1a22"/>
+            <rect x="0" y="130" width="560" height="290" fill="#171208"/>
+            <!-- legume shoot -->
+            <line x1="120" y1="130" x2="120" y2="40" stroke="#3fd6a4" stroke-width="4"/>
+            <path d="M120 70 q-34 -8 -46 -30 q34 -2 46 22 z" fill="#2f9e73"/>
+            <path d="M120 60 q34 -8 46 -30 q-34 -2 -46 22 z" fill="#2f9e73"/>
+            <path d="M120 92 q-30 -6 -40 -26 q30 -2 40 20 z" fill="#3fd6a4"/>
+            <text x="150" y="46" fill="#9db4b3" font-size="11">legume (host)</text>
+            <!-- roots -->
+            <path d="M120 130 C110 180 90 210 70 250" stroke="#8a6b3a" stroke-width="5" fill="none"/>
+            <path d="M120 130 C135 185 160 220 190 270" stroke="#8a6b3a" stroke-width="5" fill="none"/>
+            <!-- nodules -->
+            <ellipse cx="86" cy="215" rx="18" ry="13" fill="#c98b4b"/>
+            <ellipse cx="160" cy="235" rx="16" ry="12" fill="#c98b4b"/>
+            <g class="node" data-fx="nodule" tabindex="0">
+              <ellipse cx="120" cy="185" rx="24" ry="18" fill="#d69a55" stroke="#3fd6a4" stroke-width="2"/>
+              <text x="120" y="189" text-anchor="middle" fill="#3a2a12" font-size="10" font-weight="700">nodule</text>
+            </g>
+            <!-- zoom bubble -->
+            <line x1="140" y1="178" x2="330" y2="150" stroke="#26404a" stroke-dasharray="3 4"/>
+            <g class="node" data-fx="rhizobium" tabindex="0">
+              <circle cx="420" cy="230" r="120" fill="#12100a" stroke="#26404a"/>
+              <text x="420" y="128" text-anchor="middle" fill="#9db4b3" font-size="11">inside the nodule cell</text>
+              <!-- leghaemoglobin halo -->
+              <circle cx="420" cy="245" r="86" fill="#3a0f10" opacity=".55"/>
+              <text x="420" y="330" text-anchor="middle" fill="#e07070" font-size="9">leghaemoglobin (red) → low O₂</text>
+              <!-- bacteroids -->
+              <ellipse cx="392" cy="222" rx="17" ry="9" fill="#e0b24a" transform="rotate(-18 392 222)"/>
+              <ellipse cx="446" cy="238" rx="17" ry="9" fill="#e0b24a" transform="rotate(20 446 238)"/>
+              <ellipse cx="415" cy="262" rx="17" ry="9" fill="#e0b24a" transform="rotate(-6 415 262)"/>
+              <text x="470" y="210" fill="#e0b24a" font-size="9">Rhizobium</text>
+              <text x="470" y="222" fill="#e0b24a" font-size="9">(bacteroids)</text>
+              <!-- nitrogenase reaction -->
+              <text x="420" y="200" text-anchor="middle" fill="#e7f2ef" font-size="11" font-weight="700">nitrogenase</text>
+            </g>
+            <!-- N2 in, NH3 out -->
+            <g class="node" data-fx="enzyme" tabindex="0">
+              <text x="300" y="245" fill="#7fd0ff" font-size="13">N₂ →</text>
+              <text x="300" y="285" fill="#3fd6a4" font-size="13">→ NH₃</text>
+            </g>
+          </svg>
+          <div class="btns">
+            <button class="ctl" data-fx="nodule">Root nodule</button>
+            <button class="ctl" data-fx="rhizobium">Symbiosis</button>
+            <button class="ctl" data-fx="enzyme">Nitrogenase</button>
+            <button class="ctl" data-fx="anaerobic">Why anaerobic?</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="info" id="fixInfo">
+            <h3>Biological Nitrogen Fixation</h3>
+            <p>Certain prokaryotes reduce N₂ to NH₃. <b>Symbiotic:</b> <i>Rhizobium</i> in legume root nodules, <i>Frankia</i> in <i>Alnus</i>. <b>Free-living:</b> aerobic <i>Azotobacter</i>, anaerobic <i>Clostridium</i>, and cyanobacteria <i>Anabaena</i>, <i>Nostoc</i>.</p>
+            <p class="hint">Tap the diagram or the buttons for detail.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: ASSIMILATION ============ -->
+  <section class="view" id="v-assim">
+    <div class="panel">
+      <div class="row">
+        <div class="col" style="flex:2 1 420px">
+          <svg class="stage" id="assimSvg" viewBox="0 0 560 300" role="img" aria-label="Nitrate assimilation pathway">
+            <rect x="0" y="0" width="560" height="300" fill="#0c1417"/>
+            <g class="node" data-as="nr" tabindex="0">
+              <rect x="20" y="120" width="90" height="56" rx="10" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.8"/>
+              <text x="65" y="146" text-anchor="middle" fill="#e7f2ef" font-size="14" font-weight="700">NO₃⁻</text>
+              <text x="65" y="164" text-anchor="middle" fill="#9db4b3" font-size="9">nitrate</text>
+            </g>
+            <g class="node" data-as="nir" tabindex="0">
+              <rect x="160" y="120" width="90" height="56" rx="10" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.8"/>
+              <text x="205" y="146" text-anchor="middle" fill="#e7f2ef" font-size="14" font-weight="700">NO₂⁻</text>
+              <text x="205" y="164" text-anchor="middle" fill="#9db4b3" font-size="9">nitrite</text>
+            </g>
+            <g class="node" data-as="gs" tabindex="0">
+              <rect x="300" y="120" width="90" height="56" rx="10" fill="#1b2b32" stroke="#3fd6a4" stroke-width="1.8"/>
+              <text x="345" y="146" text-anchor="middle" fill="#e7f2ef" font-size="14" font-weight="700">NH₄⁺</text>
+              <text x="345" y="164" text-anchor="middle" fill="#9db4b3" font-size="9">ammonium</text>
+            </g>
+            <g class="node" data-as="trans" tabindex="0">
+              <rect x="440" y="120" width="100" height="56" rx="10" fill="#16323b" stroke="#3fd6a4" stroke-width="1.8"/>
+              <text x="490" y="144" text-anchor="middle" fill="#e7f2ef" font-size="12" font-weight="700">amino</text>
+              <text x="490" y="160" text-anchor="middle" fill="#e7f2ef" font-size="12" font-weight="700">acids</text>
+            </g>
+            <g fill="none" stroke="#3fd6a4" stroke-width="2.4" marker-end="url(#ah)">
+              <path d="M112 148 h44"/>
+              <path d="M252 148 h44"/>
+              <path d="M392 148 h44"/>
+            </g>
+            <defs>
+              <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0 0 L8 4 L0 8 z" fill="#3fd6a4"/>
+              </marker>
+            </defs>
+            <text x="134" y="112" text-anchor="middle" fill="#9db4b3" font-size="9">nitrate</text>
+            <text x="134" y="122" text-anchor="middle" fill="#3fd6a4" font-size="9">reductase</text>
+            <text x="274" y="112" text-anchor="middle" fill="#9db4b3" font-size="9">nitrite</text>
+            <text x="274" y="122" text-anchor="middle" fill="#3fd6a4" font-size="9">reductase</text>
+            <text x="414" y="112" text-anchor="middle" fill="#3fd6a4" font-size="9">GS–GOGAT</text>
+            <text x="280" y="220" text-anchor="middle" fill="#e0b24a" font-size="10">NO₃⁻ (cytosol) → NO₂⁻ → NH₄⁺ (plastid) → glutamate → transamination</text>
+            <circle id="amover" r="5" fill="#fff"></circle>
+          </svg>
+          <div class="btns">
+            <button class="ctl" data-as="nr">Nitrate reductase</button>
+            <button class="ctl" data-as="nir">Nitrite reductase</button>
+            <button class="ctl" data-as="gs">GS–GOGAT</button>
+            <button class="ctl" data-as="trans">Transamination</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="info" id="assimInfo">
+            <h3>Assimilation of Nitrate</h3>
+            <p>Roots absorb NO₃⁻. It is reduced stepwise to NH₄⁺, which is toxic if it accumulates, so it is rapidly built into amino acids and never released free.</p>
+            <p class="hint">Tap each box to follow the pathway.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS (shared) ============ -->
+  <section class="view active" id="v-facts-holder" style="display:none"></section>
+
+  <div class="panel" id="factsPanel">
+    <h3 style="margin:.1em 0 .4em;color:var(--accent)">Key Facts</h3>
+    <ul class="facts">
+      <li>Only <b>prokaryotes</b> fix nitrogen; no eukaryote makes nitrogenase.</li>
+      <li>Nitrogenase is <b>irreversibly inactivated by O₂</b> → nodules use <b>leghaemoglobin</b> (an O₂ scavenger) to keep O₂ very low while still supplying it to bacteroids by controlled release.</li>
+      <li>Fixation is costly: <span class="pill">N₂ + 8H⁺ + 8e⁻ + 16 ATP → 2NH₃ + H₂</span></li>
+      <li>Nitrification is aerobic: <b>Nitrosomonas</b> (NH₃→NO₂⁻) then <b>Nitrobacter</b> (NO₂⁻→NO₃⁻).</li>
+      <li>Denitrification (<b>Pseudomonas</b>, <b>Thiobacillus</b>) returns N₂ to air under anaerobic soil.</li>
+      <li>Ammonification: decomposers convert dead organic-N back to NH₃/NH₄⁺.</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="view" id="v-quiz">
+    <div class="panel quiz" id="quizBox">
+      <h3 style="margin:.1em 0 .4em;color:var(--accent)">Quick Quiz</h3>
+      <p class="hint">Tap an option to check it and reveal the explanation.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- tab switching ---------- */
+  var tabs=document.querySelectorAll('.tab');
+  var views={cycle:document.getElementById('v-cycle'),fix:document.getElementById('v-fix'),
+             assim:document.getElementById('v-assim'),quiz:document.getElementById('v-quiz')};
+  var factsPanel=document.getElementById('factsPanel');
+  function show(name){
+    tabs.forEach(function(t){t.classList.toggle('active',t.dataset.view===name);});
+    for(var k in views){views[k].classList.toggle('active',k===name);}
+    // facts panel only for content views
+    factsPanel.style.display = (name==='quiz')?'none':'block';
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.view);});});
+
+  /* ---------- cycle data ---------- */
+  var cycleInfo=document.getElementById('cycleInfo');
+  var stepData={
+    fix:{t:'Nitrogen Fixation',h:'Inert N₂ is reduced to ammonia. <b>Biological:</b> Rhizobium, Azotobacter, Anabaena via nitrogenase. <b>Physical:</b> lightning oxidises N₂; <b>industrial:</b> Haber process.',
+      eq:'N₂ + 8H⁺ + 8e⁻ + 16ATP → 2NH₃ + H₂'},
+    nitrif:{t:'Nitrification',h:'Aerobic soil bacteria oxidise ammonia to nitrate in two steps — an energy source (chemoautotrophy) for them.',
+      eq:'NH₃ →(Nitrosomonas) NO₂⁻ →(Nitrobacter) NO₃⁻'},
+    assimil:{t:'Assimilation',h:'Plant roots take up NO₃⁻ (and some NH₄⁺) and build it into amino acids, proteins and nucleic acids. Animals get N by eating plants.',
+      eq:'NO₃⁻ → NO₂⁻ → NH₄⁺ → amino acids'},
+    ammon:{t:'Ammonification',h:'Decomposer bacteria and fungi break down dead tissue and excreta, releasing organic-N back as ammonia/ammonium.',
+      eq:'proteins → amino acids → NH₃ / NH₄⁺'},
+    denit:{t:'Denitrification',h:'In waterlogged, anaerobic soil, Pseudomonas and Thiobacillus reduce nitrate to N₂ gas, which escapes to the atmosphere — a nitrogen loss for the soil.',
+      eq:'NO₃⁻ → NO₂⁻ → NO → N₂O → N₂↑'}
+  };
+  function setCycle(step){
+    var d=stepData[step]; if(!d)return;
+    cycleInfo.innerHTML='<h3>'+d.t+'</h3><p>'+d.h+'</p><div class="eq">'+d.eq+'</div>';
+  }
+  document.querySelectorAll('#cycleSvg .node, #cycleSvg path[data-step]').forEach(function(el){
+    var s=el.getAttribute('data-step');
+    if(!s)return;
+    el.style.cursor='pointer';
+    el.addEventListener('click',function(){setCycle(s);});
+    el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setCycle(s);}});
+  });
+
+  /* ---------- cycle animation (mover along ordered paths) ---------- */
+  var mover=document.getElementById('mover');
+  var order=['pFix','pNi1','pNi2','pAss','pAmm','pDen'];
+  var paths=order.map(function(id){return document.getElementById(id);});
+  var seg=0, t=0, playing=true, last=0;
+  function pointAt(path,frac){
+    var L=path.getTotalLength();
+    return path.getPointAtLength(L*frac);
+  }
+  function frame(ts){
+    if(!last)last=ts;
+    var dt=ts-last; last=ts;
+    if(playing && !document.hidden){
+      t += dt/2600;               // ~2.6s per segment
+      if(t>=1){t=0; seg=(seg+1)%paths.length;}
+      var p=pointAt(paths[seg],t);
+      mover.setAttribute('cx',p.x);
+      mover.setAttribute('cy',p.y);
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  var playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click',function(){
+    playing=!playing;
+    playBtn.textContent=playing?'⏸ Pause':'▶ Play';
+    playBtn.classList.toggle('on',playing);
+  });
+  document.getElementById('stepBtn').addEventListener('click',function(){
+    playing=false; playBtn.textContent='▶ Play'; playBtn.classList.remove('on');
+    t=0; seg=(seg+1)%paths.length;
+    var p=pointAt(paths[seg],0);
+    mover.setAttribute('cx',p.x); mover.setAttribute('cy',p.y);
+    // sync info to the step this segment represents
+    var stepOf=['fix','nitrif','nitrif','assimil','ammon','denit'];
+    setCycle(stepOf[seg]);
+  });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) last=0; });
+
+  /* ---------- fixation info ---------- */
+  var fixInfo=document.getElementById('fixInfo');
+  var fixData={
+    nodule:{t:'Root Nodules',h:'Legume roots release flavonoids; compatible <i>Rhizobium</i> respond with Nod factors. The bacteria enter via an infection thread and the root cortex swells into a <b>nodule</b>, where bacteria differentiate into N₂-fixing <b>bacteroids</b>.'},
+    rhizobium:{t:'Symbiosis',h:'A mutualism: the plant supplies carbohydrates (energy) and a protected micro-aerobic home; the bacteroid supplies fixed ammonia. Neither <i>Rhizobium</i> nor the legume fixes N₂ alone — only together.'},
+    enzyme:{t:'Nitrogenase',h:'The enzyme complex (Fe-protein + MoFe-protein) binds N₂ and reduces it to NH₃, consuming large amounts of ATP and reducing power. It also releases some H₂ as a by-product.'},
+    anaerobic:{t:'Why anaerobic conditions?',h:'Nitrogenase is <b>irreversibly destroyed by O₂</b>. The nodule makes <b>leghaemoglobin</b>, a pink O₂-binding pigment that keeps free O₂ extremely low, yet delivers O₂ in a controlled way for the bacteroid’s own respiration.'}
+  };
+  function setFix(k){var d=fixData[k];if(!d)return;fixInfo.innerHTML='<h3>'+d.t+'</h3><p>'+d.h+'</p>';}
+  document.querySelectorAll('#fixSvg .node').forEach(function(el){
+    var k=el.getAttribute('data-fx'); el.style.cursor='pointer';
+    el.addEventListener('click',function(){setFix(k);});
+    el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setFix(k);}});
+  });
+  document.querySelectorAll('#v-fix .ctl').forEach(function(b){
+    b.addEventListener('click',function(){setFix(b.getAttribute('data-fx'));});
+  });
+
+  /* ---------- assimilation info + mover ---------- */
+  var assimInfo=document.getElementById('assimInfo');
+  var asData={
+    nr:{t:'Nitrate Reductase',h:'In the cytosol, this molybdenum-containing enzyme reduces NO₃⁻ to NO₂⁻ using NAD(P)H. It is the rate-limiting, tightly regulated first step.',eq:'NO₃⁻ + NAD(P)H → NO₂⁻'},
+    nir:{t:'Nitrite Reductase',h:'Nitrite moves into the plastid/chloroplast where nitrite reductase reduces it all the way to ammonium, using ferredoxin as the electron donor.',eq:'NO₂⁻ + 6Fd(red) → NH₄⁺'},
+    gs:{t:'GS–GOGAT Pathway',h:'Ammonium is fixed onto glutamate by <b>glutamine synthetase (GS)</b> to give glutamine; <b>GOGAT</b> then transfers the amide-N to 2-oxoglutarate, regenerating two glutamates. This traps toxic NH₄⁺ safely.',eq:'glutamate + NH₄⁺ → glutamine → 2 glutamate'},
+    trans:{t:'Transamination',h:'The amino group of glutamate is transferred to other keto acids by <b>aminotransferases</b>, generating the full range of amino acids for protein synthesis.',eq:'glutamate + keto acid → amino acid + 2-oxoglutarate'}
+  };
+  function setAs(k){var d=asData[k];if(!d)return;assimInfo.innerHTML='<h3>'+d.t+'</h3><p>'+d.h+'</p><div class="eq">'+d.eq+'</div>';}
+  document.querySelectorAll('#assimSvg .node').forEach(function(el){
+    var k=el.getAttribute('data-as'); el.style.cursor='pointer';
+    el.addEventListener('click',function(){setAs(k);});
+    el.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();setAs(k);}});
+  });
+  document.querySelectorAll('#v-assim .ctl').forEach(function(b){
+    b.addEventListener('click',function(){setAs(b.getAttribute('data-as'));});
+  });
+  // simple mover across the pathway
+  var amover=document.getElementById('amover');
+  var ax=20, adir=1;
+  function aframe(){
+    if(!document.hidden){
+      ax+=1.4*adir;
+      if(ax>540){ax=540;adir=-1;} if(ax<20){ax=20;adir=1;}
+      amover.setAttribute('cx',ax); amover.setAttribute('cy',148);
+    }
+    requestAnimationFrame(aframe);
+  }
+  requestAnimationFrame(aframe);
+
+  /* ---------- quiz ---------- */
+  var quiz=[
+    {q:'Which enzyme carries out biological nitrogen fixation, and why must O₂ be excluded?',
+     opts:['Nitrate reductase; it needs light',
+           'Nitrogenase; it is irreversibly inactivated by oxygen',
+           'GOGAT; oxygen competes for glutamate',
+           'Nitrite reductase; oxygen raises soil pH'],
+     a:1,exp:'Nitrogenase is destroyed by O₂, so nodules use leghaemoglobin to keep free O₂ very low.'},
+    {q:'In nitrification, which pair of bacteria act in the correct order?',
+     opts:['Nitrobacter then Nitrosomonas',
+           'Pseudomonas then Rhizobium',
+           'Nitrosomonas (NH₃→NO₂⁻) then Nitrobacter (NO₂⁻→NO₃⁻)',
+           'Azotobacter then Clostridium'],
+     a:2,exp:'Nitrosomonas oxidises ammonia to nitrite; Nitrobacter oxidises nitrite to nitrate.'},
+    {q:'During assimilation, ammonium is combined with glutamate mainly by which system?',
+     opts:['The GS–GOGAT pathway',
+           'Denitrification',
+           'The Haber process',
+           'Nitrate reductase alone'],
+     a:0,exp:'Glutamine synthetase (GS) and GOGAT incorporate NH₄⁺ into amino acids, avoiding toxic build-up.'}
+  ];
+  var qbox=document.getElementById('quizBox');
+  quiz.forEach(function(item,qi){
+    var d=document.createElement('div'); d.className='q';
+    var h=document.createElement('p'); h.innerHTML='<b>Q'+(qi+1)+'.</b> '+item.q; d.appendChild(h);
+    var answered=false;
+    var exp=document.createElement('div'); exp.className='exp';
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=o;
+      b.addEventListener('click',function(){
+        if(answered)return; answered=true;
+        if(oi===item.a){b.classList.add('correct');}
+        else{b.classList.add('wrong');
+          var kids=d.querySelectorAll('.opt'); kids[item.a].classList.add('correct');}
+        exp.textContent='✓ '+item.exp; exp.classList.add('show');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(exp); qbox.appendChild(d);
+  });
+
+  // initial
+  setCycle('fix');
+})();
+</script>
+</body>
+</html>

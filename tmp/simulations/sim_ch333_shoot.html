@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shoot System Lab — NIOS Class 12 Biology (Ch 7)</title>
+<style>
+  :root{
+    --bg:#151a21; --panel:#1d242e; --panel2:#232c38; --line:#313d4c;
+    --ink:#e8eef4; --muted:#9db0c2; --accent:#5fd0a8; --accent-d:#2f9e79;
+    --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 8px; text-align:center}
+  h1{margin:0 0 4px; font-size:clamp(1.15rem,4.4vw,1.6rem)}
+  .sub{color:var(--muted); font-size:.86rem; margin:0}
+  .wrap{max-width:1000px; margin:0 auto; padding:12px 12px 40px}
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0}
+  .tab{
+    background:var(--panel); color:var(--ink); border:1px solid var(--line);
+    padding:9px 14px; border-radius:999px; cursor:pointer; font-size:.86rem;
+    transition:.15s; min-height:40px;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent); color:#08130f; border-color:var(--accent); font-weight:600}
+  .grid{display:grid; grid-template-columns:1.35fr 1fr; gap:14px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--shadow)}
+  .panel h2{margin:0 0 8px; font-size:1rem; color:var(--accent)}
+  .stage{background:var(--panel2); border-radius:12px; padding:6px; overflow:hidden}
+  svg{width:100%; height:auto; display:block; touch-action:manipulation}
+  .hint{color:var(--muted); font-size:.8rem; margin:8px 2px 0}
+  .subtabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px}
+  .stab{background:var(--panel2); border:1px solid var(--line); color:var(--ink);
+    padding:6px 11px; border-radius:8px; cursor:pointer; font-size:.8rem; min-height:36px}
+  .stab.active{background:var(--accent-d); border-color:var(--accent); color:#eafff7; font-weight:600}
+  .facts{min-height:120px}
+  .facts h3{margin:0 0 4px; font-size:.98rem; color:var(--accent)}
+  .facts p{margin:0 0 6px; font-size:.9rem; color:var(--ink)}
+  .facts .tag{display:inline-block; background:var(--panel2); border:1px solid var(--line);
+    color:var(--muted); font-size:.72rem; padding:2px 8px; border-radius:999px; margin:2px 4px 2px 0}
+  .hot{cursor:pointer; transition:.12s}
+  .hot:hover{opacity:.82}
+  .lbl{font-size:11px; fill:var(--muted); font-family:inherit}
+  .lblw{font-size:11px; fill:#dfe8f0; font-family:inherit}
+  .quiz .q{margin:0 0 6px; font-weight:600; font-size:.92rem}
+  .opt{display:block; width:100%; text-align:left; background:var(--panel2); color:var(--ink);
+    border:1px solid var(--line); border-radius:9px; padding:9px 11px; margin:5px 0; cursor:pointer;
+    font-size:.86rem; min-height:40px; transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#1f4e3d; border-color:var(--accent); color:#eafff7}
+  .opt.wrong{background:#4e2626; border-color:#c56; color:#ffe3e3}
+  .qfb{font-size:.82rem; color:var(--muted); margin:2px 2px 14px; min-height:16px}
+  .score{font-weight:600; color:var(--accent); font-size:.9rem}
+  footer{color:var(--muted); text-align:center; font-size:.76rem; margin-top:18px}
+  .legend{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+  .legend span{font-size:.74rem; color:var(--muted); display:flex; align-items:center; gap:5px}
+  .sw{width:12px; height:12px; border-radius:3px; display:inline-block; border:1px solid rgba(255,255,255,.15)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Shoot System Lab</h1>
+  <p class="sub">NIOS Class 12 Biology · Chapter 7 — Explore morphology, anatomy &amp; modifications. Tap any labelled part.</p>
+</header>
+
+<div class="wrap">
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-mode="morph">External Morphology</button>
+    <button class="tab" data-mode="stem">Stem Internal Structure</button>
+    <button class="tab" data-mode="leaf">Leaf &amp; Modifications</button>
+  </nav>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="subtabs" id="subtabs"></div>
+      <div class="stage" id="stage"></div>
+      <p class="hint" id="hint"></p>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Facts</h2>
+      <div class="facts" id="facts">
+        <h3>Welcome</h3>
+        <p>Select a mode above, then tap any coloured part in the diagram to read about it.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h2>Quick Quiz</h2>
+    <div class="quiz" id="quiz"></div>
+    <p class="score" id="score">Score: 0 / 3</p>
+  </div>
+
+  <footer>Self-contained interactive · Botany-accurate · Built for senior-secondary study.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------------- DATA ---------------- */
+var FACTS = {
+  /* Morphology */
+  node:{t:"Node",tags:["Morphology"],d:"The point on the stem where one or more leaves arise. Buds are borne at nodes. Nodes are the sites of leaf and branch attachment and are botanically fixed reference points."},
+  internode:{t:"Internode",tags:["Morphology"],d:"The portion of stem between two successive nodes. Internode elongation (by intercalary and apical meristem activity) increases plant height and spaces the leaves for light capture."},
+  apical:{t:"Apical (terminal) bud",tags:["Morphology"],d:"Bud at the stem tip containing the shoot apical meristem. It drives primary growth (increase in length) and, through auxin, imposes apical dominance that suppresses lateral buds."},
+  axillary:{t:"Axillary (lateral) bud",tags:["Morphology"],d:"Bud in the axil (angle between leaf and stem). It can grow into a branch or a flower. Released from apical dominance when the terminal bud is removed — the basis of pruning."},
+  leafm:{t:"Leaf",tags:["Morphology"],d:"Lateral, flattened photosynthetic organ borne at a node. A typical leaf has leaf base, petiole and lamina (blade). Its arrangement on the stem is called phyllotaxy."},
+  phyllo:{t:"Phyllotaxy",tags:["Morphology"],d:"The pattern of leaf arrangement on the stem: alternate (one leaf per node, e.g. china rose), opposite (two per node, e.g. Calotropis) and whorled (three or more per node, e.g. Alstonia). It maximises light interception."},
+  /* Stem — dicot */
+  d_epi:{t:"Epidermis (dicot stem)",tags:["Anatomy","Dermal"],d:"Single outermost layer with a waterproof cuticle. Bears multicellular trichomes and stomata. Protects and limits water loss."},
+  d_cortex:{t:"Cortex (dicot)",tags:["Anatomy","Ground"],d:"Differentiated: outer collenchyma (mechanical support), middle chlorenchyma, and inner endodermis. Stores food and starch."},
+  d_bundle:{t:"Vascular bundle (dicot)",tags:["Anatomy","Vascular"],d:"Conjoint, collateral and OPEN — xylem (inner) and phloem (outer) with a strip of cambium between them. Bundles are arranged in a definite RING around the pith."},
+  d_cambium:{t:"Cambium (dicot)",tags:["Anatomy","Meristem"],d:"Fascicular cambium lies between xylem and phloem. Because dicot bundles are open, this cambium allows secondary growth (increase in girth). Absent in monocots."},
+  d_pith:{t:"Pith (dicot)",tags:["Anatomy","Ground"],d:"Large central parenchymatous zone that stores food. Medullary rays extend between the vascular bundles."},
+  /* Stem — monocot */
+  m_epi:{t:"Epidermis (monocot stem)",tags:["Anatomy","Dermal"],d:"Single layer with a thick cuticle; usually no trichomes. Encloses the ground tissue."},
+  m_ground:{t:"Ground tissue (monocot)",tags:["Anatomy","Ground"],d:"NOT differentiated into cortex, endodermis and pith. It is a continuous mass of parenchyma in which the vascular bundles are embedded."},
+  m_bundle:{t:"Vascular bundle (monocot)",tags:["Anatomy","Vascular"],d:"Conjoint, collateral and CLOSED (no cambium). Bundles are SCATTERED throughout the ground tissue, each surrounded by a sclerenchymatous bundle sheath. Skull-shaped with xylem in a 'Y' and a water-containing lysigenous cavity."},
+  m_sheath:{t:"Bundle sheath",tags:["Anatomy","Mechanical"],d:"Ring of sclerenchyma surrounding each monocot bundle, giving mechanical protection. A diagnostic monocot feature."},
+  /* Leaf structure */
+  l_upper:{t:"Upper epidermis",tags:["Leaf anatomy","Dermal"],d:"Single layer with a thick cuticle on the adaxial (upper) surface. Few or no stomata. Reduces water loss and transmits light to the mesophyll."},
+  l_lower:{t:"Lower epidermis",tags:["Leaf anatomy","Dermal"],d:"Abaxial (lower) surface bearing most of the stomata, each flanked by two guard cells. Controls gas exchange and transpiration."},
+  l_palisade:{t:"Palisade mesophyll",tags:["Leaf anatomy","Ground"],d:"Columnar, tightly packed chloroplast-rich cells just below the upper epidermis. The MAIN site of photosynthesis (light-harvesting)."},
+  l_spongy:{t:"Spongy mesophyll",tags:["Leaf anatomy","Ground"],d:"Loosely packed, irregular cells with large intercellular air spaces below the palisade. Allows gas diffusion between stomata and photosynthetic cells."},
+  l_stoma:{t:"Stoma & guard cells",tags:["Leaf anatomy","Epidermal"],d:"Pore bounded by two bean-shaped guard cells. Opens/closes by turgor changes to regulate CO2 uptake, O2 release and transpiration."},
+  l_vein:{t:"Vein (vascular bundle)",tags:["Leaf anatomy","Vascular"],d:"Xylem (upper) delivers water and minerals; phloem (lower) exports sugars. The midrib and network of veins also mechanically support the lamina."},
+  /* Leaf types */
+  simple:{t:"Simple leaf",tags:["Leaf type"],d:"Lamina is undivided, or if incised the incisions do not reach the midrib. A single blade per petiole, e.g. mango, guava."},
+  compound:{t:"Compound leaf",tags:["Leaf type"],d:"Lamina is fully divided into leaflets that reach the midrib/petiole. Pinnate (leaflets along a rachis, e.g. neem) or palmate (leaflets from one point, e.g. silk cotton)."},
+  reticulate:{t:"Reticulate venation",tags:["Venation"],d:"Veins form an irregular network — typical of DICOTS, e.g. peepal, mango."},
+  parallel:{t:"Parallel venation",tags:["Venation"],d:"Veins run parallel to one another — typical of MONOCOTS, e.g. grass, banana, maize."},
+  /* Stem modifications */
+  tendril:{t:"Stem tendril",tags:["Modification","For climbing"],d:"Slender, spirally coiled branch that helps weak stems climb, e.g. grapevine, cucumber, passion flower. Arises from an axillary bud."},
+  thorn:{t:"Stem thorn",tags:["Modification","For defence"],d:"Woody, pointed axillary or terminal bud modified for protection and to reduce water loss, e.g. Bougainvillea, Citrus, Duranta."},
+  tuber:{t:"Tuber (potato)",tags:["Modification","Underground storage"],d:"Swollen tip of an underground stem branch (stolon) storing starch. The 'eyes' are nodes bearing axillary buds — proof it is a STEM, not a root."},
+  rhizome:{t:"Rhizome (ginger)",tags:["Modification","Underground storage"],d:"Horizontal, fleshy underground stem with distinct nodes, internodes, scale leaves and buds. Stores food and perennates, e.g. ginger, turmeric."},
+  runner:{t:"Runner (stolon)",tags:["Modification","Vegetative spread"],d:"Slender, prostrate stem that grows horizontally along the ground, rooting at nodes to form new plants — a mode of vegetative propagation, e.g. grass, strawberry, Oxalis."}
+};
+
+/* ---------------- SVG BUILDERS ---------------- */
+var C = {
+  epi:"#7ec8e3", cortex:"#9ad07a", vasc:"#e0a15a", xylem:"#c76a4a",
+  phloem:"#8ab661", camb:"#d76f97", pith:"#f0e2a8", ground:"#bfe0a0",
+  sheath:"#b58ad1", stem:"#78a35b", leaf:"#5aa564", bud:"#d98b4a", soil:"#8a6b4a"
+};
+
+function hotAttrs(key){ return 'class="hot" data-key="'+key+'"'; }
+
+/* --- Morphology --- */
+function svgMorph(){
+  return '<svg viewBox="0 0 460 360" role="img" aria-label="Shoot external morphology">'
+  + '<rect x="0" y="0" width="460" height="360" fill="none"/>'
+  + '<line x1="210" y1="330" x2="210" y2="70" stroke="'+C.stem+'" stroke-width="14" stroke-linecap="round"/>'
+  /* internode highlight */
+  + '<rect '+hotAttrs("internode")+' x="196" y="210" width="28" height="60" rx="8" fill="'+C.stem+'"/>'
+  /* nodes */
+  + '<circle '+hotAttrs("node")+' cx="210" cy="270" r="10" fill="#3d6b2f"/>'
+  + '<circle '+hotAttrs("node")+' cx="210" cy="200" r="10" fill="#3d6b2f"/>'
+  + '<circle '+hotAttrs("node")+' cx="210" cy="130" r="10" fill="#3d6b2f"/>'
+  /* apical bud */
+  + '<path '+hotAttrs("apical")+' d="M210 70 q-14 -26 0 -46 q14 20 0 46 z" fill="'+C.bud+'"/>'
+  /* axillary bud */
+  + '<circle '+hotAttrs("axillary")+' cx="226" cy="196" r="8" fill="'+C.bud+'"/>'
+  /* leaves (alternate phyllotaxy) */
+  + leafShape(210,270,-1,"leafm")
+  + leafShape(210,200, 1,"leafm")
+  + leafShape(210,130,-1,"leafm")
+  /* phyllotaxy hotspot area */
+  + '<rect '+hotAttrs("phyllo")+' x="250" y="90" width="120" height="26" rx="8" fill="#2c3a2a" stroke="'+C.leaf+'"/>'
+  + '<text x="310" y="107" text-anchor="middle" class="lblw">Phyllotaxy ?</text>'
+  /* labels */
+  + '<text x="150" y="24" text-anchor="middle" class="lbl">Apical bud</text>'
+  + '<line x1="150" y1="30" x2="204" y2="34" stroke="'+C.line+'"/>'
+  + '<text x="300" y="196" class="lbl">Axillary bud</text>'
+  + '<text x="150" y="205" text-anchor="end" class="lbl">Node</text>'
+  + '<line x1="152" y1="200" x2="200" y2="200" stroke="'+C.line+'"/>'
+  + '<text x="150" y="245" text-anchor="end" class="lbl">Internode</text>'
+  + '<line x1="152" y1="240" x2="196" y2="240" stroke="'+C.line+'"/>'
+  + '<text x="118" y="128" text-anchor="middle" class="lbl">Leaf</text>'
+  + '</svg>';
+}
+function leafShape(x,y,dir,key){
+  var tipx = x + dir*78, tipy = y-16, ctrl = y-46;
+  return '<path '+hotAttrs(key)+' d="M'+x+' '+y+' Q'+(x+dir*40)+' '+ctrl+' '+tipx+' '+tipy
+    +' Q'+(x+dir*40)+' '+(y+6)+' '+x+' '+y+' z" fill="'+C.leaf+'"/>'
+    + '<line x1="'+x+'" y1="'+y+'" x2="'+tipx+'" y2="'+tipy+'" stroke="#2f5a2c" stroke-width="1.5"/>';
+}
+
+/* --- Stem cross sections --- */
+function svgDicotStem(){
+  var s='<svg viewBox="0 0 320 320" role="img" aria-label="Dicot stem cross section">';
+  s+='<circle '+hotAttrs("d_epi")+' cx="160" cy="160" r="150" fill="'+C.epi+'"/>';
+  s+='<circle '+hotAttrs("d_cortex")+' cx="160" cy="160" r="140" fill="'+C.cortex+'"/>';
+  s+='<circle '+hotAttrs("d_pith")+' cx="160" cy="160" r="86" fill="'+C.pith+'"/>';
+  /* ring of vascular bundles */
+  var n=8;
+  for(var i=0;i<n;i++){
+    var a=(i/n)*2*Math.PI - Math.PI/2;
+    var cx=160+Math.cos(a)*104, cy=160+Math.sin(a)*104;
+    var rot=a*180/Math.PI+90;
+    s+='<g transform="translate('+cx.toFixed(1)+','+cy.toFixed(1)+') rotate('+rot.toFixed(1)+')">';
+    s+='<rect '+hotAttrs("d_bundle")+' x="-14" y="-20" width="28" height="40" rx="7" fill="'+C.vasc+'"/>';
+    s+='<rect '+hotAttrs("phloem")+' x="-11" y="-17" width="22" height="11" rx="4" fill="'+C.phloem+'"/>';
+    s+='<rect '+hotAttrs("d_cambium")+' x="-11" y="-4" width="22" height="6" rx="3" fill="'+C.camb+'"/>';
+    s+='<rect '+hotAttrs("xylem")+' x="-11" y="4" width="22" height="13" rx="4" fill="'+C.xylem+'"/>';
+    s+='</g>';
+  }
+  s+='<text x="160" y="164" text-anchor="middle" class="lbl">Pith</text>';
+  s+='<text x="160" y="24" text-anchor="middle" class="lblw">Bundles in a RING</text>';
+  s+='</svg>';
+  return s;
+}
+function svgMonocotStem(){
+  var s='<svg viewBox="0 0 320 320" role="img" aria-label="Monocot stem cross section">';
+  s+='<circle '+hotAttrs("m_epi")+' cx="160" cy="160" r="150" fill="'+C.epi+'"/>';
+  s+='<circle '+hotAttrs("m_ground")+' cx="160" cy="160" r="140" fill="'+C.ground+'"/>';
+  /* scattered bundles */
+  var pts=[[160,60],[110,95],[210,95],[80,150],[240,150],[130,150],[190,150],
+           [105,205],[215,205],[160,175],[160,245],[125,110],[195,110]];
+  for(var i=0;i<pts.length;i++){
+    var cx=pts[i][0], cy=pts[i][1];
+    s+='<g transform="translate('+cx+','+cy+')">';
+    s+='<circle '+hotAttrs("m_sheath")+' r="16" fill="'+C.sheath+'"/>';
+    s+='<circle '+hotAttrs("m_bundle")+' r="12" fill="'+C.vasc+'"/>';
+    s+='<circle '+hotAttrs("phloem")+' cx="0" cy="-4" r="4.5" fill="'+C.phloem+'"/>';
+    s+='<circle '+hotAttrs("xylem")+' cx="-5" cy="5" r="3.5" fill="'+C.xylem+'"/>';
+    s+='<circle '+hotAttrs("xylem")+' cx="5" cy="5" r="3.5" fill="'+C.xylem+'"/>';
+    s+='</g>';
+  }
+  s+='<text x="160" y="290" text-anchor="middle" class="lblw">Bundles SCATTERED · no cambium</text>';
+  s+='</svg>';
+  return s;
+}
+
+/* --- Leaf structure / cross-section --- */
+function svgLeafExternal(){
+  var s='<svg viewBox="0 0 460 300" role="img" aria-label="Leaf external structure">';
+  /* simple reticulate leaf (left) */
+  s+='<g>';
+  s+='<path '+hotAttrs("simple")+' d="M110 40 C40 90 40 210 110 260 C180 210 180 90 110 40 z" fill="'+C.leaf+'"/>';
+  s+='<line '+hotAttrs("reticulate")+' x1="110" y1="40" x2="110" y2="260" stroke="#2f5a2c" stroke-width="3"/>';
+  for(var i=-4;i<=4;i++){var yy=150+i*22;s+='<path '+hotAttrs("reticulate")+' d="M110 '+yy+' Q'+(85)+' '+(yy-14)+' 60 '+(yy-24)+'" stroke="#2f5a2c" fill="none" stroke-width="1.5"/>';
+  s+='<path '+hotAttrs("reticulate")+' d="M110 '+yy+' Q'+(135)+' '+(yy-14)+' 160 '+(yy-24)+'" stroke="#2f5a2c" fill="none" stroke-width="1.5"/>';}
+  s+='<text x="110" y="286" text-anchor="middle" class="lbl">Simple · reticulate (dicot)</text>';
+  s+='</g>';
+  /* compound parallel (right) */
+  s+='<g transform="translate(230,0)">';
+  /* rachis */
+  s+='<line x1="110" y1="40" x2="110" y2="250" stroke="#2f5a2c" stroke-width="4"/>';
+  for(var k=0;k<4;k++){var yc=70+k*45;
+    s+='<path '+hotAttrs("compound")+' d="M110 '+yc+' q-50 -18 -78 -6 q40 22 78 6 z" fill="'+C.leaf+'"/>';
+    s+='<path '+hotAttrs("compound")+' d="M110 '+yc+' q50 -18 78 -6 q-40 22 -78 6 z" fill="'+C.leaf+'"/>';
+    s+='<line '+hotAttrs("parallel")+' x1="40" y1="'+(yc-8)+'" x2="105" y2="'+yc+'" stroke="#2f5a2c" stroke-width="1"/>';
+    s+='<line '+hotAttrs("parallel")+' x1="180" y1="'+(yc-8)+'" x2="115" y2="'+yc+'" stroke="#2f5a2c" stroke-width="1"/>';
+  }
+  s+='<text x="110" y="286" text-anchor="middle" class="lbl">Compound · parallel (monocot)</text>';
+  s+='</g>';
+  s+='</svg>';
+  return s;
+}
+function svgLeafSection(){
+  var s='<svg viewBox="0 0 420 300" role="img" aria-label="Leaf transverse section">';
+  s+='<rect '+hotAttrs("l_upper")+' x="20" y="40" width="380" height="26" fill="'+C.epi+'"/>';
+  /* palisade columns */
+  for(var i=0;i<19;i++){var x=24+i*20;s+='<rect '+hotAttrs("l_palisade")+' x="'+x+'" y="68" width="16" height="52" rx="6" fill="'+C.leaf+'"/>';}
+  /* spongy blobs */
+  for(var r=0;r<3;r++)for(var c=0;c<12;c++){var x2=34+c*31+(r%2)*15, y2=132+r*20;s+='<circle '+hotAttrs("l_spongy")+' cx="'+x2+'" cy="'+y2+'" r="11" fill="'+C.ground+'"/>';}
+  s+='<rect '+hotAttrs("l_lower")+' x="20" y="196" width="380" height="26" fill="'+C.epi+'"/>';
+  /* stoma */
+  s+='<g '+hotAttrs("l_stoma")+'>';
+  s+='<path d="M188 222 q10 16 20 0 z" fill="'+C.leaf+'"/><path d="M212 222 q10 16 20 0 z" fill="'+C.leaf+'"/>';
+  s+='<rect x="205" y="222" width="10" height="16" fill="#151a21"/></g>';
+  /* vein bundle */
+  s+='<g '+hotAttrs("l_vein")+' transform="translate(300,120)">';
+  s+='<ellipse rx="26" ry="20" fill="'+C.vasc+'"/><ellipse cy="-7" rx="20" ry="8" fill="'+C.xylem+'"/><ellipse cy="8" rx="20" ry="8" fill="'+C.phloem+'"/></g>';
+  s+='<text x="210" y="20" text-anchor="middle" class="lblw">Leaf transverse section</text>';
+  s+='<text x="365" y="250" text-anchor="middle" class="lbl">Vein</text>';
+  s+='<text x="210" y="256" text-anchor="middle" class="lbl">Stoma</text>';
+  s+='</svg>';
+  return s;
+}
+function svgMods(){
+  var s='<svg viewBox="0 0 460 300" role="img" aria-label="Stem modifications">';
+  /* soil */
+  s+='<rect x="0" y="200" width="460" height="100" fill="'+C.soil+'" opacity="0.55"/>';
+  /* tendril */
+  s+='<g '+hotAttrs("tendril")+'><path d="M40 210 C40 150 70 150 60 120 C50 100 80 95 70 75" stroke="'+C.stem+'" stroke-width="6" fill="none" stroke-linecap="round"/></g>';
+  s+='<text x="55" y="60" text-anchor="middle" class="lbl">Tendril</text>';
+  /* thorn */
+  s+='<g '+hotAttrs("thorn")+'><line x1="140" y1="210" x2="140" y2="120" stroke="'+C.stem+'" stroke-width="7"/><path d="M140 150 l26 -14" stroke="#6c4a2a" stroke-width="6" stroke-linecap="round"/><path d="M140 135 l26 -14" stroke="#6c4a2a" stroke-width="6" stroke-linecap="round"/></g>';
+  s+='<text x="150" y="108" text-anchor="middle" class="lbl">Thorn</text>';
+  /* potato tuber */
+  s+='<g '+hotAttrs("tuber")+'><ellipse cx="245" cy="245" rx="42" ry="28" fill="#c9a36a"/><circle cx="228" cy="238" r="3" fill="#6b4b26"/><circle cx="255" cy="235" r="3" fill="#6b4b26"/><circle cx="240" cy="255" r="3" fill="#6b4b26"/></g>';
+  s+='<text x="245" y="292" text-anchor="middle" class="lbl">Tuber (potato) · eyes = nodes</text>';
+  /* rhizome */
+  s+='<g '+hotAttrs("rhizome")+'><path d="M320 250 q30 -18 60 0 q30 18 55 -4" stroke="#caa06a" stroke-width="18" fill="none" stroke-linecap="round"/><line x1="350" y1="242" x2="350" y2="222" stroke="'+C.stem+'" stroke-width="4"/><line x1="410" y1="244" x2="410" y2="224" stroke="'+C.stem+'" stroke-width="4"/></g>';
+  s+='<text x="380" y="212" text-anchor="middle" class="lbl">Rhizome (ginger)</text>';
+  /* runner */
+  s+='<g '+hotAttrs("runner")+'><path d="M40 260 h150" stroke="'+C.stem+'" stroke-width="6"/><line x1="90" y1="260" x2="90" y2="282" stroke="#6c4a2a" stroke-width="3"/><line x1="150" y1="260" x2="150" y2="282" stroke="#6c4a2a" stroke-width="3"/><circle cx="150" cy="248" r="8" fill="'+C.bud+'"/></g>';
+  s+='<text x="110" y="252" text-anchor="middle" class="lbl">Runner (rooting at nodes)</text>';
+  s+='</svg>';
+  return s;
+}
+
+/* ---------------- QUIZZES ---------------- */
+var QUIZZES = {
+  morph:[
+    {q:"1. The angle between a leaf and the stem, where an axillary bud sits, is called the:",
+     o:["Node","Leaf axil","Internode","Rachis"],a:1,
+     f:"The axil is the upper angle between leaf and stem; it houses the axillary bud."},
+    {q:"2. Apical dominance — suppression of lateral buds — is caused mainly by:",
+     o:["Cytokinin from roots","Auxin from the apical bud","Ethylene from leaves","Gibberellin from nodes"],a:1,
+     f:"Auxin produced by the shoot apex inhibits growth of axillary buds below it."},
+    {q:"3. Two leaves arising at each node describes which phyllotaxy?",
+     o:["Alternate","Whorled","Opposite","Spiral"],a:2,
+     f:"Opposite phyllotaxy = two leaves per node (e.g. Calotropis, guava)."}
+  ],
+  stem:[
+    {q:"1. In a DICOT stem the vascular bundles are:",
+     o:["Scattered, closed","In a ring, open (with cambium)","In a ring, closed","Scattered, open"],a:1,
+     f:"Dicot bundles form a ring and are open — a cambium permits secondary growth."},
+    {q:"2. Which feature is DIAGNOSTIC of a monocot stem?",
+     o:["Fascicular cambium","Differentiated cortex & pith","Sclerenchymatous bundle sheath around scattered bundles","Medullary rays"],a:2,
+     f:"Each monocot bundle is closed and wrapped by a sclerenchyma bundle sheath; ground tissue is undifferentiated."},
+    {q:"3. Secondary growth (increase in girth) in a dicot stem is due to:",
+     o:["Apical meristem","Intercalary meristem","Vascular cambium","Bundle sheath"],a:2,
+     f:"The vascular (lateral) cambium adds secondary xylem and phloem, increasing girth."}
+  ],
+  leaf:[
+    {q:"1. The chief photosynthetic tissue of a dorsiventral leaf is the:",
+     o:["Spongy mesophyll","Palisade mesophyll","Lower epidermis","Bundle sheath"],a:1,
+     f:"Columnar, chloroplast-rich palisade cells below the upper epidermis do most photosynthesis."},
+    {q:"2. A potato tuber is a modified STEM because it bears:",
+     o:["Root hairs","Nodes with axillary buds ('eyes')","A taproot","Parallel venation"],a:1,
+     f:"The 'eyes' are nodes with buds — roots never bear nodes/buds, proving it is a stem."},
+    {q:"3. Reticulate venation and parallel venation are typical, respectively, of:",
+     o:["Monocots and dicots","Dicots and monocots","Both dicots","Both monocots"],a:1,
+     f:"Reticulate (net-like) veins = dicots; parallel veins = monocots."}
+  ]
+};
+
+/* ---------------- STATE / VIEWS ---------------- */
+var SUB = {
+  morph:[{id:"m1",label:"Labelled shoot"}],
+  stem:[{id:"dicot",label:"Dicot stem"},{id:"monocot",label:"Monocot stem"}],
+  leaf:[{id:"ext",label:"Leaf types & venation"},{id:"sec",label:"Leaf T.S."},{id:"mod",label:"Stem modifications"}]
+};
+var HINTS = {
+  morph:"Tap node, internode, buds, a leaf, or the phyllotaxy tag.",
+  "stem-dicot":"Ring of open bundles. Tap epidermis, cortex, a bundle, the cambium or pith.",
+  "stem-monocot":"Scattered closed bundles. Tap the ground tissue, a bundle or its sheath.",
+  "leaf-ext":"Tap the simple/compound blades or the veins to compare venation.",
+  "leaf-sec":"Tap epidermis layers, palisade, spongy mesophyll, a stoma or the vein.",
+  "leaf-mod":"Tap each underground/aerial stem modification."
+};
+var LEGENDS = {
+  stem:[["Epidermis",C.epi],["Cortex / ground",C.cortex],["Xylem",C.xylem],["Phloem",C.phloem],["Cambium",C.camb],["Bundle sheath",C.sheath],["Pith",C.pith]],
+  leaf:[["Epidermis",C.epi],["Palisade",C.leaf],["Spongy",C.ground],["Xylem",C.xylem],["Phloem",C.phloem]],
+  morph:[["Stem",C.stem],["Node","#3d6b2f"],["Bud",C.bud],["Leaf",C.leaf]]
+};
+
+var state={mode:"morph",sub:"m1"};
+
+function el(id){return document.getElementById(id);}
+
+function renderSubtabs(){
+  var host=el("subtabs"); host.innerHTML="";
+  var subs=SUB[state.mode];
+  subs.forEach(function(sb){
+    var b=document.createElement("button");
+    b.className="stab"+(sb.id===state.sub?" active":"");
+    b.textContent=sb.label;
+    b.onclick=function(){state.sub=sb.id; renderSubtabs(); renderStage();};
+    host.appendChild(b);
+  });
+}
+function renderStage(){
+  var stage=el("stage"), svg="";
+  if(state.mode==="morph"){svg=svgMorph(); el("hint").textContent=HINTS.morph; setLegend("morph");}
+  else if(state.mode==="stem"){
+    if(state.sub==="dicot"){svg=svgDicotStem(); el("hint").textContent=HINTS["stem-dicot"];}
+    else{svg=svgMonocotStem(); el("hint").textContent=HINTS["stem-monocot"];}
+    setLegend("stem");
+  } else {
+    if(state.sub==="ext"){svg=svgLeafExternal(); el("hint").textContent=HINTS["leaf-ext"]; setLegend("morph");}
+    else if(state.sub==="sec"){svg=svgLeafSection(); el("hint").textContent=HINTS["leaf-sec"]; setLegend("leaf");}
+    else{svg=svgMods(); el("hint").textContent=HINTS["leaf-mod"]; setLegend("morph");}
+  }
+  stage.innerHTML=svg;
+  bindHotspots();
+}
+function setLegend(kind){
+  var host=el("legend"); host.innerHTML="";
+  (LEGENDS[kind]||[]).forEach(function(pair){
+    var s=document.createElement("span");
+    s.innerHTML='<span class="sw" style="background:'+pair[1]+'"></span>'+pair[0];
+    host.appendChild(s);
+  });
+}
+function bindHotspots(){
+  var hs=el("stage").querySelectorAll(".hot");
+  hs.forEach(function(node){
+    node.addEventListener("click",function(){showFact(node.getAttribute("data-key"));});
+  });
+}
+function showFact(key){
+  var f=FACTS[key]; if(!f) return;
+  var tags=(f.tags||[]).map(function(t){return '<span class="tag">'+t+'</span>';}).join("");
+  el("facts").innerHTML='<h3>'+f.t+'</h3><p>'+f.d+'</p>'+tags;
+}
+
+/* quiz */
+var scored={};
+function renderQuiz(){
+  var host=el("quiz"); host.innerHTML="";
+  var qs=QUIZZES[state.mode]; scored={};
+  qs.forEach(function(item,qi){
+    var wrap=document.createElement("div");
+    var p=document.createElement("p"); p.className="q"; p.textContent=item.q; wrap.appendChild(p);
+    item.o.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.onclick=function(){
+        if(scored[qi]!==undefined) return;
+        scored[qi]=(oi===item.a);
+        var sib=wrap.querySelectorAll(".opt");
+        sib.forEach(function(x,xi){
+          if(xi===item.a) x.classList.add("correct");
+          else if(xi===oi) x.classList.add("wrong");
+        });
+        fb.textContent=(oi===item.a?"Correct. ":"Not quite. ")+item.f;
+        updateScore();
+      };
+      wrap.appendChild(b);
+    });
+    var fb=document.createElement("p"); fb.className="qfb"; wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+  updateScore();
+}
+function updateScore(){
+  var n=0,total=QUIZZES[state.mode].length;
+  for(var k in scored) if(scored[k]) n++;
+  el("score").textContent="Score: "+n+" / "+total;
+}
+
+/* tabs */
+function setMode(m){
+  state.mode=m;
+  state.sub=SUB[m][0].id;
+  var tabs=el("tabs").querySelectorAll(".tab");
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-mode")===m);});
+  renderSubtabs(); renderStage(); renderQuiz();
+  el("facts").innerHTML='<h3>'+({morph:"External Morphology",stem:"Stem Internal Structure",leaf:"Leaf & Modifications"})[m]+'</h3><p>Tap any coloured part of the diagram to learn about it.</p>';
+}
+el("tabs").addEventListener("click",function(e){
+  var t=e.target.closest(".tab"); if(t) setMode(t.getAttribute("data-mode"));
+});
+
+/* init */
+setMode("morph");
+</script>
+</body>
+</html>
