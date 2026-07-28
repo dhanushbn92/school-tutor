@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinetic Theory Lab — NIOS Class 12 Physics (Ch 8)</title>
+<style>
+  :root{
+    --bg:#0e1622;
+    --panel:#152233;
+    --panel2:#1b2c42;
+    --edge:#263a54;
+    --ink:#e7eefa;
+    --muted:#93a6c0;
+    --accent:#4fd1c5;
+    --accent-dim:#2f8a82;
+    --warn:#f6ad55;
+    --good:#68d391;
+    --bad:#fc8181;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  header{
+    padding:18px 16px 6px;
+    max-width:1080px;margin:0 auto;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 8px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px 40px}
+  .tabs{
+    display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px;
+  }
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--ink);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent-dim)}
+  .tab.active{background:var(--accent);color:#04211e;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:16px;margin-bottom:16px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+  canvas{
+    width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--edge);border-radius:12px;touch-action:none;
+  }
+  .controls label{display:block;font-size:.82rem;color:var(--muted);margin:12px 0 4px}
+  .controls label b{color:var(--ink);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  .readout{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px;margin-top:14px;
+  }
+  .stat{
+    background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:10px;
+  }
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--accent)}
+  .stat .u{font-size:.72rem;color:var(--muted)}
+  .btn{
+    background:var(--panel2);border:1px solid var(--edge);color:var(--ink);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:.85rem;margin:8px 6px 0 0;
+  }
+  .btn:hover{border-color:var(--accent-dim)}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .seg .btn.on{background:var(--accent);color:#04211e;border-color:var(--accent);font-weight:600}
+  .formulas{font-size:.9rem}
+  .formulas .row{
+    background:var(--panel2);border:1px solid var(--edge);border-radius:10px;
+    padding:10px 12px;margin:8px 0;
+  }
+  .formulas code{color:var(--accent);font-size:1rem;font-family:"Cambria Math",Georgia,serif}
+  .formulas .d{color:var(--muted);font-size:.82rem;margin-top:2px}
+  .quiz .q{margin:16px 0;border-top:1px solid var(--edge);padding-top:14px}
+  .quiz .q:first-child{border-top:0;padding-top:0}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;background:var(--panel2);
+    border:1px solid var(--edge);color:var(--ink);padding:9px 12px;border-radius:10px;
+    margin:6px 0;cursor:pointer;font-size:.88rem;transition:.12s;
+  }
+  .quiz .opt:hover{border-color:var(--accent-dim)}
+  .quiz .opt.correct{border-color:var(--good);background:#173225}
+  .quiz .opt.wrong{border-color:var(--bad);background:#331a1a}
+  .quiz .exp{
+    display:none;margin-top:8px;font-size:.85rem;color:var(--muted);
+    background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;padding:8px 12px;
+  }
+  .quiz .exp.show{display:block}
+  .note{color:var(--muted);font-size:.82rem;margin-top:6px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Kinetic Theory Lab</h1>
+  <p class="sub">NIOS Class 12 Physics · Chapter 8 — Kinetic Theory of Gases</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="box">1 · Particle Box</button>
+    <button class="tab" data-view="laws">2 · Gas Laws (PV=nRT)</button>
+    <button class="tab" data-view="maxwell">3 · Maxwell Speeds</button>
+    <button class="tab" data-view="learn">Formulas &amp; Quiz</button>
+  </div>
+
+  <!-- VIEW 1: PARTICLE BOX -->
+  <section class="view active" id="view-box">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="boxCanvas" width="640" height="440" aria-label="Gas molecules bouncing in a box"></canvas>
+        <div class="legend"><span><i style="background:var(--accent)"></i>gas molecule</span><span>Walls are perfectly reflecting (elastic collisions)</span></div>
+      </div>
+      <div class="panel controls">
+        <label>Temperature: <b><span id="boxTval">300</span> K</b></label>
+        <input id="boxT" type="range" min="50" max="1000" step="10" value="300">
+        <label>Number of molecules N: <b><span id="boxNval">80</span></b></label>
+        <input id="boxN" type="range" min="10" max="200" step="5" value="80">
+        <div class="readout">
+          <div class="stat"><div class="k">Temperature</div><div class="v"><span id="boxT2">300</span></div><div class="u">K</div></div>
+          <div class="stat"><div class="k">Molecules N</div><div class="v"><span id="boxN2">80</span></div><div class="u">count</div></div>
+          <div class="stat"><div class="k">Pressure</div><div class="v"><span id="boxP">—</span></div><div class="u">rel. units</div></div>
+          <div class="stat"><div class="k">v_rms</div><div class="v"><span id="boxVrms">—</span></div><div class="u">rel. units</div></div>
+        </div>
+        <button class="btn" id="boxPause">Pause</button>
+        <p class="note">Pressure is measured from the <b>rate of wall collisions × momentum transferred</b>, exactly as kinetic theory predicts. Raise T and molecules speed up (v_rms ∝ √T); more collisions raise P. Add molecules (N) and P rises too.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: GAS LAWS -->
+  <section class="view" id="view-laws">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="pistonCanvas" width="640" height="440" aria-label="Cylinder with a movable piston"></canvas>
+        <div class="legend"><span><i style="background:var(--accent)"></i>molecule</span><span><i style="background:var(--warn)"></i>piston</span></div>
+      </div>
+      <div class="panel controls">
+        <label>Hold constant (special case):</label>
+        <div class="seg" id="lawSeg">
+          <button class="btn on" data-law="none">Free (PV=nRT)</button>
+          <button class="btn" data-law="T">Boyle (T const)</button>
+          <button class="btn" data-law="P">Charles (P const)</button>
+          <button class="btn" data-law="V">Gay-Lussac (V const)</button>
+        </div>
+        <label>Volume V: <b><span id="lawVval">1.00</span></b> (×10⁻³ m³ = L)</label>
+        <input id="lawV" type="range" min="0.4" max="2.0" step="0.02" value="1.0">
+        <label>Temperature T: <b><span id="lawTval">300</span> K</b></label>
+        <input id="lawT" type="range" min="100" max="600" step="5" value="300">
+        <label>Amount n: <b><span id="lawNval">1.00</span></b> mol</label>
+        <input id="lawN" type="range" min="0.5" max="2.0" step="0.05" value="1.0">
+        <div class="readout">
+          <div class="stat"><div class="k">Pressure</div><div class="v"><span id="lawP">—</span></div><div class="u">kPa</div></div>
+          <div class="stat"><div class="k">P·V</div><div class="v"><span id="lawPV">—</span></div><div class="u">J</div></div>
+          <div class="stat"><div class="k">n·R·T</div><div class="v"><span id="lawNRT">—</span></div><div class="u">J</div></div>
+        </div>
+        <canvas id="lawGraph" width="640" height="240" aria-label="Live PV graph" style="margin-top:12px"></canvas>
+        <p class="note" id="lawNote">Ideal gas: <b>PV = nRT</b> with R = 8.314 J·mol⁻¹·K⁻¹. Pick a special case to lock one variable and see Boyle / Charles / Gay-Lussac.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: MAXWELL -->
+  <section class="view" id="view-maxwell">
+    <div class="grid">
+      <div class="panel">
+        <canvas id="maxCanvas" width="640" height="440" aria-label="Maxwell speed distribution histogram"></canvas>
+        <div class="legend">
+          <span><i style="background:var(--accent)"></i>speed histogram</span>
+          <span><i style="background:var(--warn)"></i>v_rms = √(3kT/m)</span>
+          <span><i style="background:var(--good)"></i>theory curve</span>
+        </div>
+      </div>
+      <div class="panel controls">
+        <label>Temperature: <b><span id="maxTval">300</span> K</b></label>
+        <input id="maxT" type="range" min="100" max="1200" step="10" value="300">
+        <label>Gas (molar mass): <b><span id="maxGname">N₂ (28)</span></b></label>
+        <div class="seg" id="maxGasSeg">
+          <button class="btn" data-m="2">H₂</button>
+          <button class="btn" data-m="4">He</button>
+          <button class="btn on" data-m="28">N₂</button>
+          <button class="btn" data-m="32">O₂</button>
+          <button class="btn" data-m="44">CO₂</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">v_rms</div><div class="v"><span id="maxVrms">—</span></div><div class="u">m/s</div></div>
+          <div class="stat"><div class="k">v_mean</div><div class="v"><span id="maxVmean">—</span></div><div class="u">m/s</div></div>
+          <div class="stat"><div class="k">v_mp</div><div class="v"><span id="maxVmp">—</span></div><div class="u">m/s</div></div>
+          <div class="stat"><div class="k">KE_avg</div><div class="v"><span id="maxKE">—</span></div><div class="u">×10⁻²¹ J</div></div>
+        </div>
+        <p class="note">The distribution <b>broadens and shifts right</b> as T rises. Average translational KE is <b>½m⟨v²⟩ = (3/2)kT</b>, so it depends only on temperature — not on the gas. Lighter molecules move faster (larger v_rms).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: FORMULAS + QUIZ -->
+  <section class="view" id="view-learn">
+    <div class="grid">
+      <div class="panel formulas">
+        <h2 style="margin-top:0;font-size:1.05rem">Key formulas</h2>
+        <div class="row"><code>PV = nRT</code><div class="d">Ideal gas equation. R = 8.314 J·mol⁻¹·K⁻¹, n = moles, T in kelvin.</div></div>
+        <div class="row"><code>P = ⅓ ρ &lt;v²&gt;</code><div class="d">Pressure from kinetic theory; ρ = density, ⟨v²⟩ = mean-square speed.</div></div>
+        <div class="row"><code>KE_avg = ½ m &lt;v²&gt; = (3/2) k T</code><div class="d">Mean translational KE per molecule. k = 1.38×10⁻²³ J/K (Boltzmann).</div></div>
+        <div class="row"><code>v_rms = √(3kT/m) = √(3RT/M)</code><div class="d">Root-mean-square speed. M = molar mass (kg/mol). Lighter gas ⇒ faster.</div></div>
+        <div class="row"><code>v_mp = √(2kT/m) &lt; v_avg = √(8kT/πm) &lt; v_rms</code><div class="d">The three characteristic speeds always keep this order.</div></div>
+      </div>
+      <div class="panel quiz" id="quiz">
+        <h2 style="margin-top:0;font-size:1.05rem">Quick check (3 questions)</h2>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+    if(running) requestAnimationFrame(loop);
+  });
+
+  // ---------- helpers ----------
+  function $(id){return document.getElementById(id);}
+  function fit(canvas){
+    // scale drawing buffer to CSS pixel size for crispness
+    var r = canvas.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio||1, 2);
+    var w = Math.max(1, Math.round(r.width));
+    var aspect = canvas.height/canvas.width || 0.6875;
+    // keep logical coords fixed; only adjust backing store
+    var cw = canvas.width, ch = canvas.height;
+    if(canvas._cssw !== w){
+      canvas._cssw = w;
+    }
+    return {cw:cw, ch:ch};
+  }
+
+  // ================= VIEW 1: PARTICLE BOX =================
+  var bc = $("boxCanvas"), bx = bc.getContext("2d");
+  var boxParts = [];
+  var boxT = 300, boxN = 80;
+  var boxPaused = false;
+  var wallImpulse = 0;      // accumulated momentum transfer to walls
+  var pressureEMA = 0;
+  var W = bc.width, H = bc.height;
+  var PAD = 8;
+
+  function speedFromT(T){ return 0.9*Math.sqrt(T/300)*1.6; } // logical px/frame scale
+
+  function makePart(){
+    var base = speedFromT(boxT);
+    var ang = Math.random()*Math.PI*2;
+    // Maxwell-ish spread: sum for a bell shape
+    var s = base*(0.6+0.8*Math.random());
+    return {
+      x: PAD+Math.random()*(W-2*PAD),
+      y: PAD+Math.random()*(H-2*PAD),
+      vx: Math.cos(ang)*s,
+      vy: Math.sin(ang)*s,
+      r: 4
+    };
+  }
+  function rescaleSpeeds(){
+    // set rms speed to match T while keeping directions
+    var target = speedFromT(boxT);
+    var sum=0;
+    for(var i=0;i<boxParts.length;i++){var p=boxParts[i];sum+=p.vx*p.vx+p.vy*p.vy;}
+    var rms = Math.sqrt(sum/Math.max(1,boxParts.length));
+    var want = target*Math.sqrt(1.5); // typical
+    if(rms>0){var f=want/rms;for(var j=0;j<boxParts.length;j++){boxParts[j].vx*=f;boxParts[j].vy*=f;}}
+  }
+  function setBoxN(n){
+    boxN=n;
+    while(boxParts.length<n) boxParts.push(makePart());
+    while(boxParts.length>n) boxParts.pop();
+  }
+  setBoxN(boxN);
+
+  function stepBox(){
+    var i,p;
+    var impulse=0;
+    for(i=0;i<boxParts.length;i++){
+      p=boxParts[i];
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x-p.r<PAD){p.x=PAD+p.r;impulse+=2*Math.abs(p.vx);p.vx=Math.abs(p.vx);}
+      else if(p.x+p.r>W-PAD){p.x=W-PAD-p.r;impulse+=2*Math.abs(p.vx);p.vx=-Math.abs(p.vx);}
+      if(p.y-p.r<PAD){p.y=PAD+p.r;impulse+=2*Math.abs(p.vy);p.vy=Math.abs(p.vy);}
+      else if(p.y+p.r>H-PAD){p.y=H-PAD-p.r;impulse+=2*Math.abs(p.vy);p.vy=-Math.abs(p.vy);}
+    }
+    // pressure ~ impulse per unit wall-length per frame; smooth it
+    var perim = 2*((W-2*PAD)+(H-2*PAD));
+    var inst = impulse/perim*1000;
+    pressureEMA = pressureEMA*0.94 + inst*0.06;
+  }
+  function drawBox(){
+    bx.clearRect(0,0,W,H);
+    bx.fillStyle="#0f1a28";
+    bx.fillRect(PAD,PAD,W-2*PAD,H-2*PAD);
+    bx.strokeStyle="#3a5372";bx.lineWidth=2;
+    bx.strokeRect(PAD,PAD,W-2*PAD,H-2*PAD);
+    bx.fillStyle=getVar("--accent");
+    for(var i=0;i<boxParts.length;i++){
+      var p=boxParts[i];
+      bx.beginPath();bx.arc(p.x,p.y,p.r,0,6.2832);bx.fill();
+    }
+    // rms readout
+    var sum=0;for(var k=0;k<boxParts.length;k++){var q=boxParts[k];sum+=q.vx*q.vx+q.vy*q.vy;}
+    var rms=Math.sqrt(sum/Math.max(1,boxParts.length));
+    $("boxP").textContent = pressureEMA.toFixed(1);
+    $("boxVrms").textContent = rms.toFixed(2);
+  }
+
+  // ================= VIEW 2: GAS LAWS =================
+  var pc=$("pistonCanvas"),px=pc.getContext("2d");
+  var lg=$("lawGraph"),lx=lg.getContext("2d");
+  var lawV=1.0, lawT=300, lawN=1.0, lawMode="none";
+  var R=8.314;
+  var lawParts=[];
+  var PW=pc.width,PH=pc.height;
+  var lawTrail=[];
+  for(var z=0;z<28;z++){
+    lawParts.push({x:Math.random(),y:Math.random(),vx:(Math.random()*2-1),vy:(Math.random()*2-1)});
+  }
+  function pistonX(){
+    // piston position from V: V range 0.4..2.0 -> fraction of width
+    var frac=(lawV-0.4)/(2.0-0.4); // 0..1
+    return 70 + frac*(PW-90-70);
+  }
+  function computeLaw(){
+    // P in Pa: PV=nRT with V in liters(1e-3 m3)
+    var Vm=lawV*1e-3;
+    var P=lawN*R*lawT/Vm; // Pa
+    return P;
+  }
+  function stepPiston(){
+    var pxpos=pistonX();
+    var left=64,right=pxpos,top=54,bot=PH-30;
+    var spd=0.004*Math.sqrt(lawT/300)+0.001;
+    for(var i=0;i<lawParts.length;i++){
+      var p=lawParts[i];
+      p.x+=p.vx*spd; p.y+=p.vy*spd;
+      if(p.x<0){p.x=0;p.vx=Math.abs(p.vx);}
+      if(p.x>1){p.x=1;p.vx=-Math.abs(p.vx);}
+      if(p.y<0){p.y=0;p.vy=Math.abs(p.vy);}
+      if(p.y>1){p.y=1;p.vy=-Math.abs(p.vy);}
+    }
+  }
+  function drawPiston(){
+    px.clearRect(0,0,PW,PH);
+    var pxpos=pistonX();
+    var left=64,top=54,bot=PH-30;
+    // cylinder body
+    px.fillStyle="#0f1a28";
+    px.fillRect(left,top,PW-90-left,bot-top);
+    px.strokeStyle="#3a5372";px.lineWidth=3;
+    px.strokeRect(left,top,PW-90-left,bot-top);
+    // gas region up to piston
+    px.save();
+    px.beginPath();px.rect(left,top,pxpos-left,bot-top);px.clip();
+    px.fillStyle=getVar("--accent");
+    var n=Math.round(14+lawN*10);
+    for(var i=0;i<lawParts.length && i<n;i++){
+      var p=lawParts[i];
+      var gx=left+p.x*(pxpos-left);
+      var gy=top+p.y*(bot-top);
+      px.beginPath();px.arc(gx,gy,3.5,0,6.2832);px.fill();
+    }
+    px.restore();
+    // piston
+    px.fillStyle=getVar("--warn");
+    px.fillRect(pxpos,top-6,14,bot-top+12);
+    px.fillStyle="#7a5a1f";
+    px.fillRect(pxpos+14,top+ (bot-top)/2 -6, PW-90-pxpos-14 <0?0:36,12);
+    // labels
+    px.fillStyle=getVar("--muted");px.font="12px system-ui";
+    px.fillText("Gas",left+8,top+18);
+    px.fillText("Piston",pxpos-10> left? pxpos-6:pxpos, top-14);
+  }
+  function drawGraph(){
+    lx.clearRect(0,0,lg.width,lg.height);
+    var gw=lg.width,gh=lg.height;
+    // axes
+    lx.strokeStyle="#2d425e";lx.lineWidth=1;
+    lx.beginPath();lx.moveTo(40,10);lx.lineTo(40,gh-24);lx.lineTo(gw-10,gh-24);lx.stroke();
+    lx.fillStyle=getVar("--muted");lx.font="11px system-ui";
+    var xlabel="Volume V (L)", ylabel="P (kPa)";
+    if(lawMode==="V"){xlabel="Temperature T (K)";}
+    if(lawMode==="P"){xlabel="Temperature T (K)"; ylabel="Volume V (L)";}
+    lx.fillText(ylabel,6,14);
+    lx.fillText(xlabel,gw-120,gh-8);
+    // plot theory curve for current mode
+    lx.strokeStyle=getVar("--accent");lx.lineWidth=2;lx.beginPath();
+    var i,X,Y,sx,sy;
+    for(i=0;i<=100;i++){
+      var t=i/100;
+      if(lawMode==="none"||lawMode==="T"){ // P vs V (Boyle-like), T fixed at current
+        var Vl=0.4+t*(2.0-0.4);
+        var P=lawN*R*lawT/(Vl*1e-3)/1000; // kPa
+        sx=40+t*(gw-50);
+        sy=map(P,0,lawN*R*600/(0.4e-3)/1000,gh-24,12);
+      } else if(lawMode==="P"){ // V vs T (Charles), P fixed at current P
+        var Tk=100+t*(600-100);
+        var Pfix=computeLaw();
+        var Vv=lawN*R*Tk/Pfix/1e-3; // liters
+        sx=40+t*(gw-50);
+        sy=map(Vv,0,2.2,gh-24,12);
+      } else { // mode V: P vs T (Gay-Lussac), V fixed
+        var Tk2=100+t*(600-100);
+        var P2=lawN*R*Tk2/(lawV*1e-3)/1000;
+        sx=40+t*(gw-50);
+        sy=map(P2,0,lawN*R*600/(lawV*1e-3)/1000,gh-24,12);
+      }
+      if(i===0)lx.moveTo(sx,sy);else lx.lineTo(sx,sy);
+    }
+    lx.stroke();
+    // current point
+    var curX,curY,xmax,ymax;
+    var Pnow=computeLaw()/1000;
+    if(lawMode==="none"||lawMode==="T"){
+      curX=map(lawV,0.4,2.0,40,gw-10);
+      curY=map(Pnow,0,lawN*R*600/(0.4e-3)/1000,gh-24,12);
+    } else if(lawMode==="P"){
+      curX=map(lawT,100,600,40,gw-10);
+      curY=map(lawV,0,2.2,gh-24,12);
+    } else {
+      curX=map(lawT,100,600,40,gw-10);
+      curY=map(Pnow,0,lawN*R*600/(lawV*1e-3)/1000,gh-24,12);
+    }
+    lx.fillStyle=getVar("--warn");
+    lx.beginPath();lx.arc(curX,curY,5,0,6.2832);lx.fill();
+  }
+  function map(v,a,b,c,d){var t=(v-a)/(b-a);if(t<0)t=0;if(t>1)t=1;return c+t*(d-c);}
+
+  function updateLawReadout(){
+    var P=computeLaw();
+    $("lawP").textContent=(P/1000).toFixed(1);
+    $("lawPV").textContent=(P*lawV*1e-3).toFixed(1);
+    $("lawNRT").textContent=(lawN*R*lawT).toFixed(1);
+    $("lawVval").textContent=lawV.toFixed(2);
+    $("lawTval").textContent=lawT;
+    $("lawNval").textContent=lawN.toFixed(2);
+  }
+
+  // ================= VIEW 3: MAXWELL =================
+  var mc=$("maxCanvas"),mx=mc.getContext("2d");
+  var maxT=300, maxM=28;
+  var kB=1.380649e-23, NA=6.02214076e23;
+  function molMassKg(m){return m/1000/NA;} // per-molecule mass, m=molar mass g/mol
+  function vrms(T,M){return Math.sqrt(3*kB*T/molMassKg(M));}
+  function vmp(T,M){return Math.sqrt(2*kB*T/molMassKg(M));}
+  function vmean(T,M){return Math.sqrt(8*kB*T/(Math.PI*molMassKg(M)));}
+  function maxwellPDF(v,T,M){
+    var m=molMassKg(M);
+    var a=m/(2*kB*T);
+    return 4*Math.PI*Math.pow(a/Math.PI,1.5)*v*v*Math.exp(-a*v*v);
+  }
+  function drawMaxwell(){
+    mx.clearRect(0,0,mc.width,mc.height);
+    var gw=mc.width,gh=mc.height;
+    var m0=molMassKg(maxM);
+    var vr=vrms(maxT,maxM), vm=vmp(maxT,maxM), vavg=vmean(maxT,maxM);
+    // x axis max: scale so peak sits ~40% — use a fixed generous max based on lightest/hottest reference
+    var vmax=Math.max(2600, vr*2.4);
+    var L=48,Rr=gw-16,B=gh-30,Tt=16;
+    // axes
+    mx.strokeStyle="#2d425e";mx.lineWidth=1;
+    mx.beginPath();mx.moveTo(L,Tt);mx.lineTo(L,B);mx.lineTo(Rr,B);mx.stroke();
+    mx.fillStyle=getVar("--muted");mx.font="11px system-ui";
+    mx.fillText("fraction of molecules",6,12);
+    mx.fillText("speed v (m/s)",Rr-90,gh-8);
+    // find pdf peak for scaling
+    var peak=maxwellPDF(vm,maxT,maxM);
+    // histogram bars (sampled from pdf so it's smooth + looks like a histogram)
+    var bins=34;
+    mx.fillStyle=getVar("--accent");
+    for(var i=0;i<bins;i++){
+      var v0=(i/bins)*vmax, v1=((i+1)/bins)*vmax, vmid=(v0+v1)/2;
+      var pdf=maxwellPDF(vmid,maxT,maxM);
+      var h=(pdf/peak)*(B-Tt-6);
+      var x0=map(v0,0,vmax,L,Rr), x1=map(v1,0,vmax,L,Rr);
+      mx.fillRect(x0+1,B-h,(x1-x0)-2,h);
+    }
+    // theory curve overlay
+    mx.strokeStyle=getVar("--good");mx.lineWidth=2;mx.beginPath();
+    for(var s=0;s<=160;s++){
+      var vv=(s/160)*vmax;
+      var pp=maxwellPDF(vv,maxT,maxM)/peak*(B-Tt-6);
+      var sx=map(vv,0,vmax,L,Rr), sy=B-pp;
+      if(s===0)mx.moveTo(sx,sy);else mx.lineTo(sx,sy);
+    }
+    mx.stroke();
+    // v_rms marker
+    var xr=map(vr,0,vmax,L,Rr);
+    mx.strokeStyle=getVar("--warn");mx.lineWidth=2;mx.setLineDash([5,4]);
+    mx.beginPath();mx.moveTo(xr,Tt);mx.lineTo(xr,B);mx.stroke();mx.setLineDash([]);
+    mx.fillStyle=getVar("--warn");mx.font="12px system-ui";
+    mx.fillText("v_rms "+Math.round(vr),Math.min(xr+4,Rr-70),Tt+14);
+    // x ticks
+    mx.fillStyle=getVar("--muted");mx.font="10px system-ui";
+    for(var t=0;t<=vmax;t+=Math.ceil(vmax/6/100)*100){
+      var tx=map(t,0,vmax,L,Rr);
+      mx.fillText(String(Math.round(t)),tx-8,B+14);
+    }
+    // readouts
+    $("maxVrms").textContent=Math.round(vr);
+    $("maxVmean").textContent=Math.round(vavg);
+    $("maxVmp").textContent=Math.round(vm);
+    var ke=1.5*kB*maxT; // J
+    $("maxKE").textContent=(ke*1e21).toFixed(2);
+  }
+  function getVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||"#4fd1c5";}
+
+  // ================= MAIN LOOP =================
+  var activeView="box";
+  function loop(){
+    if(!running) return;
+    if(activeView==="box"){
+      if(!boxPaused) stepBox();
+      drawBox();
+    } else if(activeView==="laws"){
+      stepPiston();
+      drawPiston();
+      drawGraph();
+    } else if(activeView==="maxwell"){
+      drawMaxwell();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // ================= WIRING =================
+  // tabs
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      $("view-"+t.dataset.view).classList.add("active");
+      activeView=t.dataset.view;
+      if(activeView==="maxwell") drawMaxwell();
+      if(activeView==="laws"){updateLawReadout();drawPiston();drawGraph();}
+      requestAnimationFrame(loop);
+    });
+  });
+
+  // box controls
+  $("boxT").addEventListener("input",function(e){
+    boxT=+e.target.value;$("boxTval").textContent=boxT;$("boxT2").textContent=boxT;
+    rescaleSpeeds();
+  });
+  $("boxN").addEventListener("input",function(e){
+    setBoxN(+e.target.value);$("boxNval").textContent=e.target.value;$("boxN2").textContent=e.target.value;
+  });
+  $("boxPause").addEventListener("click",function(){
+    boxPaused=!boxPaused;this.textContent=boxPaused?"Resume":"Pause";
+  });
+
+  // law controls
+  $("lawV").addEventListener("input",function(e){lawV=+e.target.value;applyLaw("V");});
+  $("lawT").addEventListener("input",function(e){lawT=+e.target.value;applyLaw("T");});
+  $("lawN").addEventListener("input",function(e){lawN=+e.target.value;applyLaw("N");});
+  function applyLaw(changed){
+    // enforce special-case constraints by adjusting the dependent variable
+    if(lawMode==="T"){ // Boyle: T const -> if user changed T, keep, but law says T fixed; we lock T slider visually
+    }
+    updateLawReadout();
+  }
+  document.querySelectorAll("#lawSeg .btn").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#lawSeg .btn").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      lawMode=b.dataset.law;
+      var notes={
+        none:"Ideal gas: PV = nRT. Move any slider; PV always equals nRT.",
+        T:"Boyle's law (T constant): P ∝ 1/V. Increasing V lowers P so PV stays constant. Change V and watch the P–V curve.",
+        P:"Charles's law (P constant): V ∝ T. Heating expands the gas — piston moves out. Change T and watch V–T.",
+        V:"Gay-Lussac's law (V constant): P ∝ T. Heating a rigid box raises P. Change T and watch P–T."
+      };
+      $("lawNote").innerHTML=notes[lawMode];
+      // enable/disable relevant sliders
+      $("lawT").disabled = (lawMode==="P" ? false : false);
+      updateLawReadout();drawGraph();
+    });
+  });
+
+  // maxwell controls
+  $("maxT").addEventListener("input",function(e){maxT=+e.target.value;$("maxTval").textContent=maxT;drawMaxwell();});
+  document.querySelectorAll("#maxGasSeg .btn").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#maxGasSeg .btn").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      maxM=+b.dataset.m;
+      var names={2:"H₂ (2)",4:"He (4)",28:"N₂ (28)",32:"O₂ (32)",44:"CO₂ (44)"};
+      $("maxGname").textContent=names[maxM];
+      drawMaxwell();
+    });
+  });
+
+  // ================= QUIZ =================
+  var quizData=[
+    {
+      q:"1. At the same temperature, which gas has the greatest v_rms?",
+      opts:["CO₂","O₂","N₂","H₂"],
+      correct:3,
+      exp:"v_rms = √(3RT/M). At a fixed T, smaller molar mass M gives larger v_rms, so the lightest gas, H₂ (M=2), is fastest."
+    },
+    {
+      q:"2. If the absolute temperature of an ideal gas is doubled at constant volume, its pressure:",
+      opts:["Halves","Stays the same","Doubles","Quadruples"],
+      correct:2,
+      exp:"At constant V (Gay-Lussac): P ∝ T. Doubling T doubles P."
+    },
+    {
+      q:"3. The average translational kinetic energy of a gas molecule depends on:",
+      opts:["Only its mass","Only its speed direction","Only the absolute temperature","The pressure only"],
+      correct:2,
+      exp:"KE_avg = (3/2)kT — it depends only on absolute temperature, the same for every ideal gas at a given T."
+    }
+  ];
+  var qroot=$("quiz");
+  quizData.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var h=document.createElement("div");h.textContent=item.q;h.style.fontWeight="600";h.style.marginBottom="4px";
+    d.appendChild(h);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered) return;answered=true;
+        if(oi===item.correct){b.classList.add("correct");}
+        else{
+          b.classList.add("wrong");
+          d.querySelectorAll(".opt")[item.correct].classList.add("correct");
+        }
+        d.querySelector(".exp").classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var e=document.createElement("div");e.className="exp";e.innerHTML="<b>Why:</b> "+item.exp;
+    d.appendChild(e);
+    qroot.appendChild(d);
+  });
+
+  // init
+  $("boxTval").textContent=boxT;$("boxNval").textContent=boxN;
+  updateLawReadout();drawMaxwell();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

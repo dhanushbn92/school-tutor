@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elasticity Lab — Elastic Properties of Solids (NIOS Class 12 Physics)</title>
+<style>
+  :root{
+    --bg:#0f1622; --panel:#182234; --panel2:#1e2b40; --edge:#2b3b56;
+    --ink:#e8eef7; --muted:#93a4be; --accent:#4fd1c5; --accent2:#f6ad55;
+    --danger:#f56565; --good:#68d391; --line:#3a4d6e;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%,#16233a 0,var(--bg) 55%);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 6px;text-align:center}
+  h1{font-size:clamp(1.15rem,3.4vw,1.7rem);margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.86rem;margin:0 0 6px}
+  .wrap{max-width:1080px;margin:0 auto;padding:8px 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0 4px}
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.86rem;font-weight:600;
+    transition:.15s;user-select:none;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent);color:#06231f;border-color:var(--accent)}
+  .panel{
+    background:linear-gradient(180deg,var(--panel),var(--panel2));
+    border:1px solid var(--edge);border-radius:16px;padding:16px;margin:14px 0;
+    box-shadow:var(--shadow);
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  h2{font-size:1.02rem;margin:0 0 10px;color:var(--accent)}
+  h3{font-size:.9rem;margin:14px 0 6px;color:var(--accent2)}
+  label{font-size:.82rem;color:var(--muted);display:block;margin:10px 0 4px}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select,button.btn{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--edge);
+    border-radius:10px;padding:9px 11px;font-size:.86rem;width:100%;
+  }
+  button.btn{cursor:pointer;font-weight:600;width:auto}
+  button.btn:hover{border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  .chip{
+    background:var(--panel2);border:1px solid var(--edge);color:var(--muted);
+    padding:7px 12px;border-radius:999px;cursor:pointer;font-size:.8rem;font-weight:600;
+  }
+  .chip.active{background:var(--accent2);color:#3a2a05;border-color:var(--accent2)}
+  canvas{display:block;width:100%;height:auto;background:#0d1524;border-radius:12px;border:1px solid var(--edge)}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .rd{background:var(--panel2);border:1px solid var(--edge);border-radius:10px;padding:8px 10px}
+  .rd b{display:block;font-size:1.02rem;color:var(--ink)}
+  .rd span{font-size:.72rem;color:var(--muted)}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.76rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .formula{background:#0d1524;border:1px solid var(--edge);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:.86rem}
+  .formula b{color:var(--accent)}
+  .mut{color:var(--muted);font-size:.8rem}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:6px}
+  th,td{border:1px solid var(--edge);padding:6px 8px;text-align:left}
+  th{color:var(--accent2);font-weight:600}
+  .q{margin:14px 0;padding:12px;background:var(--panel2);border:1px solid var(--edge);border-radius:12px}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.9rem}
+  .opt{display:block;width:100%;text-align:left;background:#0d1524;border:1px solid var(--edge);
+    color:var(--ink);border-radius:9px;padding:9px 11px;margin:6px 0;cursor:pointer;font-size:.84rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#123324;border-color:var(--good);color:#c9f5da}
+  .opt.wrong{background:#331717;border-color:var(--danger);color:#f6c6c6}
+  .expl{display:none;margin-top:8px;font-size:.82rem;color:var(--muted);border-left:3px solid var(--accent);padding-left:10px}
+  .expl.show{display:block}
+  .hidden{display:none}
+  footer{text-align:center;color:var(--muted);font-size:.75rem;margin-top:18px}
+  .radios{display:flex;gap:8px;flex-wrap:wrap}
+  .radios .chip{flex:1;text-align:center;min-width:90px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Elasticity Lab</h1>
+  <p class="sub">NIOS Class 12 Physics · Ch 6 — Elastic Properties of Solids</p>
+</header>
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-mode="graph">Stress–Strain Grapher</div>
+    <div class="tab" data-mode="compare">Material Comparison</div>
+    <div class="tab" data-mode="stress">Types of Stress</div>
+    <div class="tab" data-mode="quiz">Quiz</div>
+  </div>
+
+  <!-- ================= MODE 1: GRAPHER ================= -->
+  <section id="mode-graph">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Load the wire</h2>
+        <label>Material</label>
+        <select id="g-mat"></select>
+        <label>Applied load F: <span id="g-fval"></span></label>
+        <input type="range" id="g-force" min="0" max="100" value="0" step="0.5">
+        <div class="mut" id="g-region">Region: unloaded</div>
+        <canvas id="g-wire" width="520" height="150"></canvas>
+        <div class="readout">
+          <div class="rd"><b id="g-stress">0</b><span>Stress σ = F/A (MPa)</span></div>
+          <div class="rd"><b id="g-strain">0</b><span>Strain ε = ΔL/L</span></div>
+          <div class="rd"><b id="g-Y">0</b><span>Young's modulus Y (GPa)</span></div>
+          <div class="rd"><b id="g-ext">0</b><span>Extension ΔL (mm)</span></div>
+        </div>
+        <p class="mut" id="g-note">Wire: L = 2.0 m, A = 1.0 mm². Increase the load and watch the stress–strain curve trace out.</p>
+      </div>
+      <div class="panel">
+        <h2>Stress–Strain Curve</h2>
+        <canvas id="g-graph" width="520" height="380"></canvas>
+        <div class="legend">
+          <span><i style="background:#4fd1c5"></i>Loading path</span>
+          <span><i style="background:#68d391"></i>Proportional limit</span>
+          <span><i style="background:#f6ad55"></i>Elastic limit</span>
+          <span><i style="background:#63b3ed"></i>Yield point</span>
+          <span><i style="background:#f56565"></i>Fracture</span>
+        </div>
+        <p class="mut">In the straight (Hooke's law) region <b>σ = Y·ε</b>. Slope of that line = Young's modulus Y.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 2: COMPARE ================= -->
+  <section id="mode-compare" class="hidden">
+    <div class="panel">
+      <h2>Compare materials</h2>
+      <p class="mut">Toggle materials to overlay their stress–strain curves. A steeper line = stiffer (higher Y). A short curve = brittle; a long flat tail = ductile.</p>
+      <div class="chips" id="c-chips"></div>
+      <canvas id="c-graph" width="960" height="440"></canvas>
+      <div style="overflow-x:auto">
+        <table id="c-table">
+          <thead><tr><th>Material</th><th>Young's modulus Y</th><th>Behaviour</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 3: STRESS TYPES ================= -->
+  <section id="mode-stress" class="hidden">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Type of stress</h2>
+        <div class="radios" id="s-radios">
+          <div class="chip active" data-t="tensile">Tensile</div>
+          <div class="chip" data-t="compressive">Compressive</div>
+          <div class="chip" data-t="shear">Shear</div>
+        </div>
+        <label>Applied force / deformation: <span id="s-fval">0%</span></label>
+        <input type="range" id="s-force" min="0" max="100" value="35">
+        <canvas id="s-block" width="520" height="300"></canvas>
+      </div>
+      <div class="panel">
+        <h2 id="s-title">Tensile stress</h2>
+        <p class="mut" id="s-desc"></p>
+        <div class="formula" id="s-mod"></div>
+        <div class="readout">
+          <div class="rd"><b id="s-stress">0</b><span id="s-stresslbl">Stress (MPa)</span></div>
+          <div class="rd"><b id="s-strain">0</b><span id="s-strainlbl">Strain</span></div>
+        </div>
+        <h3>Three elastic moduli</h3>
+        <div class="formula"><b>Young's modulus Y</b> = longitudinal stress / longitudinal strain = (F/A)/(ΔL/L)</div>
+        <div class="formula"><b>Bulk modulus K</b> = volume stress / volume strain = −ΔP / (ΔV/V)</div>
+        <div class="formula"><b>Shear modulus η</b> = shear stress / shear strain = (F/A) / (Δx/L) = (F/A)/θ</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FORMULAS (always available under graph/stress) ================= -->
+  <section id="formulas" class="panel">
+    <h2>Key formulas & definitions</h2>
+    <div class="grid2">
+      <div>
+        <div class="formula"><b>Stress</b> σ = F / A  &nbsp;(N/m² = Pa)</div>
+        <div class="formula"><b>Strain</b> ε = ΔL / L  &nbsp;(dimensionless)</div>
+        <div class="formula"><b>Hooke's law</b>: within elastic limit, stress ∝ strain</div>
+        <div class="formula"><b>Young's modulus</b> Y = σ / ε = (F·L)/(A·ΔL)</div>
+      </div>
+      <div>
+        <div class="formula"><b>Bulk modulus</b> K = −P / (ΔV/V)</div>
+        <div class="formula"><b>Shear (rigidity) modulus</b> η = (F/A) / θ</div>
+        <div class="formula"><b>Poisson's ratio</b> ν = (lateral strain)/(longitudinal strain) = −(Δd/d)/(ΔL/L)</div>
+        <div class="formula"><b>Elastic P.E. / volume</b> u = ½ · σ · ε = ½ Y ε²</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 4: QUIZ ================= -->
+  <section id="mode-quiz" class="hidden">
+    <div class="panel">
+      <h2>Quick check — 3 questions</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Elasticity Lab · self-contained interactive · units in SI. Curves are schematic teaching models.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- Material data (physically realistic) ----------
+   Y in GPa. Curves are schematic: proportional limit, elastic limit,
+   yield, and fracture defined as strain fractions & relative stress. */
+const MAT = {
+  steel:  {name:"Steel",  Y:200, color:"#63b3ed",
+           propStrain:0.0010, elasStrain:0.0012, yieldStrain:0.0018, fracStrain:0.010,
+           behaviour:"Very stiff, strong, ductile (long plastic tail before fracture)."},
+  copper: {name:"Copper", Y:110, color:"#f6ad55",
+           propStrain:0.0007, elasStrain:0.0009, yieldStrain:0.0014, fracStrain:0.035,
+           behaviour:"Moderately stiff, highly ductile (drawn into wires)."},
+  glass:  {name:"Glass",  Y:70,  color:"#b794f4",
+           propStrain:0.0009, elasStrain:0.0010, yieldStrain:0.0010, fracStrain:0.0011,
+           behaviour:"Brittle: snaps at the elastic limit with almost no plastic region."},
+  rubber: {name:"Rubber", Y:0.05, color:"#68d391",
+           propStrain:0.5, elasStrain:2.5, yieldStrain:3.0, fracStrain:5.0,
+           behaviour:"Very low Y, huge elastic strain, non-linear (elastomer)."}
+};
+/* Wire geometry for grapher */
+const WIRE = {L:2.0 /*m*/, A:1.0e-6 /*m^2 = 1 mm^2*/};
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+/* Build a schematic stress(strain) curve for a material.
+   Returns {maxStrain, stressAt(strain)} using Y in the elastic region
+   then a rolling-over plastic region up to fracture. */
+function curveModel(m){
+  const Ypa = m.Y*1e9;
+  const sigProp = Ypa*m.propStrain;          // stress at proportional limit
+  const sigElas = sigProp*1.03;              // slightly above prop
+  const sigYield= sigElas*1.02;
+  // ultimate stress a bit above yield (work hardening), then fracture
+  const sigFrac = sigYield*(m.fracStrain>m.yieldStrain? (m.name==="Rubber"?4.0:1.25):1.0);
+  return {
+    sigProp,sigElas,sigYield,sigFrac,
+    stressAt(e){
+      if(e<=m.propStrain) return Ypa*e;                    // linear Hooke region
+      if(e<=m.elasStrain){ // slight curve to elastic limit
+        const t=(e-m.propStrain)/(m.elasStrain-m.propStrain);
+        return sigProp+(sigElas-sigProp)*t;
+      }
+      if(e<=m.yieldStrain){
+        const t=(e-m.elasStrain)/Math.max(1e-12,(m.yieldStrain-m.elasStrain));
+        return sigElas+(sigYield-sigElas)*t;
+      }
+      if(e<=m.fracStrain){
+        const t=(e-m.yieldStrain)/Math.max(1e-12,(m.fracStrain-m.yieldStrain));
+        // rise then can drop slightly near fracture for ductile metals
+        if(m.name==="Rubber"){ // upward-curving elastomer
+          return sigYield+(sigFrac-sigYield)*(t*t);
+        }
+        const peak=sigYield+(sigFrac-sigYield)*Math.sin(t*Math.PI*0.5);
+        return peak;
+      }
+      return null; // fractured
+    }
+  };
+}
+
+/* ================= MODE 1: GRAPHER ================= */
+let gMat="steel";
+const gForceEl=$("g-force");
+(function initG(){
+  const sel=$("g-mat");
+  for(const k in MAT){const o=document.createElement("option");o.value=k;o.textContent=MAT[k].name;sel.appendChild(o);}
+  sel.value="steel";
+  sel.onchange=()=>{gMat=sel.value; setForceRange(); drawG();};
+  gForceEl.oninput=drawG;
+  setForceRange();
+})();
+function setForceRange(){
+  // choose a max force so that fracture is reachable ~ at slider 100
+  const m=MAT[gMat];
+  const cm=curveModel(m);
+  const maxStress=cm.stressAt(Math.min(m.fracStrain, m.fracStrain*0.999))||cm.sigFrac;
+  const maxForce=maxStress*WIRE.A*1.02; // N
+  gForceEl.dataset.max=maxForce;
+  gForceEl.value=0;
+}
+function drawG(){
+  const m=MAT[gMat], cm=curveModel(m);
+  const maxForce=parseFloat(gForceEl.dataset.max);
+  const F=(gForceEl.value/100)*maxForce; // N
+  const stress=F/WIRE.A;                  // Pa
+  // invert: find strain producing this stress (numeric on monotone-ish curve)
+  let strain=0, fractured=false;
+  {
+    // stress in elastic linear region -> direct; else search
+    let lo=0, hi=m.fracStrain, best=0;
+    for(let i=0;i<40;i++){
+      const mid=(lo+hi)/2;
+      const s=cm.stressAt(mid);
+      if(s===null){hi=mid;continue;}
+      if(s<stress){best=mid;lo=mid;} else hi=mid;
+    }
+    strain=best;
+    const sMax=cm.stressAt(m.fracStrain*0.999);
+    if(stress>=(sMax||cm.sigFrac)*0.999) fractured=true;
+  }
+  const ext=strain*WIRE.L; // m
+  const Yeff = strain>0 ? (Math.min(stress,cm.sigProp)/Math.min(strain,m.propStrain)) : m.Y*1e9;
+
+  $("g-fval").textContent=F.toFixed(1)+" N";
+  $("g-stress").textContent=(stress/1e6).toFixed(stress/1e6<10?2:1)+" MPa";
+  $("g-strain").textContent=strain.toExponential(2);
+  $("g-Y").textContent=(m.Y).toFixed(m.Y<1?3:0)+" GPa";
+  $("g-ext").textContent=(ext*1000).toFixed(3)+" mm";
+
+  // region label
+  let reg="Elastic (Hooke's law): σ = Y·ε";
+  if(strain>m.propStrain) reg="Beyond proportional limit — curve bends";
+  if(strain>m.elasStrain) reg="Beyond elastic limit — permanent set begins";
+  if(strain>m.yieldStrain) reg="Plastic / yielding region";
+  if(fractured) reg="⚠ FRACTURED — wire has broken!";
+  $("g-region").textContent="Region: "+reg;
+
+  drawWire(strain,m,fractured);
+  drawGraph(cm,m,strain,fractured);
+}
+function drawWire(strain,m,fractured){
+  const cv=$("g-wire"),ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const x0=40,y=H/2, baseLen=W-160;
+  // visual stretch exaggerated for clarity (log-ish)
+  const visStretch=clamp(strain/m.fracStrain,0,1)*90;
+  const len=baseLen+visStretch;
+  // clamp
+  ctx.fillStyle="#2b3b56";ctx.fillRect(x0-14,y-40,14,80);
+  if(!fractured){
+    const grad=ctx.createLinearGradient(0,y-8,0,y+8);
+    grad.addColorStop(0,"#5fe0d4");grad.addColorStop(1,"#2f9c92");
+    ctx.fillStyle=grad;
+    const th=clamp(9-strain/m.fracStrain*4,4,9); // necking (thins)
+    ctx.fillRect(x0,y-th/2,len,th);
+    // hanging weight
+    ctx.fillStyle="#f6ad55";
+    ctx.fillRect(x0+len,y-18,26,36);
+    ctx.fillStyle="#3a2a05";ctx.font="11px system-ui";ctx.textAlign="center";
+    ctx.fillText("F",x0+len+13,y+4);
+  }else{
+    // broken: two pieces
+    ctx.fillStyle="#f56565";
+    ctx.fillRect(x0,y-4,len*0.55,8);
+    ctx.fillRect(x0+len*0.62,y-4,len*0.38,8);
+    ctx.fillStyle="#f56565";ctx.font="12px system-ui";ctx.textAlign="center";
+    ctx.fillText("snap!",x0+len*0.58,y-14);
+  }
+  ctx.fillStyle="#93a4be";ctx.font="11px system-ui";ctx.textAlign="left";
+  ctx.fillText("fixed support",2,y-46);
+}
+function drawGraph(cm,m,curStrain,fractured){
+  const cv=$("g-graph"),ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const pad=46;
+  const maxE=m.fracStrain, maxS=(cm.stressAt(m.fracStrain*0.999)||cm.sigFrac)*1.08;
+  const X=e=>pad+(e/maxE)*(W-pad-16);
+  const Ypx=s=>H-pad-(s/maxS)*(H-pad-16);
+  // axes
+  ctx.strokeStyle="#3a4d6e";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,16);ctx.lineTo(pad,H-pad);ctx.lineTo(W-16,H-pad);ctx.stroke();
+  ctx.fillStyle="#93a4be";ctx.font="12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Strain  ε  →",(W+pad)/2,H-14);
+  ctx.save();ctx.translate(16,(H-pad)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("Stress  σ (Pa)  →",0,0);ctx.restore();
+  // gridlines
+  ctx.strokeStyle="rgba(58,77,110,.35)";
+  for(let i=1;i<=4;i++){const gx=pad+(i/4)*(W-pad-16);ctx.beginPath();ctx.moveTo(gx,16);ctx.lineTo(gx,H-pad);ctx.stroke();
+    const gy=16+(i/4)*(H-pad-16);ctx.beginPath();ctx.moveTo(pad,gy);ctx.lineTo(W-16,gy);ctx.stroke();}
+  // full curve (faint)
+  ctx.strokeStyle="rgba(79,209,197,.30)";ctx.lineWidth=2;ctx.beginPath();
+  let started=false;
+  for(let e=0;e<=maxE;e+=maxE/300){const s=cm.stressAt(e);if(s===null)break;
+    const px=X(e),py=Ypx(s);if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // loading path up to current strain (bright)
+  ctx.strokeStyle="#4fd1c5";ctx.lineWidth=3;ctx.beginPath();started=false;
+  for(let e=0;e<=curStrain;e+=Math.max(maxE/400,curStrain/400)){const s=cm.stressAt(e);if(s===null)break;
+    const px=X(e),py=Ypx(s);if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);}
+  ctx.stroke();
+  // dashed Hooke line σ=Yε
+  ctx.strokeStyle="rgba(255,255,255,.25)";ctx.setLineDash([5,4]);ctx.lineWidth=1.4;ctx.beginPath();
+  ctx.moveTo(X(0),Ypx(0));
+  const eLine=Math.min(m.propStrain*1.6,maxE);
+  ctx.lineTo(X(eLine),Ypx(m.Y*1e9*eLine));ctx.stroke();ctx.setLineDash([]);
+  // markers
+  function mark(e,color,label){const s=cm.stressAt(e);if(s===null)return;
+    const px=X(e),py=Ypx(s);
+    ctx.fillStyle=color;ctx.beginPath();ctx.arc(px,py,5,0,7);ctx.fill();
+    ctx.fillStyle=color;ctx.font="10px system-ui";ctx.textAlign="left";
+    ctx.fillText(label,Math.min(px+7,W-70),Math.max(py-6,20));}
+  mark(m.propStrain,"#68d391","Prop. limit");
+  mark(m.elasStrain,"#f6ad55","Elastic limit");
+  mark(m.yieldStrain,"#63b3ed","Yield");
+  mark(m.fracStrain*0.999,"#f56565","Fracture");
+  // current point
+  const cs=cm.stressAt(curStrain);
+  if(cs!==null && !fractured){
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(X(curStrain),Ypx(cs),6,0,7);ctx.fill();
+    ctx.strokeStyle="#4fd1c5";ctx.lineWidth=2;ctx.stroke();
+  }
+}
+
+/* ================= MODE 2: COMPARE ================= */
+const cActive={steel:true,copper:true,glass:false,rubber:false};
+(function initC(){
+  const box=$("c-chips");
+  for(const k in MAT){
+    const c=document.createElement("div");
+    c.className="chip"+(cActive[k]?" active":"");
+    c.textContent=MAT[k].name; c.style.setProperty("--x",0);
+    c.onclick=()=>{cActive[k]=!cActive[k];c.classList.toggle("active");drawCompare();buildCTable();};
+    box.appendChild(c);
+  }
+  buildCTable();
+})();
+function buildCTable(){
+  const tb=$("c-table").querySelector("tbody");tb.innerHTML="";
+  for(const k in MAT){const m=MAT[k];
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td style="color:${m.color};font-weight:600">${m.name}</td>
+      <td>${m.Y<1?m.Y.toFixed(3):m.Y} GPa</td><td>${m.behaviour}</td>`;
+    if(!cActive[k]) tr.style.opacity=.4;
+    tb.appendChild(tr);}
+}
+function drawCompare(){
+  const cv=$("c-graph"),ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height,pad=52;
+  ctx.clearRect(0,0,W,H);
+  // Use a common NORMALISED plot: strain/fracStrain on x (0..1), stress/maxStress on y,
+  // but overlay real linear-region slopes annotated with Y so stiffness is visible.
+  // To compare stiffness fairly we plot σ vs ε on shared axes with log-friendly scaling:
+  // choose x-range = 0..0.012 (metals/glass) — rubber shown normalised separately note.
+  ctx.strokeStyle="#3a4d6e";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,16);ctx.lineTo(pad,H-pad);ctx.lineTo(W-16,H-pad);ctx.stroke();
+  ctx.fillStyle="#93a4be";ctx.font="12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Strain ε  (normalised to each material's fracture strain)  →",(W)/2,H-16);
+  ctx.save();ctx.translate(18,(H-pad)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText("Stress σ (normalised)  →",0,0);ctx.restore();
+  for(let i=1;i<=4;i++){const gx=pad+(i/4)*(W-pad-16);ctx.strokeStyle="rgba(58,77,110,.3)";
+    ctx.beginPath();ctx.moveTo(gx,16);ctx.lineTo(gx,H-pad);ctx.stroke();
+    const gy=16+(i/4)*(H-pad-16);ctx.beginPath();ctx.moveTo(pad,gy);ctx.lineTo(W-16,gy);ctx.stroke();}
+  const X=t=>pad+t*(W-pad-16);
+  const Ypx=t=>H-pad-t*(H-pad-16);
+  for(const k in MAT){ if(!cActive[k]) continue;
+    const m=MAT[k],cm=curveModel(m);
+    const sMax=cm.stressAt(m.fracStrain*0.999)||cm.sigFrac;
+    ctx.strokeStyle=m.color;ctx.lineWidth=3;ctx.beginPath();let st=false;
+    for(let e=0;e<=m.fracStrain;e+=m.fracStrain/300){const s=cm.stressAt(e);if(s===null)break;
+      const px=X(e/m.fracStrain),py=Ypx(s/sMax);if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}
+    ctx.stroke();
+    // fracture dot
+    const px=X(1),py=Ypx(1);ctx.fillStyle=m.color;ctx.beginPath();ctx.arc(px,py,4,0,7);ctx.fill();
+    // label near start
+    ctx.fillStyle=m.color;ctx.font="12px system-ui";ctx.textAlign="left";
+    ctx.fillText(m.name+"  (Y="+(m.Y<1?m.Y.toFixed(2):m.Y)+" GPa)",X(0.02),Ypx(0.9)+ [ ...Object.keys(MAT)].indexOf(k)*15);
+  }
+  ctx.fillStyle="#93a4be";ctx.font="11px system-ui";ctx.textAlign="right";
+  ctx.fillText("steeper initial rise = stiffer · longer tail = more ductile",W-18,26);
+}
+
+/* ================= MODE 3: STRESS TYPES ================= */
+let sType="tensile";
+const sTypes={
+  tensile:{title:"Tensile stress",
+    desc:"Two equal and opposite forces pull the block outward along its length. It elongates (ΔL>0). The relevant elastic constant is Young's modulus Y.",
+    mod:"<b>Young's modulus  Y = (F/A) / (ΔL/L)</b>",
+    stresslbl:"Tensile stress F/A (MPa)",strainlbl:"Longitudinal strain ΔL/L"},
+  compressive:{title:"Compressive stress",
+    desc:"Two equal and opposite forces push the block inward along its length. It shortens (ΔL<0). Still governed by Young's modulus Y.",
+    mod:"<b>Young's modulus  Y = (F/A) / (ΔL/L)</b>",
+    stresslbl:"Compressive stress F/A (MPa)",strainlbl:"Longitudinal strain |ΔL/L|"},
+  shear:{title:"Shear (tangential) stress",
+    desc:"A force acts parallel to the top face while the base is fixed. The block skews through angle θ. The relevant constant is the shear (rigidity) modulus η.",
+    mod:"<b>Shear modulus  η = (F/A) / θ</b>  (θ = Δx / L)",
+    stresslbl:"Shear stress F/A (MPa)",strainlbl:"Shear strain θ (rad)"}
+};
+(function initS(){
+  document.querySelectorAll("#s-radios .chip").forEach(c=>{
+    c.onclick=()=>{document.querySelectorAll("#s-radios .chip").forEach(x=>x.classList.remove("active"));
+      c.classList.add("active");sType=c.dataset.t;drawS();};
+  });
+  $("s-force").oninput=drawS;
+})();
+function drawS(){
+  const info=sTypes[sType];
+  $("s-title").textContent=info.title;
+  $("s-desc").textContent=info.desc;
+  $("s-mod").innerHTML=info.mod;
+  $("s-stresslbl").textContent=info.stresslbl;
+  $("s-strainlbl").textContent=info.strainlbl;
+  const p=$("s-force").value/100;
+  $("s-fval").textContent=Math.round(p*100)+"%";
+  // schematic numbers
+  const stressMPa=(p*120).toFixed(1);
+  $("s-stress").textContent=stressMPa;
+  if(sType==="shear"){$("s-strain").textContent=(p*0.35).toFixed(3);}
+  else {$("s-strain").textContent=(p*0.02).toExponential(2);}
+  drawBlock(p);
+}
+function drawBlock(p){
+  const cv=$("s-block"),ctx=cv.getContext("2d");
+  const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2, bw=150,bh=120;
+  // reference outline (dashed)
+  ctx.strokeStyle="rgba(147,164,190,.4)";ctx.setLineDash([5,4]);ctx.lineWidth=1.4;
+  ctx.strokeRect(cx-bw/2,cy-bh/2,bw,bh);ctx.setLineDash([]);
+  ctx.fillStyle="rgba(79,209,197,.22)";ctx.strokeStyle="#4fd1c5";ctx.lineWidth=2.5;
+  ctx.font="13px system-ui";ctx.fillStyle="#93a4be";ctx.textAlign="center";
+
+  if(sType==="tensile"){
+    const dw=bw+p*90;
+    ctx.fillStyle="rgba(79,209,197,.22)";ctx.strokeStyle="#4fd1c5";
+    ctx.beginPath();ctx.rect(cx-dw/2,cy-bh/2,dw,bh);ctx.fill();ctx.stroke();
+    arrow(ctx,cx-dw/2,cy,cx-dw/2-40,cy,"#f6ad55");
+    arrow(ctx,cx+dw/2,cy,cx+dw/2+40,cy,"#f6ad55");
+    ctx.fillStyle="#f6ad55";ctx.fillText("F",cx-dw/2-48,cy+4);ctx.fillText("F",cx+dw/2+48,cy+4);
+    ctx.fillStyle="#93a4be";ctx.fillText("elongates →",cx,cy+bh/2+26);
+  } else if(sType==="compressive"){
+    const dw=bw-p*70;
+    ctx.fillStyle="rgba(246,173,133,.20)";ctx.strokeStyle="#f6ad55";
+    ctx.beginPath();ctx.rect(cx-dw/2,cy-bh/2,dw,bh);ctx.fill();ctx.stroke();
+    arrow(ctx,cx-dw/2-40,cy,cx-dw/2,cy,"#f56565");
+    arrow(ctx,cx+dw/2+40,cy,cx+dw/2,cy,"#f56565");
+    ctx.fillStyle="#f56565";ctx.fillText("F",cx-dw/2-48,cy+4);ctx.fillText("F",cx+dw/2+48,cy+4);
+    ctx.fillStyle="#93a4be";ctx.fillText("shortens",cx,cy+bh/2+26);
+  } else { // shear
+    const dx=p*70;
+    ctx.fillStyle="rgba(99,179,237,.20)";ctx.strokeStyle="#63b3ed";
+    ctx.beginPath();
+    ctx.moveTo(cx-bw/2,cy+bh/2);
+    ctx.lineTo(cx+bw/2,cy+bh/2);
+    ctx.lineTo(cx+bw/2+dx,cy-bh/2);
+    ctx.lineTo(cx-bw/2+dx,cy-bh/2);
+    ctx.closePath();ctx.fill();ctx.stroke();
+    // fixed base hatch
+    ctx.strokeStyle="#2b3b56";ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(cx-bw/2-6,cy+bh/2);ctx.lineTo(cx+bw/2+6,cy+bh/2);ctx.stroke();
+    for(let x=cx-bw/2;x<cx+bw/2;x+=12){ctx.beginPath();ctx.moveTo(x,cy+bh/2);ctx.lineTo(x-8,cy+bh/2+10);ctx.stroke();}
+    arrow(ctx,cx-bw/2+dx,cy-bh/2,cx-bw/2+dx+50,cy-bh/2,"#63b3ed");
+    ctx.fillStyle="#63b3ed";ctx.fillText("F (parallel)",cx+dx,cy-bh/2-12);
+    ctx.fillStyle="#93a4be";ctx.fillText("skew angle θ",cx,cy+bh/2+26);
+  }
+}
+function arrow(ctx,x1,y1,x2,y2,color){
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-10*Math.cos(a-0.4),y2-10*Math.sin(a-0.4));
+  ctx.lineTo(x2-10*Math.cos(a+0.4),y2-10*Math.sin(a+0.4));
+  ctx.closePath();ctx.fill();
+}
+
+/* ================= MODE 4: QUIZ ================= */
+const QUIZ=[
+  {q:"Within the elastic limit, stress is directly proportional to strain. This statement is:",
+   opts:["Newton's second law","Hooke's law","Pascal's law","Bernoulli's principle"],
+   ans:1,
+   ex:"Hooke's law: for small deformations, stress ∝ strain, and the constant of proportionality is the modulus of elasticity (e.g. Young's modulus)."},
+  {q:"A steel wire and a rubber band of identical dimensions are stretched by the same force. Which has the larger Young's modulus and stretches less?",
+   opts:["Rubber, because it is elastic","Steel, because Y is much higher (~200 GPa vs ~0.05 GPa)","Both stretch equally","Depends only on colour"],
+   ans:1,
+   ex:"Young's modulus Y = stress/strain. A larger Y means less strain for the same stress. Steel's Y (~200 GPa) is thousands of times larger than rubber's, so it stretches far less."},
+  {q:"The elastic modulus that governs a change in VOLUME under uniform pressure is:",
+   opts:["Young's modulus Y","Shear modulus η","Bulk modulus K","Poisson's ratio ν"],
+   ans:2,
+   ex:"Bulk modulus K = −P/(ΔV/V) relates volumetric stress (pressure) to volumetric strain. Y governs length change and η governs shape change (shear)."}
+];
+(function initQuiz(){
+  const box=$("quiz");
+  QUIZ.forEach((item,qi)=>{
+    const d=document.createElement("div");d.className="q";
+    const p=document.createElement("p");p.textContent=(qi+1)+". "+item.q;d.appendChild(p);
+    item.opts.forEach((op,oi)=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=op;
+      b.onclick=()=>{
+        if(d.dataset.done) return;
+        d.dataset.done="1";
+        const btns=d.querySelectorAll(".opt");
+        btns[item.ans].classList.add("correct");
+        if(oi!==item.ans) b.classList.add("wrong");
+        d.querySelector(".expl").classList.add("show");
+      };
+      d.appendChild(b);
+    });
+    const e=document.createElement("div");e.className="expl";
+    e.innerHTML="<b>"+(item.opts[item.ans])+"</b> — "+item.ex;
+    d.appendChild(e);
+    box.appendChild(d);
+  });
+})();
+
+/* ================= TAB SWITCHING ================= */
+const sections={graph:"mode-graph",compare:"mode-compare",stress:"mode-stress",quiz:"mode-quiz"};
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const mode=t.dataset.mode;
+    for(const k in sections) $(sections[k]).classList.toggle("hidden",k!==mode);
+    // formulas panel: show for graph & stress
+    $("formulas").classList.toggle("hidden",!(mode==="graph"||mode==="stress"));
+    if(mode==="graph") drawG();
+    if(mode==="compare") drawCompare();
+    if(mode==="stress") drawS();
+  };
+});
+
+/* ================= ANIMATION (gentle idle pulse on current point) ================= */
+let raf=null;
+function loop(){
+  raf=requestAnimationFrame(loop);
+}
+// We redraw on interaction; also keep a light rAF to respect pause-on-hidden.
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){ if(raf){cancelAnimationFrame(raf);raf=null;} }
+  else { if(!raf) loop(); }
+});
+
+/* ---------- init render ---------- */
+drawG();
+drawCompare();
+drawS();
+loop();
+</script>
+</body>
+</html>

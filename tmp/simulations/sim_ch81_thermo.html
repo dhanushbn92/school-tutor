@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermodynamics Lab — NIOS Class 12 Physics, Ch 9</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --panel:#19203010;
+    --panel1:#1a2130;
+    --panel2:#232c40;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.15);
+    --hot:#ff7a59;
+    --cold:#5aa9ff;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel1);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel1);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px;color:var(--muted)}
+  .hidden{display:none}
+
+  .grid2{display:flex;flex-wrap:wrap;gap:16px}
+  .grid2 > div{flex:1 1 300px;min-width:0}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .seg button{flex:1 1 44%;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1420;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1420}
+
+  .btn{min-height:46px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);
+    border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;padding:0 18px;touch-action:manipulation}
+  .btn.ghost{border-color:var(--line);background:var(--panel2);color:var(--muted)}
+  .btn:active{transform:scale(.98)}
+  .btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 110px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.12rem;font-weight:700;margin-top:2px}
+  .stat.q .v{color:var(--hot)}
+  .stat.w .v{color:var(--accent)}
+  .stat.u .v{color:var(--good)}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:6px}
+  .formula code{font-family:"Cascadia Code",Consolas,monospace;color:var(--accent);font-size:1rem}
+  .formula p{font-size:.85rem;color:var(--muted);margin-top:4px}
+
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+
+  .quiz-q{font-size:1rem;font-weight:600;margin:6px 0 12px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:.94rem;cursor:pointer;
+    touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14)}
+  .explain{font-size:.86rem;color:var(--muted);border-left:3px solid var(--accent);
+    padding:8px 12px;margin:4px 0 16px;background:var(--panel2);border-radius:0 10px 10px 0;display:none}
+  .explain.show{display:block}
+  .score{font-weight:700;color:var(--accent);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Thermodynamics <span>Lab</span></h1>
+    <p>NIOS Class 12 Physics · Chapter 9 — First Law, P–V Processes &amp; Heat Engines</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="pv">P–V Explorer</button>
+    <button class="tab-btn" data-mode="engine">Heat Engine</button>
+    <button class="tab-btn" data-mode="firstlaw">First-Law Playground</button>
+    <button class="tab-btn" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: P-V EXPLORER ============ -->
+  <section id="mode-pv">
+    <div class="panel">
+      <h2>P–V Process Explorer</h2>
+      <div class="seg" id="procSeg">
+        <button data-p="iso" class="on">Isothermal</button>
+        <button data-p="adia">Adiabatic</button>
+        <button data-p="isob">Isobaric</button>
+        <button data-p="isoc">Isochoric</button>
+      </div>
+      <div class="grid2">
+        <div>
+          <h3>Gas in cylinder</h3>
+          <canvas id="cyl" width="360" height="300"></canvas>
+        </div>
+        <div>
+          <h3>P–V diagram (path traced live)</h3>
+          <canvas id="pv" width="360" height="300"></canvas>
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="pvPlay">▶ Run process</button>
+        <button class="btn ghost" id="pvReset">Reset</button>
+      </div>
+      <div class="readout">
+        <div class="stat w"><div class="k">Work by gas W</div><div class="v" id="pvW">0 J</div></div>
+        <div class="stat q"><div class="k">Heat added Q</div><div class="v" id="pvQ">0 J</div></div>
+        <div class="stat u"><div class="k">ΔU</div><div class="v" id="pvU">0 J</div></div>
+        <div class="stat"><div class="k">Temp T</div><div class="v" id="pvT">300 K</div></div>
+      </div>
+      <p class="note" id="pvNote">Isothermal: T constant, so ΔU = 0 and Q = W. Area under the P–V curve = work done by the gas.</p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: HEAT ENGINE ============ -->
+  <section id="mode-engine" class="hidden">
+    <div class="panel">
+      <h2>Carnot Heat Engine</h2>
+      <div class="grid2">
+        <div>
+          <canvas id="eng" width="360" height="320"></canvas>
+        </div>
+        <div>
+          <div class="controls" style="flex-direction:column;align-items:stretch">
+            <div class="ctrl">
+              <label>Hot reservoir T<sub>H</sub> = <output id="thOut">600 K</output></label>
+              <input type="range" id="th" min="350" max="900" step="10" value="600">
+            </div>
+            <div class="ctrl">
+              <label>Cold reservoir T<sub>C</sub> = <output id="tcOut">300 K</output></label>
+              <input type="range" id="tc" min="200" max="500" step="10" value="300">
+            </div>
+            <div class="ctrl">
+              <label>Heat drawn per cycle Q<sub>H</sub> = <output id="qhOut">1000 J</output></label>
+              <input type="range" id="qh" min="200" max="2000" step="50" value="1000">
+            </div>
+          </div>
+          <div class="readout">
+            <div class="stat"><div class="k">Efficiency η</div><div class="v" id="effOut">50 %</div></div>
+            <div class="stat w"><div class="k">Work W</div><div class="v" id="engW">500 J</div></div>
+            <div class="stat"><div class="k">Q<sub>C</sub> rejected</div><div class="v" id="engQc">500 J</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="note">Carnot efficiency is the maximum for the given reservoirs. Raising T<sub>H</sub> or lowering T<sub>C</sub> increases η; η = 1 only if T<sub>C</sub> = 0 K (impossible).</p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: FIRST LAW PLAYGROUND ============ -->
+  <section id="mode-firstlaw" class="hidden">
+    <div class="panel">
+      <h2>First-Law Playground</h2>
+      <p class="note" style="margin-top:0">Fixed amount of monatomic ideal gas (n = 1 mol). Add heat or let the gas do work, and watch internal energy U and temperature T respond via ΔU = Q − W.</p>
+      <div class="grid2">
+        <div>
+          <canvas id="fl" width="360" height="260"></canvas>
+        </div>
+        <div>
+          <div class="btnrow">
+            <button class="btn" data-q="200">+200 J heat Q</button>
+            <button class="btn ghost" data-q="-200">−200 J heat</button>
+          </div>
+          <div class="btnrow">
+            <button class="btn" data-w="200">Gas does +200 J work</button>
+            <button class="btn ghost" data-w="-200">Work done on gas 200 J</button>
+          </div>
+          <div class="btnrow">
+            <button class="btn ghost" id="flReset">Reset</button>
+          </div>
+          <div class="readout">
+            <div class="stat u"><div class="k">Internal energy U</div><div class="v" id="flU">3741 J</div></div>
+            <div class="stat"><div class="k">Temperature T</div><div class="v" id="flT">300 K</div></div>
+            <div class="stat q"><div class="k">Q total</div><div class="v" id="flQ">0 J</div></div>
+            <div class="stat w"><div class="k">W total</div><div class="v" id="flW">0 J</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORMULAS (shared) ============ -->
+  <section id="formulas">
+    <div class="panel">
+      <h2>Key formulas</h2>
+      <div class="formula"><code>ΔU = Q − W</code><p>First law. W = work done <b>by</b> the gas; Q = heat added <b>to</b> the gas.</p></div>
+      <div class="formula"><code>W = ∫ P dV</code><p>Work done by the gas = area under the process curve on a P–V diagram.</p></div>
+      <div class="formula"><code>η = 1 − T<sub>C</sub> / T<sub>H</sub></code><p>Carnot (maximum) efficiency of a heat engine, temperatures in kelvin.</p></div>
+      <div class="formula"><code>U = (3/2) n R T</code><p>Internal energy of a monatomic ideal gas (R = 8.314 J·mol⁻¹·K⁻¹).</p></div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 4: QUIZ ============ -->
+  <section id="mode-quiz" class="hidden">
+    <div class="panel">
+      <h2>Quick check — 3 questions</h2>
+      <div id="quizHost"></div>
+      <div class="score" id="quizScore"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- constants ---------- */
+var R = 8.314, N = 1, GAMMA = 5/3;       // 1 mol monatomic ideal gas
+var CV = 1.5 * R, CP = 2.5 * R;
+
+/* ---------- mode switching ---------- */
+var mode = "pv";
+var tabs = document.querySelectorAll(".tab-btn");
+function setMode(m){
+  mode = m;
+  tabs.forEach(function(t){ t.classList.toggle("active", t.dataset.mode===m); });
+  ["pv","engine","firstlaw","quiz"].forEach(function(id){
+    document.getElementById("mode-"+id).classList.toggle("hidden", id!==m);
+  });
+}
+tabs.forEach(function(t){ t.addEventListener("click", function(){ setMode(t.dataset.mode); }); });
+
+/* ================================================================
+   MODE 1 — P–V EXPLORER
+   ================================================================ */
+var proc = "iso";
+// state 1 (start). Choose V1, T1, and derive P1 from ideal gas law.
+var V1 = 2.0e-2;        // m^3 (20 L)
+var T1 = 300;           // K
+var P1 = N*R*T1/V1;     // Pa
+// target volume ratio for the animated stroke
+var Vratio = 2.0;       // final V / initial V  (expansion)
+
+var procMeta = {
+  iso : {name:"Isothermal", note:"Isothermal (T constant): ΔU = 0, so Q = W. Path is a hyperbola PV = const."},
+  adia: {name:"Adiabatic",  note:"Adiabatic (Q = 0): all work comes from internal energy, so ΔU = −W. Path is steeper: PVᵞ = const."},
+  isob: {name:"Isobaric",   note:"Isobaric (P constant): W = P·ΔV (a rectangle). Q = nCpΔT, ΔU = nCvΔT."},
+  isoc: {name:"Isochoric",  note:"Isochoric (V constant): no volume change, W = 0, so Q = ΔU = nCvΔT."}
+};
+
+var cyl = document.getElementById("cyl"), cylX = cyl.getContext("2d");
+var pv  = document.getElementById("pv"),  pvX  = pv.getContext("2d");
+
+// Given a fraction f in [0,1] of the stroke, return {V,P,T}
+function stateAt(f){
+  var V, P, T;
+  if(proc==="isoc"){
+    // volume fixed; instead vary pressure from P1 up to 2*P1 (heating at const V)
+    V = V1;
+    P = P1*(1 + f);           // P1 -> 2 P1
+    T = P*V/(N*R);
+  } else {
+    var Vf = V1 * (1 + (Vratio-1)*f);   // V1 -> V1*Vratio
+    V = Vf;
+    if(proc==="iso"){ P = N*R*T1/V; T = T1; }
+    else if(proc==="adia"){ P = P1*Math.pow(V1/V, GAMMA); T = P*V/(N*R); }
+    else /*isob*/{ P = P1; T = P*V/(N*R); }
+  }
+  return {V:V, P:P, T:T};
+}
+
+// analytic totals at full stroke
+function totals(){
+  var s2 = stateAt(1), W, dU, Q;
+  var T2 = s2.T;
+  if(proc==="iso"){
+    W = N*R*T1*Math.log(s2.V/V1); dU = 0; Q = W;
+  } else if(proc==="adia"){
+    W = (P1*V1 - s2.P*s2.V)/(GAMMA-1); dU = -W; Q = 0;
+  } else if(proc==="isob"){
+    W = P1*(s2.V - V1); dU = N*CV*(T2-T1); Q = N*CP*(T2-T1);
+  } else { /*isoc*/
+    W = 0; dU = N*CV*(T2-T1); Q = dU;
+  }
+  return {W:W, dU:dU, Q:Q, T2:T2};
+}
+
+// P-V drawing bounds
+function pvBounds(){
+  var maxV = V1*Vratio*1.08, maxP = P1*2.15;
+  return {maxV:maxV, maxP:maxP};
+}
+
+function drawCyl(f){
+  var w=cyl.width, h=cyl.height, g=cylX;
+  g.clearRect(0,0,w,h);
+  // cylinder body
+  var left=70, top=30, right=w-40, bot=h-40;
+  var s = stateAt(f);
+  // piston position maps to current volume between left..right
+  var b = pvBounds();
+  var frac;
+  if(proc==="isoc"){ frac = (V1)/(b.maxV); }
+  else { frac = s.V/b.maxV; }
+  var pistonX = left + frac*(right-left);
+  if(pistonX>right-10) pistonX=right-10;
+  // gas region color intensity from temperature
+  var tnorm = Math.max(0,Math.min(1,(s.T-200)/500));
+  var rC = Math.round(90+tnorm*150), bC=Math.round(220-tnorm*120);
+  g.fillStyle = "rgba("+rC+",120,"+bC+",0.35)";
+  g.fillRect(left, top, pistonX-left, bot-top);
+  // gas particles
+  g.fillStyle = "rgba("+rC+",150,"+bC+",0.9)";
+  var np=26;
+  for(var i=0;i<np;i++){
+    var px = left+6 + ((i*97+ (f*230))%(pistonX-left-12));
+    var py = top+6 + ((i*53+ (f*140))%(bot-top-12));
+    g.beginPath(); g.arc(px,py,2.4,0,6.28); g.fill();
+  }
+  // cylinder walls
+  g.strokeStyle="#455072"; g.lineWidth=3;
+  g.strokeRect(left, top, right-left, bot-top);
+  // piston
+  g.fillStyle="#8792b0"; g.fillRect(pistonX, top-6, 12, bot-top+12);
+  g.fillStyle="#adb7d4"; g.fillRect(pistonX+12, (top+bot)/2-4, 26, 8);
+  // heat/flame source at bottom for heating processes
+  if(proc!=="adia"){
+    g.fillStyle="rgba(255,122,89,.85)";
+    for(var k=0;k<6;k++){
+      var fx=left+18+k*((right-left-30)/6);
+      g.beginPath();
+      g.moveTo(fx,bot+4); g.lineTo(fx+7,bot+4);
+      g.lineTo(fx+3.5, bot+4+10+4*Math.sin(f*8+k)); g.closePath(); g.fill();
+    }
+  }
+  // labels
+  g.fillStyle="#98a3bd"; g.font="12px system-ui";
+  g.fillText("Piston →", pistonX-2, top-12);
+  g.fillStyle="#e9edf7"; g.font="13px system-ui";
+  g.fillText("V = "+(s.V*1000).toFixed(1)+" L", left, bot+26);
+  g.fillText("T = "+s.T.toFixed(0)+" K", right-96, bot+26);
+}
+
+function drawPV(f){
+  var w=pv.width, h=pv.height, g=pvX;
+  g.clearRect(0,0,w,h);
+  var ml=48, mb=40, mt=14, mr=14;
+  var b=pvBounds();
+  function X(V){ return ml + (V/b.maxV)*(w-ml-mr); }
+  function Y(P){ return (h-mb) - (P/b.maxP)*(h-mb-mt); }
+  // axes
+  g.strokeStyle="#2c3550"; g.lineWidth=1;
+  g.beginPath(); g.moveTo(ml,mt); g.lineTo(ml,h-mb); g.lineTo(w-mr,h-mb); g.stroke();
+  g.fillStyle="#98a3bd"; g.font="12px system-ui";
+  g.fillText("P", ml-6, mt+4); g.fillText("V", w-mr-8, h-mb+16);
+  // build path points up to current f, and full faint path
+  var pts=[], full=[];
+  for(var i=0;i<=100;i++){ var s=stateAt(i/100); full.push([X(s.V),Y(s.P)]); }
+  for(var j=0;j<=Math.round(f*100);j++){ var s2=stateAt(j/100); pts.push([X(s2.V),Y(s2.P)]); }
+  // shade area under traced curve (work)
+  if(pts.length>1){
+    g.beginPath();
+    g.moveTo(pts[0][0], h-mb);
+    for(var a=0;a<pts.length;a++) g.lineTo(pts[a][0],pts[a][1]);
+    g.lineTo(pts[pts.length-1][0], h-mb); g.closePath();
+    g.fillStyle="rgba(79,209,197,.16)"; g.fill();
+  }
+  // faint full path
+  g.strokeStyle="rgba(152,163,189,.35)"; g.lineWidth=1.5;
+  g.beginPath(); for(var c=0;c<full.length;c++){ c?g.lineTo(full[c][0],full[c][1]):g.moveTo(full[c][0],full[c][1]); } g.stroke();
+  // traced path
+  g.strokeStyle="#4fd1c5"; g.lineWidth=2.6;
+  g.beginPath(); for(var d=0;d<pts.length;d++){ d?g.lineTo(pts[d][0],pts[d][1]):g.moveTo(pts[d][0],pts[d][1]); } g.stroke();
+  // start & moving marker
+  g.fillStyle="#5fd68b"; g.beginPath(); g.arc(full[0][0],full[0][1],4,0,6.28); g.fill();
+  if(pts.length){ var lp=pts[pts.length-1]; g.fillStyle="#ffb454"; g.beginPath(); g.arc(lp[0],lp[1],5,0,6.28); g.fill(); }
+  g.fillStyle="#98a3bd"; g.font="11px system-ui";
+  g.fillText("area = W", ml+8, h-mb-8);
+}
+
+function updatePVReadout(f){
+  // instantaneous work integral up to f (numeric), plus totals for display of full-process values
+  var tot = totals();
+  document.getElementById("pvW").textContent = tot.W.toFixed(0)+" J";
+  document.getElementById("pvQ").textContent = tot.Q.toFixed(0)+" J";
+  document.getElementById("pvU").textContent = tot.dU.toFixed(0)+" J";
+  var s=stateAt(f);
+  document.getElementById("pvT").textContent = s.T.toFixed(0)+" K";
+}
+
+var pvT0=null, pvRunning=false, pvF=0;
+function pvFrame(ts){
+  if(document.hidden){ pvT0=ts; requestAnimationFrame(pvFrame); return; }
+  if(pvT0==null) pvT0=ts;
+  if(pvRunning){
+    pvF += (ts-pvT0)/2600;   // ~2.6 s stroke
+    if(pvF>=1){ pvF=1; pvRunning=false; }
+  }
+  pvT0=ts;
+  drawCyl(pvF); drawPV(pvF); updatePVReadout(pvF);
+  requestAnimationFrame(pvFrame);
+}
+document.getElementById("pvPlay").addEventListener("click", function(){
+  if(pvF>=1) pvF=0;
+  pvRunning=true;
+});
+document.getElementById("pvReset").addEventListener("click", function(){ pvRunning=false; pvF=0; });
+document.querySelectorAll("#procSeg button").forEach(function(btn){
+  btn.addEventListener("click", function(){
+    document.querySelectorAll("#procSeg button").forEach(function(b){ b.classList.remove("on"); });
+    btn.classList.add("on");
+    proc = btn.dataset.p;
+    pvRunning=false; pvF=0;
+    document.getElementById("pvNote").textContent = procMeta[proc].note;
+  });
+});
+
+/* ================================================================
+   MODE 2 — HEAT ENGINE
+   ================================================================ */
+var eng=document.getElementById("eng"), engX=eng.getContext("2d");
+var thEl=document.getElementById("th"), tcEl=document.getElementById("tc"), qhEl=document.getElementById("qh");
+var engPhase=0;
+
+function engVals(){
+  var TH=+thEl.value, TC=+tcEl.value, QH=+qhEl.value;
+  if(TC>=TH) TC=TH-10;   // guard
+  var eff=1-TC/TH;
+  var W=eff*QH, QC=QH-W;
+  return {TH:TH,TC:TC,QH:QH,eff:eff,W:W,QC:QC};
+}
+function updateEngReadout(){
+  var v=engVals();
+  document.getElementById("thOut").textContent=(+thEl.value)+" K";
+  document.getElementById("tcOut").textContent=(+tcEl.value)+" K";
+  document.getElementById("qhOut").textContent=(+qhEl.value)+" J";
+  document.getElementById("effOut").textContent=(v.eff*100).toFixed(1)+" %";
+  document.getElementById("engW").textContent=v.W.toFixed(0)+" J";
+  document.getElementById("engQc").textContent=v.QC.toFixed(0)+" J";
+}
+[thEl,tcEl,qhEl].forEach(function(el){ el.addEventListener("input", updateEngReadout); });
+
+function drawEng(t){
+  var w=eng.width,h=eng.height,g=engX; g.clearRect(0,0,w,h);
+  var v=engVals();
+  // hot reservoir (top)
+  g.fillStyle="rgba(255,122,89,.22)"; g.strokeStyle="#ff7a59"; g.lineWidth=2;
+  roundRect(g,40,14,w-80,54,10); g.fill(); g.stroke();
+  g.fillStyle="#ff7a59"; g.font="bold 14px system-ui";
+  g.fillText("HOT  T_H = "+v.TH+" K", 56, 46);
+  // cold reservoir (bottom)
+  g.fillStyle="rgba(90,169,255,.20)"; g.strokeStyle="#5aa9ff";
+  roundRect(g,40,h-68,w-80,54,10); g.fill(); g.stroke();
+  g.fillStyle="#5aa9ff";
+  g.fillText("COLD  T_C = "+v.TC+" K", 56, h-34);
+  // engine block (center) rotating gear
+  var cx=w/2, cy=h/2;
+  g.save(); g.translate(cx,cy); g.rotate(t*2*(v.eff+0.15));
+  g.fillStyle="#232c40"; g.strokeStyle="#4fd1c5"; g.lineWidth=3;
+  var teeth=8, ro=34, ri=22;
+  g.beginPath();
+  for(var i=0;i<teeth*2;i++){
+    var ang=i*Math.PI/teeth, r=(i%2? ri:ro);
+    var x=Math.cos(ang)*r, y=Math.sin(ang)*r;
+    i?g.lineTo(x,y):g.moveTo(x,y);
+  }
+  g.closePath(); g.fill(); g.stroke();
+  g.beginPath(); g.arc(0,0,7,0,6.28); g.fillStyle="#4fd1c5"; g.fill();
+  g.restore();
+  g.fillStyle="#e9edf7"; g.font="bold 13px system-ui";
+  g.fillText("ENGINE", cx-26, cy+52);
+  // Q_H arrow down into engine (animated dots)
+  drawFlow(g, cx-60, 68, cx-60, cy-40, "#ff7a59", t, "Q_H="+v.QH.toFixed(0)+" J", true);
+  // Q_C arrow down out of engine
+  drawFlow(g, cx-60, cy+40, cx-60, h-68, "#5aa9ff", t, "Q_C="+v.QC.toFixed(0)+" J", true);
+  // W arrow to the right
+  drawFlow(g, cx+40, cy, w-60, cy, "#4fd1c5", t, "", false);
+  g.fillStyle="#4fd1c5"; g.font="bold 13px system-ui";
+  g.fillText("W = "+v.W.toFixed(0)+" J", cx+46, cy-10);
+  g.fillStyle="#4fd1c5"; g.font="bold 13px system-ui";
+  g.fillText("η = "+(v.eff*100).toFixed(1)+" %", cx+46, cy+22);
+}
+function drawFlow(g,x1,y1,x2,y2,col,t,label,vertical){
+  g.strokeStyle=col; g.lineWidth=2.5;
+  g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+  // arrowhead
+  var ang=Math.atan2(y2-y1,x2-x1);
+  g.beginPath(); g.moveTo(x2,y2);
+  g.lineTo(x2-9*Math.cos(ang-0.4), y2-9*Math.sin(ang-0.4));
+  g.lineTo(x2-9*Math.cos(ang+0.4), y2-9*Math.sin(ang+0.4));
+  g.closePath(); g.fillStyle=col; g.fill();
+  // moving dots
+  for(var i=0;i<3;i++){
+    var p=((t+i/3)%1);
+    var dx=x1+(x2-x1)*p, dy=y1+(y2-y1)*p;
+    g.beginPath(); g.arc(dx,dy,3,0,6.28); g.fillStyle=col; g.fill();
+  }
+  if(label){ g.fillStyle=col; g.font="12px system-ui";
+    if(vertical) g.fillText(label, x1-30, (y1+y2)/2);
+  }
+}
+function roundRect(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath();
+}
+var engT0=null, engClock=0;
+function engFrame(ts){
+  if(document.hidden){ engT0=ts; requestAnimationFrame(engFrame); return; }
+  if(engT0==null) engT0=ts;
+  engClock += (ts-engT0)/2400; engT0=ts;
+  if(mode==="engine") drawEng(engClock%1);
+  requestAnimationFrame(engFrame);
+}
+
+/* ================================================================
+   MODE 3 — FIRST-LAW PLAYGROUND
+   ================================================================ */
+var fl=document.getElementById("fl"), flX=fl.getContext("2d");
+var flU0 = 1.5*N*R*300;   // U at 300 K
+var flU = flU0, flQtot=0, flWtot=0;
+var flAnim=0;
+
+function flUpdate(){
+  var T = flU/(1.5*N*R);
+  document.getElementById("flU").textContent = flU.toFixed(0)+" J";
+  document.getElementById("flT").textContent = T.toFixed(0)+" K";
+  document.getElementById("flQ").textContent = flQtot.toFixed(0)+" J";
+  document.getElementById("flW").textContent = flWtot.toFixed(0)+" J";
+}
+function applyDelta(q,w){
+  // ΔU = Q − W
+  flU += (q - w);
+  if(flU<1.5*N*R*50) flU=1.5*N*R*50;   // floor ~50 K
+  flQtot += q; flWtot += w; flAnim=1;
+  flUpdate();
+}
+document.querySelectorAll("[data-q]").forEach(function(b){
+  b.addEventListener("click", function(){ applyDelta(+b.dataset.q, 0); });
+});
+document.querySelectorAll("[data-w]").forEach(function(b){
+  b.addEventListener("click", function(){ applyDelta(0, +b.dataset.w); });
+});
+document.getElementById("flReset").addEventListener("click", function(){
+  flU=flU0; flQtot=0; flWtot=0; flUpdate();
+});
+function drawFL(){
+  var w=fl.width,h=fl.height,g=flX; g.clearRect(0,0,w,h);
+  var T=flU/(1.5*N*R);
+  var tnorm=Math.max(0,Math.min(1,(T-50)/700));
+  // energy bar
+  g.fillStyle="#232c40"; roundRect(g,30,30,60,h-60,10); g.fill();
+  var barH=(h-60)*Math.max(0,Math.min(1,flU/ (1.5*N*R*800)));
+  var rC=Math.round(90+tnorm*160), bC=Math.round(230-tnorm*150);
+  g.fillStyle="rgb("+rC+",150,"+bC+")";
+  roundRect(g,30,30+(h-60-barH),60,barH,10); g.fill();
+  g.fillStyle="#98a3bd"; g.font="12px system-ui"; g.fillText("U", 52, h-18);
+  // gas box with jiggling particles (speed ~ sqrt T)
+  var bx=120, by=40, bw=w-150, bh=h-90;
+  g.strokeStyle="#455072"; g.lineWidth=2; g.strokeRect(bx,by,bw,bh);
+  var spd=0.6+tnorm*3.2;
+  g.fillStyle="rgb("+rC+",160,"+bC+")";
+  var now=performance.now()/300;
+  for(var i=0;i<24;i++){
+    var px=bx+8+((i*71 + now*spd*30)% (bw-16));
+    var py=by+8+((i*111 + now*spd*22*(1+ (i%3)))% (bh-16));
+    g.beginPath(); g.arc(px,py,3,0,6.28); g.fill();
+  }
+  g.fillStyle="#e9edf7"; g.font="13px system-ui";
+  g.fillText("T = "+T.toFixed(0)+" K", bx+8, by+bh+22);
+}
+function flFrame(ts){
+  if(document.hidden){ requestAnimationFrame(flFrame); return; }
+  if(mode==="firstlaw") drawFL();
+  requestAnimationFrame(flFrame);
+}
+
+/* ================================================================
+   MODE 4 — QUIZ
+   ================================================================ */
+var QUIZ=[
+  {q:"In an isothermal expansion of an ideal gas, which is TRUE?",
+   opts:["Q = 0","ΔU = 0 and Q = W","W = 0","ΔU = Q"],
+   a:1,
+   e:"Isothermal ⇒ temperature constant ⇒ ΔU = 0. By ΔU = Q − W, this gives Q = W."},
+  {q:"A gas is compressed adiabatically. What happens to its temperature?",
+   opts:["Rises","Falls","Stays the same","Depends on pressure only"],
+   a:0,
+   e:"Adiabatic ⇒ Q = 0, so ΔU = −W. Work is done ON the gas (W by gas is negative), so ΔU > 0 and T rises."},
+  {q:"A Carnot engine runs between 600 K and 300 K. Its maximum efficiency is:",
+   opts:["100 %","75 %","50 %","25 %"],
+   a:2,
+   e:"η = 1 − T_C/T_H = 1 − 300/600 = 0.5 = 50 %."}
+];
+var quizScore=0, quizAnswered=0;
+function buildQuiz(){
+  var host=document.getElementById("quizHost"); host.innerHTML="";
+  QUIZ.forEach(function(item,qi){
+    var wrap=document.createElement("div");
+    var qEl=document.createElement("div"); qEl.className="quiz-q";
+    qEl.textContent=(qi+1)+". "+item.q; wrap.appendChild(qEl);
+    var exp=document.createElement("div"); exp.className="explain"; exp.textContent="Why: "+item.e;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(b.dataset.done) return;
+        var btns=wrap.querySelectorAll(".opt");
+        btns.forEach(function(x){ x.dataset.done="1"; });
+        if(oi===item.a){ b.classList.add("correct"); quizScore++; }
+        else { b.classList.add("wrong"); btns[item.a].classList.add("correct"); }
+        exp.classList.add("show");
+        quizAnswered++;
+        document.getElementById("quizScore").textContent="Score: "+quizScore+" / "+quizAnswered+" answered";
+      });
+      wrap.appendChild(b);
+    });
+    wrap.appendChild(exp);
+    host.appendChild(wrap);
+  });
+}
+buildQuiz();
+
+/* ---------- init & launch loops ---------- */
+document.getElementById("pvNote").textContent = procMeta.iso.note;
+updateEngReadout(); flUpdate();
+requestAnimationFrame(pvFrame);
+requestAnimationFrame(engFrame);
+requestAnimationFrame(flFrame);
+</script>
+</body>
+</html>

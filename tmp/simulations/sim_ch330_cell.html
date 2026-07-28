@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Cell Explorer - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#5b8def;
+    --accent-dark:#3f6fd1;
+    --bg:#eef3fb;
+    --panel:#ffffff;
+    --ink:#243447;
+    --muted:#6b7a90;
+    --good:#2fa66b;
+    --bad:#e06666;
+    --shadow:0 6px 18px rgba(40,60,100,.10);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#eef3fb,#e6edfa);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.4rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;
+    background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.92rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .hidden{display:none;}
+  .toggle-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .btn{
+    background:var(--accent);color:#fff;border:none;
+    padding:9px 16px;border-radius:10px;font-weight:600;
+    cursor:pointer;font-size:.9rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:#eef3fb;color:var(--accent-dark);}
+  .btn.ghost.on{background:var(--accent);color:#fff;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .cell-box{flex:1 1 320px;min-width:280px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{opacity:.82;}
+  .hot.sel{stroke:#243447;stroke-width:3;stroke-dasharray:4 3;}
+  .info{
+    flex:1 1 240px;min-width:220px;background:#f6f9ff;
+    border-radius:12px;padding:14px;border:1px solid #e2ebfb;
+  }
+  .info h3{margin:0 0 6px;font-size:1.05rem;color:var(--accent-dark);}
+  .info p{margin:0;font-size:.9rem;color:var(--ink);}
+  .info .hint{color:var(--muted);font-style:italic;}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:middle;border:1px solid rgba(0,0,0,.15);}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #eef2f8;}
+  th{color:var(--muted);font-weight:600;}
+  td.tag{font-weight:600;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.75rem;font-weight:600;}
+  .pill.both{background:#e3f0ff;color:#2f6fd1;}
+  .pill.plant{background:#dff5e6;color:#22834f;}
+  tr.plantonly{background:#f4fcf6;}
+  .quiz-q{font-size:1rem;font-weight:600;margin-bottom:12px;}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  @media(max-width:480px){.options{grid-template-columns:1fr;}}
+  .opt{
+    background:#f6f9ff;border:2px solid #e2ebfb;border-radius:10px;
+    padding:11px;cursor:pointer;font-size:.9rem;font-weight:600;
+    text-align:left;transition:.12s;color:var(--ink);
+  }
+  .opt:hover:not(:disabled){border-color:var(--accent);}
+  .opt.correct{background:#e5f7ec;border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:#fdeaea;border-color:var(--bad);color:var(--bad);}
+  .opt:disabled{cursor:default;}
+  .feedback{font-size:.9rem;margin:10px 0;min-height:1.2em;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+  .score{font-weight:700;color:var(--accent-dark);}
+  .bar{height:8px;background:#e2ebfb;border-radius:6px;overflow:hidden;margin:10px 0;}
+  .bar > i{display:block;height:100%;background:var(--accent);transition:.3s;}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.78rem;color:var(--muted);}
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding:8px 0 20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Interactive Cell Explorer</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 4: Cell &mdash; Structure and Function</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="explore">Explore</button>
+    <button class="tab" data-mode="compare">Animal vs Plant</button>
+    <button class="tab" data-mode="quiz">Label-it Quiz</button>
+  </div>
+
+  <!-- EXPLORE -->
+  <section id="mode-explore" class="panel">
+    <div class="toggle-row">
+      <button class="btn ghost on" id="btnAnimal">Animal Cell</button>
+      <button class="btn ghost" id="btnPlant">Plant Cell</button>
+      <span style="color:var(--muted);font-size:.85rem;">Tap any part to learn about it</span>
+    </div>
+    <div class="stage">
+      <div class="cell-box" id="cellHolder"></div>
+      <div class="info" id="infoBox">
+        <h3>Cell Explorer</h3>
+        <p class="hint">Tap an organelle in the diagram to see its name and function. Switch between animal and plant cells above.</p>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="mode-compare" class="panel hidden">
+    <p style="margin-top:0;color:var(--muted);font-size:.9rem;">
+      Green rows are found <b>only in plant cells</b>. Blue means present in both.
+    </p>
+    <table id="cmpTable">
+      <thead><tr><th>Organelle</th><th>Found in</th><th>Function</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="mode-quiz" class="panel hidden">
+    <div class="toggle-row">
+      <span class="score" id="scoreLbl">Score: 0 / 0</span>
+      <span style="flex:1"></span>
+      <button class="btn ghost" id="btnRestart">Restart</button>
+    </div>
+    <div class="bar"><i id="progBar" style="width:0%"></i></div>
+    <div class="stage">
+      <div class="cell-box" id="quizHolder"></div>
+      <div class="info" style="flex:1 1 260px;">
+        <div class="quiz-q" id="quizQ">Loading...</div>
+        <div class="options" id="quizOpts"></div>
+        <div class="feedback" id="quizFb"></div>
+        <button class="btn hidden" id="btnNext">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Interactive study tool &middot; Draw-only SVG, works offline</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- Organelle data (biology-accurate) ---------- */
+var ORG = {
+  membrane:{name:"Cell Membrane",fn:"Thin selectively-permeable boundary that controls what enters and leaves the cell.",color:"#a7c4f2",where:"both"},
+  wall:{name:"Cell Wall",fn:"Rigid cellulose layer outside the membrane giving the plant cell shape and protection.",color:"#c9b285",where:"plant"},
+  nucleus:{name:"Nucleus",fn:"Control centre holding DNA; directs cell activities and reproduction.",color:"#8e6bd4",where:"both"},
+  mito:{name:"Mitochondria",fn:"Powerhouse of the cell; carries out aerobic respiration to release energy (ATP).",color:"#e0896b",where:"both"},
+  ribo:{name:"Ribosomes",fn:"Tiny granules that build proteins by joining amino acids.",color:"#4a5568",where:"both"},
+  er:{name:"Endoplasmic Reticulum",fn:"Network of membranes that transports materials and helps make proteins and lipids.",color:"#6bc2b8",where:"both"},
+  golgi:{name:"Golgi Apparatus",fn:"Stacked sacs that modify, pack and dispatch proteins and secretions.",color:"#e6b84f",where:"both"},
+  lyso:{name:"Lysosome",fn:"Sac of digestive enzymes; breaks down waste and worn-out parts (“suicide bag”).",color:"#d46fa8",where:"animal"},
+  chloro:{name:"Chloroplast",fn:"Contains chlorophyll; captures sunlight to make food by photosynthesis.",color:"#4caf6a",where:"plant"},
+  vacuole:{name:"Large Central Vacuole",fn:"Big fluid-filled sac storing cell sap; maintains turgor and pressure in plant cells.",color:"#bfe3f5",where:"plant"}
+};
+
+/* ---------- SVG builders ---------- */
+function el(tag,attrs){
+  var e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(var k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+function hotspot(parent,key,shapeTag,attrs,onPick){
+  attrs.fill=ORG[key].color;
+  attrs["class"]="hot";
+  var s=el(shapeTag,attrs);
+  s.setAttribute("data-key",key);
+  s.addEventListener("click",function(){onPick(key,s);});
+  parent.appendChild(s);
+  return s;
+}
+
+/* Build an animal or plant cell into a container. onPick(key,node). */
+function buildCell(container,isPlant,onPick){
+  container.innerHTML="";
+  var svg=el("svg",{viewBox:"0 0 400 320","aria-label":(isPlant?"Plant":"Animal")+" cell diagram"});
+
+  if(isPlant){
+    // cell wall (rounded rect)
+    hotspot(svg,"wall","rect",{x:14,y:14,width:372,height:292,rx:22,stroke:"#a9925f","stroke-width":6},onPick);
+    // membrane just inside
+    hotspot(svg,"membrane","rect",{x:26,y:26,width:348,height:268,rx:16,stroke:"#7fa8e8","stroke-width":2,"fill-opacity":".55"},onPick);
+    // cytoplasm fill
+    svg.appendChild(el("rect",{x:30,y:30,width:340,height:260,rx:14,fill:"#f2f8ff"}));
+    // large central vacuole
+    hotspot(svg,"vacuole","ellipse",{cx:205,cy:165,rx:118,ry:92,stroke:"#7fc4e6","stroke-width":2,"fill-opacity":".65"},onPick);
+    // nucleus (pushed to side)
+    hotspot(svg,"nucleus","circle",{cx:78,cy:110,r:34,stroke:"#6f4fb0","stroke-width":2},onPick);
+    svg.appendChild(el("circle",{cx:78,cy:110,r:13,fill:"#5b3a9e"}));
+    // chloroplasts
+    var chl=[[150,60],[300,80],[320,220],[130,255]];
+    for(var i=0;i<chl.length;i++) hotspot(svg,"chloro","ellipse",{cx:chl[i][0],cy:chl[i][1],rx:22,ry:12,stroke:"#2f8a4c","stroke-width":1.5},onPick);
+    // mitochondria
+    hotspot(svg,"mito","ellipse",{cx:250,cy:260,rx:26,ry:13,stroke:"#c26a4d","stroke-width":1.5,transform:"rotate(18 250 260)"},onPick);
+    // ER near nucleus
+    hotspot(svg,"er","path",{d:"M50,150 q30,18 8,38 q-26,16 6,34",stroke:"#3fa79c","stroke-width":6,fill:"none","stroke-linecap":"round"},onPick);
+    // golgi
+    hotspot(svg,"golgi","path",{d:"M300,150 q30,6 0,12 M296,162 q34,7 8,13 M300,175 q26,6 2,12",stroke:"#d6a833","stroke-width":5,fill:"none","stroke-linecap":"round"},onPick);
+    // ribosomes (dots)
+    var rp=[[120,120],[110,200],[175,270],[60,215],[335,150]];
+    for(var j=0;j<rp.length;j++) hotspot(svg,"ribo","circle",{cx:rp[j][0],cy:rp[j][1],r:5,stroke:"#2d3546","stroke-width":.5},onPick);
+  } else {
+    // membrane (blobby cell)
+    var d="M60,150 C40,70 130,26 210,40 C300,54 372,110 356,190 C344,258 268,300 180,290 C96,281 78,224 60,150 Z";
+    hotspot(svg,"membrane","path",{d:d,stroke:"#6f97dd","stroke-width":5},onPick);
+    svg.appendChild(el("path",{d:d,fill:"#f2f8ff","fill-opacity":".9"}));
+    // nucleus
+    hotspot(svg,"nucleus","circle",{cx:180,cy:150,r:48,stroke:"#6f4fb0","stroke-width":2},onPick);
+    svg.appendChild(el("circle",{cx:180,cy:150,r:17,fill:"#5b3a9e"}));// nucleolus
+    // mitochondria
+    hotspot(svg,"mito","ellipse",{cx:100,cy:110,rx:30,ry:15,stroke:"#c26a4d","stroke-width":1.5,transform:"rotate(-20 100 110)"},onPick);
+    hotspot(svg,"mito","ellipse",{cx:280,cy:230,rx:28,ry:14,stroke:"#c26a4d","stroke-width":1.5,transform:"rotate(15 280 230)"},onPick);
+    // ER around nucleus
+    hotspot(svg,"er","path",{d:"M235,120 q34,10 10,40 q-24,26 12,46",stroke:"#3fa79c","stroke-width":6,fill:"none","stroke-linecap":"round"},onPick);
+    // golgi
+    hotspot(svg,"golgi","path",{d:"M105,205 q34,7 2,14 M101,218 q40,8 8,15 M105,232 q30,7 2,13",stroke:"#d6a833","stroke-width":5,fill:"none","stroke-linecap":"round"},onPick);
+    // lysosomes
+    hotspot(svg,"lyso","circle",{cx:255,cy:95,r:15,stroke:"#b8548a","stroke-width":1.5},onPick);
+    hotspot(svg,"lyso","circle",{cx:150,cy:245,r:13,stroke:"#b8548a","stroke-width":1.5},onPick);
+    // ribosomes
+    var rp2=[[130,180],[220,210],[290,150],[95,160],[200,90],[160,215]];
+    for(var k=0;k<rp2.length;k++) hotspot(svg,"ribo","circle",{cx:rp2[k][0],cy:rp2[k][1],r:5,stroke:"#2d3546","stroke-width":.5},onPick);
+  }
+  container.appendChild(svg);
+  return svg;
+}
+
+/* ---------- Explore mode ---------- */
+var currentPlant=false, selNode=null;
+var holder=document.getElementById("cellHolder");
+var infoBox=document.getElementById("infoBox");
+var legendEl=document.getElementById("legend");
+
+function pickExplore(key,node){
+  if(selNode) selNode.classList.remove("sel");
+  node.classList.add("sel"); selNode=node;
+  var o=ORG[key];
+  infoBox.innerHTML="<h3>"+o.name+"</h3><p>"+o.fn+"</p>";
+}
+function renderLegend(isPlant){
+  var keys=Object.keys(ORG).filter(function(k){var w=ORG[k].where;return w==="both"||(isPlant?w==="plant":w==="animal");});
+  legendEl.innerHTML=keys.map(function(k){
+    return '<span><span class="swatch" style="background:'+ORG[k].color+'"></span>'+ORG[k].name+'</span>';
+  }).join("");
+}
+function showExplore(isPlant){
+  currentPlant=isPlant; selNode=null;
+  buildCell(holder,isPlant,pickExplore);
+  renderLegend(isPlant);
+  infoBox.innerHTML='<h3>'+(isPlant?"Plant":"Animal")+' Cell</h3><p class="hint">Tap an organelle to see its function.</p>';
+  document.getElementById("btnAnimal").classList.toggle("on",!isPlant);
+  document.getElementById("btnPlant").classList.toggle("on",isPlant);
+}
+document.getElementById("btnAnimal").onclick=function(){showExplore(false);};
+document.getElementById("btnPlant").onclick=function(){showExplore(true);};
+
+/* ---------- Compare mode ---------- */
+(function buildCompare(){
+  var order=["membrane","nucleus","mito","ribo","er","golgi","lyso","wall","chloro","vacuole"];
+  var body=document.querySelector("#cmpTable tbody");
+  order.forEach(function(k){
+    var o=ORG[k];
+    var plantOnly=(o.where==="plant");
+    var where,cls;
+    if(o.where==="both"){where="Both";cls="both";}
+    else if(o.where==="plant"){where="Plant only";cls="plant";}
+    else {where="Animal only";cls="both";}
+    var tr=document.createElement("tr");
+    if(plantOnly) tr.className="plantonly";
+    tr.innerHTML='<td class="tag"><span class="swatch" style="background:'+o.color+'"></span>'+o.name+
+      '</td><td><span class="pill '+cls+'">'+where+'</span></td><td style="color:var(--muted)">'+o.fn+'</td>';
+    body.appendChild(tr);
+  });
+})();
+
+/* ---------- Quiz mode ---------- */
+var quizHolder=document.getElementById("quizHolder");
+var qKeys=[], qIndex=0, qScore=0, answered=false, currentSvg=null;
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function startQuiz(){
+  var pool=Object.keys(ORG);
+  qKeys=shuffle(pool.slice()).slice(0,5);
+  qIndex=0; qScore=0;
+  document.getElementById("btnRestart").classList.remove("on");
+  loadQuestion();
+}
+function highlightOne(key){
+  // decide which cell shows this organelle
+  var isPlant = ORG[key].where!=="animal"; // plant-capable cell shows everything except lysosome
+  currentSvg=buildCell(quizHolder,isPlant,function(){});// no click needed
+  // dim all, spotlight the target key's nodes
+  var nodes=currentSvg.querySelectorAll(".hot");
+  var found=false;
+  nodes.forEach(function(n){
+    if(n.getAttribute("data-key")===key){
+      n.classList.add("sel");
+      n.setAttribute("fill-opacity","1");
+      found=true;
+    } else {
+      n.style.opacity=".18";
+    }
+  });
+  return found;
+}
+function loadQuestion(){
+  answered=false;
+  var key=qKeys[qIndex];
+  highlightOne(key);
+  document.getElementById("quizQ").textContent="Q"+(qIndex+1)+": Which organelle is highlighted?";
+  // build 4 options
+  var others=Object.keys(ORG).filter(function(k){return k!==key;});
+  shuffle(others);
+  var opts=shuffle([key,others[0],others[1],others[2]]);
+  var box=document.getElementById("quizOpts");
+  box.innerHTML="";
+  opts.forEach(function(k){
+    var b=document.createElement("button");
+    b.className="opt"; b.textContent=ORG[k].name;
+    b.onclick=function(){answer(k,key,b);};
+    box.appendChild(b);
+  });
+  document.getElementById("quizFb").textContent="";
+  document.getElementById("quizFb").className="feedback";
+  document.getElementById("btnNext").classList.add("hidden");
+  updateScore();
+}
+function answer(chosen,correct,btn){
+  if(answered) return;
+  answered=true;
+  var btns=document.querySelectorAll("#quizOpts .opt");
+  btns.forEach(function(b){
+    b.disabled=true;
+    if(b.textContent===ORG[correct].name) b.classList.add("correct");
+  });
+  var fb=document.getElementById("quizFb");
+  if(chosen===correct){
+    qScore++;
+    fb.textContent="Correct! "+ORG[correct].fn;
+    fb.className="feedback ok";
+  } else {
+    btn.classList.add("wrong");
+    fb.textContent="Not quite. It is the "+ORG[correct].name+" — "+ORG[correct].fn;
+    fb.className="feedback no";
+  }
+  updateScore();
+  var next=document.getElementById("btnNext");
+  next.classList.remove("hidden");
+  next.textContent=(qIndex<qKeys.length-1)?"Next →":"See Result";
+}
+function updateScore(){
+  document.getElementById("scoreLbl").textContent="Score: "+qScore+" / "+qKeys.length;
+  document.getElementById("progBar").style.width=((qIndex+(answered?1:0))/qKeys.length*100)+"%";
+}
+document.getElementById("btnNext").onclick=function(){
+  if(qIndex<qKeys.length-1){qIndex++;loadQuestion();}
+  else{
+    quizHolder.innerHTML="";
+    document.getElementById("quizQ").textContent="Quiz complete!";
+    document.getElementById("quizOpts").innerHTML="";
+    var pct=Math.round(qScore/qKeys.length*100);
+    var msg=pct>=80?"Excellent work!":pct>=50?"Good effort — review and retry.":"Keep practising!";
+    var fb=document.getElementById("quizFb");
+    fb.textContent="You scored "+qScore+" / "+qKeys.length+" ("+pct+"%). "+msg;
+    fb.className="feedback ok";
+    this.classList.add("hidden");
+    document.getElementById("progBar").style.width="100%";
+  }
+};
+document.getElementById("btnRestart").onclick=startQuiz;
+
+/* ---------- Tab switching ---------- */
+document.getElementById("tabs").addEventListener("click",function(e){
+  var t=e.target.closest(".tab"); if(!t) return;
+  var mode=t.getAttribute("data-mode");
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active",x===t);});
+  document.getElementById("mode-explore").classList.toggle("hidden",mode!=="explore");
+  document.getElementById("mode-compare").classList.toggle("hidden",mode!=="compare");
+  document.getElementById("mode-quiz").classList.toggle("hidden",mode!=="quiz");
+  if(mode==="quiz" && qKeys.length===0) startQuiz();
+});
+
+/* ---------- Init ---------- */
+showExplore(false);
+</script>
+</body>
+</html>

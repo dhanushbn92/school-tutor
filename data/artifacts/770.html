@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravity Lab — Gravitation (NIOS Class 10, Ch 11)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#ffb454;
+    --accent-soft:rgba(255,180,84,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:1.02rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+
+  .btn{min-height:48px;padding:0 22px;border-radius:12px;border:none;font-size:1rem;font-weight:700;
+    cursor:pointer;touch-action:manipulation;transition:transform .1s}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--accent);color:#1c1206}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+
+  .stage{display:flex;gap:14px;flex-wrap:wrap}
+  .stage .col{flex:1 1 280px;min-width:260px}
+  canvas{display:block;width:100%;height:auto;border-radius:12px;background:#0b0f1a;border:1px solid var(--line)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 12px;min-width:104px;flex:1 1 104px;text-align:center}
+  .chip .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .chip .v{font-size:1.08rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .chip .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .caption{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--panel2);
+    border-left:4px solid var(--accent);font-size:.92rem;color:var(--ink)}
+  .caption b{color:var(--accent)}
+  .caption.good{border-left-color:var(--good)}
+  .caption.bad{border-left-color:var(--bad)}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;margin:8px 0;font-size:1.05rem;text-align:center;
+    font-family:Georgia,"Times New Roman",serif}
+  .info p{font-size:.92rem;color:var(--muted);margin:6px 0}
+  .info p b{color:var(--ink)}
+  .info .grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .info .cell{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;font-size:.85rem;color:var(--muted)}
+  .info .cell b{display:block;color:var(--accent);font-size:.92rem;margin-bottom:2px}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:10px;font-size:.95rem}
+  .quiz .opts{display:grid;gap:8px}
+  .quiz .opts button{min-height:46px;text-align:left;padding:10px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:.92rem;
+    cursor:pointer;touch-action:manipulation}
+  .quiz .opts button:disabled{cursor:default;opacity:.85}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.12);color:var(--bad)}
+  .quiz .expl{display:none;margin-top:10px;font-size:.88rem;color:var(--muted);
+    border-top:1px dashed var(--line);padding-top:10px}
+  .quiz .expl.show{display:block}
+  .quiz .expl b{color:var(--accent)}
+
+  .hidden{display:none}
+  @media (max-width:420px){
+    .wrap{padding:10px 10px 40px}
+    header h1{font-size:1.25rem}
+    .chip{min-width:88px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🪐 Gravity <span>Lab</span></h1>
+  <p>Gravitation — NIOS Class 10 · Science &amp; Technology (212) · Chapter 11</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tabFall" type="button">⬇ Free Fall</button>
+  <button class="tab-btn" id="tabOrbit" type="button">🛰 Orbit</button>
+</div>
+
+<!-- ============ FREE FALL MODE ============ -->
+<section class="panel" id="panelFall">
+  <h2>Drop a ball — how fast does gravity pull?</h2>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Where are you? (changes g)</label>
+      <div class="seg" id="bodySeg">
+        <button type="button" data-g="9.8"  data-name="Earth"   class="on">🌍 Earth<br><small>9.8</small></button>
+        <button type="button" data-g="1.62" data-name="Moon">🌙 Moon<br><small>1.62</small></button>
+        <button type="button" data-g="24.8" data-name="Jupiter">🟠 Jupiter<br><small>24.8</small></button>
+      </div>
+    </div>
+    <div class="ctrl">
+      <label>Drop height: <output id="hOut">45</output> m</label>
+      <input type="range" id="hSlider" min="10" max="100" value="45" step="1">
+    </div>
+    <div class="ctrl btnrow">
+      <button class="btn primary" id="dropBtn" type="button">Drop it!</button>
+      <button class="btn ghost" id="fallReset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="col"><canvas id="fallCanvas" width="340" height="440"></canvas></div>
+    <div class="col">
+      <canvas id="graphCanvas" width="340" height="260"></canvas>
+      <div class="chips">
+        <div class="chip"><div class="k">time t</div><div class="v" id="tVal">0.00 <small>s</small></div></div>
+        <div class="chip"><div class="k">velocity v = gt</div><div class="v" id="vVal">0.0 <small>m/s</small></div></div>
+        <div class="chip"><div class="k">fallen s = ½gt²</div><div class="v" id="sVal">0.0 <small>m</small></div></div>
+        <div class="chip"><div class="k">g here</div><div class="v" id="gVal">9.8 <small>m/s²</small></div></div>
+      </div>
+      <div class="caption" id="fallCaption">
+        Pick a world, set a height, and press <b>Drop it!</b> The ball speeds up as it falls:
+        every second, gravity adds <b>g</b> metres/second to its velocity.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ORBIT MODE ============ -->
+<section class="panel hidden" id="panelOrbit">
+  <h2>Launch a planet — can you make it orbit the Sun?</h2>
+
+  <div class="controls">
+    <div class="ctrl">
+      <label>Orbital radius: <output id="rOut">1.00</output> AU</label>
+      <input type="range" id="rSlider" min="60" max="200" value="120" step="2">
+    </div>
+    <div class="ctrl">
+      <label>Launch speed: <output id="vOut">100</output>% of circular speed</label>
+      <input type="range" id="vSlider" min="40" max="160" value="100" step="2">
+    </div>
+    <div class="ctrl btnrow">
+      <button class="btn primary" id="launchBtn" type="button">Launch</button>
+      <button class="btn ghost" id="orbitReset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="col" style="flex:2 1 320px"><canvas id="orbitCanvas" width="640" height="440"></canvas></div>
+    <div class="col" style="flex:1 1 240px">
+      <div class="chips">
+        <div class="chip"><div class="k">circular speed v꜀</div><div class="v" id="vcVal">— <small>km/s</small></div></div>
+        <div class="chip"><div class="k">escape speed vₑ</div><div class="v" id="veVal">— <small>km/s</small></div></div>
+        <div class="chip"><div class="k">your speed</div><div class="v" id="vYouVal">— <small>km/s</small></div></div>
+        <div class="chip"><div class="k">distance now</div><div class="v" id="rNowVal">— <small>AU</small></div></div>
+      </div>
+      <div class="caption" id="orbitCaption">
+        The Sun's gravity pulls the planet <b>inward</b>; the launch speed carries it <b>sideways</b>
+        (tangentially). An orbit is a never-ending fall that keeps missing the Sun!
+        Try 100% for a circle, less to fall inward, or 142%+ to escape.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INFO PANEL ============ -->
+<section class="panel info">
+  <h2>Newton's Law of Universal Gravitation</h2>
+  <div class="formula">F = G · m₁m₂ / r²</div>
+  <p><b>Every</b> pair of masses in the universe attracts each other. The force <b>F</b> grows with both
+     masses (m₁, m₂) and shrinks with the <b>square</b> of the distance r — double the distance and the
+     force drops to a quarter.</p>
+  <div class="grid">
+    <div class="cell"><b>G</b>6.674 × 10⁻¹¹ N·m²/kg² — the universal gravitational constant, same everywhere.</div>
+    <div class="cell"><b>g = GM/R²</b>On a planet's surface, gravity gives every object the same acceleration g, whatever its mass.</div>
+    <div class="cell"><b>Free fall</b>v = gt and s = ½gt² (starting from rest) — used live in the Free Fall tab.</div>
+    <div class="cell"><b>Orbits</b>Gravity supplies the centripetal force: GMm/r² = mv²/r, so v꜀ = √(GM/r) and vₑ = √2·v꜀.</div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="panel quiz">
+  <h2>Quick check — 3 questions</h2>
+
+  <div class="q" data-ans="1">
+    <p>1. If the distance between two masses is doubled, the gravitational force between them becomes…</p>
+    <div class="opts">
+      <button type="button">Half as strong</button>
+      <button type="button">One quarter as strong</button>
+      <button type="button">Twice as strong</button>
+      <button type="button">Unchanged</button>
+    </div>
+    <div class="expl"><b>F ∝ 1/r².</b> Doubling r makes r² four times bigger, so the force falls to ¼.
+      This "inverse-square law" is why gravity weakens quickly with distance.</div>
+  </div>
+
+  <div class="q" data-ans="2">
+    <p>2. A hammer and a feather are dropped together on the Moon (no air). What happens?</p>
+    <div class="opts">
+      <button type="button">The hammer lands first</button>
+      <button type="button">The feather lands first</button>
+      <button type="button">They land at the same time</button>
+      <button type="button">Neither falls — the Moon has no gravity</button>
+    </div>
+    <div class="expl"><b>Same time!</b> Acceleration in free fall (g) does not depend on the falling object's mass —
+      g = GM/R² contains only the Moon's mass. Astronaut David Scott actually did this experiment on Apollo 15.
+      On Earth, only air resistance slows the feather.</div>
+  </div>
+
+  <div class="q" data-ans="0">
+    <p>3. A satellite stays in a circular orbit because…</p>
+    <div class="opts">
+      <button type="button">Gravity provides exactly the centripetal force needed for its sideways speed</button>
+      <button type="button">It is beyond the reach of Earth's gravity</button>
+      <button type="button">Its rocket engines keep firing to hold it up</button>
+      <button type="button">Earth's magnetic field holds it in place</button>
+    </div>
+    <div class="expl"><b>It is falling — and missing.</b> Gravity still acts strongly in orbit (that's the centripetal
+      force GMm/r² = mv²/r). The satellite moves sideways so fast that as it falls, the Earth's surface curves
+      away beneath it. Try this in the Orbit tab: 100% speed = circle.</div>
+  </div>
+</section>
+
+<footer style="color:var(--muted);font-size:.8rem;text-align:center;padding-top:6px">
+  Gravity Lab · all formulas use SI units · works offline
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- helpers ---------- */
+var $ = function(id){ return document.getElementById(id); };
+var pageVisible = true;
+document.addEventListener("visibilitychange", function(){
+  pageVisible = !document.hidden;
+  if (pageVisible) { lastTs = 0; requestFrame(); }
+});
+
+/* ---------- tabs ---------- */
+var mode = "fall";
+function setMode(m){
+  mode = m;
+  $("tabFall").classList.toggle("active", m==="fall");
+  $("tabOrbit").classList.toggle("active", m==="orbit");
+  $("panelFall").classList.toggle("hidden", m!=="fall");
+  $("panelOrbit").classList.toggle("hidden", m!=="orbit");
+  requestFrame();
+}
+$("tabFall").addEventListener("click", function(){ setMode("fall"); });
+$("tabOrbit").addEventListener("click", function(){ setMode("orbit"); });
+
+/* =========================================================
+   FREE FALL
+   ========================================================= */
+var fall = {
+  g: 9.8, body: "Earth", h: 45,
+  t: 0, s: 0, v: 0,
+  running: false, done: false,
+  samples: []            // {t, v} for the v-t graph
+};
+var bodyTheme = {
+  Earth:   { sky:"#101c30", ground:"#2c4a33", ball:"#ffb454" },
+  Moon:    { sky:"#14141c", ground:"#4a4a52", ball:"#ffb454" },
+  Jupiter: { sky:"#221a10", ground:"#7a5a33", ball:"#ffd9a0" }
+};
+
+var segBtns = $("bodySeg").querySelectorAll("button");
+segBtns.forEach(function(b){
+  b.addEventListener("click", function(){
+    segBtns.forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    fall.g = parseFloat(b.dataset.g);
+    fall.body = b.dataset.name;
+    resetFall();
+  });
+});
+$("hSlider").addEventListener("input", function(){
+  fall.h = parseFloat(this.value);
+  $("hOut").textContent = this.value;
+  resetFall();
+});
+$("dropBtn").addEventListener("click", function(){
+  if (fall.done) resetFall();
+  if (!fall.running){ fall.running = true; requestFrame(); }
+});
+$("fallReset").addEventListener("click", resetFall);
+
+function resetFall(){
+  fall.t = 0; fall.s = 0; fall.v = 0;
+  fall.running = false; fall.done = false;
+  fall.samples = [];
+  var tTotal = Math.sqrt(2*fall.h/fall.g);
+  $("fallCaption").className = "caption";
+  $("fallCaption").innerHTML =
+    "On <b>" + fall.body + "</b> (g = " + fall.g + " m/s²), a ball dropped from " +
+    fall.h + " m takes <b>t = √(2h/g) = " + tTotal.toFixed(2) + " s</b> to land and hits at <b>v = gt = " +
+    (fall.g*tTotal).toFixed(1) + " m/s</b>. Press Drop it! and watch v grow along a straight line — that is uniform acceleration.";
+  requestFrame();
+}
+
+function stepFall(dt){
+  if (!fall.running) return;
+  fall.t += dt;
+  fall.s = 0.5 * fall.g * fall.t * fall.t;
+  if (fall.s >= fall.h){
+    fall.t = Math.sqrt(2*fall.h/fall.g);      // exact landing time
+    fall.s = fall.h;
+    fall.v = fall.g * fall.t;
+    fall.running = false; fall.done = true;
+    fall.samples.push({t:fall.t, v:fall.v});
+    $("fallCaption").className = "caption good";
+    $("fallCaption").innerHTML = "💥 <b>Landed on " + fall.body + "!</b> Fall time " +
+      fall.t.toFixed(2) + " s, impact speed " + fall.v.toFixed(1) +
+      " m/s (" + (fall.v*3.6).toFixed(0) + " km/h). Notice the v–t graph is a straight line with slope g = " +
+      fall.g + " m/s².";
+  } else {
+    fall.v = fall.g * fall.t;
+    fall.samples.push({t:fall.t, v:fall.v});
+  }
+}
+
+var fc = $("fallCanvas"), fctx = fc.getContext("2d");
+function drawFall(){
+  var W = fc.width, H = fc.height;
+  var th = bodyTheme[fall.body];
+  fctx.clearRect(0,0,W,H);
+  // sky
+  var grd = fctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, th.sky); grd.addColorStop(1, "#0b0f1a");
+  fctx.fillStyle = grd; fctx.fillRect(0,0,W,H);
+  // stars for moon/jupiter flavour
+  fctx.fillStyle = "rgba(255,255,255,.35)";
+  for (var i=0;i<18;i++){
+    var sx = (i*137.5) % W, sy = (i*91.3) % (H*0.5);
+    fctx.fillRect(sx, sy, 2, 2);
+  }
+  var groundY = H - 36, topY = 46;
+  // ground
+  fctx.fillStyle = th.ground; fctx.fillRect(0, groundY, W, H-groundY);
+  fctx.fillStyle = "rgba(0,0,0,.25)"; fctx.fillRect(0, groundY, W, 4);
+  // measuring pole with ticks
+  var px = 54, scale = (groundY - topY) / fall.h;
+  fctx.strokeStyle = "#3a465f"; fctx.lineWidth = 3;
+  fctx.beginPath(); fctx.moveTo(px, topY); fctx.lineTo(px, groundY); fctx.stroke();
+  fctx.fillStyle = "#8a96b0"; fctx.font = "12px system-ui, sans-serif";
+  fctx.textAlign = "left";
+  var stepM = fall.h > 60 ? 20 : 10;
+  for (var m=0; m<=fall.h; m+=stepM){
+    var y = groundY - m*scale;
+    fctx.strokeStyle = "#3a465f"; fctx.lineWidth = 2;
+    fctx.beginPath(); fctx.moveTo(px-7, y); fctx.lineTo(px+7, y); fctx.stroke();
+    fctx.fillText(m + " m", px+12, y+4);
+  }
+  // ball
+  var bx = W*0.62, by = topY + fall.s*scale;
+  // speed streaks while moving
+  if (fall.running && fall.v > 2){
+    fctx.strokeStyle = "rgba(255,180,84,.35)"; fctx.lineWidth = 2;
+    var L = Math.min(40, fall.v*1.2);
+    fctx.beginPath(); fctx.moveTo(bx-16, by-L); fctx.lineTo(bx-16, by-4); fctx.stroke();
+    fctx.beginPath(); fctx.moveTo(bx+16, by-L); fctx.lineTo(bx+16, by-4); fctx.stroke();
+  }
+  var bg = fctx.createRadialGradient(bx-4, by-4, 2, bx, by, 13);
+  bg.addColorStop(0, "#ffe2b0"); bg.addColorStop(1, th.ball);
+  fctx.fillStyle = bg;
+  fctx.beginPath(); fctx.arc(bx, by, 12, 0, Math.PI*2); fctx.fill();
+  // shadow on ground
+  var sh = Math.max(4, 14 - (fall.h-fall.s)*scale*0.03);
+  fctx.fillStyle = "rgba(0,0,0,.35)";
+  fctx.beginPath(); fctx.ellipse(bx, groundY+8, sh+6, 4, 0, 0, Math.PI*2); fctx.fill();
+  // body label
+  fctx.fillStyle = "#c8d2e8"; fctx.font = "600 14px system-ui, sans-serif";
+  fctx.textAlign = "right";
+  fctx.fillText(fall.body + "  ·  g = " + fall.g + " m/s²", W-12, 24);
+}
+
+var gc = $("graphCanvas"), gctx = gc.getContext("2d");
+function drawGraph(){
+  var W = gc.width, H = gc.height;
+  var L = 46, R = 14, T = 26, B = 34;
+  gctx.clearRect(0,0,W,H);
+  gctx.fillStyle = "#0b0f1a"; gctx.fillRect(0,0,W,H);
+  var tMax = Math.max(0.6, Math.sqrt(2*fall.h/fall.g));
+  var vMax = Math.max(4, fall.g * tMax);
+  // grid + axes
+  gctx.strokeStyle = "#232c42"; gctx.lineWidth = 1;
+  gctx.fillStyle = "#7f8aa6"; gctx.font = "11px system-ui, sans-serif";
+  var gx, gy, k;
+  for (k=0; k<=4; k++){
+    gy = T + (H-T-B)*k/4;
+    gctx.beginPath(); gctx.moveTo(L, gy); gctx.lineTo(W-R, gy); gctx.stroke();
+    gctx.textAlign = "right";
+    gctx.fillText((vMax*(1-k/4)).toFixed(0), L-6, gy+4);
+  }
+  for (k=0; k<=4; k++){
+    gx = L + (W-L-R)*k/4;
+    gctx.beginPath(); gctx.moveTo(gx, T); gctx.lineTo(gx, H-B); gctx.stroke();
+    gctx.textAlign = "center";
+    gctx.fillText((tMax*k/4).toFixed(1), gx, H-B+16);
+  }
+  gctx.strokeStyle = "#3a465f"; gctx.lineWidth = 2;
+  gctx.beginPath(); gctx.moveTo(L, T); gctx.lineTo(L, H-B); gctx.lineTo(W-R, H-B); gctx.stroke();
+  gctx.fillStyle = "#9aa5bd"; gctx.textAlign = "left";
+  gctx.fillText("v (m/s)", L+4, T-10);
+  gctx.textAlign = "right";
+  gctx.fillText("t (s)", W-R, H-6);
+  gctx.fillStyle = "#c8d2e8"; gctx.font = "600 12px system-ui, sans-serif";
+  gctx.textAlign = "center";
+  gctx.fillText("velocity–time graph (slope = g)", (L+W-R)/2, 14);
+  // curve
+  if (fall.samples.length > 1){
+    gctx.strokeStyle = "#ffb454"; gctx.lineWidth = 3;
+    gctx.beginPath();
+    for (var i=0; i<fall.samples.length; i++){
+      var p = fall.samples[i];
+      var x = L + (W-L-R) * (p.t/tMax);
+      var y = H-B - (H-T-B) * (p.v/vMax);
+      if (i===0) gctx.moveTo(x,y); else gctx.lineTo(x,y);
+    }
+    gctx.stroke();
+    var lp = fall.samples[fall.samples.length-1];
+    var lx = L + (W-L-R)*(lp.t/tMax), ly = H-B - (H-T-B)*(lp.v/vMax);
+    gctx.fillStyle = "#ffb454";
+    gctx.beginPath(); gctx.arc(lx, ly, 5, 0, Math.PI*2); gctx.fill();
+  }
+}
+
+function updateFallReadouts(){
+  $("tVal").innerHTML = fall.t.toFixed(2) + " <small>s</small>";
+  $("vVal").innerHTML = fall.v.toFixed(1) + " <small>m/s</small>";
+  $("sVal").innerHTML = fall.s.toFixed(1) + " <small>m</small>";
+  $("gVal").innerHTML = fall.g + " <small>m/s²</small>";
+}
+
+/* =========================================================
+   ORBIT
+   ========================================================= */
+/* Simulation units: length in px, 1 AU = 120 px.
+   GM chosen so a circular orbit at 1 AU takes ~8 s on screen.
+   Real-world labels: v_c at 1 AU = 29.8 km/s (Earth's orbital speed). */
+var AU = 120;                       // px per AU
+var GM = 4 * Math.PI * Math.PI * Math.pow(AU,3) / (8*8); // period 8 s at r = 1 AU
+var SUN_R = 16;
+var VC_EARTH_KMS = 29.8;            // real circular speed at 1 AU, for labels
+
+var orbit = {
+  r0: 120, frac: 1.0,
+  x: 120, y: 0, vx: 0, vy: 0,
+  running: false, state: "ready",   // ready | flying | crashed | escaped
+  trail: []
+};
+
+function vCirc(r){ return Math.sqrt(GM/r); }
+function toKms(vSim, r){ // convert sim speed to real km/s label (scale by vc ratio)
+  return vSim / vCirc(AU) * VC_EARTH_KMS;
+}
+
+$("rSlider").addEventListener("input", function(){
+  orbit.r0 = parseFloat(this.value);
+  $("rOut").textContent = (orbit.r0/AU).toFixed(2);
+  resetOrbit();
+});
+$("vSlider").addEventListener("input", function(){
+  orbit.frac = parseFloat(this.value)/100;
+  $("vOut").textContent = this.value;
+  resetOrbit();
+});
+$("launchBtn").addEventListener("click", function(){
+  resetOrbit();
+  orbit.running = true; orbit.state = "flying";
+  explainLaunch();
+  requestFrame();
+});
+$("orbitReset").addEventListener("click", function(){
+  resetOrbit();
+  $("orbitCaption").className = "caption";
+  $("orbitCaption").innerHTML = "The Sun's gravity pulls the planet <b>inward</b>; the launch speed carries it " +
+    "<b>sideways</b> (tangentially). An orbit is a never-ending fall that keeps missing the Sun! " +
+    "Try 100% for a circle, under 100% to swing inward, or 142%+ to escape.";
+});
+
+function resetOrbit(){
+  orbit.x = orbit.r0; orbit.y = 0;
+  var v = vCirc(orbit.r0) * orbit.frac;
+  orbit.vx = 0; orbit.vy = -v;       // tangential (counter-clockwise)
+  orbit.running = false; orbit.state = "ready";
+  orbit.trail = [];
+  updateOrbitReadouts();
+  requestFrame();
+}
+
+function explainLaunch(){
+  var vc = vCirc(orbit.r0), v = vc*orbit.frac, ve = Math.SQRT2*vc;
+  var E = 0.5*v*v - GM/orbit.r0;               // specific orbital energy
+  var cap = $("orbitCaption");
+  if (v >= ve){
+    cap.className = "caption bad";
+    cap.innerHTML = "🚀 <b>Escape!</b> Speed ≥ vₑ = √2·v꜀ (" + (orbit.frac*100).toFixed(0) +
+      "% ≥ 141%). Kinetic energy now beats gravitational binding energy (½v² ≥ GM/r), so gravity can slow the planet but never turn it around — it leaves forever on an open path.";
+  } else if (Math.abs(orbit.frac - 1) <= 0.05){
+    cap.className = "caption good";
+    cap.innerHTML = "✅ <b>Stable, nearly circular orbit.</b> The inward gravitational pull GMm/r² exactly supplies the centripetal force mv²/r needed for this sideways speed. The planet keeps falling toward the Sun — and keeps missing it.";
+  } else if (orbit.frac < 1){
+    // perihelion from energy + angular momentum
+    var Lm = orbit.r0 * v;
+    var ecc = Math.sqrt(Math.max(0, 1 + 2*E*Lm*Lm/(GM*GM)));
+    var a = -GM/(2*E), rp = a*(1-ecc);
+    if (rp <= SUN_R + 6){
+      cap.className = "caption bad";
+      cap.innerHTML = "☄️ <b>Too slow — it spirals in and hits the Sun!</b> With little sideways velocity, gravity's inward pull wins: the planet cannot \"miss\" the Sun as it falls. More tangential speed is the only fix — this is why satellites need huge horizontal speed, not just height.";
+    } else {
+      cap.className = "caption";
+      cap.innerHTML = "🌀 <b>Elliptical orbit — swinging inward.</b> Below circular speed, gravity pulls the planet closer; it speeds up as it falls (nearest point: perihelion), then its speed carries it back out. Gravity and tangential velocity trade places — exactly Kepler's ellipse.";
+    }
+  } else {
+    cap.className = "caption";
+    cap.innerHTML = "🌀 <b>Elliptical orbit — stretching outward.</b> Faster than circular (but below escape), the planet climbs away from the Sun, slowing as gravity tugs it back, then falls in again. Bound, but not a circle.";
+  }
+}
+
+function stepOrbit(dt){
+  if (!orbit.running) return;
+  var sub = 8, h = Math.min(dt, 0.05)/sub;
+  for (var i=0; i<sub; i++){
+    var r = Math.hypot(orbit.x, orbit.y);
+    if (r <= SUN_R + 4){ orbit.running=false; orbit.state="crashed"; break; }
+    var a = -GM / (r*r*r);
+    orbit.vx += a*orbit.x*h;  orbit.vy += a*orbit.y*h;   // semi-implicit Euler (stable)
+    orbit.x  += orbit.vx*h;   orbit.y  += orbit.vy*h;
+  }
+  var rr = Math.hypot(orbit.x, orbit.y);
+  var vv = Math.hypot(orbit.vx, orbit.vy);
+  if (rr > 30*AU && 0.5*vv*vv - GM/rr >= 0){
+    orbit.running = false; orbit.state = "escaped";
+  }
+  if (orbit.state === "crashed"){
+    var cap = $("orbitCaption");
+    cap.className = "caption bad";
+    cap.innerHTML = "☄️ <b>Crashed into the Sun.</b> Gravity's inward pull overwhelmed the small tangential velocity. Reset and try more launch speed!";
+  }
+  orbit.trail.push({x:orbit.x, y:orbit.y});
+  if (orbit.trail.length > 700) orbit.trail.shift();
+  updateOrbitReadouts();
+}
+
+function updateOrbitReadouts(){
+  var vc = vCirc(orbit.r0), ve = Math.SQRT2*vc;
+  var v = Math.hypot(orbit.vx, orbit.vy);
+  var r = Math.hypot(orbit.x, orbit.y);
+  $("vcVal").innerHTML  = toKms(vc).toFixed(1)  + " <small>km/s</small>";
+  $("veVal").innerHTML  = toKms(ve).toFixed(1)  + " <small>km/s</small>";
+  $("vYouVal").innerHTML= toKms(v).toFixed(1)   + " <small>km/s</small>";
+  $("rNowVal").innerHTML= (r/AU).toFixed(2)     + " <small>AU</small>";
+}
+
+var oc = $("orbitCanvas"), octx = oc.getContext("2d");
+function drawOrbit(){
+  var W = oc.width, H = oc.height, cx = W/2, cy = H/2;
+  octx.clearRect(0,0,W,H);
+  octx.fillStyle = "#0b0f1a"; octx.fillRect(0,0,W,H);
+  // starfield
+  octx.fillStyle = "rgba(255,255,255,.30)";
+  for (var i=0;i<40;i++){
+    octx.fillRect((i*197.3)%W, (i*113.7)%H, 2, 2);
+  }
+  // auto-zoom if the planet wanders far
+  var rNow = Math.hypot(orbit.x, orbit.y);
+  var zoom = Math.min(1, (Math.min(W,H)/2 - 20) / Math.max(rNow, orbit.r0));
+  // reference circle for the chosen radius
+  octx.strokeStyle = "rgba(154,165,189,.25)"; octx.lineWidth = 1;
+  octx.setLineDash([5,6]);
+  octx.beginPath(); octx.arc(cx, cy, orbit.r0*zoom, 0, Math.PI*2); octx.stroke();
+  octx.setLineDash([]);
+  // trail
+  if (orbit.trail.length > 1){
+    octx.lineWidth = 2;
+    for (var t=1; t<orbit.trail.length; t++){
+      var al = t/orbit.trail.length;
+      octx.strokeStyle = "rgba(255,180,84," + (0.08 + 0.5*al).toFixed(2) + ")";
+      octx.beginPath();
+      octx.moveTo(cx + orbit.trail[t-1].x*zoom, cy + orbit.trail[t-1].y*zoom);
+      octx.lineTo(cx + orbit.trail[t].x*zoom,   cy + orbit.trail[t].y*zoom);
+      octx.stroke();
+    }
+  }
+  // sun
+  var sg = octx.createRadialGradient(cx, cy, 2, cx, cy, SUN_R*zoom + 14);
+  sg.addColorStop(0, "#fff3c4"); sg.addColorStop(.4, "#ffca4d"); sg.addColorStop(1, "rgba(255,150,50,0)");
+  octx.fillStyle = sg;
+  octx.beginPath(); octx.arc(cx, cy, SUN_R*zoom + 14, 0, Math.PI*2); octx.fill();
+  // planet (if not crashed)
+  if (orbit.state !== "crashed"){
+    var px = cx + orbit.x*zoom, py = cy + orbit.y*zoom;
+    if (px > -20 && px < W+20 && py > -20 && py < H+20){
+      var pg = octx.createRadialGradient(px-2, py-2, 1, px, py, 8);
+      pg.addColorStop(0, "#bfe3ff"); pg.addColorStop(1, "#4d9fe0");
+      octx.fillStyle = pg;
+      octx.beginPath(); octx.arc(px, py, 7, 0, Math.PI*2); octx.fill();
+      // velocity arrow before launch
+      if (orbit.state === "ready"){
+        var vv = Math.hypot(orbit.vx, orbit.vy) || 1;
+        var ax = orbit.vx/vv, ay = orbit.vy/vv, alen = 34;
+        octx.strokeStyle = "#5fd68b"; octx.lineWidth = 3;
+        octx.beginPath(); octx.moveTo(px, py); octx.lineTo(px+ax*alen, py+ay*alen); octx.stroke();
+        octx.fillStyle = "#5fd68b";
+        octx.beginPath();
+        octx.moveTo(px+ax*alen, py+ay*alen);
+        octx.lineTo(px+ax*(alen-9)-ay*5, py+ay*(alen-9)+ax*5);
+        octx.lineTo(px+ax*(alen-9)+ay*5, py+ay*(alen-9)-ax*5);
+        octx.closePath(); octx.fill();
+        // gravity arrow (toward sun)
+        var gx2 = -orbit.x/rNow, gy2 = -orbit.y/rNow;
+        octx.strokeStyle = "#ff7b7b"; octx.lineWidth = 3;
+        octx.beginPath(); octx.moveTo(px, py); octx.lineTo(px+gx2*28, py+gy2*28); octx.stroke();
+        octx.fillStyle = "#ff7b7b";
+        octx.beginPath();
+        octx.moveTo(px+gx2*28, py+gy2*28);
+        octx.lineTo(px+gx2*19-gy2*5, py+gy2*19+gx2*5);
+        octx.lineTo(px+gx2*19+gy2*5, py+gy2*19-gx2*5);
+        octx.closePath(); octx.fill();
+        octx.fillStyle = "#9aa5bd"; octx.font = "11px system-ui, sans-serif";
+        octx.textAlign = "left";
+        octx.fillText("green = launch velocity, red = gravity pull", 12, H-12);
+      }
+    }
+  } else {
+    octx.fillStyle = "#ffca4d"; octx.font = "600 15px system-ui, sans-serif";
+    octx.textAlign = "center";
+    octx.fillText("☄️ absorbed by the Sun", cx, cy - SUN_R - 24);
+  }
+  // status label
+  var labels = {ready:"ready to launch", flying:"in flight", crashed:"crashed", escaped:"escaped the Sun!"};
+  octx.fillStyle = "#c8d2e8"; octx.font = "600 13px system-ui, sans-serif";
+  octx.textAlign = "right";
+  octx.fillText(labels[orbit.state], W-12, 22);
+  if (orbit.state === "escaped"){
+    var cap = $("orbitCaption");
+    if (cap.className.indexOf("bad") < 0){
+      cap.className = "caption bad";
+      cap.innerHTML = "🚀 <b>Gone!</b> The planet's kinetic energy exceeded its gravitational binding energy, so the Sun's pull could only slow it — never reverse it. It is on an unbound (hyperbolic) path.";
+    }
+  }
+}
+
+/* =========================================================
+   MAIN LOOP — rAF, paused when tab hidden
+   ========================================================= */
+var lastTs = 0, rafId = null;
+function frame(ts){
+  rafId = null;
+  if (!pageVisible) { lastTs = 0; return; }   // battery saver
+  var dt = lastTs ? Math.min((ts - lastTs)/1000, 0.05) : 0;
+  lastTs = ts;
+  if (mode === "fall"){
+    stepFall(dt);
+    drawFall(); drawGraph(); updateFallReadouts();
+    if (fall.running) requestFrame();
+  } else {
+    stepOrbit(dt);
+    drawOrbit();
+    if (orbit.running) requestFrame();
+  }
+}
+function requestFrame(){
+  if (rafId === null) rafId = requestAnimationFrame(frame);
+}
+
+/* =========================================================
+   QUIZ
+   ========================================================= */
+document.querySelectorAll(".quiz .q").forEach(function(q){
+  var ans = parseInt(q.dataset.ans, 10);
+  var btns = q.querySelectorAll(".opts button");
+  btns.forEach(function(b, i){
+    b.addEventListener("click", function(){
+      btns.forEach(function(x){ x.disabled = true; });
+      btns[ans].classList.add("correct");
+      if (i !== ans) b.classList.add("wrong");
+      q.querySelector(".expl").classList.add("show");
+    });
+  });
+});
+
+/* init */
+resetFall();
+resetOrbit();
+})();
+</script>
+</body>
+</html>
