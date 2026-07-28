@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>हिमालयो नाम नगाधिराजः | Himalaya Explorer &amp; Games</title>
+<style>
+  :root{
+    --accent:#63b3ed;
+    --accent-soft:rgba(99,179,237,.14);
+    --accent-dark:#9ecbf0;
+    --bg:#161b24;
+    --bg2:#1c222d;
+    --panel:#212836;
+    --ink:#e7ecf3;
+    --muted:#9aa6b8;
+    --good:#54cd97;
+    --good-soft:rgba(84,205,151,.15);
+    --bad:#f0728c;
+    --bad-soft:rgba(240,114,140,.15);
+    --line:#303a4b;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Kokila",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(165deg,#161b24 0%,#1c222d 60%,#20293a 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:840px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:14px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6.5vw,2.4rem);color:var(--accent-dark);line-height:1.4;}
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:2px 0 4px;
+    color:var(--ink);font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:16px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#0d1420;box-shadow:0 4px 14px rgba(99,179,237,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.32);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .kind-tag{
+    display:inline-block;font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;
+    font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:12px;
+    background:var(--accent-soft);color:var(--accent-dark);border:1px solid var(--line);
+  }
+  .verse-card{
+    background:var(--bg2);
+    border-radius:16px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,4.8vw,1.75rem);
+    line-height:1.85;
+    text-align:center;
+    color:var(--accent-dark);
+    margin-bottom:8px;
+    white-space:pre-line;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.88rem;color:var(--muted);
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.08rem;color:var(--accent-dark);font-weight:600;}
+  .info-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.94rem;
+  }
+  .info-box.anvaya{border-left:3px solid var(--accent);}
+  .info-box.trans{border-left:3px solid var(--good);}
+  .info-box.trans .block-label{color:var(--good);}
+  .info-box.appreciate{background:var(--good-soft);border-color:rgba(84,205,151,.3);}
+  .info-box.appreciate .block-label{color:var(--good);}
+  .info-box .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#0d1420;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;
+    border:1px solid var(--line);
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .match-col-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--bg2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(99,179,237,.2);}
+  .word-item.done,.mean-item.done{
+    border-color:rgba(84,205,151,.4);background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.9;
+  }
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.94rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid rgba(84,205,151,.4);
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-q{
+    font-size:1.02rem;font-weight:600;margin-bottom:14px;text-align:center;
+    line-height:1.6;
+  }
+  .quiz-q .deva-inline{font-family:var(--deva);color:var(--accent-dark);font-size:1.15rem;}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:.98rem;
+    border:2px solid var(--line);background:var(--bg2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+    text-align:left;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:rgba(84,205,151,.5);background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--bg2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;border-left:3px solid var(--accent);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:14px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">हिमालयो नाम नगाधिराजः</div>
+    <h1>Himalaya &mdash; King of Mountains</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 15 &middot; Kalidasa's Kumarasambhava 1.1</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">🏔️ Verse Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse &amp; Himalaya Explorer</h2>
+      <p class="mode-sub">Move through Kalidasa's verses and simple-Sanskrit cards on the Himalaya.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">MCQ Quiz</h2>
+      <p class="mode-sub">Answer 3 questions on the verse and the Himalaya. Explanations reveal after each.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Kalidasa's Kumarasambhava is public domain &middot; Verses quoted verbatim &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA ---------------- */
+var ENTRIES = [
+  {
+    kind:"Kumarasambhava 1.1 · मूलपाठः",
+    deva:"अस्त्युत्तरस्यां दिशि देवतात्मा हिमालयो नाम नगाधिराजः।\nपूर्वापरौ तोयनिधी वगाह्य स्थितः पृथिव्या इव मानदण्डः॥",
+    translit:"asty uttarasyāṁ diśi devatātmā himālayo nāma nagādhirājaḥ,\npūrvāparau toyanidhī vagāhya sthitaḥ pṛthivyā iva mānadaṇḍaḥ.",
+    words:[
+      {w:"अस्ति", m:"there is / exists"},
+      {w:"उत्तरस्याम् दिशि", m:"in the northern direction"},
+      {w:"देवतात्मा", m:"having a divine soul"},
+      {w:"हिमालयः नाम", m:"named Himalaya"},
+      {w:"नगाधिराजः", m:"king of mountains"},
+      {w:"पूर्वापरौ", m:"eastern &amp; western"},
+      {w:"तोयनिधी", m:"the two oceans"},
+      {w:"वगाह्य", m:"having plunged into"},
+      {w:"स्थितः", m:"stands"},
+      {w:"पृथिव्याः इव", m:"like (that) of the earth"},
+      {w:"मानदण्डः", m:"a measuring-rod"}
+    ],
+    anvaya:"उत्तरस्यां दिशि देवतात्मा हिमालयः नाम नगाधिराजः अस्ति। (सः) पूर्वापरौ तोयनिधी अवगाह्य पृथिव्याः मानदण्डः इव स्थितः (अस्ति)।",
+    trans:"In the northern direction there is a divine-souled king of mountains named Himalaya. Having plunged into the eastern and western oceans, he stands like a measuring-rod of the earth.",
+    appreciate:"The <span class='deva-inline'>मानदण्ड</span> (measuring-rod) image is Kalidasa's masterstroke: the Himalaya stretches from the eastern to the western ocean, so vast that it seems to gauge the very breadth of the earth. The simile fuses grandeur with precision — the mountain is both a divine being (देवतात्मा) and a cosmic yardstick marking the land's northern limit."
+  },
+  {
+    kind:"Kumarasambhava 1.3 · मूलपाठः",
+    deva:"अनन्तरत्नप्रभवस्य यस्य हिमं न सौभाग्यविलोपि जातम्।\nएको हि दोषो गुणसन्निपाते निमज्जतीन्दोः किरणेष्विवाङ्कः॥",
+    translit:"ananta-ratna-prabhavasya yasya himaṁ na saubhāgya-vilopi jātam,\neko hi doṣo guṇa-sannipāte nimajjatīndoḥ kiraṇeṣv ivāṅkaḥ.",
+    words:[
+      {w:"अनन्तरत्नप्रभवस्य", m:"of (him) source of endless jewels"},
+      {w:"यस्य", m:"whose"},
+      {w:"हिमम्", m:"snow"},
+      {w:"सौभाग्यविलोपि", m:"destroying (its) beauty"},
+      {w:"न जातम्", m:"did not become"},
+      {w:"एकः दोषः", m:"a single flaw"},
+      {w:"गुणसन्निपाते", m:"in a host of virtues"},
+      {w:"निमज्जति", m:"sinks / is submerged"},
+      {w:"इन्दोः किरणेषु", m:"amid the moon's rays"},
+      {w:"अङ्कः इव", m:"like the dark spot"}
+    ],
+    anvaya:"अनन्तरत्नप्रभवस्य यस्य हिमं सौभाग्यविलोपि न जातम्; (यतः) गुणसन्निपाते एकः दोषः इन्दोः किरणेषु अङ्कः इव निमज्जति हि।",
+    trans:"The snow of that Himalaya — the source of endless jewels — never destroyed its beauty. For a single flaw sinks amid a host of virtues, just as the dark spot of the moon is lost amid its rays.",
+    appreciate:"A celebrated Kalidasan simile: the mountain's icy cold, a possible defect, is overwhelmed by its countless virtues — exactly as the moon's blemish disappears in its radiance. The verse teaches that one small flaw is negligible where merits abound."
+  },
+  {
+    kind:"वर्णनम् · Rivers (सरलं संस्कृतम्)",
+    deva:"हिमालयात् गङ्गा यमुना च प्रभवतः।\nते नद्यौ भारतं पोषयतः।",
+    translit:"himālayāt gaṅgā yamunā ca prabhavataḥ,\nte nadyau bhārataṁ poṣayataḥ.",
+    words:[
+      {w:"हिमालयात्", m:"from the Himalaya"},
+      {w:"गङ्गा यमुना च", m:"the Ganga and Yamuna"},
+      {w:"प्रभवतः", m:"(the two) arise"},
+      {w:"ते नद्यौ", m:"those two rivers"},
+      {w:"पोषयतः", m:"(they two) nourish"}
+    ],
+    trans:"From the Himalaya the Ganga and Yamuna arise; these two rivers nourish India.",
+    appreciate:"The Himalaya is the <span class='deva-inline'>जलस्रोतः</span> (water-source) of the north-Indian plains. Its glaciers feed the Ganga, Yamuna and other rivers that have sustained civilization, agriculture and pilgrimage for millennia."
+  },
+  {
+    kind:"वर्णनम् · Holy places (सरलं संस्कृतम्)",
+    deva:"हिमालये बहूनि तीर्थानि सन्ति।\nकेदारनाथः बद्रीनाथः च पवित्रे स्थाने स्तः।",
+    translit:"himālaye bahūni tīrthāni santi,\nkedāranāthaḥ badrīnāthaḥ ca pavitre sthāne staḥ.",
+    words:[
+      {w:"हिमालये", m:"in the Himalaya"},
+      {w:"बहूनि तीर्थानि", m:"many pilgrimage-sites"},
+      {w:"सन्ति", m:"there are"},
+      {w:"पवित्रे स्थाने", m:"two sacred places"},
+      {w:"स्तः", m:"(the two) are"}
+    ],
+    trans:"In the Himalaya there are many pilgrimage-sites; Kedarnath and Badrinath are two sacred places.",
+    appreciate:"For Indian tradition the Himalaya is <span class='deva-inline'>देवभूमिः</span> (land of the gods) — the abode of Shiva at Kailasa, and home to shrines like Kedarnath, Badrinath and Amarnath that draw pilgrims from across the land."
+  },
+  {
+    kind:"वर्णनम् · Forests (सरलं संस्कृतम्)",
+    deva:"हिमालयस्य वनेषु देवदारवः औषधयश्च वर्धन्ते।\nतत्र नानाविधाः पशवः पक्षिणश्च वसन्ति।",
+    translit:"himālayasya vaneṣu devadāravaḥ auṣadhayaś ca vardhante,\ntatra nānāvidhāḥ paśavaḥ pakṣiṇaś ca vasanti.",
+    words:[
+      {w:"वनेषु", m:"in the forests"},
+      {w:"देवदारवः", m:"deodar trees"},
+      {w:"औषधयः", m:"medicinal herbs"},
+      {w:"वर्धन्ते", m:"grow"},
+      {w:"पशवः पक्षिणः च", m:"animals and birds"},
+      {w:"वसन्ति", m:"dwell"}
+    ],
+    trans:"In the forests of the Himalaya deodar trees and medicinal herbs grow; there many kinds of animals and birds dwell.",
+    appreciate:"The Himalayan forests are a treasury of <span class='deva-inline'>औषधयः</span> (healing herbs) — the very ‘endless jewels’ Kalidasa praises in 1.3 — and shelter a rich variety of wildlife across their slopes."
+  },
+  {
+    kind:"वर्णनम् · Guardian of the north (सरलं संस्कृतम्)",
+    deva:"हिमालयः उत्तरस्यां दिशि प्राचीरः इव भारतं रक्षति।\nसः देशस्य रक्षकः वर्तते।",
+    translit:"himālayaḥ uttarasyāṁ diśi prācīraḥ iva bhārataṁ rakṣati,\nsaḥ deśasya rakṣakaḥ vartate.",
+    words:[
+      {w:"उत्तरस्याम् दिशि", m:"in the northern direction"},
+      {w:"प्राचीरः इव", m:"like a rampart"},
+      {w:"रक्षति", m:"protects"},
+      {w:"देशस्य", m:"of the country"},
+      {w:"रक्षकः वर्तते", m:"stands as protector"}
+    ],
+    trans:"In the northern direction the Himalaya, like a rampart, protects India; it stands as the guardian of the country.",
+    appreciate:"This mirrors verse 1.1's <span class='deva-inline'>उत्तरस्यां दिशि</span>: the Himalaya walls off the north, blocking cold winds and standing as a natural boundary — the guardian (रक्षकः) of the land."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = ENTRIES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> = '+x.m+'</span>';
+  }).join("");
+  var html =
+    '<span class="kind-tag">'+v.kind+'</span>'+
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थः &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>';
+  if(v.anvaya){
+    html += '<div class="info-box anvaya"><div class="block-label">अन्वयः &middot; Prose Order</div>'+
+            '<span class="deva-inline">'+v.anvaya+'</span></div>';
+  }
+  html += '<div class="info-box trans"><div class="block-label">Translation</div>'+v.trans+'</div>';
+  if(v.appreciate){
+    html += '<div class="info-box appreciate"><div class="block-label">रसास्वादः &middot; Appreciation</div>'+v.appreciate+'</div>';
+  }
+  verseCard.innerHTML = html;
+  verseCount.textContent = "Card "+(vIndex+1)+" of "+ENTRIES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===ENTRIES.length-1);
+  var d = "";
+  for(var i=0;i<ENTRIES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<ENTRIES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"हिमालयः", m:"Himalaya"},
+  {w:"नगाधिराजः", m:"king of mountains"},
+  {w:"तोयनिधिः", m:"ocean"},
+  {w:"मानदण्डः", m:"measuring-rod"},
+  {w:"देवतात्मा", m:"having a divine soul"},
+  {w:"दिक्", m:"direction"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: MCQ QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"In verse 1.1 the Himalaya is called <span class='deva-inline'>नगाधिराजः</span>. What does this mean?",
+    options:[
+      "<span class='deva-inline'>नगाधिराजः</span> = king of mountains",
+      "<span class='deva-inline'>नगाधिराजः</span> = lord of rivers",
+      "<span class='deva-inline'>नगाधिराजः</span> = king of the gods",
+      "<span class='deva-inline'>नगाधिराजः</span> = ruler of the sky"
+    ],
+    answer:0,
+    explain:"<b>नग</b> means mountain and <b>अधिराज</b> means supreme king, so <b>नगाधिराजः</b> = ‘king of mountains’. Kalidasa exalts the Himalaya as the sovereign of all peaks."
+  },
+  {
+    q:"Kalidasa says the Himalaya, spanning the two oceans, stands like a <span class='deva-inline'>____</span> of the earth. Fill the image.",
+    options:[
+      "<span class='deva-inline'>मानदण्डः</span> (measuring-rod)",
+      "<span class='deva-inline'>सिंहासनम्</span> (throne)",
+      "<span class='deva-inline'>मुकुटम्</span> (crown)",
+      "<span class='deva-inline'>सेतुः</span> (bridge)"
+    ],
+    answer:0,
+    explain:"<b>पृथिव्या इव मानदण्डः</b> — stretching from the eastern to the western ocean, the Himalaya seems to measure the earth's breadth, hence ‘like a measuring-rod (मानदण्डः) of the earth’."
+  },
+  {
+    q:"According to the verse and its geography, in which direction does the Himalaya lie, and what famous rivers rise from it?",
+    options:[
+      "North (<span class='deva-inline'>उत्तरस्याम्</span>); the Ganga and Yamuna",
+      "South (<span class='deva-inline'>दक्षिणस्याम्</span>); the Kaveri and Krishna",
+      "East (<span class='deva-inline'>पूर्वस्याम्</span>); the Brahmaputra alone",
+      "West (<span class='deva-inline'>पश्चिमस्याम्</span>); the Narmada and Tapi"
+    ],
+    answer:0,
+    explain:"The verse opens <b>अस्त्युत्तरस्यां दिशि</b> — ‘there is, in the northern direction’. The Himalaya guards India's north, and its glaciers give rise to the Ganga, Yamuna and other great rivers."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-opt="'+i+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.opt, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.opt, 10);
+    if(bi === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

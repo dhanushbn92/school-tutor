@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>वर्षर्तुवर्णनम् · Rainy Season in Sanskrit Kavya</title>
+<style>
+  :root{
+    --accent:#3fb6d8;
+    --accent-dark:#7fd6ef;
+    --accent-soft:rgba(63,182,216,.14);
+    --bg:#101820;
+    --bg2:#16222e;
+    --panel:#182734;
+    --ink:#e7eef3;
+    --muted:#9fb2c0;
+    --good:#54cf95;
+    --good-soft:rgba(84,207,149,.14);
+    --bad:#f2758d;
+    --bad-soft:rgba(242,117,141,.15);
+    --line:#2a3b49;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(165deg,#0e1620 0%,#16222e 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:840px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:14px;}
+  header.top .deva-title{
+    font-family:var(--deva);font-size:clamp(1.7rem,6.5vw,2.5rem);
+    color:var(--accent-dark);line-height:1.3;
+  }
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:2px 0 4px;color:var(--ink);font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+  .rain-strip{font-size:1.1rem;letter-spacing:.35em;color:var(--accent);opacity:.7;margin-top:6px;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .tab-btn{
+    border:1px solid var(--line);cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);border-color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#08131a;border-color:var(--accent);box-shadow:0 4px 14px rgba(63,182,216,.3);}
+
+  .panel{
+    background:var(--panel);border-radius:20px;padding:22px;
+    box-shadow:0 10px 32px rgba(0,0,0,.35);
+    border:1px solid var(--line);margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.86rem;margin:0 0 16px;}
+
+  /* ---- Verse Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:10px;}
+  .verse-card{background:var(--bg2);border-radius:16px;padding:20px 18px;border:1px solid var(--line);}
+  .src-tag{
+    display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;
+    padding:3px 10px;border-radius:999px;margin-bottom:12px;
+  }
+  .src-kal{background:var(--accent-soft);color:var(--accent-dark);border:1px solid var(--line);}
+  .src-orig{background:var(--good-soft);color:var(--good);border:1px solid var(--line);}
+  .verse-deva{
+    font-family:var(--deva);font-size:clamp(1.2rem,4.6vw,1.65rem);
+    line-height:1.9;text-align:center;color:var(--ink);margin-bottom:8px;
+  }
+  .verse-translit{text-align:center;font-style:italic;color:var(--muted);font-size:.9rem;margin-bottom:16px;line-height:1.7;}
+  .block-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700;margin-bottom:6px;}
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 10px;font-size:.88rem;}
+  .shabda-chip b{font-family:var(--deva);font-size:1.05rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .box{background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;border:1px solid var(--line);font-size:.93rem;}
+  .box .deva-in{font-family:var(--deva);color:var(--accent-dark);}
+  .note-box{background:var(--good-soft);border-color:rgba(84,207,149,.3);}
+  .note-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#08131a;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--accent-soft);color:var(--accent-dark);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;border:1px solid var(--line);}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .match-col-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;padding:12px 8px;margin-bottom:10px;
+    background:var(--bg2);font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(63,182,216,.2);}
+  .word-item.done,.mean-item.done{border-color:rgba(84,207,149,.5);background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.93rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{border:2px solid var(--accent);background:transparent;color:var(--accent-dark);padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;}
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{text-align:center;background:var(--good-soft);border:1px solid rgba(84,207,149,.4);border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;}
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{font-family:var(--deva);font-size:clamp(1.1rem,4.4vw,1.5rem);text-align:center;line-height:1.8;color:var(--accent-dark);background:var(--bg2);border-radius:14px;padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{border:2px solid var(--line);background:var(--bg2);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;font-size:.95rem;transition:.15s;text-align:left;}
+  .opt-btn .od{font-family:var(--deva);color:var(--accent-dark);font-size:1.1rem;}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:rgba(84,207,149,.6);background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .od{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{display:none;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.9rem;margin-bottom:8px;}
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:16px 0 6px;line-height:1.6;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:9px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">वर्षर्तुवर्णनम्</div>
+    <h1>The Rainy Season in Sanskrit Poetry</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 13 &middot; वर्षा ऋतु &middot; Kavya Tradition</p>
+    <div class="rain-strip">☁ ⚡ 🌧 🦚 🌊</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Verse Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Verse Explorer &middot; काव्यदर्शनम्</h2>
+      <p class="mode-sub">Authentic Kalidasa monsoon verses (public domain) with word-meanings, prose order (अन्वय), translation and imagery — plus simple original descriptive lines.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game &middot; शब्दार्थमेलनम्</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to pair them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शोभनम्! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">MCQ Quiz &middot; प्रश्नोत्तरम्</h2>
+      <p class="mode-sub">Three questions on the imagery of वर्षा ऋतु and the verses above. Answer, then read the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Kalidasa's <i>Meghadūtam</i> is public domain. Verses quoted are standard transmitted text; original descriptive lines are marked separately. Built for NIOS Sanskrit learning.
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA ---------------- */
+/* Kalidasa verses = confident, standard public-domain text. */
+/* Original lines = simple descriptive Sanskrit, clearly marked. */
+var VERSES = [
+  {
+    kal:true,
+    src:"कालिदासः · Meghadūtam 1.1 (Pūrvamegha)",
+    deva:"कश्चित्कान्ताविरहगुरुणा स्वाधिकारात्प्रमत्तः<br>शापेनास्तंगमितमहिमा वर्षभोग्येण भर्तुः।<br>यक्षश्चक्रे जनकतनयास्नानपुण्योदकेषु<br>स्निग्धच्छायातरुषु वसतिं रामगिर्याश्रमेषु॥",
+    translit:"kaścit kāntā-viraha-guruṇā svādhikārāt pramattaḥ / śāpenāstaṁgamita-mahimā varṣa-bhogyeṇa bhartuḥ / yakṣaś cakre janaka-tanayā-snāna-puṇyodakeṣu / snigdha-cchāyā-taruṣu vasatiṁ rāmagiry-āśrameṣu",
+    words:[
+      {w:"कान्ताविरहगुरुणा", m:"made heavy by separation from the beloved"},
+      {w:"स्वाधिकारात् प्रमत्तः", m:"negligent of his own duty"},
+      {w:"शापेन", m:"by a curse"},
+      {w:"वर्षभोग्येन", m:"to be endured for a (whole) year"},
+      {w:"यक्षः", m:"a Yaksha (attendant of Kubera)"},
+      {w:"रामगिर्याश्रमेषु", m:"in the hermitages of Ramagiri"}
+    ],
+    anvaya:"कान्ताविरहगुरुणा भर्तुः शापेन स्वाधिकारात् प्रमत्तः अस्तंगमितमहिमा कश्चित् यक्षः जनकतनयास्नानपुण्योदकेषु स्निग्धच्छायातरुषु रामगिर्याश्रमेषु वर्षभोग्येन वसतिं चक्रे।",
+    trans:"A certain Yaksha, negligent in his duty and stripped of his glory by his master's curse — a curse to be borne for a full year and made grievous by separation from his beloved — made his dwelling in the hermitages of Ramagiri, where the waters are hallowed by the bathing of Janaka's daughter (Sita) and the trees give cool, dense shade.",
+    note:"The opening of the Meghadūta. The whole poem hangs on वर्ष (the year / the rains): the coming monsoon deepens the exile's longing and sets the stage for a cloud to carry his message."
+  },
+  {
+    kal:true,
+    src:"कालिदासः · Meghadūtam 1.2 (Pūrvamegha)",
+    deva:"तस्मिन्नद्रौ कतिचिदबलाविप्रयुक्तः स कामी<br>नीत्वा मासान्कनकवलयभ्रंशरिक्तप्रकोष्ठः।<br>आषाढस्य प्रथमदिवसे मेघमाश्लिष्टसानुं<br>वप्रक्रीडापरिणतगजप्रेक्षणीयं ददर्श॥",
+    translit:"tasminn adrau katicid abalā-viprayuktaḥ sa kāmī / nītvā māsān kanaka-valaya-bhraṁśa-rikta-prakoṣṭhaḥ / āṣāḍhasya prathama-divase megham āśliṣṭa-sānuṁ / vapra-krīḍā-pariṇata-gaja-prekṣaṇīyaṁ dadarśa",
+    words:[
+      {w:"तस्मिन् अद्रौ", m:"on that mountain"},
+      {w:"अबलाविप्रयुक्तः", m:"separated from his wife"},
+      {w:"कनकवलयभ्रंशरिक्तप्रकोष्ठः", m:"forearm bared by the slipping of his gold bracelet (thin from grief)"},
+      {w:"आषाढस्य प्रथमदिवसे", m:"on the first day of (the month) Āṣāḍha"},
+      {w:"आश्लिष्टसानुम्", m:"embracing the mountain-peak"},
+      {w:"वप्रक्रीडापरिणतगज…", m:"lovely like an elephant bent low, butting a bank in play"}
+    ],
+    anvaya:"तस्मिन् अद्रौ अबलाविप्रयुक्तः कनकवलयभ्रंशरिक्तप्रकोष्ठः सः कामी कतिचित् मासान् नीत्वा आषाढस्य प्रथमदिवसे आश्लिष्टसानुं वप्रक्रीडापरिणतगजप्रेक्षणीयं मेघं ददर्श।",
+    trans:"On that mountain the love-lorn one, parted from his wife — his forearm so thinned by grief that the gold bracelet had slipped off — passed several months; and on the first day of the month of Āṣāḍha he saw a cloud clinging to the peak, as lovely to behold as an elephant lowering its head to butt a river-bank in sport.",
+    note:"The single most famous image of the Indian monsoon in kavya: आषाढस्य प्रथमदिवसे — 'the first day of Āṣāḍha' — the cloud embracing the peak like a playful elephant marks the very onset of वर्षा."
+  },
+  {
+    kal:true,
+    src:"कालिदासः · Meghadūtam (Pūrvamegha)",
+    deva:"धूमज्योतिःसलिलमरुतां संनिपातः क्व मेघः<br>संदेशार्थाः क्व पटुकरणैः प्राणिभिः प्रापणीयाः।<br>इत्यौत्सुक्यादपरिगणयन्गुह्यकस्तं ययाचे<br>कामार्ता हि प्रकृतिकृपणाश्चेतनाचेतनेषु॥",
+    translit:"dhūma-jyotiḥ-salila-marutāṁ saṁnipātaḥ kva meghaḥ / saṁdeśārthāḥ kva paṭu-karaṇaiḥ prāṇibhiḥ prāpaṇīyāḥ / ity autsukyād aparigaṇayan guhyakas taṁ yayāce / kāmārtā hi prakṛti-kṛpaṇāś cetanācetaneṣu",
+    words:[
+      {w:"धूमज्योतिःसलिलमरुताम्", m:"of smoke, light (fire), water and wind"},
+      {w:"संनिपातः", m:"a mere combination / gathering"},
+      {w:"क्व मेघः", m:"where (indeed) is a cloud…"},
+      {w:"संदेशार्थाः", m:"the contents of a message"},
+      {w:"पटुकरणैः प्राणिभिः", m:"by living beings with capable sense-organs"},
+      {w:"कामार्ताः", m:"those tormented by love"}
+    ],
+    anvaya:"धूमज्योतिःसलिलमरुतां संनिपातः मेघः क्व, पटुकरणैः प्राणिभिः प्रापणीयाः संदेशार्थाः क्व — इति औत्सुक्यात् अपरिगणयन् गुह्यकः तं ययाचे; कामार्ताः हि चेतनाचेतनेषु प्रकृतिकृपणाः (भवन्ति)।",
+    trans:"Where is a cloud, a mere confluence of smoke, light, water and wind — and where are messages, things to be delivered only by living beings with keen senses? Not weighing this in his eagerness, the Yaksha still made his plea to it; for those afflicted by love are by nature helpless, (pleading alike) to the sentient and the insentient.",
+    note:"Kalidasa's self-aware wit: a cloud is only धूम, ज्योति, सलिल and मरुत् — smoke, fire, water and wind. Yet longing makes the exile treat a lifeless raincloud as a trusted messenger."
+  },
+  {
+    kal:false,
+    src:"मूलवाक्यानि · Original descriptive lines",
+    deva:"मेघाः गर्जन्ति, विद्युत् स्फुरति, वृष्टिः च पतति॥",
+    translit:"meghāḥ garjanti, vidyut sphurati, vṛṣṭiś ca patati",
+    words:[
+      {w:"मेघाः", m:"clouds"},
+      {w:"गर्जन्ति", m:"thunder / roar"},
+      {w:"विद्युत्", m:"lightning"},
+      {w:"स्फुरति", m:"flashes / quivers"},
+      {w:"वृष्टिः", m:"rain"},
+      {w:"पतति", m:"falls"}
+    ],
+    anvaya:"मेघाः गर्जन्ति। विद्युत् स्फुरति। वृष्टिः च पतति।",
+    trans:"The clouds thunder, the lightning flashes, and the rain falls.",
+    note:"Simple original Sanskrit (not Kalidasa) describing the monsoon sky — useful practice sentences for basic verbs and नाम-words."
+  },
+  {
+    kal:false,
+    src:"मूलवाक्यानि · Original descriptive lines",
+    deva:"मयूराः नृत्यन्ति, नद्यः जलेन पूर्णाः, कृषकाः च प्रसन्नाः॥",
+    translit:"mayūrāḥ nṛtyanti, nadyaḥ jalena pūrṇāḥ, kṛṣakāś ca prasannāḥ",
+    words:[
+      {w:"मयूराः", m:"peacocks"},
+      {w:"नृत्यन्ति", m:"dance"},
+      {w:"नद्यः", m:"rivers"},
+      {w:"जलेन पूर्णाः", m:"full of water"},
+      {w:"कृषकाः", m:"farmers"},
+      {w:"प्रसन्नाः", m:"joyful / happy"}
+    ],
+    anvaya:"मयूराः नृत्यन्ति। नद्यः जलेन पूर्णाः (सन्ति)। कृषकाः च प्रसन्नाः (सन्ति)।",
+    trans:"The peacocks dance, the rivers are full of water, and the farmers are happy.",
+    note:"Original lines capturing the joy of वर्षा ऋतु — the dancing peacock, brimming rivers and glad farmers are the classic delights of the season in Sanskrit poetry."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  var srcCls = v.kal ? "src-kal" : "src-orig";
+  verseCard.innerHTML =
+    '<span class="src-tag '+srcCls+'">'+v.src+'</span>'+
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="box"><div class="block-label">अन्वय &middot; Prose Order</div><span class="deva-in">'+v.anvaya+'</span></div>'+
+    '<div class="box"><div class="block-label">Translation &middot; अनुवाद</div>'+v.trans+'</div>'+
+    '<div class="box note-box"><div class="block-label">Imagery &middot; भाव</div>'+v.note+'</div>';
+  verseCount.textContent = "Verse "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"मेघः", m:"cloud"},
+  {w:"वृष्टिः", m:"rain"},
+  {w:"मयूरः", m:"peacock"},
+  {w:"नदी", m:"river"},
+  {w:"वर्षा", m:"rainy season"},
+  {w:"कृषकः", m:"farmer"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ सम्यक्! Correct!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 सर्वं मिलितम्! All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ पुनः प्रयत्नः! Try again.", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"In Kalidasa's Meghadūta, on which day does the exiled Yaksha first see the cloud on the peak?",
+    options:[
+      {t:"आषाढस्य प्रथमदिवसे — the first day of Āṣāḍha", ok:true},
+      {t:"चैत्रस्य पूर्णिमायाम् — the full-moon of Chaitra", ok:false},
+      {t:"माघस्य अन्तिमदिने — the last day of Māgha", ok:false}
+    ],
+    explain:"<b>आषाढस्य प्रथमदिवसे मेघमाश्लिष्टसानुं… ददर्श</b> — 'on the first day of Āṣāḍha he saw a cloud embracing the peak.' Āṣāḍha (June–July) opens the monsoon, so this line is the classic marker of वर्षा ऋतु."
+  },
+  {
+    q:"Which bird is celebrated as the joyful dancer of the rainy season in Sanskrit poetry?",
+    options:[
+      {t:"मयूरः — the peacock", ok:true},
+      {t:"काकः — the crow", ok:false},
+      {t:"हंसः — the swan", ok:false}
+    ],
+    explain:"The <b>मयूरः</b> (peacock) spreads its tail and dances at the sight of the monsoon clouds — <b>मयूराः नृत्यन्ति</b>. The हंस (swan) is instead linked with autumn (शरद्)."
+  },
+  {
+    q:"In the धूमज्योतिः verse, Kalidasa says a cloud is only a combination of which four things?",
+    options:[
+      {t:"धूम, ज्योति, सलिल, मरुत् — smoke, light, water, wind", ok:true},
+      {t:"पृथ्वी, अग्नि, आकाश, मनस् — earth, fire, sky, mind", ok:false},
+      {t:"सुवर्ण, रजत, ताम्र, लोह — gold, silver, copper, iron", ok:false}
+    ],
+    explain:"<b>धूमज्योतिःसलिलमरुतां संनिपातः क्व मेघः</b> — a cloud is a mere gathering of smoke, light (fire), water and wind. Kalidasa notes the irony that a lovelorn heart still trusts this lifeless thing with a message."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    var bi = parseInt(b.dataset.i,10);
+    b.disabled = true;
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(bi===chosen) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ सम्यक्! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

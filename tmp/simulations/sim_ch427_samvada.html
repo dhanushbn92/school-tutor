@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>संवादलेखनम् Builder | Samvadalekhanam</title>
+<style>
+  :root{
+    --accent:#e08a3c;
+    --accent-soft:#fbecdb;
+    --accent-dark:#b9662a;
+    --bg:#1c1a24;
+    --panel:#262230;
+    --panel-2:#2f2a3b;
+    --ink:#efe9f5;
+    --muted:#a79fb8;
+    --good:#4fbf8b;
+    --good-soft:#1f3b30;
+    --bad:#e5698a;
+    --bad-soft:#3a2530;
+    --line:#3c3550;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1c1a24 0%,#241f2e 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.6vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6vw,2.4rem);color:var(--ink);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#231d16;box-shadow:0 4px 14px rgba(224,138,60,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+
+  /* ---- Learn cards ---- */
+  .card{
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:16px;padding:16px 16px;margin-bottom:14px;
+  }
+  .card h3{margin:0 0 8px;font-size:1rem;color:var(--accent);}
+  .card h3 .deva{font-family:var(--deva);font-size:1.2rem;}
+  .card p{margin:6px 0;font-size:.92rem;}
+  .deva{font-family:var(--deva);}
+  .big-deva{font-family:var(--deva);font-size:1.15rem;color:var(--ink);}
+  .hi{color:var(--accent);font-weight:700;}
+  .phrase-list{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px;}
+  .phrase-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:8px 11px;font-size:.9rem;flex:1 1 46%;min-width:150px;
+  }
+  .phrase-chip b{font-family:var(--deva);font-size:1.08rem;color:var(--accent);display:block;}
+  .phrase-chip span{color:var(--muted);font-size:.85rem;}
+  .qword-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+  .qword{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:9px 11px;font-size:.88rem;
+  }
+  .qword b{font-family:var(--deva);font-size:1.1rem;color:var(--accent);margin-right:6px;}
+  .note{background:var(--good-soft);border:1px solid #2c4f40;border-radius:12px;padding:10px 12px;font-size:.9rem;margin-top:8px;}
+  .note .block-label{color:var(--good);}
+
+  /* ---- Model dialogue ---- */
+  .dialogue{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:8px;}
+  .dialogue .scene{font-size:.82rem;color:var(--muted);font-style:italic;margin-bottom:10px;}
+  .line{display:flex;gap:8px;margin-bottom:11px;align-items:flex-start;}
+  .who{font-family:var(--deva);font-weight:700;color:var(--accent);min-width:78px;font-size:.95rem;flex-shrink:0;}
+  .say .sa{font-family:var(--deva);font-size:1.12rem;color:var(--ink);}
+  .say .en{color:var(--muted);font-size:.82rem;margin-top:1px;}
+
+  /* ---- Game (match Q to A) ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--accent-soft);color:var(--accent-dark);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 15px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);color:var(--accent-dark);}
+  .game-scene{font-size:.85rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:14px;}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .match-col-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .q-item,.a-item{
+    display:block;width:100%;text-align:left;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 12px;margin-bottom:10px;background:var(--panel-2);
+    font-family:var(--deva);font-size:1.05rem;color:var(--ink);transition:.15s;line-height:1.4;
+  }
+  .q-item:hover,.a-item:hover{border-color:var(--accent);}
+  .q-item.sel,.a-item.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);box-shadow:0 0 0 3px rgba(224,138,60,.2);}
+  .q-item.done,.a-item.done{border-color:#2c4f40;background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .q-item.wrong,.a-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0 4px;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .win-banner{text-align:center;background:var(--good-soft);border:1px solid #2c4f40;border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;}
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-q{font-size:1rem;margin-bottom:14px;text-align:center;}
+  .quiz-q .deva{font-size:1.15rem;color:var(--ink);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-family:var(--deva);font-size:1.05rem;text-align:left;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:11px 14px;cursor:pointer;color:var(--ink);font-weight:600;transition:.15s;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2c4f40;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.9rem;margin-bottom:8px;}
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+  .nav-btn{border:none;cursor:pointer;background:var(--accent);color:#231d16;padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;transition:.15s;}
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{grid-template-columns:1fr;gap:6px;}
+    .who{min-width:64px;}
+    .phrase-chip{flex:1 1 100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">संवादलेखनम्</div>
+    <h1>Samvada Builder &middot; Sanskrit Dialogue Writing</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 12 &middot; संवादलेखनम्</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="learn">📖 कथं लिखेम? (How to)</button>
+    <button class="tab-btn" data-mode="game">🧩 संवादनिर्माणम् (Build)</button>
+    <button class="tab-btn" data-mode="quiz">✍️ प्रश्नोत्तरी (Quiz)</button>
+  </div>
+
+  <!-- ============ MODE 1: LEARN ============ -->
+  <section class="mode active" id="learn">
+    <div class="panel">
+      <h2 class="mode-title">How to Write a Sanskrit Dialogue</h2>
+      <p class="mode-sub">Learn polite greetings, the भवान्/भवती form, question words, and study two model dialogues.</p>
+
+      <div class="card">
+        <h3>1. आदरपूर्वकं सम्बोधनम् &middot; Polite Greetings</h3>
+        <p>A dialogue (संवादः) usually opens and closes with a greeting.</p>
+        <div class="phrase-list">
+          <div class="phrase-chip"><b>नमस्ते।</b><span>Greetings / Hello.</span></div>
+          <div class="phrase-chip"><b>नमो नमः।</b><span>Respectful greetings.</span></div>
+          <div class="phrase-chip"><b>धन्यवादः।</b><span>Thank you.</span></div>
+          <div class="phrase-chip"><b>पुनर्मिलामः।</b><span>We will meet again.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. <span class="deva">भवान् / भवती</span> &middot; The Polite "You"</h3>
+        <p>To address someone politely, use <span class="hi deva">भवान्</span> (for a man) or <span class="hi deva">भवती</span> (for a woman) meaning "you" (respected). The trap: these take a <span class="hi">THIRD-person</span> verb, not second-person.</p>
+        <div class="note">
+          <div class="block-label">Correct usage</div>
+          <p class="big-deva">भवान् किं <span class="hi">करोति</span>? — What do you (sir) do? <span style="color:var(--good)">✓</span></p>
+          <p class="big-deva">भवती कुत्र <span class="hi">गच्छति</span>? — Where do you (madam) go? <span style="color:var(--good)">✓</span></p>
+          <p style="color:var(--bad);font-size:.86rem;margin-top:6px;">Not भवान् करोषि (that mixes polite भवान् with 2nd-person करोषि). ✗</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3. <span class="deva">प्रश्नवाचकशब्दाः</span> &middot; Question Words</h3>
+        <p>Every question (प्रश्नः) begins with a question word.</p>
+        <div class="qword-grid">
+          <div class="qword"><b>किम्</b>what?</div>
+          <div class="qword"><b>कुत्र</b>where?</div>
+          <div class="qword"><b>कदा</b>when?</div>
+          <div class="qword"><b>कथम्</b>how?</div>
+          <div class="qword"><b>किमर्थम्</b>why / for what?</div>
+          <div class="qword"><b>कः / का</b>who? (m/f)</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>4. प्रश्न-उत्तर-प्रवाहः &middot; Question–Answer Flow</h3>
+        <p>A good dialogue moves in short turns: one asks a <span class="hi">प्रश्नः</span> (question), the other gives an <span class="hi">उत्तरम्</span> (answer). Keep sentences simple and natural.</p>
+        <div class="phrase-list">
+          <div class="phrase-chip"><b>भवतः नाम किम्?</b><span>What is your name?</span></div>
+          <div class="phrase-chip"><b>मम नाम रमेशः।</b><span>My name is Ramesh.</span></div>
+          <div class="phrase-chip"><b>भवान् कथम् अस्ति?</b><span>How are you?</span></div>
+          <div class="phrase-chip"><b>अहं कुशली अस्मि।</b><span>I am well.</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>आदर्शसंवादः १ &middot; Model Dialogue 1: शिक्षक–छात्र</h3>
+        <div class="dialogue">
+          <div class="scene">विद्यालये शिक्षकः छात्रः च — At school, a teacher and a student.</div>
+          <div class="line"><div class="who">छात्रः —</div><div class="say"><div class="sa">नमस्ते गुरुजी!</div><div class="en">Greetings, teacher!</div></div></div>
+          <div class="line"><div class="who">शिक्षकः —</div><div class="say"><div class="sa">नमस्ते। भवान् किं पठति?</div><div class="en">Greetings. What do you study?</div></div></div>
+          <div class="line"><div class="who">छात्रः —</div><div class="say"><div class="sa">अहं संस्कृतं पठामि।</div><div class="en">I study Sanskrit.</div></div></div>
+          <div class="line"><div class="who">शिक्षकः —</div><div class="say"><div class="sa">साधु! संस्कृतं किमर्थं रोचते?</div><div class="en">Good! Why do you like Sanskrit?</div></div></div>
+          <div class="line"><div class="who">छात्रः —</div><div class="say"><div class="sa">एषा भाषा सरला मधुरा च अस्ति।</div><div class="en">This language is simple and sweet.</div></div></div>
+          <div class="line"><div class="who">शिक्षकः —</div><div class="say"><div class="sa">शोभनम्! परिश्रमं कुरु। शुभम् अस्तु।</div><div class="en">Excellent! Work hard. May it be well.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>आदर्शसंवादः २ &middot; Model Dialogue 2: क्रेता–विक्रेता</h3>
+        <div class="dialogue">
+          <div class="scene">आपणे क्रेता विक्रेता च — At the shop, a buyer and a seller.</div>
+          <div class="line"><div class="who">क्रेता —</div><div class="say"><div class="sa">नमो नमः! आपणे फलानि सन्ति वा?</div><div class="en">Greetings! Are there fruits in the shop?</div></div></div>
+          <div class="line"><div class="who">विक्रेता —</div><div class="say"><div class="sa">आम्, सन्ति। भवान् किं इच्छति?</div><div class="en">Yes, there are. What do you want?</div></div></div>
+          <div class="line"><div class="who">क्रेता —</div><div class="say"><div class="sa">आम्रफलानां मूल्यं कियत्?</div><div class="en">What is the price of the mangoes?</div></div></div>
+          <div class="line"><div class="who">विक्रेता —</div><div class="say"><div class="sa">एकस्य किलोग्रामस्य मूल्यं शतरूप्यकाणि।</div><div class="en">One kilogram costs a hundred rupees.</div></div></div>
+          <div class="line"><div class="who">क्रेता —</div><div class="say"><div class="sa">उत्तमम्। द्वे किलोग्रामे ददातु।</div><div class="en">Fine. Please give two kilograms.</div></div></div>
+          <div class="line"><div class="who">विक्रेता —</div><div class="say"><div class="sa">एतानि गृह्णातु। धन्यवादः।</div><div class="en">Please take these. Thank you.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: GAME ============ -->
+  <section class="mode" id="game">
+    <div class="panel">
+      <h2 class="mode-title">Build the Dialogue</h2>
+      <p class="mode-sub">Tap a प्रश्नः (question), then tap its correct उत्तरम् (answer) to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="gameScore">Matched: 0 / 5</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 New Round</button>
+      </div>
+      <div class="game-scene" id="gameScene"></div>
+      <div class="feedback" id="gameFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">प्रश्नः (Question)</div>
+          <div id="qCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">उत्तरम् (Answer)</div>
+          <div id="aCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! संवादः सम्पूर्णः — dialogue complete!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Usage Quiz</h2>
+      <p class="mode-sub">Test your grip on polite forms, question words, and greetings.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ पुनः (Try Again)</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Simple standard Sanskrit &middot; Built for NIOS learners</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 2: BUILD GAME ---------------- */
+var GAME_SCENE = "मित्रयोः संवादः — a conversation between two friends. Match each question to its answer.";
+var PAIRS = [
+  {q:"भवतः नाम किम्?",           a:"मम नाम मोहनः।"},
+  {q:"भवान् कुत्र वसति?",        a:"अहं दिल्ल्यां वसामि।"},
+  {q:"भवान् किं पठति?",          a:"अहं विज्ञानं पठामि।"},
+  {q:"विद्यालयः कदा आरभते?",     a:"विद्यालयः प्रातः अष्टवादने आरभते।"},
+  {q:"भवान् कथम् अस्ति?",        a:"अहं कुशली अस्मि, धन्यवादः।"}
+];
+var qCol = document.getElementById("qCol");
+var aCol = document.getElementById("aCol");
+var gameScore = document.getElementById("gameScore");
+var gameFeedback = document.getElementById("gameFeedback");
+var winBanner = document.getElementById("winBanner");
+document.getElementById("gameScene").textContent = GAME_SCENE;
+var selQ = null, selA = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  gameFeedback.textContent = txt;
+  gameFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildGame(){
+  matched = 0; selQ = null; selA = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  gameScore.textContent = "Matched: 0 / "+PAIRS.length;
+  var qOrder = shuffle(PAIRS);
+  var aOrder = shuffle(PAIRS);
+  qCol.innerHTML = qOrder.map(function(p,i){
+    return '<button class="q-item" data-key="'+p.q+'">'+p.q+'</button>';
+  }).join("");
+  aCol.innerHTML = aOrder.map(function(p){
+    return '<button class="a-item" data-key="'+p.q+'">'+p.a+'</button>';
+  }).join("");
+  qCol.querySelectorAll(".q-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickQ(el); });
+  });
+  aCol.querySelectorAll(".a-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickA(el); });
+  });
+}
+function pickQ(el){
+  if(el.classList.contains("done")) return;
+  if(selQ) selQ.classList.remove("sel");
+  selQ = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickA(el){
+  if(el.classList.contains("done")) return;
+  if(selA) selA.classList.remove("sel");
+  selA = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selQ || !selA) return;
+  if(selQ.dataset.key === selA.dataset.key){
+    selQ.classList.add("done"); selA.classList.add("done");
+    selQ.classList.remove("sel"); selA.classList.remove("sel");
+    selQ = null; selA = null;
+    matched++;
+    gameScore.textContent = "Matched: "+matched+" / "+PAIRS.length;
+    setFeedback("✓ सम्यक्! Correct match.", "good");
+    if(matched===PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selQ, b = selA;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ न सम्यक्। Try again.", "bad");
+    if(selQ) selQ.classList.remove("sel");
+    if(selA) selA.classList.remove("sel");
+    selQ = null; selA = null;
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 420);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildGame);
+buildGame();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'Choose the correct polite sentence with <b>भवान्</b>:',
+    options:["भवान् किं करोषि?","भवान् किं करोति?","भवान् किं करोमि?"],
+    answer:"भवान् किं करोति?",
+    explain:"<b>भवान्</b> (polite ‘you’) always takes a <b>third-person</b> verb, so <b>करोति</b> is right. करोषि is 2nd-person (त्वम्) and करोमि is 1st-person (अहम्)."
+  },
+  {
+    q:'Which question word means <b>“why / for what?”</b>',
+    options:["कुत्र","कदा","किमर्थम्"],
+    answer:"किमर्थम्",
+    explain:"<b>किमर्थम्</b> = why / for what purpose. <b>कुत्र</b> = where, <b>कदा</b> = when."
+  },
+  {
+    q:'A dialogue politely closes with:',
+    options:["गच्छ गच्छ।","धन्यवादः, पुनर्मिलामः।","किम् एतत्?"],
+    answer:"धन्यवादः, पुनर्मिलामः।",
+    explain:"<b>धन्यवादः, पुनर्मिलामः</b> = ‘Thank you, we’ll meet again’ — a courteous farewell to end a संवादः."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o){
+    return '<button class="opt-btn" data-opt="'+o+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">आगे &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = el.dataset.opt;
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    if(b.dataset.opt === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
