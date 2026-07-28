@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Measures of Dispersion Lab — NIOS Class 12 Maths Ch17</title>
+<style>
+  :root{
+    --bg:#12161c; --panel:#1b222c; --panel2:#232c38; --line:#2f3a48;
+    --ink:#e8edf3; --mut:#9fb0c3; --accent:#39d0c8; --accent2:#2aa39c;
+    --a:#39d0c8; --b:#f6a94a; --good:#5ad19a; --bad:#f2708a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--mut);font-size:.85rem;margin-bottom:12px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tab{
+    background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.9rem;
+    min-height:40px;
+  }
+  .tab.active{background:var(--accent);color:#06201e;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 10px}
+  .view{display:none}
+  .view.on{display:block}
+  canvas{width:100%;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:none}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+  .chip button{background:transparent;border:none;color:var(--bad);font-size:1.05rem;cursor:pointer;line-height:1;padding:0 2px}
+  input[type=number],input[type=text]{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:8px;font-size:.95rem;width:90px;
+  }
+  button.btn{
+    background:var(--accent);color:#06201e;border:none;border-radius:10px;
+    padding:9px 14px;font-size:.9rem;cursor:pointer;font-weight:600;min-height:40px;
+  }
+  button.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;min-height:40px}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:6px}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .fact .k{color:var(--mut);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .fact .v{font-size:1.25rem;font-weight:700;color:var(--accent)}
+  .work{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.86rem;overflow-x:auto}
+  .work table{border-collapse:collapse;width:100%;font-size:.82rem;min-width:340px}
+  .work th,.work td{border:1px solid var(--line);padding:4px 6px;text-align:right}
+  .work th:first-child,.work td:first-child{text-align:left}
+  .frm{color:var(--mut);font-family:ui-monospace,Consolas,monospace;font-size:.82rem;margin:4px 0}
+  .frm b{color:var(--ink)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){.two{grid-template-columns:1fr}}
+  .qbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .qbox .q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 11px;margin:5px 0;cursor:pointer;font-size:.9rem;min-height:40px}
+  .opt.correct{background:rgba(90,209,154,.18);border-color:var(--good)}
+  .opt.wrong{background:rgba(242,112,138,.15);border-color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--mut);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .hint{color:var(--mut);font-size:.82rem}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--mut);margin-top:6px}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px}
+</style>
+</head>
+<body>
+<h1>Measures of Dispersion Lab</h1>
+<div class="sub">NIOS Class 12 Mathematics · Chapter 17 — range, mean deviation, variance σ², standard deviation σ, CV. (Population formulas, divisor N.)</div>
+
+<div class="tabs">
+  <button class="tab active" data-v="explorer">1 · Data Explorer</button>
+  <button class="tab" data-v="compare">2 · Compare Spread</button>
+  <button class="tab" data-v="visual">3 · Histogram Visual</button>
+  <button class="tab" data-v="quiz">Quiz</button>
+</div>
+
+<!-- ===== EXPLORER ===== -->
+<section class="view on" id="v-explorer">
+  <div class="panel">
+    <h2>Drag the dots or edit the values</h2>
+    <p class="hint">Drag any point on the number line to change it. Add a value below, or tap × on a chip to remove it. Everything recomputes live.</p>
+    <canvas id="dot" height="170" aria-label="dot plot of the data set"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--a)"></span>data point</span>
+      <span><span class="sw" style="background:var(--b)"></span>mean x̄</span>
+      <span><span class="sw" style="background:#6f7d8c"></span>±1 σ band</span>
+    </div>
+    <div class="row" id="chips"></div>
+    <div class="row">
+      <input type="number" id="newv" placeholder="value" step="any">
+      <button class="btn" id="add">Add value</button>
+      <button class="ghost" id="reset">Reset</button>
+      <button class="ghost" id="sample">Random set</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Live statistics</h2>
+    <div class="facts" id="facts"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Formulas with your numbers</h2>
+    <div class="frm">Range = max − min = <b id="fRange"></b></div>
+    <div class="frm">Mean  x̄ = (Σxᵢ) / N = <b id="fMean"></b></div>
+    <div class="frm">Mean deviation = (Σ|xᵢ − x̄|) / N = <b id="fMD"></b></div>
+    <div class="frm">Variance σ² = (Σ(xᵢ − x̄)²) / N = <b id="fVar"></b></div>
+    <div class="frm">Std. dev. σ = √σ² = <b id="fSD"></b></div>
+    <div class="frm">CV = (σ / x̄) × 100 = <b id="fCV"></b></div>
+    <div class="work" id="work"></div>
+  </div>
+</section>
+
+<!-- ===== COMPARE ===== -->
+<section class="view" id="v-compare">
+  <div class="panel">
+    <h2>Same mean, different spread</h2>
+    <p class="hint">Both sets share the same mean, yet one is tightly bunched and the other is spread out. Watch the σ bars and the coefficient of variation.</p>
+    <div class="two">
+      <div>
+        <div style="font-weight:600;margin-bottom:4px">Set A (tight)</div>
+        <canvas id="cA" height="150"></canvas>
+        <div class="facts" id="fA"></div>
+      </div>
+      <div>
+        <div style="font-weight:600;margin-bottom:4px">Set B (spread)</div>
+        <canvas id="cB" height="150"></canvas>
+        <div class="facts" id="fB"></div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="ghost" id="spreadMore">Spread B wider</button>
+      <button class="ghost" id="spreadLess">Tighten B</button>
+      <button class="ghost" id="cReset">Reset sets</button>
+    </div>
+    <div class="panel" style="margin-top:12px;background:var(--panel2)">
+      <h2 style="font-size:.98rem">σ bars — relative spread at a glance</h2>
+      <canvas id="cBar" height="120"></canvas>
+      <p class="hint" id="cvNote"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VISUAL ===== -->
+<section class="view" id="v-visual">
+  <div class="panel">
+    <h2>Distribution with mean and ±1 σ</h2>
+    <p class="hint">A frequency histogram of the current data set. The gold line is the mean; the shaded band covers x̄ ± σ. Roughly how much of the data falls inside one standard deviation?</p>
+    <canvas id="hist" height="240"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--a)"></span>frequency</span>
+      <span><span class="sw" style="background:var(--b)"></span>mean x̄</span>
+      <span><span class="sw" style="background:rgba(57,208,200,.25)"></span>x̄ ± σ band</span>
+    </div>
+    <div class="facts" id="hFacts" style="margin-top:12px"></div>
+    <div class="row">
+      <button class="ghost" id="hNarrow">Bunch data</button>
+      <button class="ghost" id="hWide">Spread data</button>
+      <button class="ghost" id="hNormal">Bell-ish set</button>
+    </div>
+    <p class="hint" id="hWithin"></p>
+  </div>
+</section>
+
+<!-- ===== QUIZ ===== -->
+<section class="view" id="v-quiz">
+  <div class="panel">
+    <h2>Quick quiz — tap an option</h2>
+    <div id="quiz"></div>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* ---------- statistics helpers (population, divisor N) ---------- */
+function mean(a){return a.reduce((s,x)=>s+x,0)/a.length;}
+function range(a){return Math.max(...a)-Math.min(...a);}
+function meanDev(a){var m=mean(a);return a.reduce((s,x)=>s+Math.abs(x-m),0)/a.length;}
+function variance(a){var m=mean(a);return a.reduce((s,x)=>s+(x-m)*(x-m),0)/a.length;}
+function stdev(a){return Math.sqrt(variance(a));}
+function cv(a){var m=mean(a);return m===0?0:(stdev(a)/Math.abs(m))*100;}
+function r2(x){return Math.round(x*100)/100;}
+function fmt(x){if(!isFinite(x))return "—";return (Math.round(x*100)/100).toString();}
+
+/* ---------- tab switching ---------- */
+var tabs=document.querySelectorAll('.tab');
+tabs.forEach(function(t){
+  t.addEventListener('click',function(){
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    document.getElementById('v-'+t.dataset.v).classList.add('on');
+    redrawAll();
+  });
+});
+
+/* =====================================================================
+   MODE 1 — DATA EXPLORER
+   ===================================================================== */
+var data=[4,6,7,9,12,14];
+var dot=document.getElementById('dot');
+var dctx=dot.getContext('2d');
+
+function dataBounds(){
+  var lo=Math.min(...data), hi=Math.max(...data);
+  if(lo===hi){lo-=1;hi+=1;}
+  var pad=(hi-lo)*0.15+0.5;
+  return {lo:lo-pad, hi:hi+pad};
+}
+function xToPx(x,w,b){return 40+((x-b.lo)/(b.hi-b.lo))*(w-70);}
+function pxToX(px,w,b){return b.lo+((px-40)/(w-70))*(b.hi-b.lo);}
+
+function drawDot(){
+  var w=dot.clientWidth,h=170;
+  dot.width=w*devicePixelRatio; dot.height=h*devicePixelRatio;
+  dctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  dctx.clearRect(0,0,w,h);
+  var b=dataBounds();
+  var m=mean(data), sd=stdev(data);
+  var axisY=h-38;
+  // sigma band
+  var xL=xToPx(m-sd,w,b), xR=xToPx(m+sd,w,b);
+  dctx.fillStyle='rgba(111,125,140,.22)';
+  dctx.fillRect(xL,20,xR-xL,axisY-20);
+  // axis
+  dctx.strokeStyle='#3a4657';dctx.lineWidth=2;
+  dctx.beginPath();dctx.moveTo(30,axisY);dctx.lineTo(w-20,axisY);dctx.stroke();
+  // ticks
+  dctx.fillStyle='#9fb0c3';dctx.font='11px system-ui';dctx.textAlign='center';
+  var lo=Math.ceil(b.lo),hi=Math.floor(b.hi);
+  var step=Math.max(1,Math.round((hi-lo)/8));
+  for(var t=lo;t<=hi;t+=step){
+    var px=xToPx(t,w,b);
+    dctx.strokeStyle='#2f3a48';dctx.beginPath();dctx.moveTo(px,axisY);dctx.lineTo(px,axisY+5);dctx.stroke();
+    dctx.fillText(t,px,axisY+18);
+  }
+  // mean line
+  var mx=xToPx(m,w,b);
+  dctx.strokeStyle='#f6a94a';dctx.lineWidth=2;dctx.setLineDash([5,4]);
+  dctx.beginPath();dctx.moveTo(mx,14);dctx.lineTo(mx,axisY);dctx.stroke();
+  dctx.setLineDash([]);
+  dctx.fillStyle='#f6a94a';dctx.textAlign='center';
+  dctx.fillText('x̄='+fmt(m),mx,10);
+  // stacking counts
+  var counts={};
+  data.forEach(function(v,i){
+    var key=v.toFixed(3);
+    counts[key]=(counts[key]||0);
+    var stack=counts[key]; counts[key]++;
+    var px=xToPx(v,w,b);
+    var py=axisY-14-stack*20;
+    dctx.beginPath();dctx.arc(px,py,9,0,7);
+    dctx.fillStyle='#39d0c8';dctx.fill();
+    dctx.strokeStyle='#0c2b29';dctx.lineWidth=2;dctx.stroke();
+    dctx.fillStyle='#06201e';dctx.font='10px system-ui';dctx.fillText(fmt(v),px,py+3);
+    dot._pts=dot._pts||[];
+  });
+  dot._b=b; dot._w=w; dot._axisY=axisY;
+}
+
+/* drag points */
+var dragIdx=-1;
+function nearestIdx(px,py){
+  var w=dot._w,b=dot._b,axisY=dot._axisY;
+  var best=-1,bd=1e9;
+  data.forEach(function(v,i){
+    var x=xToPx(v,w,b);
+    var d=Math.abs(px-x);
+    if(d<bd && d<26){bd=d;best=i;}
+  });
+  return best;
+}
+function evtPos(e){
+  var r=dot.getBoundingClientRect();
+  var t=e.touches?e.touches[0]:e;
+  return {x:t.clientX-r.left, y:t.clientY-r.top};
+}
+function startDrag(e){
+  var p=evtPos(e); dragIdx=nearestIdx(p.x,p.y);
+  if(dragIdx>=0)e.preventDefault();
+}
+function moveDrag(e){
+  if(dragIdx<0)return;
+  e.preventDefault();
+  var p=evtPos(e);
+  var b=dot._b,w=dot._w;
+  var nx=pxToX(p.x,w,b);
+  nx=Math.round(nx*10)/10;
+  data[dragIdx]=nx;
+  drawDot(); refreshFacts();
+}
+function endDrag(){dragIdx=-1;}
+dot.addEventListener('mousedown',startDrag);
+dot.addEventListener('mousemove',moveDrag);
+window.addEventListener('mouseup',endDrag);
+dot.addEventListener('touchstart',startDrag,{passive:false});
+dot.addEventListener('touchmove',moveDrag,{passive:false});
+dot.addEventListener('touchend',endDrag);
+
+function renderChips(){
+  var c=document.getElementById('chips');c.innerHTML='';
+  data.forEach(function(v,i){
+    var s=document.createElement('span');s.className='chip';
+    s.innerHTML='<span>'+fmt(v)+'</span>';
+    var b=document.createElement('button');b.textContent='×';b.title='remove';
+    b.onclick=function(){if(data.length>2){data.splice(i,1);drawDot();refreshFacts();}};
+    s.appendChild(b);c.appendChild(s);
+  });
+}
+function refreshFacts(){
+  renderChips();
+  var fc=document.getElementById('facts');
+  var m=mean(data),rg=range(data),md=meanDev(data),vr=variance(data),sd=stdev(data),cvv=cv(data);
+  var facts=[['N',data.length],['Range',fmt(rg)],['Mean x̄',fmt(m)],
+    ['Mean dev.',fmt(md)],['Variance σ²',fmt(vr)],['Std dev σ',fmt(sd)],['CV %',fmt(cvv)]];
+  fc.innerHTML=facts.map(f=>'<div class="fact"><div class="k">'+f[0]+'</div><div class="v">'+f[1]+'</div></div>').join('');
+  document.getElementById('fRange').textContent=fmt(Math.max(...data))+' − '+fmt(Math.min(...data))+' = '+fmt(rg);
+  document.getElementById('fMean').textContent=fmt(data.reduce((s,x)=>s+x,0))+' / '+data.length+' = '+fmt(m);
+  document.getElementById('fMD').textContent=fmt(data.reduce((s,x)=>s+Math.abs(x-m),0))+' / '+data.length+' = '+fmt(md);
+  document.getElementById('fVar').textContent=fmt(data.reduce((s,x)=>s+(x-m)*(x-m),0))+' / '+data.length+' = '+fmt(vr);
+  document.getElementById('fSD').textContent='√'+fmt(vr)+' = '+fmt(sd);
+  document.getElementById('fCV').textContent='('+fmt(sd)+' / '+fmt(m)+') × 100 = '+fmt(cvv)+'%';
+  // working table
+  var rows='<table><tr><th>xᵢ</th><th>xᵢ − x̄</th><th>|xᵢ − x̄|</th><th>(xᵢ − x̄)²</th></tr>';
+  var sAbs=0,sSq=0;
+  data.forEach(function(v){var d=v-m;sAbs+=Math.abs(d);sSq+=d*d;
+    rows+='<tr><td>'+fmt(v)+'</td><td>'+fmt(d)+'</td><td>'+fmt(Math.abs(d))+'</td><td>'+fmt(d*d)+'</td></tr>';});
+  rows+='<tr><th>Σ</th><th>~0</th><th>'+fmt(sAbs)+'</th><th>'+fmt(sSq)+'</th></tr></table>';
+  document.getElementById('work').innerHTML=rows;
+}
+document.getElementById('add').onclick=function(){
+  var v=parseFloat(document.getElementById('newv').value);
+  if(isFinite(v)){data.push(v);document.getElementById('newv').value='';drawDot();refreshFacts();}
+};
+document.getElementById('newv').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('add').click();});
+document.getElementById('reset').onclick=function(){data=[4,6,7,9,12,14];drawDot();refreshFacts();};
+document.getElementById('sample').onclick=function(){
+  var n=4+Math.floor(Math.random()*5);data=[];
+  for(var i=0;i<n;i++)data.push(Math.round((2+Math.random()*16)*10)/10);
+  drawDot();refreshFacts();
+};
+
+/* =====================================================================
+   MODE 2 — COMPARE SPREAD
+   ===================================================================== */
+var TARGET=20;
+var setA=[18,19,20,21,22];
+var setB=[10,15,20,25,30];
+function recenter(a){var m=mean(a);var d=TARGET-m;return a.map(x=>Math.round((x+d)*100)/100);}
+function drawStrip(cv0,arr,color){
+  var c=document.getElementById(cv0),ctx=c.getContext('2d');
+  var w=c.clientWidth,h=150;
+  c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  var lo=0,hi=40,axisY=h-30;
+  function X(x){return 30+((x-lo)/(hi-lo))*(w-45);}
+  var m=mean(arr),sd=stdev(arr);
+  ctx.fillStyle='rgba(111,125,140,.22)';
+  ctx.fillRect(X(m-sd),16,X(m+sd)-X(m-sd),axisY-16);
+  ctx.strokeStyle='#3a4657';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(20,axisY);ctx.lineTo(w-15,axisY);ctx.stroke();
+  ctx.fillStyle='#9fb0c3';ctx.font='10px system-ui';ctx.textAlign='center';
+  for(var t=0;t<=40;t+=10){ctx.fillText(t,X(t),axisY+15);}
+  var mx=X(m);
+  ctx.strokeStyle='#f6a94a';ctx.setLineDash([5,4]);ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(mx,12);ctx.lineTo(mx,axisY);ctx.stroke();ctx.setLineDash([]);
+  var counts={};
+  arr.forEach(function(v){
+    var k=v.toFixed(2);counts[k]=(counts[k]||0);var st=counts[k];counts[k]++;
+    var px=X(v),py=axisY-12-st*16;
+    ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.fillStyle=color;ctx.fill();
+    ctx.strokeStyle='#0c2b29';ctx.lineWidth=1.5;ctx.stroke();
+  });
+}
+function factGrid(id,arr){
+  var el=document.getElementById(id);
+  var f=[['Mean',fmt(mean(arr))],['σ',fmt(stdev(arr))],['σ²',fmt(variance(arr))],['CV %',fmt(cv(arr))]];
+  el.innerHTML=f.map(x=>'<div class="fact"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>').join('');
+}
+function drawBars(){
+  var c=document.getElementById('cBar'),ctx=c.getContext('2d');
+  var w=c.clientWidth,h=120;
+  c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  var sA=stdev(setA),sB=stdev(setB);
+  var mx=Math.max(sA,sB,1);
+  var items=[['A',sA,'#39d0c8'],['B',sB,'#f6a94a']];
+  var bw=Math.min(120,(w-80)/2);
+  items.forEach(function(it,i){
+    var bh=(it[1]/mx)*(h-40);
+    var x=40+i*(bw+40);
+    ctx.fillStyle=it[2];
+    ctx.fillRect(x,h-25-bh,bw,bh);
+    ctx.fillStyle='#e8edf3';ctx.font='12px system-ui';ctx.textAlign='center';
+    ctx.fillText('σ='+fmt(it[1]),x+bw/2,h-30-bh);
+    ctx.fillStyle='#9fb0c3';ctx.fillText('Set '+it[0],x+bw/2,h-8);
+  });
+}
+function refreshCompare(){
+  drawStrip('cA',setA,'#39d0c8');drawStrip('cB',setB,'#f6a94a');
+  factGrid('fA',setA);factGrid('fB',setB);drawBars();
+  var cvA=cv(setA),cvB=cv(setB);
+  document.getElementById('cvNote').innerHTML='Both sets have mean ≈ '+fmt(mean(setA))+
+    '. Set B has the larger σ and larger CV ('+fmt(cvB)+'% vs '+fmt(cvA)+'%), so it is <b>more dispersed</b>. CV compares relative spread even when means differ.';
+}
+document.getElementById('spreadMore').onclick=function(){
+  setB=setB.map(x=>Math.round((TARGET+(x-TARGET)*1.25)*100)/100);refreshCompare();};
+document.getElementById('spreadLess').onclick=function(){
+  setB=setB.map(x=>Math.round((TARGET+(x-TARGET)*0.8)*100)/100);refreshCompare();};
+document.getElementById('cReset').onclick=function(){setA=[18,19,20,21,22];setB=[10,15,20,25,30];refreshCompare();};
+
+/* =====================================================================
+   MODE 3 — HISTOGRAM VISUAL
+   ===================================================================== */
+var hData=[5,6,6,7,7,7,8,8,8,8,9,9,9,10,10,11];
+function drawHist(){
+  var c=document.getElementById('hist'),ctx=c.getContext('2d');
+  var w=c.clientWidth,h=240;
+  c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  var lo=Math.min(...hData),hi=Math.max(...hData);
+  var bins=Math.max(5,Math.min(12,Math.round(Math.sqrt(hData.length))+3));
+  var bw=(hi-lo)/bins||1;
+  var freq=new Array(bins).fill(0);
+  hData.forEach(function(v){var idx=Math.min(bins-1,Math.floor((v-lo)/bw));freq[idx]++;});
+  var maxF=Math.max(...freq,1);
+  var axisY=h-32,left=36,plotW=w-left-15;
+  var m=mean(hData),sd=stdev(hData);
+  function X(x){return left+((x-lo)/((hi-lo)||1))*plotW;}
+  // sigma band
+  ctx.fillStyle='rgba(57,208,200,.20)';
+  var bl=Math.max(left,X(m-sd)),br=Math.min(left+plotW,X(m+sd));
+  ctx.fillRect(bl,14,br-bl,axisY-14);
+  // bars
+  for(var i=0;i<bins;i++){
+    var x0=X(lo+i*bw),x1=X(lo+(i+1)*bw);
+    var bh=(freq[i]/maxF)*(axisY-24);
+    ctx.fillStyle='#39d0c8';
+    ctx.fillRect(x0+1,axisY-bh,(x1-x0)-2,bh);
+    if(freq[i]>0){ctx.fillStyle='#06201e';ctx.font='11px system-ui';ctx.textAlign='center';
+      ctx.fillText(freq[i],(x0+x1)/2,axisY-bh+13);}
+  }
+  // axis
+  ctx.strokeStyle='#3a4657';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(left,axisY);ctx.lineTo(left+plotW,axisY);ctx.stroke();
+  ctx.fillStyle='#9fb0c3';ctx.font='10px system-ui';ctx.textAlign='center';
+  for(var t=Math.ceil(lo);t<=Math.floor(hi);t++){ctx.fillText(t,X(t),axisY+14);}
+  // mean line
+  ctx.strokeStyle='#f6a94a';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(X(m),12);ctx.lineTo(X(m),axisY);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#f6a94a';ctx.fillText('x̄='+fmt(m),X(m),9);
+  // sd edges
+  ctx.fillStyle='#9fb0c3';
+  if(m-sd>=lo)ctx.fillText('x̄−σ',X(m-sd),9);
+  if(m+sd<=hi)ctx.fillText('x̄+σ',X(m+sd),9);
+  // facts + within
+  var within=hData.filter(v=>v>=m-sd&&v<=m+sd).length;
+  var pct=Math.round(within/hData.length*100);
+  document.getElementById('hFacts').innerHTML=
+    [['N',hData.length],['Mean',fmt(m)],['σ',fmt(sd)],['σ²',fmt(variance(hData))],['CV %',fmt(cv(hData))]]
+    .map(x=>'<div class="fact"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>').join('');
+  document.getElementById('hWithin').innerHTML='<b>'+within+' of '+hData.length+' values ('+pct+
+    '%)</b> lie within one standard deviation of the mean — inside the shaded band.';
+}
+document.getElementById('hNarrow').onclick=function(){
+  var m=mean(hData);hData=hData.map(v=>Math.round((m+(v-m)*0.6)*10)/10);drawHist();};
+document.getElementById('hWide').onclick=function(){
+  var m=mean(hData);hData=hData.map(v=>Math.round((m+(v-m)*1.4)*10)/10);drawHist();};
+document.getElementById('hNormal').onclick=function(){
+  hData=[5,6,6,7,7,7,8,8,8,8,9,9,9,10,10,11];drawHist();};
+
+/* =====================================================================
+   QUIZ
+   ===================================================================== */
+var QS=[
+  {q:"For the data 2, 4, 6, 8 the mean is 5. What is the variance σ² (population, divisor N)?",
+   opts:["5","11","20","2.24"],ok:0,
+   ex:"Deviations: −3,−1,1,3 → squares 9,1,1,9, sum 20. σ² = 20/4 = 5."},
+  {q:"Two data sets have the same standard deviation but different means. Which measure best compares their relative spread?",
+   opts:["Range","Coefficient of variation (CV)","Mean deviation","Variance"],ok:1,
+   ex:"CV = (σ/mean)×100 expresses spread relative to the mean, so it compares sets with different means."},
+  {q:"If every value in a data set is increased by 10, what happens to the standard deviation?",
+   opts:["Increases by 10","Multiplies by 10","Stays the same","Becomes zero"],ok:2,
+   ex:"Adding a constant shifts all values equally; deviations from the mean are unchanged, so σ is unchanged."}
+];
+function buildQuiz(){
+  var box=document.getElementById('quiz');box.innerHTML='';
+  QS.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='qbox';
+    var h='<div class="q">Q'+(qi+1)+'. '+item.q+'</div>';
+    d.innerHTML=h;
+    item.opts.forEach(function(o,oi){
+      var btn=document.createElement('button');btn.className='opt';btn.textContent=o;
+      btn.onclick=function(){
+        if(d.dataset.done)return;d.dataset.done='1';
+        var all=d.querySelectorAll('.opt');
+        all.forEach(function(b,bi){if(bi===item.ok)b.classList.add('correct');});
+        if(oi!==item.ok)btn.classList.add('wrong');
+        d.querySelector('.expl').classList.add('show');
+      };
+      d.appendChild(btn);
+    });
+    var ex=document.createElement('div');ex.className='expl';ex.textContent='✔ '+item.ex;
+    d.appendChild(ex);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- init ---------- */
+function redrawAll(){
+  drawDot();refreshFacts();refreshCompare();drawHist();
+}
+setA=recenter(setA);setB=recenter(setB);
+buildQuiz();
+redrawAll();
+window.addEventListener('resize',function(){redrawAll();});
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrices Lab - NIOS Class 12 Mathematics Ch20</title>
+<style>
+  :root{
+    --accent:#7c9cff;
+    --accent-dark:#5b7ce0;
+    --bg:#161a24;
+    --bg2:#1d2331;
+    --panel:#222838;
+    --panel2:#2a3145;
+    --ink:#e7ecf6;
+    --muted:#9aa6bd;
+    --good:#57c98a;
+    --bad:#ef7676;
+    --line:#39415a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,#161a24,#12151d);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:100px;background:var(--panel);
+    border:2px solid transparent;padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;}
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 10px;}
+  h3{font-size:.95rem;margin:14px 0 8px;color:var(--accent);}
+  label{font-size:.85rem;color:var(--muted);}
+  select,input{font-family:inherit;}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:6px 8px;font-size:.9rem;}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;}
+  .mx{display:inline-flex;align-items:stretch;margin:2px 0;}
+  .mx .bracket{width:10px;border:2px solid var(--muted);}
+  .mx .bracket.l{border-right:none;border-radius:6px 0 0 6px;}
+  .mx .bracket.r{border-left:none;border-radius:0 6px 6px 0;}
+  .grid{display:grid;gap:5px;padding:5px 6px;}
+  .cell,.dcell{width:46px;height:38px;text-align:center;border-radius:8px;
+    font-size:.92rem;font-variant-numeric:tabular-nums;}
+  input.cell{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  input.cell:focus{outline:none;border-color:var(--accent);background:#323a52;}
+  .dcell{display:flex;align-items:center;justify-content:center;background:var(--bg2);
+    border:1px solid var(--line);color:var(--ink);}
+  .dcell.hi{background:var(--accent);color:#fff;border-color:var(--accent-dark);cursor:pointer;}
+  .dcell.hi.sel{outline:2px solid #fff;}
+  .mblock{margin-bottom:6px;}
+  .mlabel{font-weight:700;font-size:.9rem;margin-bottom:2px;}
+  .btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:10px;
+    font-weight:600;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .msg{font-size:.85rem;padding:8px 10px;border-radius:8px;margin:8px 0;}
+  .msg.ok{background:rgba(87,201,138,.14);color:var(--good);}
+  .msg.no{background:rgba(239,118,118,.14);color:var(--bad);}
+  .facts{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .facts ul{margin:6px 0 0;padding-left:18px;}
+  .facts li{margin:4px 0;font-size:.85rem;}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85em;}
+  .tag{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:20px;padding:4px 11px;font-size:.82rem;margin:3px 4px 3px 0;}
+  .tag.on{background:var(--accent);color:#fff;border-color:var(--accent-dark);}
+  .work{font-size:.86rem;color:var(--muted);margin-top:8px;line-height:1.7;}
+  .work b{color:var(--ink);}
+  .quiz{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--bg2);}
+  .quiz p{margin:0 0 8px;font-weight:600;font-size:.9rem;}
+  .opt{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    padding:8px 10px;margin:5px 0;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(87,201,138,.2);border-color:var(--good);}
+  .opt.wrong{background:rgba(239,118,118,.2);border-color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;}
+  .muted{color:var(--muted);font-size:.85rem;}
+  .flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  @media(max-width:420px){.cell,.dcell{width:40px;height:34px;font-size:.84rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Matrices Lab</h1>
+    <p>NIOS Class 12 Mathematics &middot; Chapter 20 &middot; Matrices. Edit cells, choose orders, compute exactly.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-mode="ops">Operations</div>
+    <div class="tab" data-mode="types">Types &amp; Properties</div>
+    <div class="tab" data-mode="rules">Order &amp; Rules</div>
+    <div class="tab" data-mode="quiz">Quiz</div>
+  </div>
+
+  <!-- OPERATIONS -->
+  <section id="ops" class="panel">
+    <h2>Matrix Operations</h2>
+    <div class="ctl">
+      <label>A order:
+        <select id="aRows">1</select> &times; <select id="aCols">1</select>
+      </label>
+      <label>B order:
+        <select id="bRows">1</select> &times; <select id="bCols">1</select>
+      </label>
+      <label>scalar k: <input class="cell" id="kval" value="2" style="width:52px"></label>
+      <button class="btn ghost" id="randBtn">Randomise</button>
+    </div>
+    <div class="row">
+      <div class="mblock"><div class="mlabel">Matrix A</div><div id="matA"></div></div>
+      <div class="mblock"><div class="mlabel">Matrix B</div><div id="matB"></div></div>
+    </div>
+
+    <h3>Choose an operation</h3>
+    <div class="flex" id="opBtns">
+      <button class="btn" data-op="add">A + B</button>
+      <button class="btn" data-op="sub">A &minus; B</button>
+      <button class="btn" data-op="scal">kA</button>
+      <button class="btn" data-op="mul">A &times; B</button>
+      <button class="btn" data-op="tA">Aᵀ</button>
+    </div>
+    <div id="opMsg"></div>
+    <div class="row" style="margin-top:6px">
+      <div class="mblock"><div class="mlabel" id="resLbl">Result</div><div id="matR"></div></div>
+    </div>
+    <div class="work" id="opWork"></div>
+  </section>
+
+  <!-- TYPES -->
+  <section id="types" class="panel hidden">
+    <h2>Types &amp; Properties</h2>
+    <p class="muted">Enter a matrix; it is classified automatically. Symmetric / skew checks apply to square matrices.</p>
+    <div class="ctl">
+      <label>Order:
+        <select id="tRows">1</select> &times; <select id="tCols">1</select>
+      </label>
+      <button class="btn ghost" id="tRand">Randomise</button>
+    </div>
+    <div class="mblock"><div class="mlabel">Matrix M</div><div id="matT"></div></div>
+    <h3>This matrix is</h3>
+    <div id="typeTags"></div>
+    <div class="facts" style="margin-top:12px">
+      <b>What each type means</b>
+      <ul>
+        <li><b>Row</b>: only one row (1&times;n). <b>Column</b>: only one column (m&times;1).</li>
+        <li><b>Square</b>: rows = columns. <b>Diagonal</b>: square, all off-diagonal entries 0.</li>
+        <li><b>Scalar</b>: diagonal with all diagonal entries equal. <b>Identity (I)</b>: scalar with that value = 1.</li>
+        <li><b>Zero (null)</b>: every entry is 0. <b>Symmetric</b>: Aᵀ = A. <b>Skew-symmetric</b>: Aᵀ = &minus;A (diagonal all 0).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- RULES -->
+  <section id="rules" class="panel hidden">
+    <h2>Order &amp; Rules of Operations</h2>
+    <div class="facts">
+      <b>When is each operation defined?</b>
+      <ul>
+        <li><b>Addition / subtraction (A &plusmn; B):</b> only when A and B have the <b>same order</b>. Add entrywise.</li>
+        <li><b>Scalar multiple (kA):</b> always defined; multiply every entry by k. Order unchanged.</li>
+        <li><b>Product (A &times; B):</b> defined only when <b>columns of A = rows of B</b>. If A is m&times;n and B is n&times;p, then AB is m&times;p.</li>
+        <li><b>Transpose (Aᵀ):</b> always defined; an m&times;n matrix becomes n&times;m (rows and columns swapped).</li>
+      </ul>
+    </div>
+    <h3>Matrix multiplication is not commutative: AB &ne; BA in general</h3>
+    <p class="muted">Take A = [[1,2],[3,4]] and B = [[0,1],[1,0]].</p>
+    <div class="row">
+      <div class="mblock"><div class="mlabel">AB</div><div id="abBox"></div></div>
+      <div class="mblock"><div class="mlabel">BA</div><div id="baBox"></div></div>
+    </div>
+    <p class="muted">AB = [[2,1],[4,3]] but BA = [[3,4],[1,2]] &mdash; different, so order of multiplication matters.</p>
+
+    <div class="facts" style="margin-top:14px">
+      <b>Quick facts panel</b>
+      <ul>
+        <li><b>Order</b> of a matrix = (number of rows) &times; (number of columns).</li>
+        <li><b>Element</b> a<sub>ij</sub> sits in row i, column j.</li>
+        <li><b>Addition rules:</b> A+B = B+A (commutative); (A+B)+C = A+(B+C) (associative).</li>
+        <li><b>Scalar rules:</b> k(A+B) = kA + kB; (k+l)A = kA + lA.</li>
+        <li><b>Product rules:</b> (AB)C = A(BC); A(B+C) = AB + AC; but AB &ne; BA generally.</li>
+        <li><b>Transpose rules:</b> (Aᵀ)ᵀ = A; (A+B)ᵀ = Aᵀ + Bᵀ; (AB)ᵀ = BᵀAᵀ.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="panel hidden">
+    <h2>Quick Quiz</h2>
+    <p class="muted">Click an option to reveal the answer.</p>
+    <div id="quizBox"></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+// ---- helpers ----
+function fmt(x){
+  // exact display: integers plain, otherwise reduced fraction
+  if(x.d===1) return String(x.n);
+  return x.n+"/"+x.d;
+}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a||1;}
+// rational as {n,d}
+function R(n,d){d=d||1;if(d<0){n=-n;d=-d;}var g=gcd(n,d);return {n:n/g,d:d/g};}
+function radd(a,b){return R(a.n*b.d+b.n*a.d,a.d*b.d);}
+function rsub(a,b){return R(a.n*b.d-b.n*a.d,a.d*b.d);}
+function rmul(a,b){return R(a.n*b.n,a.d*b.d);}
+function req(a,b){return a.n===b.n&&a.d===b.d;}
+function parseR(str){
+  str=(str||"").trim();
+  if(str==="") return R(0);
+  if(str.indexOf("/")>=0){var p=str.split("/");var n=parseInt(p[0],10),d=parseInt(p[1],10);
+    if(isNaN(n)||isNaN(d)||d===0) return R(0);return R(n,d);}
+  if(str.indexOf(".")>=0){var f=parseFloat(str);if(isNaN(f))return R(0);
+    var den=1;while(Math.abs(f*den-Math.round(f*den))>1e-9&&den<1e6){den*=10;}
+    return R(Math.round(f*den),den);}
+  var v=parseInt(str,10);return isNaN(v)?R(0):R(v);
+}
+
+// build a select of 1..3
+function fillDims(sel){
+  for(var i=1;i<=3;i++){var o=document.createElement("option");o.value=i;o.textContent=i;sel.appendChild(o);}
+}
+
+// render an editable matrix into container; store cells in state
+function buildEditable(container,rows,cols,vals){
+  container.innerHTML="";
+  var mx=document.createElement("div");mx.className="mx";
+  var bl=document.createElement("div");bl.className="bracket l";
+  var g=document.createElement("div");g.className="grid";
+  g.style.gridTemplateColumns="repeat("+cols+",auto)";
+  var br=document.createElement("div");br.className="bracket r";
+  for(var i=0;i<rows;i++)for(var j=0;j<cols;j++){
+    var inp=document.createElement("input");inp.className="cell";inp.type="text";inp.inputMode="text";
+    inp.dataset.r=i;inp.dataset.c=j;
+    inp.value=(vals&&vals[i]&&vals[i][j]!=null)?vals[i][j]:"0";
+    g.appendChild(inp);
+  }
+  mx.appendChild(bl);mx.appendChild(g);mx.appendChild(br);
+  container.appendChild(mx);
+}
+function readMatrix(container){
+  var inps=$$(".cell",container);var m={};
+  inps.forEach(function(inp){var r=+inp.dataset.r,c=+inp.dataset.c;m[r+","+c]=parseR(inp.value);});
+  // determine dims
+  var rows=0,cols=0;inps.forEach(function(inp){rows=Math.max(rows,+inp.dataset.r+1);cols=Math.max(cols,+inp.dataset.c+1);});
+  var mat=[];for(var i=0;i<rows;i++){mat[i]=[];for(var j=0;j<cols;j++)mat[i][j]=m[i+","+j]||R(0);}
+  return mat;
+}
+// render read-only matrix of rationals; opt highlight for mul cells
+function renderMatrix(container,mat,opts){
+  opts=opts||{};container.innerHTML="";
+  if(!mat||!mat.length){container.innerHTML='<span class="muted">&mdash;</span>';return;}
+  var rows=mat.length,cols=mat[0].length;
+  var mx=document.createElement("div");mx.className="mx";
+  var bl=document.createElement("div");bl.className="bracket l";
+  var g=document.createElement("div");g.className="grid";g.style.gridTemplateColumns="repeat("+cols+",auto)";
+  var br=document.createElement("div");br.className="bracket r";
+  for(var i=0;i<rows;i++)for(var j=0;j<cols;j++){
+    var d=document.createElement("div");d.className="dcell";d.textContent=fmt(mat[i][j]);
+    if(opts.clickable){d.className+=" hi";d.dataset.r=i;d.dataset.c=j;
+      if(opts.sel&&opts.sel[0]===i&&opts.sel[1]===j)d.className+=" sel";}
+    g.appendChild(d);
+  }
+  mx.appendChild(bl);mx.appendChild(g);mx.appendChild(br);container.appendChild(mx);
+}
+
+// ============ OPERATIONS MODE ============
+var aR=$("#aRows"),aC=$("#aCols"),bR=$("#bRows"),bC=$("#bCols");
+[aR,aC,bR,bC].forEach(fillDims);
+aR.value=2;aC.value=2;bR.value=2;bC.value=2;
+var lastOp="add", mulSel=[0,0];
+
+function syncEditableSizes(){
+  buildEditable($("#matA"),+aR.value,+aC.value,readVals($("#matA"),+aR.value,+aC.value,[[1,2],[3,4]]));
+  buildEditable($("#matB"),+bR.value,+bC.value,readVals($("#matB"),+bR.value,+bC.value,[[5,6],[7,8]]));
+  bindOps();
+  runOp(lastOp);
+}
+// keep existing typed values when resizing
+function readVals(container,rows,cols,def){
+  var existing=$$(".cell",container);var map={};
+  existing.forEach(function(inp){map[inp.dataset.r+","+inp.dataset.c]=inp.value;});
+  var out=[];for(var i=0;i<rows;i++){out[i]=[];for(var j=0;j<cols;j++){
+    out[i][j]=map[i+","+j]!=null?map[i+","+j]:(def&&def[i]&&def[i][j]!=null?def[i][j]:"0");
+  }}
+  return out;
+}
+function bindOps(){
+  $$(".cell",$("#matA")).forEach(function(i){i.addEventListener("input",function(){runOp(lastOp);});});
+  $$(".cell",$("#matB")).forEach(function(i){i.addEventListener("input",function(){runOp(lastOp);});});
+}
+$("#kval").addEventListener("input",function(){runOp(lastOp);});
+[aR,aC,bR,bC].forEach(function(s){s.addEventListener("change",syncEditableSizes);});
+$$("#opBtns .btn").forEach(function(b){b.addEventListener("click",function(){mulSel=[0,0];runOp(b.dataset.op);});});
+$("#randBtn").addEventListener("click",function(){
+  $$(".cell",$("#matA")).forEach(function(i){i.value=Math.floor(Math.random()*9)-2;});
+  $$(".cell",$("#matB")).forEach(function(i){i.value=Math.floor(Math.random()*9)-2;});
+  runOp(lastOp);
+});
+
+function runOp(op){
+  lastOp=op;
+  var A=readMatrix($("#matA")),B=readMatrix($("#matB"));
+  var msg=$("#opMsg"),work=$("#opWork"),res=$("#matR"),lbl=$("#resLbl");
+  msg.innerHTML="";work.innerHTML="";
+  var ar=A.length,ac=A[0].length,br2=B.length,bc=B[0].length;
+
+  if(op==="add"||op==="sub"){
+    lbl.textContent=(op==="add"?"A + B":"A − B");
+    if(ar!==br2||ac!==bc){
+      renderMatrix(res,null);
+      msg.innerHTML='<div class="msg no">Not defined: addition/subtraction needs the same order. A is '+ar+'×'+ac+', B is '+br2+'×'+bc+'.</div>';
+      return;
+    }
+    var out=[];for(var i=0;i<ar;i++){out[i]=[];for(var j=0;j<ac;j++)out[i][j]=(op==="add")?radd(A[i][j],B[i][j]):rsub(A[i][j],B[i][j]);}
+    renderMatrix(res,out);
+    msg.innerHTML='<div class="msg ok">Defined: same order '+ar+'×'+ac+'. Combine entrywise.</div>';
+    work.innerHTML='<b>Entrywise:</b> each result entry = a<sub>ij</sub> '+(op==="add"?"+":"−")+' b<sub>ij</sub>. e.g. ['+"1,1"+'] = '+fmt(A[0][0])+' '+(op==="add"?"+":"−")+' '+fmt(B[0][0])+' = '+fmt(out[0][0])+'.';
+  }
+  else if(op==="scal"){
+    lbl.textContent="kA";
+    var k=parseR($("#kval").value);
+    var out2=[];for(var i2=0;i2<ar;i2++){out2[i2]=[];for(var j2=0;j2<ac;j2++)out2[i2][j2]=rmul(k,A[i2][j2]);}
+    renderMatrix(res,out2);
+    msg.innerHTML='<div class="msg ok">Defined always. Multiply every entry of A by k = '+fmt(k)+'.</div>';
+    work.innerHTML='<b>Scalar:</b> ['+"1,1"+'] = '+fmt(k)+' × '+fmt(A[0][0])+' = '+fmt(out2[0][0])+'.';
+  }
+  else if(op==="tA"){
+    lbl.textContent="Aᵀ";
+    var out3=[];for(var j3=0;j3<ac;j3++){out3[j3]=[];for(var i3=0;i3<ar;i3++)out3[j3][i3]=A[i3][j3];}
+    renderMatrix(res,out3);
+    msg.innerHTML='<div class="msg ok">Defined always. Rows become columns: '+ar+'×'+ac+' → '+ac+'×'+ar+'.</div>';
+    work.innerHTML='<b>Transpose:</b> entry (i,j) of A moves to (j,i) of Aᵀ.';
+  }
+  else if(op==="mul"){
+    lbl.textContent="A × B";
+    if(ac!==br2){
+      renderMatrix(res,null);
+      msg.innerHTML='<div class="msg no">Not defined: columns of A ('+ac+') must equal rows of B ('+br2+'). Try changing an order.</div>';
+      return;
+    }
+    var out4=[];for(var i4=0;i4<ar;i4++){out4[i4]=[];for(var j4=0;j4<bc;j4++){
+      var s=R(0);for(var k4=0;k4<ac;k4++)s=radd(s,rmul(A[i4][k4],B[k4][j4]));out4[i4][j4]=s;}}
+    if(mulSel[0]>=ar)mulSel[0]=0;if(mulSel[1]>=bc)mulSel[1]=0;
+    renderMatrix(res,out4,{clickable:true,sel:mulSel});
+    msg.innerHTML='<div class="msg ok">Defined: A is '+ar+'×'+ac+', B is '+br2+'×'+bc+' → AB is '+ar+'×'+bc+'. Tap a result cell to see its row×column dot product.</div>';
+    // dot-product visual for selected cell
+    $$(".dcell.hi",res).forEach(function(d){d.addEventListener("click",function(){mulSel=[+d.dataset.r,+d.dataset.c];runOp("mul");});});
+    var ri=mulSel[0],cj=mulSel[1];
+    var terms=[];for(var kk=0;kk<ac;kk++)terms.push("("+fmt(A[ri][kk])+"×"+fmt(B[kk][cj])+")");
+    work.innerHTML='<b>Cell ('+(ri+1)+','+(cj+1)+')</b> = (row '+(ri+1)+' of A) · (column '+(cj+1)+' of B) = '+terms.join(" + ")+' = <b>'+fmt(out4[ri][cj])+'</b>.';
+  }
+}
+
+// ============ TYPES MODE ============
+var tR=$("#tRows"),tC=$("#tCols");[tR,tC].forEach(fillDims);tR.value=2;tC.value=2;
+function buildTypes(){
+  buildEditable($("#matT"),+tR.value,+tC.value,readVals($("#matT"),+tR.value,+tC.value,[[1,0],[0,1]]));
+  $$(".cell",$("#matT")).forEach(function(i){i.addEventListener("input",classifyT);});
+  classifyT();
+}
+[tR,tC].forEach(function(s){s.addEventListener("change",buildTypes);});
+$("#tRand").addEventListener("click",function(){
+  $$(".cell",$("#matT")).forEach(function(i){i.value=Math.floor(Math.random()*5)-1;});classifyT();
+});
+function classifyT(){
+  var M=readMatrix($("#matT"));var rows=M.length,cols=M[0].length;var tags=[];
+  var isSquare=rows===cols;
+  var allZero=true,i,j;
+  for(i=0;i<rows;i++)for(j=0;j<cols;j++)if(!(M[i][j].n===0))allZero=false;
+  if(rows===1)tags.push("Row matrix");
+  if(cols===1)tags.push("Column matrix");
+  if(isSquare)tags.push("Square matrix");
+  if(allZero)tags.push("Zero (null) matrix");
+  if(isSquare){
+    var offDiagZero=true,diagEqual=true,diagVal=M[0][0],isIdentity=true,symmetric=true,skew=true;
+    for(i=0;i<rows;i++)for(j=0;j<cols;j++){
+      if(i!==j&&!(M[i][j].n===0))offDiagZero=false;
+      if(i===j&&!req(M[i][j],diagVal))diagEqual=false;
+      if(i===j&&!(M[i][j].n===1&&M[i][j].d===1))isIdentity=false;
+      if(!req(M[i][j],M[j][i]))symmetric=false;
+      if(!req(M[i][j],R(-M[j][i].n,M[j][i].d)))skew=false;
+    }
+    if(offDiagZero)tags.push("Diagonal matrix");
+    if(offDiagZero&&diagEqual)tags.push("Scalar matrix");
+    if(offDiagZero&&diagEqual&&isIdentity)tags.push("Identity matrix (I)");
+    if(symmetric)tags.push("Symmetric (Aᵀ = A)");
+    if(skew)tags.push("Skew-symmetric (Aᵀ = −A)");
+  }
+  var box=$("#typeTags");box.innerHTML="";
+  if(!tags.length){box.innerHTML='<span class="muted">A general '+rows+'×'+cols+' matrix — no special type.</span>';return;}
+  tags.forEach(function(t){var s=document.createElement("span");s.className="tag on";s.textContent=t;box.appendChild(s);});
+  var note=document.createElement("span");note.className="tag";note.textContent="order "+rows+"×"+cols;box.appendChild(note);
+}
+
+// ============ RULES MODE (static AB vs BA) ============
+function num(v){return R(v);}
+function mm(A,B){var out=[];for(var i=0;i<A.length;i++){out[i]=[];for(var j=0;j<B[0].length;j++){var s=R(0);for(var k=0;k<B.length;k++)s=radd(s,rmul(A[i][k],B[k][j]));out[i][j]=s;}}return out;}
+(function(){
+  var A=[[num(1),num(2)],[num(3),num(4)]],B=[[num(0),num(1)],[num(1),num(0)]];
+  renderMatrix($("#abBox"),mm(A,B));renderMatrix($("#baBox"),mm(B,A));
+})();
+
+// ============ QUIZ ============
+var quiz=[
+  {q:"If A is a 2×3 matrix and B is a 3×4 matrix, what is the order of AB?",
+   opts:["2×4","3×3","2×3","Not defined"],ans:0,
+   ex:"Columns of A (3) = rows of B (3), so AB exists with order (rows of A)×(cols of B) = 2×4."},
+  {q:"Which condition makes A + B defined?",
+   opts:["A and B are both square","A and B have the same order","Columns of A equal rows of B","A is the transpose of B"],ans:1,
+   ex:"Addition is entrywise, so A and B must have identical order (same rows and columns)."},
+  {q:"A square matrix with Aᵀ = −A and all diagonal entries 0 is called:",
+   opts:["Symmetric","Scalar","Skew-symmetric","Identity"],ans:2,
+   ex:"Skew-symmetric means Aᵀ = −A; this forces every diagonal entry to satisfy a = −a, so a = 0."}
+];
+(function(){
+  var box=$("#quizBox");
+  quiz.forEach(function(item,qi){
+    var div=document.createElement("div");div.className="quiz";
+    var p=document.createElement("p");p.textContent=(qi+1)+". "+item.q;div.appendChild(p);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var o=document.createElement("div");o.className="opt";o.textContent=opt;
+      o.addEventListener("click",function(){
+        if(answered)return;answered=true;
+        $$(".opt",div).forEach(function(x,xi){if(xi===item.ans)x.className="opt correct";});
+        if(oi!==item.ans)o.className="opt wrong";
+        var e=document.createElement("div");e.className="expl";e.textContent=item.ex;div.appendChild(e);
+      });
+      div.appendChild(o);
+    });
+    box.appendChild(div);
+  });
+})();
+
+// ============ TABS ============
+$$(".tab").forEach(function(t){t.addEventListener("click",function(){
+  $$(".tab").forEach(function(x){x.classList.remove("active");});t.classList.add("active");
+  ["ops","types","rules","quiz"].forEach(function(m){$("#"+m).classList.add("hidden");});
+  $("#"+t.dataset.mode).classList.remove("hidden");
+});});
+
+// init
+syncEditableSizes();
+buildTypes();
+</script>
+</body>
+</html>

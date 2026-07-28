@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Experiments Lab - NIOS Class 12 Maths Ch18</title>
+<style>
+  :root{
+    --bg:#12161f; --panel:#1b2130; --panel2:#232b3d; --ink:#e7ecf5;
+    --muted:#9aa6bd; --accent:#5ad2b4; --accent-d:#2f9d84;
+    --line:#2c3548; --fav:#5ad2b4; --a:#6aa6ff; --b:#ffb15a;
+    --good:#5ad2b4; --bad:#ff7a7a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:16px}
+  h1{font-size:1.4rem;margin:.2rem 0}
+  h2{font-size:1.05rem;margin:.1rem 0;color:var(--accent)}
+  p.sub{color:var(--muted);margin:.2rem 0 1rem}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{
+    flex:1 1 auto;min-width:100px;padding:10px 12px;border-radius:12px;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    font-size:.92rem;cursor:pointer;text-align:center;
+  }
+  .tab.active{background:var(--accent);color:#0c1017;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  label{font-size:.85rem;color:var(--muted)}
+  select,button{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;font-size:.92rem;cursor:pointer;
+    min-height:40px;
+  }
+  select{min-width:140px}
+  button:active{transform:translateY(1px)}
+  .btn-accent{background:var(--accent);color:#0c1017;border-color:var(--accent);font-weight:600}
+  .stat{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:6px 12px;margin:4px 6px 4px 0;font-size:.9rem}
+  .stat b{color:var(--accent)}
+  .cells{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .cell{
+    background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    padding:8px 10px;font-size:.85rem;min-width:34px;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .cell.fav{background:var(--fav);color:#0c1017;border-color:var(--fav);font-weight:700}
+  .cell.a{background:rgba(106,166,255,.28);border-color:var(--a)}
+  .cell.b{background:rgba(255,177,90,.28);border-color:var(--b)}
+  .cell.ab{background:#c58bff;color:#0c1017;border-color:#c58bff;font-weight:700}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+  .gcell{
+    background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+    padding:6px 2px;text-align:center;font-size:.72rem;font-variant-numeric:tabular-nums;
+  }
+  .ghdr{background:transparent;border:none;color:var(--muted);font-weight:700}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:.8rem;color:var(--muted)}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+  .facts dt{color:var(--accent);font-weight:600;margin-top:8px}
+  .facts dd{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+  .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .q:first-child{border-top:none;padding-top:0;margin-top:0}
+  .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;cursor:pointer;font-size:.9rem;text-align:left}
+  .opt.correct{background:rgba(90,210,180,.22);border-color:var(--good)}
+  .opt.wrong{background:rgba(255,122,122,.18);border-color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .venn-wrap{display:flex;justify-content:center;margin-top:8px}
+  .note{font-size:.85rem;color:var(--muted);margin-top:8px}
+  .hidden{display:none}
+  .setline{font-size:.9rem;word-break:break-word;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:8px}
+  .tagrow{margin-top:10px}
+  .tag{display:inline-block;padding:4px 9px;border-radius:999px;font-size:.78rem;
+    margin:3px 5px 3px 0;border:1px solid var(--line);color:var(--muted)}
+  .tag.on{background:var(--accent);color:#0c1017;border-color:var(--accent);font-weight:600}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Random Experiments Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics &middot; Chapter 18 &mdash; Random Experiments and Events</p>
+
+  <div class="tabs">
+    <button class="tab active" data-mode="space">1. Sample Space</button>
+    <button class="tab" data-mode="events">2. Events</button>
+    <button class="tab" data-mode="ops">3. Types &amp; Set Ops</button>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <label for="exp">Experiment:</label>
+      <select id="exp">
+        <option value="coin1">Toss 1 coin</option>
+        <option value="coin2">Toss 2 coins</option>
+        <option value="die1">Roll 1 die</option>
+        <option value="dice2" selected>Roll 2 dice</option>
+        <option value="card">Draw a card</option>
+      </select>
+    </div>
+
+    <!-- MODE 1: SAMPLE SPACE -->
+    <div id="mode-space">
+      <h2>Sample space S</h2>
+      <div>
+        <span class="stat">n(S) = <b id="ns">36</b></span>
+      </div>
+      <div id="spaceView"></div>
+      <p class="note" id="spaceNote"></p>
+    </div>
+
+    <!-- MODE 2: EVENTS -->
+    <div id="mode-events" class="hidden">
+      <h2>Event E</h2>
+      <div class="row">
+        <label for="evt">Event:</label>
+        <select id="evt"></select>
+      </div>
+      <div>
+        <span class="stat">n(S) = <b id="ns2">36</b></span>
+        <span class="stat">n(E) = <b id="ne">6</b></span>
+        <span class="stat">P(E) = <b id="pe">6/36</b></span>
+      </div>
+      <div id="evtSpace"></div>
+      <div class="setline"><b>E</b> = <span id="evtSet"></span></div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--fav)"></span>favourable outcome (in E)</span>
+      </div>
+    </div>
+
+    <!-- MODE 3: TYPES & SET OPS -->
+    <div id="mode-ops" class="hidden">
+      <h2>Two events &mdash; set operations</h2>
+      <div class="row">
+        <label for="evA">A:</label><select id="evA"></select>
+        <label for="evB">B:</label><select id="evB"></select>
+      </div>
+      <div class="row">
+        <label for="op">Show:</label>
+        <select id="op">
+          <option value="both">A and B separately</option>
+          <option value="union">A &cup; B (union)</option>
+          <option value="inter">A &cap; B (intersection)</option>
+        </select>
+      </div>
+      <div>
+        <span class="stat">n(A) = <b id="nA">0</b></span>
+        <span class="stat">n(B) = <b id="nB">0</b></span>
+        <span class="stat">n(A&cap;B) = <b id="nAB">0</b></span>
+        <span class="stat">n(A&cup;B) = <b id="nAuB">0</b></span>
+      </div>
+      <div id="opsSpace"></div>
+      <div class="tagrow" id="relTags"></div>
+      <div class="venn-wrap"><svg id="venn" width="300" height="180" viewBox="0 0 300 180" aria-label="Venn diagram"></svg></div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--a)"></span>only A</span>
+        <span><span class="swatch" style="background:var(--b)"></span>only B</span>
+        <span><span class="swatch" style="background:#c58bff"></span>A&cap;B</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FACTS -->
+  <div class="panel facts">
+    <h2>Key ideas</h2>
+    <dl>
+      <dt>Sample space (S)</dt>
+      <dd>The set of all possible outcomes of a random experiment. n(S) is its size.</dd>
+      <dt>Event (E)</dt>
+      <dd>Any subset of the sample space. An outcome in E is called <i>favourable</i>. P(E) = n(E)/n(S).</dd>
+      <dt>Simple vs compound</dt>
+      <dd>A <b>simple</b> event has exactly one outcome; a <b>compound</b> event has more than one.</dd>
+      <dt>Mutually exclusive</dt>
+      <dd>Events A and B cannot happen together: A &cap; B = &empty; (no common outcome).</dd>
+      <dt>Exhaustive</dt>
+      <dd>Events together cover the whole sample space: their union = S.</dd>
+      <dt>Complementary</dt>
+      <dd>A&prime; (not A) = S &minus; A. A and A&prime; are mutually exclusive and exhaustive; n(A)+n(A&prime;)=n(S).</dd>
+    </dl>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <div id="quiz"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- Build sample spaces ----------
+  function build(exp){
+    var S=[], meta={};
+    if(exp==="coin1"){ S=["H","T"]; meta.kind="list"; meta.label="Toss 1 coin"; }
+    else if(exp==="coin2"){ S=["HH","HT","TH","TT"]; meta.kind="list"; meta.label="Toss 2 coins"; }
+    else if(exp==="die1"){ for(var i=1;i<=6;i++)S.push(String(i)); meta.kind="list"; meta.label="Roll 1 die"; }
+    else if(exp==="dice2"){
+      for(var a=1;a<=6;a++)for(var b=1;b<=6;b++)S.push("("+a+","+b+")");
+      meta.kind="grid"; meta.label="Roll 2 dice";
+    }
+    else if(exp==="card"){
+      var suits=[["S","♠"],["H","♥"],["D","♦"],["C","♣"]];
+      var ranks=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+      for(var s=0;s<4;s++)for(var r=0;r<13;r++)S.push(ranks[r]+suits[s][1]);
+      meta.kind="cards"; meta.label="Draw a card"; meta.suits=suits; meta.ranks=ranks;
+    }
+    return {S:S, meta:meta};
+  }
+
+  // ---------- Event predicates per experiment ----------
+  // each returns a function(outcome index, outcome string) -> boolean
+  function eventsFor(exp){
+    var E=[];
+    if(exp==="coin1"){
+      E=[
+        {name:"Head", fn:function(o){return o==="H";}},
+        {name:"Tail", fn:function(o){return o==="T";}}
+      ];
+    } else if(exp==="coin2"){
+      E=[
+        {name:"At least one head", fn:function(o){return o.indexOf("H")>=0;}},
+        {name:"Exactly one head", fn:function(o){return (o.match(/H/g)||[]).length===1;}},
+        {name:"No head (all tails)", fn:function(o){return o.indexOf("H")<0;}},
+        {name:"Both same face", fn:function(o){return o[0]===o[1];}}
+      ];
+    } else if(exp==="die1"){
+      E=[
+        {name:"Even number", fn:function(o){return (+o)%2===0;}},
+        {name:"Odd number", fn:function(o){return (+o)%2===1;}},
+        {name:"Prime number", fn:function(o){return [2,3,5].indexOf(+o)>=0;}},
+        {name:"Greater than 4", fn:function(o){return (+o)>4;}}
+      ];
+    } else if(exp==="dice2"){
+      var sum=function(o){var m=o.match(/\d+/g);return (+m[0])+(+m[1]);};
+      E=[
+        {name:"Sum = 7", fn:function(o){return sum(o)===7;}},
+        {name:"Sum = 8", fn:function(o){return sum(o)===8;}},
+        {name:"Doubles (a=b)", fn:function(o){var m=o.match(/\d+/g);return m[0]===m[1];}},
+        {name:"Sum is even", fn:function(o){return sum(o)%2===0;}},
+        {name:"At least one 6", fn:function(o){var m=o.match(/\d+/g);return m[0]==="6"||m[1]==="6";}},
+        {name:"Sum > 9", fn:function(o){return sum(o)>9;}}
+      ];
+    } else if(exp==="card"){
+      E=[
+        {name:"A red card", fn:function(o){return o.indexOf("♥")>=0||o.indexOf("♦")>=0;}},
+        {name:"A heart", fn:function(o){return o.indexOf("♥")>=0;}},
+        {name:"A face card (J,Q,K)", fn:function(o){return /^(J|Q|K)/.test(o);}},
+        {name:"An ace", fn:function(o){return /^A/.test(o);}}
+      ];
+    }
+    return E;
+  }
+
+  // ---------- State ----------
+  var st={ exp:"dice2", mode:"space" };
+  var cur=build(st.exp);
+
+  var elExp=document.getElementById("exp");
+  var tabs=document.querySelectorAll(".tab");
+
+  // ---------- Rendering helpers ----------
+  function renderCells(container, favSet, tagMap){
+    // tagMap: index -> class string ('fav','a','b','ab'); favSet fallback
+    container.innerHTML="";
+    if(cur.meta.kind==="grid"){
+      var g=document.createElement("div"); g.className="grid";
+      // header row
+      g.appendChild(hdr(""));
+      for(var c=1;c<=6;c++) g.appendChild(hdr("⚅"+c));
+      for(var a=1;a<=6;a++){
+        g.appendChild(hdr("⚅"+a));
+        for(var b=1;b<=6;b++){
+          var idx=(a-1)*6+(b-1);
+          var d=document.createElement("div"); d.className="gcell";
+          d.textContent=a+","+b;
+          applyTag(d,idx,favSet,tagMap);
+          g.appendChild(d);
+        }
+      }
+      container.appendChild(g);
+    } else if(cur.meta.kind==="cards"){
+      // group by suit rows for readability
+      var box=document.createElement("div"); box.className="cells";
+      for(var i=0;i<cur.S.length;i++){
+        var cel=document.createElement("div"); cel.className="cell";
+        cel.textContent=cur.S[i];
+        applyTag(cel,i,favSet,tagMap);
+        box.appendChild(cel);
+      }
+      container.appendChild(box);
+    } else {
+      var box2=document.createElement("div"); box2.className="cells";
+      for(var j=0;j<cur.S.length;j++){
+        var c2=document.createElement("div"); c2.className="cell";
+        c2.textContent=cur.S[j];
+        applyTag(c2,j,favSet,tagMap);
+        box2.appendChild(c2);
+      }
+      container.appendChild(box2);
+    }
+  }
+  function hdr(t){var h=document.createElement("div");h.className="gcell ghdr";h.textContent=t;return h;}
+  function applyTag(el, idx, favSet, tagMap){
+    var base=el.className;
+    if(tagMap && tagMap[idx]){ el.className=base+" "+tagMap[idx]; }
+    else if(favSet && favSet.has(idx)){ el.className=base+" fav"; }
+  }
+
+  function setText(id,v){document.getElementById(id).textContent=v;}
+
+  // ---------- MODE 1 ----------
+  function renderSpace(){
+    setText("ns", cur.S.length);
+    renderCells(document.getElementById("spaceView"), null, null);
+    var n=document.getElementById("spaceNote");
+    if(st.exp==="dice2") n.textContent="Ordered pairs (first die, second die). Rows = first die, columns = second die.";
+    else if(st.exp==="card") n.textContent="52 cards: 13 ranks × 4 suits (♠ ♥ ♦ ♣).";
+    else if(st.exp==="coin2") n.textContent="Ordered outcomes: first coin then second coin.";
+    else n.textContent="Every outcome is equally likely.";
+  }
+
+  // ---------- MODE 2 ----------
+  function fillEventSelect(sel, exp){
+    var list=eventsFor(exp);
+    sel.innerHTML="";
+    for(var i=0;i<list.length;i++){
+      var o=document.createElement("option");
+      o.value=i; o.textContent=list[i].name; sel.appendChild(o);
+    }
+  }
+  function evalEvent(idx){
+    var list=eventsFor(st.exp); var fn=list[idx].fn;
+    var set=new Set(); var members=[];
+    for(var i=0;i<cur.S.length;i++){ if(fn(cur.S[i])){ set.add(i); members.push(cur.S[i]); } }
+    return {set:set, members:members};
+  }
+  function gcd(a,b){return b?gcd(b,a%b):a;}
+  function frac(n,d){ if(n===0)return "0"; var g=gcd(n,d)||1; return (n/g)+"/"+(d/g); }
+  function renderEvents(){
+    var sel=document.getElementById("evt");
+    var idx=+sel.value||0;
+    var r=evalEvent(idx);
+    setText("ns2", cur.S.length);
+    setText("ne", r.set.size);
+    setText("pe", cur.S.length? frac(r.set.size,cur.S.length):"0");
+    renderCells(document.getElementById("evtSpace"), r.set, null);
+    var set=document.getElementById("evtSet");
+    set.textContent = "{ " + (r.members.length? r.members.join(", ") : "∅ (empty)") + " }";
+  }
+
+  // ---------- MODE 3 ----------
+  function renderOps(){
+    var selA=document.getElementById("evA"), selB=document.getElementById("evB");
+    var rA=evalEvent(+selA.value||0), rB=evalEvent(+selB.value||0);
+    var A=rA.set, B=rB.set;
+    var inter=new Set(), uni=new Set();
+    A.forEach(function(x){ uni.add(x); if(B.has(x))inter.add(x); });
+    B.forEach(function(x){ uni.add(x); });
+    setText("nA",A.size); setText("nB",B.size);
+    setText("nAB",inter.size); setText("nAuB",uni.size);
+
+    // tag map based on selected op
+    var op=document.getElementById("op").value;
+    var tag={};
+    if(op==="both"){
+      A.forEach(function(x){ tag[x]="a"; });
+      B.forEach(function(x){ tag[x]= inter.has(x)?"ab":"b"; });
+    } else if(op==="union"){
+      uni.forEach(function(x){ tag[x]= inter.has(x)?"ab":(A.has(x)?"a":"b"); });
+    } else { // inter
+      inter.forEach(function(x){ tag[x]="ab"; });
+    }
+    renderCells(document.getElementById("opsSpace"), null, tag);
+
+    // relations
+    var tags=[];
+    tags.push({t:"Mutually exclusive", on:inter.size===0});
+    tags.push({t:"Exhaustive (A∪B = S)", on:uni.size===cur.S.length});
+    var complementary = inter.size===0 && uni.size===cur.S.length && A.size+B.size===cur.S.length;
+    tags.push({t:"Complementary (A = B′)", on:complementary});
+    tags.push({t:"A is simple event", on:A.size===1});
+    tags.push({t:"A is compound event", on:A.size>1});
+    var tr=document.getElementById("relTags"); tr.innerHTML="";
+    tags.forEach(function(o){
+      var s=document.createElement("span");
+      s.className="tag"+(o.on?" on":"");
+      s.textContent=(o.on?"✓ ":"✗ ")+o.t;
+      tr.appendChild(s);
+    });
+
+    drawVenn(A.size,B.size,inter.size,cur.S.length);
+  }
+
+  function drawVenn(nA,nB,nAB,nS){
+    var svg=document.getElementById("venn");
+    var onlyA=nA-nAB, onlyB=nB-nAB, outside=nS-(nA+nB-nAB);
+    var overlap = nAB>0;
+    var cx1= overlap?110:85, cx2= overlap?190:215, cy=90, r=62;
+    var html="";
+    html+='<rect x="1" y="1" width="298" height="178" rx="12" fill="none" stroke="#2c3548"/>';
+    html+='<text x="288" y="20" fill="#9aa6bd" font-size="12" text-anchor="end">S</text>';
+    html+='<text x="288" y="36" fill="#9aa6bd" font-size="11" text-anchor="end">outside: '+outside+'</text>';
+    html+='<circle cx="'+cx1+'" cy="'+cy+'" r="'+r+'" fill="rgba(106,166,255,.30)" stroke="#6aa6ff"/>';
+    html+='<circle cx="'+cx2+'" cy="'+cy+'" r="'+r+'" fill="rgba(255,177,90,.28)" stroke="#ffb15a"/>';
+    html+='<text x="'+(cx1-r*0.55)+'" y="'+cy+'" fill="#e7ecf5" font-size="16" text-anchor="middle">'+onlyA+'</text>';
+    html+='<text x="'+(cx2+r*0.55)+'" y="'+cy+'" fill="#e7ecf5" font-size="16" text-anchor="middle">'+onlyB+'</text>';
+    if(overlap) html+='<text x="150" y="'+cy+'" fill="#0c1017" font-size="16" font-weight="700" text-anchor="middle">'+nAB+'</text>';
+    html+='<text x="'+(cx1-r*0.55)+'" y="'+(cy+22)+'" fill="#6aa6ff" font-size="12" text-anchor="middle">A</text>';
+    html+='<text x="'+(cx2+r*0.55)+'" y="'+(cy+22)+'" fill="#ffb15a" font-size="12" text-anchor="middle">B</text>';
+    svg.innerHTML=html;
+  }
+
+  // ---------- Mode switching ----------
+  function showMode(m){
+    st.mode=m;
+    document.getElementById("mode-space").classList.toggle("hidden",m!=="space");
+    document.getElementById("mode-events").classList.toggle("hidden",m!=="events");
+    document.getElementById("mode-ops").classList.toggle("hidden",m!=="ops");
+    tabs.forEach(function(t){ t.classList.toggle("active", t.getAttribute("data-mode")===m); });
+    refresh();
+  }
+
+  function onExpChange(){
+    st.exp=elExp.value;
+    cur=build(st.exp);
+    // repopulate event selects, keep index 0
+    fillEventSelect(document.getElementById("evt"), st.exp);
+    fillEventSelect(document.getElementById("evA"), st.exp);
+    var selB=document.getElementById("evB");
+    fillEventSelect(selB, st.exp);
+    if(selB.options.length>1) selB.value=1; // pick a different B by default
+    refresh();
+  }
+
+  function refresh(){
+    if(st.mode==="space") renderSpace();
+    else if(st.mode==="events") renderEvents();
+    else renderOps();
+  }
+
+  // ---------- Quiz ----------
+  var QUIZ=[
+    {q:"A die is rolled once. What is n(S), the size of the sample space?",
+     opts:["1","6","12","36"], correct:1,
+     ex:"A single die has 6 equally likely faces, so S = {1,2,3,4,5,6} and n(S)=6."},
+    {q:"Two dice are rolled. The event 'sum = 7' has how many favourable outcomes?",
+     opts:["5","6","7","11"], correct:1,
+     ex:"(1,6),(2,5),(3,4),(4,3),(5,2),(6,1) — exactly 6 outcomes, so n(E)=6 and P=6/36=1/6."},
+    {q:"Two events A and B satisfy A ∩ B = ∅ and A ∪ B = S. They are:",
+     opts:["Simple events","Only mutually exclusive","Mutually exclusive and exhaustive","Equally likely"],
+     correct:2,
+     ex:"No common outcome (mutually exclusive) and together they cover S (exhaustive). Such a pair is complementary."}
+  ];
+  function buildQuiz(){
+    var box=document.getElementById("quiz");
+    QUIZ.forEach(function(item,qi){
+      var d=document.createElement("div"); d.className="q";
+      var p=document.createElement("p"); p.style.margin="0 0 4px"; p.innerHTML="<b>Q"+(qi+1)+".</b> "+item.q;
+      d.appendChild(p);
+      var opts=document.createElement("div"); opts.className="opts";
+      item.opts.forEach(function(text,oi){
+        var b=document.createElement("button"); b.className="opt"; b.type="button"; b.textContent=text;
+        b.addEventListener("click",function(){
+          if(d.getAttribute("data-done")==="1")return;
+          d.setAttribute("data-done","1");
+          var children=opts.querySelectorAll(".opt");
+          children[item.correct].classList.add("correct");
+          if(oi!==item.correct) b.classList.add("wrong");
+          d.querySelector(".expl").classList.add("show");
+        });
+        opts.appendChild(b);
+      });
+      d.appendChild(opts);
+      var ex=document.createElement("div"); ex.className="expl"; ex.textContent="→ "+item.ex;
+      d.appendChild(ex);
+      box.appendChild(d);
+    });
+  }
+
+  // ---------- Wire up ----------
+  elExp.addEventListener("change", onExpChange);
+  document.getElementById("evt").addEventListener("change", renderEvents);
+  document.getElementById("evA").addEventListener("change", renderOps);
+  document.getElementById("evB").addEventListener("change", renderOps);
+  document.getElementById("op").addEventListener("change", renderOps);
+  tabs.forEach(function(t){ t.addEventListener("click",function(){ showMode(t.getAttribute("data-mode")); }); });
+
+  // init
+  fillEventSelect(document.getElementById("evt"), st.exp);
+  fillEventSelect(document.getElementById("evA"), st.exp);
+  var _b=document.getElementById("evB"); fillEventSelect(_b, st.exp); if(_b.options.length>1)_b.value=1;
+  buildQuiz();
+  showMode("space");
+})();
+</script>
+</body>
+</html>

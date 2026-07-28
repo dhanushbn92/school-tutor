@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conic Sections Lab — NIOS Class 12 Maths, Ch 16</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#181e2e;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#98a3bc;
+    --accent:#5ad1c4;
+    --accent-soft:rgba(90,209,196,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.08rem;margin-bottom:6px}
+  .panel h2 span{color:var(--accent)}
+  .lead{color:var(--muted);font-size:.9rem;margin-bottom:12px}
+
+  canvas{display:block;width:100%;height:auto;background:#0b0f1a;border:1px solid var(--line);
+    border-radius:12px;touch-action:manipulation}
+
+  .controls{display:flex;flex-direction:column;gap:14px;margin-top:14px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:6px}
+  .ctrl label b{color:var(--accent);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;background:var(--panel2)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;
+    margin-top:-9px;border-radius:50%;background:var(--accent);border:3px solid #0b0f1a;cursor:pointer}
+  input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:var(--panel2)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);
+    border:3px solid #0b0f1a;cursor:pointer}
+
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{flex:1 1 80px;min-height:44px;border:1px solid var(--line);border-radius:12px;
+    background:var(--panel2);color:var(--muted);font-weight:600;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .seg button.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  .stat .v small{color:var(--muted);font-weight:400;font-size:.75rem}
+
+  .facts table{width:100%;border-collapse:collapse;font-size:.86rem}
+  .facts th,.facts td{border:1px solid var(--line);padding:8px 9px;text-align:left;vertical-align:top}
+  .facts th{background:var(--panel2);color:var(--accent);font-weight:600}
+  .facts td .m{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .scroller{overflow-x:auto}
+
+  .q{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+  .q p{font-weight:600;margin-bottom:8px}
+  .q .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;
+    background:var(--panel);color:var(--ink);padding:9px 11px;margin-bottom:7px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .q .opt:hover{border-color:var(--accent)}
+  .q .opt.correct{border-color:var(--good);background:rgba(95,214,139,.16)}
+  .q .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14)}
+  .q .fb{font-size:.85rem;color:var(--muted);margin-top:4px;min-height:1.1em}
+  .q .fb.show{color:var(--ink)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;font-size:.82rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:14px;height:14px;border-radius:4px;display:inline-block}
+  .hidden{display:none}
+  .note{font-size:.82rem;color:var(--muted);margin-top:10px}
+  .eq{font-family:"Cambria Math",Georgia,serif;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Conic Sections <span>Lab</span></h1>
+    <p>NIOS Class 12 Mathematics · Chapter 16 — circle, ellipse, parabola, hyperbola</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="cone">Cone Slice</button>
+    <button class="tab-btn" data-tab="parab">Parabola</button>
+    <button class="tab-btn" data-tab="ellip">Ellipse</button>
+    <button class="tab-btn" data-tab="hyper">Hyperbola</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ CONE ============ -->
+  <section class="panel tabpage" id="tab-cone">
+    <h2>Slicing a <span>double cone</span></h2>
+    <p class="lead">A plane cutting a double cone produces the four conics. The tilt of the cutting plane (relative to the cone's axis) decides which one you get.</p>
+    <canvas id="cvCone" width="900" height="520"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Slice angle from horizontal <b><span id="coneAngV">0</span>°</b></label>
+        <input type="range" id="coneAng" min="0" max="90" step="1" value="0">
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Conic obtained</div><div class="v" id="coneType">Circle</div></div>
+      <div class="stat"><div class="k">Half-angle of cone α</div><div class="v">35°</div></div>
+      <div class="stat"><div class="k">Rule</div><div class="v" id="coneRule" style="font-size:.82rem;font-weight:500"></div></div>
+    </div>
+    <p class="note" id="coneDesc"></p>
+  </section>
+
+  <!-- ============ PARABOLA ============ -->
+  <section class="panel tabpage hidden" id="tab-parab">
+    <h2><span>Parabola</span></h2>
+    <p class="lead">Standard forms <span class="eq">y² = 4ax</span> (opens along x-axis) and <span class="eq">x² = 4ay</span> (opens along y-axis). Vertex at origin; a &gt; 0.</p>
+    <div class="seg" id="parabForm">
+      <button class="active" data-f="x">y² = 4ax</button>
+      <button data-f="y">x² = 4ay</button>
+    </div>
+    <canvas id="cvParab" width="900" height="560"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label>a <b><span id="paV">1.0</span></b></label>
+        <input type="range" id="paA" min="0.3" max="4" step="0.1" value="1">
+      </div>
+    </div>
+    <div class="stats" id="parabStats"></div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#5ad1c4"></i>curve</span>
+      <span><i class="swatch" style="background:#ff7b7b"></i>focus</span>
+      <span><i class="swatch" style="background:#ffd166"></i>directrix</span>
+      <span><i class="swatch" style="background:#8aa0ff"></i>latus rectum</span>
+    </div>
+  </section>
+
+  <!-- ============ ELLIPSE ============ -->
+  <section class="panel tabpage hidden" id="tab-ellip">
+    <h2><span>Ellipse</span></h2>
+    <p class="lead">Standard form <span class="eq">x²/a² + y²/b² = 1</span>. Drag the sliders; larger axis is the major axis. Foci lie on the major axis.</p>
+    <canvas id="cvEllip" width="900" height="560"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label>a (semi-axis on x) <b><span id="elAV">4.0</span></b></label>
+        <input type="range" id="elA" min="1" max="6" step="0.1" value="4">
+      </div>
+      <div class="ctrl">
+        <label>b (semi-axis on y) <b><span id="elBV">2.5</span></b></label>
+        <input type="range" id="elB" min="1" max="6" step="0.1" value="2.5">
+      </div>
+    </div>
+    <div class="stats" id="ellipStats"></div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#5ad1c4"></i>curve</span>
+      <span><i class="swatch" style="background:#ff7b7b"></i>foci</span>
+      <span><i class="swatch" style="background:#ffd166"></i>vertices</span>
+      <span><i class="swatch" style="background:#8aa0ff"></i>latus rectum</span>
+    </div>
+  </section>
+
+  <!-- ============ HYPERBOLA ============ -->
+  <section class="panel tabpage hidden" id="tab-hyper">
+    <h2><span>Hyperbola</span></h2>
+    <p class="lead">Standard form <span class="eq">x²/a² − y²/b² = 1</span>. Two branches, opening left/right. Asymptotes <span class="eq">y = ±(b/a)x</span>.</p>
+    <canvas id="cvHyper" width="900" height="560"></canvas>
+    <div class="controls">
+      <div class="ctrl">
+        <label>a <b><span id="hyAV">3.0</span></b></label>
+        <input type="range" id="hyA" min="1" max="6" step="0.1" value="3">
+      </div>
+      <div class="ctrl">
+        <label>b <b><span id="hyBV">2.0</span></b></label>
+        <input type="range" id="hyB" min="1" max="6" step="0.1" value="2">
+      </div>
+    </div>
+    <div class="stats" id="hyperStats"></div>
+    <div class="legend">
+      <span><i class="swatch" style="background:#5ad1c4"></i>curve</span>
+      <span><i class="swatch" style="background:#ff7b7b"></i>foci</span>
+      <span><i class="swatch" style="background:#ffd166"></i>vertices</span>
+      <span><i class="swatch" style="background:#8aa0ff"></i>asymptotes</span>
+    </div>
+  </section>
+
+  <!-- ============ FACTS + QUIZ ============ -->
+  <section class="panel tabpage hidden" id="tab-facts">
+    <h2>Facts <span>panel</span></h2>
+    <p class="lead">Standard equations (centre/vertex at origin), key features, and eccentricity of each conic.</p>
+    <div class="facts scroller">
+      <table>
+        <thead>
+          <tr><th>Conic</th><th>Standard equation</th><th>Focus / Directrix</th><th>Eccentricity e</th><th>Latus rectum</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Circle</td>
+            <td class="m">x² + y² = r²</td>
+            <td>centre (0,0), radius r</td>
+            <td class="m">e = 0</td>
+            <td class="m">2r (diameter)</td>
+          </tr>
+          <tr>
+            <td>Parabola</td>
+            <td class="m">y² = 4ax</td>
+            <td>F(a, 0); directrix x = −a</td>
+            <td class="m">e = 1</td>
+            <td class="m">4a</td>
+          </tr>
+          <tr>
+            <td>Ellipse<br>(a &gt; b)</td>
+            <td class="m">x²/a² + y²/b² = 1</td>
+            <td>F(±c, 0), c = √(a²−b²);<br>directrix x = ±a/e</td>
+            <td class="m">e = √(1 − b²/a²)<br>= c/a, 0&lt;e&lt;1</td>
+            <td class="m">2b²/a</td>
+          </tr>
+          <tr>
+            <td>Hyperbola</td>
+            <td class="m">x²/a² − y²/b² = 1</td>
+            <td>F(±c, 0), c = √(a²+b²);<br>asymptotes y = ±(b/a)x</td>
+            <td class="m">e = √(1 + b²/a²)<br>= c/a, e&gt;1</td>
+            <td class="m">2b²/a</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Focal distance defining property: for any conic, distance to focus = e × distance to directrix. e = 0 circle, e &lt; 1 ellipse, e = 1 parabola, e &gt; 1 hyperbola.</p>
+
+    <h2 style="margin-top:22px">Quick <span>quiz</span></h2>
+    <p class="lead">Tap an option to check your answer.</p>
+    <div id="quiz"></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  var pages = document.querySelectorAll(".tabpage");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var id = t.getAttribute("data-tab");
+      pages.forEach(function(p){ p.classList.toggle("hidden", p.id !== "tab-"+id); });
+      redrawAll();
+    });
+  });
+
+  function fmt(n, d){ d = (d===undefined)?2:d; return Number(n).toFixed(d); }
+
+  /* ================= CONE SLICE ================= */
+  var cvCone = document.getElementById("cvCone");
+  var gc = cvCone.getContext("2d");
+  var coneAng = document.getElementById("coneAng");
+  var ALPHA = 35; // cone half-angle in degrees (from axis)
+
+  function drawCone(){
+    var W = cvCone.width, H = cvCone.height;
+    gc.clearRect(0,0,W,H);
+    var cx = W*0.42, cy = H/2;
+    var alpha = ALPHA*Math.PI/180;
+    var slant = H*0.42;
+    // slope of cone edge: horizontal spread per vertical unit = tan(alpha)
+    var spread = Math.tan(alpha);
+    // draw double cone (two triangles meeting at apex cy)
+    var topH = slant, botH = slant;
+    gc.lineWidth = 2;
+    gc.strokeStyle = "#556084";
+    gc.beginPath();
+    // upper nappe
+    gc.moveTo(cx, cy);
+    gc.lineTo(cx - spread*topH, cy - topH);
+    gc.moveTo(cx, cy);
+    gc.lineTo(cx + spread*topH, cy - topH);
+    // lower nappe
+    gc.moveTo(cx, cy);
+    gc.lineTo(cx - spread*botH, cy + botH);
+    gc.moveTo(cx, cy);
+    gc.lineTo(cx + spread*botH, cy + botH);
+    gc.stroke();
+    // rim ellipses (top and bottom) for 3D feel
+    gc.strokeStyle = "rgba(120,135,180,.5)";
+    ellipseRim(cx, cy - topH, spread*topH, spread*topH*0.28);
+    ellipseRim(cx, cy + botH, spread*botH, spread*botH*0.28);
+    // axis
+    gc.strokeStyle = "rgba(120,135,180,.35)";
+    gc.setLineDash([5,5]);
+    gc.beginPath(); gc.moveTo(cx, cy-topH-14); gc.lineTo(cx, cy+botH+14); gc.stroke();
+    gc.setLineDash([]);
+
+    // cutting plane: angle theta from horizontal
+    var theta = (+coneAng.value)*Math.PI/180;
+    var thetaDeg = +coneAng.value;
+    var px = cx, py = cy - topH*0.42; // pivot point inside upper nappe
+    var len = W*0.30;
+    var dx = Math.cos(theta), dy = -Math.sin(theta); // going up-right
+    gc.strokeStyle = "#5ad1c4";
+    gc.lineWidth = 3;
+    gc.beginPath();
+    gc.moveTo(px - dx*len, py - dy*len);
+    gc.lineTo(px + dx*len, py + dy*len);
+    gc.stroke();
+    // plane band (translucent)
+    gc.fillStyle = "rgba(90,209,196,.10)";
+    var nx = -dy, ny = dx; var t = 16;
+    gc.beginPath();
+    gc.moveTo(px - dx*len + nx*t, py - dy*len + ny*t);
+    gc.lineTo(px + dx*len + nx*t, py + dy*len + ny*t);
+    gc.lineTo(px + dx*len - nx*t, py + dy*len - ny*t);
+    gc.lineTo(px - dx*len - nx*t, py - dy*len - ny*t);
+    gc.closePath(); gc.fill();
+
+    // classify
+    var type, rule, desc;
+    if(thetaDeg === 0){
+      type="Circle"; rule="plane ⟂ axis";
+      desc="Plane perpendicular to the axis (parallel to the base) cuts one nappe in a circle. e = 0.";
+    } else if(thetaDeg < ALPHA){
+      type="Ellipse"; rule="0° < θ < α";
+      desc="Plane tilted less than the cone's half-angle cuts one nappe in a closed ellipse. 0 < e < 1.";
+    } else if(Math.abs(thetaDeg - ALPHA) < 0.5){
+      type="Parabola"; rule="θ = α (∥ slant)";
+      desc="Plane parallel to a slant edge of the cone gives an open parabola. e = 1.";
+    } else {
+      type="Hyperbola"; rule="θ > α";
+      desc="Plane steeper than the slant edge cuts both nappes, giving a two-branch hyperbola. e > 1.";
+    }
+    document.getElementById("coneType").textContent = type;
+    document.getElementById("coneRule").textContent = rule;
+    document.getElementById("coneDesc").textContent = desc;
+    document.getElementById("coneAngV").textContent = thetaDeg;
+
+    // draw the resulting conic sketch on the right
+    sketchConic(type, W*0.80, H/2);
+  }
+  function ellipseRim(cx, cy, rx, ry){
+    gc.beginPath();
+    for(var a=0;a<=Math.PI*2+0.01;a+=0.15){
+      var x=cx+rx*Math.cos(a), y=cy+ry*Math.sin(a);
+      if(a===0) gc.moveTo(x,y); else gc.lineTo(x,y);
+    }
+    gc.stroke();
+  }
+  function sketchConic(type, cx, cy){
+    gc.save();
+    gc.strokeStyle="#5ad1c4"; gc.lineWidth=2.5;
+    gc.fillStyle="#98a3bc"; gc.font="13px system-ui";
+    gc.textAlign="center";
+    gc.fillText("result", cx, cy-92);
+    gc.beginPath();
+    if(type==="Circle"){
+      gc.arc(cx,cy,58,0,Math.PI*2); gc.stroke();
+    } else if(type==="Ellipse"){
+      for(var a=0;a<=Math.PI*2+0.01;a+=0.1){var x=cx+70*Math.cos(a),y=cy+44*Math.sin(a);if(a===0)gc.moveTo(x,y);else gc.lineTo(x,y);}
+      gc.stroke();
+    } else if(type==="Parabola"){
+      for(var t=-1.3;t<=1.3;t+=0.05){var x=cx+58*t,y=cy+52-70*t*t;if(t===-1.3)gc.moveTo(x,y);else gc.lineTo(x,y);}
+      gc.stroke();
+    } else {
+      // hyperbola two branches
+      for(var s=-1;s<=1;s+=0.05){var y1=cy+70*s,x1=cx+40*Math.cosh(s);if(s===-1)gc.moveTo(x1,y1);else gc.lineTo(x1,y1);}
+      gc.stroke();
+      gc.beginPath();
+      for(var s2=-1;s2<=1;s2+=0.05){var y2=cy+70*s2,x2=cx-40*Math.cosh(s2);if(s2===-1)gc.moveTo(x2,y2);else gc.lineTo(x2,y2);}
+      gc.stroke();
+    }
+    gc.restore();
+  }
+
+  /* ================= shared plot helpers ================= */
+  function setupPlot(g, W, H, unit){
+    g.clearRect(0,0,W,H);
+    var ox = W/2, oy = H/2;
+    // grid
+    g.strokeStyle="#1c2438"; g.lineWidth=1;
+    g.beginPath();
+    for(var gx=ox%unit; gx<W; gx+=unit){ g.moveTo(gx,0); g.lineTo(gx,H); }
+    for(var gy=oy%unit; gy<H; gy+=unit){ g.moveTo(0,gy); g.lineTo(W,gy); }
+    g.stroke();
+    // axes
+    g.strokeStyle="#54608a"; g.lineWidth=1.5;
+    g.beginPath(); g.moveTo(0,oy); g.lineTo(W,oy); g.moveTo(ox,0); g.lineTo(ox,H); g.stroke();
+    // axis arrows/labels
+    g.fillStyle="#98a3bc"; g.font="12px system-ui"; g.textAlign="left";
+    g.fillText("x", W-14, oy-6);
+    g.fillText("y", ox+6, 14);
+    return {ox:ox, oy:oy, u:unit,
+      X:function(x){return ox + x*unit;},
+      Y:function(y){return oy - y*unit;}};
+  }
+  function dot(g, x, y, col, r){ g.fillStyle=col; g.beginPath(); g.arc(x,y,r||4.5,0,Math.PI*2); g.fill(); }
+  function label(g, txt, x, y, col, align){
+    g.fillStyle=col||"#e9edf7"; g.font="12px system-ui"; g.textAlign=align||"left";
+    g.fillText(txt, x, y);
+  }
+  function statCard(k, v, sub){
+    return '<div class="stat"><div class="k">'+k+'</div><div class="v">'+v+(sub?' <small>'+sub+'</small>':'')+'</div></div>';
+  }
+
+  /* ================= PARABOLA ================= */
+  var cvP = document.getElementById("cvParab");
+  var gp = cvP.getContext("2d");
+  var paA = document.getElementById("paA");
+  var parabForm = "x";
+  document.querySelectorAll("#parabForm button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#parabForm button").forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active"); parabForm = b.getAttribute("data-f"); drawParab();
+    });
+  });
+  function drawParab(){
+    var W=cvP.width, H=cvP.height, u=52;
+    var P=setupPlot(gp,W,H,u);
+    var a = +paA.value;
+    document.getElementById("paV").textContent = fmt(a,1);
+    gp.strokeStyle="#5ad1c4"; gp.lineWidth=2.5;
+    gp.beginPath();
+    var first=true, yMax=(H/2)/u + 1;
+    if(parabForm==="x"){
+      // y^2=4ax  -> x = y^2/(4a)
+      for(var y=-yMax;y<=yMax;y+=0.04){
+        var x=y*y/(4*a); var px=P.X(x), py=P.Y(y);
+        if(first){gp.moveTo(px,py);first=false;}else gp.lineTo(px,py);
+      }
+      gp.stroke();
+      // directrix x=-a
+      gp.strokeStyle="#ffd166"; gp.lineWidth=2; gp.setLineDash([6,5]);
+      gp.beginPath(); gp.moveTo(P.X(-a),0); gp.lineTo(P.X(-a),H); gp.stroke(); gp.setLineDash([]);
+      // latus rectum: vertical through focus, length 4a (from y=-2a..2a)
+      gp.strokeStyle="#8aa0ff"; gp.lineWidth=2;
+      gp.beginPath(); gp.moveTo(P.X(a),P.Y(-2*a)); gp.lineTo(P.X(a),P.Y(2*a)); gp.stroke();
+      dot(gp,P.X(a),P.Y(0),"#ff7b7b",6);
+      dot(gp,P.X(0),P.Y(0),"#5fd68b",5);
+      label(gp,"F("+fmt(a,1)+", 0)",P.X(a)+8,P.Y(0)-8,"#ff7b7b");
+      label(gp,"V",P.X(0)-14,P.Y(0)+18,"#5fd68b");
+      label(gp,"x = "+fmt(-a,1),P.X(-a)-6,18,"#ffd166","right");
+      label(gp,"axis: x-axis",W-14,H-14,"#98a3bc","right");
+    } else {
+      // x^2=4ay -> y=x^2/(4a)
+      var xMax=(W/2)/u+1;
+      for(var x2=-xMax;x2<=xMax;x2+=0.04){
+        var y2=x2*x2/(4*a); var px2=P.X(x2), py2=P.Y(y2);
+        if(first){gp.moveTo(px2,py2);first=false;}else gp.lineTo(px2,py2);
+      }
+      gp.stroke();
+      gp.strokeStyle="#ffd166"; gp.lineWidth=2; gp.setLineDash([6,5]);
+      gp.beginPath(); gp.moveTo(0,P.Y(-a)); gp.lineTo(W,P.Y(-a)); gp.stroke(); gp.setLineDash([]);
+      gp.strokeStyle="#8aa0ff"; gp.lineWidth=2;
+      gp.beginPath(); gp.moveTo(P.X(-2*a),P.Y(a)); gp.lineTo(P.X(2*a),P.Y(a)); gp.stroke();
+      dot(gp,P.X(0),P.Y(a),"#ff7b7b",6);
+      dot(gp,P.X(0),P.Y(0),"#5fd68b",5);
+      label(gp,"F(0, "+fmt(a,1)+")",P.X(0)+8,P.Y(a)-8,"#ff7b7b");
+      label(gp,"V",P.X(0)+8,P.Y(0)+16,"#5fd68b");
+      label(gp,"y = "+fmt(-a,1),8,P.Y(-a)-6,"#ffd166");
+      label(gp,"axis: y-axis",W-14,H-14,"#98a3bc","right");
+    }
+    var eq = parabForm==="x" ? "y² = "+fmt(4*a,1)+"x" : "x² = "+fmt(4*a,1)+"y";
+    var foc = parabForm==="x" ? "("+fmt(a,1)+", 0)" : "(0, "+fmt(a,1)+")";
+    var dir = parabForm==="x" ? "x = "+fmt(-a,1) : "y = "+fmt(-a,1);
+    document.getElementById("parabStats").innerHTML =
+      statCard("Equation", eq) +
+      statCard("Focus", foc) +
+      statCard("Directrix", dir) +
+      statCard("Eccentricity", "1") +
+      statCard("Latus rectum", fmt(4*a,1), "= 4a") +
+      statCard("Vertex", "(0, 0)");
+  }
+
+  /* ================= ELLIPSE ================= */
+  var cvE=document.getElementById("cvEllip"), ge=cvE.getContext("2d");
+  var elA=document.getElementById("elA"), elB=document.getElementById("elB");
+  function drawEllip(){
+    var W=cvE.width,H=cvE.height,u=44;
+    var P=setupPlot(ge,W,H,u);
+    var a=+elA.value, b=+elB.value;
+    document.getElementById("elAV").textContent=fmt(a,1);
+    document.getElementById("elBV").textContent=fmt(b,1);
+    // major axis is the larger; foci on that axis
+    var aMaj=Math.max(a,b), bMin=Math.min(a,b);
+    var xMajor = a>=b;
+    var c=Math.sqrt(aMaj*aMaj - bMin*bMin);
+    var e = c/aMaj; // = sqrt(1 - bMin^2/aMaj^2)
+    // curve
+    ge.strokeStyle="#5ad1c4"; ge.lineWidth=2.5; ge.beginPath();
+    for(var t=0;t<=Math.PI*2+0.01;t+=0.03){
+      var x=a*Math.cos(t), y=b*Math.sin(t);
+      var px=P.X(x),py=P.Y(y);
+      if(t===0)ge.moveTo(px,py);else ge.lineTo(px,py);
+    }
+    ge.stroke();
+    // axes segments
+    ge.strokeStyle="rgba(255,209,102,.55)"; ge.lineWidth=1.5; ge.setLineDash([4,4]);
+    ge.beginPath(); ge.moveTo(P.X(-a),P.Y(0)); ge.lineTo(P.X(a),P.Y(0));
+    ge.moveTo(P.X(0),P.Y(-b)); ge.lineTo(P.X(0),P.Y(b)); ge.stroke(); ge.setLineDash([]);
+    // foci & latus rectum
+    var lr = 2*bMin*bMin/aMaj;
+    ge.strokeStyle="#8aa0ff"; ge.lineWidth=2;
+    if(xMajor){
+      dot(ge,P.X(c),P.Y(0),"#ff7b7b",6); dot(ge,P.X(-c),P.Y(0),"#ff7b7b",6);
+      dot(ge,P.X(a),P.Y(0),"#ffd166",5); dot(ge,P.X(-a),P.Y(0),"#ffd166",5);
+      var half=bMin*bMin/aMaj;
+      ge.beginPath(); ge.moveTo(P.X(c),P.Y(-half)); ge.lineTo(P.X(c),P.Y(half)); ge.stroke();
+      label(ge,"F₁("+fmt(c,2)+",0)",P.X(c)+7,P.Y(0)-9,"#ff7b7b");
+      label(ge,"F₂",P.X(-c)-6,P.Y(0)-9,"#ff7b7b","right");
+      label(ge,"V("+fmt(a,1)+",0)",P.X(a)+6,P.Y(0)+18,"#ffd166");
+    } else {
+      dot(ge,P.X(0),P.Y(c),"#ff7b7b",6); dot(ge,P.X(0),P.Y(-c),"#ff7b7b",6);
+      dot(ge,P.X(0),P.Y(b),"#ffd166",5); dot(ge,P.X(0),P.Y(-b),"#ffd166",5);
+      var half2=bMin*bMin/aMaj;
+      ge.beginPath(); ge.moveTo(P.X(-half2),P.Y(c)); ge.lineTo(P.X(half2),P.Y(c)); ge.stroke();
+      label(ge,"F₁(0,"+fmt(c,2)+")",P.X(0)+8,P.Y(c)-8,"#ff7b7b");
+      label(ge,"F₂",P.X(0)+8,P.Y(-c)+16,"#ff7b7b");
+      label(ge,"V(0,"+fmt(b,1)+")",P.X(0)+8,P.Y(b)+16,"#ffd166");
+    }
+    document.getElementById("ellipStats").innerHTML =
+      statCard("Equation","x²/"+fmt(a*a,2)+" + y²/"+fmt(b*b,2)+" = 1") +
+      statCard("c = √(a²−b²)", fmt(c,3)) +
+      statCard("Eccentricity e", fmt(e,3), "√(1−b²/a²)") +
+      statCard("Major axis", fmt(2*aMaj,2), (xMajor?"along x":"along y")) +
+      statCard("Minor axis", fmt(2*bMin,2)) +
+      statCard("Latus rectum", fmt(lr,3), "2b²/a");
+  }
+
+  /* ================= HYPERBOLA ================= */
+  var cvH=document.getElementById("cvHyper"), gh=cvH.getContext("2d");
+  var hyA=document.getElementById("hyA"), hyB=document.getElementById("hyB");
+  function drawHyper(){
+    var W=cvH.width,H=cvH.height,u=44;
+    var P=setupPlot(gh,W,H,u);
+    var a=+hyA.value, b=+hyB.value;
+    document.getElementById("hyAV").textContent=fmt(a,1);
+    document.getElementById("hyBV").textContent=fmt(b,1);
+    var c=Math.sqrt(a*a+b*b);
+    var e=c/a; // = sqrt(1 + b^2/a^2)
+    var xMax=(W/2)/u+1;
+    // asymptotes y=±(b/a)x
+    gh.strokeStyle="rgba(138,160,255,.6)"; gh.lineWidth=1.5; gh.setLineDash([6,5]);
+    gh.beginPath();
+    gh.moveTo(P.X(-xMax),P.Y(-(b/a)*xMax)); gh.lineTo(P.X(xMax),P.Y((b/a)*xMax));
+    gh.moveTo(P.X(-xMax),P.Y((b/a)*xMax)); gh.lineTo(P.X(xMax),P.Y(-(b/a)*xMax));
+    gh.stroke(); gh.setLineDash([]);
+    // curve: x=±a cosh t, y=b sinh t
+    gh.strokeStyle="#5ad1c4"; gh.lineWidth=2.5;
+    var tMax=Math.acosh(Math.max(1.01,xMax/a));
+    gh.beginPath(); var f=true;
+    for(var t=-tMax;t<=tMax;t+=0.02){
+      var x=a*Math.cosh(t), y=b*Math.sinh(t);
+      if(f){gh.moveTo(P.X(x),P.Y(y));f=false;}else gh.lineTo(P.X(x),P.Y(y));
+    }
+    gh.stroke();
+    gh.beginPath(); f=true;
+    for(var t2=-tMax;t2<=tMax;t2+=0.02){
+      var x2=-a*Math.cosh(t2), y2=b*Math.sinh(t2);
+      if(f){gh.moveTo(P.X(x2),P.Y(y2));f=false;}else gh.lineTo(P.X(x2),P.Y(y2));
+    }
+    gh.stroke();
+    // foci, vertices, latus rectum
+    dot(gh,P.X(c),P.Y(0),"#ff7b7b",6); dot(gh,P.X(-c),P.Y(0),"#ff7b7b",6);
+    dot(gh,P.X(a),P.Y(0),"#ffd166",5); dot(gh,P.X(-a),P.Y(0),"#ffd166",5);
+    var half=b*b/a;
+    gh.strokeStyle="#8aa0ff"; gh.lineWidth=2;
+    gh.beginPath(); gh.moveTo(P.X(c),P.Y(-half)); gh.lineTo(P.X(c),P.Y(half)); gh.stroke();
+    label(gh,"F("+fmt(c,2)+",0)",P.X(c)+7,P.Y(0)-9,"#ff7b7b");
+    label(gh,"V("+fmt(a,1)+",0)",P.X(a)+6,P.Y(0)+18,"#ffd166");
+    label(gh,"y=±(b/a)x",W-14,20,"#8aa0ff","right");
+    document.getElementById("hyperStats").innerHTML =
+      statCard("Equation","x²/"+fmt(a*a,2)+" − y²/"+fmt(b*b,2)+" = 1") +
+      statCard("c = √(a²+b²)", fmt(c,3)) +
+      statCard("Eccentricity e", fmt(e,3), "√(1+b²/a²)") +
+      statCard("Vertices", "(±"+fmt(a,1)+", 0)") +
+      statCard("Asymptotes", "y = ±"+fmt(b/a,2)+"x") +
+      statCard("Latus rectum", fmt(2*b*b/a,3), "2b²/a");
+  }
+
+  /* ================= QUIZ ================= */
+  var quizData = [
+    {q:"The eccentricity of a parabola is:",
+     opts:["0","between 0 and 1","exactly 1","greater than 1"], ans:2,
+     fb:"For a parabola e = 1 (focus distance equals directrix distance)."},
+    {q:"For the ellipse x²/25 + y²/9 = 1, the eccentricity is:",
+     opts:["3/5","4/5","5/4","√34/5"], ans:1,
+     fb:"a²=25, b²=9 ⇒ e=√(1−9/25)=√(16/25)=4/5."},
+    {q:"For x²/9 − y²/16 = 1, the foci are at:",
+     opts:["(±3, 0)","(±4, 0)","(±5, 0)","(0, ±5)"], ans:2,
+     fb:"c=√(a²+b²)=√(9+16)=√25=5, foci on x-axis ⇒ (±5, 0)."}
+  ];
+  function buildQuiz(){
+    var box=document.getElementById("quiz");
+    box.innerHTML="";
+    quizData.forEach(function(item,qi){
+      var d=document.createElement("div"); d.className="q";
+      var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+      var fb=document.createElement("div"); fb.className="fb";
+      item.opts.forEach(function(opt,oi){
+        var btn=document.createElement("button"); btn.className="opt"; btn.textContent=opt;
+        btn.addEventListener("click", function(){
+          if(d.getAttribute("data-done")) return;
+          d.setAttribute("data-done","1");
+          var kids=d.querySelectorAll(".opt");
+          kids[item.ans].classList.add("correct");
+          if(oi!==item.ans) btn.classList.add("wrong");
+          fb.textContent=(oi===item.ans?"Correct! ":"Not quite. ")+item.fb;
+          fb.classList.add("show");
+        });
+        d.appendChild(btn);
+      });
+      d.appendChild(fb); box.appendChild(d);
+    });
+  }
+
+  /* ---------- redraw dispatch ---------- */
+  function redrawAll(){
+    drawCone(); drawParab(); drawEllip(); drawHyper();
+  }
+  coneAng.addEventListener("input", drawCone);
+  paA.addEventListener("input", drawParab);
+  elA.addEventListener("input", drawEllip);
+  elB.addEventListener("input", drawEllip);
+  hyA.addEventListener("input", drawHyper);
+  hyB.addEventListener("input", drawHyper);
+
+  buildQuiz();
+  redrawAll();
+})();
+</script>
+</body>
+</html>

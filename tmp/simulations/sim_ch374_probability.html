@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability Lab — Probability (NIOS Class 12, Ch 19)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#1a2130;
+    --panel2:#232c40;
+    --ink:#e9edf7;
+    --muted:#98a3bc;
+    --accent:#6fb1ff;
+    --accent-soft:rgba(111,177,255,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:12px 0 6px}
+  .panel p{font-size:.92rem;color:var(--ink)}
+  .muted{color:var(--muted)}
+  .small{font-size:.82rem}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 70px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .btn{min-height:48px;padding:0 18px;border:1px solid var(--accent);border-radius:12px;
+    background:var(--accent-soft);color:var(--accent);font-size:.95rem;font-weight:700;
+    cursor:pointer;touch-action:manipulation}
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{border-color:var(--line);background:var(--panel2);color:var(--muted)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 4px}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131d;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f131d}
+
+  .stat{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;flex:1 1 130px}
+  .chip .k{font-size:.75rem;color:var(--muted)}
+  .chip .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .chip .v.acc{color:var(--accent)}
+  .chip .v.good{color:var(--good)}
+
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:var(--panel2);border:1px solid var(--line);margin-top:10px}
+
+  .facts{background:var(--panel2);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;margin-top:6px}
+  .facts ul{margin:6px 0 0 18px}
+  .facts li{font-size:.86rem;margin-bottom:5px}
+  .facts b{color:var(--accent)}
+
+  .quiz-q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .quiz-q:first-child{border-top:none;margin-top:0;padding-top:0}
+  .quiz-q p.q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .explain{font-size:.84rem;color:var(--muted);margin-top:4px;display:none}
+
+  .hide{display:none}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.88em}
+  .venn-wrap{text-align:center}
+  table.tree{width:100%;border-collapse:collapse;margin-top:8px;font-size:.86rem}
+  table.tree td{border:1px solid var(--line);padding:6px 8px}
+  .kbd{color:var(--accent);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Probability</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Chapter 19 · Probability</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="sim">1 · Classical &amp; Simulation</button>
+    <button class="tab-btn" data-tab="rules">2 · Addition &amp; Complement</button>
+    <button class="tab-btn" data-tab="cond">3 · Conditional &amp; Independence</button>
+  </div>
+
+  <!-- ============ TAB 1: CLASSICAL & SIMULATION ============ -->
+  <section id="tab-sim">
+    <div class="panel">
+      <h2>Classical probability &amp; the Law of Large Numbers</h2>
+      <p class="muted small">Theoretical <code>P(E) = n(E) / n(S)</code>. Run many random trials and watch the
+        experimental (relative) frequency settle toward the theoretical value.</p>
+
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Experiment</label>
+          <div class="seg" id="expSeg">
+            <button data-exp="coin" class="on">Coin</button>
+            <button data-exp="die">Single die</button>
+            <button data-exp="two">Two dice (sum)</button>
+            <button data-exp="spin">Spinner (4)</button>
+          </div>
+        </div>
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Event E</label>
+          <div class="seg" id="evtSeg"></div>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn" id="run1">Run 1 trial</button>
+        <button class="btn" id="run100">Run 100</button>
+        <button class="btn" id="run1000">Run 1000</button>
+        <button class="btn ghost" id="resetSim">Reset</button>
+      </div>
+
+      <div class="stat">
+        <div class="chip"><div class="k">n(S)</div><div class="v" id="nS">2</div></div>
+        <div class="chip"><div class="k">n(E)</div><div class="v" id="nE">1</div></div>
+        <div class="chip"><div class="k">Theoretical P(E)</div><div class="v acc" id="pTheo">0.5000</div></div>
+        <div class="chip"><div class="k">Experimental (trials)</div><div class="v good" id="pExp">—</div></div>
+      </div>
+      <p class="small muted" id="trialInfo" style="margin-top:8px">Trials run: 0 · Favourable: 0</p>
+
+      <canvas id="convCanvas" width="900" height="300" aria-label="Convergence graph"></canvas>
+      <p class="small muted">Blue line = experimental relative frequency after each batch · dashed = theoretical P(E).</p>
+    </div>
+
+    <div class="panel">
+      <h3>Facts</h3>
+      <div class="facts">
+        <ul>
+          <li><b>Probability axioms:</b> for any event E, <code>0 &le; P(E) &le; 1</code>; P(S)=1; P(&empty;)=0.</li>
+          <li><b>Classical definition:</b> equally likely outcomes &rarr; <code>P(E)=n(E)/n(S)</code>.</li>
+          <li><b>Law of large numbers:</b> as trials &rarr; &infin;, relative frequency &rarr; P(E).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: ADDITION & COMPLEMENT ============ -->
+  <section id="tab-rules" class="hide">
+    <div class="panel">
+      <h2>Addition rule &amp; complement</h2>
+      <p class="muted small">Sample space = a single die roll, S = {1,2,3,4,5,6}. Choose two events and see how
+        the union counts overlaps only once.</p>
+
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Event A</label>
+          <div class="seg" id="segA"></div>
+        </div>
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Event B</label>
+          <div class="seg" id="segB"></div>
+        </div>
+      </div>
+
+      <div class="venn-wrap">
+        <canvas id="vennCanvas" width="700" height="330" aria-label="Sample space of a die with events A and B"></canvas>
+      </div>
+
+      <div class="stat">
+        <div class="chip"><div class="k">P(A)</div><div class="v" id="rPA">—</div></div>
+        <div class="chip"><div class="k">P(B)</div><div class="v" id="rPB">—</div></div>
+        <div class="chip"><div class="k">P(A&cap;B)</div><div class="v" id="rPAB">—</div></div>
+        <div class="chip"><div class="k">P(A&cup;B)</div><div class="v acc" id="rPAuB">—</div></div>
+        <div class="chip"><div class="k">P(A&prime;) = 1 &minus; P(A)</div><div class="v good" id="rPAc">—</div></div>
+      </div>
+      <p class="small" id="ruleExplain" style="margin-top:10px"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Facts</h3>
+      <div class="facts">
+        <ul>
+          <li><b>Addition rule:</b> <code>P(A&cup;B) = P(A) + P(B) &minus; P(A&cap;B)</code>.</li>
+          <li><b>Mutually exclusive</b> (A&cap;B = &empty;): <code>P(A&cup;B) = P(A) + P(B)</code>.</li>
+          <li><b>Complement:</b> <code>P(A&prime;) = 1 &minus; P(A)</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: CONDITIONAL & INDEPENDENCE ============ -->
+  <section id="tab-cond" class="hide">
+    <div class="panel">
+      <h2>Conditional probability &amp; independence</h2>
+      <p class="muted small">An urn holds <b id="rTxt">3 red</b> and <b id="bTxt">2 blue</b> balls. Draw two balls in
+        sequence. Compare drawing <em>with</em> vs <em>without</em> replacement — a two-stage tree.</p>
+
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl">
+          <label>Red balls: <span id="redOut" class="kbd">3</span></label>
+          <input type="range" id="redR" min="1" max="6" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Blue balls: <span id="blueOut" class="kbd">2</span></label>
+          <input type="range" id="blueR" min="1" max="6" value="2">
+        </div>
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Drawing method</label>
+          <div class="seg" id="replSeg">
+            <button data-repl="without" class="on">Without replacement</button>
+            <button data-repl="with">With replacement</button>
+          </div>
+        </div>
+      </div>
+
+      <canvas id="treeCanvas" width="720" height="330" aria-label="Probability tree for two draws"></canvas>
+
+      <div class="stat">
+        <div class="chip"><div class="k">P(1st Red)</div><div class="v" id="p1r">—</div></div>
+        <div class="chip"><div class="k">P(2nd Red | 1st Red)</div><div class="v acc" id="p2r1r">—</div></div>
+        <div class="chip"><div class="k">P(both Red)</div><div class="v good" id="pboth">—</div></div>
+      </div>
+      <p class="small" id="condExplain" style="margin-top:10px"></p>
+    </div>
+
+    <div class="panel">
+      <h3>Facts</h3>
+      <div class="facts">
+        <ul>
+          <li><b>Conditional:</b> <code>P(A|B) = P(A&cap;B) / P(B)</code>, provided P(B) &gt; 0.</li>
+          <li><b>Multiplication:</b> <code>P(A&cap;B) = P(B)&middot;P(A|B)</code>.</li>
+          <li><b>Independence:</b> A, B independent &hArr; <code>P(A&cap;B) = P(A)&middot;P(B)</code>, i.e. P(A|B)=P(A).</li>
+          <li><b>With replacement</b> &rarr; draws independent; <b>without replacement</b> &rarr; dependent.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <p class="small muted">Tap an option to check. One correct answer each.</p>
+    <div id="quiz"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ---------- tabs ---------- */
+var tabBtns = document.querySelectorAll('.tab-btn');
+var sections = {sim:'tab-sim', rules:'tab-rules', cond:'tab-cond'};
+tabBtns.forEach(function(b){
+  b.addEventListener('click', function(){
+    tabBtns.forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    for(var k in sections){ document.getElementById(sections[k]).classList.add('hide'); }
+    document.getElementById(sections[b.dataset.tab]).classList.remove('hide');
+    if(b.dataset.tab==='sim') drawConv();
+    if(b.dataset.tab==='rules') drawVenn();
+    if(b.dataset.tab==='cond') updateCond();
+  });
+});
+
+/* ================= TAB 1: SIMULATION ================= */
+// Each experiment defines outcomes (equally likely) and a set of events.
+var experiments = {
+  coin:{
+    label:'Coin', outcomes:[0,1], // 0=Tails, 1=Heads
+    draw:function(){ return Math.random()<0.5?1:0; },
+    events:[
+      {name:'Heads', test:function(o){return o===1;}},
+      {name:'Tails', test:function(o){return o===0;}}
+    ]
+  },
+  die:{
+    label:'Single die', outcomes:[1,2,3,4,5,6],
+    draw:function(){ return 1+Math.floor(Math.random()*6); },
+    events:[
+      {name:'Even', test:function(o){return o%2===0;}},
+      {name:'≥ 5', test:function(o){return o>=5;}},
+      {name:'= 6', test:function(o){return o===6;}},
+      {name:'Prime (2,3,5)', test:function(o){return o===2||o===3||o===5;}}
+    ]
+  },
+  two:{
+    label:'Two dice (sum)', outcomes:(function(){var a=[];for(var i=1;i<=6;i++)for(var j=1;j<=6;j++)a.push(i+j);return a;})(),
+    draw:function(){ return (1+Math.floor(Math.random()*6))+(1+Math.floor(Math.random()*6)); },
+    events:[
+      {name:'Sum = 7', test:function(o){return o===7;}},
+      {name:'Sum ≥ 10', test:function(o){return o>=10;}},
+      {name:'Sum even', test:function(o){return o%2===0;}},
+      {name:'Sum = 2 or 12', test:function(o){return o===2||o===12;}}
+    ]
+  },
+  spin:{
+    label:'Spinner (4)', outcomes:[1,2,3,4],
+    draw:function(){ return 1+Math.floor(Math.random()*4); },
+    events:[
+      {name:'Section 1', test:function(o){return o===1;}},
+      {name:'1 or 2', test:function(o){return o<=2;}},
+      {name:'Not 4', test:function(o){return o!==4;}}
+    ]
+  }
+};
+
+var curExpKey='coin', curEvtIdx=0;
+var trials=0, favourable=0;
+var history=[]; // relative-frequency snapshots for the graph
+
+function curExp(){ return experiments[curExpKey]; }
+function curEvt(){ return curExp().events[curEvtIdx]; }
+
+function theoretical(){
+  var outs=curExp().outcomes, ev=curEvt();
+  var nS=outs.length, nE=0;
+  for(var i=0;i<outs.length;i++) if(ev.test(outs[i])) nE++;
+  return {nS:nS, nE:nE, p:nE/nS};
+}
+
+function buildEvtSeg(){
+  var seg=document.getElementById('evtSeg');
+  seg.innerHTML='';
+  curExp().events.forEach(function(e,i){
+    var btn=document.createElement('button');
+    btn.textContent=e.name;
+    if(i===curEvtIdx) btn.classList.add('on');
+    btn.addEventListener('click', function(){
+      curEvtIdx=i;
+      seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      btn.classList.add('on');
+      resetSim(); updateTheoDisplay();
+    });
+    seg.appendChild(btn);
+  });
+}
+
+function updateTheoDisplay(){
+  var t=theoretical();
+  document.getElementById('nS').textContent=t.nS;
+  document.getElementById('nE').textContent=t.nE;
+  document.getElementById('pTheo').textContent=t.p.toFixed(4);
+  drawConv();
+}
+
+document.getElementById('expSeg').querySelectorAll('button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    curExpKey=btn.dataset.exp; curEvtIdx=0;
+    document.getElementById('expSeg').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    btn.classList.add('on');
+    buildEvtSeg(); resetSim(); updateTheoDisplay();
+  });
+});
+
+function runTrials(n){
+  var ev=curEvt(), ex=curExp();
+  for(var i=0;i<n;i++){
+    var o=ex.draw();
+    trials++;
+    if(ev.test(o)) favourable++;
+    // snapshot periodically to keep graph light
+    if(trials<=50 || trials%Math.max(1,Math.floor(n/50))===0 || i===n-1){
+      history.push(favourable/trials);
+    }
+  }
+  if(history.length>600) history=history.slice(history.length-600);
+  updateSimDisplay();
+}
+
+function updateSimDisplay(){
+  document.getElementById('pExp').textContent = trials? (favourable/trials).toFixed(4) : '—';
+  document.getElementById('trialInfo').textContent='Trials run: '+trials+' · Favourable: '+favourable;
+  drawConv();
+}
+
+function resetSim(){
+  trials=0; favourable=0; history=[];
+  updateSimDisplay();
+}
+
+document.getElementById('run1').addEventListener('click', function(){runTrials(1);});
+document.getElementById('run100').addEventListener('click', function(){runTrials(100);});
+document.getElementById('run1000').addEventListener('click', function(){runTrials(1000);});
+document.getElementById('resetSim').addEventListener('click', resetSim);
+
+function drawConv(){
+  var cv=document.getElementById('convCanvas');
+  var ctx=cv.getContext('2d');
+  var W=cv.width, H=cv.height, pad=40;
+  ctx.clearRect(0,0,W,H);
+  var p=theoretical().p;
+  // axes
+  ctx.strokeStyle='#2c3650'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad,10); ctx.lineTo(pad,H-25); ctx.lineTo(W-10,H-25); ctx.stroke();
+  // y gridlines 0,0.5,1
+  ctx.fillStyle='#98a3bc'; ctx.font='13px system-ui';
+  [0,0.25,0.5,0.75,1].forEach(function(v){
+    var y=(H-25)-v*(H-35);
+    ctx.strokeStyle='#232c40'; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-10,y); ctx.stroke();
+    ctx.fillText(v.toFixed(2), 6, y+4);
+  });
+  // theoretical dashed line
+  var yt=(H-25)-p*(H-35);
+  ctx.strokeStyle='#ffb454'; ctx.setLineDash([7,6]); ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad,yt); ctx.lineTo(W-10,yt); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#ffb454';
+  ctx.fillText('P(E)='+p.toFixed(3), W-140, yt-6);
+  // experimental curve
+  if(history.length>1){
+    ctx.strokeStyle='#6fb1ff'; ctx.lineWidth=2.5; ctx.beginPath();
+    for(var i=0;i<history.length;i++){
+      var x=pad+(i/(history.length-1))*(W-10-pad);
+      var y=(H-25)-history[i]*(H-35);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    // last point
+    var lx=W-10, ly=(H-25)-history[history.length-1]*(H-35);
+    ctx.fillStyle='#6fb1ff'; ctx.beginPath(); ctx.arc(lx-1,ly,4,0,Math.PI*2); ctx.fill();
+  } else {
+    ctx.fillStyle='#98a3bc'; ctx.font='14px system-ui';
+    ctx.fillText('Run some trials to see the curve…', pad+20, H/2);
+  }
+}
+
+/* ================= TAB 2: ADDITION & COMPLEMENT ================= */
+var dieEvents=[
+  {name:'Even {2,4,6}', set:[2,4,6]},
+  {name:'Odd {1,3,5}', set:[1,3,5]},
+  {name:'> 3 {4,5,6}', set:[4,5,6]},
+  {name:'Prime {2,3,5}', set:[2,3,5]},
+  {name:'{1,2}', set:[1,2]}
+];
+var idxA=0, idxB=2;
+
+function buildRuleSegs(){
+  ['segA','segB'].forEach(function(id,which){
+    var seg=document.getElementById(id);
+    seg.innerHTML='';
+    dieEvents.forEach(function(e,i){
+      var btn=document.createElement('button');
+      btn.textContent=e.name;
+      var cur=which===0?idxA:idxB;
+      if(i===cur) btn.classList.add('on');
+      btn.addEventListener('click', function(){
+        if(which===0) idxA=i; else idxB=i;
+        seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        btn.classList.add('on');
+        drawVenn();
+      });
+      seg.appendChild(btn);
+    });
+  });
+}
+
+function drawVenn(){
+  var A=dieEvents[idxA].set, B=dieEvents[idxB].set;
+  var inter=A.filter(function(x){return B.indexOf(x)>=0;});
+  var uni=[]; for(var i=1;i<=6;i++){ if(A.indexOf(i)>=0||B.indexOf(i)>=0) uni.push(i);}
+  var pA=A.length/6, pB=B.length/6, pAB=inter.length/6, pAuB=uni.length/6, pAc=1-pA;
+
+  document.getElementById('rPA').textContent=frac(A.length,6)+' = '+pA.toFixed(3);
+  document.getElementById('rPB').textContent=frac(B.length,6)+' = '+pB.toFixed(3);
+  document.getElementById('rPAB').textContent=frac(inter.length,6)+' = '+pAB.toFixed(3);
+  document.getElementById('rPAuB').textContent=frac(uni.length,6)+' = '+pAuB.toFixed(3);
+  document.getElementById('rPAc').textContent=frac(6-A.length,6)+' = '+pAc.toFixed(3);
+
+  var ex=document.getElementById('ruleExplain');
+  var mutual = inter.length===0;
+  ex.innerHTML='P(A&cup;B) = P(A)+P(B)&minus;P(A&cap;B) = '+
+    frac(A.length,6)+' + '+frac(B.length,6)+' &minus; '+frac(inter.length,6)+' = '+frac(uni.length,6)+'. '+
+    (mutual? '<b style="color:var(--good)">A and B are mutually exclusive</b> (A&cap;B = &empty;), so the overlap term is 0.'
+           : 'The '+inter.length+' shared outcome(s) '+setStr(inter)+' are counted once.');
+
+  // canvas: two overlapping circles with the six outcomes placed
+  var cv=document.getElementById('vennCanvas'); var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height; ctx.clearRect(0,0,W,H);
+  var cAx=270, cBx=430, cy=165, r=140;
+  // circle A
+  ctx.lineWidth=2;
+  ctx.fillStyle='rgba(111,177,255,.12)'; ctx.strokeStyle='#6fb1ff';
+  ctx.beginPath(); ctx.arc(cAx,cy,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='rgba(255,180,84,.12)'; ctx.strokeStyle='#ffb454';
+  ctx.beginPath(); ctx.arc(cBx,cy,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#6fb1ff'; ctx.font='bold 15px system-ui'; ctx.fillText('A', cAx-r+18, cy-r+30);
+  ctx.fillStyle='#ffb454'; ctx.fillText('B', cBx+r-30, cy-r+30);
+  // place outcomes 1..6
+  ctx.font='bold 17px system-ui'; ctx.textAlign='center';
+  var slots={onlyA:[[210,120],[205,210]],inter:[[350,120],[350,210]],onlyB:[[490,120],[495,210]],out:[[80,300],[150,300],[560,300],[630,300]]};
+  var iA=0,iI=0,iB=0,iO=0;
+  for(var n=1;n<=6;n++){
+    var inA=A.indexOf(n)>=0, inB=B.indexOf(n)>=0, pos, col;
+    if(inA&&inB){ pos=slots.inter[iI++]; col='#e9edf7'; }
+    else if(inA){ pos=slots.onlyA[iA++]; col='#6fb1ff'; }
+    else if(inB){ pos=slots.onlyB[iB++]; col='#ffb454'; }
+    else { pos=slots.out[iO++]; col='#98a3bc'; }
+    if(!pos) pos=[80+ (n*70),305];
+    ctx.fillStyle='rgba(35,44,64,.9)';
+    ctx.beginPath(); ctx.arc(pos[0],pos[1],16,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=col; ctx.fillText(n,pos[0],pos[1]+6);
+  }
+  ctx.textAlign='left';
+  ctx.fillStyle='#98a3bc'; ctx.font='12px system-ui';
+  ctx.fillText('S = {1,2,3,4,5,6} · grey = outside A and B', 20, 22);
+}
+function frac(a,b){ if(a===0) return '0'; if(a===b) return '1'; return a+'/'+b; }
+function setStr(a){ return '{'+a.join(',')+'}'; }
+
+/* ================= TAB 3: CONDITIONAL & INDEPENDENCE ================= */
+var repl='without';
+document.getElementById('replSeg').querySelectorAll('button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    repl=btn.dataset.repl;
+    document.getElementById('replSeg').querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    btn.classList.add('on');
+    updateCond();
+  });
+});
+var redR=document.getElementById('redR'), blueR=document.getElementById('blueR');
+redR.addEventListener('input', updateCond);
+blueR.addEventListener('input', updateCond);
+
+function updateCond(){
+  var R=+redR.value, Bn=+blueR.value, N=R+Bn;
+  document.getElementById('redOut').textContent=R;
+  document.getElementById('blueOut').textContent=Bn;
+  document.getElementById('rTxt').textContent=R+' red';
+  document.getElementById('bTxt').textContent=Bn+' blue';
+
+  var p1r=R/N;
+  var p2r_given_r, p2b_given_r, p2r_given_b, p2b_given_b;
+  if(repl==='without'){
+    p2r_given_r = (R-1)/(N-1);
+    p2b_given_r = Bn/(N-1);
+    p2r_given_b = R/(N-1);
+    p2b_given_b = (Bn-1)/(N-1);
+  } else {
+    p2r_given_r = R/N; p2b_given_r = Bn/N;
+    p2r_given_b = R/N; p2b_given_b = Bn/N;
+  }
+  var pRR = p1r*p2r_given_r;
+
+  document.getElementById('p1r').textContent=frac(R,N)+' = '+p1r.toFixed(3);
+  document.getElementById('p2r1r').textContent = (repl==='without'? frac(R-1,N-1):frac(R,N))+' = '+p2r_given_r.toFixed(3);
+  document.getElementById('pboth').textContent = pRR.toFixed(4);
+
+  var ex=document.getElementById('condExplain');
+  if(repl==='without'){
+    ex.innerHTML='<b>Without replacement</b> the draws are <b style="color:var(--bad)">dependent</b>: '+
+      'P(2nd Red | 1st Red) = '+frac(R-1,N-1)+' &ne; P(2nd Red)=P(Red)='+frac(R,N)+'. '+
+      'P(both Red) = P(1st R)&middot;P(2nd R|1st R) = '+frac(R,N)+' &times; '+frac(R-1,N-1)+' = '+pRR.toFixed(4)+'.';
+  } else {
+    ex.innerHTML='<b>With replacement</b> the draws are <b style="color:var(--good)">independent</b>: '+
+      'P(2nd Red | 1st Red) = P(2nd Red) = '+frac(R,N)+'. '+
+      'P(both Red) = P(Red)&middot;P(Red) = '+frac(R,N)+' &times; '+frac(R,N)+' = '+pRR.toFixed(4)+'.';
+  }
+  drawTree(R,Bn,N,p1r,p2r_given_r,p2b_given_r,p2r_given_b,p2b_given_b);
+}
+
+function drawTree(R,Bn,N,p1r,rr,rb,br,bb){
+  var cv=document.getElementById('treeCanvas'); var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height; ctx.clearRect(0,0,W,H);
+  var x0=40, x1=300, x2=560;
+  var yRoot=H/2, yR=90, yB=250;
+  function node(x,y,label,col){
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#0f131d'; ctx.font='bold 15px system-ui'; ctx.textAlign='center';
+    ctx.fillText(label,x,y+5); ctx.textAlign='left';
+  }
+  function edge(x1,y1,x2,y2,txt,col){
+    ctx.strokeStyle='#2c3650'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x1+20,y1); ctx.lineTo(x2-20,y2); ctx.stroke();
+    ctx.fillStyle=col; ctx.font='13px system-ui';
+    ctx.fillText(txt,(x1+x2)/2-24,(y1+y2)/2 - 6);
+  }
+  var p1b=Bn/N;
+  // root -> R, B
+  edge(x0,yRoot,x1,yR, frac(R,N), '#6fb1ff');
+  edge(x0,yRoot,x1,yB, frac(Bn,N), '#ffb454');
+  node(x0,yRoot,'S','#e9edf7');
+  node(x1,yR,'R','#6fb1ff'); node(x1,yB,'B','#ffb454');
+  // second level
+  var yRR=45,yRB=135,yBR=205,yBB=295;
+  edge(x1,yR,x2,yRR, repl==='without'?frac(R-1,N-1):frac(R,N), '#6fb1ff');
+  edge(x1,yR,x2,yRB, repl==='without'?frac(Bn,N-1):frac(Bn,N), '#ffb454');
+  edge(x1,yB,x2,yBR, repl==='without'?frac(R,N-1):frac(R,N), '#6fb1ff');
+  edge(x1,yB,x2,yBB, repl==='without'?frac(Bn-1,N-1):frac(Bn,N), '#ffb454');
+  node(x2,yRR,'R','#6fb1ff'); node(x2,yRB,'B','#ffb454');
+  node(x2,yBR,'R','#6fb1ff'); node(x2,yBB,'B','#ffb454');
+  // outcome probs
+  ctx.font='12px system-ui'; ctx.fillStyle='#98a3bc';
+  ctx.fillText('P(RR)='+(p1r*rr).toFixed(3), x2+26, yRR+4);
+  ctx.fillText('P(RB)='+(p1r*rb).toFixed(3), x2+26, yRB+4);
+  ctx.fillText('P(BR)='+(p1b*br).toFixed(3), x2+26, yBR+4);
+  ctx.fillText('P(BB)='+(p1b*bb).toFixed(3), x2+26, yBB+4);
+  ctx.fillStyle='#98a3bc'; ctx.fillText('Draw 1', x1-16, 20); ctx.fillText('Draw 2', x2-16, 20);
+}
+
+/* ================= QUIZ ================= */
+var quizData=[
+  {q:'A fair die is rolled once. What is P(getting a number greater than 4)?',
+   opts:['1/2','1/3','2/3','1/6'], correct:1,
+   why:'Favourable outcomes {5,6} → n(E)=2, n(S)=6, so P = 2/6 = 1/3.'},
+  {q:'For events A, B with P(A)=0.5, P(B)=0.4, P(A∩B)=0.2, find P(A∪B).',
+   opts:['0.9','0.7','1.1','0.5'], correct:1,
+   why:'P(A∪B)=P(A)+P(B)−P(A∩B)=0.5+0.4−0.2=0.7.'},
+  {q:'An urn has 3 red and 2 blue balls. Two are drawn without replacement. P(both red)?',
+   opts:['9/25','3/10','1/2','6/20'], correct:1,
+   why:'P(RR)=(3/5)×(2/4)=6/20=3/10. (With replacement it would be 9/25.)'}
+];
+function buildQuiz(){
+  var box=document.getElementById('quiz');
+  quizData.forEach(function(item,qi){
+    var d=document.createElement('div'); d.className='quiz-q';
+    var p=document.createElement('p'); p.className='q'; p.textContent=(qi+1)+'. '+item.q; d.appendChild(p);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.addEventListener('click', function(){
+        if(answered) return; answered=true;
+        if(oi===item.correct){ b.classList.add('correct'); }
+        else{ b.classList.add('wrong');
+          d.querySelectorAll('.opt')[item.correct].classList.add('correct'); }
+        ex.style.display='block';
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement('p'); ex.className='explain'; ex.textContent='✓ '+item.why; d.appendChild(ex);
+    box.appendChild(d);
+  });
+}
+
+/* ---------- init ---------- */
+buildEvtSeg(); updateTheoDisplay(); resetSim();
+buildRuleSegs();
+buildQuiz();
+updateCond();
+drawConv();
+window.addEventListener('resize', function(){
+  if(!document.getElementById('tab-sim').classList.contains('hide')) drawConv();
+  if(!document.getElementById('tab-rules').classList.contains('hide')) drawVenn();
+  if(!document.getElementById('tab-cond').classList.contains('hide')) updateCond();
+});
+</script>
+</body>
+</html>
