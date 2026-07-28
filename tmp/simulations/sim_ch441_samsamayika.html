@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>समसामयिकं संस्कृतसाहित्यम् | Modern Sanskrit Literature</title>
+<style>
+  :root{
+    --accent:#e07a3f;
+    --accent-soft:#3a2a1f;
+    --accent-dark:#f4a76a;
+    --bg:#1b1712;
+    --panel:#25201a;
+    --ink:#f3ece2;
+    --muted:#b3a693;
+    --good:#5fd39b;
+    --good-soft:#1f3a2c;
+    --bad:#f0778c;
+    --bad-soft:#3a2028;
+    --line:#3a3229;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1b1712 0%,#241c14 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.5vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent-dark);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.5rem,6vw,2.2rem);color:var(--accent);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.30);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#1b1712;box-shadow:0 4px 12px rgba(224,122,63,.40);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Topic Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--accent-soft);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5vw,1.8rem);
+    line-height:1.7;
+    text-align:center;
+    color:var(--accent-dark);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.95rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#2c5240;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#1b1712;
+    padding:11px 18px;border-radius:12px;font-weight:600;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(224,122,63,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#2c5240;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2c5240;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-q{margin-bottom:8px;}
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.15rem,4.5vw,1.5rem);
+    text-align:center;line-height:1.7;color:var(--accent-dark);
+    background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .opt-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:12px;}
+  .opt-btn{
+    font-family:var(--deva);font-size:1.1rem;
+    border:2px solid var(--line);background:var(--panel);border-radius:12px;
+    padding:10px 18px;cursor:pointer;color:var(--accent-dark);font-weight:600;transition:.15s;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2c5240;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">समसामयिकं संस्कृतसाहित्यम्</div>
+    <h1>Modern Sanskrit Literature Explorer</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 26 &middot; Sanskrit as a Living Language</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Topic Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Topic Explorer</h2>
+      <p class="mode-sub">Discover how Sanskrit lives and grows even today — its modern poetry, prose, journals, and media.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">MCQ Quiz</h2>
+      <p class="mode-sub">Answer 3 questions on modern Sanskrit literature. Tap an option to reveal the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Facts kept general &middot; Sanskrit is a living, modern language &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE 1: TOPIC EXPLORER DATA ---------------- */
+var VERSES = [
+  {
+    deva: "संस्कृतं जीवन्ती भाषा अस्ति।",
+    translit: "saṁskṛtaṁ jīvantī bhāṣā asti",
+    words: [
+      {w:"संस्कृतम्", m:"Sanskrit"},
+      {w:"जीवन्ती", m:"living / alive"},
+      {w:"भाषा", m:"language"},
+      {w:"अस्ति", m:"is"}
+    ],
+    trans: "Sanskrit is a living language.",
+    moral: "Sanskrit is not only an ancient language. Even today people write new poems, stories and essays in it, and speak it — so it is a living language, not a dead one."
+  },
+  {
+    deva: "अधुना अपि आधुनिककाव्यं रच्यते।",
+    translit: "adhunā api ādhunika-kāvyaṁ racyate",
+    words: [
+      {w:"अधुना", m:"now / today"},
+      {w:"आधुनिकः", m:"modern"},
+      {w:"काव्यम्", m:"poetry"},
+      {w:"रच्यते", m:"is composed"}
+    ],
+    trans: "Even today, modern poetry is composed.",
+    moral: "Modern Sanskrit poets write on new themes — nature, patriotism, science and daily life. New poems (गीतिकाव्यम्, खण्डकाव्यम्, महाकाव्यम्) keep being composed in the present age."
+  },
+  {
+    deva: "अद्यत्वे उपन्यासाः कथाश्च लिख्यन्ते।",
+    translit: "adyatve upanyāsāḥ kathāś ca likhyante",
+    words: [
+      {w:"अद्यत्वे", m:"in the present time"},
+      {w:"उपन्यासः", m:"novel"},
+      {w:"कथा", m:"story"},
+      {w:"लिख्यन्ते", m:"are written"}
+    ],
+    trans: "In modern times, novels and stories are written.",
+    moral: "Modern Sanskrit prose is rich: novels (उपन्यासः), short stories (लघुकथा), essays (निबन्धः) and dramas (नाटकम्) are all written today, showing Sanskrit can express modern life."
+  },
+  {
+    deva: "पत्रिकाः प्रकाश्यन्ते संस्कृतेन।",
+    translit: "patrikāḥ prakāśyante saṁskṛtena",
+    words: [
+      {w:"पत्रिका", m:"magazine / journal"},
+      {w:"प्रकाश्यते", m:"is published"},
+      {w:"संस्कृतेन", m:"in Sanskrit"},
+      {w:"मासिकम्", m:"monthly (magazine)"}
+    ],
+    trans: "Magazines are published in Sanskrit.",
+    moral: "Many Sanskrit journals and magazines are published today, such as the monthly सम्भाषणसन्देशः and the periodical संस्कृतप्रतिभा. They carry news, poems and articles in Sanskrit."
+  },
+  {
+    deva: "आकाशवाण्यां संस्कृतवार्ता श्रूयते।",
+    translit: "ākāśavāṇyāṁ saṁskṛta-vārtā śrūyate",
+    words: [
+      {w:"आकाशवाणी", m:"radio (All India Radio)"},
+      {w:"वार्ता", m:"news"},
+      {w:"श्रूयते", m:"is heard"},
+      {w:"सम्भाषणम्", m:"conversation / speaking"}
+    ],
+    trans: "News in Sanskrit is heard on the radio.",
+    moral: "Sanskrit news bulletins are broadcast on आकाशवाणी (All India Radio). The Spoken-Sanskrit movement (संस्कृतसम्भाषणम्) also encourages people to speak Sanskrit in daily life."
+  },
+  {
+    deva: "संस्कृतस्य अध्ययनम् अद्यापि महत्त्वपूर्णम्।",
+    translit: "saṁskṛtasya adhyayanam adyāpi mahattva-pūrṇam",
+    words: [
+      {w:"अध्ययनम्", m:"study"},
+      {w:"अद्यापि", m:"even today"},
+      {w:"महत्त्वपूर्णम्", m:"important"},
+      {w:"संस्कृतिः", m:"culture"}
+    ],
+    trans: "The study of Sanskrit is important even today.",
+    moral: "Sanskrit connects us to our culture, values and knowledge. Modern Sanskrit literature keeps this heritage alive and shows the language can grow with the times."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  verseCard.innerHTML =
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">Explanation</div>'+v.moral+'</div>';
+  verseCount.textContent = "Topic "+(vIndex+1)+" of "+VERSES.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"साहित्यम्", m:"literature"},
+  {w:"काव्यम्", m:"poetry"},
+  {w:"उपन्यासः", m:"novel"},
+  {w:"कथा", m:"story"},
+  {w:"पत्रिका", m:"magazine"},
+  {w:"आधुनिकः", m:"modern"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"संस्कृतभाषा अद्यत्वे कीदृशी भाषा अस्ति? (What kind of language is Sanskrit today?)",
+    options:["जीवन्ती (living)","मृता (dead)","अलिखिता (unwritten)"],
+    answer:"जीवन्ती (living)",
+    explain:"Sanskrit is a <b>जीवन्ती</b> (living) language. New poems, stories, essays and journals are still written in it, and it is spoken through the spoken-Sanskrit movement."
+  },
+  {
+    q:"संस्कृतभाषायां मासिकपत्रिका का? (Which is a Sanskrit monthly magazine?)",
+    options:["सम्भाषणसन्देशः","इन्द्रधनुः","पञ्चतन्त्रम्"],
+    answer:"सम्भाषणसन्देशः",
+    explain:"<b>सम्भाषणसन्देशः</b> is a well-known Sanskrit monthly magazine. संस्कृतप्रतिभा is another Sanskrit periodical. Such journals show Sanskrit thriving in print today."
+  },
+  {
+    q:"'उपन्यासः' इति शब्दस्य अर्थः कः? (What does the word 'उपन्यासः' mean?)",
+    options:["novel","poem","song"],
+    answer:"novel",
+    explain:"<b>उपन्यासः</b> means a <b>novel</b>. Modern Sanskrit prose includes novels (उपन्यासः), short stories (कथा / लघुकथा) and essays (निबन्धः)."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o){
+    return '<button class="opt-btn" data-opt="'+o+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = el.dataset.opt;
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    if(b.dataset.opt === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
