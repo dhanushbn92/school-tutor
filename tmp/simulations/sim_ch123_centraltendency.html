@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central Tendency Lab - NIOS Class 10 Maths Ch25</title>
+<style>
+  :root{
+    --accent:#7c9cff;
+    --accent2:#ff9f6b;
+    --bg:#141a26;
+    --panel:#1e2636;
+    --panel2:#263048;
+    --ink:#e8edf7;
+    --muted:#93a0bb;
+    --line:#33405c;
+    --mean:#7c9cff;
+    --median:#4fd1a8;
+    --mode:#ff9f6b;
+    --good:#4fd1a8;
+    --bad:#ff7a7a;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.30);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1c2740,#141a26);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#0f1524;background:var(--accent);border-color:var(--accent);}
+  .tab:focus-visible{outline:2px solid var(--accent2);outline-offset:2px;}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .panel h2{font-size:1.05rem;margin:0 0 10px;}
+  .panel h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  .view{display:none;}
+  .view.active{display:block;}
+  .row{display:flex;flex-wrap:wrap;gap:12px;}
+  .col{flex:1 1 300px;min-width:0;}
+  label{font-size:.85rem;color:var(--muted);display:block;margin:8px 0 4px;}
+  input[type=text],input[type=number],select{
+    width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;padding:9px 11px;font-size:.95rem;font-family:inherit;
+  }
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent);}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    padding:9px 13px;font-size:.88rem;cursor:pointer;font-weight:600;transition:.15s;}
+  .btn:hover{border-color:var(--accent);}
+  .btn.primary{background:var(--accent);color:#0f1524;border-color:var(--accent);}
+  .btn.warn{background:var(--accent2);color:#2a1608;border-color:var(--accent2);}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:none;}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .stat{flex:1 1 120px;background:var(--panel2);border-radius:12px;padding:10px 12px;border-left:4px solid var(--line);}
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .stat .v{font-size:1.25rem;font-weight:700;margin-top:2px;}
+  .stat.mean{border-left-color:var(--mean);}
+  .stat.median{border-left-color:var(--median);}
+  .stat.mode{border-left-color:var(--mode);}
+  .stat .sub{font-size:.72rem;color:var(--muted);margin-top:2px;}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:6px;}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;}
+  th{background:var(--panel2);color:var(--accent);font-weight:600;}
+  td input{width:100%;text-align:center;padding:5px;}
+  .work{background:var(--panel2);border-radius:12px;padding:12px;font-size:.86rem;margin-top:10px;border:1px solid var(--line);overflow-x:auto;}
+  .work code{font-family:"Consolas","SF Mono",monospace;color:var(--median);}
+  .work .step{margin:4px 0;}
+  .facts dt{font-weight:700;color:var(--accent);margin-top:8px;}
+  .facts dd{margin:2px 0 0;color:var(--ink);font-size:.88rem;}
+  .formula{background:var(--panel2);border-radius:8px;padding:6px 10px;display:inline-block;
+    font-family:"Consolas",monospace;font-size:.85rem;color:var(--median);margin:3px 0;}
+  .quiz .q{background:var(--panel2);border-radius:12px;padding:12px;margin-bottom:10px;border:1px solid var(--line);}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .quiz .opt{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+    cursor:pointer;font-size:.88rem;transition:.12s;}
+  .quiz .opt:hover{border-color:var(--accent);}
+  .quiz .opt.correct{background:rgba(79,209,168,.18);border-color:var(--good);color:var(--good);}
+  .quiz .opt.wrong{background:rgba(255,122,122,.15);border-color:var(--bad);color:var(--bad);}
+  .quiz .ex{font-size:.82rem;color:var(--muted);margin-top:8px;display:none;}
+  .quiz .ex.show{display:block;}
+  .hint{font-size:.8rem;color:var(--muted);margin-top:6px;}
+  .note{font-size:.82rem;color:var(--accent2);margin-top:8px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;margin-top:8px;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  @media (max-width:420px){header h1{font-size:1.15rem;} .stat .v{font-size:1.1rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Central Tendency Lab</h1>
+    <p>NIOS Class 10 Mathematics &middot; Ch25 Measures of Central Tendency &mdash; mean, median &amp; mode, live.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="ungrouped" role="tab">Ungrouped</button>
+    <button class="tab" data-view="grouped" role="tab">Grouped data</button>
+    <button class="tab" data-view="compare" role="tab">Compare &amp; relation</button>
+    <button class="tab" data-view="facts" role="tab">Facts</button>
+    <button class="tab" data-view="quiz" role="tab">Quiz</button>
+  </div>
+
+  <!-- ================= UNGROUPED ================= -->
+  <section class="view active" id="view-ungrouped">
+    <div class="panel">
+      <h2>Mean, Median &amp; Mode (ungrouped)</h2>
+      <label for="dataInput">Data set (comma or space separated). Drag any dot up/down to change its value.</label>
+      <input type="text" id="dataInput" value="4, 6, 6, 7, 9, 10, 12">
+      <div class="btns">
+        <button class="btn primary" id="applyData">Apply</button>
+        <button class="btn" id="sortData">Sort</button>
+        <button class="btn warn" id="outlierBtn">Add outlier (40)</button>
+        <button class="btn" id="resetData">Reset</button>
+      </div>
+      <canvas id="dotplot" width="900" height="300" aria-label="Dot plot of the data"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--mean)"></i>Mean</span>
+        <span><i class="dot" style="background:var(--median)"></i>Median</span>
+        <span><i class="dot" style="background:var(--mode)"></i>Mode</span>
+      </div>
+      <div class="stats">
+        <div class="stat mean"><div class="k">Mean</div><div class="v" id="uMean">-</div><div class="sub" id="uMeanSub">sum / n</div></div>
+        <div class="stat median"><div class="k">Median</div><div class="v" id="uMedian">-</div><div class="sub" id="uMedianSub">middle value</div></div>
+        <div class="stat mode"><div class="k">Mode</div><div class="v" id="uMode">-</div><div class="sub" id="uModeSub">most frequent</div></div>
+      </div>
+      <div class="work" id="uWork"></div>
+      <div class="note" id="outlierNote"></div>
+    </div>
+  </section>
+
+  <!-- ================= GROUPED ================= -->
+  <section class="view" id="view-grouped">
+    <div class="panel">
+      <h2>Grouped Data</h2>
+      <p class="hint">Edit class intervals &amp; frequencies. Mean, median and mode recompute instantly with full working.</p>
+      <div style="overflow-x:auto">
+      <table id="gTable">
+        <thead><tr><th>Lower</th><th>Upper</th><th>Frequency f</th><th></th></tr></thead>
+        <tbody id="gBody"></tbody>
+      </table>
+      </div>
+      <div class="btns">
+        <button class="btn" id="gAddRow">+ Row</button>
+        <button class="btn warn" id="gReset">Reset table</button>
+      </div>
+      <label for="gMethod">Mean method</label>
+      <select id="gMethod">
+        <option value="direct">Direct method</option>
+        <option value="assumed">Assumed-mean method</option>
+        <option value="step">Step-deviation method</option>
+      </select>
+      <div class="stats">
+        <div class="stat mean"><div class="k">Mean</div><div class="v" id="gMean">-</div></div>
+        <div class="stat median"><div class="k">Median</div><div class="v" id="gMedian">-</div></div>
+        <div class="stat mode"><div class="k">Mode</div><div class="v" id="gMode">-</div></div>
+      </div>
+      <h3>Working</h3>
+      <div class="work" id="gWork"></div>
+    </div>
+  </section>
+
+  <!-- ================= COMPARE ================= -->
+  <section class="view" id="view-compare">
+    <div class="panel">
+      <h2>Empirical Relation &amp; When to Use</h2>
+      <p class="hint">For a moderately skewed distribution:
+        <span class="formula">Mode = 3 &times; Median &minus; 2 &times; Mean</span></p>
+      <div class="row">
+        <div class="col">
+          <label for="cMean">Mean</label><input type="number" id="cMean" value="45.5" step="any">
+          <label for="cMedian">Median</label><input type="number" id="cMedian" value="46">
+        </div>
+        <div class="col">
+          <label for="cMode">Mode (measured, optional)</label><input type="number" id="cMode" value="47" step="any">
+          <div class="work" id="cWork" style="margin-top:26px"></div>
+        </div>
+      </div>
+      <h3>Which measure to use?</h3>
+      <dl class="facts">
+        <dt>Mean</dt><dd>Uses every value; best for symmetric data. Sensitive to outliers &mdash; one extreme value distorts it.</dd>
+        <dt>Median</dt><dd>Middle value; unaffected by outliers. Best for skewed data or incomes.</dd>
+        <dt>Mode</dt><dd>Most frequent value; the only measure for qualitative/categorical data (e.g. most common shoe size).</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= FACTS ================= -->
+  <section class="view" id="view-facts">
+    <div class="panel">
+      <h2>Facts &amp; Formulas</h2>
+      <dl class="facts">
+        <dt>Mean (ungrouped)</dt><dd><span class="formula">x&#772; = (&Sigma;x&#7522;) / n</span></dd>
+        <dt>Median (ungrouped)</dt><dd>Sort the data. If n is odd, median = the ((n+1)/2)th value. If n is even, median = average of the (n/2)th and (n/2+1)th values.</dd>
+        <dt>Mode (ungrouped)</dt><dd>The value(s) that occur most often.</dd>
+        <dt>Grouped mean &mdash; direct</dt><dd><span class="formula">x&#772; = &Sigma;f&#7522;x&#7522; / &Sigma;f&#7522;</span> where x&#7522; is the class mark (mid-point).</dd>
+        <dt>Grouped mean &mdash; assumed</dt><dd><span class="formula">x&#772; = a + (&Sigma;f&#7522;d&#7522; / &Sigma;f&#7522;)</span>, d&#7522; = x&#7522; &minus; a.</dd>
+        <dt>Grouped mean &mdash; step-deviation</dt><dd><span class="formula">x&#772; = a + h &times; (&Sigma;f&#7522;u&#7522; / &Sigma;f&#7522;)</span>, u&#7522; = (x&#7522; &minus; a)/h.</dd>
+        <dt>Grouped median</dt><dd><span class="formula">Median = l + ((n/2 &minus; cf) / f) &times; h</span><br>l = lower boundary of median class, n = &Sigma;f, cf = cumulative freq before median class, f = freq of median class, h = class width.</dd>
+        <dt>Grouped mode</dt><dd><span class="formula">Mode = l + ((f&#8321; &minus; f&#8320;) / (2f&#8321; &minus; f&#8320; &minus; f&#8322;)) &times; h</span><br>l = lower boundary of modal class, f&#8321; = modal freq, f&#8320; = freq before, f&#8322; = freq after, h = class width.</dd>
+        <dt>Empirical relation</dt><dd><span class="formula">Mode = 3 Median &minus; 2 Mean</span></dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="view" id="view-quiz">
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz</h2>
+      <p class="hint">Tap an option to check your answer.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+
+  // ---------- tab switching ----------
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      $("view-"+t.dataset.view).classList.add("active");
+    });
+  });
+
+  var fmt=function(n){
+    if(!isFinite(n))return "-";
+    var r=Math.round(n*100)/100;
+    return (Math.abs(r-Math.round(r))<1e-9)?String(Math.round(r)):String(r);
+  };
+
+  // =================================================================
+  //  UNGROUPED
+  // =================================================================
+  var DEFAULT="4, 6, 6, 7, 9, 10, 12";
+  var data=[];
+
+  function parseData(str){
+    var arr=str.split(/[\s,]+/).map(function(s){return parseFloat(s);})
+              .filter(function(x){return isFinite(x);});
+    return arr;
+  }
+  function meanOf(a){var s=0;for(var i=0;i<a.length;i++)s+=a[i];return s/a.length;}
+  function medianOf(a){
+    var b=a.slice().sort(function(x,y){return x-y;});
+    var n=b.length;if(!n)return NaN;
+    if(n%2)return b[(n-1)/2];
+    return (b[n/2-1]+b[n/2])/2;
+  }
+  function modesOf(a){
+    var m={},best=0;
+    a.forEach(function(v){m[v]=(m[v]||0)+1;if(m[v]>best)best=m[v];});
+    if(best<=1)return {list:[],count:best};
+    var list=[];for(var k in m)if(m[k]===best)list.push(parseFloat(k));
+    list.sort(function(x,y){return x-y;});
+    return {list:list,count:best};
+  }
+
+  var cv=$("dotplot"),ctx=cv.getContext("2d");
+  var plot={x0:50,x1:850,y0:250,minV:0,maxV:10,unit:1};
+
+  function computeScale(){
+    var lo=Math.min.apply(null,data),hi=Math.max.apply(null,data);
+    if(!isFinite(lo)){lo=0;hi=10;}
+    if(lo===hi){lo-=1;hi+=1;}
+    var pad=(hi-lo)*0.08;
+    plot.minV=lo-pad;plot.maxV=hi+pad;
+  }
+  function vToX(v){return plot.x0+(v-plot.minV)/(plot.maxV-plot.minV)*(plot.x1-plot.x0);}
+  function xToV(x){return plot.minV+(x-plot.x0)/(plot.x1-plot.x0)*(plot.maxV-plot.minV);}
+
+  function draw(){
+    var W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    // axis
+    ctx.strokeStyle="#4a597a";ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(plot.x0,plot.y0);ctx.lineTo(plot.x1,plot.y0);ctx.stroke();
+    // ticks
+    ctx.fillStyle="#93a0bb";ctx.font="14px sans-serif";ctx.textAlign="center";
+    var span=plot.maxV-plot.minV;
+    var step=Math.pow(10,Math.floor(Math.log(span/6)/Math.LN10));
+    if(span/step>12)step*=2; if(span/step<4)step/=2;
+    var start=Math.ceil(plot.minV/step)*step;
+    for(var t=start;t<=plot.maxV+1e-9;t+=step){
+      var x=vToX(t);
+      ctx.strokeStyle="#33405c";ctx.beginPath();ctx.moveTo(x,plot.y0);ctx.lineTo(x,plot.y0+6);ctx.stroke();
+      ctx.fillText(fmt(t),x,plot.y0+22);
+    }
+    // stack dots by value
+    var counts={};
+    var sorted=data.map(function(v,i){return {v:v,i:i};});
+    sorted.sort(function(a,b){return a.v-b.v;});
+    dotPos=[];
+    sorted.forEach(function(o){
+      var key=o.v.toFixed(4);
+      counts[key]=(counts[key]||0);
+      var level=counts[key]++;
+      var x=vToX(o.v),y=plot.y0-14-level*22;
+      dotPos.push({x:x,y:y,idx:o.i,v:o.v});
+      ctx.fillStyle=(dragIdx===o.i)?"#ffd27a":"var(--accent)";
+      ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);
+      ctx.fillStyle=(dragIdx===o.i)?"#ffd27a":"#7c9cff";ctx.fill();
+      ctx.strokeStyle="#0f1524";ctx.lineWidth=1.5;ctx.stroke();
+    });
+    // markers
+    if(data.length){
+      drawMarker(meanOf(data),"#7c9cff","Mean",0);
+      drawMarker(medianOf(data),"#4fd1a8","Median",1);
+      var mo=modesOf(data);
+      if(mo.list.length)mo.list.forEach(function(mv){drawMarker(mv,"#ff9f6b","Mode",2);});
+    }
+  }
+  function drawMarker(v,color,label,slot){
+    var x=vToX(v);
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash([6,4]);
+    ctx.beginPath();ctx.moveTo(x,plot.y0);ctx.lineTo(x,26+slot*0);ctx.stroke();
+    ctx.setLineDash([]);
+    // triangle
+    ctx.fillStyle=color;
+    ctx.beginPath();ctx.moveTo(x,plot.y0-2);ctx.lineTo(x-7,plot.y0+12);ctx.lineTo(x+7,plot.y0+12);ctx.closePath();ctx.fill();
+    ctx.fillStyle=color;ctx.font="bold 13px sans-serif";ctx.textAlign="center";
+    ctx.fillText(label,x,20+slot*16);
+  }
+  var dotPos=[],dragIdx=-1;
+
+  function refreshUngrouped(){
+    computeScale();
+    var n=data.length;
+    if(!n){$("uMean").textContent="-";$("uMedian").textContent="-";$("uMode").textContent="-";$("uWork").innerHTML="Enter some data.";draw();return;}
+    var mn=meanOf(data),md=medianOf(data),mo=modesOf(data);
+    $("uMean").textContent=fmt(mn);
+    $("uMedian").textContent=fmt(md);
+    $("uMode").textContent=mo.list.length?mo.list.map(fmt).join(", "):"none";
+    var sum=data.reduce(function(a,b){return a+b;},0);
+    var sortedArr=data.slice().sort(function(a,b){return a-b;});
+    $("uMeanSub").textContent=fmt(sum)+" / "+n;
+    // median explanation
+    var medExpl;
+    if(n%2)medExpl="middle of "+n+" = ("+((n+1)/2)+")th";
+    else medExpl="avg of "+ (n/2)+"th & "+(n/2+1)+"th";
+    $("uMedianSub").textContent=medExpl;
+    $("uModeSub").textContent=mo.count>1?("appears "+mo.count+"×"):"no repeats";
+    var w="";
+    w+='<div class="step"><b>Mean</b> = (Σx) / n = <code>'+fmt(sum)+' / '+n+' = '+fmt(mn)+'</code></div>';
+    w+='<div class="step"><b>Sorted:</b> <code>'+sortedArr.map(fmt).join(", ")+'</code></div>';
+    if(n%2){
+      w+='<div class="step"><b>Median</b> = ('+((n+1)/2)+')th value = <code>'+fmt(md)+'</code></div>';
+    }else{
+      w+='<div class="step"><b>Median</b> = ('+fmt(sortedArr[n/2-1])+' + '+fmt(sortedArr[n/2])+') / 2 = <code>'+fmt(md)+'</code></div>';
+    }
+    w+='<div class="step"><b>Mode</b> = '+(mo.list.length?('<code>'+mo.list.map(fmt).join(", ")+'</code> (frequency '+mo.count+')'):'no value repeats')+'</div>';
+    $("uWork").innerHTML=w;
+    draw();
+  }
+
+  // outlier note: compare with/without outlier
+  function updateOutlierNote(){
+    var mx=Math.max.apply(null,data);
+    var without=data.filter(function(v){return v!==mx;});
+    if(data.length>3 && without.length>=2 && mx>meanOf(without)+2*(medianOf(without)||1)){
+      var m1=meanOf(data),m2=meanOf(without),md1=medianOf(data),md2=medianOf(without);
+      $("outlierNote").innerHTML="Outlier "+fmt(mx)+" pulls the mean "+fmt(m2)+" → "+fmt(m1)+
+        " but the median barely moves ("+fmt(md2)+" → "+fmt(md1)+"). The median resists outliers.";
+    }else{$("outlierNote").textContent="";}
+  }
+
+  $("applyData").addEventListener("click",function(){
+    data=parseData($("dataInput").value);refreshUngrouped();updateOutlierNote();
+  });
+  $("sortData").addEventListener("click",function(){
+    data.sort(function(a,b){return a-b;});
+    $("dataInput").value=data.map(fmt).join(", ");refreshUngrouped();
+  });
+  $("outlierBtn").addEventListener("click",function(){
+    data.push(40);$("dataInput").value=data.map(fmt).join(", ");refreshUngrouped();updateOutlierNote();
+  });
+  $("resetData").addEventListener("click",function(){
+    $("dataInput").value=DEFAULT;data=parseData(DEFAULT);refreshUngrouped();$("outlierNote").textContent="";
+  });
+
+  // dragging dots
+  function evtPos(e){
+    var r=cv.getBoundingClientRect();
+    var cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    var cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    var sx=cv.width/r.width,sy=cv.height/r.height;
+    return {x:cx*sx,y:cy*sy};
+  }
+  function pickDot(p){
+    for(var i=0;i<dotPos.length;i++){
+      var d=dotPos[i];
+      if((p.x-d.x)*(p.x-d.x)+(p.y-d.y)*(p.y-d.y)<220)return d.idx;
+    }
+    return -1;
+  }
+  function startDrag(e){
+    var p=evtPos(e);dragIdx=pickDot(p);
+    if(dragIdx>=0){e.preventDefault();}
+  }
+  function moveDrag(e){
+    if(dragIdx<0)return;e.preventDefault();
+    var p=evtPos(e);
+    var v=xToV(p.x);
+    v=Math.round(v);
+    data[dragIdx]=v;
+    $("dataInput").value=data.map(fmt).join(", ");
+    refreshUngrouped();updateOutlierNote();
+  }
+  function endDrag(){dragIdx=-1;draw();}
+  cv.addEventListener("mousedown",startDrag);
+  window.addEventListener("mousemove",moveDrag);
+  window.addEventListener("mouseup",endDrag);
+  cv.addEventListener("touchstart",startDrag,{passive:false});
+  cv.addEventListener("touchmove",moveDrag,{passive:false});
+  cv.addEventListener("touchend",endDrag);
+
+  data=parseData(DEFAULT);refreshUngrouped();
+
+  // =================================================================
+  //  GROUPED
+  // =================================================================
+  var DEFAULT_ROWS=[[0,10,5],[10,20,8],[20,30,15],[30,40,16],[40,50,6]];
+  var rows=[];
+
+  function renderTable(){
+    var tb=$("gBody");tb.innerHTML="";
+    rows.forEach(function(r,i){
+      var tr=document.createElement("tr");
+      tr.innerHTML='<td><input type="number" data-i="'+i+'" data-k="0" value="'+r[0]+'"></td>'+
+                   '<td><input type="number" data-i="'+i+'" data-k="1" value="'+r[1]+'"></td>'+
+                   '<td><input type="number" data-i="'+i+'" data-k="2" value="'+r[2]+'" min="0"></td>'+
+                   '<td><button class="btn" data-del="'+i+'" aria-label="delete row">&times;</button></td>';
+      tb.appendChild(tr);
+    });
+    tb.querySelectorAll("input").forEach(function(inp){
+      inp.addEventListener("input",function(){
+        var i=+inp.dataset.i,k=+inp.dataset.k,val=parseFloat(inp.value);
+        rows[i][k]=isFinite(val)?val:0;computeGrouped();
+      });
+    });
+    tb.querySelectorAll("button[data-del]").forEach(function(b){
+      b.addEventListener("click",function(){
+        rows.splice(+b.dataset.del,1);renderTable();computeGrouped();
+      });
+    });
+  }
+
+  function computeGrouped(){
+    var method=$("gMethod").value;
+    var N=0,valid=rows.filter(function(r){return isFinite(r[0])&&isFinite(r[1])&&r[1]>r[0]&&r[2]>=0;});
+    if(valid.length<2){$("gMean").textContent="-";$("gMedian").textContent="-";$("gMode").textContent="-";$("gWork").innerHTML="Need at least two valid class intervals.";return;}
+    var h=valid[0][1]-valid[0][0];
+    var marks=valid.map(function(r){return (r[0]+r[1])/2;});
+    var freqs=valid.map(function(r){return r[2];});
+    N=freqs.reduce(function(a,b){return a+b;},0);
+    if(N<=0){$("gWork").innerHTML="Total frequency is zero.";$("gMean").textContent="-";$("gMedian").textContent="-";$("gMode").textContent="-";return;}
+
+    var work="";
+    // ----- MEAN -----
+    var mean,fx=[],fd=[],fu=[];
+    if(method==="direct"){
+      var sfx=0;marks.forEach(function(x,i){fx[i]=x*freqs[i];sfx+=fx[i];});
+      mean=sfx/N;
+      work+='<h3 style="margin-top:0">Mean (direct)</h3>';
+      work+=miniTable(["Class mark xᵢ","fᵢ","fᵢxᵢ"],marks.map(fmt),freqs.map(fmt),fx.map(fmt));
+      work+='<div class="step">x̄ = Σfᵢxᵢ / Σfᵢ = <code>'+fmt(sfx)+' / '+fmt(N)+' = '+fmt(mean)+'</code></div>';
+    }else if(method==="assumed"){
+      var a=marks[Math.floor(marks.length/2)];
+      var sfd=0;marks.forEach(function(x,i){fd[i]=(x-a)*freqs[i];sfd+=fd[i];});
+      mean=a+sfd/N;
+      work+='<h3 style="margin-top:0">Mean (assumed mean, a = '+fmt(a)+')</h3>';
+      work+=miniTable(["xᵢ","fᵢ","dᵢ=xᵢ−a","fᵢdᵢ"],marks.map(fmt),freqs.map(fmt),marks.map(function(x){return fmt(x-a);}),fd.map(fmt));
+      work+='<div class="step">x̄ = a + Σfᵢdᵢ/Σfᵢ = <code>'+fmt(a)+' + '+fmt(sfd)+'/'+fmt(N)+' = '+fmt(mean)+'</code></div>';
+    }else{ // step
+      var a2=marks[Math.floor(marks.length/2)];
+      var sfu=0;marks.forEach(function(x,i){fu[i]=((x-a2)/h)*freqs[i];sfu+=fu[i];});
+      mean=a2+h*(sfu/N);
+      work+='<h3 style="margin-top:0">Mean (step-deviation, a = '+fmt(a2)+', h = '+fmt(h)+')</h3>';
+      work+=miniTable(["xᵢ","fᵢ","uᵢ=(xᵢ−a)/h","fᵢuᵢ"],marks.map(fmt),freqs.map(fmt),marks.map(function(x){return fmt((x-a2)/h);}),fu.map(fmt));
+      work+='<div class="step">x̄ = a + h·Σfᵢuᵢ/Σfᵢ = <code>'+fmt(a2)+' + '+fmt(h)+'×'+fmt(sfu)+'/'+fmt(N)+' = '+fmt(mean)+'</code></div>';
+    }
+
+    // ----- MEDIAN -----
+    var cum=[],c=0;
+    freqs.forEach(function(f){c+=f;cum.push(c);});
+    var half=N/2,mi=0;
+    for(var i=0;i<cum.length;i++){if(cum[i]>=half){mi=i;break;}}
+    var l=valid[mi][0],cf=(mi>0?cum[mi-1]:0),fmed=freqs[mi],hm=valid[mi][1]-valid[mi][0];
+    var median=l+((half-cf)/fmed)*hm;
+    work+='<h3>Median</h3>';
+    work+='<div class="step">n/2 = '+fmt(half)+', median class = <code>'+fmt(valid[mi][0])+'–'+fmt(valid[mi][1])+'</code> (cf reaches '+fmt(cum[mi])+')</div>';
+    work+='<div class="step">l='+fmt(l)+', cf='+fmt(cf)+', f='+fmt(fmed)+', h='+fmt(hm)+'</div>';
+    work+='<div class="step">Median = l + ((n/2 − cf)/f)×h = <code>'+fmt(l)+' + (('+fmt(half)+'−'+fmt(cf)+')/'+fmt(fmed)+')×'+fmt(hm)+' = '+fmt(median)+'</code></div>';
+
+    // ----- MODE -----
+    var maxf=Math.max.apply(null,freqs),oi=freqs.indexOf(maxf);
+    var l0=valid[oi][0],f1=freqs[oi],f0=(oi>0?freqs[oi-1]:0),f2=(oi<freqs.length-1?freqs[oi+1]:0),h0=valid[oi][1]-valid[oi][0];
+    var denom=(2*f1-f0-f2);
+    var mode=denom!==0?l0+((f1-f0)/denom)*h0:l0;
+    work+='<h3>Mode</h3>';
+    work+='<div class="step">Modal class = <code>'+fmt(valid[oi][0])+'–'+fmt(valid[oi][1])+'</code> (highest f = '+fmt(f1)+')</div>';
+    work+='<div class="step">l='+fmt(l0)+', f₁='+fmt(f1)+', f₀='+fmt(f0)+', f₂='+fmt(f2)+', h='+fmt(h0)+'</div>';
+    work+='<div class="step">Mode = l + ((f₁−f₀)/(2f₁−f₀−f₂))×h = <code>'+fmt(l0)+' + (('+fmt(f1)+'−'+fmt(f0)+')/'+fmt(denom)+')×'+fmt(h0)+' = '+fmt(mode)+'</code></div>';
+
+    $("gMean").textContent=fmt(mean);
+    $("gMedian").textContent=fmt(median);
+    $("gMode").textContent=fmt(mode);
+    $("gWork").innerHTML=work;
+  }
+  function miniTable(headers){
+    var cols=[].slice.call(arguments,1); // arrays
+    var rowsN=cols[0].length;
+    var t='<div style="overflow-x:auto"><table><thead><tr>';
+    headers.forEach(function(h){t+='<th>'+h+'</th>';});
+    t+='</tr></thead><tbody>';
+    for(var r=0;r<rowsN;r++){t+='<tr>';cols.forEach(function(col){t+='<td>'+col[r]+'</td>';});t+='</tr>';}
+    t+='</tbody></table></div>';
+    return t;
+  }
+
+  $("gAddRow").addEventListener("click",function(){
+    var last=rows[rows.length-1];
+    var lo=last?last[1]:0,w=last?(last[1]-last[0]):10;
+    rows.push([lo,lo+w,0]);renderTable();computeGrouped();
+  });
+  $("gReset").addEventListener("click",function(){
+    rows=DEFAULT_ROWS.map(function(r){return r.slice();});renderTable();computeGrouped();
+  });
+  $("gMethod").addEventListener("change",computeGrouped);
+  rows=DEFAULT_ROWS.map(function(r){return r.slice();});
+  renderTable();computeGrouped();
+
+  // =================================================================
+  //  COMPARE
+  // =================================================================
+  function compareCalc(){
+    var mn=parseFloat($("cMean").value),md=parseFloat($("cMedian").value),mo=parseFloat($("cMode").value);
+    var w="";
+    if(isFinite(mn)&&isFinite(md)){
+      var predMode=3*md-2*mn;
+      w+='<div class="step"><b>Predicted mode</b> = 3×Median − 2×Mean</div>';
+      w+='<div class="step">= 3×'+fmt(md)+' − 2×'+fmt(mn)+' = <code>'+fmt(predMode)+'</code></div>';
+      if(isFinite(mo)){
+        var diff=Math.abs(predMode-mo);
+        w+='<div class="step">Measured mode = '+fmt(mo)+', difference = <code>'+fmt(diff)+'</code>'+
+           (diff<1e-6?' (exact match)':'')+'</div>';
+      }
+    }else{w="Enter Mean and Median.";}
+    $("cWork").innerHTML=w;
+  }
+  ["cMean","cMedian","cMode"].forEach(function(id){$(id).addEventListener("input",compareCalc);});
+  compareCalc();
+
+  // =================================================================
+  //  QUIZ
+  // =================================================================
+  var QUESTIONS=[
+    {q:"The median of 3, 5, 9, 4, 7 is:",
+     opts:["4","5","6","7"],ans:1,
+     ex:"Sort: 3,4,5,7,9. n=5 (odd), middle = 3rd value = 5."},
+    {q:"Which measure is most affected by an extreme (outlier) value?",
+     opts:["Mode","Median","Mean","All equally"],ans:2,
+     ex:"The mean uses every value, so one very large/small value drags it. Median and mode are resistant."},
+    {q:"If Mean = 30 and Median = 32, the empirical mode is:",
+     opts:["28","34","36","30"],ans:2,
+     ex:"Mode = 3×Median − 2×Mean = 3×32 − 2×30 = 96 − 60 = 36."}
+  ];
+  (function buildQuiz(){
+    var box=$("quiz");
+    QUESTIONS.forEach(function(item,qi){
+      var d=document.createElement("div");d.className="q";
+      var h='<div><b>Q'+(qi+1)+'.</b> '+item.q+'</div><div class="opts">';
+      item.opts.forEach(function(o,oi){h+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</div>';});
+      h+='</div><div class="ex" id="ex-'+qi+'">'+item.ex+'</div>';
+      d.innerHTML=h;box.appendChild(d);
+    });
+    box.querySelectorAll(".opt").forEach(function(op){
+      op.addEventListener("click",function(){
+        var qi=+op.dataset.q,oi=+op.dataset.o,item=QUESTIONS[qi];
+        var opts=box.querySelectorAll('.opt[data-q="'+qi+'"]');
+        opts.forEach(function(x){x.classList.remove("correct","wrong");});
+        opts[item.ans].classList.add("correct");
+        if(oi!==item.ans)op.classList.add("wrong");
+        $("ex-"+qi).classList.add("show");
+      });
+    });
+  })();
+
+})();
+</script>
+</body>
+</html>

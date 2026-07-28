@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Representation Lab — NIOS Class 10 Maths Ch24</title>
+<style>
+  :root{
+    --bg:#12161c; --panel:#1b222c; --panel2:#232c38; --line:#2f3a48;
+    --ink:#e8edf3; --mut:#9fb0c3; --accent:#5aa9f6; --accent2:#3f86d0;
+    --good:#5ad19a; --bad:#f2708a; --gold:#f6a94a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--mut);font-size:.85rem;margin-bottom:12px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tab{
+    background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.9rem;min-height:40px;
+  }
+  .tab.active{background:var(--accent);color:#04121f;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 10px}
+  .view{display:none}
+  .view.on{display:block}
+  canvas{width:100%;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:pan-y}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px;font-size:.9rem}
+  .chip button{background:transparent;border:none;color:var(--bad);font-size:1.05rem;cursor:pointer;line-height:1;padding:0 2px}
+  input[type=number]{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:8px;font-size:.95rem;width:90px;
+  }
+  select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px;font-size:.9rem;min-height:40px}
+  button.btn{
+    background:var(--accent);color:#04121f;border:none;border-radius:10px;
+    padding:9px 14px;font-size:.9rem;cursor:pointer;font-weight:600;min-height:40px;
+  }
+  button.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;min-height:40px}
+  button.ghost.sel{border-color:var(--accent);color:var(--accent);font-weight:600}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:6px}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .fact .k{color:var(--mut);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+  .fact .v{font-size:1.25rem;font-weight:700;color:var(--accent)}
+  .work{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.86rem;overflow-x:auto}
+  .work table{border-collapse:collapse;width:100%;font-size:.82rem;min-width:340px}
+  .work th,.work td{border:1px solid var(--line);padding:5px 7px;text-align:right}
+  .work th:first-child,.work td:first-child{text-align:left}
+  .work .tally{font-family:ui-monospace,Consolas,monospace;letter-spacing:1px;text-align:left;color:var(--gold)}
+  .work tr.sum th,.work tr.sum td{background:rgba(90,169,246,.12);font-weight:700}
+  .ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .stepper{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .stepper button{background:var(--panel2);color:var(--ink);border:none;width:38px;height:40px;font-size:1.2rem;cursor:pointer}
+  .stepper span{min-width:46px;text-align:center;font-weight:700;color:var(--accent)}
+  .hint{color:var(--mut);font-size:.82rem}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--mut);margin-top:8px}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}
+  .qbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .qbox .q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 11px;margin:5px 0;cursor:pointer;font-size:.9rem;min-height:40px}
+  .opt.correct{background:rgba(90,209,154,.18);border-color:var(--good)}
+  .opt.wrong{background:rgba(242,112,138,.15);border-color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--mut);margin-top:6px;display:none}
+  .expl.show{display:block}
+  details{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  summary{cursor:pointer;font-weight:600}
+  details p{margin:8px 0 2px;font-size:.88rem;color:var(--mut)}
+</style>
+</head>
+<body>
+<h1>Data Representation Lab</h1>
+<div class="sub">NIOS Class 10 Mathematics · Chapter 24 — Data and Their Representations. Tabulate, chart, and read cumulative curves from your own data.</div>
+
+<div class="tabs">
+  <button class="tab active" data-v="table">1 · Enter &amp; Tabulate</button>
+  <button class="tab" data-v="charts">2 · Charts</button>
+  <button class="tab" data-v="ogive">3 · Ogive</button>
+  <button class="tab" data-v="facts">Facts</button>
+  <button class="tab" data-v="quiz">Quiz</button>
+</div>
+
+<!-- ===== TABLE ===== -->
+<section class="view on" id="v-table">
+  <div class="panel">
+    <h2>Your data set</h2>
+    <p class="hint">Type a value and add it, tap × to remove, or load a preset. Everything below recomputes instantly.</p>
+    <div class="row">
+      <select id="preset">
+        <option value="marks">Preset: Test marks (30 students)</option>
+        <option value="ages">Preset: Ages in a park</option>
+        <option value="temp">Preset: Daily temperatures</option>
+        <option value="dice">Preset: 40 dice rolls</option>
+      </select>
+      <button class="ghost" id="loadPreset">Load</button>
+      <button class="ghost" id="clearData">Clear</button>
+    </div>
+    <div class="row">
+      <input type="number" id="newv" placeholder="value" step="any">
+      <button class="btn" id="add">Add value</button>
+      <button class="ghost" id="randset">Random set</button>
+    </div>
+    <div class="row" id="chips"></div>
+    <p class="hint" id="dataSummary"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Ungrouped frequency distribution</h2>
+    <p class="hint">Each distinct value with its tally, frequency f, and less-than cumulative frequency cf.</p>
+    <div class="work" id="ungrouped"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Grouped frequency distribution</h2>
+    <div class="row ctrl">
+      <span class="hint">Class width h:</span>
+      <div class="stepper">
+        <button id="wDown" aria-label="decrease width">−</button>
+        <span id="wVal">5</span>
+        <button id="wUp" aria-label="increase width">+</button>
+      </div>
+      <span class="hint" id="clInfo"></span>
+    </div>
+    <p class="hint">Continuous classes use the boundary rule <b>lower ≤ x &lt; upper</b> (the last class includes its upper value). cf is the less-than cumulative frequency.</p>
+    <div class="work" id="grouped"></div>
+  </div>
+</section>
+
+<!-- ===== CHARTS ===== -->
+<section class="view" id="v-charts">
+  <div class="panel">
+    <h2>Charts of the same data</h2>
+    <div class="row">
+      <button class="ghost sel" data-c="bar">Bar graph</button>
+      <button class="ghost" data-c="hist">Histogram</button>
+      <button class="ghost" data-c="poly">Frequency polygon</button>
+      <button class="ghost" data-c="pie">Pie chart</button>
+    </div>
+    <canvas id="chart" height="320" aria-label="chart of the data"></canvas>
+    <div class="legend" id="chartLegend"></div>
+    <p class="hint" id="chartNote"></p>
+  </div>
+</section>
+
+<!-- ===== OGIVE ===== -->
+<section class="view" id="v-ogive">
+  <div class="panel">
+    <h2>Less-than ogive (cumulative frequency curve)</h2>
+    <p class="hint">Plot the less-than cumulative frequency against the <b>upper boundary</b> of each class, then join the points with a smooth rising curve. It starts at the lower boundary of the first class (cf = 0).</p>
+    <canvas id="ogive" height="320" aria-label="less-than ogive curve"></canvas>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--accent)"></span>cumulative frequency curve</span>
+      <span><span class="sw" style="background:var(--gold)"></span>median guide (N/2)</span>
+    </div>
+    <p class="hint" id="ogiveNote"></p>
+  </div>
+</section>
+
+<!-- ===== FACTS ===== -->
+<section class="view" id="v-facts">
+  <div class="panel">
+    <h2>Key ideas</h2>
+    <details open><summary>Frequency distribution</summary>
+      <p>A table that shows each value (or class of values) alongside its <b>frequency</b> — how many times it occurs. The frequencies add up to the total number of observations N.</p></details>
+    <details><summary>Class interval</summary>
+      <p>When data is spread over a wide range, values are grouped into equal <b>class intervals</b> such as 0–10, 10–20, … The <b>class width</b> h is upper limit − lower limit; the <b>class mark</b> (mid-value) is (lower + upper)/2.</p></details>
+    <details><summary>Bar graph vs histogram</summary>
+      <p>A <b>bar graph</b> shows discrete/categorical data with equal-width bars separated by gaps; only the height matters. A <b>histogram</b> shows grouped continuous data with bars that <b>touch</b> (no gaps); the width spans the class interval and the area represents the frequency.</p></details>
+    <details><summary>Frequency polygon</summary>
+      <p>Join the tops of the histogram bars — the points are the <b>class marks</b> plotted against frequency. The polygon is closed by extending to class marks of imaginary classes (one below and one above) so it meets the x-axis.</p></details>
+    <details><summary>Pie chart</summary>
+      <p>A circle split into sectors, one per category. The angle of each sector is <b>(frequency ÷ total) × 360°</b>. All the sector angles add up to 360°.</p></details>
+    <details><summary>Ogive (cumulative frequency curve)</summary>
+      <p>A <b>less-than ogive</b> plots the less-than cumulative frequency against the upper class boundary and joins the points into a rising curve. Reading across from N/2 gives the <b>median</b> of the grouped data.</p></details>
+  </div>
+</section>
+
+<!-- ===== QUIZ ===== -->
+<section class="view" id="v-quiz">
+  <div class="panel">
+    <h2>Quick quiz — tap an option</h2>
+    <div id="quiz"></div>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* ============ data model ============ */
+var PRESETS={
+  marks:[23,45,32,56,67,41,38,52,49,60,55,44,39,62,48,51,33,58,47,42,54,36,61,50,46,57,40,53,43,59],
+  ages:[5,7,8,6,12,15,9,11,14,7,6,8,10,13,16,9,5,11,12,7,8,14,10,6],
+  temp:[28,31,29,33,35,30,27,32,34,36,29,31,30,28,33,35,32,34,31,29],
+  dice:[3,6,2,5,1,4,6,3,2,5,4,1,6,3,5,2,4,6,1,3,5,2,4,6,3,1,5,4,2,6,3,5,1,4,6,2,3,5,4,6]
+};
+var data=PRESETS.marks.slice();
+var classWidth=10;
+
+function distinctFreq(arr){
+  var map={};
+  arr.forEach(function(v){var k=v; map[k]=(map[k]||0)+1;});
+  return Object.keys(map).map(Number).sort(function(a,b){return a-b;})
+    .map(function(v){return {v:v,f:map[v]};});
+}
+function tallyMarks(n){
+  var s=''; var groups=Math.floor(n/5), rem=n%5;
+  for(var g=0;g<groups;g++) s+='卌 ';
+  s+='|'.repeat(rem);
+  return s.trim();
+}
+/* grouped classes: continuous, lower<=x<upper, last inclusive */
+function buildGroups(){
+  if(data.length===0) return {classes:[],N:0,start:0};
+  var mn=Math.min.apply(null,data), mx=Math.max.apply(null,data);
+  var h=classWidth;
+  var start=Math.floor(mn/h)*h;
+  var classes=[];
+  var lo=start;
+  var guard=0;
+  while(lo<=mx && guard<400){
+    classes.push({lo:lo,hi:lo+h,f:0});
+    lo+=h; guard++;
+  }
+  if(classes.length===0) classes.push({lo:start,hi:start+h,f:0});
+  data.forEach(function(v){
+    var idx=Math.floor((v-start)/h);
+    if(idx<0) idx=0;
+    if(idx>=classes.length) idx=classes.length-1;
+    classes[idx].f++;
+  });
+  var cf=0;
+  classes.forEach(function(c){c.mid=(c.lo+c.hi)/2; cf+=c.f; c.cf=cf;});
+  return {classes:classes,N:data.length,start:start,h:h};
+}
+function num(x){var r=Math.round(x*100)/100; return (r%1===0)?String(r):String(r);}
+
+/* ============ tabs ============ */
+var tabs=document.querySelectorAll('.tab');
+tabs.forEach(function(t){
+  t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+    document.getElementById('v-'+t.dataset.v).classList.add('on');
+    redrawAll();
+  });
+});
+
+/* ============ MODE 1 : table ============ */
+function renderChips(){
+  var c=document.getElementById('chips'); c.innerHTML='';
+  data.forEach(function(v,i){
+    var s=document.createElement('span'); s.className='chip';
+    s.innerHTML='<span>'+num(v)+'</span>';
+    var b=document.createElement('button'); b.textContent='×'; b.title='remove';
+    b.onclick=function(){data.splice(i,1); refreshTable();};
+    s.appendChild(b); c.appendChild(s);
+  });
+}
+function refreshTable(){
+  renderChips();
+  var N=data.length;
+  var sum=data.reduce(function(s,x){return s+x;},0);
+  var ds=document.getElementById('dataSummary');
+  if(N===0){ ds.textContent='No data. Add values or load a preset.'; }
+  else{
+    ds.innerHTML='N = <b>'+N+'</b> · min = <b>'+num(Math.min.apply(null,data))+
+      '</b> · max = <b>'+num(Math.max.apply(null,data))+'</b> · range = <b>'+
+      num(Math.max.apply(null,data)-Math.min.apply(null,data))+'</b> · mean = <b>'+
+      num(sum/N)+'</b>';
+  }
+  // ungrouped
+  var uf=distinctFreq(data);
+  var ug=document.getElementById('ungrouped');
+  if(N===0){ ug.innerHTML='<p class="hint">No data.</p>'; }
+  else{
+    var rows='<table><tr><th>Value</th><th>Tally</th><th>Frequency f</th><th>Cumulative cf</th></tr>';
+    var cf=0;
+    uf.forEach(function(r){ cf+=r.f;
+      rows+='<tr><td>'+num(r.v)+'</td><td class="tally">'+tallyMarks(r.f)+'</td><td>'+r.f+'</td><td>'+cf+'</td></tr>';
+    });
+    rows+='<tr class="sum"><th>Total</th><th></th><th>'+N+'</th><th></th></tr></table>';
+    ug.innerHTML=rows;
+  }
+  // grouped
+  document.getElementById('wVal').textContent=classWidth;
+  var g=buildGroups();
+  var gr=document.getElementById('grouped');
+  if(N===0){ gr.innerHTML='<p class="hint">No data.</p>'; document.getElementById('clInfo').textContent=''; }
+  else{
+    document.getElementById('clInfo').textContent=g.classes.length+' classes · class marks are mid-values';
+    var t='<table><tr><th>Class interval</th><th>Class mark</th><th>Tally</th><th>Frequency f</th><th>Cumulative cf</th></tr>';
+    g.classes.forEach(function(c){
+      t+='<tr><td>'+num(c.lo)+' – '+num(c.hi)+'</td><td>'+num(c.mid)+'</td><td class="tally">'+
+         tallyMarks(c.f)+'</td><td>'+c.f+'</td><td>'+c.cf+'</td></tr>';
+    });
+    t+='<tr class="sum"><th>Total</th><th></th><th></th><th>'+g.N+'</th><th></th></tr></table>';
+    gr.innerHTML=t;
+  }
+}
+document.getElementById('add').onclick=function(){
+  var v=parseFloat(document.getElementById('newv').value);
+  if(isFinite(v)){ data.push(v); document.getElementById('newv').value=''; refreshTable(); }
+};
+document.getElementById('newv').addEventListener('keydown',function(e){
+  if(e.key==='Enter') document.getElementById('add').click();
+});
+document.getElementById('loadPreset').onclick=function(){
+  var k=document.getElementById('preset').value;
+  data=PRESETS[k].slice();
+  classWidth=(k==='dice')?1:(k==='ages'?3:(k==='temp'?2:10));
+  refreshTable();
+};
+document.getElementById('clearData').onclick=function(){ data=[]; refreshTable(); };
+document.getElementById('randset').onclick=function(){
+  var n=20+Math.floor(Math.random()*20); data=[];
+  for(var i=0;i<n;i++) data.push(Math.floor(10+Math.random()*60));
+  classWidth=10; refreshTable();
+};
+document.getElementById('wUp').onclick=function(){ classWidth++; if(classWidth>50)classWidth=50; refreshTable(); };
+document.getElementById('wDown').onclick=function(){ classWidth--; if(classWidth<1)classWidth=1; refreshTable(); };
+
+/* ============ canvas helpers ============ */
+function setup(c,h){
+  var w=c.clientWidth||320;
+  c.width=w*devicePixelRatio; c.height=h*devicePixelRatio;
+  var ctx=c.getContext('2d');
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,w,h);
+  return {ctx:ctx,w:w,h:h};
+}
+function niceStep(max){
+  var raw=max/5, pow=Math.pow(10,Math.floor(Math.log10(raw||1)));
+  var n=raw/pow;
+  var m=(n<=1)?1:(n<=2)?2:(n<=5)?5:10;
+  return Math.max(1,m*pow);
+}
+var PAL=['#5aa9f6','#f6a94a','#5ad19a','#f2708a','#b48ef2','#4fd0d8','#e8c84a','#88b4ff','#f28f6a','#7ad19a'];
+
+/* ============ MODE 2 : charts ============ */
+var chartMode='bar';
+document.querySelectorAll('#v-charts [data-c]').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('#v-charts [data-c]').forEach(function(x){x.classList.remove('sel');});
+    b.classList.add('sel'); chartMode=b.dataset.c; drawChart();
+  };
+});
+function drawChart(){
+  var note=document.getElementById('chartNote');
+  var leg=document.getElementById('chartLegend');
+  leg.innerHTML='';
+  if(data.length===0){
+    var s=setup(document.getElementById('chart'),300);
+    s.ctx.fillStyle='#9fb0c3'; s.ctx.font='14px system-ui'; s.ctx.textAlign='center';
+    s.ctx.fillText('Add data in tab 1 to see charts.',s.w/2,150);
+    note.textContent=''; return;
+  }
+  if(chartMode==='bar') drawBar();
+  else if(chartMode==='hist') drawHistogram();
+  else if(chartMode==='poly') drawPolygon();
+  else drawPie();
+}
+function axes(ctx,L,R,T,B,maxY,step,w){
+  ctx.strokeStyle='#3a4657'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(L,T); ctx.lineTo(L,B); ctx.lineTo(R,B); ctx.stroke();
+  ctx.fillStyle='#9fb0c3'; ctx.font='11px system-ui'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(var y=0;y<=maxY+0.001;y+=step){
+    var py=B-(y/maxY)*(B-T);
+    ctx.strokeStyle='#28313d'; ctx.beginPath(); ctx.moveTo(L,py); ctx.lineTo(R,py); ctx.stroke();
+    ctx.fillStyle='#9fb0c3'; ctx.fillText(String(Math.round(y)),L-6,py);
+  }
+}
+function drawBar(){
+  var uf=distinctFreq(data);
+  var s=setup(document.getElementById('chart'),320); var ctx=s.ctx;
+  var L=42,R=s.w-14,T=22,B=s.h-46;
+  var maxF=Math.max.apply(null,uf.map(function(r){return r.f;}));
+  var step=niceStep(maxF);
+  var maxY=Math.ceil(maxF/step)*step;
+  axes(ctx,L,R,T,B,maxY,step,s.w);
+  var n=uf.length, slot=(R-L)/n, bw=Math.min(46,slot*0.6);
+  uf.forEach(function(r,i){
+    var cx=L+slot*(i+0.5);
+    var bh=(r.f/maxY)*(B-T);
+    ctx.fillStyle=PAL[0];
+    ctx.fillRect(cx-bw/2,B-bh,bw,bh);
+    ctx.fillStyle='#e8edf3'; ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText(r.f,cx,B-bh-4);
+    ctx.fillStyle='#9fb0c3'; ctx.save(); ctx.translate(cx,B+6);
+    if(n>10){ctx.rotate(-Math.PI/4); ctx.textAlign='right';}
+    ctx.textBaseline='top'; ctx.fillText(num(r.v),0,0); ctx.restore();
+  });
+  ctx.fillStyle='#9fb0c3'; ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Value →',(L+R)/2,s.h-4);
+  ctx.save(); ctx.translate(12,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Frequency',0,0); ctx.restore();
+  document.getElementById('chartLegend').innerHTML='<span><span class="sw" style="background:'+PAL[0]+'"></span>frequency of each distinct value (bars separated by gaps)</span>';
+  document.getElementById('chartNote').textContent='Bar graph: discrete values on the x-axis, frequency on the y-axis. Bars have equal width and are separated by gaps.';
+}
+function drawHistogram(){
+  var g=buildGroups();
+  var s=setup(document.getElementById('chart'),320); var ctx=s.ctx;
+  var L=42,R=s.w-14,T=22,B=s.h-46;
+  var maxF=Math.max.apply(null,g.classes.map(function(c){return c.f;}),1);
+  var step=niceStep(maxF); var maxY=Math.ceil(maxF/step)*step;
+  axes(ctx,L,R,T,B,maxY,step,s.w);
+  var n=g.classes.length, slot=(R-L)/n;
+  g.classes.forEach(function(c,i){
+    var x0=L+slot*i, bh=(c.f/maxY)*(B-T);
+    ctx.fillStyle=PAL[0]; ctx.strokeStyle='#12161c'; ctx.lineWidth=1;
+    ctx.fillRect(x0,B-bh,slot,bh); ctx.strokeRect(x0,B-bh,slot,bh);
+    if(c.f>0){ctx.fillStyle='#e8edf3'; ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.fillText(c.f,x0+slot/2,B-bh-4);}
+    ctx.fillStyle='#9fb0c3'; ctx.font=(n>9?'9px':'10px')+' system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(num(c.lo),x0,B+5);
+  });
+  ctx.fillStyle='#9fb0c3'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(num(g.classes[n-1].hi),L+slot*n,B+5);
+  ctx.font='11px system-ui'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Class boundaries →',(L+R)/2,s.h-4);
+  ctx.save(); ctx.translate(12,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Frequency',0,0); ctx.restore();
+  document.getElementById('chartLegend').innerHTML='<span><span class="sw" style="background:'+PAL[0]+'"></span>frequency per class interval (bars touch)</span>';
+  document.getElementById('chartNote').textContent='Histogram: continuous class intervals on the x-axis. Bars touch because the classes are contiguous. Class width h = '+g.h+'.';
+}
+function drawPolygon(){
+  var g=buildGroups();
+  var s=setup(document.getElementById('chart'),320); var ctx=s.ctx;
+  var L=46,R=s.w-16,T=22,B=s.h-46;
+  var maxF=Math.max.apply(null,g.classes.map(function(c){return c.f;}),1);
+  var step=niceStep(maxF); var maxY=Math.ceil(maxF/step)*step;
+  var h=g.h;
+  // points include imaginary class below first and above last (f=0)
+  var pts=[{mid:g.classes[0].mid-h,f:0}];
+  g.classes.forEach(function(c){pts.push({mid:c.mid,f:c.f});});
+  pts.push({mid:g.classes[g.classes.length-1].mid+h,f:0});
+  var minX=pts[0].mid, maxX=pts[pts.length-1].mid;
+  axes(ctx,L,R,T,B,maxY,step,s.w);
+  function X(m){return L+((m-minX)/(maxX-minX))*(R-L);}
+  function Y(f){return B-(f/maxY)*(B-T);}
+  ctx.strokeStyle=PAL[1]; ctx.lineWidth=2.5; ctx.beginPath();
+  pts.forEach(function(p,i){ var x=X(p.mid),y=Y(p.f); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+  pts.forEach(function(p){
+    var x=X(p.mid),y=Y(p.f);
+    ctx.fillStyle=PAL[0]; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+    ctx.fillStyle='#9fb0c3'; ctx.font='10px system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText(num(p.mid),x,B+5);
+  });
+  ctx.fillStyle='#9fb0c3'; ctx.font='11px system-ui'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Class mark (mid-value) →',(L+R)/2,s.h-4);
+  ctx.save(); ctx.translate(12,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Frequency',0,0); ctx.restore();
+  document.getElementById('chartLegend').innerHTML='<span><span class="sw" style="background:'+PAL[1]+'"></span>frequency polygon</span><span><span class="sw" style="background:'+PAL[0]+'"></span>plotted point (class mark, f)</span>';
+  document.getElementById('chartNote').textContent='Frequency polygon: class marks vs frequency, joined and closed to the axis with imaginary classes at each end.';
+}
+function drawPie(){
+  var g=buildGroups();
+  var s=setup(document.getElementById('chart'),320); var ctx=s.ctx;
+  var N=g.N;
+  var cx=Math.min(s.w*0.36,150)+10, cy=s.h/2, rad=Math.min(cy-16,cx-16,120);
+  var a0=-Math.PI/2;
+  var legHTML='';
+  g.classes.forEach(function(c,i){
+    if(c.f===0) return;
+    var frac=c.f/N, ang=frac*Math.PI*2, deg=frac*360;
+    var col=PAL[i%PAL.length];
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,rad,a0,a0+ang); ctx.closePath();
+    ctx.fillStyle=col; ctx.fill(); ctx.strokeStyle='#12161c'; ctx.lineWidth=1.5; ctx.stroke();
+    var mid=a0+ang/2;
+    if(frac>0.06){
+      var lx=cx+Math.cos(mid)*rad*0.62, ly=cy+Math.sin(mid)*rad*0.62;
+      ctx.fillStyle='#0a1420'; ctx.font='bold 11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(Math.round(deg)+'°',lx,ly);
+    }
+    a0+=ang;
+    legHTML+='<span><span class="sw" style="background:'+col+'"></span>'+num(c.lo)+'–'+num(c.hi)+
+             ' : f='+c.f+', '+(Math.round(deg*10)/10)+'°</span>';
+  });
+  document.getElementById('chartLegend').innerHTML=legHTML;
+  document.getElementById('chartNote').textContent='Pie chart: sector angle = (frequency ÷ '+N+') × 360°. All angles add to 360°.';
+}
+
+/* ============ MODE 3 : ogive ============ */
+function drawOgive(){
+  var note=document.getElementById('ogiveNote');
+  if(data.length===0){
+    var e=setup(document.getElementById('ogive'),300);
+    e.ctx.fillStyle='#9fb0c3'; e.ctx.font='14px system-ui'; e.ctx.textAlign='center';
+    e.ctx.fillText('Add data in tab 1 to see the ogive.',e.w/2,150);
+    note.textContent=''; return;
+  }
+  var g=buildGroups();
+  var s=setup(document.getElementById('ogive'),320); var ctx=s.ctx;
+  var L=46,R=s.w-16,T=22,B=s.h-46;
+  var N=g.N, step=niceStep(N), maxY=Math.ceil(N/step)*step;
+  var minX=g.classes[0].lo, maxX=g.classes[g.classes.length-1].hi;
+  axes(ctx,L,R,T,B,maxY,step,s.w);
+  function X(x){return L+((x-minX)/(maxX-minX))*(R-L);}
+  function Y(f){return B-(f/maxY)*(B-T);}
+  // x-axis boundary labels
+  ctx.fillStyle='#9fb0c3'; ctx.font=(g.classes.length>9?'9px':'10px')+' system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText(num(minX),X(minX),B+5);
+  g.classes.forEach(function(c){ ctx.fillText(num(c.hi),X(c.hi),B+5); });
+  // curve: start (lowerBoundary,0) then (upper,cf)
+  var pts=[{x:g.classes[0].lo,cf:0}];
+  g.classes.forEach(function(c){ pts.push({x:c.hi,cf:c.cf}); });
+  ctx.strokeStyle=PAL[0]; ctx.lineWidth=2.5; ctx.beginPath();
+  pts.forEach(function(p,i){ var x=X(p.x),y=Y(p.cf); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+  pts.forEach(function(p,i){
+    var x=X(p.x),y=Y(p.cf);
+    ctx.fillStyle=PAL[0]; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fill();
+    if(i>0){ctx.fillStyle='#cfe0f3'; ctx.font='10px system-ui'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.fillText(p.cf,x,y-7);}
+  });
+  // median guide at N/2
+  var half=N/2, yh=Y(half);
+  ctx.strokeStyle=PAL[1]; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(L,yh); ctx.lineTo(R,yh); ctx.stroke(); ctx.setLineDash([]);
+  // find median x by interpolation on curve
+  var medX=minX;
+  for(var i=1;i<pts.length;i++){
+    if(pts[i].cf>=half){
+      var p0=pts[i-1],p1=pts[i];
+      medX=p0.x+((half-p0.cf)/((p1.cf-p0.cf)||1))*(p1.x-p0.x);
+      break;
+    }
+  }
+  var mx=X(medX);
+  ctx.strokeStyle=PAL[1]; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(mx,yh); ctx.lineTo(mx,B); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=PAL[1]; ctx.font='11px system-ui'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('N/2 = '+num(half),L+4,yh-4);
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('median ≈ '+num(medX),mx,B+18);
+  // axis titles
+  ctx.fillStyle='#9fb0c3'; ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Upper class boundary →',(L+R)/2,s.h-2);
+  ctx.save(); ctx.translate(12,(T+B)/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Cumulative frequency',0,0); ctx.restore();
+  note.innerHTML='Reading across from N/2 = '+num(half)+' to the curve and down gives the median ≈ <b>'+num(medX)+
+    '</b>. Change the class width in tab 1 to see the curve rebuild.';
+}
+
+/* ============ QUIZ ============ */
+var QS=[
+  {q:"In a grouped frequency distribution the class 20–30 has frequency 8 and 30–40 has frequency 5. What is the cumulative frequency (less-than) up to 40?",
+   opts:["5","8","13","40"],ok:2,
+   ex:"Less-than cf up to 40 = 8 + 5 = 13 — it adds all frequencies of classes up to and including 30–40."},
+  {q:"A pie chart shows 4 categories with frequencies 10, 20, 30 and 60 (total 120). What is the sector angle for the category with frequency 30?",
+   opts:["30°","60°","90°","120°"],ok:2,
+   ex:"Angle = (frequency ÷ total) × 360° = (30 ÷ 120) × 360° = 90°."},
+  {q:"Which statement correctly distinguishes a histogram from a bar graph?",
+   opts:["A histogram has gaps between bars; a bar graph has none",
+         "A histogram is for grouped continuous data and its bars touch; a bar graph is for discrete data with gaps",
+         "They are exactly the same",
+         "A bar graph must always be drawn horizontally"],ok:1,
+   ex:"Histograms represent grouped continuous data with adjoining (touching) bars, while bar graphs show discrete categories with equal gaps between bars."}
+];
+function buildQuiz(){
+  var box=document.getElementById('quiz'); box.innerHTML='';
+  QS.forEach(function(item,qi){
+    var d=document.createElement('div'); d.className='qbox';
+    d.innerHTML='<div class="q">Q'+(qi+1)+'. '+item.q+'</div>';
+    item.opts.forEach(function(o,oi){
+      var btn=document.createElement('button'); btn.className='opt'; btn.textContent=o;
+      btn.onclick=function(){
+        if(d.dataset.done) return; d.dataset.done='1';
+        d.querySelectorAll('.opt').forEach(function(b,bi){ if(bi===item.ok)b.classList.add('correct'); });
+        if(oi!==item.ok) btn.classList.add('wrong');
+        d.querySelector('.expl').classList.add('show');
+      };
+      d.appendChild(btn);
+    });
+    var ex=document.createElement('div'); ex.className='expl'; ex.textContent='✔ '+item.ex;
+    d.appendChild(ex); box.appendChild(d);
+  });
+}
+
+/* ============ init ============ */
+function redrawAll(){ drawChart(); drawOgive(); }
+refreshTable(); buildQuiz(); drawChart(); drawOgive();
+window.addEventListener('resize',redrawAll);
+</script>
+</body>
+</html>

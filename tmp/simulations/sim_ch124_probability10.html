@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probability Lab — NIOS Class 10 Maths (Ch26)</title>
+<style>
+  :root{
+    --bg:#161a23;
+    --panel:#1e2430;
+    --panel2:#252c3a;
+    --edge:#333c4d;
+    --txt:#e6ebf2;
+    --muted:#9aa6b8;
+    --accent:#5ad1c0;
+    --accent-dim:#2f6f68;
+    --bar:#3a4356;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.5;
+    padding:14px;
+  }
+  h1{font-size:1.35rem;margin:0 0 4px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  p{margin:6px 0}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--txt);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;min-width:120px;text-align:center;
+  }
+  .tab.active{background:var(--accent);color:#0d1117;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  label{font-size:.88rem;color:var(--muted);display:block;margin:10px 0 4px}
+  select,input[type=number]{
+    background:var(--panel2);border:1px solid var(--edge);color:var(--txt);
+    padding:8px 10px;border-radius:10px;font-size:.95rem;width:100%;max-width:260px;
+  }
+  input[type=range]{width:100%;max-width:260px;accent-color:var(--accent)}
+  button{
+    background:var(--accent);color:#0d1117;border:none;padding:10px 16px;
+    border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;margin:4px 6px 4px 0;
+  }
+  button.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--edge)}
+  button:active{transform:translateY(1px)}
+  .grid{display:flex;flex-wrap:wrap;gap:14px}
+  .grid>div{flex:1 1 240px;min-width:0}
+  .result{
+    background:var(--panel2);border:1px solid var(--edge);border-radius:12px;
+    padding:12px;margin-top:12px;
+  }
+  .big{font-size:1.6rem;font-weight:700;color:var(--accent)}
+  .frac{display:inline-block;text-align:center;vertical-align:middle;margin:0 4px}
+  .frac .n{display:block;border-bottom:2px solid var(--txt);padding:0 6px}
+  .frac .d{display:block;padding:0 6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{
+    background:var(--panel);border:1px solid var(--edge);border-radius:8px;
+    padding:4px 9px;font-size:.85rem;user-select:none;
+  }
+  .chip.on{background:var(--accent-dim);border-color:var(--accent);color:#eafffb}
+  .barwrap{margin-top:14px}
+  .barrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.85rem}
+  .barrow .lab{width:90px;color:var(--muted);flex:none}
+  .bartrack{flex:1;background:var(--bar);border-radius:8px;height:20px;overflow:hidden;position:relative}
+  .barfill{height:100%;border-radius:8px;transition:width .2s}
+  .fill-exp{background:var(--accent)}
+  .fill-the{background:#c88be0}
+  .barrow .val{width:64px;text-align:right;flex:none}
+  canvas{width:100%;max-width:520px;background:var(--panel2);border:1px solid var(--edge);border-radius:12px;display:block;margin-top:12px}
+  .facts li{margin:6px 0}
+  .facts b{color:var(--accent)}
+  .quiz{margin-top:6px}
+  .q{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:12px;margin:10px 0}
+  .q p{font-weight:600}
+  .opt{display:block;background:var(--panel);border:1px solid var(--edge);border-radius:9px;
+    padding:8px 10px;margin:6px 0;cursor:pointer;font-size:.9rem}
+  .opt.correct{background:#1f5d43;border-color:#3fbf82;color:#eafff3}
+  .opt.wrong{background:#5d2330;border-color:#c8586e;color:#ffe9ee}
+  .ans{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .note{font-size:.82rem;color:var(--muted)}
+  .warn{color:#f0b45a}
+  .mono{font-family:ui-monospace,Consolas,monospace}
+  @media(max-width:400px){body{padding:10px}.big{font-size:1.35rem}}
+</style>
+</head>
+<body>
+<h1>Probability Lab</h1>
+<p class="sub">NIOS Class 10 Mathematics · Chapter 26 — Probability</p>
+
+<div class="tabs">
+  <button class="tab active" data-view="classical">Classical P(E)</button>
+  <button class="tab" data-view="experimental">Experiment (trials)</button>
+  <button class="tab" data-view="rules">Complement &amp; rules</button>
+  <button class="tab" data-view="facts">Facts</button>
+  <button class="tab" data-view="quiz">Quiz</button>
+</div>
+
+<!-- ============ CLASSICAL ============ -->
+<section class="view active" id="view-classical">
+  <div class="panel">
+    <h2>Classical (theoretical) probability</h2>
+    <div class="grid">
+      <div>
+        <label for="expt">Experiment</label>
+        <select id="expt">
+          <option value="coin">Toss a coin</option>
+          <option value="die">Roll a die</option>
+          <option value="card">Draw a card (52-card deck)</option>
+          <option value="ball">Pick a ball from a bag</option>
+        </select>
+
+        <div id="ballControls" style="display:none">
+          <label for="rBalls">Red balls: <span id="rVal">3</span></label>
+          <input type="range" id="rBalls" min="0" max="10" value="3">
+          <label for="gBalls">Green balls: <span id="gVal">2</span></label>
+          <input type="range" id="gBalls" min="0" max="10" value="2">
+          <label for="bBalls">Blue balls: <span id="bVal">1</span></label>
+          <input type="range" id="bBalls" min="0" max="10" value="1">
+        </div>
+
+        <label>Event E = favourable outcome(s). Tap to select:</label>
+        <div class="chips" id="chips"></div>
+      </div>
+      <div>
+        <div class="result">
+          <p>Sample space size <span class="mono">n(S)</span> = <b id="nS">2</b></p>
+          <p>Favourable outcomes <span class="mono">n(E)</span> = <b id="nE">0</b></p>
+          <p style="margin-top:10px">P(E) =
+            <span class="frac"><span class="n" id="fracN">0</span><span class="d" id="fracD">2</span></span>
+            = <span class="big" id="pDec">0.000</span>
+          </p>
+          <p class="note" id="pWords"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIMENTAL ============ -->
+<section class="view" id="view-experimental">
+  <div class="panel">
+    <h2>Experimental probability — law of large numbers</h2>
+    <p class="note">Simulate many random trials of an experiment. As the number of trials grows,
+      the <b>relative frequency</b> (experimental probability) approaches the <b>theoretical</b> value.</p>
+    <div class="grid">
+      <div>
+        <label for="expE">Experiment &amp; event</label>
+        <select id="expE">
+          <option value="coinH">Coin — get Heads (theory 1/2)</option>
+          <option value="die6">Die — get a 6 (theory 1/6)</option>
+          <option value="dieEven">Die — get an even number (theory 1/2)</option>
+          <option value="ballR">Bag: 3R 2G 1B — get Red (theory 1/2)</option>
+        </select>
+        <div>
+          <button id="run100">+100 trials</button>
+          <button id="run1000">+1000 trials</button>
+          <button class="ghost" id="resetTrials">Reset</button>
+        </div>
+        <p class="note">Total trials: <b id="tTotal">0</b> · Favourable: <b id="tHits">0</b></p>
+      </div>
+      <div>
+        <div class="barwrap">
+          <div class="barrow"><span class="lab">Experimental</span>
+            <div class="bartrack"><div class="barfill fill-exp" id="barExp" style="width:0%"></div></div>
+            <span class="val" id="valExp">—</span></div>
+          <div class="barrow"><span class="lab">Theoretical</span>
+            <div class="bartrack"><div class="barfill fill-the" id="barThe" style="width:0%"></div></div>
+            <span class="val" id="valThe">—</span></div>
+        </div>
+      </div>
+    </div>
+    <canvas id="conv" width="520" height="200" aria-label="convergence chart"></canvas>
+    <p class="note">Line: experimental probability after each batch. Dashed: theoretical probability.</p>
+  </div>
+</section>
+
+<!-- ============ RULES ============ -->
+<section class="view" id="view-rules">
+  <div class="panel">
+    <h2>Complement &amp; addition rule</h2>
+    <ul class="facts">
+      <li><b>Complement:</b> P(not E) = 1 − P(E). "not E" is everything in S outside E.</li>
+      <li><b>Total:</b> the probabilities of all possible outcomes add up to <b>1</b>.</li>
+    </ul>
+    <div class="result">
+      <p>Bag with <b id="rr">3</b> red, <b id="gg">2</b> green, <b id="bb">1</b> blue balls. Pick one at random.</p>
+      <label for="ruleColor">Event E = pick a</label>
+      <select id="ruleColor" style="max-width:160px">
+        <option value="r">Red ball</option>
+        <option value="g">Green ball</option>
+        <option value="b">Blue ball</option>
+      </select>
+      <p>P(E) = <span class="frac"><span class="n" id="rN">3</span><span class="d" id="rD">6</span></span>
+        = <b id="rP">0.500</b></p>
+      <p>P(not E) = 1 − P(E) = <b id="rNot">0.500</b></p>
+      <p class="note">P(red) + P(green) + P(blue) = <b id="rSum">1.000</b> ✓</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Worked word problems</h2>
+    <div class="q">
+      <p>1. A bag has 5 red and 3 black balls. One ball is drawn at random. Find P(black).</p>
+      <p class="note">n(S) = 5 + 3 = 8. Favourable (black) = 3. So <b>P(black) = 3/8 = 0.375</b>.
+        Then P(not black) = 1 − 3/8 = <b>5/8</b>.</p>
+    </div>
+    <div class="q">
+      <p>2. A die is rolled once. Find the probability of getting a number greater than 4.</p>
+      <p class="note">Outcomes &gt; 4 are {5, 6}, so n(E) = 2 and n(S) = 6.
+        <b>P = 2/6 = 1/3 ≈ 0.333</b>.</p>
+    </div>
+    <div class="q">
+      <p>3. A card is drawn from a well-shuffled deck of 52. Find P(a king).</p>
+      <p class="note">There are 4 kings, so <b>P(king) = 4/52 = 1/13 ≈ 0.077</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACTS ============ -->
+<section class="view" id="view-facts">
+  <div class="panel">
+    <h2>Key facts</h2>
+    <ul class="facts">
+      <li><b>Definition (equally likely):</b> P(E) = <span class="frac"><span class="n">number of favourable outcomes n(E)</span><span class="d">total number of outcomes n(S)</span></span></li>
+      <li><b>Range:</b> for any event E, <b>0 ≤ P(E) ≤ 1</b>.</li>
+      <li><b>Impossible event:</b> P = 0 (e.g. rolling a 7 on an ordinary die).</li>
+      <li><b>Sure / certain event:</b> P = 1 (e.g. rolling a number from 1 to 6).</li>
+      <li><b>Complement:</b> P(not E) = 1 − P(E). E and "not E" together cover all of S.</li>
+      <li><b>Sum rule:</b> probabilities of all outcomes of an experiment add up to 1.</li>
+      <li><b>Theoretical vs experimental:</b> theoretical P is computed from counting; experimental P = (favourable trials)/(total trials). By the <b>law of large numbers</b>, as trials increase, experimental P gets close to theoretical P.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="view" id="view-quiz">
+  <div class="panel">
+    <h2>Quick quiz — tap an answer</h2>
+    <div class="quiz" id="quiz"></div>
+  </div>
+</section>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('view-'+t.dataset.view).classList.add('active');
+  });
+});
+
+/* ---------- helpers ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a||1;}
+function fracStr(n,d){if(n===0)return "0";var g=gcd(n,d);return (n/g)+"/"+(d/g);}
+
+/* ================= CLASSICAL ================= */
+var exptSel=document.getElementById('expt');
+var chipsEl=document.getElementById('chips');
+var ballControls=document.getElementById('ballControls');
+var selected={}; // outcome label -> true
+
+function ballCounts(){
+  return {
+    r:+document.getElementById('rBalls').value,
+    g:+document.getElementById('gBalls').value,
+    b:+document.getElementById('bBalls').value
+  };
+}
+
+function outcomes(){
+  var e=exptSel.value;
+  if(e==='coin') return ['Heads','Tails'];
+  if(e==='die') return ['1','2','3','4','5','6'];
+  if(e==='card'){
+    var suits=['♠','♥','♦','♣'], ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    var arr=[];
+    suits.forEach(function(s){ranks.forEach(function(r){arr.push(r+s);});});
+    return arr; // 52
+  }
+  if(e==='ball'){
+    var c=ballCounts(), arr=[], i;
+    for(i=1;i<=c.r;i++)arr.push('R'+i);
+    for(i=1;i<=c.g;i++)arr.push('G'+i);
+    for(i=1;i<=c.b;i++)arr.push('B'+i);
+    return arr;
+  }
+  return [];
+}
+
+function buildChips(){
+  var outs=outcomes();
+  chipsEl.innerHTML='';
+  selected={};
+  if(exptSel.value==='card'){
+    // too many to chip individually: offer meaningful events
+    var groups=[
+      {k:'red',label:'Red cards (♥♦)'},
+      {k:'face',label:'Face cards (J,Q,K)'},
+      {k:'king',label:'Kings'},
+      {k:'spade',label:'Spades (♠)'},
+      {k:'ace',label:'Aces'}
+    ];
+    chipsEl.dataset.mode='card';
+    groups.forEach(function(gp){
+      var c=document.createElement('span');
+      c.className='chip';c.textContent=gp.label;c.dataset.k=gp.k;
+      c.addEventListener('click',function(){
+        c.classList.toggle('on');
+        selected[gp.k]=c.classList.contains('on');
+        update();
+      });
+      chipsEl.appendChild(c);
+    });
+  } else {
+    chipsEl.dataset.mode='plain';
+    outs.forEach(function(o){
+      var c=document.createElement('span');
+      c.className='chip';c.textContent=o;
+      c.addEventListener('click',function(){
+        c.classList.toggle('on');
+        selected[o]=c.classList.contains('on');
+        update();
+      });
+      chipsEl.appendChild(c);
+    });
+  }
+}
+
+function cardFav(){
+  // count favourable among 52 for chosen groups (union)
+  var suits=['♠','♥','♦','♣'], ranks=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  var n=0;
+  suits.forEach(function(s){ranks.forEach(function(r){
+    var isRed=(s==='♥'||s==='♦');
+    var isFace=(r==='J'||r==='Q'||r==='K');
+    var ok=false;
+    if(selected.red&&isRed)ok=true;
+    if(selected.face&&isFace)ok=true;
+    if(selected.king&&r==='K')ok=true;
+    if(selected.spade&&s==='♠')ok=true;
+    if(selected.ace&&r==='A')ok=true;
+    if(ok)n++;
+  });});
+  return n;
+}
+
+function update(){
+  var outs=outcomes();
+  var nS=outs.length;
+  var nE;
+  if(chipsEl.dataset.mode==='card'){
+    nE=cardFav();
+  } else {
+    nE=outs.filter(function(o){return selected[o];}).length;
+  }
+  document.getElementById('nS').textContent=nS;
+  document.getElementById('nE').textContent=nE;
+  document.getElementById('fracN').textContent=nE;
+  document.getElementById('fracD').textContent=nS;
+  var p=nS?nE/nS:0;
+  document.getElementById('pDec').textContent=p.toFixed(3);
+  var words='';
+  if(nS===0){words='Empty bag — add some balls.';}
+  else if(nE===0){words='P(E)=0 → impossible event (no favourable outcome selected).';}
+  else if(nE===nS){words='P(E)=1 → certain event (every outcome is favourable).';}
+  else{words='Reduced fraction: '+fracStr(nE,nS)+'. Since 0 ≤ P ≤ 1, this event is possible but not certain.';}
+  document.getElementById('pWords').textContent=words;
+}
+
+exptSel.addEventListener('change',function(){
+  ballControls.style.display = exptSel.value==='ball' ? 'block':'none';
+  buildChips();update();
+});
+['rBalls','gBalls','bBalls'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){
+    document.getElementById(id[0]+'Val').textContent=document.getElementById(id).value;
+    buildChips();update();
+  });
+});
+buildChips();update();
+
+/* ================= EXPERIMENTAL ================= */
+var expESel=document.getElementById('expE');
+var total=0, hits=0, history=[];
+
+function theory(){
+  switch(expESel.value){
+    case 'coinH': return 1/2;
+    case 'die6': return 1/6;
+    case 'dieEven': return 1/2;
+    case 'ballR': return 3/6;
+  }
+  return 0;
+}
+function oneTrial(){
+  switch(expESel.value){
+    case 'coinH': return Math.random()<0.5; // heads
+    case 'die6': return (Math.floor(Math.random()*6)+1)===6;
+    case 'dieEven': return ((Math.floor(Math.random()*6)+1)%2)===0;
+    case 'ballR':{ // bag 3R 2G 1B => index 0..5, red = 0,1,2
+      var k=Math.floor(Math.random()*6); return k<3;
+    }
+  }
+  return false;
+}
+function runBatch(n){
+  var i;
+  for(i=0;i<n;i++){ if(oneTrial())hits++; total++; }
+  history.push(hits/total);
+  renderTrials();
+}
+function renderTrials(){
+  var exp = total? hits/total : 0;
+  var the = theory();
+  document.getElementById('tTotal').textContent=total;
+  document.getElementById('tHits').textContent=hits;
+  document.getElementById('valExp').textContent = total? exp.toFixed(3):'—';
+  document.getElementById('valThe').textContent = the.toFixed(3);
+  document.getElementById('barExp').style.width=(exp*100)+'%';
+  document.getElementById('barThe').style.width=(the*100)+'%';
+  drawConv();
+}
+function drawConv(){
+  var cv=document.getElementById('conv'), ctx=cv.getContext('2d');
+  var W=cv.width, H=cv.height, pad=28;
+  ctx.clearRect(0,0,W,H);
+  // axes
+  ctx.strokeStyle='#3a4356'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,8);ctx.lineTo(pad,H-pad);ctx.lineTo(W-8,H-pad);ctx.stroke();
+  // y labels 0 / 0.5 / 1
+  ctx.fillStyle='#9aa6b8';ctx.font='11px sans-serif';ctx.textAlign='right';
+  [0,0.5,1].forEach(function(v){
+    var y=(H-pad)-v*(H-pad-8);
+    ctx.fillText(v.toFixed(1),pad-4,y+3);
+    ctx.strokeStyle='#252c3a';ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-8,y);ctx.stroke();
+  });
+  // theoretical dashed
+  var the=theory();
+  var ty=(H-pad)-the*(H-pad-8);
+  ctx.strokeStyle='#c88be0';ctx.setLineDash([6,4]);ctx.beginPath();
+  ctx.moveTo(pad,ty);ctx.lineTo(W-8,ty);ctx.stroke();ctx.setLineDash([]);
+  // history line
+  if(history.length){
+    ctx.strokeStyle='#5ad1c0';ctx.lineWidth=2;ctx.beginPath();
+    var n=history.length;
+    history.forEach(function(v,i){
+      var x=pad+(n===1?0:(i/(n-1))*(W-8-pad));
+      var y=(H-pad)-v*(H-pad-8);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+}
+document.getElementById('run100').addEventListener('click',function(){runBatch(100);});
+document.getElementById('run1000').addEventListener('click',function(){runBatch(1000);});
+document.getElementById('resetTrials').addEventListener('click',function(){
+  total=0;hits=0;history=[];renderTrials();
+});
+expESel.addEventListener('change',function(){
+  total=0;hits=0;history=[];renderTrials();
+});
+renderTrials();
+
+/* ================= RULES ================= */
+var ruleColor=document.getElementById('ruleColor');
+function renderRules(){
+  var r=3,g=2,b=1,tot=6;
+  var pick=ruleColor.value;
+  var nE = pick==='r'?r : pick==='g'?g : b;
+  var p=nE/tot;
+  document.getElementById('rN').textContent=nE;
+  document.getElementById('rD').textContent=tot;
+  document.getElementById('rP').textContent=p.toFixed(3);
+  document.getElementById('rNot').textContent=(1-p).toFixed(3);
+  document.getElementById('rSum').textContent=((r+g+b)/tot).toFixed(3);
+}
+ruleColor.addEventListener('change',renderRules);
+renderRules();
+
+/* ================= QUIZ ================= */
+var quizData=[
+  {q:'A die is rolled once. What is the probability of getting an even number?',
+   opts:['1/6','1/3','1/2','2/3'],a:2,
+   exp:'Even outcomes {2,4,6} → 3 of 6 → 1/2.'},
+  {q:'For any event E, which is always true?',
+   opts:['P(E) can be 1.5','0 ≤ P(E) ≤ 1','P(E) is always 0','P(E) > 1'],a:1,
+   exp:'A probability is never negative and never more than 1.'},
+  {q:'If P(E) = 0.3, then P(not E) equals:',
+   opts:['0.3','0.7','1.3','0'],a:1,
+   exp:'P(not E) = 1 − P(E) = 1 − 0.3 = 0.7.'}
+];
+var quizEl=document.getElementById('quiz');
+quizData.forEach(function(item,qi){
+  var div=document.createElement('div');div.className='q';
+  var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;div.appendChild(p);
+  var ansP=document.createElement('div');ansP.className='ans';
+  ansP.textContent='Answer: '+item.opts[item.a]+'. '+item.exp;
+  item.opts.forEach(function(o,oi){
+    var b=document.createElement('span');b.className='opt';b.textContent=o;
+    b.addEventListener('click',function(){
+      if(div.dataset.done)return;
+      div.dataset.done='1';
+      div.querySelectorAll('.opt').forEach(function(x,xi){
+        if(xi===item.a)x.classList.add('correct');
+      });
+      if(oi!==item.a)b.classList.add('wrong');
+      ansP.style.display='block';
+    });
+    div.appendChild(b);
+  });
+  div.appendChild(ansP);
+  quizEl.appendChild(div);
+});
+</script>
+</body>
+</html>
