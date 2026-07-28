@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Measurement Lab - NIOS Class 10 Science &amp; Technology</title>
+<style>
+  :root{
+    --bg:#12161d;
+    --panel:#1b2029;
+    --panel2:#222836;
+    --line:#2e3646;
+    --txt:#e7ecf3;
+    --muted:#9aa6b6;
+    --accent:#4dd0b1;
+    --accent-d:#2f8f7a;
+    --warn:#e0a458;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5;
+    padding:14px;
+    -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  h2{font-size:1.05rem;margin:0 0 10px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+  .wrap{max-width:920px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .tab{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:9px 13px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    flex:1 1 auto;min-width:120px;text-align:center;transition:.15s;
+  }
+  .tab:hover{color:var(--txt)}
+  .tab.active{background:var(--accent);color:#08201b;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--line);touch-action:none}
+  label.ctl{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 4px}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select,input[type=number]{
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:8px 10px;font-size:.95rem;width:100%;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .row>div{flex:1 1 160px;min-width:140px}
+  .readout{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-top:14px;font-size:.95rem;
+  }
+  .readout .big{font-size:1.5rem;font-weight:700;color:var(--accent)}
+  .calc{font-family:ui-monospace,Consolas,monospace;font-size:.85rem;color:var(--muted);margin-top:6px;white-space:pre-wrap}
+  .chip{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem;margin:3px 4px 0 0;color:var(--muted)}
+  .facts{font-size:.88rem}
+  .facts li{margin:5px 0}
+  .facts code{background:var(--panel2);padding:1px 6px;border-radius:6px;color:var(--accent)}
+  .quiz .q{margin:0 0 6px;font-weight:600}
+  .opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+  .opt{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:9px 11px;cursor:pointer;font-size:.9rem;transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent-d)}
+  .opt.correct{background:rgba(77,208,177,.18);border-color:var(--accent)}
+  .opt.wrong{background:rgba(224,164,88,.16);border-color:var(--warn)}
+  .qitem{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .qitem:first-child{border-top:0;padding-top:0;margin-top:0}
+  .explain{font-size:.83rem;color:var(--muted);margin-top:4px;display:none}
+  .explain.show{display:block}
+  .btn{background:var(--accent);color:#08201b;border:0;border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:.9rem}
+  .btn.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  .conv-eq{font-size:1.1rem;text-align:center;margin:10px 0;color:var(--accent);font-weight:600}
+  .sf-line{font-family:ui-monospace,Consolas,monospace;font-size:1.05rem;letter-spacing:1px}
+  .hl{color:var(--accent);font-weight:700}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+  @media(max-width:420px){h1{font-size:1.15rem}.tab{min-width:0;padding:8px 6px;font-size:.82rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Measurement Lab</h1>
+  <p class="sub">NIOS Class 10 Science &amp; Technology &middot; Chapter 1: Measurement in Science and Technology</p>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-view="v-instr">1 &middot; Read Instruments</div>
+    <div class="tab" data-view="v-units">2 &middot; Units &amp; Conversion</div>
+    <div class="tab" data-view="v-sf">3 &middot; Sig Figs &amp; Error</div>
+    <div class="tab" data-view="v-facts">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- VIEW 1: INSTRUMENTS -->
+  <section class="view active" id="v-instr">
+    <div class="panel">
+      <h2>Instrument</h2>
+      <div class="row">
+        <div>
+          <label class="ctl" for="instSel">Choose an instrument</label>
+          <select id="instSel">
+            <option value="vernier">Vernier Caliper (least count 0.01 cm)</option>
+            <option value="screw">Screw Gauge / Micrometer (least count 0.01 mm)</option>
+          </select>
+        </div>
+      </div>
+      <label class="ctl" id="jawLabel" for="jaw">Move the jaws / thimble</label>
+      <input type="range" id="jaw" min="0" max="1000" value="352">
+      <canvas id="instCanvas" width="880" height="300" aria-label="instrument scale"></canvas>
+      <div class="readout">
+        <div>Reading: <span class="big" id="instValue">--</span></div>
+        <div class="calc" id="instCalc"></div>
+      </div>
+      <div class="note">Tip: the vernier/circular scale division that lines up best with a main-scale line gives the fractional part.</div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: UNITS -->
+  <section class="view" id="v-units">
+    <div class="panel">
+      <h2>SI Base Units</h2>
+      <div class="row">
+        <div>
+          <label class="ctl" for="baseSel">Pick a physical quantity</label>
+          <select id="baseSel">
+            <option value="length">Length</option>
+            <option value="mass">Mass</option>
+            <option value="time">Time</option>
+            <option value="current">Electric current</option>
+            <option value="temp">Temperature</option>
+            <option value="amount">Amount of substance</option>
+            <option value="lum">Luminous intensity</option>
+          </select>
+        </div>
+      </div>
+      <div class="readout" id="baseOut"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Unit Converter</h2>
+      <div class="row">
+        <div>
+          <label class="ctl" for="famSel">Quantity family</label>
+          <select id="famSel">
+            <option value="len">Length (km-m-cm-mm)</option>
+            <option value="mass">Mass (kg-g-mg)</option>
+            <option value="time">Time (h-min-s-ms)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <div>
+          <label class="ctl" for="convIn">Value</label>
+          <input type="number" id="convIn" value="1" step="any">
+        </div>
+        <div>
+          <label class="ctl" for="fromU">From</label>
+          <select id="fromU"></select>
+        </div>
+        <div>
+          <label class="ctl" for="toU">To</label>
+          <select id="toU"></select>
+        </div>
+      </div>
+      <div class="conv-eq" id="convEq"></div>
+    </div>
+
+    <div class="panel">
+      <h2>SI Prefixes</h2>
+      <div id="prefixes"></div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: SIG FIGS -->
+  <section class="view" id="v-sf">
+    <div class="panel">
+      <h2>Rounding to Significant Figures</h2>
+      <div class="row">
+        <div>
+          <label class="ctl" for="sfNum">A measured number</label>
+          <input type="number" id="sfNum" value="3.14159" step="any">
+        </div>
+        <div>
+          <label class="ctl" for="sfN">Round to how many sig figs?</label>
+          <input type="number" id="sfN" value="3" min="1" max="8">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="sf-line" id="sfOrig"></div>
+        <div class="sf-line" style="margin-top:8px">Rounded: <span class="hl" id="sfOut"></span></div>
+        <div class="calc" id="sfWhy"></div>
+      </div>
+      <div class="note">Rules: non-zero digits always count; zeros between them count; leading zeros never count; trailing zeros after a decimal point count.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Least-Count Error</h2>
+      <p class="sub" style="margin-bottom:6px">A reading is only as precise as the instrument. The uncertainty equals its least count.</p>
+      <div class="row">
+        <div>
+          <label class="ctl" for="lcRead">Reading value</label>
+          <input type="number" id="lcRead" value="2.35" step="any">
+        </div>
+        <div>
+          <label class="ctl" for="lcUnit">Unit</label>
+          <select id="lcUnit"><option>cm</option><option>mm</option><option>g</option><option>s</option></select>
+        </div>
+        <div>
+          <label class="ctl" for="lcLC">Least count</label>
+          <input type="number" id="lcLC" value="0.01" step="any">
+        </div>
+      </div>
+      <div class="readout">
+        <div>Result: <span class="big" id="lcOut"></span></div>
+        <div class="calc" id="lcRel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: FACTS + QUIZ -->
+  <section class="view" id="v-facts">
+    <div class="panel facts">
+      <h2>Key Facts</h2>
+      <ul>
+        <li>The <b>SI system</b> has 7 base units. All other (derived) units come from them.</li>
+        <li><code>Least count = smallest main-scale division &divide; number of divisions on vernier/circular scale</code></li>
+        <li>Vernier caliper: main scale in mm, 10 vernier divisions &rarr; LC = 1&nbsp;mm &divide; 10 = 0.1&nbsp;mm = <b>0.01&nbsp;cm</b>.</li>
+        <li>Screw gauge: pitch 1&nbsp;mm, 100 circular divisions &rarr; LC = 1&nbsp;mm &divide; 100 = <b>0.01&nbsp;mm</b>.</li>
+        <li>Total reading = <b>Main-scale reading + (vernier/circular coincidence &times; least count)</b>.</li>
+        <li>The uncertainty of any measurement equals the instrument's least count.</li>
+        <li>Significant figures show how precise a measurement is; keep only the digits you actually measured.</li>
+      </ul>
+      <div>
+        <span class="chip">metre (m)</span><span class="chip">kilogram (kg)</span>
+        <span class="chip">second (s)</span><span class="chip">ampere (A)</span>
+        <span class="chip">kelvin (K)</span><span class="chip">mole (mol)</span>
+        <span class="chip">candela (cd)</span>
+      </div>
+    </div>
+
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz</h2>
+      <div class="qitem" data-a="1">
+        <p class="q">1. A vernier caliper has 10 vernier divisions matching 9 mm of the main scale. Its least count is:</p>
+        <div class="opts">
+          <div class="opt">0.1 mm</div>
+          <div class="opt">1 mm</div>
+          <div class="opt">0.01 mm</div>
+          <div class="opt">0.5 mm</div>
+        </div>
+        <div class="explain">LC = 1 mm main division &divide; 10 vernier divisions = 0.1 mm (= 0.01 cm).</div>
+      </div>
+      <div class="qitem" data-a="2">
+        <p class="q">2. Which of these is an SI base unit?</p>
+        <div class="opts">
+          <div class="opt">newton</div>
+          <div class="opt">mole</div>
+          <div class="opt">litre</div>
+          <div class="opt">joule</div>
+        </div>
+        <div class="explain">The mole (amount of substance) is one of the 7 SI base units. Newton and joule are derived; litre is a non-SI unit of volume.</div>
+      </div>
+      <div class="qitem" data-a="1">
+        <p class="q">3. The number 0.004560 rounded to 2 significant figures is:</p>
+        <div class="opts">
+          <div class="opt">0.0046</div>
+          <div class="opt">0.0045</div>
+          <div class="opt">0.00</div>
+          <div class="opt">4.6</div>
+        </div>
+        <div class="explain">Leading zeros are not significant. The first two sig figs are 4 and 5; the next digit 6 rounds 5 up to 6 &rarr; 0.0046.</div>
+      </div>
+      <p class="note">Click an option to check. Correct answer highlights in green.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tabs ---------- */
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      document.getElementById(t.dataset.view).classList.add("active");
+    });
+  });
+
+  /* ---------- Instruments ---------- */
+  var canvas=document.getElementById("instCanvas");
+  var ctx=canvas.getContext("2d");
+  var instSel=document.getElementById("instSel");
+  var jaw=document.getElementById("jaw");
+  var jawLabel=document.getElementById("jawLabel");
+  var instValue=document.getElementById("instValue");
+  var instCalc=document.getElementById("instCalc");
+
+  var COL={bg:"#222836",metal:"#3a4356",metal2:"#4a566d",tick:"#c7d1de",red:"#e0a458",accent:"#4dd0b1",txt:"#e7ecf3",dim:"#8b96a7"};
+
+  function line(x1,y1,x2,y2,c,w){ctx.strokeStyle=c;ctx.lineWidth=w||1;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+  function txt(s,x,y,c,f,al){ctx.fillStyle=c;ctx.font=f||"11px system-ui";ctx.textAlign=al||"left";ctx.fillText(s,x,y);}
+
+  function drawVernier(){
+    var W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    // measured value: total from 0.00 to 5.00 cm
+    var frac=jaw.value/1000;               // 0..1
+    var total=frac*5;                       // cm, continuous
+    // quantize to least count 0.01 cm
+    total=Math.round(total*100)/100;
+    var msr=Math.floor(total*10)/10;        // main scale reading (cm) to 0.1
+    var vernierCoin=Math.round((total-msr)*100); // 0..9 (in 0.01 cm units)
+
+    var mainX0=40, mainY=120, pxPerMM=(W-100)/60; // main scale 0..5 cm => 50 mm shown across, use 60mm span
+    // Main scale (fixed): draw 0..5 cm in mm
+    ctx.fillStyle=COL.metal;ctx.fillRect(20,90,W-40,44);
+    for(var mm=0;mm<=55;mm++){
+      var x=mainX0+mm*pxPerMM;
+      if(x>W-30)break;
+      var big=(mm%10===0);
+      var mid=(mm%5===0);
+      line(x,mainY,x,mainY-(big?24:mid?16:10),COL.tick,big?2:1);
+      if(big) txt((mm/10).toFixed(0),x,mainY-27,COL.dim,"11px system-ui","center");
+    }
+    txt("Main scale (cm)  → divisions in mm",mainX0,72,COL.dim,"12px system-ui");
+
+    // Vernier (sliding) scale under, offset by total
+    var slideX=mainX0+total*10*pxPerMM;
+    ctx.fillStyle=COL.metal2;ctx.fillRect(slideX-6,134,120,42);
+    // jaws hint
+    ctx.fillStyle=COL.metal;ctx.fillRect(20,176,26,80); // fixed jaw
+    ctx.fillStyle=COL.metal2;ctx.fillRect(slideX-6,176,26,80); // moving jaw
+    txt("object",slideX-30,250,COL.dim,"10px system-ui","left");
+    // vernier ticks: 10 divisions spanning 9 mm
+    var vspan=9*pxPerMM;
+    for(var v=0;v<=10;v++){
+      var vx=slideX+v*(vspan/10);
+      var coin=(v===vernierCoin);
+      line(vx,155,vx,175,coin?COL.accent:COL.tick,coin?3:1);
+      if(v%1===0) txt(v,vx,190,coin?COL.accent:COL.dim,"10px system-ui","center");
+    }
+    // pointer for main-scale reading position of vernier 0
+    line(slideX,90,slideX,155,COL.red,1.5);
+    txt("vernier 0",slideX,148,COL.red,"10px system-ui","center");
+    txt("Vernier scale (LC = 0.01 cm)",slideX,278,COL.dim,"11px system-ui","left");
+
+    instValue.textContent=total.toFixed(2)+" cm";
+    instCalc.textContent=
+      "Least count (LC) = 1 mm ÷ 10 = 0.1 mm = 0.01 cm\n"+
+      "Main scale reading (MSR) = "+msr.toFixed(1)+" cm\n"+
+      "Vernier coincidence = "+vernierCoin+" division(s)\n"+
+      "Total = MSR + (coincidence × LC) = "+msr.toFixed(1)+" + ("+vernierCoin+" × 0.01) = "+total.toFixed(2)+" cm";
+  }
+
+  function drawScrew(){
+    var W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    var frac=jaw.value/1000;
+    var total=frac*7;                    // mm 0..7
+    total=Math.round(total*100)/100;     // LC 0.01 mm
+    var msr=Math.floor(total*2)/2;       // main scale in 0.5 mm steps (pitch view: use 0.5 divisions)
+    var circ=Math.round((total-msr)*100);// 0..49 (0.01 mm units within a half-mm)... keep 0..49
+    if(circ>=50){circ=circ-50;msr+=0.5;} // wrap within half mm
+    // For clarity use pitch 0.5 mm, 50 circular divisions => LC 0.01 mm
+    // Draw sleeve (main scale) horizontal
+    ctx.fillStyle=COL.metal;ctx.fillRect(20,120,W-260,40);
+    var sx0=40, pxPerHalf=(W-320)/14; // 14 half-mm = 7 mm
+    for(var i=0;i<=14;i++){
+      var x=sx0+i*pxPerHalf;
+      var whole=(i%2===0);
+      // main line above, half line below
+      if(whole){line(x,140,x,120,COL.tick,2);txt((i/2).toFixed(0),x,116,COL.dim,"11px system-ui","center");}
+      else {line(x,160,x,140,COL.tick,1);}
+    }
+    line(20,140,W-240,140,COL.tick,1); // reference line
+    txt("Sleeve / main scale (mm)  • upper = whole, lower = 0.5 mm",sx0,104,COL.dim,"12px system-ui");
+
+    // Thimble edge at position = total
+    var edgeX=sx0+total*2*pxPerHalf;
+    ctx.fillStyle=COL.metal2;ctx.fillRect(edgeX,86,W-40-edgeX-40,110);
+    // circular scale: draw the ticks vertically on the thimble edge
+    var cy0=90, tick=Math.round((W-40-edgeX-90)/1); // just labels
+    // show numbers 0..50 mapped vertically; highlight the coincident one
+    var rows=11;
+    for(var r=0;r<rows;r++){
+      var val=r*5; if(val>50)break;
+      var yy=96+r*((196-96)/10);
+      var coin=(Math.abs(val-circ)<2.5);
+      line(edgeX,yy,edgeX+14,yy,coin?COL.accent:COL.tick,coin?3:1);
+      txt(val,edgeX+18,yy+4,coin?COL.accent:COL.dim,"10px system-ui","left");
+    }
+    // reference line pointer on thimble = the datum
+    line(sx0,175,edgeX,175,COL.red,1.5);
+    txt("Circular scale (LC = 0.01 mm)",edgeX+4,214,COL.dim,"11px system-ui","left");
+
+    instValue.textContent=total.toFixed(2)+" mm";
+    instCalc.textContent=
+      "Least count (LC) = pitch ÷ divisions = 0.5 mm ÷ 50 = 0.01 mm\n"+
+      "Main scale reading (MSR) = "+msr.toFixed(2)+" mm\n"+
+      "Circular scale coincidence = "+circ+" division(s)\n"+
+      "Total = MSR + (coincidence × LC) = "+msr.toFixed(2)+" + ("+circ+" × 0.01) = "+total.toFixed(2)+" mm";
+  }
+
+  function drawInst(){
+    if(instSel.value==="vernier"){jawLabel.textContent="Move the sliding vernier jaw";drawVernier();}
+    else {jawLabel.textContent="Rotate the thimble (move the spindle)";drawScrew();}
+  }
+  instSel.addEventListener("change",drawInst);
+  jaw.addEventListener("input",drawInst);
+
+  /* ---------- SI base units ---------- */
+  var BASE={
+    length:["Length","metre","m","The distance travelled by light in vacuum in 1/299 792 458 second."],
+    mass:["Mass","kilogram","kg","Defined via the fixed Planck constant. 1 kg is the mass of ~1 litre of water."],
+    time:["Time","second","s","The duration of 9 192 631 770 periods of caesium-133 radiation."],
+    current:["Electric current","ampere","A","Defined by the fixed elementary charge e."],
+    temp:["Temperature","kelvin","K","Defined by the fixed Boltzmann constant. 0 K is absolute zero."],
+    amount:["Amount of substance","mole","mol","One mole contains 6.022 140 76 × 10²³ entities (Avogadro number)."],
+    lum:["Luminous intensity","candela","cd","Luminous intensity of a source in a given direction."]
+  };
+  var baseSel=document.getElementById("baseSel"), baseOut=document.getElementById("baseOut");
+  function drawBase(){
+    var b=BASE[baseSel.value];
+    baseOut.innerHTML="<div>Quantity: <b>"+b[0]+"</b></div>"+
+      "<div>SI unit: <span class='big'>"+b[1]+" ("+b[2]+")</span></div>"+
+      "<div class='calc'>"+b[3]+"</div>";
+  }
+  baseSel.addEventListener("change",drawBase);
+
+  /* ---------- Converter ---------- */
+  var FAM={
+    len:{units:[["km",1000],["m",1],["cm",0.01],["mm",0.001]],name:"metre"},
+    mass:{units:[["kg",1000],["g",1],["mg",0.001]],name:"gram"},
+    time:{units:[["h",3600],["min",60],["s",1],["ms",0.001]],name:"second"}
+  };
+  var famSel=document.getElementById("famSel"), fromU=document.getElementById("fromU"),
+      toU=document.getElementById("toU"), convIn=document.getElementById("convIn"),
+      convEq=document.getElementById("convEq");
+
+  function fillUnits(){
+    var f=FAM[famSel.value];
+    fromU.innerHTML="";toU.innerHTML="";
+    f.units.forEach(function(u,i){
+      var o1=document.createElement("option");o1.value=i;o1.textContent=u[0];fromU.appendChild(o1);
+      var o2=document.createElement("option");o2.value=i;o2.textContent=u[0];toU.appendChild(o2);
+    });
+    fromU.value=0; toU.value=f.units.length-1;
+    convert();
+  }
+  function convert(){
+    var f=FAM[famSel.value];
+    var fi=+fromU.value, ti=+toU.value;
+    var val=parseFloat(convIn.value); if(isNaN(val))val=0;
+    var base=val*f.units[fi][1];
+    var out=base/f.units[ti][1];
+    var outStr=(Math.abs(out)!==0 && (Math.abs(out)<1e-4||Math.abs(out)>=1e7))?out.toExponential(4):
+               parseFloat(out.toPrecision(8)).toString();
+    convEq.textContent=val+" "+f.units[fi][0]+"  =  "+outStr+" "+f.units[ti][0];
+  }
+  famSel.addEventListener("change",fillUnits);
+  [fromU,toU,convIn].forEach(function(el){el.addEventListener("input",convert);el.addEventListener("change",convert);});
+
+  /* ---------- Prefixes ---------- */
+  var PRE=[["giga","G","10⁹","1 000 000 000"],["mega","M","10⁶","1 000 000"],
+    ["kilo","k","10³","1 000"],["centi","c","10⁻²","0.01"],
+    ["milli","m","10⁻³","0.001"],["micro","µ","10⁻⁶","0.000 001"],
+    ["nano","n","10⁻⁹","0.000 000 001"]];
+  var pdiv=document.getElementById("prefixes");
+  pdiv.innerHTML=PRE.map(function(p){
+    return "<span class='chip'>"+p[0]+" ("+p[1]+") = "+p[2]+" = "+p[3]+"</span>";
+  }).join(" ");
+
+  /* ---------- Sig figs ---------- */
+  var sfNum=document.getElementById("sfNum"), sfN=document.getElementById("sfN"),
+      sfOrig=document.getElementById("sfOrig"), sfOut=document.getElementById("sfOut"),
+      sfWhy=document.getElementById("sfWhy");
+  function roundSig(x,n){
+    if(x===0)return "0";
+    if(!isFinite(x))return String(x);
+    var d=Math.ceil(Math.log10(Math.abs(x)));
+    var power=n-d;
+    var mag=Math.pow(10,power);
+    var r=Math.round(x*mag)/mag;
+    // format to n sig figs
+    return parseFloat(r.toPrecision(n)).toString();
+  }
+  function drawSF(){
+    var x=parseFloat(sfNum.value);
+    var n=parseInt(sfN.value,10);
+    if(isNaN(x)){sfOut.textContent="--";sfWhy.textContent="";return;}
+    if(isNaN(n)||n<1)n=1; if(n>8)n=8;
+    sfOrig.textContent="Original: "+x;
+    sfOut.textContent=roundSig(x,n).toString();
+    sfWhy.textContent="Keep the first "+n+" significant digit(s), counting from the first non-zero digit; the next digit decides rounding.";
+  }
+  sfNum.addEventListener("input",drawSF);
+  sfN.addEventListener("input",drawSF);
+
+  /* ---------- Least count error ---------- */
+  var lcRead=document.getElementById("lcRead"), lcUnit=document.getElementById("lcUnit"),
+      lcLC=document.getElementById("lcLC"), lcOut=document.getElementById("lcOut"),
+      lcRel=document.getElementById("lcRel");
+  function drawLC(){
+    var r=parseFloat(lcRead.value), lc=parseFloat(lcLC.value), u=lcUnit.value;
+    if(isNaN(r)){lcOut.textContent="--";lcRel.textContent="";return;}
+    if(isNaN(lc)||lc<=0)lc=0;
+    lcOut.textContent="("+r+" ± "+lc+") "+u;
+    var rel=lc&&r?(lc/Math.abs(r)*100):0;
+    lcRel.textContent="Absolute error = ± "+lc+" "+u+
+      "\nRelative (percentage) error = (LC ÷ reading) × 100 = "+rel.toFixed(2)+" %";
+  }
+  [lcRead,lcUnit,lcLC].forEach(function(el){el.addEventListener("input",drawLC);el.addEventListener("change",drawLC);});
+
+  /* ---------- Quiz ---------- */
+  document.querySelectorAll("#quiz .qitem").forEach(function(item){
+    var ans=parseInt(item.dataset.a,10);
+    var opts=item.querySelectorAll(".opt");
+    var exp=item.querySelector(".explain");
+    opts.forEach(function(o,i){
+      o.addEventListener("click",function(){
+        if(item.dataset.done)return;
+        item.dataset.done="1";
+        opts[ans].classList.add("correct");
+        if(i!==ans)o.classList.add("wrong");
+        exp.classList.add("show");
+      });
+    });
+  });
+
+  /* ---------- init ---------- */
+  drawInst();drawBase();fillUnits();drawSF();drawLC();
+})();
+</script>
+</body>
+</html>

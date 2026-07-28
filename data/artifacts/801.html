@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atomic Structure Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --accent:#7cc4ff;
+    --accent-2:#4a9ce0;
+    --bg1:#0f1724;
+    --bg2:#131d2e;
+    --panel:#1a2536;
+    --panel-2:#20304a;
+    --ink:#e8eef7;
+    --muted:#9fb0c8;
+    --good:#54d98c;
+    --bad:#ff8a8a;
+    --warn:#ffcf6b;
+    --line:#2c3a52;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1b2a44,var(--bg1)) fixed;
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);
+    border:2px solid transparent;padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#0f1724;background:var(--accent);border-color:var(--accent-2);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 10px;}
+  h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .viz{flex:1 1 320px;min-width:280px;}
+  .ctrls{flex:1 1 280px;min-width:260px;}
+  canvas{width:100%;height:auto;display:block;background:radial-gradient(circle at 50% 45%,#16233a,#0d1626);
+    border-radius:14px;border:1px solid var(--line);touch-action:manipulation;}
+  .stepper{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:var(--panel-2);border-radius:12px;padding:8px 10px;margin-bottom:10px;border:1px solid var(--line);}
+  .stepper .lbl{font-weight:600;font-size:.9rem;}
+  .stepper .lbl small{display:block;color:var(--muted);font-weight:400;font-size:.72rem;}
+  .stepper .grp{display:flex;align-items:center;gap:8px;}
+  .rbtn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;
+    font-size:1.3rem;font-weight:700;background:var(--accent);color:#0f1724;line-height:1;
+    touch-action:manipulation;}
+  .rbtn:active{transform:scale(.94);}
+  .rbtn:disabled{opacity:.35;cursor:not-allowed;}
+  .val{min-width:34px;text-align:center;font-size:1.15rem;font-weight:700;font-variant-numeric:tabular-nums;}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .chip{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;}
+  .chip .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .chip .v{font-size:1.05rem;font-weight:700;}
+  .chip.full{grid-column:1/-1;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:700;}
+  .badge.good{background:rgba(84,217,140,.18);color:var(--good);}
+  .badge.bad{background:rgba(255,138,138,.18);color:var(--bad);}
+  .badge.warn{background:rgba(255,207,107,.18);color:var(--warn);}
+  .btn{background:var(--accent);color:#0f1724;border:none;padding:9px 14px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;touch-action:manipulation;}
+  .btn:hover{background:var(--accent-2);color:#fff;}
+  .btn.ghost{background:var(--panel-2);color:var(--accent);border:1px solid var(--line);}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .preset{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);
+    padding:6px 10px;border-radius:999px;cursor:pointer;font-size:.8rem;font-weight:600;}
+  .preset:hover{border-color:var(--accent);color:var(--accent);}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th,td{padding:7px 8px;text-align:center;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;}
+  .shellbar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+  .shellcell{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;
+    text-align:center;min-width:56px;}
+  .shellcell .sn{font-size:.72rem;color:var(--muted);}
+  .shellcell .se{font-size:1.05rem;font-weight:700;color:var(--accent);}
+  .facts ul{margin:6px 0;padding-left:18px;}
+  .facts li{margin-bottom:6px;font-size:.88rem;}
+  .facts b{color:var(--accent);}
+  .iso-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .isotoggle{flex:1 1 auto;min-width:70px;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--ink);padding:8px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.85rem;}
+  .isotoggle.on{background:var(--accent);color:#0f1724;border-color:var(--accent-2);}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px;}
+  .quiz .q{margin-bottom:14px;}
+  .quiz .qtext{font-weight:600;margin-bottom:8px;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--line);
+    color:var(--ink);padding:9px 12px;border-radius:10px;margin-bottom:6px;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(84,217,140,.2);border-color:var(--good);}
+  .opt.wrong{background:rgba(255,138,138,.2);border-color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:4px;display:none;}
+  .expl.show{display:block;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;margin-right:4px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:6px 0 20px;}
+  @media(max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Atomic Structure Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 5: Atomic Structure</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="build">Build an Atom</button>
+    <button class="tab" data-mode="config">Electronic Config</button>
+    <button class="tab" data-mode="iso">Isotopes</button>
+    <button class="tab" data-mode="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- BUILD MODE -->
+  <section class="panel" id="mode-build">
+    <div class="stage">
+      <div class="viz">
+        <canvas id="atomCanvas" width="440" height="440" aria-label="Atom diagram"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background:#ff8a8a"></span>Proton (+)</span>
+          <span><span class="dot" style="background:#9fb0c8"></span>Neutron (0)</span>
+          <span><span class="dot" style="background:#7cc4ff"></span>Electron (&minus;)</span>
+        </div>
+      </div>
+      <div class="ctrls">
+        <div class="stepper">
+          <div class="lbl">Protons <small>Z &middot; defines element</small></div>
+          <div class="grp">
+            <button class="rbtn" data-dec="p">&minus;</button>
+            <span class="val" id="valP">1</span>
+            <button class="rbtn" data-inc="p">+</button>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="lbl">Neutrons <small>mass, no charge</small></div>
+          <div class="grp">
+            <button class="rbtn" data-dec="n">&minus;</button>
+            <span class="val" id="valN">0</span>
+            <button class="rbtn" data-inc="n">+</button>
+          </div>
+        </div>
+        <div class="stepper">
+          <div class="lbl">Electrons <small>fill shells 2,8,8...</small></div>
+          <div class="grp">
+            <button class="rbtn" data-dec="e">&minus;</button>
+            <span class="val" id="valE">1</span>
+            <button class="rbtn" data-inc="e">+</button>
+          </div>
+        </div>
+
+        <div class="readout">
+          <div class="chip"><div class="k">Element</div><div class="v" id="rElem">Hydrogen</div></div>
+          <div class="chip"><div class="k">Symbol</div><div class="v" id="rSym">H</div></div>
+          <div class="chip"><div class="k">Atomic No. Z</div><div class="v" id="rZ">1</div></div>
+          <div class="chip"><div class="k">Mass No. A</div><div class="v" id="rA">1</div></div>
+          <div class="chip full"><div class="k">Charge</div><div class="v" id="rCharge">Neutral atom</div></div>
+          <div class="chip full"><div class="k">Status</div><div class="v" id="rStatus"><span class="badge warn">&mdash;</span></div></div>
+        </div>
+        <div class="presets" id="presets"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIG MODE -->
+  <section class="panel hidden" id="mode-config">
+    <h2>Electronic Configuration (Elements 1&ndash;20)</h2>
+    <div class="presets" id="cfgList"></div>
+    <div style="margin-top:14px" class="stage">
+      <div class="viz">
+        <div class="chip full" style="margin-bottom:10px">
+          <div class="k">Selected element</div>
+          <div class="v" id="cfgName">Hydrogen (H) &middot; Z = 1</div>
+        </div>
+        <h3>Shell filling (K L M N)</h3>
+        <div class="shellbar" id="cfgShells"></div>
+        <div class="chip full" style="margin-top:8px">
+          <div class="k">Configuration</div><div class="v" id="cfgStr">1</div>
+        </div>
+      </div>
+      <div class="ctrls">
+        <div class="readout">
+          <div class="chip"><div class="k">Valence electrons</div><div class="v" id="cfgVe">1</div></div>
+          <div class="chip"><div class="k">Valency</div><div class="v" id="cfgVal">1</div></div>
+          <div class="chip full"><div class="k">Periodic position (hint)</div><div class="v" id="cfgPos" style="font-size:.9rem">Period 1, Group 1</div></div>
+          <div class="chip full"><div class="k">Nature</div><div class="v" id="cfgNat" style="font-size:.9rem">&mdash;</div></div>
+        </div>
+        <p class="note">Rule: shells fill K(max 2) &rarr; L(max 8) &rarr; M(max 8 for first 20) &rarr; N. Valency = electrons needed to gain, lose, or share to reach a full outer shell (octet, or duplet for H/He).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ISOTOPE MODE -->
+  <section class="panel hidden" id="mode-iso">
+    <h2>Isotopes &mdash; same element, different mass</h2>
+    <div class="iso-btns" id="isoFamily">
+      <button class="isotoggle on" data-fam="H">Hydrogen</button>
+      <button class="isotoggle" data-fam="C">Carbon</button>
+      <button class="isotoggle" data-fam="Cl">Chlorine</button>
+    </div>
+    <table id="isoTable">
+      <thead><tr><th>Isotope</th><th>Protons (Z)</th><th>Neutrons</th><th>Electrons</th><th>Mass No. A</th></tr></thead>
+      <tbody id="isoBody"></tbody>
+    </table>
+    <p class="note" id="isoNote"></p>
+    <div class="facts" style="margin-top:10px">
+      <ul>
+        <li><b>Same Z</b> &rarr; same number of protons &amp; electrons &rarr; <b>same chemistry</b>.</li>
+        <li><b>Different N</b> &rarr; different mass number A (A = Z + N). Only the mass changes.</li>
+        <li>Some isotopes are radioactive (e.g. Tritium, C-14 used in carbon dating).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FACTS + QUIZ -->
+  <section class="panel hidden" id="mode-facts">
+    <h2>Key Facts</h2>
+    <div class="facts">
+      <ul>
+        <li><b>Proton:</b> charge +1, mass ~1 u, in the nucleus. Number of protons = <b>Atomic Number (Z)</b>.</li>
+        <li><b>Neutron:</b> charge 0, mass ~1 u, in the nucleus.</li>
+        <li><b>Electron:</b> charge &minus;1, mass ~1/1840 u, orbits in shells around the nucleus.</li>
+        <li><b>Mass Number A</b> = protons + neutrons (Z + N).</li>
+        <li><b>Neutral atom:</b> electrons = protons. <b>Ion:</b> electrons &ne; protons (cation if fewer electrons, anion if more).</li>
+        <li><b>Shell rule (Bohr-Bury):</b> maximum electrons = 2n&sup2; &rarr; K=2, L=8, M=18 (but 8 while it is the outermost for Z&le;20), N=8.</li>
+        <li><b>Isotopes:</b> atoms of the same element (same Z) with different numbers of neutrons.</li>
+        <li><b>Octet:</b> 8 electrons in the outermost shell (2 for H/He) &rarr; stable, unreactive (noble gases).</li>
+      </ul>
+    </div>
+    <h2 style="margin-top:16px">Quick Quiz</h2>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>Interactive learning tool &middot; Chemistry values follow the 2,8,8 shell rule</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---- Element data (Z 1..20) ----
+  var ELEMENTS = [
+    {z:1, sym:"H", name:"Hydrogen"},   {z:2, sym:"He",name:"Helium"},
+    {z:3, sym:"Li",name:"Lithium"},    {z:4, sym:"Be",name:"Beryllium"},
+    {z:5, sym:"B", name:"Boron"},      {z:6, sym:"C", name:"Carbon"},
+    {z:7, sym:"N", name:"Nitrogen"},   {z:8, sym:"O", name:"Oxygen"},
+    {z:9, sym:"F", name:"Fluorine"},   {z:10,sym:"Ne",name:"Neon"},
+    {z:11,sym:"Na",name:"Sodium"},     {z:12,sym:"Mg",name:"Magnesium"},
+    {z:13,sym:"Al",name:"Aluminium"},  {z:14,sym:"Si",name:"Silicon"},
+    {z:15,sym:"P", name:"Phosphorus"}, {z:16,sym:"S", name:"Sulfur"},
+    {z:17,sym:"Cl",name:"Chlorine"},   {z:18,sym:"Ar",name:"Argon"},
+    {z:19,sym:"K", name:"Potassium"},  {z:20,sym:"Ca",name:"Calcium"}
+  ];
+  // common mass numbers for presets / default neutrons (Z 1..20)
+  var COMMON_A = [1,4,7,9,11,12,14,16,19,20,23,24,27,28,31,32,35,40,39,40];
+
+  function elemByZ(z){ for(var i=0;i<ELEMENTS.length;i++){ if(ELEMENTS[i].z===z) return ELEMENTS[i]; } return null; }
+
+  // Bohr-Bury shell filling for the first 20 elements (K2 L8 M8 N...)
+  function shells(e){
+    var caps=[2,8,8,2]; // K,L,M,N caps sufficient up to Z=20
+    var out=[], rem=e, i=0;
+    while(rem>0 && i<caps.length){
+      var put=Math.min(caps[i], rem);
+      out.push(put); rem-=put; i++;
+    }
+    if(out.length===0) out.push(0);
+    return out;
+  }
+
+  function valency(ve){
+    if(ve===8 || ve===0 || ve===2) return 0; // full outer (2 counts as duplet for period-1 completeness display)
+    return ve<=4 ? ve : 8-ve;
+  }
+
+  // ================= BUILD MODE =================
+  var state={p:1,n:0,e:1};
+  var canvas=document.getElementById("atomCanvas");
+  var ctx=canvas.getContext("2d");
+  var DPR=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+
+  function fitCanvas(){
+    var cssW=canvas.clientWidth||440;
+    canvas.width=Math.round(cssW*DPR);
+    canvas.height=Math.round(cssW*DPR); // square
+    ctx.setTransform(DPR,DPR,0,0);
+    // after setTransform we work in css px = cssW
+    CW=cssW; CH=cssW;
+  }
+  var CW=440, CH=440;
+
+  function clampState(){
+    state.p=Math.max(0,Math.min(20,state.p));
+    state.n=Math.max(0,Math.min(30,state.n));
+    state.e=Math.max(0,Math.min(20,state.e));
+  }
+
+  function updateBuild(){
+    clampState();
+    document.getElementById("valP").textContent=state.p;
+    document.getElementById("valN").textContent=state.n;
+    document.getElementById("valE").textContent=state.e;
+
+    var el=elemByZ(state.p);
+    var A=state.p+state.n;
+    document.getElementById("rElem").textContent = state.p===0 ? "(no nucleus)" : (el?el.name:"?");
+    document.getElementById("rSym").textContent  = state.p===0 ? "—" : (el?el.sym:"?");
+    document.getElementById("rZ").textContent=state.p;
+    document.getElementById("rA").textContent=A;
+
+    // charge
+    var q=state.p-state.e;
+    var ch=document.getElementById("rCharge");
+    if(q===0) ch.textContent="Neutral atom (0)";
+    else if(q>0) ch.textContent="Cation, charge +"+q;
+    else ch.textContent="Anion, charge "+q;
+
+    // stable octet flag (for the neutral atom's electron shells)
+    var sh=shells(state.e);
+    var outer=sh.length?sh[sh.length-1]:0;
+    var stat=document.getElementById("rStatus");
+    var isNoble=(state.e===2 || state.e===10 || state.e===18);
+    if(state.e===0){
+      stat.innerHTML='<span class="badge warn">no electrons</span>';
+    } else if(isNoble){
+      stat.innerHTML='<span class="badge good">Stable octet / duplet ✓</span>';
+    } else {
+      stat.innerHTML='<span class="badge bad">Incomplete outer shell ('+outer+')</span>';
+    }
+    rebuildElectrons(sh);
+  }
+
+  // electrons positioned on shells, animated
+  var electrons=[]; // {shellIdx, baseAngle, speed, r}
+  function rebuildElectrons(sh){
+    electrons=[];
+    var maxR=CW*0.42;
+    var n=sh.length;
+    for(var s=0;s<n;s++){
+      var count=sh[s];
+      var r=(CW*0.16)+(s+1)*((maxR-CW*0.16)/(n+0.2));
+      var speed=(0.5/(s+1))*(s%2===0?1:-1);
+      for(var k=0;k<count;k++){
+        electrons.push({r:r, base:(k/count)*Math.PI*2, speed:speed});
+      }
+    }
+  }
+
+  function drawNucleus(){
+    var cx=CW/2, cy=CH/2;
+    // pack protons+neutrons in a small cluster
+    var parts=[];
+    var total=state.p+state.n;
+    for(var i=0;i<state.p;i++) parts.push("#ff8a8a");
+    for(var j=0;j<state.n;j++) parts.push("#9fb0c8");
+    // shuffle deterministically for mix
+    for(var s=parts.length-1;s>0;s--){ var t=(s*7+3)%(s+1); var tmp=parts[s]; parts[s]=parts[t]; parts[t]=tmp; }
+    var pr=Math.max(4, Math.min(9, 60/Math.sqrt(total+1)));
+    var ring=total<=1?0:pr*1.15;
+    // spiral packing
+    for(var idx=0;idx<parts.length;idx++){
+      var ang=idx*2.399963; // golden angle
+      var rad=ring*Math.sqrt(idx);
+      var x=cx+rad*Math.cos(ang), y=cy+rad*Math.sin(ang);
+      ctx.beginPath();
+      ctx.arc(x,y,pr,0,Math.PI*2);
+      ctx.fillStyle=parts[idx];
+      ctx.fill();
+      ctx.lineWidth=1; ctx.strokeStyle="rgba(0,0,0,.25)"; ctx.stroke();
+    }
+    if(total===0){
+      ctx.fillStyle="#6b7a90"; ctx.font="12px sans-serif"; ctx.textAlign="center";
+      ctx.fillText("(no nucleus)", cx, cy);
+    }
+  }
+
+  var t0=performance.now();
+  function drawAtom(now){
+    ctx.clearRect(0,0,CW,CH);
+    var cx=CW/2, cy=CH/2;
+    // shell rings
+    var uniqueR={};
+    for(var i=0;i<electrons.length;i++) uniqueR[Math.round(electrons[i].r)]=1;
+    ctx.strokeStyle="rgba(124,196,255,.22)"; ctx.lineWidth=1;
+    for(var rk in uniqueR){
+      ctx.beginPath(); ctx.arc(cx,cy,parseFloat(rk),0,Math.PI*2); ctx.stroke();
+    }
+    drawNucleus();
+    // electrons
+    var tt=(now-t0)/1000;
+    for(var e=0;e<electrons.length;e++){
+      var el=electrons[e];
+      var a=el.base+tt*el.speed;
+      var x=cx+el.r*Math.cos(a), y=cy+el.r*Math.sin(a);
+      ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2);
+      ctx.fillStyle="#7cc4ff"; ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,.35)"; ctx.lineWidth=1; ctx.stroke();
+    }
+  }
+
+  var raf=null;
+  function loop(now){
+    if(document.hidden){ raf=null; return; }
+    drawAtom(now||performance.now());
+    raf=requestAnimationFrame(loop);
+  }
+  function startLoop(){ if(raf===null && !document.hidden && currentMode==="build"){ raf=requestAnimationFrame(loop); } }
+  function stopLoop(){ if(raf!==null){ cancelAnimationFrame(raf); raf=null; } }
+
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden) stopLoop(); else startLoop();
+  });
+
+  // steppers
+  document.querySelectorAll("[data-inc]").forEach(function(b){
+    b.addEventListener("click",function(){ var k=b.getAttribute("data-inc"); state[k]++; if(k==="p"){/*keep e in sync? no*/} updateBuild(); });
+  });
+  document.querySelectorAll("[data-dec]").forEach(function(b){
+    b.addEventListener("click",function(){ var k=b.getAttribute("data-dec"); state[k]--; updateBuild(); });
+  });
+
+  // presets
+  var presetsBox=document.getElementById("presets");
+  [[1,0,1,"Hydrogen"],[2,2,2,"Helium"],[6,6,6,"Carbon"],[8,8,8,"Oxygen"],
+   [11,12,11,"Sodium"],[11,12,10,"Na⁺ ion"],[17,18,18,"Cl⁻ ion"],[10,10,10,"Neon"]]
+   .forEach(function(pr){
+    var b=document.createElement("button"); b.className="preset"; b.textContent=pr[3];
+    b.addEventListener("click",function(){ state.p=pr[0]; state.n=pr[1]; state.e=pr[2]; updateBuild(); });
+    presetsBox.appendChild(b);
+  });
+
+  // ================= CONFIG MODE =================
+  var cfgList=document.getElementById("cfgList");
+  var cfgSel=1;
+  ELEMENTS.forEach(function(el){
+    var b=document.createElement("button"); b.className="preset"; b.textContent=el.z+" "+el.sym;
+    b.addEventListener("click",function(){ cfgSel=el.z; renderConfig(); });
+    cfgList.appendChild(b);
+  });
+  var SHELLNAMES=["K","L","M","N"];
+  var GROUP_MAP={1:1,2:18,3:1,4:2,5:13,6:14,7:15,8:16,9:17,10:18,
+                 11:1,12:2,13:13,14:14,15:15,16:16,17:17,18:18,19:1,20:2};
+  function periodOf(z){ return shells(z).length; }
+  function renderConfig(){
+    var el=elemByZ(cfgSel);
+    var sh=shells(el.z);
+    document.getElementById("cfgName").textContent=el.name+" ("+el.sym+") · Z = "+el.z;
+    var box=document.getElementById("cfgShells"); box.innerHTML="";
+    for(var i=0;i<sh.length;i++){
+      var c=document.createElement("div"); c.className="shellcell";
+      c.innerHTML='<div class="sn">'+SHELLNAMES[i]+'</div><div class="se">'+sh[i]+'</div>';
+      box.appendChild(c);
+    }
+    document.getElementById("cfgStr").textContent=sh.join(", ");
+    var ve=sh[sh.length-1];
+    document.getElementById("cfgVe").textContent=ve;
+    var val=valency(ve);
+    document.getElementById("cfgVal").textContent=val;
+    document.getElementById("cfgPos").textContent="Period "+periodOf(el.z)+", Group "+GROUP_MAP[el.z];
+    var nat;
+    if(ve===8 || el.z===2) nat="Noble gas — stable, inert";
+    else if(ve<=3) nat="Metal — tends to lose "+ve+" electron(s)";
+    else if(ve>=5 && ve<8) nat="Non-metal — tends to gain "+(8-ve)+" electron(s)";
+    else nat="Can share electrons";
+    document.getElementById("cfgNat").textContent=nat;
+  }
+
+  // ================= ISOTOPE MODE =================
+  var ISO={
+    H:{z:1, name:"Hydrogen", list:[
+        {label:"Protium (¹H)", n:0},
+        {label:"Deuterium (²H, D)", n:1},
+        {label:"Tritium (³H, T)", n:2}
+      ], note:"All three have Z=1 (1 proton, 1 electron) — so all behave chemically like hydrogen. Tritium is radioactive."},
+    C:{z:6, name:"Carbon", list:[
+        {label:"Carbon-12", n:6},
+        {label:"Carbon-13", n:7},
+        {label:"Carbon-14", n:8}
+      ], note:"All have Z=6, so all are carbon. C-14 is radioactive and is used in carbon dating of fossils."},
+    Cl:{z:17, name:"Chlorine", list:[
+        {label:"Chlorine-35", n:18},
+        {label:"Chlorine-37", n:20}
+      ], note:"Both have Z=17. Natural chlorine is a mix, giving an average atomic mass of about 35.5 u."}
+  };
+  function renderIso(fam){
+    var d=ISO[fam];
+    var tb=document.getElementById("isoBody"); tb.innerHTML="";
+    d.list.forEach(function(it){
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td>"+it.label+"</td><td>"+d.z+"</td><td>"+it.n+"</td><td>"+d.z+"</td><td><b>"+(d.z+it.n)+"</b></td>";
+      tb.appendChild(tr);
+    });
+    document.getElementById("isoNote").textContent=d.note;
+  }
+  document.querySelectorAll("#isoFamily .isotoggle").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#isoFamily .isotoggle").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      renderIso(b.getAttribute("data-fam"));
+    });
+  });
+
+  // ================= QUIZ =================
+  var QUIZ=[
+    {q:"An atom has 11 protons, 12 neutrons and 11 electrons. What is its mass number A?",
+     opts:["11","12","23","34"], a:2,
+     ex:"A = protons + neutrons = 11 + 12 = 23. (This is sodium.)"},
+    {q:"Two atoms have the same number of protons but different numbers of neutrons. They are:",
+     opts:["Ions","Isotopes","Different elements","Molecules"], a:1,
+     ex:"Same Z, different N = isotopes of the same element."},
+    {q:"The electronic configuration of an element is 2, 8, 1. Its valency is:",
+     opts:["1","7","8","0"], a:0,
+     ex:"Outer shell has 1 electron; it loses 1 to reach a full octet, so valency = 1."}
+  ];
+  function renderQuiz(){
+    var box=document.getElementById("quiz"); box.innerHTML="";
+    QUIZ.forEach(function(item,qi){
+      var wrap=document.createElement("div"); wrap.className="q";
+      var qt=document.createElement("div"); qt.className="qtext"; qt.textContent=(qi+1)+". "+item.q;
+      wrap.appendChild(qt);
+      var answered=false;
+      item.opts.forEach(function(opt,oi){
+        var btn=document.createElement("button"); btn.className="opt"; btn.textContent=opt;
+        btn.addEventListener("click",function(){
+          if(answered) return; answered=true;
+          if(oi===item.a){ btn.classList.add("correct"); }
+          else {
+            btn.classList.add("wrong");
+            var opts=wrap.querySelectorAll(".opt");
+            opts[item.a].classList.add("correct");
+          }
+          ex.classList.add("show");
+        });
+        wrap.appendChild(btn);
+      });
+      var ex=document.createElement("div"); ex.className="expl"; ex.textContent="→ "+item.ex;
+      wrap.appendChild(ex);
+      box.appendChild(wrap);
+    });
+  }
+
+  // ================= MODE SWITCH =================
+  var currentMode="build";
+  var modeEls={build:"mode-build",config:"mode-config",iso:"mode-iso",facts:"mode-facts"};
+  document.querySelectorAll(".tab").forEach(function(tab){
+    tab.addEventListener("click",function(){
+      document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+      tab.classList.add("active");
+      currentMode=tab.getAttribute("data-mode");
+      for(var m in modeEls){
+        document.getElementById(modeEls[m]).classList.toggle("hidden", m!==currentMode);
+      }
+      if(currentMode==="build"){ fitCanvas(); updateBuild(); startLoop(); }
+      else { stopLoop(); }
+    });
+  });
+
+  window.addEventListener("resize",function(){
+    if(currentMode==="build"){ fitCanvas(); rebuildElectrons(shells(state.e)); }
+  });
+
+  // init
+  fitCanvas();
+  updateBuild();
+  renderConfig();
+  renderIso("H");
+  renderQuiz();
+  startLoop();
+})();
+</script>
+</body>
+</html>

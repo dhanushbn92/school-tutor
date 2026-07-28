@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>States of Matter Lab — Matter in Our Surroundings (NIOS Class 10, Ch 2)</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --panel:#18202f;
+    --panel2:#212b3e;
+    --ink:#e9edf7;
+    --muted:#98a3bc;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffb454;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 100px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hidden{display:none !important}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 90px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;transition:all .15s}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .seg button:active{transform:scale(.98)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+
+  canvas{display:block;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .badge{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:700;font-size:.95rem}
+  .badge.solid{background:rgba(95,214,139,.16);color:var(--good)}
+  .badge.liquid{background:rgba(79,209,197,.16);color:var(--accent)}
+  .badge.gas{background:rgba(255,180,84,.16);color:var(--warn)}
+
+  .facts{font-size:.9rem;color:var(--ink)}
+  .facts li{margin:6px 0 6px 18px}
+  .facts b{color:var(--accent)}
+  .tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:8px;margin-left:6px}
+  .tag.abs{background:rgba(255,123,123,.16);color:var(--bad)}
+  .tag.rel{background:rgba(95,214,139,.16);color:var(--good)}
+
+  .quiz .q{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .quiz .q:last-child{border-bottom:none;margin-bottom:0}
+  .quiz .opt{display:block;width:100%;text-align:left;margin:6px 0;padding:11px 13px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);border-radius:11px;cursor:pointer;font-size:.92rem;touch-action:manipulation}
+  .quiz .opt.correct{background:rgba(95,214,139,.2);border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:rgba(255,123,123,.18);border-color:var(--bad);color:var(--bad)}
+  .quiz .explain{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .quiz .explain.show{display:block}
+
+  .hint{font-size:.82rem;color:var(--muted);margin-top:8px}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding-top:8px}
+  @media (max-width:400px){ header h1{font-size:1.2rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>States of Matter</span> Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology — Ch 2: Matter in Our Surroundings</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="particle">Particle Model</button>
+    <button class="tab-btn" data-mode="change">Change of State</button>
+    <button class="tab-btn" data-mode="diffusion">Diffusion</button>
+  </div>
+
+  <!-- ================= PARTICLE MODEL ================= -->
+  <section id="mode-particle">
+    <div class="panel">
+      <h2>Heat it up, cool it down</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Temperature: <output id="tempOut">25 &deg;C</output></label>
+          <input type="range" id="temp" min="-40" max="140" value="25" step="1">
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <div style="flex:1 1 300px">
+          <canvas id="boxCanvas" width="440" height="300"></canvas>
+        </div>
+        <div style="flex:1 1 260px">
+          <canvas id="curveCanvas" width="440" height="300"></canvas>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="k">Current state</div><div class="v"><span id="stateBadge" class="badge solid">Solid</span></div></div>
+        <div class="stat"><div class="k">Particle speed (KE)</div><div class="v" id="keOut">low</div></div>
+        <div class="stat"><div class="k">Melting point</div><div class="v">0 &deg;C</div></div>
+        <div class="stat"><div class="k">Boiling point</div><div class="v">100 &deg;C</div></div>
+      </div>
+      <p class="hint">Model uses water: ice melts at 0 &deg;C, boils at 100 &deg;C. On the heating curve the temperature stays flat while latent heat drives the change of state. Higher temperature = faster particles = more kinetic energy.</p>
+    </div>
+  </section>
+
+  <!-- ================= CHANGE OF STATE ================= -->
+  <section id="mode-change" class="hidden">
+    <div class="panel">
+      <h2>Pick a change of state</h2>
+      <div class="seg" id="changeBtns">
+        <button data-c="melting" class="on">Melting</button>
+        <button data-c="freezing">Freezing</button>
+        <button data-c="evaporation">Evaporation</button>
+        <button data-c="condensation">Condensation</button>
+        <button data-c="sublimation">Sublimation</button>
+      </div>
+      <canvas id="changeCanvas" width="440" height="260" style="margin-top:12px"></canvas>
+      <div class="stat-row">
+        <div class="stat"><div class="k">Change</div><div class="v" id="cName">Melting</div></div>
+        <div class="stat"><div class="k">Direction</div><div class="v" id="cDir">Solid &rarr; Liquid</div></div>
+        <div class="stat"><div class="k">Heat</div><div class="v" id="cHeat">Absorbs</div></div>
+      </div>
+      <p class="hint" id="cDesc"></p>
+    </div>
+  </section>
+
+  <!-- ================= DIFFUSION ================= -->
+  <section id="mode-diffusion" class="hidden">
+    <div class="panel">
+      <h2>Watch particles spread</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Temperature: <output id="dTempOut">40 &deg;C</output></label>
+          <input type="range" id="dTemp" min="5" max="95" value="40" step="1">
+        </div>
+      </div>
+      <div class="seg">
+        <button id="dropBtn">Drop ink / gas</button>
+        <button id="dResetBtn">Reset</button>
+      </div>
+      <canvas id="diffCanvas" width="440" height="280" style="margin-top:12px"></canvas>
+      <div class="stat-row">
+        <div class="stat"><div class="k">Spread</div><div class="v" id="spreadOut">0 %</div></div>
+        <div class="stat"><div class="k">Rate</div><div class="v" id="rateOut">medium</div></div>
+      </div>
+      <p class="hint">Diffusion is the spreading of particles from high to low concentration due to their constant random motion. Warmer particles move faster, so diffusion is quicker at higher temperature.</p>
+    </div>
+  </section>
+
+  <!-- ================= FACTS ================= -->
+  <div class="panel">
+    <h2>Key facts</h2>
+    <ul class="facts">
+      <li><b>Solid:</b> particles packed in a fixed lattice, only vibrate; fixed shape &amp; volume.</li>
+      <li><b>Liquid:</b> particles close but mobile; fixed volume, takes shape of container.</li>
+      <li><b>Gas:</b> particles far apart, fast, random; no fixed shape or volume, highly compressible.</li>
+      <li><b>Kinetic energy &amp; temperature:</b> average particle KE rises with temperature (in kelvin). Hotter = faster particles.</li>
+      <li><b>Latent heat:</b> heat absorbed or released during a change of state <b>without</b> a temperature change. Latent heat of fusion (melting/freezing); latent heat of vaporisation (boiling/condensing).</li>
+      <li><b>Kelvin scale:</b> T(K) = T(&deg;C) + 273. Melting point of ice = 273 K, boiling point of water = 373 K.</li>
+    </ul>
+  </div>
+
+  <!-- ================= QUIZ ================= -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz (tap an answer)</h2>
+    <div class="q" data-correct="1">
+      <h3>1. During melting or boiling the temperature of a substance stays constant. The heat supplied is used as&hellip;</h3>
+      <button class="opt">to raise particle speed only</button>
+      <button class="opt">latent heat, to break the bonds/arrangement between particles</button>
+      <button class="opt">to lower the pressure</button>
+      <div class="explain">Correct: the supplied heat is latent heat — it overcomes forces between particles to change state, so the thermometer reading does not rise.</div>
+    </div>
+    <div class="q" data-correct="2">
+      <h3>2. The direct change of a solid to a gas without passing through the liquid state is called&hellip;</h3>
+      <button class="opt">condensation</button>
+      <button class="opt">evaporation</button>
+      <button class="opt">sublimation</button>
+      <div class="explain">Correct: sublimation, e.g. camphor or dry ice (solid CO&#8322;) turning straight into vapour.</div>
+    </div>
+    <div class="q" data-correct="0">
+      <h3>3. Compared to a solid, particles in a gas have&hellip;</h3>
+      <button class="opt">much higher kinetic energy and are far apart</button>
+      <button class="opt">lower kinetic energy and are tightly packed</button>
+      <button class="opt">the same energy but a fixed shape</button>
+      <div class="explain">Correct: gas particles move fast (high KE) and are widely spaced with negligible forces between them.</div>
+    </div>
+  </div>
+
+  <footer>Interactive learning simulation • water model, values approximate • units labelled throughout</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  // ---------- helpers ----------
+  function $(id){ return document.getElementById(id); }
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function fitCanvas(c){
+    var cssW = c.clientWidth || c.width;
+    var ratio = c.height / c.width;
+    var dpr = Math.min(window.devicePixelRatio||1, 2);
+    var w = Math.round(cssW), h = Math.round(cssW*ratio);
+    if(c.width !== w*dpr || c.height !== h*dpr){
+      c.width = w*dpr; c.height = h*dpr;
+      c.style.height = h + "px";
+    }
+    var ctx = c.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx:ctx, w:w, h:h};
+  }
+
+  var COL = {
+    solid:"#5fd68b", liquid:"#4fd1c5", gas:"#ffb454",
+    line:"#2c3650", ink:"#e9edf7", muted:"#98a3bc",
+    panel2:"#212b3e", accent:"#4fd1c5", warn:"#ffb454", bad:"#ff7b7b"
+  };
+
+  // ================= TABS =================
+  var modes = ["particle","change","diffusion"];
+  document.querySelectorAll(".tab-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".tab-btn").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      modes.forEach(function(m){
+        $("mode-"+m).classList.toggle("hidden", m !== btn.dataset.mode);
+      });
+    });
+  });
+
+  // ================= PARTICLE MODEL =================
+  var N = 90;
+  var parts = [];
+  for(var i=0;i<N;i++) parts.push({x:0,y:0,vx:0,vy:0,hx:0,hy:0});
+
+  function stateFor(t){
+    if(t < 0) return "solid";
+    if(t < 100) return "liquid";
+    return "gas";
+  }
+  // fraction 0..1 through melting (0C) / boiling (100C) transition band for viz mixing
+  function initLattice(w,h){
+    var cols = 10, rows = 9, mx = 40, my = 30;
+    var gw = (w-2*mx)/(cols-1), gh = (h-2*my)/(rows-1);
+    var k=0;
+    for(var r=0;r<rows;r++){
+      for(var c=0;c<cols;c++){
+        if(k>=N) break;
+        var p = parts[k++];
+        p.hx = mx + c*gw; p.hy = my + r*gh;
+        p.x = p.hx; p.y = p.hy;
+        p.vx = rand(-.3,.3); p.vy = rand(-.3,.3);
+      }
+    }
+  }
+
+  var boxInit = false;
+  function drawBox(ts){
+    var d = fitCanvas($("boxCanvas"));
+    var ctx = d.ctx, w = d.w, h = d.h;
+    if(!boxInit){ initLattice(w,h); boxInit = true; }
+    var t = parseFloat($("temp").value);
+    var st = stateFor(t);
+    var col = COL[st];
+
+    // speed factor: from KE. Map -40..140 to speed.
+    var speed;
+    if(st==="solid") speed = 0.15 + (t+40)/40*0.15;      // small vibration
+    else if(st==="liquid") speed = 0.5 + t/100*0.9;      // flowing
+    else speed = 1.8 + (t-100)/40*1.4;                   // fast
+
+    ctx.clearRect(0,0,w,h);
+    // container
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 2;
+    ctx.strokeRect(6,6,w-12,h-12);
+
+    var mx=6, my=6;
+    for(var i=0;i<N;i++){
+      var p = parts[i];
+      if(st==="solid"){
+        // vibrate around lattice site
+        p.x = p.hx + Math.sin(ts/180 + i)*3*speed*3;
+        p.y = p.hy + Math.cos(ts/160 + i*1.3)*3*speed*3;
+      } else {
+        p.vx += rand(-.15,.15); p.vy += rand(-.15,.15);
+        var maxv = speed*2.2;
+        var sp = Math.hypot(p.vx,p.vy);
+        if(sp>maxv){ p.vx = p.vx/sp*maxv; p.vy = p.vy/sp*maxv; }
+        if(st==="liquid"){
+          // slight downward settle so it "pools"
+          p.vy += 0.03;
+        }
+        p.x += p.vx; p.y += p.vy;
+        // walls
+        var r=7;
+        if(p.x < mx+r){ p.x=mx+r; p.vx=Math.abs(p.vx); }
+        if(p.x > w-mx-r){ p.x=w-mx-r; p.vx=-Math.abs(p.vx); }
+        if(p.y < my+r){ p.y=my+r; p.vy=Math.abs(p.vy); }
+        if(p.y > h-my-r){ p.y=h-my-r; p.vy=-Math.abs(p.vy)*(st==="gas"?1:0.9); }
+        // liquid keeps to lower ~65%
+        if(st==="liquid" && p.y < h*0.32){ p.vy += 0.25; }
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 7, 0, Math.PI*2);
+      ctx.fillStyle = col; ctx.globalAlpha = st==="gas"?0.85:1;
+      ctx.fill(); ctx.globalAlpha = 1;
+    }
+
+    // labels
+    $("tempOut").textContent = t + " °C";
+    var badge = $("stateBadge");
+    badge.className = "badge " + st;
+    badge.textContent = st.charAt(0).toUpperCase()+st.slice(1);
+    $("keOut").textContent = st==="solid"?"low":(st==="liquid"?"medium":"high");
+
+    drawCurve(t, st);
+  }
+
+  function drawCurve(t, st){
+    var d = fitCanvas($("curveCanvas"));
+    var ctx = d.ctx, w = d.w, h = d.h;
+    ctx.clearRect(0,0,w,h);
+    var padL = 40, padB = 30, padT = 18, padR = 12;
+    var x0 = padL, x1 = w-padR, y0 = h-padB, y1 = padT;
+    // axes
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+    ctx.fillStyle = COL.muted; ctx.font = "11px system-ui";
+    ctx.fillText("Temp (°C)", 4, y1+8);
+    ctx.fillText("Heat added →", x1-84, y0+20);
+
+    // temperature axis: -40..140
+    function tempToY(tt){ return y0 - (tt+40)/(180)*(y0-y1); }
+    // heating curve segments (x = heat, arbitrary units), y = temperature
+    // solid heat -40->0, plateau at 0 (fusion), liquid 0->100, plateau at 100 (vap), gas 100->140
+    var seg = [
+      {hx:0,   t:-40},
+      {hx:0.14,t:0},
+      {hx:0.30,t:0},    // fusion plateau
+      {hx:0.55,t:100},
+      {hx:0.82,t:100},  // vaporisation plateau
+      {hx:1.0, t:140}
+    ];
+    function hxToX(hx){ return x0 + hx*(x1-x0); }
+    // gridlines at 0 and 100
+    ctx.strokeStyle = "rgba(152,163,188,.25)"; ctx.setLineDash([4,4]);
+    [0,100].forEach(function(v){
+      var y = tempToY(v);
+      ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+      ctx.fillStyle = COL.muted; ctx.fillText(v+"°", 6, y+4);
+    });
+    ctx.setLineDash([]);
+
+    // draw curve
+    ctx.strokeStyle = COL.accent; ctx.lineWidth = 2.5; ctx.beginPath();
+    seg.forEach(function(s,idx){
+      var X = hxToX(s.hx), Y = tempToY(s.t);
+      if(idx===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+    });
+    ctx.stroke();
+
+    // marker for current temperature: find hx on curve
+    var hx = curveHxForTemp(t, seg);
+    var mX = hxToX(hx), mY = tempToY(t);
+    ctx.fillStyle = COL[st];
+    ctx.beginPath(); ctx.arc(mX,mY,6,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#0f1420"; ctx.lineWidth=2; ctx.stroke();
+
+    // plateau labels
+    ctx.fillStyle = COL.warn; ctx.font = "10px system-ui";
+    ctx.fillText("fusion", hxToX(0.18), tempToY(0)-6);
+    ctx.fillText("vaporisation", hxToX(0.60), tempToY(100)-6);
+  }
+  function curveHxForTemp(t, seg){
+    // walk segments; for plateau temps pick middle of plateau
+    if(t<=0){
+      // solid heating: -40..0 maps hx 0..0.14 ; at exactly 0 include plateau start
+      return (t+40)/40*0.14;
+    }
+    if(t>=100){
+      // gas region 100..140 -> 0.82..1.0
+      if(t===100) return 0.70; // middle of vaporisation plateau
+      return 0.82 + (t-100)/40*0.18;
+    }
+    // liquid 0..100 -> 0.30..0.55
+    return 0.30 + t/100*0.25;
+  }
+
+  // ================= CHANGE OF STATE =================
+  var CHANGES = {
+    melting:      {name:"Melting",      dir:"Solid → Liquid", heat:"Absorbs", from:"solid", to:"liquid",
+      desc:"Solid gains heat; the fixed lattice breaks down and particles start to flow. Heat is absorbed (endothermic)."},
+    freezing:     {name:"Freezing",     dir:"Liquid → Solid", heat:"Releases", from:"liquid", to:"solid",
+      desc:"Liquid loses heat; particles slow and lock into a fixed lattice. Heat is released (exothermic)."},
+    evaporation:  {name:"Evaporation",  dir:"Liquid → Gas",   heat:"Absorbs", from:"liquid", to:"gas",
+      desc:"Fast surface particles escape as vapour. Heat is absorbed, which is why evaporation cools the surroundings."},
+    condensation: {name:"Condensation", dir:"Gas → Liquid",   heat:"Releases", from:"gas", to:"liquid",
+      desc:"Vapour cools; particles slow and clump into a liquid. Heat is released, e.g. dew forming on a cold surface."},
+    sublimation:  {name:"Sublimation",  dir:"Solid → Gas",    heat:"Absorbs", from:"solid", to:"gas",
+      desc:"Solid turns straight into vapour without melting, e.g. camphor or dry ice. Heat is absorbed."}
+  };
+  var curChange = "melting";
+  var changeT0 = 0;
+  var cParts = [];
+  for(var j=0;j<60;j++) cParts.push({x:0,y:0,vx:0,vy:0,hx:0,hy:0});
+  var cInit=false;
+
+  function setupChangeParts(w,h){
+    var cols=10, rows=6, mx=w*0.5-90, my=h*0.5-70, gw=180/(cols-1), gh=140/(rows-1), k=0;
+    for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+      if(k>=60) break;
+      var p=cParts[k++]; p.hx=mx+c*gw; p.hy=my+r*gh; p.x=p.hx; p.y=p.hy; p.vx=0; p.vy=0;
+    }
+  }
+  function drawChange(ts){
+    var d = fitCanvas($("changeCanvas"));
+    var ctx=d.ctx, w=d.w, h=d.h;
+    if(!cInit){ setupChangeParts(w,h); cInit=true; }
+    var cfg = CHANGES[curChange];
+    var prog = Math.min(1,(ts - changeT0)/2600); // 2.6s animation, then hold
+    // ease
+    var e = prog<1 ? (0.5-0.5*Math.cos(prog*Math.PI)) : 1;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle = COL.line; ctx.lineWidth=2; ctx.strokeRect(6,6,w-12,h-12);
+
+    // arrangement blend from -> to
+    var order = {solid:0,liquid:1,gas:2};
+    for(var i=0;i<60;i++){
+      var p=cParts[i];
+      // target motion amplitude & color blend
+      var fromCol = COL[cfg.from], toCol = COL[cfg.to];
+      var col = blend(fromCol, toCol, e);
+      var amp, tx, ty;
+      // FROM position/behaviour vs TO
+      if(cfg.from==="solid"){ tx=p.hx; ty=p.hy; }
+      else if(cfg.from==="liquid"){ tx=p.hx + Math.sin(ts/200+i)*6; ty=p.hy + Math.cos(ts/220+i)*5 + 20; }
+      else { tx=p.hx + Math.sin(ts/90+i)*40; ty=p.hy + Math.cos(ts/80+i*1.7)*36; }
+
+      var tx2, ty2;
+      if(cfg.to==="solid"){ tx2=p.hx; ty2=p.hy; }
+      else if(cfg.to==="liquid"){ tx2=p.hx + Math.sin(ts/200+i)*6; ty2=p.hy + Math.cos(ts/220+i)*5 + 20; }
+      else { tx2=p.hx + Math.sin(ts/90+i)*50; ty2=p.hy + Math.cos(ts/80+i*1.7)*44 - 30; }
+
+      p.x = tx + (tx2-tx)*e;
+      p.y = ty + (ty2-ty)*e;
+
+      var alpha = (blendState(cfg.to,e)==="gas") ? 0.85 : 1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2);
+      ctx.fillStyle=col; ctx.globalAlpha=alpha; ctx.fill(); ctx.globalAlpha=1;
+    }
+
+    // heat arrows
+    ctx.font="12px system-ui";
+    if(cfg.heat==="Absorbs"){ ctx.fillStyle=COL.bad; ctx.fillText("▲ heat absorbed",14,h-14); }
+    else { ctx.fillStyle=COL.good; ctx.fillText("▼ heat released",14,h-14); }
+  }
+  function blendState(to,e){ return e>0.5?to:to; }
+  function blend(a,b,t){
+    var pa=hex(a), pb=hex(b);
+    var r=Math.round(pa[0]+(pb[0]-pa[0])*t);
+    var g=Math.round(pa[1]+(pb[1]-pa[1])*t);
+    var bl=Math.round(pa[2]+(pb[2]-pa[2])*t);
+    return "rgb("+r+","+g+","+bl+")";
+  }
+  function hex(h){ h=h.replace("#",""); return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)]; }
+
+  document.querySelectorAll("#changeBtns button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#changeBtns button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      curChange = b.dataset.c;
+      changeT0 = performance.now();
+      var cfg = CHANGES[curChange];
+      $("cName").textContent = cfg.name;
+      $("cDir").textContent = cfg.dir;
+      $("cHeat").textContent = cfg.heat;
+      $("cDesc").textContent = cfg.desc;
+    });
+  });
+  // init labels
+  (function(){ var cfg=CHANGES[curChange]; $("cDesc").textContent=cfg.desc; })();
+
+  // ================= DIFFUSION =================
+  var dParts = [];
+  var dReleased = false;
+  var dInit=false;
+  function setupDiff(w,h){
+    dParts = [];
+    for(var i=0;i<140;i++){
+      dParts.push({x:rand(10,w-10), y:rand(10,h-10), vx:0, vy:0, ink:false});
+    }
+    dReleased = false;
+  }
+  function dropInk(){
+    var c=$("diffCanvas");
+    var w=c.clientWidth||c.width;
+    // mark a cluster near center-left as ink
+    var cx = w*0.3, cy = (c.height/(window.devicePixelRatio||1))*0.5;
+    dParts.forEach(function(p){
+      var dist = Math.hypot(p.x-cx, p.y-cy);
+      p.ink = dist < 34;
+    });
+    dReleased = true;
+  }
+  function drawDiff(ts){
+    var d = fitCanvas($("diffCanvas"));
+    var ctx=d.ctx, w=d.w, h=d.h;
+    if(!dInit){ setupDiff(w,h); dInit=true; }
+    var T = parseFloat($("dTemp").value);
+    var speed = 0.4 + T/95*1.9;
+    $("dTempOut").textContent = T + " °C";
+    $("rateOut").textContent = T<35?"slow":(T<70?"medium":"fast");
+
+    ctx.clearRect(0,0,w,h);
+    ctx.strokeStyle=COL.line; ctx.lineWidth=2; ctx.strokeRect(6,6,w-12,h-12);
+
+    var inkCount=0, inkSpreadX=0, inkXs=[];
+    for(var i=0;i<dParts.length;i++){
+      var p=dParts[i];
+      p.vx += rand(-.4,.4)*speed*0.4;
+      p.vy += rand(-.4,.4)*speed*0.4;
+      var mv=speed; var sp=Math.hypot(p.vx,p.vy);
+      if(sp>mv){ p.vx=p.vx/sp*mv; p.vy=p.vy/sp*mv; }
+      p.x+=p.vx; p.y+=p.vy;
+      var r=6;
+      if(p.x<6+r){p.x=6+r;p.vx=Math.abs(p.vx);}
+      if(p.x>w-6-r){p.x=w-6-r;p.vx=-Math.abs(p.vx);}
+      if(p.y<6+r){p.y=6+r;p.vy=Math.abs(p.vy);}
+      if(p.y>h-6-r){p.y=h-6-r;p.vy=-Math.abs(p.vy);}
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.ink?6:5,0,Math.PI*2);
+      if(p.ink){ ctx.fillStyle=COL.warn; inkCount++; inkXs.push(p.x); }
+      else { ctx.fillStyle="rgba(152,163,188,.5)"; }
+      ctx.fill();
+    }
+    // spread % = std-dev of ink x normalised to width
+    var pct=0;
+    if(dReleased && inkCount>1){
+      var mean=inkXs.reduce(function(a,b){return a+b;},0)/inkXs.length;
+      var varr=inkXs.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/inkXs.length;
+      var sd=Math.sqrt(varr);
+      pct = Math.min(100, Math.round(sd/(w*0.29)*100));
+    }
+    $("spreadOut").textContent = pct + " %";
+  }
+  $("dropBtn").addEventListener("click", dropInk);
+  $("dResetBtn").addEventListener("click", function(){
+    var c=$("diffCanvas"); var d=fitCanvas(c); setupDiff(d.w,d.h); $("spreadOut").textContent="0 %";
+  });
+
+  // ================= QUIZ =================
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var correct = parseInt(q.dataset.correct,10);
+    var opts = q.querySelectorAll(".opt");
+    opts.forEach(function(opt,idx){
+      opt.addEventListener("click", function(){
+        opts.forEach(function(o){ o.classList.remove("correct","wrong"); });
+        opts[correct].classList.add("correct");
+        if(idx!==correct) opt.classList.add("wrong");
+        q.querySelector(".explain").classList.add("show");
+      });
+    });
+  });
+
+  // ================= LOOP =================
+  function loop(ts){
+    if(running){
+      try{
+        if(!$("mode-particle").classList.contains("hidden")) drawBox(ts);
+        if(!$("mode-change").classList.contains("hidden")) drawChange(ts);
+        if(!$("mode-diffusion").classList.contains("hidden")) drawDiff(ts);
+      }catch(e){ /* keep loop alive */ }
+    }
+    requestAnimationFrame(loop);
+  }
+  // recompute layout-dependent inits on resize
+  window.addEventListener("resize", function(){ boxInit=false; cInit=false; dInit=false; });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

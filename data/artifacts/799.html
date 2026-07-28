@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atoms &amp; Molecules Lab — NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#161a23; --panel:#1e2432; --panel2:#252c3d; --line:#333c52;
+    --ink:#e6ebf5; --muted:#9aa6be; --accent:#5fc9a3; --accent-dk:#3f9d7c;
+    --warn:#e2795a; --ok:#5fc9a3;
+    --H:#e6ebf5; --O:#e2795a; --C:#4a5568; --N:#6c8be0; --Na:#c9a24a; --Cl:#7bc86c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;padding:14px}
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;flex:1 1 auto;min-width:120px}
+  .tab.active{background:var(--accent);color:#0c1017;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .panel h2{font-size:1.05rem;margin:0 0 10px}
+  .view{display:none}.view.active{display:block}
+  .muted{color:var(--muted);font-size:.85rem}
+  button{font-family:inherit}
+  .btn{background:var(--accent);color:#0c1017;border:none;border-radius:10px;
+    padding:9px 14px;font-size:.9rem;font-weight:600;cursor:pointer}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);font-weight:500}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  /* atom palette */
+  .palette{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .atom{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:1rem;cursor:pointer;user-select:none;border:2px solid rgba(255,255,255,.15);
+    color:#0c1017;transition:transform .1s}
+  .atom:active{transform:scale(.92)}
+  .atom .val{position:absolute;font-size:.55rem;opacity:.7;transform:translate(14px,-14px)}
+  .canvasWrap{position:relative}
+  #buildCanvas{width:100%;height:230px;background:var(--panel2);border:1px dashed var(--line);
+    border-radius:12px;display:block;touch-action:none}
+  .formula{font-size:1.5rem;font-weight:700;margin:10px 0 4px}
+  .status{font-size:.9rem;font-weight:600;min-height:1.2em}
+  .status.ok{color:var(--ok)}.status.bad{color:var(--warn)}
+  .gallery{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;
+    cursor:pointer;font-size:.85rem}
+  .chip.done{border-color:var(--accent);color:var(--accent)}
+  sub{font-size:.7em}
+  /* mole */
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;
+    padding:8px;font-size:.9rem;font-family:inherit}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;flex:1 1 150px;min-width:150px}
+  .stat .k{color:var(--muted);font-size:.78rem}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:3px;word-break:break-word}
+  .grid{display:flex;flex-wrap:wrap;gap:10px}
+  /* constant proportions */
+  .bar{height:26px;border-radius:6px;display:flex;overflow:hidden;border:1px solid var(--line);margin:6px 0}
+  .bar .seg{display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#0c1017;font-weight:700}
+  /* facts */
+  .facts dt{font-weight:700;color:var(--accent);margin-top:8px}
+  .facts dd{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+  /* quiz */
+  .q{margin-bottom:14px}
+  .q .opts{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;
+    cursor:pointer;font-size:.9rem;text-align:left}
+  .opt.correct{border-color:var(--ok);background:rgba(95,201,163,.15)}
+  .opt.wrong{border-color:var(--warn);background:rgba(226,121,90,.15)}
+  .ans{font-size:.85rem;margin-top:4px;display:none}
+  .ans.show{display:block}
+</style>
+</head>
+<body>
+<h1>Atoms &amp; Molecules Lab</h1>
+<p class="sub">NIOS Class 10 Science &amp; Technology — Ch 3: Atoms and Molecules</p>
+
+<div class="tabs">
+  <button class="tab active" data-view="build">Build a Molecule</button>
+  <button class="tab" data-view="mole">Mole Concept</button>
+  <button class="tab" data-view="law">Constant Proportions</button>
+  <button class="tab" data-view="facts">Facts &amp; Quiz</button>
+</div>
+
+<!-- ================= BUILD ================= -->
+<section class="view active" id="view-build">
+  <div class="panel">
+    <h2>1. Combine atoms into a molecule</h2>
+    <p class="muted">Tap an atom to add it to the tray. Respect valency (bonds each atom can form). Build a target from the gallery, then check the formula.</p>
+    <div class="palette" id="palette"></div>
+    <div class="canvasWrap"><canvas id="buildCanvas" width="600" height="230"></canvas></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="checkBtn">Check molecule</button>
+      <button class="btn ghost" id="clearBtn">Clear tray</button>
+    </div>
+    <div class="formula" id="formula">—</div>
+    <div class="status" id="buildStatus">Add atoms to begin.</div>
+    <h2 style="margin-top:14px">Target gallery</h2>
+    <div class="gallery" id="gallery"></div>
+  </div>
+</section>
+
+<!-- ================= MOLE ================= -->
+<section class="view" id="view-mole">
+  <div class="panel">
+    <h2>2. Mole ↔ particles ↔ mass</h2>
+    <p class="muted">1 mole = Avogadro's number = 6.022 × 10²³ particles. Mass of 1 mole = molar mass (g).</p>
+    <div class="row" style="margin-bottom:8px">
+      <label class="muted">Substance:</label>
+      <select id="moleSub"></select>
+    </div>
+    <label class="muted">Amount: <span id="moleVal">1.00</span> mol</label>
+    <input type="range" id="moleSlider" min="0" max="5" step="0.05" value="1">
+    <div class="grid" style="margin-top:10px">
+      <div class="stat"><div class="k">Molar mass</div><div class="v" id="mmOut">—</div></div>
+      <div class="stat"><div class="k">Mass = n × M</div><div class="v" id="massOut">—</div></div>
+      <div class="stat"><div class="k">Particles = n × Nₐ</div><div class="v" id="numOut">—</div></div>
+    </div>
+    <p class="muted" id="moleNote" style="margin-top:10px"></p>
+  </div>
+</section>
+
+<!-- ================= LAW ================= -->
+<section class="view" id="view-law">
+  <div class="panel">
+    <h2>3. Law of Constant (Definite) Proportions</h2>
+    <p class="muted">A pure compound always contains the same elements in the same fixed proportion by mass, no matter the source or amount. Water is always H : O = 1 : 8 by mass.</p>
+    <label class="muted">Water sample mass: <span id="waterVal">18</span> g</label>
+    <input type="range" id="waterSlider" min="9" max="90" step="9" value="18">
+    <div class="bar" id="waterBar"></div>
+    <div class="grid">
+      <div class="stat"><div class="k">Hydrogen (2 × 1)</div><div class="v" id="hOut">—</div></div>
+      <div class="stat"><div class="k">Oxygen (1 × 16)</div><div class="v" id="oOut">—</div></div>
+      <div class="stat"><div class="k">Mass ratio H : O</div><div class="v" id="ratioOut">1 : 8</div></div>
+    </div>
+    <p class="muted" style="margin-top:10px">In H<sub>2</sub>O the mass of H is 2×1=2 and O is 1×16=16, so H:O = 2:16 = <b>1:8</b>. Whatever the total mass, this ratio never changes — that is the law of constant proportions.</p>
+  </div>
+</section>
+
+<!-- ================= FACTS + QUIZ ================= -->
+<section class="view" id="view-facts">
+  <div class="panel facts">
+    <h2>Key facts</h2>
+    <dl>
+      <dt>Atom</dt><dd>The smallest particle of an element that takes part in a chemical reaction. Example: one O atom.</dd>
+      <dt>Molecule</dt><dd>Two or more atoms chemically bonded together. Can be of an element (O<sub>2</sub>) or a compound (H<sub>2</sub>O).</dd>
+      <dt>Valency</dt><dd>The combining capacity of an element = number of bonds it forms. H=1, O=2, N=3, C=4, Na=1, Cl=1.</dd>
+      <dt>Mole (mol)</dt><dd>The amount of substance containing 6.022 × 10²³ particles. Mass of 1 mole in grams = molar mass.</dd>
+      <dt>Avogadro's number (Nₐ)</dt><dd>6.022 × 10²³ — the number of particles in one mole.</dd>
+    </dl>
+  </div>
+  <div class="panel">
+    <h2>Quick quiz</h2>
+    <div id="quiz"></div>
+  </div>
+</section>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabs=document.querySelectorAll('.tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+      t.classList.add('active');
+      document.getElementById('view-'+t.dataset.view).classList.add('active');
+    });
+  });
+
+  // ---------- atom data ----------
+  var ATOMS={
+    H:{color:'#e6ebf5',val:1,mass:1},
+    O:{color:'#e2795a',val:2,mass:16},
+    C:{color:'#6b7688',val:4,mass:12},
+    N:{color:'#6c8be0',val:3,mass:14},
+    Na:{color:'#c9a24a',val:1,mass:23},
+    Cl:{color:'#7bc86c',val:1,mass:35.5}
+  };
+  var ORDER=['H','O','C','N','Na','Cl'];
+
+  // ---------- BUILD MODE ----------
+  var palette=document.getElementById('palette');
+  ORDER.forEach(function(sym){
+    var d=document.createElement('div');
+    d.className='atom';
+    d.style.background=ATOMS[sym].color;
+    d.style.color=(sym==='H')?'#0c1017':'#0c1017';
+    d.textContent=sym;
+    d.title=sym+' (valency '+ATOMS[sym].val+')';
+    d.addEventListener('click',function(){ addAtom(sym); });
+    palette.appendChild(d);
+  });
+
+  var canvas=document.getElementById('buildCanvas');
+  var ctx=canvas.getContext('2d');
+  var tray=[]; // {sym,x,y}
+  var draggingIdx=-1, dragOff={x:0,y:0};
+
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function addAtom(sym){
+    var r=canvas.getBoundingClientRect();
+    tray.push({sym:sym,x:rand(40,r.width-40),y:rand(40,r.height-40)});
+    draw(); updateFormula();
+    document.getElementById('buildStatus').className='status';
+    document.getElementById('buildStatus').textContent='Tap "Check molecule" when ready.';
+  }
+  document.getElementById('clearBtn').addEventListener('click',function(){
+    tray=[]; draw();
+    document.getElementById('formula').textContent='—';
+    var s=document.getElementById('buildStatus'); s.className='status'; s.textContent='Tray cleared.';
+  });
+
+  function draw(){
+    // size canvas to CSS box for crisp circles
+    var r=canvas.getBoundingClientRect();
+    if(canvas.width!==Math.round(r.width)){canvas.width=Math.round(r.width);canvas.height=230;}
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    tray.forEach(function(a){
+      ctx.beginPath();
+      ctx.arc(a.x,a.y,22,0,Math.PI*2);
+      ctx.fillStyle=ATOMS[a.sym].color;
+      ctx.fill();
+      ctx.lineWidth=2;ctx.strokeStyle='rgba(255,255,255,.2)';ctx.stroke();
+      ctx.fillStyle='#0c1017';
+      ctx.font='bold 15px system-ui,sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(a.sym,a.x,a.y);
+    });
+    if(tray.length===0){
+      ctx.fillStyle='#9aa6be';ctx.font='14px system-ui,sans-serif';ctx.textAlign='center';
+      ctx.fillText('Tap atoms above to drop them here — drag to arrange',canvas.width/2,canvas.height/2);
+    }
+  }
+
+  function pointFrom(e){
+    var r=canvas.getBoundingClientRect();
+    var t=(e.touches&&e.touches[0])||e;
+    return {x:t.clientX-r.left,y:t.clientY-r.top};
+  }
+  function hit(p){
+    for(var i=tray.length-1;i>=0;i--){
+      var dx=p.x-tray[i].x, dy=p.y-tray[i].y;
+      if(dx*dx+dy*dy<=22*22) return i;
+    }
+    return -1;
+  }
+  function down(e){
+    var p=pointFrom(e); var i=hit(p);
+    if(i>=0){draggingIdx=i;dragOff.x=p.x-tray[i].x;dragOff.y=p.y-tray[i].y;e.preventDefault();}
+  }
+  function move(e){
+    if(draggingIdx<0)return;
+    var p=pointFrom(e);
+    tray[draggingIdx].x=Math.max(22,Math.min(canvas.width-22,p.x-dragOff.x));
+    tray[draggingIdx].y=Math.max(22,Math.min(canvas.height-22,p.y-dragOff.y));
+    draw();e.preventDefault();
+  }
+  function up(){draggingIdx=-1;}
+  canvas.addEventListener('mousedown',down);
+  window.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',up);
+  canvas.addEventListener('touchstart',down,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',up);
+
+  function counts(){
+    var c={};
+    tray.forEach(function(a){c[a.sym]=(c[a.sym]||0)+1;});
+    return c;
+  }
+  // Hill-ish ordering for readability: C, H, then others alphabetical
+  function formulaString(c){
+    var keys=Object.keys(c);
+    keys.sort(function(a,b){
+      var pri={C:0,H:1};
+      var pa=(a in pri)?pri[a]:2, pb=(b in pri)?pri[b]:2;
+      if(pa!==pb)return pa-pb;
+      return a<b?-1:1;
+    });
+    return keys.map(function(k){return k+(c[k]>1?'<sub>'+c[k]+'</sub>':'');}).join('');
+  }
+  function updateFormula(){
+    var c=counts();
+    document.getElementById('formula').innerHTML=tray.length? formulaString(c) : '—';
+  }
+
+  // target molecules: composition + molar mass
+  var TARGETS=[
+    {name:'Water',formula:'H<sub>2</sub>O',c:{H:2,O:1}},
+    {name:'Carbon dioxide',formula:'CO<sub>2</sub>',c:{C:1,O:2}},
+    {name:'Oxygen gas',formula:'O<sub>2</sub>',c:{O:2}},
+    {name:'Table salt',formula:'NaCl',c:{Na:1,Cl:1}},
+    {name:'Methane',formula:'CH<sub>4</sub>',c:{C:1,H:4}},
+    {name:'Ammonia',formula:'NH<sub>3</sub>',c:{N:1,H:3}}
+  ];
+  var built={}; // name->true
+  var gallery=document.getElementById('gallery');
+  function renderGallery(){
+    gallery.innerHTML='';
+    TARGETS.forEach(function(t){
+      var ch=document.createElement('div');
+      ch.className='chip'+(built[t.name]?' done':'');
+      ch.innerHTML=(built[t.name]?'✓ ':'')+t.name+' — '+t.formula;
+      ch.addEventListener('click',function(){ loadTarget(t); });
+      gallery.appendChild(ch);
+    });
+  }
+  function loadTarget(t){
+    // preload the exact atoms so learner can arrange/verify
+    tray=[]; var r=canvas.getBoundingClientRect(); var w=r.width||canvas.width;
+    var list=[]; for(var k in t.c){for(var i=0;i<t.c[k];i++)list.push(k);}
+    list.forEach(function(sym,idx){
+      var ang=idx/list.length*Math.PI*2;
+      tray.push({sym:sym,x:w/2+Math.cos(ang)*55,y:115+Math.sin(ang)*55});
+    });
+    draw(); updateFormula();
+    var s=document.getElementById('buildStatus'); s.className='status';
+    s.textContent='Loaded target "'+t.name+'". Tap Check to verify.';
+  }
+
+  // valency check: sum of valencies must be even (bonds pair up) and molecule connected-plausible.
+  // For these simple targets we validate against known composition AND a valency balance.
+  function valencySum(c){var s=0;for(var k in c)s+=c[k]*ATOMS[k].val;return s;}
+  function sameComposition(a,b){
+    var ka=Object.keys(a),kb=Object.keys(b);
+    if(ka.length!==kb.length)return false;
+    for(var i=0;i<ka.length;i++){if(a[ka[i]]!==b[ka[i]])return false;}
+    return true;
+  }
+
+  document.getElementById('checkBtn').addEventListener('click',function(){
+    var s=document.getElementById('buildStatus');
+    var c=counts();
+    if(tray.length===0){s.className='status bad';s.textContent='Tray is empty — add some atoms first.';return;}
+    // find matching target
+    var match=null;
+    TARGETS.forEach(function(t){ if(sameComposition(c,t.c)) match=t; });
+    if(match){
+      built[match.name]=true; renderGallery();
+      s.className='status ok';
+      s.innerHTML='✓ Valid! You built '+match.name+' ('+match.formula+'). Valencies balance.';
+      return;
+    }
+    // not a known target — give valency feedback
+    var vs=valencySum(c);
+    if(vs%2!==0){
+      s.className='status bad';
+      s.textContent='Not a stable molecule: total valency is odd ('+vs+'), so bonds cannot all pair up. Adjust the atoms.';
+    } else {
+      s.className='status bad';
+      s.textContent='Valencies balance, but this is not one of the target molecules. Try matching a gallery formula.';
+    }
+  });
+
+  renderGallery();
+  requestAnimationFrame(function(){draw();});
+
+  // ---------- MOLE MODE ----------
+  var NA=6.022e23;
+  var SUBS=[
+    {name:'Water (H₂O)',mm:18,unit:'molecules'},
+    {name:'Carbon dioxide (CO₂)',mm:44,unit:'molecules'},
+    {name:'Oxygen gas (O₂)',mm:32,unit:'molecules'},
+    {name:'Sodium chloride (NaCl)',mm:58.5,unit:'formula units'},
+    {name:'Carbon (C)',mm:12,unit:'atoms'},
+    {name:'Methane (CH₄)',mm:16,unit:'molecules'}
+  ];
+  var moleSel=document.getElementById('moleSub');
+  SUBS.forEach(function(s,i){var o=document.createElement('option');o.value=i;o.textContent=s.name;moleSel.appendChild(o);});
+  var moleSlider=document.getElementById('moleSlider');
+  function fmtSci(x){
+    if(x===0)return '0';
+    var e=Math.floor(Math.log10(x));
+    var m=x/Math.pow(10,e);
+    return m.toFixed(3)+' × 10'+sup(e);
+  }
+  function sup(n){
+    var map={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+    return String(n).split('').map(function(ch){return map[ch]||ch;}).join('');
+  }
+  function updateMole(){
+    var s=SUBS[+moleSel.value];
+    var n=parseFloat(moleSlider.value);
+    document.getElementById('moleVal').textContent=n.toFixed(2);
+    document.getElementById('mmOut').textContent=s.mm+' g/mol';
+    document.getElementById('massOut').textContent=(n*s.mm).toFixed(2)+' g';
+    document.getElementById('numOut').textContent=fmtSci(n*NA)+' '+s.unit;
+    document.getElementById('moleNote').innerHTML=
+      n.toFixed(2)+' mol of '+s.name+' has a mass of <b>'+(n*s.mm).toFixed(2)+' g</b> and contains <b>'+
+      fmtSci(n*NA)+'</b> '+s.unit+'.';
+  }
+  moleSel.addEventListener('change',updateMole);
+  moleSlider.addEventListener('input',updateMole);
+  updateMole();
+
+  // ---------- LAW MODE ----------
+  var waterSlider=document.getElementById('waterSlider');
+  function updateWater(){
+    var total=parseFloat(waterSlider.value);
+    var h=total*(2/18), o=total*(16/18);
+    document.getElementById('waterVal').textContent=total;
+    document.getElementById('hOut').textContent=h.toFixed(2)+' g H';
+    document.getElementById('oOut').textContent=o.toFixed(2)+' g O';
+    document.getElementById('ratioOut').textContent='1 : 8';
+    var bar=document.getElementById('waterBar');
+    bar.innerHTML='';
+    var segH=document.createElement('div');segH.className='seg';
+    segH.style.width=(2/18*100)+'%';segH.style.background=ATOMS.H.color;segH.textContent='H';
+    var segO=document.createElement('div');segO.className='seg';
+    segO.style.width=(16/18*100)+'%';segO.style.background=ATOMS.O.color;segO.textContent='O';
+    bar.appendChild(segH);bar.appendChild(segO);
+  }
+  waterSlider.addEventListener('input',updateWater);
+  updateWater();
+
+  // ---------- QUIZ ----------
+  var QUIZ=[
+    {q:'What is the valency of oxygen?',opts:['1','2','3','4'],a:1,
+     e:'Oxygen has valency 2 — it forms 2 bonds, e.g. in H₂O and CO₂.'},
+    {q:'How many particles are in 1 mole of a substance?',
+     opts:['6.022 × 10²³','1 × 10⁶','3.14 × 10²³','9.8 × 10²³'],a:0,
+     e:'One mole always contains Avogadro\'s number = 6.022 × 10²³ particles.'},
+    {q:'By mass, water always contains H : O in the ratio…',
+     opts:['1 : 1','2 : 1','1 : 8','8 : 1'],a:2,
+     e:'In H₂O, H mass = 2 and O mass = 16, so 2:16 = 1:8 (law of constant proportions).'}
+  ];
+  var quizEl=document.getElementById('quiz');
+  QUIZ.forEach(function(item,qi){
+    var box=document.createElement('div');box.className='q';
+    box.innerHTML='<div><b>Q'+(qi+1)+'.</b> '+item.q+'</div>';
+    var opts=document.createElement('div');opts.className='opts';
+    var ans=document.createElement('div');ans.className='ans';
+    item.opts.forEach(function(txt,oi){
+      var b=document.createElement('button');b.className='opt';b.innerHTML=txt;
+      b.addEventListener('click',function(){
+        if(box.dataset.done)return;
+        box.dataset.done='1';
+        var kids=opts.querySelectorAll('.opt');
+        kids[item.a].classList.add('correct');
+        if(oi!==item.a)b.classList.add('wrong');
+        ans.classList.add('show');
+        ans.innerHTML=(oi===item.a?'✓ Correct. ':'✗ Not quite. ')+item.e;
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);box.appendChild(ans);
+    quizEl.appendChild(box);
+  });
+
+  // redraw canvas when its tab becomes visible (size may have been 0)
+  document.querySelector('.tab[data-view="build"]').addEventListener('click',function(){
+    requestAnimationFrame(function(){draw();});
+  });
+  window.addEventListener('resize',function(){draw();});
+})();
+</script>
+</body>
+</html>
