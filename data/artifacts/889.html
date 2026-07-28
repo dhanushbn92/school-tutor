@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Differential Equations Lab — NIOS Class 12 Maths (Ch32)</title>
+<style>
+  :root{
+    --bg:#12151c; --panel:#1b1f2a; --panel2:#232838; --ink:#e8ecf4;
+    --muted:#9aa4bd; --accent:#5fd0c8; --accent2:#8f7bff;
+    --line:#2c3345; --good:#57d38c; --bad:#ff7a8a; --grid:#2a3040;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%,#1a2030,#12151c 60%);
+    color:var(--ink);
+    font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    padding:16px;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.86rem;margin-bottom:14px}
+  .wrap{max-width:960px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.85rem;
+    transition:.15s;user-select:none;
+  }
+  .tab.active{background:var(--accent);color:#08201e;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .panel h2 .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+  select,button{
+    font:inherit;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+  }
+  select{width:100%;max-width:420px}
+  button{cursor:pointer;transition:.15s}
+  button:hover{border-color:var(--accent)}
+  button.primary{background:var(--accent);color:#08201e;border-color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);max-width:420px}
+  canvas{
+    width:100%;height:auto;background:#0e1119;border:1px solid var(--line);
+    border-radius:12px;touch-action:none;display:block;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:16px}
+  .col{flex:1 1 300px;min-width:0}
+  .eqn{font-family:"Cambria Math",Georgia,serif;font-size:1.1rem}
+  .val{color:var(--accent);font-weight:600}
+  .chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:3px 9px;margin:3px 4px 0 0;font-size:.82rem}
+  .hint{color:var(--muted);font-size:.82rem}
+  .facts dt{color:var(--accent);font-weight:600;margin-top:9px}
+  .facts dd{margin:2px 0 0;color:var(--ink)}
+  .facts dl{margin:0}
+  .quiz .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .quiz .q:first-child{border-top:0;padding-top:0;margin-top:0}
+  .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:9px 11px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);
+  }
+  .opt.correct{border-color:var(--good);background:rgba(87,211,140,.14)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,122,138,.14)}
+  .feedback{font-size:.85rem;margin-top:6px;min-height:1.1em}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .answerbox{font-size:.95rem;margin-top:8px}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+  .legend{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .legend b{color:var(--accent)}
+  .kbd{font-family:ui-monospace,Consolas,monospace;background:var(--panel2);
+    border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.8rem}
+  .hide{display:none}
+  @media(max-width:420px){ h1{font-size:1.15rem} .panel{padding:13px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Differential Equations Lab</h1>
+  <div class="sub">NIOS Class 12 Mathematics · Chapter 32 — Order, degree, slope fields &amp; solving simple ODEs</div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-m="0">1 · Order &amp; Degree</div>
+    <div class="tab" data-m="1">2 · Slope Field</div>
+    <div class="tab" data-m="2">3 · Solve ODE</div>
+    <div class="tab" data-m="3">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ===== MODE 0: Order & Degree ===== -->
+  <section id="m0" class="panel">
+    <h2><span class="dot"></span>Order &amp; Degree</h2>
+    <p class="hint"><b>Order</b> = order of the highest derivative present. <b>Degree</b> = power of that highest-order derivative, once the equation is a polynomial in the derivatives (free of radicals/fractions on them).</p>
+    <label for="odeSel">Choose a differential equation</label>
+    <select id="odeSel"></select>
+    <div class="eqn" id="odeShow" style="margin:12px 0"></div>
+
+    <div class="btnrow">
+      <span class="hint">Your guess — Order:</span>
+      <select id="gOrder" style="width:90px"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      <span class="hint">Degree:</span>
+      <select id="gDeg" style="width:90px"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      <button class="primary" id="checkOD">Check</button>
+      <button id="revealOD">Reveal</button>
+    </div>
+    <div class="answerbox" id="odAns"></div>
+  </section>
+
+  <!-- ===== MODE 1: Slope field ===== -->
+  <section id="m1" class="panel hide">
+    <h2><span class="dot"></span>Slope Field &amp; Solution Curves</h2>
+    <div class="row">
+      <div class="col">
+        <label for="sfSel">Equation dy/dx = f(x, y)</label>
+        <select id="sfSel"></select>
+        <label for="cSlide">Constant C for the general solution family: <span class="val" id="cVal"></span></label>
+        <input type="range" id="cSlide" min="-4" max="4" step="0.25" value="1">
+        <div class="btnrow">
+          <button id="sfClear">Clear my curves</button>
+          <button id="sfToggleFam" class="primary">Family: ON</button>
+        </div>
+        <div class="legend">
+          <b>Grey segments</b> = slope field. <b>Accent curve</b> = general solution for the chosen C.
+          <b>Purple curves</b> = particular solutions — <b>tap / click</b> the plot to drop an initial point (x₀,y₀).
+        </div>
+      </div>
+      <div class="col">
+        <canvas id="sfCanvas" width="520" height="420"></canvas>
+        <div class="legend" id="sfInfo"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MODE 2: Solve simple ODEs ===== -->
+  <section id="m2" class="panel hide">
+    <h2><span class="dot"></span>Solve a Simple ODE (Variable Separable)</h2>
+    <div class="row">
+      <div class="col">
+        <p class="eqn" style="margin-top:0">dy/dx = k·y</p>
+        <p class="hint">Separate the variables and integrate:</p>
+        <div class="chip">dy/y = k dx</div>
+        <div class="chip">∫dy/y = ∫k dx</div>
+        <div class="chip">ln|y| = kx + c</div>
+        <div class="chip">y = C·e^(kx)</div>
+        <label for="kSlide">Growth / decay rate k = <span class="val" id="kVal"></span></label>
+        <input type="range" id="kSlide" min="-1.5" max="1.5" step="0.05" value="0.6">
+        <label for="cSlide2">Initial value C = y(0) = <span class="val" id="c2Val"></span></label>
+        <input type="range" id="cSlide2" min="0.2" max="4" step="0.1" value="1">
+        <p class="hint" id="solNote"></p>
+      </div>
+      <div class="col">
+        <canvas id="expCanvas" width="520" height="420"></canvas>
+        <div class="legend">Solution <b>y = C·e^(kx)</b>. k&gt;0 → exponential <b>growth</b>; k&lt;0 → exponential <b>decay</b>; k=0 → constant.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MODE 3: Facts + Quiz ===== -->
+  <section id="m3" class="panel hide">
+    <h2><span class="dot"></span>Key Facts</h2>
+    <div class="facts"><dl>
+      <dt>Order</dt><dd>The order of the highest derivative appearing in the equation. e.g. d²y/dx² + y = 0 has order 2.</dd>
+      <dt>Degree</dt><dd>The power (exponent) of the highest-order derivative, after the equation is made a polynomial in derivatives (no radicals or fractional powers on them). If it can't be, the degree is not defined.</dd>
+      <dt>General solution</dt><dd>Contains arbitrary constants (as many as the order). It represents a whole family of curves — e.g. y = Ce^(kx).</dd>
+      <dt>Particular solution</dt><dd>Obtained by fixing the constants using an initial/boundary condition — one specific curve through a given point.</dd>
+      <dt>Variable separable</dt><dd>An ODE that can be written g(y) dy = h(x) dx, then solved by integrating each side.</dd>
+    </dl></div>
+  </section>
+
+  <section id="mq" class="panel quiz hide">
+    <h2><span class="dot"></span>Quick Quiz</h2>
+    <div id="quiz"></div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var panels = ["m0","m1","m2","m3","mq"];
+var tabs = document.querySelectorAll("#tabs .tab");
+function showMode(m){
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle("active", +tabs[i].dataset.m===m);
+  document.getElementById("m0").classList.toggle("hide", m!==0);
+  document.getElementById("m1").classList.toggle("hide", m!==1);
+  document.getElementById("m2").classList.toggle("hide", m!==2);
+  document.getElementById("m3").classList.toggle("hide", m!==3);
+  document.getElementById("mq").classList.toggle("hide", m!==3);
+  if(m===1) drawSlope();
+  if(m===2) drawExp();
+}
+for(var t=0;t<tabs.length;t++){
+  tabs[t].addEventListener("click", function(){ showMode(+this.dataset.m); });
+}
+
+/* ================= MODE 0: order & degree ================= */
+var odes = [
+  {eq:"dy/dx + 2y = 0", order:1, deg:1},
+  {eq:"d²y/dx² + 3(dy/dx) + 2y = 0", order:2, deg:1},
+  {eq:"(d²y/dx²)³ + (dy/dx)² + y = x", order:2, deg:3},
+  {eq:"(dy/dx)² + y = sin x", order:1, deg:2},
+  {eq:"d³y/dx³ + x(dy/dx) = e^x", order:3, deg:1},
+  {eq:"[1 + (dy/dx)²]^(3/2) = d²y/dx²", order:2, deg:1,
+   note:"Square both sides to clear the 3/2 power: [1+(y′)²]³ = (y″)². The highest derivative y″ appears to power 2 → degree 2.", degFix:2}
+];
+var odeSel = document.getElementById("odeSel");
+for(var i=0;i<odes.length;i++){
+  var o=document.createElement("option"); o.value=i; o.textContent=odes[i].eq; odeSel.appendChild(o);
+}
+function renderOde(){
+  var o=odes[+odeSel.value];
+  document.getElementById("odeShow").innerHTML = "<b>"+o.eq+"</b>";
+  document.getElementById("odAns").innerHTML="";
+}
+odeSel.addEventListener("change", renderOde);
+function trueDeg(o){ return o.degFix!==undefined ? o.degFix : o.deg; }
+document.getElementById("checkOD").addEventListener("click", function(){
+  var o=odes[+odeSel.value];
+  var go=+document.getElementById("gOrder").value, gd=+document.getElementById("gDeg").value;
+  var okO = go===o.order, okD = gd===trueDeg(o);
+  var msg = "Order: <span class='"+(okO?"ok":"no")+"'>"+(okO?"correct":"→ "+o.order)+"</span> · " +
+            "Degree: <span class='"+(okD?"ok":"no")+"'>"+(okD?"correct":"→ "+trueDeg(o))+"</span>";
+  document.getElementById("odAns").innerHTML = msg + (o.note?("<div class='hint' style='margin-top:6px'>"+o.note+"</div>"):"");
+});
+document.getElementById("revealOD").addEventListener("click", function(){
+  var o=odes[+odeSel.value];
+  document.getElementById("odAns").innerHTML =
+    "<span class='val'>Order = "+o.order+", Degree = "+trueDeg(o)+"</span>" +
+    (o.note?("<div class='hint' style='margin-top:6px'>"+o.note+"</div>"):
+      "<div class='hint' style='margin-top:6px'>Highest derivative fixes the order; its power fixes the degree.</div>");
+});
+renderOde();
+
+/* ================= MODE 1: slope field ================= */
+var fields = [
+  {name:"dy/dx = x",      f:function(x,y){return x;},        gen:function(x,C){return 0.5*x*x + C;},           genLbl:"y = x²/2 + C"},
+  {name:"dy/dx = y",      f:function(x,y){return y;},        gen:function(x,C){return C*Math.exp(x);},         genLbl:"y = C·eˣ"},
+  {name:"dy/dx = -x/y",   f:function(x,y){return y===0?1e6:-x/y;}, gen:null,                                    genLbl:"x² + y² = C  (circles)"},
+  {name:"dy/dx = x + y",  f:function(x,y){return x+y;},      gen:function(x,C){return C*Math.exp(x) - x - 1;}, genLbl:"y = C·eˣ − x − 1"},
+  {name:"dy/dx = -y",     f:function(x,y){return -y;},       gen:function(x,C){return C*Math.exp(-x);},        genLbl:"y = C·e^(−x)"}
+];
+var sfSel=document.getElementById("sfSel");
+for(var j=0;j<fields.length;j++){var op=document.createElement("option");op.value=j;op.textContent=fields[j].name;sfSel.appendChild(op);}
+var cSlide=document.getElementById("cSlide");
+var sfSeeds=[];      // particular-solution initial points
+var showFam=true;
+var SF = {xmin:-4,xmax:4,ymin:-4,ymax:4};
+
+function toPx(cv,x,y){
+  var w=cv.width,h=cv.height;
+  return [ (x-SF.xmin)/(SF.xmax-SF.xmin)*w, h-(y-SF.ymin)/(SF.ymax-SF.ymin)*h ];
+}
+function integrateCurve(f,x0,y0,dir){
+  // RK4 from (x0,y0) in direction dir(+1/-1) across the window
+  var pts=[], x=x0,y=y0, hstep=0.03*dir, steps=Math.ceil((SF.xmax-SF.xmin)/0.03)+4;
+  pts.push([x,y]);
+  for(var s=0;s<steps;s++){
+    if(x<SF.xmin-0.5||x>SF.xmax+0.5||y<SF.ymin-3||y>SF.ymax+3) break;
+    var k1=f(x,y), k2=f(x+hstep/2,y+hstep/2*k1),
+        k3=f(x+hstep/2,y+hstep/2*k2), k4=f(x+hstep,y+hstep*k3);
+    y = y + hstep/6*(k1+2*k2+2*k3+k4); x = x + hstep;
+    if(!isFinite(y)||Math.abs(y)>50) break;
+    pts.push([x,y]);
+  }
+  return pts;
+}
+function plotPts(ctx,cv,pts,color,width){
+  if(pts.length<2)return;
+  ctx.strokeStyle=color; ctx.lineWidth=width; ctx.beginPath();
+  var started=false;
+  for(var i=0;i<pts.length;i++){
+    var p=toPx(cv,pts[i][0],pts[i][1]);
+    if(p[1]<-50||p[1]>cv.height+50){started=false;continue;}
+    if(!started){ctx.moveTo(p[0],p[1]);started=true;} else ctx.lineTo(p[0],p[1]);
+  }
+  ctx.stroke();
+}
+function drawAxes(ctx,cv){
+  ctx.strokeStyle="#2a3040"; ctx.lineWidth=1;
+  for(var gx=SF.xmin;gx<=SF.xmax;gx++){var p=toPx(cv,gx,0);ctx.beginPath();ctx.moveTo(p[0],0);ctx.lineTo(p[0],cv.height);ctx.stroke();}
+  for(var gy=SF.ymin;gy<=SF.ymax;gy++){var q=toPx(cv,0,gy);ctx.beginPath();ctx.moveTo(0,q[1]);ctx.lineTo(cv.width,q[1]);ctx.stroke();}
+  ctx.strokeStyle="#4a5573"; ctx.lineWidth=1.5;
+  var o=toPx(cv,0,0);
+  ctx.beginPath();ctx.moveTo(0,o[1]);ctx.lineTo(cv.width,o[1]);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(o[0],0);ctx.lineTo(o[0],cv.height);ctx.stroke();
+}
+function drawSlope(){
+  var cv=document.getElementById("sfCanvas"), ctx=cv.getContext("2d");
+  var fld=fields[+sfSel.value], C=+cSlide.value;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  drawAxes(ctx,cv);
+  // slope field
+  var N=17, seg=0.34;
+  ctx.strokeStyle="#586079"; ctx.lineWidth=1.4;
+  for(var a=0;a<N;a++){
+    for(var b=0;b<N;b++){
+      var x=SF.xmin+(SF.xmax-SF.xmin)*a/(N-1);
+      var y=SF.ymin+(SF.ymax-SF.ymin)*b/(N-1);
+      var m=fld.f(x,y);
+      var ang=Math.atan(m);
+      var dx=Math.cos(ang)*seg, dy=Math.sin(ang)*seg;
+      var p1=toPx(cv,x-dx/2,y-dy/2), p2=toPx(cv,x+dx/2,y+dy/2);
+      ctx.beginPath();ctx.moveTo(p1[0],p1[1]);ctx.lineTo(p2[0],p2[1]);ctx.stroke();
+    }
+  }
+  // general solution for chosen C (accent)
+  if(showFam){
+    if(fld.gen){
+      var gpts=[];
+      for(var gx=SF.xmin;gx<=SF.xmax+0.01;gx+=0.02){ gpts.push([gx, fld.gen(gx,C)]); }
+      plotPts(ctx,cv,gpts,"#5fd0c8",2.4);
+    } else if(fld.name.indexOf("-x/y")>=0){
+      // circle x^2+y^2 = R^2 ; use R from |C| (C in [-4,4] -> radius up to 4)
+      var R=Math.abs(C)*1.0; if(R<0.15)R=0.15;
+      var cp=[];
+      for(var th=0;th<=2*Math.PI+0.02;th+=0.03){ cp.push([R*Math.cos(th), R*Math.sin(th)]); }
+      plotPts(ctx,cv,cp,"#5fd0c8",2.4);
+    }
+  }
+  // particular solutions through user points (both directions), purple
+  for(var s=0;s<sfSeeds.length;s++){
+    var sd=sfSeeds[s];
+    plotPts(ctx,cv,integrateCurve(fld.f,sd[0],sd[1],+1),"#8f7bff",2.2);
+    plotPts(ctx,cv,integrateCurve(fld.f,sd[0],sd[1],-1),"#8f7bff",2.2);
+    var pp=toPx(cv,sd[0],sd[1]);
+    ctx.fillStyle="#ffd36e"; ctx.beginPath(); ctx.arc(pp[0],pp[1],4,0,2*Math.PI); ctx.fill();
+  }
+  document.getElementById("cVal").textContent=C.toFixed(2);
+  document.getElementById("sfInfo").innerHTML =
+    "General solution: <b class='val'>"+fld.genLbl+"</b>. " +
+    (sfSeeds.length? ("Particular curves through "+sfSeeds.length+" point"+(sfSeeds.length>1?"s":"")+".") :
+      "Tap the plot to add a particular solution.");
+}
+sfSel.addEventListener("change", function(){ sfSeeds=[]; drawSlope(); });
+cSlide.addEventListener("input", drawSlope);
+document.getElementById("sfClear").addEventListener("click", function(){ sfSeeds=[]; drawSlope(); });
+document.getElementById("sfToggleFam").addEventListener("click", function(){
+  showFam=!showFam; this.textContent="Family: "+(showFam?"ON":"OFF"); drawSlope();
+});
+function sfPoint(ev){
+  var cv=document.getElementById("sfCanvas");
+  var r=cv.getBoundingClientRect();
+  var cx = (ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+  var cy = (ev.touches?ev.touches[0].clientY:ev.clientY)-r.top;
+  var px = cx * cv.width / r.width, py = cy * cv.height / r.height;
+  var x = SF.xmin + px/cv.width*(SF.xmax-SF.xmin);
+  var y = SF.ymin + (cv.height-py)/cv.height*(SF.ymax-SF.ymin);
+  sfSeeds.push([x,y]); drawSlope();
+}
+document.getElementById("sfCanvas").addEventListener("click", sfPoint);
+document.getElementById("sfCanvas").addEventListener("touchstart", function(e){ e.preventDefault(); sfPoint(e); }, {passive:false});
+
+/* ================= MODE 2: exponential ODE ================= */
+var kSlide=document.getElementById("kSlide"), cSlide2=document.getElementById("cSlide2");
+function drawExp(){
+  var cv=document.getElementById("expCanvas"), ctx=cv.getContext("2d");
+  var k=+kSlide.value, C=+cSlide2.value;
+  var xmin=-3,xmax=3,ymin=0,ymax=8;
+  function px(x,y){ return [ (x-xmin)/(xmax-xmin)*cv.width, cv.height-(y-ymin)/(ymax-ymin)*cv.height ]; }
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // grid
+  ctx.strokeStyle="#2a3040";ctx.lineWidth=1;
+  for(var gx=xmin;gx<=xmax;gx++){var p=px(gx,ymin);ctx.beginPath();ctx.moveTo(p[0],0);ctx.lineTo(p[0],cv.height);ctx.stroke();}
+  for(var gy=ymin;gy<=ymax;gy+=1){var q=px(0,gy);ctx.beginPath();ctx.moveTo(0,q[1]);ctx.lineTo(cv.width,q[1]);ctx.stroke();}
+  ctx.strokeStyle="#4a5573";ctx.lineWidth=1.5;
+  var o=px(0,ymin); ctx.beginPath();ctx.moveTo(o[0],0);ctx.lineTo(o[0],cv.height);ctx.stroke();
+  var yb=px(xmin,0); ctx.beginPath();ctx.moveTo(0,yb[1]);ctx.lineTo(cv.width,yb[1]);ctx.stroke();
+  // curve y = C e^{kx}
+  ctx.strokeStyle="#5fd0c8";ctx.lineWidth=2.6;ctx.beginPath();var st=false;
+  for(var x=xmin;x<=xmax+0.001;x+=0.02){
+    var y=C*Math.exp(k*x); var p2=px(x,y);
+    if(p2[1]<-20||p2[1]>cv.height+20){st=false;continue;}
+    if(!st){ctx.moveTo(p2[0],p2[1]);st=true;}else ctx.lineTo(p2[0],p2[1]);
+  }
+  ctx.stroke();
+  // mark y(0)=C
+  var m0=px(0,C); ctx.fillStyle="#ffd36e";ctx.beginPath();ctx.arc(m0[0],m0[1],4,0,2*Math.PI);ctx.fill();
+  ctx.fillStyle="#e8ecf4";ctx.font="12px system-ui";ctx.fillText("y(0)="+C.toFixed(1), m0[0]+7, m0[1]-6);
+  document.getElementById("kVal").textContent=k.toFixed(2);
+  document.getElementById("c2Val").textContent=C.toFixed(1);
+  var kind = k>0.01?"exponential growth":(k<-0.01?"exponential decay":"a constant");
+  document.getElementById("solNote").innerHTML =
+    "Solution: <span class='val'>y = "+C.toFixed(1)+"·e^("+k.toFixed(2)+"x)</span> — this is "+kind+
+    ". The constant C = y(0) is fixed by the initial condition, giving a <b>particular</b> solution.";
+}
+kSlide.addEventListener("input", drawExp);
+cSlide2.addEventListener("input", drawExp);
+
+/* ================= MODE 3: quiz ================= */
+var quiz=[
+  {q:"What is the order of  d²y/dx² + 5(dy/dx)³ + y = 0 ?",
+   opts:["1","2","3","5"], ans:1, why:"Highest derivative is d²y/dx² → order 2. (The power 3 is on the first derivative, not the highest.)"},
+  {q:"For (d²y/dx²)³ + (dy/dx) = x, the degree is:",
+   opts:["1","2","3","not defined"], ans:2, why:"Highest-order derivative d²y/dx² is raised to power 3 → degree 3."},
+  {q:"The solution y = C·eˣ of dy/dx = y is called a:",
+   opts:["particular solution","general solution","singular solution","numerical solution"], ans:1,
+   why:"It contains an arbitrary constant C, so it represents the whole family — the general solution."}
+];
+var qDiv=document.getElementById("quiz");
+quiz.forEach(function(item,qi){
+  var wrap=document.createElement("div"); wrap.className="q";
+  var h=document.createElement("div"); h.innerHTML="<b>Q"+(qi+1)+".</b> "+item.q; wrap.appendChild(h);
+  var opts=document.createElement("div"); opts.className="opts";
+  var fb=document.createElement("div"); fb.className="feedback";
+  item.opts.forEach(function(txt,oi){
+    var b=document.createElement("button"); b.className="opt"; b.textContent=txt;
+    b.addEventListener("click", function(){
+      var kids=opts.querySelectorAll(".opt");
+      for(var z=0;z<kids.length;z++){ kids[z].classList.remove("correct","wrong"); }
+      kids[item.ans].classList.add("correct");
+      if(oi!==item.ans) b.classList.add("wrong");
+      fb.innerHTML = (oi===item.ans?"<span class='ok'>Correct! </span>":"<span class='no'>Not quite. </span>")+item.why;
+    });
+    opts.appendChild(b);
+  });
+  wrap.appendChild(opts); wrap.appendChild(fb); qDiv.appendChild(wrap);
+});
+
+/* responsive canvas backing-store on resize */
+window.addEventListener("resize", function(){
+  if(!document.getElementById("m1").classList.contains("hide")) drawSlope();
+  if(!document.getElementById("m2").classList.contains("hide")) drawExp();
+});
+
+/* init */
+showMode(0);
+</script>
+</body>
+</html>

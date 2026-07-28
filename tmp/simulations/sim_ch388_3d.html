@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3-D Coordinate Geometry Lab — NIOS Class 12 Maths (Ch 33)</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#1a2233; --panel2:#222c40; --line:#2e3a52;
+    --text:#e6ecf7; --muted:#93a1bd; --accent:#4fd1c5; --accent2:#2a9d8f;
+    --x:#ff6b6b; --y:#6bd66b; --z:#6b9bff; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.45; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.25rem;margin:0 0 2px}
+  h2{font-size:1rem;margin:0 0 8px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+  .wrap{max-width:960px;margin:0 auto}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:8px 14px;border-radius:999px;cursor:pointer;font-size:.85rem;
+    touch-action:manipulation;
+  }
+  .tab.active{background:var(--accent);color:#08221f;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin-bottom:14px;
+  }
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 300px}}
+  canvas{
+    width:100%;height:auto;display:block;background:#0b101a;
+    border-radius:10px;border:1px solid var(--line);touch-action:none;cursor:grab;
+  }
+  canvas:active{cursor:grabbing}
+  .ctl{margin-bottom:10px}
+  label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:3px}
+  .row{display:flex;gap:8px;align-items:center}
+  .row .fld{flex:1}
+  input[type=number]{
+    width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:7px 8px;font-size:.9rem;
+  }
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  button.btn{
+    background:var(--accent2);color:#fff;border:none;border-radius:8px;
+    padding:8px 12px;font-size:.85rem;cursor:pointer;touch-action:manipulation;
+  }
+  button.btn.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--text)}
+  .readout{font-size:.85rem}
+  .readout .k{color:var(--muted)}
+  .readout .v{color:var(--accent);font-weight:600}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+  .chip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:6px;padding:2px 7px;font-size:.78rem;margin:2px 2px 2px 0}
+  .cx{color:var(--x)} .cy{color:var(--y)} .cz{color:var(--z)}
+  .facts li{margin-bottom:7px;font-size:.85rem}
+  .facts b{color:var(--accent)}
+  details.q{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-bottom:10px}
+  details.q summary{cursor:pointer;font-size:.9rem;font-weight:600}
+  details.q .opt{font-size:.85rem;margin:6px 0 0 4px;color:var(--muted)}
+  details.q .ans{margin-top:8px;color:var(--accent);font-size:.85rem}
+  .hint{font-size:.78rem;color:var(--muted);margin-top:6px}
+  .switchbox{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px}
+  .switchbox label{display:flex;gap:5px;align-items:center;margin:0;cursor:pointer}
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;margin:18px 0 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>3-D Coordinate Geometry Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics · Chapter 33 — Introduction to 3-D · drag the canvas to rotate the view</p>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-mode="points">Axes &amp; Points</div>
+    <div class="tab" data-mode="dist">Distance &amp; Section</div>
+    <div class="tab" data-mode="dc">Direction Cosines</div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <canvas id="cv" width="640" height="460" aria-label="3-D coordinate view"></canvas>
+      <div class="switchbox">
+        <label><input type="checkbox" id="showProj" checked> Projections to planes</label>
+        <label><input type="checkbox" id="showOct"> Octant labels</label>
+        <label><input type="checkbox" id="spin"> Auto-rotate</label>
+      </div>
+      <div class="hint">Tip: drag left/right to spin, up/down to tilt. On phones use one finger.</div>
+    </div>
+
+    <div>
+      <!-- MODE: points -->
+      <div class="panel modep" id="p-points">
+        <h2>Plot a point P(x, y, z)</h2>
+        <div class="row ctl">
+          <div class="fld"><label class="cx">x</label><input type="number" id="px" value="3" step="0.5"></div>
+          <div class="fld"><label class="cy">y</label><input type="number" id="py" value="2" step="0.5"></div>
+          <div class="fld"><label class="cz">z</label><input type="number" id="pz" value="4" step="0.5"></div>
+        </div>
+        <div class="readout" id="octRead"></div>
+        <div class="hint">The three coordinate planes split space into 8 octants.</div>
+      </div>
+
+      <!-- MODE: dist -->
+      <div class="panel modep hidden" id="p-dist">
+        <h2>Two points A, B</h2>
+        <div class="row ctl">
+          <div class="fld"><label class="cx">Aₓ</label><input type="number" id="ax" value="1" step="0.5"></div>
+          <div class="fld"><label class="cy">Aᵧ</label><input type="number" id="ay" value="2" step="0.5"></div>
+          <div class="fld"><label class="cz">A_z</label><input type="number" id="az" value="2" step="0.5"></div>
+        </div>
+        <div class="row ctl">
+          <div class="fld"><label class="cx">Bₓ</label><input type="number" id="bx" value="4" step="0.5"></div>
+          <div class="fld"><label class="cy">Bᵧ</label><input type="number" id="by" value="-1" step="0.5"></div>
+          <div class="fld"><label class="cz">B_z</label><input type="number" id="bz" value="4" step="0.5"></div>
+        </div>
+        <div class="ctl">
+          <label>Section ratio m : n (point divides AB), m/(m+n) = <span id="tlab">1/2</span></label>
+          <input type="range" id="ratio" min="0" max="100" value="50">
+          <div class="row" style="margin-top:6px">
+            <div class="fld"><label>m</label><input type="number" id="mIn" value="1" step="1"></div>
+            <div class="fld"><label>n</label><input type="number" id="nIn" value="1" step="1"></div>
+          </div>
+        </div>
+        <div class="readout" id="distRead"></div>
+      </div>
+
+      <!-- MODE: dc -->
+      <div class="panel modep hidden" id="p-dc">
+        <h2>Vector OP = (a, b, c)</h2>
+        <div class="row ctl">
+          <div class="fld"><label class="cx">a</label><input type="number" id="da" value="2" step="0.5"></div>
+          <div class="fld"><label class="cy">b</label><input type="number" id="db" value="3" step="0.5"></div>
+          <div class="fld"><label class="cz">c</label><input type="number" id="dc" value="6" step="0.5"></div>
+        </div>
+        <div class="readout" id="dcRead"></div>
+        <div class="hint">Direction ratios ∝ (a,b,c); direction cosines l=a/r, m=b/r, n=c/r with r=√(a²+b²+c²).</div>
+      </div>
+
+      <div class="panel">
+        <h2>Facts</h2>
+        <ul class="facts" style="margin:0;padding-left:18px">
+          <li><b>Octants:</b> the 3 coordinate planes divide space into <b>8</b> octants by the signs of (x,y,z).</li>
+          <li><b>Distance:</b> PQ = √[(x₂−x₁)²+(y₂−y₁)²+(z₂−z₁)²].</li>
+          <li><b>Midpoint:</b> ((x₁+x₂)/2, (y₁+y₂)/2, (z₁+z₂)/2).</li>
+          <li><b>Section (m:n internal):</b> ((mx₂+nx₁)/(m+n), (my₂+ny₁)/(m+n), (mz₂+nz₁)/(m+n)).</li>
+          <li><b>Direction cosines:</b> l=cosα, m=cosβ, n=cosγ and <b>l²+m²+n²=1</b>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Quick Quiz</h2>
+    <details class="q">
+      <summary>1. In which octant does the point (−2, 3, −5) lie by signs (x,y,z)?</summary>
+      <div class="opt">A) (+,+,+)  B) (−,+,−)  C) (−,−,−)  D) (+,−,+)</div>
+      <div class="ans">Answer: B — signs are (−, +, −).</div>
+    </details>
+    <details class="q">
+      <summary>2. Distance between (1,2,3) and (4,6,15) is?</summary>
+      <div class="opt">A) 13  B) 12  C) √13  D) 25</div>
+      <div class="ans">Answer: A — √(3²+4²+12²)=√(9+16+144)=√169=13.</div>
+    </details>
+    <details class="q">
+      <summary>3. If a line has direction cosines l, m, n, then l²+m²+n² equals?</summary>
+      <div class="opt">A) 0  B) 3  C) 1  D) depends on the line</div>
+      <div class="ans">Answer: C — always 1.</div>
+    </details>
+  </div>
+
+  <footer>Pure canvas 2-D projection of 3-D points · no external libraries</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  var mode = 'points';
+
+  // view rotation angles
+  var yaw = -0.6, pitch = 0.5;
+  var scale = 34;              // world units -> px
+  var spin = false;
+
+  // ---------- 3D -> 2D projection (orthographic, yaw + pitch) ----------
+  function proj(p){
+    var cy = Math.cos(yaw), sy = Math.sin(yaw);
+    var cp = Math.cos(pitch), sp = Math.sin(pitch);
+    var x1 = p.x*cy + p.y*sy;
+    var y1 = -p.x*sy + p.y*cy;
+    var z1 = p.z;
+    var Y = y1*cp - z1*sp;    // depth
+    var Z = y1*sp + z1*cp;    // vertical
+    return { sx: W/2 + x1*scale, sy: H/2 - Z*scale, depth: Y };
+  }
+
+  function line(a,b,color,width){
+    var A=proj(a), B=proj(b);
+    ctx.strokeStyle=color; ctx.lineWidth=width||1.5;
+    ctx.beginPath(); ctx.moveTo(A.sx,A.sy); ctx.lineTo(B.sx,B.sy); ctx.stroke();
+  }
+  function dot(p,color,r,label,lcolor){
+    var P=proj(p);
+    ctx.fillStyle=color; ctx.beginPath(); ctx.arc(P.sx,P.sy,r||5,0,7); ctx.fill();
+    if(label){ ctx.fillStyle=lcolor||'#e6ecf7'; ctx.font='12px system-ui';
+      ctx.fillText(label, P.sx+7, P.sy-6); }
+  }
+  function dashed(a,b,color){
+    var A=proj(a),B=proj(b);
+    ctx.save(); ctx.setLineDash([4,4]); ctx.strokeStyle=color; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(A.sx,A.sy); ctx.lineTo(B.sx,B.sy); ctx.stroke(); ctx.restore();
+  }
+
+  function num(id){ var v=parseFloat(document.getElementById(id).value); return isFinite(v)?v:0; }
+  function fmt(n){ return (Math.round(n*1000)/1000).toString(); }
+
+  function drawGridPlane(){
+    // faint xy-plane grid
+    ctx.strokeStyle='rgba(120,140,180,0.12)'; ctx.lineWidth=1;
+    var g=5;
+    for(var i=-g;i<=g;i++){
+      line({x:i,y:-g,z:0},{x:i,y:g,z:0},'rgba(120,140,180,0.10)',1);
+      line({x:-g,y:i,z:0},{x:g,y:i,z:0},'rgba(120,140,180,0.10)',1);
+    }
+  }
+
+  function drawAxes(){
+    var L=6;
+    line({x:-L,y:0,z:0},{x:L,y:0,z:0},'#ff6b6b',2);
+    line({x:0,y:-L,z:0},{x:0,y:L,z:0},'#6bd66b',2);
+    line({x:0,y:0,z:-L},{x:0,y:0,z:L},'#6b9bff',2);
+    var px=proj({x:L,y:0,z:0}), py=proj({x:0,y:L,z:0}), pz=proj({x:0,y:0,z:L});
+    ctx.font='bold 14px system-ui';
+    ctx.fillStyle='#ff6b6b'; ctx.fillText('x',px.sx+4,px.sy);
+    ctx.fillStyle='#6bd66b'; ctx.fillText('y',py.sx+4,py.sy);
+    ctx.fillStyle='#6b9bff'; ctx.fillText('z',pz.sx+4,pz.sy-4);
+    dot({x:0,y:0,z:0},'#93a1bd',3);
+    ctx.fillStyle='#93a1bd'; ctx.font='11px system-ui'; ctx.fillText('O', W/2-14, H/2+14);
+  }
+
+  function octantLabels(){
+    if(!document.getElementById('showOct').checked) return;
+    ctx.font='10px system-ui'; ctx.fillStyle='rgba(147,161,189,0.85)';
+    var s=3.2, k=1;
+    var signs=[[1,1,1],[-1,1,1],[-1,-1,1],[1,-1,1],[1,1,-1],[-1,1,-1],[-1,-1,-1],[1,-1,-1]];
+    for(var i=0;i<signs.length;i++){
+      var q=proj({x:signs[i][0]*s,y:signs[i][1]*s,z:signs[i][2]*s});
+      ctx.fillText('('+ (signs[i][0]>0?'+':'−') + (signs[i][1]>0?'+':'−') + (signs[i][2]>0?'+':'−') +')', q.sx-12, q.sy);
+    }
+  }
+
+  function drawPointMode(){
+    var p={x:num('px'),y:num('py'),z:num('pz')};
+    if(document.getElementById('showProj').checked){
+      dashed(p,{x:p.x,y:p.y,z:0},'#4fd1c5');
+      dashed(p,{x:p.x,y:0,z:p.z},'#4fd1c5');
+      dashed(p,{x:0,y:p.y,z:p.z},'#4fd1c5');
+      dot({x:p.x,y:p.y,z:0},'#4fd1c5',3);
+      dot({x:p.x,y:0,z:p.z},'#4fd1c5',3);
+      dot({x:0,y:p.y,z:p.z},'#4fd1c5',3);
+    }
+    line({x:0,y:0,z:0},p,'rgba(79,209,197,0.5)',1.2);
+    dot(p,'#f6c453',7,'P('+fmt(p.x)+','+fmt(p.y)+','+fmt(p.z)+')');
+    // octant read
+    function s(v){return v>0?'+':(v<0?'−':'0');}
+    var oct = octantNumber(p.x,p.y,p.z);
+    document.getElementById('octRead').innerHTML =
+      '<div><span class="k">Signs (x,y,z):</span> <span class="v">('+s(p.x)+', '+s(p.y)+', '+s(p.z)+')</span></div>'+
+      '<div><span class="k">Octant:</span> <span class="v">'+(oct?('#'+oct):'on a plane/axis')+'</span></div>'+
+      '<div class="mono" style="margin-top:6px">Projections: xy('+fmt(p.x)+','+fmt(p.y)+',0) · xz('+fmt(p.x)+',0,'+fmt(p.z)+') · yz(0,'+fmt(p.y)+','+fmt(p.z)+')</div>';
+  }
+
+  function octantNumber(x,y,z){
+    if(x===0||y===0||z===0) return 0;
+    var map={ '+++':1,'-++':2,'--+':3,'+-+':4,'++-':5,'-+-':6,'---':7,'+--':8 };
+    var key=(x>0?'+':'-')+(y>0?'+':'-')+(z>0?'+':'-');
+    return map[key];
+  }
+
+  function drawDistMode(){
+    var A={x:num('ax'),y:num('ay'),z:num('az')};
+    var B={x:num('bx'),y:num('by'),z:num('bz')};
+    var m=num('mIn'), n=num('nIn');
+    if(m+n===0){m=1;n=1;}
+    // section point (internal): (m*B + n*A)/(m+n)
+    var S={ x:(m*B.x+n*A.x)/(m+n), y:(m*B.y+n*A.y)/(m+n), z:(m*B.z+n*A.z)/(m+n) };
+    var M={ x:(A.x+B.x)/2, y:(A.y+B.y)/2, z:(A.z+B.z)/2 };
+    line(A,B,'#4fd1c5',2);
+    dot(A,'#ff6b6b',6,'A');
+    dot(B,'#6b9bff',6,'B');
+    dot(M,'#93a1bd',4,'M');
+    dot(S,'#f6c453',6,'P');
+    var d=Math.sqrt(Math.pow(B.x-A.x,2)+Math.pow(B.y-A.y,2)+Math.pow(B.z-A.z,2));
+    document.getElementById('distRead').innerHTML =
+      '<div><span class="k">Distance AB =</span> <span class="v">'+fmt(d)+'</span></div>'+
+      '<div class="mono">√['+fmt(B.x-A.x)+'²+'+fmt(B.y-A.y)+'²+'+fmt(B.z-A.z)+'²]</div>'+
+      '<div style="margin-top:6px"><span class="k">Midpoint M =</span> <span class="v">('+fmt(M.x)+', '+fmt(M.y)+', '+fmt(M.z)+')</span></div>'+
+      '<div><span class="k">P divides '+fmt(m)+':'+fmt(n)+' (internal) =</span> <span class="v">('+fmt(S.x)+', '+fmt(S.y)+', '+fmt(S.z)+')</span></div>';
+  }
+
+  function drawDcMode(){
+    var a=num('da'), b=num('db'), c=num('dc');
+    var r=Math.sqrt(a*a+b*b+c*c);
+    var P={x:a,y:b,z:c};
+    line({x:0,y:0,z:0},P,'#f6c453',2.4);
+    dot(P,'#f6c453',6,'P('+fmt(a)+','+fmt(b)+','+fmt(c)+')');
+    if(document.getElementById('showProj').checked){
+      dashed(P,{x:a,y:b,z:0},'#4fd1c5');
+      dashed(P,{x:a,y:0,z:c},'#4fd1c5');
+      dashed(P,{x:0,y:b,z:c},'#4fd1c5');
+    }
+    var el, m_, n_;
+    if(r===0){
+      document.getElementById('dcRead').innerHTML='<div class="k">Vector is zero — direction undefined.</div>';
+      return;
+    }
+    el=a/r; m_=b/r; n_=c/r;
+    var al=Math.acos(el)*180/Math.PI, be=Math.acos(m_)*180/Math.PI, ga=Math.acos(n_)*180/Math.PI;
+    var check=el*el+m_*m_+n_*n_;
+    document.getElementById('dcRead').innerHTML =
+      '<div><span class="k">|OP| = r =</span> <span class="v">'+fmt(r)+'</span></div>'+
+      '<div><span class="k">Direction ratios:</span> <span class="v">('+fmt(a)+', '+fmt(b)+', '+fmt(c)+')</span></div>'+
+      '<div><span class="k">Direction cosines:</span> <span class="v">l='+fmt(el)+', m='+fmt(m_)+', n='+fmt(n_)+'</span></div>'+
+      '<div class="mono">l²+m²+n² = '+fmt(check)+'</div>'+
+      '<div style="margin-top:6px"><span class="chip cx">α with x = '+fmt(al)+'°</span><span class="chip cy">β with y = '+fmt(be)+'°</span><span class="chip cz">γ with z = '+fmt(ga)+'°</span></div>';
+  }
+
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    drawGridPlane();
+    drawAxes();
+    octantLabels();
+    if(mode==='points') drawPointMode();
+    else if(mode==='dist') drawDistMode();
+    else drawDcMode();
+  }
+
+  // ---------- interaction ----------
+  var dragging=false, lastX=0, lastY=0;
+  function down(x,y){ dragging=true; lastX=x; lastY=y; }
+  function move(x,y){
+    if(!dragging) return;
+    yaw   += (x-lastX)*0.01;
+    pitch += (y-lastY)*0.01;
+    pitch = Math.max(-1.4, Math.min(1.4, pitch));
+    lastX=x; lastY=y; render();
+  }
+  function up(){ dragging=false; }
+
+  cv.addEventListener('mousedown',function(e){ down(e.offsetX,e.offsetY); });
+  window.addEventListener('mousemove',function(e){
+    if(!dragging) return;
+    var r=cv.getBoundingClientRect();
+    var sx=W/r.width, sy=H/r.height;
+    move((e.clientX-r.left)*sx,(e.clientY-r.top)*sy);
+  });
+  window.addEventListener('mouseup',up);
+  cv.addEventListener('touchstart',function(e){
+    var t=e.touches[0], r=cv.getBoundingClientRect();
+    down((t.clientX-r.left)*(W/r.width),(t.clientY-r.top)*(H/r.height));
+    e.preventDefault();
+  },{passive:false});
+  cv.addEventListener('touchmove',function(e){
+    var t=e.touches[0], r=cv.getBoundingClientRect();
+    move((t.clientX-r.left)*(W/r.width),(t.clientY-r.top)*(H/r.height));
+    e.preventDefault();
+  },{passive:false});
+  cv.addEventListener('touchend',up);
+
+  // tabs
+  var tabs=document.querySelectorAll('.tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      mode=t.getAttribute('data-mode');
+      document.getElementById('p-points').classList.toggle('hidden',mode!=='points');
+      document.getElementById('p-dist').classList.toggle('hidden',mode!=='dist');
+      document.getElementById('p-dc').classList.toggle('hidden',mode!=='dc');
+      render();
+    });
+  });
+
+  // ratio slider <-> m,n
+  var ratio=document.getElementById('ratio');
+  ratio.addEventListener('input',function(){
+    var t=+ratio.value;               // 0..100 => m/(m+n)
+    document.getElementById('tlab').textContent=(t/100).toFixed(2);
+    // set m,n as simple ints
+    document.getElementById('mIn').value=t;
+    document.getElementById('nIn').value=100-t;
+    render();
+  });
+
+  // inputs
+  ['px','py','pz','ax','ay','az','bx','by','bz','mIn','nIn','da','db','dc','showProj','showOct']
+    .forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){ el.addEventListener('input',render); el.addEventListener('change',render); }
+    });
+
+  document.getElementById('spin').addEventListener('change',function(e){ spin=e.target.checked; });
+
+  // animation loop
+  function loop(){
+    if(spin && !document.hidden && !dragging){ yaw+=0.006; render(); }
+    requestAnimationFrame(loop);
+  }
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) render(); });
+
+  render();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

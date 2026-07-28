@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vectors Lab — Vectors (NIOS Class 12, Ch 34)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#6ee7b7;
+    --accent2:#7aa2ff;
+    --accent-soft:rgba(110,231,183,.15);
+    --a-col:#6ee7b7;
+    --b-col:#7aa2ff;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 100px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px;color:var(--ink)}
+  .hide{display:none!important}
+
+  .stage{width:100%;touch-action:none;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+  .ctrl{flex:1 1 150px;min-width:140px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .seg button{flex:1 1 90px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.88rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:32px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:6px}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .fact .k{font-size:.76rem;color:var(--muted)}
+  .fact .v{font-size:1.02rem;font-weight:700;margin-top:2px;word-break:break-word}
+  .fact .v.a{color:var(--a-col)}
+  .fact .v.b{color:var(--b-col)}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;margin-top:6px}
+  .badge.perp{background:rgba(255,180,84,.16);color:#ffb454;border:1px solid #ffb454}
+  .badge.par{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+
+  .quiz .q{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:7px;cursor:pointer;font-size:.9rem;
+    touch-action:manipulation}
+  .quiz .opt:hover{border-color:var(--accent2)}
+  .quiz .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:#c7f2d6}
+  .quiz .opt.wrong{background:rgba(255,123,123,.15);border-color:var(--bad);color:#ffd0d0}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend .dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .num{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .num label{font-size:.82rem;color:var(--muted);min-width:36px}
+  .num input[type=number]{width:64px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:6px 8px;font-size:.9rem}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Vectors</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch 34 — drag the arrows, watch the maths.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="add">Basics &amp; Addition</button>
+    <button class="tab-btn" data-mode="dot">Dot Product</button>
+    <button class="tab-btn" data-mode="cross">Cross Product (3D)</button>
+  </div>
+
+  <!-- ============ MODE: ADDITION ============ -->
+  <section id="mode-add" class="panel">
+    <h2>Vector basics &amp; addition</h2>
+    <canvas id="cvAdd" class="stage" width="640" height="420"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--a-col)"></span>a</span>
+      <span><span class="dot" style="background:var(--b-col)"></span>b</span>
+      <span><span class="dot" style="background:#ffb454"></span>result</span>
+    </div>
+    <p class="hint">Drag the tip of <b style="color:var(--a-col)">a</b> or <b style="color:var(--b-col)">b</b>. Grid unit = 1.</p>
+    <div class="seg" id="opSeg">
+      <button data-op="add" class="on">a + b</button>
+      <button data-op="sub">a &minus; b</button>
+      <button data-op="scal">k·a</button>
+    </div>
+    <div class="seg" id="lawSeg">
+      <button data-law="tri" class="on">Triangle law</button>
+      <button data-law="par">Parallelogram</button>
+    </div>
+    <div class="controls" id="scalWrap" style="display:none">
+      <div class="ctrl">
+        <label>scalar k = <output id="kOut">2.0</output></label>
+        <input type="range" id="kRange" min="-3" max="3" step="0.1" value="2">
+      </div>
+    </div>
+    <div class="facts" id="factsAdd"></div>
+  </section>
+
+  <!-- ============ MODE: DOT ============ -->
+  <section id="mode-dot" class="panel hide">
+    <h2>Dot product &amp; projection</h2>
+    <canvas id="cvDot" class="stage" width="640" height="420"></canvas>
+    <p class="hint">Drag the tips. The dashed line shows the projection of <b style="color:var(--a-col)">a</b> onto <b style="color:var(--b-col)">b</b>.</p>
+    <div class="facts" id="factsDot"></div>
+    <div id="dotBadge" style="margin-top:4px"></div>
+  </section>
+
+  <!-- ============ MODE: CROSS ============ -->
+  <section id="mode-cross" class="panel hide">
+    <h2>Cross product (3-D)</h2>
+    <canvas id="cvCross" class="stage" width="640" height="420"></canvas>
+    <p class="hint">Pseudo-3D view. Adjust components; a×b (orange) is perpendicular to the a–b plane.</p>
+    <div class="num"><label>a =</label>
+      <span>(</span><input type="number" id="ax" value="2" step="1"><input type="number" id="ay" value="0" step="1"><input type="number" id="az" value="1" step="1"><span>)</span>
+    </div>
+    <div class="num"><label>b =</label>
+      <span>(</span><input type="number" id="bx" value="0" step="1"><input type="number" id="by" value="2" step="1"><input type="number" id="bz" value="1" step="1"><span>)</span>
+    </div>
+    <div class="facts" id="factsCross"></div>
+    <div id="crossBadge" style="margin-top:4px"></div>
+  </section>
+
+  <!-- ============ FACTS REFERENCE ============ -->
+  <section class="panel">
+    <h2>Facts &amp; formulas</h2>
+    <div class="facts">
+      <div class="fact"><div class="k">Magnitude (2D)</div><div class="v">|a| = &radic;(a&#8321;²+a&#8322;²)</div></div>
+      <div class="fact"><div class="k">Unit vector</div><div class="v">â = a / |a|</div></div>
+      <div class="fact"><div class="k">Dot product</div><div class="v">a·b = a&#8321;b&#8321;+a&#8322;b&#8322; = |a||b|cosθ</div></div>
+      <div class="fact"><div class="k">Angle</div><div class="v">cosθ = a·b / (|a||b|)</div></div>
+      <div class="fact"><div class="k">Projection of a on b</div><div class="v">(a·b)/|b|</div></div>
+      <div class="fact"><div class="k">Cross product</div><div class="v">|a×b| = |a||b|sinθ = area</div></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel quiz" id="quiz">
+    <h2>Quick quiz — tap an option</h2>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var $ = function(s){return document.querySelector(s);};
+  var round = function(x,n){n=n||2;var f=Math.pow(10,n);return Math.round(x*f)/f;};
+
+  /* ---------- Tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  var panes = {add:$("#mode-add"), dot:$("#mode-dot"), cross:$("#mode-cross")};
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      for(var k in panes){panes[k].classList.add("hide");}
+      panes[t.dataset.mode].classList.remove("hide");
+      if(t.dataset.mode==="add") drawAdd();
+      if(t.dataset.mode==="dot") drawDot();
+      if(t.dataset.mode==="cross") drawCross();
+    });
+  });
+
+  /* ---------- Shared canvas helpers ---------- */
+  // world<->screen: origin at canvas centre, unit = px per grid unit
+  function makeView(canvas){
+    return {c:canvas, ctx:canvas.getContext("2d"), unit:38};
+  }
+  function toS(v, x, y){ // world (grid units) -> screen px
+    return {x: v.c.width/2 + x*v.unit, y: v.c.height/2 - y*v.unit};
+  }
+  function toW(v, sx, sy){ // screen px -> world grid units
+    var r = v.c.getBoundingClientRect();
+    var scaleX = v.c.width / r.width, scaleY = v.c.height / r.height;
+    var px = (sx - r.left)*scaleX, py = (sy - r.top)*scaleY;
+    return {x:(px - v.c.width/2)/v.unit, y:(v.c.height/2 - py)/v.unit};
+  }
+  function drawGrid(v){
+    var ctx=v.ctx, W=v.c.width, H=v.c.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.lineWidth=1;
+    ctx.strokeStyle="rgba(255,255,255,0.05)";
+    var i;
+    for(i=-12;i<=12;i++){
+      var p1=toS(v,i,-12), p2=toS(v,i,12);
+      ctx.beginPath();ctx.moveTo(p1.x,0);ctx.lineTo(p1.x,H);ctx.stroke();
+      var q1=toS(v,-12,i);
+      ctx.beginPath();ctx.moveTo(0,q1.y);ctx.lineTo(W,q1.y);ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle="rgba(255,255,255,0.25)";ctx.lineWidth=1.5;
+    var o=toS(v,0,0);
+    ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+    ctx.fillStyle="rgba(255,255,255,0.4)";ctx.font="12px system-ui";
+    ctx.fillText("x", W-16, o.y-6); ctx.fillText("y", o.x+6, 14);
+  }
+  function arrow(v, x1,y1, x2,y2, color, width){
+    var ctx=v.ctx, a=toS(v,x1,y1), b=toS(v,x2,y2);
+    ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=width||3;
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+    var ang=Math.atan2(b.y-a.y, b.x-a.x), h=11;
+    if(Math.hypot(b.x-a.x,b.y-a.y) < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y);
+    ctx.lineTo(b.x-h*Math.cos(ang-0.4), b.y-h*Math.sin(ang-0.4));
+    ctx.lineTo(b.x-h*Math.cos(ang+0.4), b.y-h*Math.sin(ang+0.4));
+    ctx.closePath();ctx.fill();
+  }
+  function dot(v,x,y,color,r){
+    var p=toS(v,x,y);v.ctx.fillStyle=color;
+    v.ctx.beginPath();v.ctx.arc(p.x,p.y,r||6,0,7);v.ctx.fill();
+  }
+  function label(v,x,y,txt,color){
+    var p=toS(v,x,y);v.ctx.fillStyle=color;v.ctx.font="bold 14px system-ui";
+    v.ctx.fillText(txt, p.x+8, p.y-8);
+  }
+
+  /* generic drag: returns nearest tip index within threshold */
+  function attachDrag(v, getTips, onMove){
+    var dragging=-1;
+    function start(sx,sy){
+      var w=toW(v,sx,sy), tips=getTips(), best=-1, bd=0.7;
+      for(var i=0;i<tips.length;i++){
+        var d=Math.hypot(tips[i].x-w.x, tips[i].y-w.y);
+        if(d<bd){bd=d;best=i;}
+      }
+      dragging=best;
+    }
+    function move(sx,sy){ if(dragging<0) return; var w=toW(v,sx,sy); onMove(dragging,w); }
+    v.c.addEventListener("mousedown",function(e){start(e.clientX,e.clientY);});
+    window.addEventListener("mousemove",function(e){if(dragging>=0){move(e.clientX,e.clientY);e.preventDefault();}});
+    window.addEventListener("mouseup",function(){dragging=-1;});
+    v.c.addEventListener("touchstart",function(e){var t=e.touches[0];start(t.clientX,t.clientY);if(dragging>=0)e.preventDefault();},{passive:false});
+    v.c.addEventListener("touchmove",function(e){var t=e.touches[0];if(dragging>=0){move(t.clientX,t.clientY);e.preventDefault();}},{passive:false});
+    v.c.addEventListener("touchend",function(){dragging=-1;});
+  }
+
+  /* ================= MODE ADD ================= */
+  var vAdd = makeView($("#cvAdd"));
+  var A = {x:3, y:1}, B = {x:1, y:2.5};
+  var op="add", law="tri", kVal=2;
+
+  function fact(k, val, cls){
+    return '<div class="fact"><div class="k">'+k+'</div><div class="v '+(cls||"")+'">'+val+'</div></div>';
+  }
+  function vecStr(v){ return "("+round(v.x,1)+", "+round(v.y,1)+")"; }
+
+  function drawAdd(){
+    drawGrid(vAdd);
+    var res;
+    if(op==="add") res={x:A.x+B.x, y:A.y+B.y};
+    else if(op==="sub") res={x:A.x-B.x, y:A.y-B.y};
+    else res={x:kVal*A.x, y:kVal*A.y};
+
+    if(op==="scal"){
+      arrow(vAdd,0,0,A.x,A.y,"var(--a-col)",3);
+      arrow(vAdd,0,0,res.x,res.y,"#ffb454",3);
+      label(vAdd,A.x,A.y,"a","var(--a-col)");
+      label(vAdd,res.x,res.y,"k·a","#ffb454");
+      dot(vAdd,A.x,A.y,"var(--a-col)");
+    } else {
+      // draw a and b from origin
+      arrow(vAdd,0,0,A.x,A.y,"var(--a-col)",3);
+      arrow(vAdd,0,0,B.x,B.y,"var(--b-col)",3);
+      label(vAdd,A.x,A.y,"a","var(--a-col)");
+      label(vAdd,B.x,B.y,"b","var(--b-col)");
+      dot(vAdd,A.x,A.y,"var(--a-col)");
+      dot(vAdd,B.x,B.y,"var(--b-col)");
+      if(op==="add"){
+        if(law==="tri"){
+          // b placed at tip of a
+          arrow(vAdd,A.x,A.y,A.x+B.x,A.y+B.y,"rgba(122,162,255,.5)",2);
+        } else {
+          // parallelogram sides
+          vAdd.ctx.setLineDash([5,5]);
+          arrow(vAdd,A.x,A.y,res.x,res.y,"rgba(122,162,255,.4)",2);
+          arrow(vAdd,B.x,B.y,res.x,res.y,"rgba(110,231,183,.4)",2);
+          vAdd.ctx.setLineDash([]);
+        }
+        arrow(vAdd,0,0,res.x,res.y,"#ffb454",3.5);
+        label(vAdd,res.x,res.y,"a+b","#ffb454");
+      } else { // sub  a-b = a + (-b)
+        arrow(vAdd,A.x,A.y,A.x-B.x,A.y-B.y,"rgba(122,162,255,.5)",2);
+        arrow(vAdd,0,0,res.x,res.y,"#ffb454",3.5);
+        label(vAdd,res.x,res.y,"a-b","#ffb454");
+      }
+    }
+
+    var magA=Math.hypot(A.x,A.y), magB=Math.hypot(B.x,B.y), magR=Math.hypot(res.x,res.y);
+    var uh = magA>1e-9 ? "("+round(A.x/magA,2)+", "+round(A.y/magA,2)+")" : "undefined";
+    var html = fact("a","("+round(A.x,1)+", "+round(A.y,1)+")","a")
+             + fact("b","("+round(B.x,1)+", "+round(B.y,1)+")","b")
+             + fact("|a|", round(magA,2), "a")
+             + fact("|b|", round(magB,2), "b")
+             + fact("â (unit of a)", uh, "a")
+             + fact(op==="scal"?"k·a":(op==="add"?"a+b":"a-b"), vecStr(res), "")
+             + fact("|result|", round(magR,2), "");
+    $("#factsAdd").innerHTML = html;
+  }
+  attachDrag(vAdd, function(){ return op==="scal" ? [A] : [A,B]; },
+    function(i,w){
+      var t = (op==="scal") ? A : (i===0?A:B);
+      // snap to 0.5 grid for tidy numbers
+      t.x = Math.max(-9,Math.min(9, Math.round(w.x*2)/2));
+      t.y = Math.max(-9,Math.min(9, Math.round(w.y*2)/2));
+      drawAdd();
+    });
+
+  document.querySelectorAll("#opSeg button").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll("#opSeg button").forEach(function(b){b.classList.remove("on");});
+      btn.classList.add("on"); op=btn.dataset.op;
+      $("#scalWrap").style.display = op==="scal" ? "flex":"none";
+      $("#lawSeg").style.display = op==="add" ? "flex":"none";
+      drawAdd();
+    });
+  });
+  document.querySelectorAll("#lawSeg button").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll("#lawSeg button").forEach(function(b){b.classList.remove("on");});
+      btn.classList.add("on"); law=btn.dataset.law; drawAdd();
+    });
+  });
+  $("#kRange").addEventListener("input",function(e){
+    kVal=parseFloat(e.target.value); $("#kOut").textContent=kVal.toFixed(1); drawAdd();
+  });
+
+  /* ================= MODE DOT ================= */
+  var vDot = makeView($("#cvDot"));
+  var DA={x:3.5,y:0.5}, DB={x:1.5,y:3};
+  function drawDot(){
+    drawGrid(vDot);
+    var mA=Math.hypot(DA.x,DA.y), mB=Math.hypot(DB.x,DB.y);
+    var dp=DA.x*DB.x+DA.y*DB.y;
+    var cos = (mA*mB>1e-9)? dp/(mA*mB):0;
+    cos=Math.max(-1,Math.min(1,cos));
+    var theta=Math.acos(cos);
+    // projection of a onto b (scalar) and vector
+    var projScalar = mB>1e-9 ? dp/mB : 0;
+    var ub = mB>1e-9 ? {x:DB.x/mB,y:DB.y/mB} : {x:0,y:0};
+    var projVec = {x:ub.x*projScalar, y:ub.y*projScalar};
+
+    // projection drop line
+    vDot.ctx.setLineDash([4,4]);
+    vDot.ctx.strokeStyle="rgba(255,255,255,0.4)";vDot.ctx.lineWidth=1.5;
+    var pa=toS(vDot,DA.x,DA.y), pp=toS(vDot,projVec.x,projVec.y);
+    vDot.ctx.beginPath();vDot.ctx.moveTo(pa.x,pa.y);vDot.ctx.lineTo(pp.x,pp.y);vDot.ctx.stroke();
+    vDot.ctx.setLineDash([]);
+    // projection vector along b
+    arrow(vDot,0,0,projVec.x,projVec.y,"#ffb454",5);
+
+    // angle arc
+    var a0=Math.atan2(DA.y,DA.x), a1=Math.atan2(DB.y,DB.x);
+    var o=toS(vDot,0,0);
+    vDot.ctx.strokeStyle="rgba(255,255,255,0.6)";vDot.ctx.lineWidth=2;
+    vDot.ctx.beginPath();
+    // canvas y is flipped: use -angles
+    var s=-a0,e=-a1;
+    vDot.ctx.arc(o.x,o.y,30,Math.min(s,e),Math.max(s,e));
+    vDot.ctx.stroke();
+
+    arrow(vDot,0,0,DA.x,DA.y,"var(--a-col)",3);
+    arrow(vDot,0,0,DB.x,DB.y,"var(--b-col)",3);
+    label(vDot,DA.x,DA.y,"a","var(--a-col)");
+    label(vDot,DB.x,DB.y,"b","var(--b-col)");
+    dot(vDot,DA.x,DA.y,"var(--a-col)"); dot(vDot,DB.x,DB.y,"var(--b-col)");
+    label(vDot,projVec.x,projVec.y,"proj","#ffb454");
+
+    var degs=theta*180/Math.PI;
+    var html = fact("a", "("+round(DA.x,1)+", "+round(DA.y,1)+")","a")
+             + fact("b", "("+round(DB.x,1)+", "+round(DB.y,1)+")","b")
+             + fact("a·b = a&#8321;b&#8321;+a&#8322;b&#8322;", round(dp,2),"")
+             + fact("|a| , |b|", round(mA,2)+" , "+round(mB,2),"")
+             + fact("angle θ", round(degs,1)+"°","")
+             + fact("proj of a on b", round(projScalar,2),"");
+    $("#factsDot").innerHTML=html;
+
+    var bg=$("#dotBadge");
+    if(Math.abs(dp)<0.05) bg.innerHTML='<span class="badge perp">a·b ≈ 0 → a ⟂ b (perpendicular)</span>';
+    else if(Math.abs(Math.abs(cos)-1)<0.02) bg.innerHTML='<span class="badge par">parallel (θ ≈ '+(cos>0?"0":"180")+'°)</span>';
+    else bg.innerHTML="";
+  }
+  attachDrag(vDot, function(){return [DA,DB];}, function(i,w){
+    var t=(i===0?DA:DB);
+    t.x=Math.max(-9,Math.min(9,Math.round(w.x*2)/2));
+    t.y=Math.max(-9,Math.min(9,Math.round(w.y*2)/2));
+    drawDot();
+  });
+
+  /* ================= MODE CROSS ================= */
+  var vCross = makeView($("#cvCross"));
+  function getCross(){
+    var a={x:+$("#ax").value,y:+$("#ay").value,z:+$("#az").value};
+    var b={x:+$("#bx").value,y:+$("#by").value,z:+$("#bz").value};
+    var c={x:a.y*b.z-a.z*b.y, y:a.z*b.x-a.x*b.z, z:a.x*b.y-a.y*b.x};
+    return {a:a,b:b,c:c};
+  }
+  // isometric projection: 3D -> 2D screen (grid units)
+  function iso(p){
+    var s=0.5; // z depth influence
+    return { x: p.x + p.z*(-0.55), y: p.y + p.z*(0.4) };
+  }
+  function arrow3(x1,y1,z1,x2,y2,z2,color,w){
+    var p1=iso({x:x1,y:y1,z:z1}), p2=iso({x:x2,y:y2,z:z2});
+    arrow(vCross,p1.x*0.9,p1.y*0.9,p2.x*0.9,p2.y*0.9,color,w);
+  }
+  function drawCross(){
+    drawGrid(vCross);
+    var g=getCross(), a=g.a,b=g.b,c=g.c;
+    var mA=Math.hypot(a.x,a.y,a.z), mB=Math.hypot(b.x,b.y,b.z), mC=Math.hypot(c.x,c.y,c.z);
+    // scale so vectors fit
+    var maxc=Math.max(mA,mB,mC,1);
+    var sc=4/maxc;
+    function A3(x,y,z){return {x:x*sc,y:y*sc,z:z*sc};}
+    // parallelogram fill a,b
+    var o=iso({x:0,y:0,z:0});
+    var pa=iso(A3(a.x,a.y,a.z)), pb=iso(A3(b.x,b.y,b.z)), pab=iso(A3(a.x+b.x,a.y+b.y,a.z+b.z));
+    function S(pt){return toS(vCross, pt.x*0.9, pt.y*0.9);}
+    var s0=S(o), sa=S(pa), sab=S(pab), sb=S(pb);
+    vCross.ctx.fillStyle="rgba(122,162,255,0.14)";
+    vCross.ctx.beginPath();vCross.ctx.moveTo(s0.x,s0.y);vCross.ctx.lineTo(sa.x,sa.y);
+    vCross.ctx.lineTo(sab.x,sab.y);vCross.ctx.lineTo(sb.x,sb.y);vCross.ctx.closePath();vCross.ctx.fill();
+
+    var av=A3(a.x,a.y,a.z), bv=A3(b.x,b.y,b.z), cv=A3(c.x,c.y,c.z);
+    arrow3(0,0,0, av.x,av.y,av.z, "var(--a-col)",3);
+    arrow3(0,0,0, bv.x,bv.y,bv.z, "var(--b-col)",3);
+    arrow3(0,0,0, cv.x,cv.y,cv.z, "#ffb454",3.5);
+    // labels
+    var la=S(pa), lb=S(pb), lc=S(iso(A3(c.x,c.y,c.z)));
+    vCross.ctx.font="bold 14px system-ui";
+    vCross.ctx.fillStyle="#6ee7b7";vCross.ctx.fillText("a",la.x+8,la.y-6);
+    vCross.ctx.fillStyle="#7aa2ff";vCross.ctx.fillText("b",lb.x+8,lb.y-6);
+    vCross.ctx.fillStyle="#ffb454";vCross.ctx.fillText("a×b",lc.x+8,lc.y-6);
+
+    var dp=a.x*b.x+a.y*b.y+a.z*b.z;
+    var cosT=(mA*mB>1e-9)?dp/(mA*mB):0; cosT=Math.max(-1,Math.min(1,cosT));
+    var theta=Math.acos(cosT)*180/Math.PI;
+    // verify perpendicular
+    var cda=c.x*a.x+c.y*a.y+c.z*a.z, cdb=c.x*b.x+c.y*b.y+c.z*b.z;
+
+    var html = fact("a×b", "("+round(c.x,1)+", "+round(c.y,1)+", "+round(c.z,1)+")","")
+             + fact("|a×b| = area", round(mC,2),"")
+             + fact("|a||b|sinθ", round(mA*mB*Math.sin(theta*Math.PI/180),2),"")
+             + fact("angle θ", round(theta,1)+"°","")
+             + fact("(a×b)·a , (a×b)·b", round(cda,2)+" , "+round(cdb,2),"")
+             + fact("unit n̂", mC>1e-9?"("+round(c.x/mC,2)+", "+round(c.y/mC,2)+", "+round(c.z/mC,2)+")":"undefined","");
+    $("#factsCross").innerHTML=html;
+    $("#crossBadge").innerHTML = (Math.abs(cda)<1e-6&&Math.abs(cdb)<1e-6)
+      ? '<span class="badge par">a×b ⟂ both a and b ✓ (both dot products = 0)</span>' : "";
+  }
+  ["ax","ay","az","bx","by","bz"].forEach(function(id){
+    $("#"+id).addEventListener("input",drawCross);
+  });
+
+  /* ================= QUIZ ================= */
+  var quizData=[
+    {q:"If a = 3î + 4ĵ, then |a| equals:",
+     opts:["5","7","12","25"], ans:0,
+     exp:"|a| = √(3²+4²) = √25 = 5."},
+    {q:"For a = (2,1,0) and b = (1,-2,0), a·b = 2·1 + 1·(-2) + 0 = 0. This means:",
+     opts:["a is parallel to b","a is perpendicular to b","|a| = |b|","a = b"], ans:1,
+     exp:"A dot product of zero means the vectors are perpendicular (θ = 90°)."},
+    {q:"For non-zero a and b, |a×b| = 0 tells you that a and b are:",
+     opts:["perpendicular","parallel (or anti-parallel)","unit vectors","equal in length"], ans:1,
+     exp:"|a×b| = |a||b|sinθ. It is zero only when sinθ = 0, i.e. θ = 0° or 180° → parallel."}
+  ];
+  (function buildQuiz(){
+    var box=$("#quiz");
+    quizData.forEach(function(item,qi){
+      var d=document.createElement("div");d.className="q";
+      var p=document.createElement("p");p.textContent=(qi+1)+". "+item.q;d.appendChild(p);
+      item.opts.forEach(function(opt,oi){
+        var btn=document.createElement("button");btn.className="opt";btn.textContent=opt;
+        btn.addEventListener("click",function(){
+          if(d.dataset.done)return; d.dataset.done="1";
+          var all=d.querySelectorAll(".opt");
+          all[item.ans].classList.add("correct");
+          if(oi!==item.ans) btn.classList.add("wrong");
+          d.querySelector(".exp").classList.add("show");
+        });
+        d.appendChild(btn);
+      });
+      var ex=document.createElement("div");ex.className="exp";ex.textContent="Why: "+item.exp;d.appendChild(ex);
+      box.appendChild(d);
+    });
+  })();
+
+  /* fix stray char in fact label */
+  function cleanup(){ } // no-op
+
+  // initial draws
+  $("#lawSeg").style.display="flex";
+  drawAdd();
+  // pre-render others so switching is instant
+  drawDot(); drawCross();
+})();
+</script>
+</body>
+</html>

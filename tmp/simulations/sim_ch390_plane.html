@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Plane Lab — Plane (NIOS Class 12 Maths, Ch 35)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#98a3ba;
+    --accent:#6fd0c0;
+    --accent-soft:rgba(111,208,192,.16);
+    --accent2:#ff9d5c;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.92rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:4px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.02rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px}
+
+  .grid2{display:flex;flex-wrap:wrap;gap:16px}
+  .grid2 .col{flex:1 1 300px;min-width:0}
+
+  canvas{width:100%;height:auto;display:block;background:#0c1019;border:1px solid var(--line);
+    border-radius:12px;touch-action:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:12px}
+  .ctrl{flex:1 1 150px;min-width:130px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .ctrl label b{color:var(--ink)}
+
+  input[type=range]{width:100%;height:32px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131d;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid #0f131d}
+
+  .out{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:12px;
+    font-size:.95rem;line-height:1.7}
+  .out .eq{font-size:1.05rem;color:var(--accent);font-weight:600}
+  .out .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .k{color:var(--muted)}
+  .v{color:var(--ink);font-weight:600}
+  code{background:#0c1019;border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+    font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:.9em;color:var(--accent)}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .seg button{flex:1 1 auto;min-height:42px;min-width:110px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.85rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+  .facts ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .facts li{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.9rem}
+  .facts li b{color:var(--accent)}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px}
+  .quiz .opts button{text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:10px;padding:9px 12px;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .quiz .exp.show{display:block}
+
+  .num{display:inline-flex;align-items:center;gap:6px;margin:4px 8px 4px 0}
+  .num label{font-size:.82rem;color:var(--muted)}
+  .num input{width:56px;background:#0c1019;border:1px solid var(--line);color:var(--ink);border-radius:8px;
+    padding:6px;font-size:.9rem;text-align:center}
+  .btn{min-height:42px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);
+    border-radius:12px;font-weight:600;cursor:pointer;padding:8px 16px;font-size:.9rem;touch-action:manipulation}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>The <span>Plane</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch 35 — Equation of a plane in 3-D space. Drag the view to rotate.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="eq">Equation</button>
+    <button class="tab-btn" data-tab="rel">Distance &amp; Angle</button>
+    <button class="tab-btn" data-tab="data">Plane from Data</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===================== TAB 1: EQUATION ===================== -->
+  <section id="tab-eq">
+    <div class="grid2">
+      <div class="col panel">
+        <h2>ax + by + cz = d</h2>
+        <canvas id="cv1" width="440" height="380"></canvas>
+        <p class="hint">Drag on the view to rotate the 3-D scene. The green plane has normal vector <b>n</b> = (a, b, c) drawn from the origin.</p>
+      </div>
+      <div class="col panel">
+        <h3>Coefficients</h3>
+        <div class="controls">
+          <div class="ctrl"><label>a = <b id="v_a">1</b></label><input type="range" id="s_a" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>b = <b id="v_b">1</b></label><input type="range" id="s_b" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>c = <b id="v_c">1</b></label><input type="range" id="s_c" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>d = <b id="v_d">3</b></label><input type="range" id="s_d" min="-8" max="8" step="1" value="3"></div>
+        </div>
+        <div class="out">
+          <div class="eq" id="eq1">x + y + z = 3</div>
+          <div class="row"><span class="k">Normal vector n</span><span class="v" id="nv1">(1, 1, 1)</span></div>
+          <div class="row"><span class="k">Normal (unit) form</span><span class="v" id="nf1"></span></div>
+          <div class="row"><span class="k">Distance of plane from O</span><span class="v" id="pd1"></span></div>
+          <div class="row"><span class="k">Intercept form</span><span class="v" id="if1"></span></div>
+        </div>
+        <p class="hint">Cartesian: <code>ax+by+cz=d</code>. Normal form: <code>lx+my+nz=p</code> where (l,m,n) is the unit normal and p&nbsp;=&nbsp;d/|n| is the perpendicular distance from the origin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 2: DISTANCE & ANGLE ===================== -->
+  <section id="tab-rel" class="hidden">
+    <div class="seg" id="relmode">
+      <button class="on" data-m="dist">Point → Plane distance</button>
+      <button data-m="angle">Angle between planes</button>
+    </div>
+
+    <div id="relDist">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Distance from a point</h2>
+          <canvas id="cv2" width="440" height="380"></canvas>
+          <p class="hint">Drag the view to rotate. Use the sliders to move the orange point P; the dashed segment is the perpendicular foot on the plane.</p>
+        </div>
+        <div class="col panel">
+          <h3>Plane: ax + by + cz = d</h3>
+          <div class="controls">
+            <div class="ctrl"><label>a = <b id="d_a">2</b></label><input type="range" id="d_sa" min="-4" max="4" step="1" value="2"></div>
+            <div class="ctrl"><label>b = <b id="d_b">1</b></label><input type="range" id="d_sb" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>c = <b id="d_c">2</b></label><input type="range" id="d_sc" min="-4" max="4" step="1" value="2"></div>
+            <div class="ctrl"><label>d = <b id="d_d">4</b></label><input type="range" id="d_sd" min="-8" max="8" step="1" value="4"></div>
+          </div>
+          <h3 style="margin-top:12px">Point P (x₀, y₀, z₀)</h3>
+          <div class="controls">
+            <div class="ctrl"><label>x₀ = <b id="p_x">3</b></label><input type="range" id="p_sx" min="-5" max="5" step="1" value="3"></div>
+            <div class="ctrl"><label>y₀ = <b id="p_y">3</b></label><input type="range" id="p_sy" min="-5" max="5" step="1" value="3"></div>
+            <div class="ctrl"><label>z₀ = <b id="p_z">3</b></label><input type="range" id="p_sz" min="-5" max="5" step="1" value="3"></div>
+          </div>
+          <div class="out">
+            <div class="eq" id="eq2">2x + y + 2z = 4</div>
+            <div class="row"><span class="k">ax₀+by₀+cz₀ − d</span><span class="v" id="num2"></span></div>
+            <div class="row"><span class="k">√(a²+b²+c²)</span><span class="v" id="den2"></span></div>
+            <div class="row"><span class="k">Distance |P, plane|</span><span class="v" id="dist2"></span></div>
+            <div class="row"><span class="k">P lies</span><span class="v" id="side2"></span></div>
+          </div>
+          <p class="hint">Distance = <code>|ax₀+by₀+cz₀−d| / √(a²+b²+c²)</code>. The sign of the numerator tells which side of the plane P is on.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="relAngle" class="hidden">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Angle between two planes</h2>
+          <canvas id="cv3" width="440" height="380"></canvas>
+          <p class="hint">Two planes through the origin with normals n₁ (green) and n₂ (orange). Drag to rotate.</p>
+        </div>
+        <div class="col panel">
+          <h3>Plane 1 normal n₁ = (a₁, b₁, c₁)</h3>
+          <div class="controls">
+            <div class="ctrl"><label>a₁ = <b id="a_a1">1</b></label><input type="range" id="a_sa1" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>b₁ = <b id="a_b1">0</b></label><input type="range" id="a_sb1" min="-4" max="4" step="1" value="0"></div>
+            <div class="ctrl"><label>c₁ = <b id="a_c1">1</b></label><input type="range" id="a_sc1" min="-4" max="4" step="1" value="1"></div>
+          </div>
+          <h3 style="margin-top:12px">Plane 2 normal n₂ = (a₂, b₂, c₂)</h3>
+          <div class="controls">
+            <div class="ctrl"><label>a₂ = <b id="a_a2">1</b></label><input type="range" id="a_sa2" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>b₂ = <b id="a_b2">1</b></label><input type="range" id="a_sb2" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>c₂ = <b id="a_c2">0</b></label><input type="range" id="a_sc2" min="-4" max="4" step="1" value="0"></div>
+          </div>
+          <div class="out">
+            <div class="row"><span class="k">n₁ · n₂</span><span class="v" id="dot3"></span></div>
+            <div class="row"><span class="k">|n₁| · |n₂|</span><span class="v" id="mag3"></span></div>
+            <div class="row"><span class="k">cos θ</span><span class="v" id="cos3"></span></div>
+            <div class="eq" id="ang3">θ = 60°</div>
+            <div class="row"><span class="k">Relationship</span><span class="v" id="relwhat3"></span></div>
+          </div>
+          <p class="hint">cos θ = <code>(n₁·n₂)/(|n₁||n₂|)</code>. Planes are <b>parallel</b> when normals are proportional, <b>perpendicular</b> when n₁·n₂ = 0.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 3: PLANE FROM DATA ===================== -->
+  <section id="tab-data" class="hidden">
+    <div class="seg" id="datamode">
+      <button class="on" data-m="three">Through 3 points</button>
+      <button data-m="pn">Point + normal</button>
+    </div>
+
+    <div id="dataThree">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Plane through three points</h2>
+          <canvas id="cv4" width="440" height="380"></canvas>
+          <p class="hint">Points A, B, C (blue) determine one plane. The green normal is (B−A)×(C−A). Drag to rotate.</p>
+        </div>
+        <div class="col panel">
+          <h3>Enter coordinates</h3>
+          <div>
+            <div class="num"><label>A</label>
+              <input id="ax" type="number" value="1"><input id="ay" type="number" value="0"><input id="az" type="number" value="0"></div><br>
+            <div class="num"><label>B</label>
+              <input id="bx" type="number" value="0"><input id="by" type="number" value="1"><input id="bz" type="number" value="0"></div><br>
+            <div class="num"><label>C</label>
+              <input id="cx" type="number" value="0"><input id="cy" type="number" value="0"><input id="cz" type="number" value="1"></div>
+          </div>
+          <button class="btn" id="calc3pt" style="margin-top:10px">Compute plane</button>
+          <div class="out">
+            <div class="row"><span class="k">Normal n = AB × AC</span><span class="v" id="pn_n"></span></div>
+            <div class="eq" id="pn_eq">x + y + z = 1</div>
+            <div class="row"><span class="k" id="pn_note"></span></div>
+          </div>
+          <p class="hint">Normal n = <code>(B−A)×(C−A)</code>; the plane is <code>n·(r−A)=0</code>. If the three points are collinear no unique plane exists.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="dataPN" class="hidden">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Plane through a point with given normal</h2>
+          <canvas id="cv5" width="440" height="380"></canvas>
+          <p class="hint">Point A (blue) with normal n (green). The plane is <code>n·(r−A)=0</code>. Drag to rotate.</p>
+        </div>
+        <div class="col panel">
+          <h3>Point A (x₁, y₁, z₁)</h3>
+          <div class="num"><label>A</label>
+            <input id="pa_x" type="number" value="1"><input id="pa_y" type="number" value="2"><input id="pa_z" type="number" value="3"></div>
+          <h3 style="margin-top:12px">Normal n = (a, b, c)</h3>
+          <div class="num"><label>n</label>
+            <input id="pa_a" type="number" value="2"><input id="pa_b" type="number" value="1"><input id="pa_c" type="number" value="2"></div>
+          <button class="btn" id="calcPN" style="margin-top:10px">Compute plane</button>
+          <div class="out">
+            <div class="row"><span class="k">n · A (= d)</span><span class="v" id="pn2_d"></span></div>
+            <div class="eq" id="pn2_eq">2x + y + 2z = 10</div>
+            <div class="row"><span class="k">Vector form</span><span class="v" id="pn2_vec"></span></div>
+          </div>
+          <p class="hint">Cartesian form: <code>a(x−x₁)+b(y−y₁)+c(z−z₁)=0</code>, i.e. <code>ax+by+cz = ax₁+by₁+cz₁</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 4: FACTS & QUIZ ===================== -->
+  <section id="tab-facts" class="hidden">
+    <div class="panel facts">
+      <h2>Key facts — the plane</h2>
+      <ul>
+        <li><b>General (Cartesian):</b> ax + by + cz = d. The coefficient vector <b>n</b> = (a, b, c) is normal (perpendicular) to the plane.</li>
+        <li><b>Vector form:</b> <b>r</b>·<b>n</b> = d, and normal form <b>r</b>·<b>n̂</b> = p, where n̂ is the unit normal and p = d/|n| is the perpendicular distance from the origin.</li>
+        <li><b>Intercept form:</b> x/A + y/B + z/C = 1, where A = d/a, B = d/b, C = d/c are the intercepts on the axes.</li>
+        <li><b>Distance of point P(x₀,y₀,z₀):</b> |ax₀+by₀+cz₀−d| / √(a²+b²+c²).</li>
+        <li><b>Angle between planes:</b> cos θ = (n₁·n₂)/(|n₁||n₂|), using the two normals.</li>
+        <li><b>Parallel:</b> a₁/a₂ = b₁/b₂ = c₁/c₂ (normals proportional). <b>Perpendicular:</b> a₁a₂+b₁b₂+c₁c₂ = 0.</li>
+        <li><b>Through 3 points A,B,C:</b> normal n = (B−A)×(C−A); plane is n·(r−A)=0.</li>
+      </ul>
+    </div>
+
+    <div class="panel quiz" id="quiz">
+      <h2>Quick check (3 questions)</h2>
+
+      <div class="q" data-a="1">
+        <p>1. What is the normal vector to the plane 3x − 2y + z = 7?</p>
+        <div class="opts">
+          <button>(7, 7, 7)</button>
+          <button>(3, −2, 1)</button>
+          <button>(−3, 2, −1) only if d &lt; 0</button>
+          <button>(1/3, −1/2, 1)</button>
+        </div>
+        <div class="exp">The coefficients of x, y, z form the normal: n = (3, −2, 1).</div>
+      </div>
+
+      <div class="q" data-a="2">
+        <p>2. The distance of the point (1, 2, 2) from the plane 2x + y + 2z = 3 is:</p>
+        <div class="opts">
+          <button>3</button>
+          <button>5/3</button>
+          <button>5</button>
+          <button>1</button>
+        </div>
+        <div class="exp">|2·1+1·2+2·2 − 3| / √(4+1+4) = |8−3|/3 = 5/3.</div>
+      </div>
+
+      <div class="q" data-a="0">
+        <p>3. Two planes with normals (1, 0, 1) and (1, 0, −1) are:</p>
+        <div class="opts">
+          <button>Perpendicular</button>
+          <button>Parallel</button>
+          <button>The same plane</button>
+          <button>At 60°</button>
+        </div>
+        <div class="exp">n₁·n₂ = 1·1 + 0 + 1·(−1) = 0, so the planes are perpendicular.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- 3D → 2D projection engine ----------
+  function makeView(canvas){
+    return { az: -0.6, el: 0.5, cx: canvas.width/2, cy: canvas.height/2, scale: 30, canvas: canvas };
+  }
+  // rotate point (x,y,z) by azimuth (about z/up) then elevation, isometric-ish
+  function project(v, view){
+    var x=v[0], y=v[1], z=v[2];
+    var ca=Math.cos(view.az), sa=Math.sin(view.az);
+    // rotate about vertical (z) axis
+    var x1 = x*ca - y*sa;
+    var y1 = x*sa + y*ca;
+    var z1 = z;
+    // tilt about horizontal axis by elevation
+    var ce=Math.cos(view.el), se=Math.sin(view.el);
+    var y2 = y1*ce - z1*se;
+    var z2 = y1*se + z1*ce;
+    var sx = view.cx + x1*view.scale;
+    var sy = view.cy - z2*view.scale;
+    return [sx, sy, y2];
+  }
+  function line(ctx,a,b,view,color,w){
+    var pa=project(a,view), pb=project(b,view);
+    ctx.strokeStyle=color; ctx.lineWidth=w||1.5;
+    ctx.beginPath(); ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pb[0],pb[1]); ctx.stroke();
+  }
+  function dot(ctx,a,view,color,r){
+    var p=project(a,view);
+    ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p[0],p[1],r||4,0,7); ctx.fill();
+  }
+  function label(ctx,a,view,text,color){
+    var p=project(a,view);
+    ctx.fillStyle=color; ctx.font="12px system-ui,sans-serif";
+    ctx.fillText(text,p[0]+6,p[1]-6);
+  }
+  // draw axes with arrows
+  function axes(ctx,view){
+    var L=4.6;
+    line(ctx,[-L,0,0],[L,0,0],view,"#39435f",1);
+    line(ctx,[0,-L,0],[0,L,0],view,"#39435f",1);
+    line(ctx,[0,0,-L],[0,0,L],view,"#39435f",1);
+    label(ctx,[L,0,0],view,"x","#5b6785");
+    label(ctx,[0,L,0],view,"y","#5b6785");
+    label(ctx,[0,0,L],view,"z","#5b6785");
+  }
+
+  // Given plane a,b,c,d find a point on it and two in-plane basis vectors, draw a shaded quad
+  function drawPlane(ctx,view,a,b,c,d,color,fill){
+    var n=[a,b,c];
+    var nn=a*a+b*b+c*c;
+    if(nn<1e-9) return;
+    // a point on plane closest to origin: p0 = d*n/|n|^2
+    var p0=[a*d/nn, b*d/nn, c*d/nn];
+    // build two orthonormal vectors in the plane
+    var ref = (Math.abs(a)<0.9 && Math.abs(b)<0.9) ? [1,0,0] : [0,0,1];
+    var u=cross(n,ref); u=norm(u);
+    var w=cross(n,u); w=norm(w);
+    var S=3.4;
+    var corners=[
+      add(p0, add(scale(u,S), scale(w,S))),
+      add(p0, add(scale(u,-S), scale(w,S))),
+      add(p0, add(scale(u,-S), scale(w,-S))),
+      add(p0, add(scale(u,S), scale(w,-S)))
+    ];
+    ctx.beginPath();
+    for(var i=0;i<4;i++){ var p=project(corners[i],view); if(i===0)ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); }
+    ctx.closePath();
+    ctx.fillStyle=fill; ctx.fill();
+    ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
+    // grid lines on plane
+    ctx.strokeStyle="rgba(111,208,192,.25)"; ctx.lineWidth=1;
+    for(var g=-2;g<=2;g++){
+      if(g===0) continue;
+      var t=g/2*S;
+      line(ctx, add(p0,add(scale(u,t),scale(w,-S))), add(p0,add(scale(u,t),scale(w,S))), view,"rgba(111,208,192,.20)",1);
+      line(ctx, add(p0,add(scale(u,-S),scale(w,t))), add(p0,add(scale(u,S),scale(w,t))), view,"rgba(111,208,192,.20)",1);
+    }
+    return p0;
+  }
+
+  // vector helpers
+  function cross(a,b){return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];}
+  function add(a,b){return [a[0]+b[0],a[1]+b[1],a[2]+b[2]];}
+  function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+  function scale(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+  function dotp(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+  function mag(a){return Math.sqrt(dotp(a,a));}
+  function norm(a){var m=mag(a); return m<1e-9?[0,0,0]:[a[0]/m,a[1]/m,a[2]/m];}
+
+  function drawVector(ctx,view,from,to,color){
+    line(ctx,from,to,view,color,2.5);
+    // arrowhead as a dot at tip
+    dot(ctx,to,view,color,4);
+  }
+
+  function fmt(x){ // tidy number
+    if(Math.abs(x)<1e-9) x=0;
+    var r=Math.round(x*1000)/1000;
+    return (Number.isInteger(r)? r.toString() : r.toFixed(3).replace(/0+$/,'').replace(/\.$/,''));
+  }
+
+  // ---------- drag-to-rotate wiring ----------
+  var views={}; var needsDraw={};
+  function attachDrag(canvas,key,redraw){
+    var view=makeView(canvas); views[key]=view;
+    var dragging=false, lx=0, ly=0;
+    function down(e){ dragging=true; var p=pt(e); lx=p.x; ly=p.y; e.preventDefault(); }
+    function move(e){ if(!dragging) return; var p=pt(e);
+      view.az += (p.x-lx)*0.01; view.el += (p.y-ly)*0.01;
+      if(view.el>1.5) view.el=1.5; if(view.el<-1.5) view.el=-1.5;
+      lx=p.x; ly=p.y; redraw(); e.preventDefault();
+    }
+    function up(){ dragging=false; }
+    function pt(e){ var r=canvas.getBoundingClientRect(); var t=e.touches?e.touches[0]:e;
+      return {x:(t.clientX-r.left)*(canvas.width/r.width), y:(t.clientY-r.top)*(canvas.height/r.height)}; }
+    canvas.addEventListener("mousedown",down); window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    canvas.addEventListener("touchstart",down,{passive:false}); canvas.addEventListener("touchmove",move,{passive:false}); canvas.addEventListener("touchend",up);
+    return view;
+  }
+  function clear(ctx,cv){ ctx.clearRect(0,0,cv.width,cv.height); }
+
+  // ==================== TAB 1: EQUATION ====================
+  var cv1=document.getElementById("cv1"), ctx1=cv1.getContext("2d");
+  var s_a=document.getElementById("s_a"),s_b=document.getElementById("s_b"),s_c=document.getElementById("s_c"),s_d=document.getElementById("s_d");
+  function draw1(){
+    clear(ctx1,cv1); axes(ctx1,views.v1);
+    var a=+s_a.value,b=+s_b.value,c=+s_c.value,d=+s_d.value;
+    drawPlane(ctx1,views.v1,a,b,c,d,"#6fd0c0","rgba(111,208,192,.14)");
+    // normal from foot point p0
+    var nn=a*a+b*b+c*c;
+    if(nn>1e-9){
+      var p0=[a*d/nn,b*d/nn,c*d/nn];
+      var un=norm([a,b,c]);
+      drawVector(ctx1,views.v1,p0,add(p0,scale(un,2.5)),"#ff9d5c");
+      label(ctx1,add(p0,scale(un,2.6)),views.v1,"n","#ff9d5c");
+    }
+    dot(ctx1,[0,0,0],views.v1,"#e8ecf6",3);
+    // update readouts
+    document.getElementById("v_a").textContent=a; document.getElementById("v_b").textContent=b;
+    document.getElementById("v_c").textContent=c; document.getElementById("v_d").textContent=d;
+    document.getElementById("eq1").textContent=eqStr(a,b,c,d);
+    document.getElementById("nv1").textContent="("+a+", "+b+", "+c+")";
+    var m=Math.sqrt(nn);
+    if(m>1e-9){
+      document.getElementById("nf1").textContent=fmt(a/m)+"x + "+fmt(b/m)+"y + "+fmt(c/m)+"z = "+fmt(d/m);
+      document.getElementById("pd1").textContent="p = "+fmt(Math.abs(d)/m);
+      // intercepts
+      var parts=[];
+      parts.push(a!==0? "x/"+fmt(d/a) : "x-axis: none");
+      parts.push(b!==0? "y/"+fmt(d/b) : "y: none");
+      parts.push(c!==0? "z/"+fmt(d/c) : "z: none");
+      if(a!==0&&b!==0&&c!==0&&d!==0)
+        document.getElementById("if1").textContent="x/"+fmt(d/a)+" + y/"+fmt(d/b)+" + z/"+fmt(d/c)+" = 1";
+      else document.getElementById("if1").textContent = (d===0? "passes through O" : "some intercepts undefined");
+    } else {
+      document.getElementById("nf1").textContent="n = 0 (not a plane)";
+      document.getElementById("pd1").textContent="—"; document.getElementById("if1").textContent="—";
+    }
+  }
+  function eqStr(a,b,c,d){
+    var t=[];
+    function term(co,v){ if(co===0) return null; var s=(co<0?"− ":(t.length?"+ ":"")); var m=Math.abs(co); return s+(m===1?"":m)+v; }
+    [["x",a],["y",b],["z",c]].forEach(function(p){ var s=term(p[1],p[0]); if(s!==null) t.push(s); });
+    var lhs=t.length? t.join(" ") : "0";
+    return lhs+" = "+d;
+  }
+
+  // ==================== TAB 2a: DISTANCE ====================
+  var cv2=document.getElementById("cv2"), ctx2=cv2.getContext("2d");
+  var d_sa=document.getElementById("d_sa"),d_sb=document.getElementById("d_sb"),d_sc=document.getElementById("d_sc"),d_sd=document.getElementById("d_sd");
+  var p_sx=document.getElementById("p_sx"),p_sy=document.getElementById("p_sy"),p_sz=document.getElementById("p_sz");
+  function draw2(){
+    clear(ctx2,cv2); axes(ctx2,views.v2);
+    var a=+d_sa.value,b=+d_sb.value,c=+d_sc.value,d=+d_sd.value;
+    drawPlane(ctx2,views.v2,a,b,c,d,"#6fd0c0","rgba(111,208,192,.12)");
+    var P=[+p_sx.value,+p_sy.value,+p_sz.value];
+    dot(ctx2,P,views.v2,"#ff9d5c",5); label(ctx2,P,views.v2,"P","#ff9d5c");
+    dot(ctx2,[0,0,0],views.v2,"#e8ecf6",3);
+    var nn=a*a+b*b+c*c;
+    document.getElementById("d_a").textContent=a;document.getElementById("d_b").textContent=b;
+    document.getElementById("d_c").textContent=c;document.getElementById("d_d").textContent=d;
+    document.getElementById("p_x").textContent=P[0];document.getElementById("p_y").textContent=P[1];document.getElementById("p_z").textContent=P[2];
+    document.getElementById("eq2").textContent=eqStr(a,b,c,d);
+    if(nn>1e-9){
+      var num=a*P[0]+b*P[1]+c*P[2]-d;
+      var den=Math.sqrt(nn);
+      // foot of perpendicular F = P - (num/nn) n
+      var F=sub(P, scale([a,b,c], num/nn));
+      ctx2.setLineDash([5,4]);
+      line(ctx2,P,F,views.v2,"#ffd27a",2);
+      ctx2.setLineDash([]);
+      dot(ctx2,F,views.v2,"#ffd27a",4); label(ctx2,F,views.v2,"F","#ffd27a");
+      document.getElementById("num2").textContent=fmt(num);
+      document.getElementById("den2").textContent=fmt(den);
+      document.getElementById("dist2").textContent=fmt(Math.abs(num)/den);
+      document.getElementById("side2").textContent = num>1e-9? "on +n side" : (num<-1e-9? "on −n side" : "on the plane");
+    } else {
+      document.getElementById("num2").textContent="—";document.getElementById("den2").textContent="—";
+      document.getElementById("dist2").textContent="n = 0";document.getElementById("side2").textContent="—";
+    }
+  }
+
+  // ==================== TAB 2b: ANGLE ====================
+  var cv3=document.getElementById("cv3"), ctx3=cv3.getContext("2d");
+  var a_sa1=document.getElementById("a_sa1"),a_sb1=document.getElementById("a_sb1"),a_sc1=document.getElementById("a_sc1");
+  var a_sa2=document.getElementById("a_sa2"),a_sb2=document.getElementById("a_sb2"),a_sc2=document.getElementById("a_sc2");
+  function draw3(){
+    clear(ctx3,cv3); axes(ctx3,views.v3);
+    var n1=[+a_sa1.value,+a_sb1.value,+a_sc1.value];
+    var n2=[+a_sa2.value,+a_sb2.value,+a_sc2.value];
+    // planes through origin: d=0
+    if(mag(n1)>1e-9) drawPlane(ctx3,views.v3,n1[0],n1[1],n1[2],0,"#6fd0c0","rgba(111,208,192,.10)");
+    if(mag(n2)>1e-9) drawPlane(ctx3,views.v3,n2[0],n2[1],n2[2],0,"#ff9d5c","rgba(255,157,92,.10)");
+    if(mag(n1)>1e-9) drawVector(ctx3,views.v3,[0,0,0],scale(norm(n1),2.6),"#6fd0c0");
+    if(mag(n2)>1e-9) drawVector(ctx3,views.v3,[0,0,0],scale(norm(n2),2.6),"#ff9d5c");
+    label(ctx3,scale(norm(n1),2.7),views.v3,"n₁","#6fd0c0");
+    label(ctx3,scale(norm(n2),2.7),views.v3,"n₂","#ff9d5c");
+    document.getElementById("a_a1").textContent=n1[0];document.getElementById("a_b1").textContent=n1[1];document.getElementById("a_c1").textContent=n1[2];
+    document.getElementById("a_a2").textContent=n2[0];document.getElementById("a_b2").textContent=n2[1];document.getElementById("a_c2").textContent=n2[2];
+    var dp=dotp(n1,n2), m1=mag(n1), m2=mag(n2);
+    document.getElementById("dot3").textContent=fmt(dp);
+    document.getElementById("mag3").textContent=fmt(m1)+" · "+fmt(m2)+" = "+fmt(m1*m2);
+    if(m1>1e-9 && m2>1e-9){
+      var cos=dp/(m1*m2); cos=Math.max(-1,Math.min(1,cos));
+      var deg=Math.acos(Math.abs(cos))*180/Math.PI; // acute angle between planes
+      document.getElementById("cos3").textContent=fmt(cos);
+      document.getElementById("ang3").textContent="θ = "+fmt(deg)+"°";
+      var rel="oblique";
+      if(Math.abs(dp)<1e-9) rel="perpendicular (n₁·n₂ = 0)";
+      else {
+        // parallel if cross ~ 0
+        var cr=cross(n1,n2);
+        if(mag(cr)<1e-9) rel="parallel (normals proportional)";
+      }
+      document.getElementById("relwhat3").textContent=rel;
+    } else {
+      document.getElementById("cos3").textContent="—";document.getElementById("ang3").textContent="θ = —";
+      document.getElementById("relwhat3").textContent="need non-zero normals";
+    }
+  }
+
+  // ==================== TAB 3a: THREE POINTS ====================
+  var cv4=document.getElementById("cv4"), ctx4=cv4.getContext("2d");
+  var last3={a:[1,0,0],b:[0,1,0],c:[0,0,1],n:[1,1,1],d:1,ok:true};
+  function compute3(){
+    var A=[+ax.value,+ay.value,+az.value], B=[+bx.value,+by.value,+bz.value], C=[+cx.value,+cy.value,+cz.value];
+    var n=cross(sub(B,A),sub(C,A));
+    last3.a=A;last3.b=B;last3.c=C;last3.n=n;
+    if(mag(n)<1e-9){
+      last3.ok=false;
+      document.getElementById("pn_n").textContent="("+fmt(n[0])+", "+fmt(n[1])+", "+fmt(n[2])+")";
+      document.getElementById("pn_eq").textContent="no unique plane";
+      document.getElementById("pn_note").textContent="Points are collinear.";
+    } else {
+      last3.ok=true;
+      var d=dotp(n,A); last3.d=d;
+      document.getElementById("pn_n").textContent="("+fmt(n[0])+", "+fmt(n[1])+", "+fmt(n[2])+")";
+      document.getElementById("pn_eq").textContent=eqStr(n[0],n[1],n[2],d);
+      document.getElementById("pn_note").textContent="Check: n·A = n·B = n·C = "+fmt(d);
+    }
+    draw4();
+  }
+  var ax=document.getElementById("ax"),ay=document.getElementById("ay"),az=document.getElementById("az");
+  var bx=document.getElementById("bx"),by=document.getElementById("by"),bz=document.getElementById("bz");
+  var cx=document.getElementById("cx"),cy=document.getElementById("cy"),cz=document.getElementById("cz");
+  function draw4(){
+    clear(ctx4,cv4); axes(ctx4,views.v4);
+    if(last3.ok && mag(last3.n)>1e-9)
+      drawPlane(ctx4,views.v4,last3.n[0],last3.n[1],last3.n[2],last3.d,"#6fd0c0","rgba(111,208,192,.12)");
+    ["a","b","c"].forEach(function(k,i){
+      dot(ctx4,last3[k],views.v4,"#7db4ff",5); label(ctx4,last3[k],views.v4,k.toUpperCase(),"#7db4ff");
+    });
+    if(last3.ok && mag(last3.n)>1e-9){
+      var un=norm(last3.n);
+      drawVector(ctx4,views.v4,last3.a,add(last3.a,scale(un,2.4)),"#ff9d5c");
+    }
+    dot(ctx4,[0,0,0],views.v4,"#e8ecf6",3);
+  }
+
+  // ==================== TAB 3b: POINT + NORMAL ====================
+  var cv5=document.getElementById("cv5"), ctx5=cv5.getContext("2d");
+  var pa_x=document.getElementById("pa_x"),pa_y=document.getElementById("pa_y"),pa_z=document.getElementById("pa_z");
+  var pa_a=document.getElementById("pa_a"),pa_b=document.getElementById("pa_b"),pa_c=document.getElementById("pa_c");
+  var lastPN={A:[1,2,3],n:[2,1,2],d:10};
+  function computePN(){
+    var A=[+pa_x.value,+pa_y.value,+pa_z.value], n=[+pa_a.value,+pa_b.value,+pa_c.value];
+    var d=dotp(n,A); lastPN={A:A,n:n,d:d};
+    document.getElementById("pn2_d").textContent=fmt(d);
+    document.getElementById("pn2_eq").textContent=eqStr(n[0],n[1],n[2],d);
+    document.getElementById("pn2_vec").textContent="r·("+fmt(n[0])+", "+fmt(n[1])+", "+fmt(n[2])+") = "+fmt(d);
+    draw5();
+  }
+  function draw5(){
+    clear(ctx5,cv5); axes(ctx5,views.v5);
+    if(mag(lastPN.n)>1e-9)
+      drawPlane(ctx5,views.v5,lastPN.n[0],lastPN.n[1],lastPN.n[2],lastPN.d,"#6fd0c0","rgba(111,208,192,.12)");
+    dot(ctx5,lastPN.A,views.v5,"#7db4ff",5); label(ctx5,lastPN.A,views.v5,"A","#7db4ff");
+    if(mag(lastPN.n)>1e-9){
+      var un=norm(lastPN.n);
+      drawVector(ctx5,views.v5,lastPN.A,add(lastPN.A,scale(un,2.4)),"#ff9d5c");
+      label(ctx5,add(lastPN.A,scale(un,2.5)),views.v5,"n","#ff9d5c");
+    }
+    dot(ctx5,[0,0,0],views.v5,"#e8ecf6",3);
+  }
+
+  // ---------- attach drags ----------
+  attachDrag(cv1,"v1",draw1);
+  attachDrag(cv2,"v2",draw2);
+  attachDrag(cv3,"v3",draw3);
+  attachDrag(cv4,"v4",draw4);
+  attachDrag(cv5,"v5",draw5);
+
+  // ---------- slider events ----------
+  [s_a,s_b,s_c,s_d].forEach(function(s){ s.addEventListener("input",draw1); });
+  [d_sa,d_sb,d_sc,d_sd,p_sx,p_sy,p_sz].forEach(function(s){ s.addEventListener("input",draw2); });
+  [a_sa1,a_sb1,a_sc1,a_sa2,a_sb2,a_sc2].forEach(function(s){ s.addEventListener("input",draw3); });
+  document.getElementById("calc3pt").addEventListener("click",compute3);
+  document.getElementById("calcPN").addEventListener("click",computePN);
+
+  // ---------- tabs ----------
+  var tabs=document.querySelectorAll(".tab-btn");
+  var sections={eq:document.getElementById("tab-eq"),rel:document.getElementById("tab-rel"),
+    data:document.getElementById("tab-data"),facts:document.getElementById("tab-facts")};
+  tabs.forEach(function(t){ t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");}); t.classList.add("active");
+    for(var k in sections) sections[k].classList.add("hidden");
+    sections[t.dataset.tab].classList.remove("hidden");
+    // redraw the now-visible canvas
+    if(t.dataset.tab==="eq") draw1();
+    if(t.dataset.tab==="rel"){ draw2(); draw3(); }
+    if(t.dataset.tab==="data"){ draw4(); draw5(); }
+  }); });
+
+  // ---------- sub-mode toggles ----------
+  var relmode=document.getElementById("relmode");
+  relmode.querySelectorAll("button").forEach(function(b){ b.addEventListener("click",function(){
+    relmode.querySelectorAll("button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    document.getElementById("relDist").classList.toggle("hidden", b.dataset.m!=="dist");
+    document.getElementById("relAngle").classList.toggle("hidden", b.dataset.m!=="angle");
+    if(b.dataset.m==="dist") draw2(); else draw3();
+  }); });
+  var datamode=document.getElementById("datamode");
+  datamode.querySelectorAll("button").forEach(function(b){ b.addEventListener("click",function(){
+    datamode.querySelectorAll("button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    document.getElementById("dataThree").classList.toggle("hidden", b.dataset.m!=="three");
+    document.getElementById("dataPN").classList.toggle("hidden", b.dataset.m!=="pn");
+    if(b.dataset.m==="three") draw4(); else draw5();
+  }); });
+
+  // ---------- quiz ----------
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var ans=+q.dataset.a, opts=q.querySelectorAll(".opts button"), exp=q.querySelector(".exp");
+    opts.forEach(function(o,i){ o.addEventListener("click",function(){
+      opts.forEach(function(x){x.disabled=true;});
+      if(i===ans) o.classList.add("correct");
+      else { o.classList.add("wrong"); opts[ans].classList.add("correct"); }
+      exp.classList.add("show");
+    }); });
+  });
+
+  // ---------- init ----------
+  compute3(); computePN(); draw1(); draw2(); draw3(); draw5();
+})();
+</script>
+</body>
+</html>

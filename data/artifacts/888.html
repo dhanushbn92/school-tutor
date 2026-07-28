@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Definite Integrals Lab — NIOS Class 12 Mathematics</title>
+<style>
+  :root{
+    --bg:#141821; --panel:#1c2230; --panel2:#232b3b; --line:#313b50;
+    --ink:#e6ecf7; --mut:#9aa7bd; --accent:#5ad1c8; --accentdim:#2b7a74;
+    --pos:#5ad1c8; --neg:#f2a65a; --axis:#5c6a86; --curve:#8ab4ff;
+    --ok:#7ee081; --bad:#f2778a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--mut);font-size:.85rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);color:var(--mut);border:1px solid var(--line);
+    padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .tab.active{background:var(--accentdim);color:#eafffb;border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .mode{display:none}
+  .mode.active{display:block}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:manipulation}
+  .ctrls{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+  .ctrl{flex:1 1 190px;min-width:150px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--mut);margin-bottom:5px}
+  .ctrl label b{color:var(--accent)}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select{
+    width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:8px;font-size:.9rem;
+  }
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .stat{
+    flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;
+  }
+  .stat .k{font-size:.74rem;color:var(--mut)}
+  .stat .v{font-size:1.15rem;font-weight:600;margin-top:2px}
+  .v.pos{color:var(--pos)} .v.neg{color:var(--neg)}
+  .note{font-size:.82rem;color:var(--mut);margin-top:12px}
+  .facts,.quiz{margin-top:2px}
+  .facts h3,.quiz h3{margin:0 0 8px;font-size:1rem;color:var(--accent)}
+  .facts ul{margin:0;padding-left:18px;font-size:.86rem;color:var(--ink)}
+  .facts li{margin-bottom:7px}
+  code{background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85em}
+  .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .q:first-of-type{border-top:none;padding-top:0;margin-top:0}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.92rem}
+  .opt{
+    display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:9px 12px;margin-bottom:7px;cursor:pointer;font-size:.88rem;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .opt:hover{border-color:var(--accent)}
+  .opt.ok{border-color:var(--ok);background:#1e3326;color:#d9ffdd}
+  .opt.bad{border-color:var(--bad);background:#3a2029;color:#ffdbe2}
+  .exp{font-size:.83rem;color:var(--mut);margin-top:6px;display:none}
+  .exp.show{display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--mut);margin-top:10px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+  @media(max-width:420px){h1{font-size:1.15rem}.tab{padding:8px 11px;font-size:.84rem}}
+</style>
+</head>
+<body>
+<h1>Definite Integrals Lab</h1>
+<p class="sub">NIOS Class 12 Mathematics · Chapter 31 — Definite Integrals</p>
+
+<div class="tabs">
+  <div class="tab active" data-m="area">Area</div>
+  <div class="tab" data-m="ftc">Fundamental Theorem</div>
+  <div class="tab" data-m="props">Properties</div>
+  <div class="tab" data-m="facts">Facts &amp; Quiz</div>
+</div>
+
+<!-- ================= AREA ================= -->
+<div class="mode active" id="m-area">
+  <div class="panel">
+    <div class="ctrl" style="margin-bottom:12px">
+      <label>Function f(x)</label>
+      <select id="areaFn">
+        <option value="0">f(x) = x² − 2</option>
+        <option value="1">f(x) = sin x</option>
+        <option value="2">f(x) = x³ ⁄ 4</option>
+        <option value="3">f(x) = x</option>
+      </select>
+    </div>
+    <canvas id="cvA" width="640" height="360"></canvas>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--curve)"></i>f(x)</span>
+      <span><i class="sw" style="background:var(--pos)"></i>area above axis (+)</span>
+      <span><i class="sw" style="background:var(--neg)"></i>area below axis (−)</span>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Lower limit a = <b id="lblA">-1.0</b></label>
+        <input type="range" id="A_a" min="-3" max="3" step="0.1" value="-1"></div>
+      <div class="ctrl"><label>Upper limit b = <b id="lblB">2.0</b></label>
+        <input type="range" id="A_b" min="-3" max="3" step="0.1" value="2"></div>
+      <div class="ctrl"><label>Riemann rectangles n = <b id="lblN">20</b></label>
+        <input type="range" id="A_n" min="2" max="120" step="1" value="20"></div>
+    </div>
+    <div class="readout">
+      <div class="stat"><div class="k">FTC value  F(b) − F(a)</div><div class="v pos" id="A_ftc">—</div></div>
+      <div class="stat"><div class="k">Riemann sum (n rects)</div><div class="v" id="A_rie">—</div></div>
+      <div class="stat"><div class="k">Difference</div><div class="v" id="A_diff">—</div></div>
+    </div>
+    <p class="note">The signed area <code>∫ₐᵇ f(x) dx</code> counts regions <b>below</b> the x-axis as
+    negative. As you raise n, the Riemann sum converges to the exact FTC value. Set a &gt; b and the value flips sign.</p>
+  </div>
+</div>
+
+<!-- ================= FTC ================= -->
+<div class="mode" id="m-ftc">
+  <div class="panel">
+    <p class="note" style="margin-top:0">The accumulation function
+    <code>A(x) = ∫ₐˣ f(t) dt</code> measures signed area from a to x.
+    The Fundamental Theorem says <b>A′(x) = f(x)</b>: the slope of the blue accumulation
+    curve at any x equals the height of f there. Move the probe to check.</p>
+    <div class="ctrl" style="margin:6px 0 12px">
+      <label>Function f(x)</label>
+      <select id="ftcFn">
+        <option value="1">f(x) = sin x</option>
+        <option value="0">f(x) = x² − 2</option>
+        <option value="3">f(x) = x</option>
+      </select>
+    </div>
+    <canvas id="cvF" width="640" height="380"></canvas>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--curve)"></i>f(x)</span>
+      <span><i class="sw" style="background:var(--pos)"></i>A(x)=∫ₐˣ f</span>
+      <span><i class="sw" style="background:var(--neg)"></i>tangent slope of A = f</span>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><label>Start a = <b id="lblFa">-3.0</b></label>
+        <input type="range" id="F_a" min="-3" max="0" step="0.1" value="-3"></div>
+      <div class="ctrl"><label>Probe x = <b id="lblFx">1.0</b></label>
+        <input type="range" id="F_x" min="-3" max="3" step="0.1" value="1"></div>
+    </div>
+    <div class="readout">
+      <div class="stat"><div class="k">A(x) = ∫ₐˣ f (area so far)</div><div class="v" id="F_area">—</div></div>
+      <div class="stat"><div class="k">A′(x) measured slope</div><div class="v" id="F_slope">—</div></div>
+      <div class="stat"><div class="k">f(x) direct value</div><div class="v" id="F_fx">—</div></div>
+    </div>
+    <p class="note">A′(x) and f(x) agree — that is the Fundamental Theorem of Calculus in action.</p>
+  </div>
+</div>
+
+<!-- ================= PROPERTIES ================= -->
+<div class="mode" id="m-props">
+  <div class="panel">
+    <h3 style="color:var(--accent);margin:0 0 4px">Reversing limits &amp; splitting</h3>
+    <p class="note" style="margin-top:0">With f(x)=x²−2, watch how reversing limits negates the
+    integral, and how splitting at c adds up to the whole.</p>
+    <div class="ctrls">
+      <div class="ctrl"><label>a = <b id="lblPa">-2.0</b></label>
+        <input type="range" id="P_a" min="-3" max="3" step="0.1" value="-2"></div>
+      <div class="ctrl"><label>split c = <b id="lblPc">0.5</b></label>
+        <input type="range" id="P_c" min="-3" max="3" step="0.1" value="0.5"></div>
+      <div class="ctrl"><label>b = <b id="lblPb">2.5</b></label>
+        <input type="range" id="P_b" min="-3" max="3" step="0.1" value="2.5"></div>
+    </div>
+    <div class="readout">
+      <div class="stat"><div class="k">∫ₐᵇ f</div><div class="v" id="P_ab">—</div></div>
+      <div class="stat"><div class="k">−∫ᵇₐ f</div><div class="v" id="P_rev">—</div></div>
+      <div class="stat"><div class="k">∫ₐᶜ f + ∫꜀ᵇ f</div><div class="v" id="P_split">—</div></div>
+    </div>
+    <p class="note"><code>∫ₐᵇ f = −∫ᵇₐ f</code> and <code>∫ₐᵇ f = ∫ₐᶜ f + ∫꜀ᵇ f</code> — the three
+    numbers above match to the last digit.</p>
+  </div>
+
+  <div class="panel">
+    <h3 style="color:var(--accent);margin:0 0 4px">Even / odd symmetry over [−a, a]</h3>
+    <canvas id="cvS" width="640" height="260"></canvas>
+    <div class="ctrls">
+      <div class="ctrl"><label>Function</label>
+        <select id="symFn">
+          <option value="even">even: f(x)=x² (∫₋ₐᵃ = 2∫₀ᵃ)</option>
+          <option value="odd">odd: f(x)=x³ (∫₋ₐᵃ = 0)</option>
+        </select></div>
+      <div class="ctrl"><label>half-width a = <b id="lblSa">2.0</b></label>
+        <input type="range" id="S_a" min="0.4" max="3" step="0.1" value="2"></div>
+    </div>
+    <div class="readout">
+      <div class="stat"><div class="k">∫₋ₐᵃ f</div><div class="v" id="S_full">—</div></div>
+      <div class="stat"><div class="k">2·∫₀ᵃ f</div><div class="v" id="S_dbl">—</div></div>
+      <div class="stat"><div class="k">symmetry rule</div><div class="v" id="S_rule" style="font-size:.9rem">—</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="color:var(--accent);margin:0 0 4px">Worked example: area between two curves</h3>
+    <canvas id="cvB" width="640" height="300"></canvas>
+    <p class="note" style="margin-bottom:4px">Region between <code>y = 2 − x²</code> (upper) and
+    <code>y = x</code> (lower). Intersections: 2−x² = x ⇒ x²+x−2 = 0 ⇒ (x+2)(x−1)=0, so x = −2 and x = 1.</p>
+    <p class="note" style="margin-top:2px">Area = ∫₋₂¹ [(2 − x²) − x] dx
+    = [2x − x³⁄3 − x²⁄2]₋₂¹ = <b style="color:var(--pos)">9⁄2 = 4.5</b> square units
+    (confirmed numerically: <b id="B_num">—</b>).</p>
+  </div>
+</div>
+
+<!-- ================= FACTS + QUIZ ================= -->
+<div class="mode" id="m-facts">
+  <div class="panel facts">
+    <h3>Key facts</h3>
+    <ul>
+      <li><b>Definite integral:</b> <code>∫ₐᵇ f(x) dx = F(b) − F(a)</code> where F′ = f.
+      The result is a number, not a function; the constant of integration cancels.</li>
+      <li><b>Fundamental Theorem of Calculus:</b> if <code>A(x) = ∫ₐˣ f(t) dt</code> then
+      <code>A′(x) = f(x)</code>. Differentiation and integration are inverse operations.</li>
+      <li><b>Signed area:</b> parts of the graph below the x-axis contribute negative area. For total
+      geometric area use <code>∫|f|</code>.</li>
+      <li><b>Reversal:</b> <code>∫ₐᵇ f = −∫ᵇₐ f</code>, and <code>∫ₐᵃ f = 0</code>.</li>
+      <li><b>Additivity:</b> <code>∫ₐᵇ f = ∫ₐᶜ f + ∫꜀ᵇ f</code> for any c.</li>
+      <li><b>Linearity:</b> <code>∫ₐᵇ [k·f + g] = k∫ₐᵇ f + ∫ₐᵇ g</code>.</li>
+      <li><b>Symmetry on [−a, a]:</b> even f ⇒ <code>∫₋ₐᵃ f = 2∫₀ᵃ f</code>; odd f ⇒ <code>∫₋ₐᵃ f = 0</code>.</li>
+      <li><b>Area between curves:</b> <code>∫ₐᵇ [ f_top − f_bottom ] dx</code> between intersection points.</li>
+    </ul>
+  </div>
+
+  <div class="panel quiz" id="quiz">
+    <h3>Quick quiz — tap an option</h3>
+    <div class="q" data-a="1">
+      <p>1. Using the FTC, <code>∫₀² 3x² dx</code> equals:</p>
+      <div class="opt">4</div><div class="opt">6</div><div class="opt">8</div><div class="opt">12</div>
+      <div class="exp">F(x)=x³, so F(2)−F(0)=8−0=8.</div>
+    </div>
+    <div class="q" data-a="2">
+      <p>2. What is <code>∫₋π^π sin x dx</code>?</p>
+      <div class="opt">2</div><div class="opt">π</div><div class="opt">0</div><div class="opt">−2</div>
+      <div class="exp">sin x is odd, so its integral over the symmetric interval [−π, π] is 0.</div>
+    </div>
+    <div class="q" data-a="0">
+      <p>3. If <code>A(x) = ∫₁ˣ t² dt</code>, then A′(x) equals:</p>
+      <div class="opt">x²</div><div class="opt">x³⁄3</div><div class="opt">2x</div><div class="opt">1</div>
+      <div class="exp">By the Fundamental Theorem of Calculus, A′(x) = f(x) = x².</div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---------- function library: f, antiderivative F, label ----------
+var FN = [
+  { f:function(x){return x*x-2;},        F:function(x){return x*x*x/3 - 2*x;} },      //0 x^2-2
+  { f:function(x){return Math.sin(x);},  F:function(x){return -Math.cos(x);} },       //1 sin
+  { f:function(x){return x*x*x/4;},      F:function(x){return x*x*x*x/16;} },         //2 x^3/4
+  { f:function(x){return x;},            F:function(x){return x*x/2;} }               //3 x
+];
+function riemann(f,a,b,n){ // midpoint sum, signed
+  var h=(b-a)/n, s=0;
+  for(var i=0;i<n;i++){ s += f(a+(i+0.5)*h); }
+  return s*h;
+}
+function fmt(v){ var s=(Math.abs(v)<1e-9?0:v).toFixed(3); return s; }
+
+// ---------- generic plot helpers ----------
+function makeMap(cv,xmin,xmax,ymin,ymax){
+  var W=cv.width,H=cv.height,pad=30;
+  return {
+    W:W,H:H,
+    X:function(x){return pad+(x-xmin)/(xmax-xmin)*(W-2*pad);},
+    Y:function(y){return H-pad-(y-ymin)/(ymax-ymin)*(H-2*pad);},
+    xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax
+  };
+}
+function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
+function axes(ctx,m){
+  ctx.strokeStyle=css('--axis'); ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(m.X(m.xmin),m.Y(0)); ctx.lineTo(m.X(m.xmax),m.Y(0)); ctx.stroke();
+  if(m.xmin<=0&&m.xmax>=0){ ctx.beginPath(); ctx.moveTo(m.X(0),m.Y(m.ymin)); ctx.lineTo(m.X(0),m.Y(m.ymax)); ctx.stroke(); }
+  // ticks
+  ctx.fillStyle=css('--mut'); ctx.font='10px system-ui'; ctx.textAlign='center';
+  for(var x=Math.ceil(m.xmin);x<=m.xmax;x++){ if(x===0)continue;
+    ctx.fillText(x, m.X(x), m.Y(0)+13); }
+}
+function plotCurve(ctx,m,f){
+  ctx.strokeStyle=css('--curve'); ctx.lineWidth=2.4; ctx.beginPath();
+  var first=true;
+  for(var px=0;px<=m.W;px+=2){
+    var x=m.xmin+(px)/(m.W)*(m.xmax-m.xmin);
+    var y=f(x); if(y>m.ymax*1.4||y<m.ymin*1.4){first=true;continue;}
+    var sx=m.X(x),sy=m.Y(y);
+    if(first){ctx.moveTo(sx,sy);first=false;} else ctx.lineTo(sx,sy);
+  }
+  ctx.stroke();
+}
+
+// ===================== AREA MODE =====================
+var cvA=document.getElementById('cvA'), ctxA=cvA.getContext('2d');
+function drawArea(){
+  var idx=+document.getElementById('areaFn').value, F=FN[idx];
+  var a=+document.getElementById('A_a').value, b=+document.getElementById('A_b').value, n=+document.getElementById('A_n').value;
+  document.getElementById('lblA').textContent=a.toFixed(1);
+  document.getElementById('lblB').textContent=b.toFixed(1);
+  document.getElementById('lblN').textContent=n;
+  var m=makeMap(cvA,-3.2,3.2,-4.5,7);
+  ctxA.clearRect(0,0,m.W,m.H);
+  // Riemann rectangles (midpoint) over [min,max]
+  var lo=Math.min(a,b), hi=Math.max(a,b), h=(hi-lo)/n;
+  for(var i=0;i<n;i++){
+    var xm=lo+(i+0.5)*h, y=F.f(xm);
+    var col = y>=0 ? css('--pos') : css('--neg');
+    ctxA.fillStyle=col; ctxA.globalAlpha=0.30;
+    var yTop=m.Y(Math.max(0,y)), yBot=m.Y(Math.min(0,y));
+    ctxA.fillRect(m.X(lo+i*h), yTop, (m.X(lo+(i+1)*h)-m.X(lo+i*h)), yBot-yTop);
+    ctxA.globalAlpha=1; ctxA.strokeStyle=col; ctxA.lineWidth=0.5;
+    ctxA.strokeRect(m.X(lo+i*h), yTop, (m.X(lo+(i+1)*h)-m.X(lo+i*h)), yBot-yTop);
+  }
+  axes(ctxA,m); plotCurve(ctxA,m,F.f);
+  // limit markers
+  ctxA.setLineDash([4,4]); ctxA.strokeStyle=css('--ink'); ctxA.lineWidth=1;
+  [a,b].forEach(function(v){ ctxA.beginPath(); ctxA.moveTo(m.X(v),m.Y(m.ymin)); ctxA.lineTo(m.X(v),m.Y(m.ymax)); ctxA.stroke(); });
+  ctxA.setLineDash([]);
+  ctxA.fillStyle=css('--ink'); ctxA.font='12px system-ui'; ctxA.textAlign='center';
+  ctxA.fillText('a', m.X(a), m.Y(m.ymax)+2+10); ctxA.fillText('b', m.X(b), m.Y(m.ymax)+2+10);
+  // values
+  var ftc=F.F(b)-F.F(a);
+  var rie=riemann(F.f,a,b,n);
+  var ev=document.getElementById('A_ftc'); ev.textContent=fmt(ftc);
+  ev.className='v '+(ftc>=0?'pos':'neg');
+  document.getElementById('A_rie').textContent=fmt(rie);
+  document.getElementById('A_diff').textContent=fmt(Math.abs(ftc-rie));
+}
+
+// ===================== FTC MODE =====================
+var cvF=document.getElementById('cvF'), ctxF=cvF.getContext('2d');
+function drawFtc(){
+  var idx=+document.getElementById('ftcFn').value, F=FN[idx];
+  var a=+document.getElementById('F_a').value, xp=+document.getElementById('F_x').value;
+  document.getElementById('lblFa').textContent=a.toFixed(1);
+  document.getElementById('lblFx').textContent=xp.toFixed(1);
+  var m=makeMap(cvF,-3.2,3.2,-4.5,6);
+  ctxF.clearRect(0,0,m.W,m.H);
+  // shade area a..xp under f
+  var lo=Math.min(a,xp), hi=Math.max(a,xp), N=200, h=(hi-lo)/N;
+  for(var i=0;i<N;i++){
+    var xm=lo+(i+0.5)*h, y=F.f(xm);
+    ctxF.fillStyle = y>=0?css('--pos'):css('--neg'); ctxF.globalAlpha=0.20;
+    var yTop=m.Y(Math.max(0,y)), yBot=m.Y(Math.min(0,y));
+    ctxF.fillRect(m.X(lo+i*h), yTop, (m.X(lo+(i+1)*h)-m.X(lo+i*h))+0.6, yBot-yTop);
+  }
+  ctxF.globalAlpha=1;
+  axes(ctxF,m); plotCurve(ctxF,m,F.f);
+  // accumulation curve A(x)=F(x)-F(a)
+  ctxF.strokeStyle=css('--pos'); ctxF.lineWidth=2.2; ctxF.beginPath(); var first=true;
+  for(var px=0;px<=m.W;px+=2){
+    var x=m.xmin+px/m.W*(m.xmax-m.xmin);
+    var Ax=F.F(x)-F.F(a); if(Ax>m.ymax*1.4||Ax<m.ymin*1.4){first=true;continue;}
+    if(first){ctxF.moveTo(m.X(x),m.Y(Ax));first=false;} else ctxF.lineTo(m.X(x),m.Y(Ax));
+  }
+  ctxF.stroke();
+  // tangent to A at xp with slope f(xp)
+  var Axp=F.F(xp)-F.F(a), slope=F.f(xp);
+  ctxF.strokeStyle=css('--neg'); ctxF.lineWidth=2; ctxF.beginPath();
+  var dx=1.1;
+  ctxF.moveTo(m.X(xp-dx),m.Y(Axp-slope*dx)); ctxF.lineTo(m.X(xp+dx),m.Y(Axp+slope*dx)); ctxF.stroke();
+  // probe dot
+  ctxF.fillStyle=css('--ink'); ctxF.beginPath(); ctxF.arc(m.X(xp),m.Y(Axp),4,0,7); ctxF.fill();
+  // numeric slope via central difference
+  var eps=0.001, mslope=((F.F(xp+eps)-F.F(a))-(F.F(xp-eps)-F.F(a)))/(2*eps);
+  document.getElementById('F_area').textContent=fmt(Axp);
+  document.getElementById('F_slope').textContent=fmt(mslope);
+  document.getElementById('F_fx').textContent=fmt(F.f(xp));
+}
+
+// ===================== PROPERTIES =====================
+var P=FN[0];
+function drawProps(){
+  var a=+document.getElementById('P_a').value, c=+document.getElementById('P_c').value, b=+document.getElementById('P_b').value;
+  document.getElementById('lblPa').textContent=a.toFixed(1);
+  document.getElementById('lblPc').textContent=c.toFixed(1);
+  document.getElementById('lblPb').textContent=b.toFixed(1);
+  var ab=P.F(b)-P.F(a);
+  var rev=-(P.F(a)-P.F(b));
+  var split=(P.F(c)-P.F(a))+(P.F(b)-P.F(c));
+  document.getElementById('P_ab').textContent=fmt(ab);
+  document.getElementById('P_rev').textContent=fmt(rev);
+  document.getElementById('P_split').textContent=fmt(split);
+}
+
+// symmetry
+var cvS=document.getElementById('cvS'), ctxS=cvS.getContext('2d');
+function drawSym(){
+  var kind=document.getElementById('symFn').value;
+  var a=+document.getElementById('S_a').value;
+  document.getElementById('lblSa').textContent=a.toFixed(1);
+  var f = kind==='even' ? function(x){return x*x;} : function(x){return x*x*x;};
+  var Fanti = kind==='even' ? function(x){return x*x*x/3;} : function(x){return x*x*x*x/4;};
+  var full=Fanti(a)-Fanti(-a);
+  var half=Fanti(a)-Fanti(0);
+  document.getElementById('S_full').textContent=fmt(full);
+  document.getElementById('S_dbl').textContent=fmt(2*half);
+  document.getElementById('S_rule').textContent = kind==='even' ? '∫₋ₐᵃ = 2∫₀ᵃ' : '∫₋ₐᵃ = 0';
+  var ymax = kind==='even'? 9.5 : 9.5, ymin = kind==='even'? -1 : -9.5;
+  var m=makeMap(cvS,-3.2,3.2,ymin,ymax);
+  ctxS.clearRect(0,0,m.W,m.H);
+  // shade [-a,a]
+  var N=160, h=(2*a)/N;
+  for(var i=0;i<N;i++){ var xm=-a+(i+0.5)*h, y=f(xm);
+    ctxS.fillStyle=y>=0?css('--pos'):css('--neg'); ctxS.globalAlpha=0.22;
+    var yTop=m.Y(Math.max(0,y)), yBot=m.Y(Math.min(0,y));
+    ctxS.fillRect(m.X(-a+i*h),yTop,(m.X(-a+(i+1)*h)-m.X(-a+i*h))+0.6,yBot-yTop);
+  }
+  ctxS.globalAlpha=1; axes(ctxS,m); plotCurve(ctxS,m,f);
+}
+
+// between curves
+var cvB=document.getElementById('cvB'), ctxB=cvB.getContext('2d');
+function drawBetween(){
+  var top=function(x){return 2-x*x;}, bot=function(x){return x;};
+  var m=makeMap(cvB,-3.2,2.2,-3.5,3.2);
+  ctxB.clearRect(0,0,m.W,m.H);
+  // shade region -2..1
+  var N=200, lo=-2, hi=1, h=(hi-lo)/N;
+  ctxB.fillStyle=css('--accent'); ctxB.globalAlpha=0.22;
+  for(var i=0;i<N;i++){ var x0=lo+i*h;
+    ctxB.beginPath();
+    ctxB.moveTo(m.X(x0),m.Y(bot(x0))); ctxB.lineTo(m.X(x0),m.Y(top(x0)));
+    ctxB.lineTo(m.X(x0+h),m.Y(top(x0+h))); ctxB.lineTo(m.X(x0+h),m.Y(bot(x0+h)));
+    ctxB.closePath(); ctxB.fill();
+  }
+  ctxB.globalAlpha=1; axes(ctxB,m);
+  plotCurve(ctxB,m,top);
+  ctxB.strokeStyle=css('--neg'); ctxB.lineWidth=2.2; ctxB.beginPath();
+  ctxB.moveTo(m.X(m.xmin),m.Y(bot(m.xmin))); ctxB.lineTo(m.X(m.xmax),m.Y(bot(m.xmax))); ctxB.stroke();
+  var num=riemann(function(x){return (2-x*x)-x;}, -2,1, 2000);
+  document.getElementById('B_num').textContent=fmt(num);
+}
+
+// ===================== QUIZ =====================
+document.querySelectorAll('#quiz .q').forEach(function(q){
+  var ans=+q.getAttribute('data-a'), opts=q.querySelectorAll('.opt'), exp=q.querySelector('.exp');
+  opts.forEach(function(o,i){
+    o.addEventListener('click',function(){
+      opts.forEach(function(x){x.classList.remove('ok','bad');});
+      if(i===ans){o.classList.add('ok');} else {o.classList.add('bad'); opts[ans].classList.add('ok');}
+      exp.classList.add('show');
+    });
+  });
+});
+
+// ===================== TABS + WIRING =====================
+function redrawAll(){ drawArea(); drawFtc(); drawProps(); drawSym(); drawBetween(); }
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.mode').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById('m-'+t.getAttribute('data-m')).classList.add('active');
+    redrawAll();
+  });
+});
+['A_a','A_b','A_n','areaFn'].forEach(function(id){document.getElementById(id).addEventListener('input',drawArea);});
+['F_a','F_x','ftcFn'].forEach(function(id){document.getElementById(id).addEventListener('input',drawFtc);});
+['P_a','P_c','P_b'].forEach(function(id){document.getElementById(id).addEventListener('input',drawProps);});
+['S_a','symFn'].forEach(function(id){document.getElementById(id).addEventListener('input',drawSym);});
+redrawAll();
+</script>
+</body>
+</html>
