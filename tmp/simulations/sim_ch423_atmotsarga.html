@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>परार्थे आत्मोत्सर्गः | Self-Sacrifice — Dadhichi</title>
+<style>
+  :root{
+    --accent:#e07a3f;
+    --accent-soft:#fbeadd;
+    --accent-dark:#b85a22;
+    --bg:#1c1a24;
+    --panel:#26232f;
+    --panel2:#2f2b3a;
+    --ink:#f0ecf6;
+    --muted:#a7a1b8;
+    --good:#4fca8b;
+    --good-soft:#213a30;
+    --bad:#f0687f;
+    --bad-soft:#3a2129;
+    --line:#3a3547;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1c1a24 0%,#241f2e 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.5vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--accent);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);}
+  .tab-btn.active{background:var(--accent);color:#1c1a24;box-shadow:0 4px 12px rgba(224,122,63,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.30);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Explorer ---- */
+  .subtabs{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+  .subtab{
+    border:1px solid var(--line);background:var(--panel2);color:var(--muted);
+    padding:7px 14px;border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.15s;
+  }
+  .subtab.active{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent);}
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .card-tag{
+    display:inline-block;font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;
+    background:var(--accent);color:#1c1a24;padding:2px 10px;border-radius:999px;font-weight:700;margin-bottom:10px;
+  }
+  .verse-card{
+    background:var(--panel2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5vw,1.8rem);
+    line-height:1.8;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box,.anvaya-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .anvaya-box .deva-inline{font-family:var(--deva);font-size:1.05rem;color:var(--ink);}
+  .moral-box{background:var(--good-soft);border-color:#2c5341;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#1c1a24;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{background:var(--accent-soft);color:var(--accent-dark);padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.25rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);box-shadow:0 0 0 3px rgba(224,122,63,.2);}
+  .word-item.done,.mean-item.done{border-color:#2c5341;background:var(--good-soft);color:var(--good);cursor:default;opacity:.85;}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);color:var(--accent-dark);}
+  .win-banner{text-align:center;background:var(--good-soft);border:1px solid #2c5341;border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;}
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.1rem,4.5vw,1.4rem);
+    text-align:center;line-height:1.7;color:var(--ink);
+    background:var(--panel2);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:1rem;border:2px solid var(--line);background:var(--panel2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;text-align:left;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);font-size:1.15rem;color:var(--accent);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2c5341;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.92rem;margin-bottom:8px;}
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.1rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">परार्थे आत्मोत्सर्गः</div>
+    <h1>Self-Sacrifice for Others — The Story of Dadhichi</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 8 &middot; Pararthe Atmotsargah</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story &amp; Verse Explorer</h2>
+      <p class="mode-sub">Follow the legend of sage Dadhichi, then study verses on sacrifice and service.</p>
+      <div class="subtabs">
+        <button class="subtab active" data-set="story">🕉️ The Story</button>
+        <button class="subtab" data-set="verse">📜 The Verses</button>
+      </div>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to pair them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer questions about the story and its moral. Explanations reveal after each choice.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Legend of महर्षि दधीचि (Rigveda / Puranas) &middot; Public-domain Sanskrit &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- STORY CARDS ---------------- */
+var STORY = [
+  {
+    tag:"आरम्भः · Beginning",
+    deva:"पुरा वृत्रासुरः देवान् अतीव अपीडयत्।",
+    translit:"purā vṛtrāsuraḥ devān atīva apīḍayat.",
+    words:[
+      {w:"पुरा", m:"long ago"},
+      {w:"वृत्रासुरः", m:"the demon Vritra"},
+      {w:"देवान्", m:"the gods (object)"},
+      {w:"अपीडयत्", m:"tormented"}
+    ],
+    trans:"Long ago the demon Vritra severely tormented the gods."
+  },
+  {
+    tag:"सङ्कटम् · The Crisis",
+    deva:"इन्द्रः स्वायुधैः तं वृत्रं जेतुं न अशक्नोत्।",
+    translit:"indraḥ svāyudhaiḥ taṁ vṛtraṁ jetuṁ na aśaknot.",
+    words:[
+      {w:"इन्द्रः", m:"Indra, king of gods"},
+      {w:"स्वायुधैः", m:"with his own weapons"},
+      {w:"जेतुम्", m:"to conquer"},
+      {w:"न अशक्नोत्", m:"was not able"}
+    ],
+    trans:"Indra could not defeat Vritra with his ordinary weapons."
+  },
+  {
+    tag:"उपायः · The Way",
+    deva:"देवाः विष्णुम् अगच्छन्। सः अवदत् — दधीचेः अस्थिभिः एव वृत्रः वध्यः।",
+    translit:"devāḥ viṣṇum agacchan. saḥ avadat — dadhīceḥ asthibhiḥ eva vṛtraḥ vadhyaḥ.",
+    words:[
+      {w:"विष्णुम्", m:"to Vishnu"},
+      {w:"दधीचेः", m:"of sage Dadhichi"},
+      {w:"अस्थिभिः", m:"with the bones"},
+      {w:"वध्यः", m:"can be slain"}
+    ],
+    trans:"The gods went to Vishnu. He said: Vritra can be slain only by a weapon made from the bones of sage Dadhichi."
+  },
+  {
+    tag:"प्रार्थना · The Request",
+    deva:"देवाः दधीचिम् उपगम्य प्रार्थयन्त — भो महर्षे, अस्माकं रक्षार्थं स्वास्थीनि देहि।",
+    translit:"devāḥ dadhīcim upagamya prārthayanta — bho maharṣe, asmākaṁ rakṣārthaṁ svāsthīni dehi.",
+    words:[
+      {w:"उपगम्य", m:"having approached"},
+      {w:"प्रार्थयन्त", m:"they prayed / requested"},
+      {w:"रक्षार्थम्", m:"for the sake of protection"},
+      {w:"देहि", m:"please give"}
+    ],
+    trans:"The gods approached Dadhichi and begged: O great sage, for our protection, give us your bones."
+  },
+  {
+    tag:"त्यागः · The Sacrifice",
+    deva:"दधीचिः प्रसन्नः अभवत्। परार्थे मम शरीरम् इति उक्त्वा योगेन प्राणान् अत्यजत्।",
+    translit:"dadhīciḥ prasannaḥ abhavat. parārthe mama śarīram iti uktvā yogena prāṇān atyajat.",
+    words:[
+      {w:"प्रसन्नः", m:"pleased / willing"},
+      {w:"परार्थे", m:"for the sake of others"},
+      {w:"योगेन", m:"through yoga"},
+      {w:"प्राणान् अत्यजत्", m:"gave up his life"}
+    ],
+    trans:"Dadhichi gladly agreed. Saying 'this body is for others,' he gave up his life through yogic power."
+  },
+  {
+    tag:"वज्रम् · The Thunderbolt",
+    deva:"तस्य अस्थिभिः विश्वकर्मा दृढं वज्रम् अरचयत्।",
+    translit:"tasya asthibhiḥ viśvakarmā dṛḍhaṁ vajram aracayat.",
+    words:[
+      {w:"तस्य", m:"his"},
+      {w:"विश्वकर्मा", m:"Vishvakarma, divine craftsman"},
+      {w:"दृढम्", m:"strong / firm"},
+      {w:"वज्रम् अरचयत्", m:"fashioned the thunderbolt"}
+    ],
+    trans:"From his bones Vishvakarma fashioned the mighty vajra (thunderbolt)."
+  },
+  {
+    tag:"विजयः · The Victory",
+    deva:"इन्द्रः तेन वज्रेण वृत्रम् अवधीत्। देवाः रक्षिताः अभवन्।",
+    translit:"indraḥ tena vajreṇa vṛtram avadhīt. devāḥ rakṣitāḥ abhavan.",
+    words:[
+      {w:"तेन वज्रेण", m:"with that thunderbolt"},
+      {w:"अवधीत्", m:"slew / killed"},
+      {w:"रक्षिताः", m:"protected"},
+      {w:"अभवन्", m:"became"}
+    ],
+    trans:"With that thunderbolt Indra slew Vritra, and the gods were saved."
+  },
+  {
+    tag:"आदर्शः · The Ideal",
+    deva:"दधीचेः आत्मोत्सर्गः सर्वेषाम् आदर्शः। परार्थे आत्मोत्सर्गः परमो धर्मः।",
+    translit:"dadhīceḥ ātmotsargaḥ sarveṣām ādarśaḥ. parārthe ātmotsargaḥ paramo dharmaḥ.",
+    words:[
+      {w:"आत्मोत्सर्गः", m:"self-sacrifice"},
+      {w:"आदर्शः", m:"an ideal / model"},
+      {w:"परमः", m:"supreme / highest"},
+      {w:"धर्मः", m:"duty / virtue"}
+    ],
+    trans:"Dadhichi's self-sacrifice is a model for all. Self-sacrifice for others is the supreme virtue."
+  }
+];
+
+/* ---------------- VERSE CARDS (authentic, public domain) ---------------- */
+var VERSES = [
+  {
+    tag:"Subhashita · Service",
+    deva:"पिबन्ति नद्यः स्वयमेव नाम्भः स्वयं न खादन्ति फलानि वृक्षाः।<br>नादन्ति सस्यं खलु वारिवाहाः परोपकाराय सतां विभूतयः॥",
+    translit:"pibanti nadyaḥ svayam eva nāmbhaḥ svayaṁ na khādanti phalāni vṛkṣāḥ; nādanti sasyaṁ khalu vārivāhāḥ paropakārāya satāṁ vibhūtayaḥ",
+    words:[
+      {w:"नद्यः", m:"rivers"},
+      {w:"न अम्भः पिबन्ति", m:"do not drink water"},
+      {w:"वृक्षाः", m:"trees"},
+      {w:"वारिवाहाः", m:"clouds"},
+      {w:"परोपकाराय", m:"for helping others"},
+      {w:"सतां विभूतयः", m:"the wealth of the good"}
+    ],
+    anvaya:"नद्यः स्वयम् एव अम्भः न पिबन्ति, वृक्षाः स्वयं फलानि न खादन्ति, वारिवाहाः खलु सस्यं न अदन्ति; सतां विभूतयः परोपकाराय (भवन्ति)।",
+    trans:"Rivers do not drink their own water, trees do not eat their own fruit, clouds do not devour the grain they nourish; the riches of the good exist for helping others.",
+    moral:"All of nature lives to serve others. So too, the good use their wealth and strength for the welfare of others."
+  },
+  {
+    tag:"Hitopadesha · Priorities",
+    deva:"त्यजेदेकं कुलस्यार्थे ग्रामस्यार्थे कुलं त्यजेत्।<br>ग्रामं जनपदस्यार्थे आत्मार्थे पृथिवीं त्यजेत्॥",
+    translit:"tyajed ekaṁ kulasyārthe grāmasyārthe kulaṁ tyajet; grāmaṁ janapadasyārthe ātmārthe pṛthivīṁ tyajet",
+    words:[
+      {w:"त्यजेत्", m:"one should give up"},
+      {w:"एकम्", m:"one (person)"},
+      {w:"कुलस्य अर्थे", m:"for the sake of the family"},
+      {w:"ग्रामस्य अर्थे", m:"for the sake of the village"},
+      {w:"जनपदस्य अर्थे", m:"for the sake of the country"},
+      {w:"आत्मार्थे", m:"for the sake of the Self / soul"}
+    ],
+    anvaya:"कुलस्य अर्थे एकं त्यजेत्, ग्रामस्य अर्थे कुलं त्यजेत्, जनपदस्य अर्थे ग्रामं त्यजेत्, आत्मार्थे पृथिवीं त्यजेत्।",
+    trans:"For the family give up one person; for the village give up the family; for the country give up the village; for the sake of the soul give up the whole earth.",
+    moral:"The greater good outweighs the smaller. True renunciation places the welfare of the many above the few."
+  },
+  {
+    tag:"Vyasa · The Essence",
+    deva:"अष्टादशपुराणेषु व्यासस्य वचनद्वयम्।<br>परोपकारः पुण्याय पापाय परपीडनम्॥",
+    translit:"aṣṭādaśa-purāṇeṣu vyāsasya vacana-dvayam; paropakāraḥ puṇyāya pāpāya para-pīḍanam",
+    words:[
+      {w:"अष्टादशपुराणेषु", m:"in the eighteen Puranas"},
+      {w:"वचनद्वयम्", m:"two statements"},
+      {w:"परोपकारः", m:"helping others"},
+      {w:"पुण्याय", m:"leads to merit"},
+      {w:"परपीडनम्", m:"harming others"},
+      {w:"पापाय", m:"leads to sin"}
+    ],
+    anvaya:"अष्टादशपुराणेषु व्यासस्य वचनद्वयम् (अस्ति) — परोपकारः पुण्याय (भवति), परपीडनम् पापाय (भवति)।",
+    trans:"In all eighteen Puranas, Vyasa's teaching is but two lines: helping others brings merit; harming others brings sin.",
+    moral:"The whole of scripture reduces to one rule — do good to others. Dadhichi lived this truth to its very limit."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var curSet = "story";
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+var subtabs = document.querySelectorAll(".subtab");
+
+function activeList(){ return curSet==="story" ? STORY : VERSES; }
+
+subtabs.forEach(function(st){
+  st.addEventListener("click", function(){
+    subtabs.forEach(function(s){s.classList.remove("active");});
+    st.classList.add("active");
+    curSet = st.dataset.set;
+    vIndex = 0;
+    renderCard();
+  });
+});
+
+function chipHtml(words){
+  return words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+}
+
+function renderCard(){
+  var list = activeList();
+  var v = list[vIndex];
+  var html = '<span class="card-tag">'+v.tag+'</span>'+
+    '<div class="verse-deva">'+v.deva+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chipHtml(v.words)+'</div>';
+  if(v.anvaya){
+    html += '<div class="anvaya-box"><div class="block-label">अन्वयः &middot; Prose Order</div><span class="deva-inline">'+v.anvaya+'</span></div>';
+  }
+  html += '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>';
+  if(v.moral){
+    html += '<div class="moral-box"><div class="block-label">Moral &middot; सन्देशः</div>'+v.moral+'</div>';
+  }
+  verseCard.innerHTML = html;
+  var label = curSet==="story" ? "Scene" : "Verse";
+  verseCount.textContent = label+" "+(vIndex+1)+" of "+list.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===list.length-1);
+  var d = "";
+  for(var i=0;i<list.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderCard();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<activeList().length-1){vIndex++;renderCard();} });
+renderCard();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"त्यागः", m:"sacrifice / renunciation"},
+  {w:"परोपकारः", m:"helping others"},
+  {w:"अस्थि", m:"bone"},
+  {w:"वज्रम्", m:"thunderbolt"},
+  {w:"दधीचिः", m:"sage Dadhichi"},
+  {w:"आत्मोत्सर्गः", m:"self-sacrifice"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"किमर्थं दधीचिः स्वशरीरं त्यक्तवान्? (Why did Dadhichi give up his body?)",
+    options:[
+      {t:'<span class="deva-inline">देवानां रक्षणाय</span> — to protect the gods (so his bones could make the vajra)', ok:true},
+      {t:'<span class="deva-inline">धनप्राप्त्यर्थम्</span> — to gain wealth', ok:false},
+      {t:'<span class="deva-inline">युद्धे पराजयात्</span> — because he lost a battle', ok:false}
+    ],
+    explain:"<b>परार्थे आत्मोत्सर्गः</b> — Dadhichi willingly gave up his life so that the gods could be saved. His bones became the vajra that slew Vritra."
+  },
+  {
+    q:"केन आयुधेन इन्द्रः वृत्रम् अवधीत्? (With which weapon did Indra slay Vritra?)",
+    options:[
+      {t:'<span class="deva-inline">वज्रेण</span> — with the thunderbolt (vajra)', ok:true},
+      {t:'<span class="deva-inline">चक्रेण</span> — with the discus', ok:false},
+      {t:'<span class="deva-inline">धनुषा</span> — with the bow', ok:false}
+    ],
+    explain:"Vishvakarma made the <b>वज्रम्</b> (thunderbolt) from Dadhichi's bones (<b>अस्थि</b>). Only that weapon could kill Vritra."
+  },
+  {
+    q:"अस्य पाठस्य मुख्यः सन्देशः कः? (What is the central message of this lesson?)",
+    options:[
+      {t:'<span class="deva-inline">परार्थे आत्मोत्सर्गः परमो धर्मः</span> — self-sacrifice for others is the highest virtue', ok:true},
+      {t:'<span class="deva-inline">बलम् एव श्रेष्ठम्</span> — physical strength alone is supreme', ok:false},
+      {t:'<span class="deva-inline">धनं सर्वस्य मूलम्</span> — wealth is the root of everything', ok:false}
+    ],
+    explain:"The chapter <b>परार्थे आत्मोत्सर्गः</b> teaches that sacrificing oneself for the good of others is the noblest ideal — embodied by महर्षि दधीचि."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o, i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i, 10);
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(bi === chosen) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

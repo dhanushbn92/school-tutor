@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>पतन्ति परपीडकाः | Patanti Parapidakah — Sanskrit Learning Game</title>
+<style>
+  :root{
+    --accent:#e6a94d;
+    --accent-soft:#3a3220;
+    --accent-dim:#c98f34;
+    --accent-glow:rgba(230,169,77,.30);
+    --bg:#161826;
+    --bg2:#1d2032;
+    --panel:#232741;
+    --panel2:#2a2f4d;
+    --ink:#eceafc;
+    --muted:#9a9cbf;
+    --good:#5fd39a;
+    --good-soft:#1e3830;
+    --bad:#f0728f;
+    --bad-soft:#3a2130;
+    --line:#343a5e;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%,#20233a 0%,var(--bg) 60%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:840px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:14px;}
+  header.top .deva-title{
+    font-family:var(--deva);
+    font-size:clamp(1.7rem,6.5vw,2.5rem);
+    color:var(--accent);
+    text-shadow:0 0 24px var(--accent-glow);
+    line-height:1.35;
+  }
+  header.top h1{
+    font-size:clamp(1rem,3.5vw,1.35rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.85rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:16px 0;
+  }
+  .tab-btn{
+    border:1px solid var(--line);cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 15px;border-radius:999px;
+    font-size:.88rem;font-weight:600;
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent);border-color:var(--accent-dim);}
+  .tab-btn.active{
+    background:var(--accent);color:#241c08;border-color:var(--accent);
+    box-shadow:0 4px 18px var(--accent-glow);
+  }
+
+  .panel{
+    background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.86rem;margin:0 0 16px;}
+
+  /* ---- Story + Verse Explorer ---- */
+  .seg{
+    display:flex;gap:6px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .seg-btn{
+    border:1px solid var(--line);background:var(--panel2);color:var(--muted);
+    padding:7px 14px;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .seg-btn.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-dim);}
+  .card-count{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:10px;}
+  .story-card,.verse-card{
+    background:var(--panel2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .stage{
+    font-size:2.6rem;text-align:center;margin-bottom:6px;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));
+  }
+  .verse-deva,.story-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,5vw,1.75rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:8px;
+  }
+  .story-deva{font-size:clamp(1.15rem,4.6vw,1.55rem);}
+  .verse-translit,.story-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.9rem;margin-bottom:14px;
+  }
+  .block-label{
+    font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--accent-dim);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.88rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.08rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box,.anvaya-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.92rem;
+  }
+  .anvaya-box .anv{font-family:var(--deva);color:var(--ink);}
+  .moral-box{background:var(--good-soft);border-color:#2c5645;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#241c08;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.92rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dim);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .match-col-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel2);
+    font-size:.95rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent-dim);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-glow);}
+  .word-item.done,.mean-item.done{
+    border-color:#2c5645;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.9;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.92rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent-dim);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.86rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2c5645;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.1rem,4vw,1.4rem);
+    text-align:center;line-height:1.7;color:var(--accent);
+    background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .q-text{font-size:1rem;margin-bottom:14px;color:var(--ink);font-weight:600;text-align:center;}
+  .q-text .dv{font-family:var(--deva);color:var(--accent);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    border:2px solid var(--line);background:var(--panel2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+    text-align:left;font-size:.95rem;
+  }
+  .opt-btn .dv{font-family:var(--deva);color:var(--accent);}
+  .opt-btn:hover{border-color:var(--accent-dim);}
+  .opt-btn.correct{border-color:#2c5645;background:var(--good-soft);color:var(--good);}
+  .opt-btn.correct .dv{color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;color:var(--muted);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:9px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.15rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">पतन्ति परपीडकाः</div>
+    <h1>Patanti Parapidakah &middot; "Those who torment others fall"</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 10 &middot; The Heron &amp; the Crab (बक-कर्कट कथा)</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Story &amp; Verses</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Comprehension Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY + VERSE EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story &amp; Verse Explorer</h2>
+      <p class="mode-sub">Read the Panchatantra fable of the greedy heron and the wise crab, then study the verses on karma and non-harm.</p>
+      <div class="seg">
+        <button class="seg-btn active" id="segStory">🐦 The Fable</button>
+        <button class="seg-btn" id="segVerse">🕉️ Verses</button>
+      </div>
+      <div class="card-count" id="cardCount"></div>
+      <div id="explorerBody"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Comprehension Quiz</h2>
+      <p class="mode-sub">Answer three questions about the fable and its moral. An explanation is revealed each time.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Authentic public-domain Panchatantra / Subhashita material &middot; Built for NIOS Sanskrit learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- STORY DATA (बक-कर्कट कथा) ---------------- */
+var STORY = [
+  {
+    stage:"🌊🐦",
+    deva:"एकस्मिन् सरसि वृद्धः बकः वसति स्म। सः मत्स्यान् ग्रहीतुम् अशक्तः आसीत्।",
+    translit:"ekasmin sarasi vṛddhaḥ bakaḥ vasati sma. saḥ matsyān grahītum aśaktaḥ āsīt.",
+    words:[
+      {w:"सरसि", m:"in a lake"},
+      {w:"वृद्धः बकः", m:"an old heron"},
+      {w:"मत्स्यान्", m:"the fish"},
+      {w:"अशक्तः", m:"unable"}
+    ],
+    trans:"In a lake lived an old heron. He was too weak to catch fish.",
+    note:"The greedy heron cannot hunt honestly, so he begins to plot."
+  },
+  {
+    stage:"🐦💭",
+    deva:"बकः छलम् अचिन्तयत्। \"धीवराः आगमिष्यन्ति, सर्वान् मत्स्यान् मारयिष्यन्ति\" इति असत्यम् अवदत्।",
+    translit:"bakaḥ chalam acintayat. \"dhīvarāḥ āgamiṣyanti, sarvān matsyān mārayiṣyanti\" iti asatyam avadat.",
+    words:[
+      {w:"छलम्", m:"a trick / deceit"},
+      {w:"धीवराः", m:"fishermen"},
+      {w:"मारयिष्यन्ति", m:"will kill"},
+      {w:"असत्यम्", m:"a lie"}
+    ],
+    trans:"The heron devised a trick. \"Fishermen are coming and will kill you all,\" he lied.",
+    note:"He frightens the fish with a false warning to win their trust."
+  },
+  {
+    stage:"🐟➡️🪨",
+    deva:"\"अहं युष्मान् क्षेमं सरः नयामि\" इति उक्त्वा एकैकं मत्स्यं नीत्वा शिलायाम् अखादत्।",
+    translit:"\"ahaṁ yuṣmān kṣemaṁ saraḥ nayāmi\" iti uktvā ekaikaṁ matsyaṁ nītvā śilāyām akhādat.",
+    words:[
+      {w:"क्षेमं सरः", m:"a safe lake"},
+      {w:"एकैकम्", m:"one by one"},
+      {w:"नीत्वा", m:"having carried"},
+      {w:"शिलायाम्", m:"on a rock"},
+      {w:"अखादत्", m:"he ate"}
+    ],
+    trans:"\"I will carry you to a safe lake,\" he said — but carried each fish one by one and ate it on a rock.",
+    note:"The oppressor (परपीडकः) devours the trusting fish, hiding his cruelty behind kind words."
+  },
+  {
+    stage:"🦀🤔",
+    deva:"अन्ते कर्कटः अपि गन्तुम् इच्छति स्म। बकः तम् अपि नीतवान्। मार्गे कर्कटः मत्स्यानाम् अस्थीनि अपश्यत्।",
+    translit:"ante karkaṭaḥ api gantum icchati sma. bakaḥ tam api nītavān. mārge karkaṭaḥ matsyānām asthīni apaśyat.",
+    words:[
+      {w:"कर्कटः", m:"the crab"},
+      {w:"नीतवान्", m:"carried (him)"},
+      {w:"मार्गे", m:"on the way"},
+      {w:"अस्थीनि", m:"the bones"}
+    ],
+    trans:"At last the crab too wished to go. The heron carried him as well. On the way the crab saw the fishes' bones.",
+    note:"The wise crab notices the pile of bones and understands the deceit (छलम् अबुध्यत)."
+  },
+  {
+    stage:"🦀✂️🐦",
+    deva:"कर्कटः छलम् अबुध्यत। सद्यः स्वैः दंष्ट्राभिः बकस्य ग्रीवाम् अपीडयत् चिच्छेद च।",
+    translit:"karkaṭaḥ chalam abudhyata. sadyaḥ svaiḥ daṁṣṭrābhiḥ bakasya grīvām apīḍayat cicheda ca.",
+    words:[
+      {w:"अबुध्यत", m:"understood"},
+      {w:"दंष्ट्राभिः", m:"with its claws"},
+      {w:"ग्रीवाम्", m:"the neck"},
+      {w:"चिच्छेद", m:"cut off"}
+    ],
+    trans:"The crab understood the trick. At once, with his claws, he gripped the heron's neck and cut it off.",
+    note:"The tormentor's own victim becomes the instrument of justice."
+  },
+  {
+    stage:"⚖️💀",
+    deva:"एवं परपीडकः बकः स्वकर्मणा एव अपतत्। सत्यम् — पतन्ति परपीडकाः।",
+    translit:"evaṁ parapīḍakaḥ bakaḥ svakarmaṇā eva apatat. satyam — patanti parapīḍakāḥ.",
+    words:[
+      {w:"परपीडकः", m:"the tormentor of others"},
+      {w:"स्वकर्मणा", m:"by his own deed"},
+      {w:"अपतत्", m:"fell / was ruined"},
+      {w:"पतन्ति", m:"fall"}
+    ],
+    trans:"Thus the tormenting heron fell by his own deed. Truly — those who torment others fall.",
+    note:"The moral of the chapter: cruelty rebounds on the cruel. Karma catches the oppressor."
+  }
+];
+
+/* ---------------- VERSE DATA (public-domain subhashitas) ---------------- */
+var VERSES = [
+  {
+    stage:"🕉️",
+    deva:"अष्टादशपुराणेषु व्यासस्य वचनद्वयम्।\nपरोपकारः पुण्याय पापाय परपीडनम्॥",
+    translit:"aṣṭādaśa-purāṇeṣu vyāsasya vacana-dvayam;\nparopakāraḥ puṇyāya pāpāya para-pīḍanam.",
+    words:[
+      {w:"परोपकारः", m:"helping others"},
+      {w:"पुण्याय", m:"leads to merit"},
+      {w:"पापाय", m:"leads to sin"},
+      {w:"परपीडनम्", m:"tormenting others"}
+    ],
+    anvaya:"अष्टादशपुराणेषु व्यासस्य वचनद्वयम् (अस्ति) — परोपकारः पुण्याय (भवति), परपीडनम् पापाय (भवति)।",
+    trans:"In all eighteen Puranas, Vyasa has just two sayings: helping others brings merit, harming others brings sin.",
+    moral:"The whole essence of scripture: do good to others; harming others is itself sin — the very theme of this chapter."
+  },
+  {
+    stage:"🏰🔥",
+    deva:"अतिदर्पे हता लङ्का अतिमाने च कौरवाः।\nअतिदाने बलिर्बद्धो ह्यतिसर्वत्र वर्जयेत्॥",
+    translit:"atidarpe hatā laṅkā atimāne ca kauravāḥ;\natidāne balir baddho hy atisarvatra varjayet.",
+    words:[
+      {w:"अतिदर्पे", m:"through excess pride"},
+      {w:"हता लङ्का", m:"Lanka was destroyed"},
+      {w:"अतिमाने", m:"through excess arrogance"},
+      {w:"वर्जयेत्", m:"one should avoid"}
+    ],
+    anvaya:"अतिदर्पे लङ्का हता, अतिमाने कौरवाः (हताः) च, अतिदाने बलिः बद्धः; हि अति सर्वत्र वर्जयेत्।",
+    trans:"Through pride Lanka fell; through arrogance the Kauravas fell; through over-giving Bali was bound. Excess of anything should be shunned.",
+    moral:"History repeats the chapter's lesson: the arrogant and the cruel bring about their own downfall — पतन्ति परपीडकाः।"
+  },
+  {
+    stage:"🕊️",
+    deva:"अहिंसा परमो धर्मः सर्वप्राणभृतां वरः।\nतस्मात् प्राणभृतः सर्वान् न हिंस्यात् ब्राह्मणः क्वचित्॥",
+    translit:"ahiṁsā paramo dharmaḥ sarva-prāṇabhṛtāṁ varaḥ;\ntasmāt prāṇabhṛtaḥ sarvān na hiṁsyāt brāhmaṇaḥ kvacit.",
+    words:[
+      {w:"अहिंसा", m:"non-harming"},
+      {w:"परमः धर्मः", m:"the highest dharma"},
+      {w:"प्राणभृताम्", m:"of all living beings"},
+      {w:"न हिंस्यात्", m:"should not harm"}
+    ],
+    anvaya:"अहिंसा सर्वप्राणभृतां वरः परमः धर्मः (अस्ति); तस्मात् (कश्चित्) सर्वान् प्राणभृतः क्वचित् न हिंस्यात्।",
+    trans:"Non-harming is the highest dharma, the best for all living beings; therefore one should never harm any creature.",
+    moral:"The positive teaching behind the fable: since harming others is the root of ruin, अहिंसा is the highest virtue."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER (Story + Verses) ---------------- */
+var explorerBody = document.getElementById("explorerBody");
+var cardCount = document.getElementById("cardCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+var segStory = document.getElementById("segStory");
+var segVerse = document.getElementById("segVerse");
+
+var mode1view = "story"; // "story" | "verse"
+var sIndex = 0, vIndex = 0;
+
+function chipsHTML(words){
+  return words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+}
+
+function renderExplorer(){
+  var list = (mode1view==="story") ? STORY : VERSES;
+  var idx = (mode1view==="story") ? sIndex : vIndex;
+  var item = list[idx];
+  var html = "";
+  if(mode1view==="story"){
+    html =
+      '<div class="story-card">'+
+        '<div class="stage">'+item.stage+'</div>'+
+        '<div class="story-deva">'+item.deva+'</div>'+
+        '<div class="story-translit">'+item.translit+'</div>'+
+        '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+        '<div class="shabda-list">'+chipsHTML(item.words)+'</div>'+
+        '<div class="trans-box"><div class="block-label">Translation</div>'+item.trans+'</div>'+
+        '<div class="moral-box"><div class="block-label">Note</div>'+item.note+'</div>'+
+      '</div>';
+    cardCount.textContent = "Fable card "+(idx+1)+" of "+STORY.length;
+  } else {
+    var devaHTML = item.deva.replace(/\n/g,"<br>");
+    html =
+      '<div class="verse-card">'+
+        '<div class="stage">'+item.stage+'</div>'+
+        '<div class="verse-deva">'+devaHTML+'</div>'+
+        '<div class="verse-translit">'+item.translit.replace(/\n/g," / ")+'</div>'+
+        '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+        '<div class="shabda-list">'+chipsHTML(item.words)+'</div>'+
+        '<div class="anvaya-box"><div class="block-label">अन्वयः &middot; Prose Order</div><span class="anv">'+item.anvaya+'</span></div>'+
+        '<div class="trans-box"><div class="block-label">Translation</div>'+item.trans+'</div>'+
+        '<div class="moral-box"><div class="block-label">Moral</div>'+item.moral+'</div>'+
+      '</div>';
+    cardCount.textContent = "Verse "+(idx+1)+" of "+VERSES.length;
+  }
+  explorerBody.innerHTML = html;
+  prevBtn.disabled = (idx===0);
+  nextBtn.disabled = (idx===list.length-1);
+  var d = "";
+  for(var i=0;i<list.length;i++){ d += '<span class="dot'+(i===idx?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+function curIdx(){ return (mode1view==="story") ? sIndex : vIndex; }
+function setIdx(v){ if(mode1view==="story"){sIndex=v;} else {vIndex=v;} }
+prevBtn.addEventListener("click", function(){ var i=curIdx(); if(i>0){setIdx(i-1);renderExplorer();} });
+nextBtn.addEventListener("click", function(){
+  var list=(mode1view==="story")?STORY:VERSES; var i=curIdx();
+  if(i<list.length-1){setIdx(i+1);renderExplorer();}
+});
+segStory.addEventListener("click", function(){
+  mode1view="story"; segStory.classList.add("active"); segVerse.classList.remove("active"); renderExplorer();
+});
+segVerse.addEventListener("click", function(){
+  mode1view="verse"; segVerse.classList.add("active"); segStory.classList.remove("active"); renderExplorer();
+});
+renderExplorer();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"बकः", m:"heron"},
+  {w:"कर्कटः", m:"crab"},
+  {w:"मत्स्यः", m:"fish"},
+  {w:"पीडा", m:"harm / torment"},
+  {w:"पतनम्", m:"downfall"},
+  {w:"पापम्", m:"sin"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ सम्यक्! Correct!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ पुनः प्रयत्नः। Try again!", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'Who finally killed the deceitful heron (<span class="dv">बकः</span>)?',
+    options:[
+      {t:'The fishermen (<span class="dv">धीवराः</span>)', ok:false},
+      {t:'The crab (<span class="dv">कर्कटः</span>)', ok:true},
+      {t:'Another heron', ok:false}
+    ],
+    explain:"The wise <b>कर्कटः</b> (crab), carried last, gripped the heron's neck with his claws and cut it off. The victim became the agent of justice."
+  },
+  {
+    q:'How did the crab discover the heron’s trick?',
+    options:[
+      {t:'A fish warned him', ok:false},
+      {t:'He saw the fishes’ bones (<span class="dv">अस्थीनि</span>) on the way', ok:true},
+      {t:'The heron confessed', ok:false}
+    ],
+    explain:"On the way to the “safe lake,” the crab saw the pile of <b>अस्थीनि</b> (bones) on the rock and realised the heron had been eating the fish."
+  },
+  {
+    q:'What is the central moral of “<span class="dv">पतन्ति परपीडकाः</span>”?',
+    options:[
+      {t:'Cleverness always defeats strength', ok:false},
+      {t:'Those who torment others bring about their own downfall', ok:true},
+      {t:'One should never travel to a new lake', ok:false}
+    ],
+    explain:"<b>पतन्ति परपीडकाः</b> — those who harm others fall. The heron’s cruelty (परपीडनम्) rebounded on him; as the verse says, परपीडनम् पापाय — harming others is sin, and it leads to ruin."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="q-text">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i,10);
+    if(q.options[bi].ok) b.classList.add("correct");
+    else if(bi===chosen) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

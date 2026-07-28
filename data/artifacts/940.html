@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>राजते खलु कन्याकुमारी | Kanyakumari Yatra Explorer</title>
+<style>
+  :root{
+    --accent:#0ea5a3;
+    --accent-soft:#e2f6f4;
+    --accent-dark:#0b6f6d;
+    --bg:#0f1720;
+    --panel:#182634;
+    --panel-2:#1f3140;
+    --ink:#e7f0f2;
+    --muted:#9db4bd;
+    --good:#3fd08a;
+    --good-soft:#123528;
+    --bad:#ff6b8a;
+    --bad-soft:#3a1622;
+    --line:#2c4150;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#1b3040 0%,#0f1720 60%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:12px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6.5vw,2.5rem);color:var(--accent);line-height:1.3;}
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:4px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:18px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--ink);}
+  .tab-btn.active{background:var(--accent);color:#04211f;box-shadow:0 4px 14px rgba(14,165,163,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Yatra Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .verse-card{
+    background:var(--panel-2);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .card-emoji{text-align:center;font-size:2.4rem;margin-bottom:4px;}
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.3rem,5.2vw,1.9rem);
+    line-height:1.35;
+    text-align:center;
+    color:var(--accent);
+    margin-bottom:6px;
+  }
+  .verse-body{
+    font-family:var(--deva);
+    font-size:clamp(1.02rem,3.8vw,1.2rem);
+    line-height:1.85;
+    text-align:center;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.9rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#1e5a41;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#04211f;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);color:#fff;}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  /* ---- Match Game ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:#20464a;box-shadow:0 0 0 3px rgba(14,165,163,.25);}
+  .word-item.done,.mean-item.done{
+    border-color:#1e5a41;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:#123434;}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #1e5a41;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.05rem,4vw,1.35rem);line-height:1.7;
+    text-align:center;color:var(--ink);
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-family:var(--deva);font-size:1.05rem;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:600;transition:.15s;text-align:left;
+  }
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#1e5a41;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+    .word-item{font-size:1.15rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">राजते खलु कन्याकुमारी</div>
+    <h1>Kanyakumari Yatra Explorer &middot; कन्याकुमारी-यात्रावर्णनम्</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 6 &middot; A Travel Description</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">🧭 Yatra Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Yatra Explorer &middot; यात्रा-अन्वेषणम्</h2>
+      <p class="mode-sub">Explore the wonders of Kanyakumari — read simple Sanskrit prose with transliteration, word meanings, and English.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; पूर्वम्</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">अग्रे &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game &middot; शब्दार्थ-मेलनम्</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्दः (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थः (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Kanyakumari Quiz &middot; प्रश्नोत्तरी</h2>
+      <p class="mode-sub">Answer 3 questions about Kanyakumari's features and facts. Read the explanation after each.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>कन्याकुमारी &middot; भारतस्य दक्षिणतमः बिन्दुः &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE 1 DATA: EXPLORER CARDS ---------------- */
+var CARDS = [
+  {
+    emoji:"🌊",
+    title:"सागरत्रयसङ्गमः",
+    translit:"sāgara-traya-saṅgamaḥ — The Meeting of Three Seas",
+    body:"कन्याकुमारी भारतस्य दक्षिणतमे तटे स्थिता। अत्र त्रयाणां जलराशीनां सङ्गमः भवति — पूर्वतः बङ्गोपसागरः, पश्चिमतः अरबसागरः, दक्षिणतः च हिन्दमहासागरः मिलन्ति।",
+    words:[
+      {w:"सागरः", m:"sea / ocean"},
+      {w:"त्रयम्", m:"three (a triad)"},
+      {w:"सङ्गमः", m:"confluence / meeting"},
+      {w:"तटः", m:"shore / coast"},
+      {w:"मिलन्ति", m:"they meet / unite"}
+    ],
+    trans:"Kanyakumari stands on the southernmost coast of India. Here three bodies of water meet — the Bay of Bengal to the east, the Arabian Sea to the west, and the Indian Ocean to the south.",
+    note:"This meeting of the Bay of Bengal, the Arabian Sea, and the Indian Ocean is Kanyakumari's most famous feature."
+  },
+  {
+    emoji:"🌅",
+    title:"सूर्योदयः सूर्यास्तश्च",
+    translit:"sūryodayaḥ sūryāstaśca — Sunrise and Sunset",
+    body:"अत्र पर्यटकाः सूर्योदयं सूर्यास्तं च एकस्मात् एव स्थानात् द्रष्टुं शक्नुवन्ति। प्रातः सागरात् उदयन् सूर्यः, सायं च सागरे अस्तं गच्छन् सूर्यः — उभयं दृश्यं मनोहरम्।",
+    words:[
+      {w:"सूर्योदयः", m:"sunrise"},
+      {w:"सूर्यास्तः", m:"sunset"},
+      {w:"पर्यटकः", m:"tourist / traveller"},
+      {w:"दृश्यम्", m:"sight / scene"},
+      {w:"मनोहरम्", m:"beautiful / charming"}
+    ],
+    trans:"Here travellers can see both the sunrise and the sunset from a single place. The sun rising from the sea at dawn, and the sun setting into the sea at dusk — both sights are enchanting.",
+    note:"Kanyakumari is celebrated for views of both sunrise and sunset over the ocean from the same shore."
+  },
+  {
+    emoji:"🪨",
+    title:"विवेकानन्दशिला",
+    translit:"vivekānanda-śilā — The Vivekananda Rock Memorial",
+    body:"सागरमध्ये द्वे शिले स्तः। तत्र एकस्यां शिलायां स्वामी विवेकानन्दः १८९२ तमे वर्षे डिसेम्बर-मासे ध्यानम् अकरोत्। अद्य तत्र विवेकानन्द-स्मारकमन्दिरं विराजते।",
+    words:[
+      {w:"शिला", m:"rock / boulder"},
+      {w:"मध्ये", m:"in the middle of"},
+      {w:"ध्यानम्", m:"meditation"},
+      {w:"स्मारकम्", m:"memorial"},
+      {w:"विराजते", m:"shines / stands gloriously"}
+    ],
+    trans:"In the middle of the sea there are two rocks. On one of them Swami Vivekananda meditated in December of the year 1892. Today the Vivekananda Rock Memorial stands there.",
+    note:"Swami Vivekananda meditated on this rock in December 1892; the memorial was built and dedicated in 1970."
+  },
+  {
+    emoji:"🗿",
+    title:"तिरुवल्लुवर-प्रतिमा",
+    translit:"tiruvalluvar-pratimā — The Thiruvalluvar Statue",
+    body:"विवेकानन्दशिलायाः समीपे अन्यस्यां शिलायां तिरुवल्लुवरस्य विशाला प्रतिमा तिष्ठति। तमिऴ्-कवेः तिरुवल्लुवरस्य इयं प्रतिमा त्रयस्त्रिंशदधिकशतपादोन्नता (१३३ पादाः), २००० तमे वर्षे उद्घाटिता।",
+    words:[
+      {w:"प्रतिमा", m:"statue / image"},
+      {w:"विशाला", m:"huge / vast"},
+      {w:"कविः", m:"poet"},
+      {w:"पादः", m:"foot (unit) / foot"},
+      {w:"उद्घाटिता", m:"unveiled / inaugurated"}
+    ],
+    trans:"Near the Vivekananda Rock, on another rock, stands a huge statue of Thiruvalluvar. This statue of the Tamil poet Thiruvalluvar is 133 feet tall and was unveiled in the year 2000.",
+    note:"The Thiruvalluvar statue honours the Tamil poet-saint; it is 133 feet tall and was unveiled in 2000."
+  },
+  {
+    emoji:"🛕",
+    title:"देवीमन्दिरम्",
+    translit:"devī-mandiram — The Devi (Kanya Kumari) Temple",
+    body:"तटे कुमारी-देव्याः प्राचीनं मन्दिरं वर्तते। अस्याः देव्याः नाम्ना एव इदं स्थानं 'कन्याकुमारी' इति प्रसिद्धम्। भक्ताः दूरदेशेभ्यः अत्र आगच्छन्ति।",
+    words:[
+      {w:"मन्दिरम्", m:"temple"},
+      {w:"देवी", m:"goddess"},
+      {w:"प्राचीनम्", m:"ancient"},
+      {w:"भक्तः", m:"devotee"},
+      {w:"प्रसिद्धम्", m:"famous / well-known"}
+    ],
+    trans:"On the shore stands the ancient temple of the goddess Kumari. It is from the name of this goddess that the place became famous as 'Kanyakumari'. Devotees come here from distant regions.",
+    note:"The town takes its name from the goddess Kanya Kumari, whose shore temple draws pilgrims from across India."
+  },
+  {
+    emoji:"🇮🇳",
+    title:"भारतस्य एकता",
+    translit:"bhāratasya ekatā — The Unity of India",
+    body:"कन्याकुमारी भारतस्य दक्षिणतमः बिन्दुः। यथा गङ्गा उत्तरे प्रवहति, तथा अत्र त्रयः सागराः सङ्गच्छन्ते। एतत् स्थानं भारतस्य भौगोलिकैक्यस्य एकतायाश्च प्रतीकम्।",
+    words:[
+      {w:"एकता", m:"unity / oneness"},
+      {w:"बिन्दुः", m:"point / tip"},
+      {w:"प्रवहति", m:"flows"},
+      {w:"प्रतीकम्", m:"symbol"},
+      {w:"भौगोलिकम्", m:"geographical"}
+    ],
+    trans:"Kanyakumari is the southernmost tip of India. Just as the Ganga flows in the north, here three seas come together. This place is a symbol of India's geographical unity and oneness.",
+    note:"As India's southern tip, Kanyakumari stands as a symbol of the nation's geography and unity."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderCard(){
+  var c = CARDS[vIndex];
+  var chips = c.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  verseCard.innerHTML =
+    '<div class="card-emoji">'+c.emoji+'</div>'+
+    '<div class="verse-deva">'+c.title+'</div>'+
+    '<div class="verse-translit">'+c.translit+'</div>'+
+    '<div class="verse-body">'+c.body+'</div>'+
+    '<div class="block-label">शब्दार्थः &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+c.trans+'</div>'+
+    '<div class="moral-box"><div class="block-label">Fact &middot; तथ्यम्</div>'+c.note+'</div>';
+  verseCount.textContent = "Card "+(vIndex+1)+" of "+CARDS.length;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===CARDS.length-1);
+  var d = "";
+  for(var i=0;i<CARDS.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderCard();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<CARDS.length-1){vIndex++;renderCard();} });
+renderCard();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"सागरः", m:"sea"},
+  {w:"सङ्गमः", m:"confluence"},
+  {w:"शिला", m:"rock"},
+  {w:"प्रतिमा", m:"statue"},
+  {w:"सूर्योदयः", m:"sunrise"},
+  {w:"दक्षिणः", m:"southern"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"कन्याकुमार्यां कति सागराणां सङ्गमः भवति? (How many seas meet at Kanyakumari?)",
+    options:["द्वयोः (two)","त्रयाणाम् (three) — बङ्गोपसागरः, अरबसागरः, हिन्दमहासागरः","चतुर्णाम् (four)"],
+    answer:1,
+    explain:"<b>त्रयाणां सागराणां सङ्गमः</b> — three seas meet: the Bay of Bengal, the Arabian Sea, and the Indian Ocean. This confluence is Kanyakumari's most famous feature."
+  },
+  {
+    q:"कस्मिन् वर्षे स्वामी विवेकानन्दः शिलायां ध्यानम् अकरोत्? (In which year did Swami Vivekananda meditate on the rock?)",
+    options:["१८९२ तमे वर्षे, डिसेम्बर-मासे (December 1892)","१९७० तमे वर्षे (1970)","२००० तमे वर्षे (2000)"],
+    answer:0,
+    explain:"Swami Vivekananda meditated on the rock in <b>डिसेम्बर १८९२</b> (December 1892). The Vivekananda Rock Memorial there was later dedicated in 1970."
+  },
+  {
+    q:"तिरुवल्लुवर-प्रतिमायाः औन्नत्यं किम्? (What is the height of the Thiruvalluvar statue?)",
+    options:["शतपादाः (100 feet)","त्रयस्त्रिंशदधिकशतपादाः (133 feet), २००० तमे वर्षे उद्घाटिता","द्विशतपादाः (200 feet)"],
+    answer:1,
+    explain:"The Thiruvalluvar statue is <b>१३३ पादोन्नता</b> (133 feet tall) and was unveiled in the year 2000, honouring the Tamil poet-saint Thiruvalluvar."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-idx="'+i+'">'+o+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">अग्रे &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.idx,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.idx,10);
+    if(bi === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
