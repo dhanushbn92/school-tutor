@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relations &amp; Functions II Lab - NIOS Class 12 Mathematics</title>
+<style>
+  :root{
+    --accent:#7c9cf0;
+    --accent-dark:#5b7fe0;
+    --bg:#151a24;
+    --bg2:#1b2130;
+    --panel:#222a3a;
+    --panel2:#28324699;
+    --ink:#e7ecf5;
+    --muted:#9aa7bd;
+    --good:#4fc98a;
+    --bad:#f0776f;
+    --line:#33405a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1e2636,#141924 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);
+    border:2px solid transparent;padding:10px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);padding:16px;
+    box-shadow:var(--shadow);margin-bottom:16px;border:1px solid var(--line);
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 6px;}
+  .panel h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  .mode{display:none;}
+  .mode.active{display:block;}
+  .hint{color:var(--muted);font-size:.85rem;margin:0 0 12px;}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .col{flex:1 1 300px;min-width:0;}
+  label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:4px;}
+  select,button{font-family:inherit;font-size:.9rem;}
+  select{
+    background:var(--bg2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:8px 10px;width:100%;
+  }
+  button.btn{
+    background:var(--accent);color:#fff;border:none;border-radius:10px;
+    padding:9px 14px;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  button.btn:hover{background:var(--accent-dark);}
+  button.btn.ghost{background:var(--bg2);color:var(--ink);border:1px solid var(--line);}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  table.mat{border-collapse:collapse;margin:8px 0;}
+  table.mat td,table.mat th{
+    border:1px solid var(--line);width:40px;height:40px;text-align:center;
+    font-size:.9rem;padding:0;cursor:pointer;user-select:none;
+  }
+  table.mat th{background:var(--bg2);color:var(--accent);cursor:default;font-weight:700;}
+  table.mat td.on{background:var(--accent);color:#fff;font-weight:700;}
+  table.mat td.diag{outline:2px dashed #ffffff44;outline-offset:-4px;}
+  .props{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .chip{
+    padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:600;
+    border:1px solid var(--line);background:var(--bg2);
+  }
+  .chip.yes{background:rgba(79,201,138,.18);color:var(--good);border-color:var(--good);}
+  .chip.no{background:rgba(240,119,111,.15);color:var(--bad);border-color:var(--bad);}
+  .eq{margin-top:10px;font-size:.9rem;}
+  .eq b{color:var(--accent);}
+  canvas{max-width:100%;height:auto;background:var(--bg2);border-radius:12px;border:1px solid var(--line);}
+  .fx{font-family:"Cambria Math",Georgia,serif;font-size:1rem;}
+  .val{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.92rem;margin-top:8px;}
+  .val code{color:var(--accent);font-weight:700;}
+  .facts{columns:2;column-gap:18px;}
+  .facts .fact{break-inside:avoid;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:.85rem;}
+  .facts .fact b{color:var(--accent);}
+  .quiz .q{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.92rem;}
+  .quiz .opt{display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:6px;cursor:pointer;font-size:.88rem;transition:.12s;}
+  .quiz .opt:hover{border-color:var(--accent);}
+  .quiz .opt.correct{background:rgba(79,201,138,.2);border-color:var(--good);color:var(--good);}
+  .quiz .opt.wrong{background:rgba(240,119,111,.18);border-color:var(--bad);color:var(--bad);}
+  .quiz .exp{font-size:.83rem;color:var(--muted);margin-top:6px;display:none;}
+  .quiz .exp.show{display:block;}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  @media(max-width:560px){.facts{columns:1;}table.mat td,table.mat th{width:34px;height:34px;font-size:.82rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Relations &amp; Functions II Lab</h1>
+  <p>NIOS Class 12 Mathematics &middot; Ch 23 &mdash; explore relation properties, composition &amp; inverse, and binary operations.</p>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-mode="rel" role="tab">1. Types of Relations</button>
+  <button class="tab" data-mode="fn" role="tab">2. Composition &amp; Inverse</button>
+  <button class="tab" data-mode="bin" role="tab">3. Binary Operations</button>
+  <button class="tab" data-mode="learn" role="tab">Facts &amp; Quiz</button>
+</div>
+
+<!-- MODE 1: RELATIONS -->
+<section class="mode active" id="mode-rel">
+  <div class="panel">
+    <h2>Build a relation on a set and test its properties</h2>
+    <p class="hint">Tap cells in the grid to add / remove ordered pairs (a, b). The relation R is on set A. Properties recompute instantly.</p>
+    <div class="row">
+      <div>
+        <label for="setSize">Set A</label>
+        <select id="setSize">
+          <option value="3">A = {1, 2, 3}</option>
+          <option value="4" selected>A = {1, 2, 3, 4}</option>
+        </select>
+      </div>
+      <div class="toolbar" style="align-self:flex-end;">
+        <button class="btn ghost" id="relClear">Clear</button>
+        <button class="btn ghost" id="relReflex">Make reflexive</button>
+        <button class="btn ghost" id="relEqDemo">Example: mod-2 equivalence</button>
+      </div>
+    </div>
+    <div id="relGrid" style="overflow-x:auto;"></div>
+    <div class="props" id="relProps"></div>
+    <div class="eq" id="relClasses"></div>
+  </div>
+</section>
+
+<!-- MODE 2: FUNCTIONS -->
+<section class="mode" id="mode-fn">
+  <div class="panel">
+    <h2>Composition &amp; inverse of functions</h2>
+    <p class="hint">Pick f and g, then evaluate (f&#8728;g)(x) and (g&#8728;f)(x). Composition is generally not commutative.</p>
+    <div class="row">
+      <div class="col"><label for="fSel">f(x)</label><select id="fSel"></select></div>
+      <div class="col"><label for="gSel">g(x)</label><select id="gSel"></select></div>
+      <div style="flex:0 0 90px;"><label for="xVal">x</label><select id="xVal"></select></div>
+    </div>
+    <div class="val" id="fnComp"></div>
+    <h3>Inverse and reflection in y = x</h3>
+    <p class="hint">Choose a one-one function f. Its inverse f&#8315;&#185; is the reflection of f across the line y = x.</p>
+    <div class="row">
+      <div class="col"><label for="invSel">One-one f(x)</label><select id="invSel"></select></div>
+    </div>
+    <div class="val" id="invText"></div>
+    <canvas id="invCanvas" width="440" height="440" aria-label="Graph of f and its inverse reflected across y=x"></canvas>
+  </div>
+</section>
+
+<!-- MODE 3: BINARY OPERATIONS -->
+<section class="mode" id="mode-bin">
+  <div class="panel">
+    <h2>Binary operations on Z<sub>n</sub></h2>
+    <p class="hint">Operation table for the given set. The lab tests closure, commutativity, associativity, identity, and inverses.</p>
+    <div class="row">
+      <div class="col">
+        <label for="binOp">Operation</label>
+        <select id="binOp">
+          <option value="add">Addition mod n  (a &#8853; b = (a+b) mod n)</option>
+          <option value="mul">Multiplication mod n  (a &#8857; b = (a&times;b) mod n)</option>
+        </select>
+      </div>
+      <div style="flex:0 0 120px;">
+        <label for="binN">n</label>
+        <select id="binN">
+          <option value="3">n = 3</option>
+          <option value="4" selected>n = 4</option>
+          <option value="5">n = 5</option>
+        </select>
+      </div>
+    </div>
+    <div id="binTable" style="overflow-x:auto;"></div>
+    <div class="props" id="binProps"></div>
+    <div class="eq" id="binNotes"></div>
+  </div>
+</section>
+
+<!-- MODE 4: FACTS + QUIZ -->
+<section class="mode" id="mode-learn">
+  <div class="panel">
+    <h2>Key facts</h2>
+    <div class="facts">
+      <div class="fact"><b>Reflexive:</b> (a, a) &isin; R for every a &isin; A.</div>
+      <div class="fact"><b>Symmetric:</b> if (a, b) &isin; R then (b, a) &isin; R.</div>
+      <div class="fact"><b>Transitive:</b> if (a, b) &isin; R and (b, c) &isin; R then (a, c) &isin; R.</div>
+      <div class="fact"><b>Equivalence relation:</b> reflexive AND symmetric AND transitive. It partitions A into disjoint equivalence classes.</div>
+      <div class="fact"><b>Composition:</b> (f&#8728;g)(x) = f(g(x)). Apply g first, then f. Generally (f&#8728;g) &ne; (g&#8728;f).</div>
+      <div class="fact"><b>Inverse function:</b> exists only when f is one-one and onto (bijective). f&#8315;&#185;(f(x)) = x and its graph is the reflection of f in the line y = x.</div>
+      <div class="fact"><b>Binary operation *:</b> a map A&times;A &rarr; A. Closed if a*b stays in A; commutative if a*b = b*a; associative if (a*b)*c = a*(b*c).</div>
+      <div class="fact"><b>Identity e:</b> a*e = e*a = a for all a. <b>Inverse of a:</b> element b with a*b = b*a = e.</div>
+    </div>
+  </div>
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz</h2>
+    <p class="hint">Click an option to reveal the answer.</p>
+  </div>
+</section>
+
+<footer style="color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 24px;">
+  Relations &amp; Functions II Lab &middot; self-contained interactive simulation.
+</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- Tab switching ---------- */
+var tabs = document.querySelectorAll(".tab");
+var modes = document.querySelectorAll(".mode");
+tabs.forEach(function(t){
+  t.addEventListener("click", function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    t.classList.add("active");
+    document.getElementById("mode-"+t.dataset.mode).classList.add("active");
+    if(t.dataset.mode==="fn"){drawInverse();}
+  });
+});
+
+/* ================= MODE 1: RELATIONS ================= */
+var relN = 4;
+var rel = {};            // key "i,j" -> true
+function relKey(i,j){return i+","+j;}
+function relHas(i,j){return !!rel[relKey(i,j)];}
+
+function buildRelGrid(){
+  var el = document.getElementById("relGrid");
+  var h = '<table class="mat"><tr><th>R</th>';
+  for(var j=1;j<=relN;j++) h += '<th>'+j+'</th>';
+  h += '</tr>';
+  for(var i=1;i<=relN;i++){
+    h += '<tr><th>'+i+'</th>';
+    for(var j2=1;j2<=relN;j2++){
+      var on = relHas(i,j2);
+      var diag = (i===j2)?' diag':'';
+      h += '<td class="'+(on?'on':'')+diag+'" data-i="'+i+'" data-j="'+j2+'">'+(on?'✓':'')+'</td>';
+    }
+    h += '</tr>';
+  }
+  h += '</table><p class="hint" style="margin-top:6px;">Rows = first element a, columns = second element b. Dashed cells are the diagonal (a, a).</p>';
+  el.innerHTML = h;
+  el.querySelectorAll("td[data-i]").forEach(function(td){
+    td.addEventListener("click", function(){
+      var i=+td.dataset.i, j=+td.dataset.j;
+      if(relHas(i,j)) delete rel[relKey(i,j)]; else rel[relKey(i,j)]=true;
+      buildRelGrid(); analyzeRel();
+    });
+  });
+}
+
+function analyzeRel(){
+  var i,j,k;
+  var reflexive=true, symmetric=true, transitive=true;
+  for(i=1;i<=relN;i++){ if(!relHas(i,i)){reflexive=false;break;} }
+  outer:
+  for(i=1;i<=relN;i++) for(j=1;j<=relN;j++){
+    if(relHas(i,j) && !relHas(j,i)){symmetric=false;break outer;}
+  }
+  outer2:
+  for(i=1;i<=relN;i++) for(j=1;j<=relN;j++) for(k=1;k<=relN;k++){
+    if(relHas(i,j) && relHas(j,k) && !relHas(i,k)){transitive=false;break outer2;}
+  }
+  var isEmpty = Object.keys(rel).length===0;
+  if(isEmpty) reflexive=false; // empty relation not reflexive on nonempty set
+  var equiv = reflexive && symmetric && transitive;
+
+  function chip(name,ok){return '<span class="chip '+(ok?'yes':'no')+'">'+name+': '+(ok?'Yes':'No')+'</span>';}
+  document.getElementById("relProps").innerHTML =
+    chip("Reflexive",reflexive)+chip("Symmetric",symmetric)+chip("Transitive",transitive)+
+    '<span class="chip '+(equiv?'yes':'no')+'">Equivalence relation: '+(equiv?'Yes':'No')+'</span>';
+
+  var out="";
+  if(equiv){
+    // build classes via union of related elements (symmetric+transitive => partition)
+    var parent={}; for(i=1;i<=relN;i++) parent[i]=i;
+    function find(x){while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;}
+    for(i=1;i<=relN;i++) for(j=1;j<=relN;j++) if(relHas(i,j)) parent[find(i)]=find(j);
+    var groups={};
+    for(i=1;i<=relN;i++){var r=find(i);(groups[r]=groups[r]||[]).push(i);}
+    var parts=[];
+    Object.keys(groups).forEach(function(g){parts.push("{"+groups[g].join(", ")+"}");});
+    out = '<b>Equivalence classes partition A into:</b> '+parts.join("  ,  ");
+  } else {
+    var reasons=[];
+    if(!reflexive) reasons.push(isEmpty?"the relation is empty":"some (a, a) is missing");
+    if(!symmetric) reasons.push("a pair (a, b) has no matching (b, a)");
+    if(!transitive) reasons.push("a chain (a, b) &amp; (b, c) lacks (a, c)");
+    out = '<span style="color:var(--muted)">Not an equivalence relation because '+reasons.join("; ")+'. No equivalence classes.</span>';
+  }
+  document.getElementById("relClasses").innerHTML = out;
+}
+
+document.getElementById("setSize").addEventListener("change", function(e){
+  relN=+e.target.value; rel={}; buildRelGrid(); analyzeRel();
+});
+document.getElementById("relClear").addEventListener("click", function(){rel={};buildRelGrid();analyzeRel();});
+document.getElementById("relReflex").addEventListener("click", function(){
+  for(var i=1;i<=relN;i++) rel[relKey(i,i)]=true; buildRelGrid(); analyzeRel();
+});
+document.getElementById("relEqDemo").addEventListener("click", function(){
+  rel={};
+  // relation: a R b iff a ≡ b (mod 2)
+  for(var i=1;i<=relN;i++) for(var j=1;j<=relN;j++) if((i%2)===(j%2)) rel[relKey(i,j)]=true;
+  buildRelGrid(); analyzeRel();
+});
+
+/* ================= MODE 2: FUNCTIONS ================= */
+var funcs = [
+  {id:"2x1", label:"2x + 1", f:function(x){return 2*x+1;}},
+  {id:"x2",  label:"x²", f:function(x){return x*x;}},
+  {id:"xm3", label:"x − 3", f:function(x){return x-3;}},
+  {id:"3x",  label:"3x",    f:function(x){return 3*x;}},
+  {id:"xp2", label:"x + 2", f:function(x){return x+2;}}
+];
+function fillFuncSelect(sel){
+  funcs.forEach(function(fn){ var o=document.createElement("option"); o.value=fn.id; o.textContent=fn.label; sel.appendChild(o); });
+}
+function getFunc(id){for(var i=0;i<funcs.length;i++) if(funcs[i].id===id) return funcs[i]; return funcs[0];}
+
+var fSel=document.getElementById("fSel"), gSel=document.getElementById("gSel"), xVal=document.getElementById("xVal");
+fillFuncSelect(fSel); fillFuncSelect(gSel);
+gSel.selectedIndex=2; // x-3
+for(var xv=-3;xv<=3;xv++){var o=document.createElement("option");o.value=xv;o.textContent=xv;xVal.appendChild(o);}
+xVal.value="2";
+
+function updateComp(){
+  var f=getFunc(fSel.value), g=getFunc(gSel.value), x=+xVal.value;
+  var gx=g.f(x), fgx=f.f(gx);
+  var fx=f.f(x), gfx=g.f(fx);
+  var same = (fgx===gfx);
+  var html =
+    '<div><span class="fx">(f&#8728;g)(x) = f(g(x))</span>: g('+x+') = <code>'+gx+'</code>, then f('+gx+') = <code>'+fgx+'</code></div>'+
+    '<div style="margin-top:6px;"><span class="fx">(g&#8728;f)(x) = g(f(x))</span>: f('+x+') = <code>'+fx+'</code>, then g('+fx+') = <code>'+gfx+'</code></div>'+
+    '<div style="margin-top:8px;">At x = '+x+': (f&#8728;g)(x) = <code>'+fgx+'</code> and (g&#8728;f)(x) = <code>'+gfx+'</code> &rarr; '+
+    (same? '<b style="color:var(--muted)">equal here (but not equal in general)</b>' : '<b style="color:var(--bad)">different &mdash; composition is not commutative</b>')+'</div>';
+  document.getElementById("fnComp").innerHTML = html;
+}
+fSel.addEventListener("change",updateComp);
+gSel.addEventListener("change",updateComp);
+xVal.addEventListener("change",updateComp);
+
+/* Inverse: only one-one (invertible) linear funcs */
+var invFuncs = [
+  {id:"2x1", label:"2x + 1",  f:function(x){return 2*x+1;},  inv:function(y){return (y-1)/2;}, invLabel:"(x − 1) / 2"},
+  {id:"xm3", label:"x − 3", f:function(x){return x-3;},   inv:function(y){return y+3;},     invLabel:"x + 3"},
+  {id:"3x",  label:"3x",        f:function(x){return 3*x;},    inv:function(y){return y/3;},     invLabel:"x / 3"},
+  {id:"xp2", label:"x + 2",     f:function(x){return x+2;},    inv:function(y){return y-2;},     invLabel:"x − 2"}
+];
+var invSel=document.getElementById("invSel");
+invFuncs.forEach(function(fn){var o=document.createElement("option");o.value=fn.id;o.textContent=fn.label;invSel.appendChild(o);});
+function getInv(id){for(var i=0;i<invFuncs.length;i++) if(invFuncs[i].id===id) return invFuncs[i]; return invFuncs[0];}
+
+function updateInvText(){
+  var fn=getInv(invSel.value);
+  var chk = fn.inv(fn.f(2));
+  document.getElementById("invText").innerHTML =
+    '<div><span class="fx">f(x) = '+fn.label+'</span> is one-one, so f&#8315;&#185;(x) = <code>'+fn.invLabel+'</code>.</div>'+
+    '<div style="margin-top:6px;">Check: f(2) = <code>'+fn.f(2)+'</code>, and f&#8315;&#185;('+fn.f(2)+') = <code>'+chk+'</code> = 2. ✓</div>';
+}
+
+function drawInverse(){
+  var c=document.getElementById("invCanvas");
+  if(!c || !c.getContext) return;
+  var ctx=c.getContext("2d");
+  var W=c.width, H=c.height, pad=30;
+  var min=-6, max=6, span=max-min;
+  function sx(x){return pad + (x-min)/span*(W-2*pad);}
+  function sy(y){return H-pad - (y-min)/span*(H-2*pad);}
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="#28324699"; ctx.fillRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle="#33405a"; ctx.lineWidth=1;
+  for(var g=min;g<=max;g++){
+    ctx.beginPath();ctx.moveTo(sx(g),sy(min));ctx.lineTo(sx(g),sy(max));ctx.stroke();
+    ctx.beginPath();ctx.moveTo(sx(min),sy(g));ctx.lineTo(sx(max),sy(g));ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle="#7d8aa5"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(sx(min),sy(0));ctx.lineTo(sx(max),sy(0));ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sx(0),sy(min));ctx.lineTo(sx(0),sy(max));ctx.stroke();
+  // y=x line
+  ctx.strokeStyle="#ffffff55"; ctx.setLineDash([5,5]); ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(sx(min),sy(min));ctx.lineTo(sx(max),sy(max));ctx.stroke();
+  ctx.setLineDash([]);
+  var fn=getInv(invSel.value);
+  function plot(fun,color){
+    ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath();
+    var first=true;
+    for(var px=0;px<=W;px+=2){
+      var x = min + (px/(W))*span;
+      var y = fun(x);
+      if(y<min-2||y>max+2){first=true;continue;}
+      var X=sx(x), Y=sy(y);
+      if(first){ctx.moveTo(X,Y);first=false;} else ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+  }
+  plot(fn.f, "#7c9cf0");        // f
+  plot(fn.inv, "#4fc98a");      // f inverse
+  // legend
+  ctx.font="13px sans-serif";
+  ctx.fillStyle="#7c9cf0"; ctx.fillRect(pad,10,14,14); ctx.fillStyle="#e7ecf5"; ctx.fillText("f(x) = "+fn.label, pad+20, 22);
+  ctx.fillStyle="#4fc98a"; ctx.fillRect(pad,30,14,14); ctx.fillStyle="#e7ecf5"; ctx.fillText("f⁻¹(x) = "+fn.invLabel, pad+20, 42);
+  ctx.fillStyle="#ffffff99"; ctx.fillText("y = x", sx(max)-46, sy(max)+16);
+}
+invSel.addEventListener("change", function(){updateInvText();drawInverse();});
+
+/* ================= MODE 3: BINARY OPERATIONS ================= */
+function binCompute(op,n,a,b){
+  if(op==="add") return (a+b)%n;
+  return (a*b)%n;
+}
+function buildBin(){
+  var op=document.getElementById("binOp").value;
+  var n=+document.getElementById("binN").value;
+  var sym = op==="add" ? "⊕" : "⊗";
+  var elems=[]; for(var e=0;e<n;e++) elems.push(e);
+  // table
+  var h='<table class="mat"><tr><th>'+sym+'</th>';
+  for(var j=0;j<n;j++) h+='<th>'+j+'</th>';
+  h+='</tr>';
+  for(var i=0;i<n;i++){
+    h+='<tr><th>'+i+'</th>';
+    for(var j2=0;j2<n;j2++){
+      h+='<td style="cursor:default;">'+binCompute(op,n,i,j2)+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</table>';
+  document.getElementById("binTable").innerHTML=h;
+
+  // properties
+  var closed=true; // mod n always in set 0..n-1
+  var commutative=true;
+  for(i=0;i<n&&commutative;i++) for(j2=0;j2<n;j2++) if(binCompute(op,n,i,j2)!==binCompute(op,n,j2,i)){commutative=false;break;}
+  var assoc=true;
+  for(i=0;i<n&&assoc;i++) for(j2=0;j2<n&&assoc;j2++) for(var kk=0;kk<n;kk++){
+    if(binCompute(op,n,binCompute(op,n,i,j2),kk)!==binCompute(op,n,i,binCompute(op,n,j2,kk))){assoc=false;break;}
+  }
+  // identity
+  var identity=null;
+  for(var eI=0;eI<n;eI++){
+    var ok=true;
+    for(var a=0;a<n;a++){ if(binCompute(op,n,a,eI)!==a || binCompute(op,n,eI,a)!==a){ok=false;break;} }
+    if(ok){identity=eI;break;}
+  }
+  // inverses
+  var invList=[];
+  if(identity!==null){
+    for(var a2=0;a2<n;a2++){
+      var found=null;
+      for(var b=0;b<n;b++){ if(binCompute(op,n,a2,b)===identity && binCompute(op,n,b,a2)===identity){found=b;break;} }
+      invList.push({a:a2,inv:found});
+    }
+  }
+  function chip(name,ok){return '<span class="chip '+(ok?'yes':'no')+'">'+name+': '+(ok?'Yes':'No')+'</span>';}
+  var propHtml = chip("Closed",closed)+chip("Commutative",commutative)+chip("Associative",assoc)+
+    '<span class="chip '+(identity!==null?'yes':'no')+'">Identity: '+(identity!==null?identity:'None')+'</span>';
+  document.getElementById("binProps").innerHTML=propHtml;
+
+  var notes="";
+  if(identity!==null){
+    var haveAll = invList.every(function(o){return o.inv!==null;});
+    var invStr = invList.map(function(o){return o.inv===null? (o.a+"&rarr;none") : (o.a+"&#8315;&#185;="+o.inv);}).join(",  ");
+    notes = '<b>Identity element e = '+identity+'.</b><br>Inverses: '+invStr+'<br>'+
+      (haveAll? '<span style="color:var(--good)">Every element has an inverse.</span>'
+              : '<span style="color:var(--bad)">Some elements have no inverse under this operation.</span>');
+  } else {
+    notes = '<span style="color:var(--muted)">No identity element exists for this operation on the set, so inverses are not defined.</span>';
+  }
+  document.getElementById("binNotes").innerHTML=notes;
+}
+document.getElementById("binOp").addEventListener("change",buildBin);
+document.getElementById("binN").addEventListener("change",buildBin);
+
+/* ================= QUIZ ================= */
+var quizData=[
+  {q:"On A = {1,2,3}, which property must hold for R to be reflexive?",
+   opts:["(1,1),(2,2),(3,3) all in R","R contains (1,2) and (2,1)","R is empty","R has exactly 3 pairs"],
+   ans:0, exp:"Reflexive requires (a,a) in R for every element a of A."},
+  {q:"If f(x)=2x+1 and g(x)=x−3, what is (f∘g)(4)?",
+   opts:["9","3","5","7"],
+   ans:1, exp:"g(4)=1, then f(1)=2(1)+1=3. Note (g∘f)(4)=2(4)+1−3=6, so they differ."},
+  {q:"For addition mod 4 on {0,1,2,3}, the inverse of 3 is:",
+   opts:["3","0","1","2"],
+   ans:2, exp:"Identity is 0; 3⊕1=(3+1) mod 4=0, so the inverse of 3 is 1."}
+];
+function buildQuiz(){
+  var host=document.getElementById("quiz");
+  quizData.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; div.appendChild(p);
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.type="button"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        var btns=div.querySelectorAll(".opt");
+        btns.forEach(function(x){x.disabled=true;});
+        btns[item.ans].classList.add("correct");
+        if(oi!==item.ans) b.classList.add("wrong");
+        div.querySelector(".exp").classList.add("show");
+      });
+      div.appendChild(b);
+    });
+    var exp=document.createElement("div"); exp.className="exp"; exp.innerHTML="<b>Answer:</b> "+item.exp;
+    div.appendChild(exp);
+    host.appendChild(div);
+  });
+}
+
+/* ---------- init ---------- */
+buildRelGrid(); analyzeRel();
+updateComp();
+updateInvText(); drawInverse();
+buildBin();
+buildQuiz();
+</script>
+</body>
+</html>

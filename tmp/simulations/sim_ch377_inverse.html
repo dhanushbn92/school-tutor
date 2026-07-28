@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Inverse Lab - NIOS Class 12 Maths Ch22</title>
+<style>
+  :root{
+    --accent:#7c9cff;
+    --accent-dark:#5b7bef;
+    --bg:#141a26;
+    --panel:#1d2536;
+    --panel2:#232c40;
+    --ink:#e8edf7;
+    --muted:#9aa6bd;
+    --good:#4bd08b;
+    --bad:#ff6b7a;
+    --line:#2e394f;
+    --radius:16px;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1b2333,#111623);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.4rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent-dark);border-color:var(--accent);}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--shadow);margin-bottom:16px;}
+  .panel h2{font-size:1.05rem;margin:0 0 10px;}
+  .panel h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  .row{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+  .col{flex:1 1 280px;min-width:0;}
+  .hide{display:none!important;}
+  .muted{color:var(--muted);font-size:.86rem;}
+  .sizectl{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .sizebtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.85rem;}
+  .sizebtn.on{background:var(--accent-dark);border-color:var(--accent);color:#fff;}
+  table.mat{border-collapse:separate;border-spacing:6px;}
+  table.mat td{padding:0;}
+  table.mat input{
+    width:56px;height:44px;text-align:center;font-size:1rem;font-weight:600;
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  }
+  table.mat input:focus{outline:2px solid var(--accent);border-color:var(--accent);}
+  .matwrap{display:inline-flex;align-items:stretch;gap:4px;margin:4px 0;}
+  .bracket{width:10px;border:2px solid var(--muted);}
+  .bl{border-right:none;border-radius:6px 0 0 6px;}
+  .br{border-left:none;border-radius:0 6px 6px 0;}
+  .showmat{border-collapse:separate;border-spacing:4px;margin:2px 0;}
+  .showmat td{background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    min-width:52px;height:40px;text-align:center;padding:2px 8px;font-size:.92rem;
+    font-variant-numeric:tabular-nums;}
+  .showmat td.id{background:rgba(75,208,139,.14);border-color:var(--good);}
+  .lbl{font-weight:600;color:var(--muted);font-size:.82rem;margin-bottom:2px;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:700;}
+  .badge.ok{background:rgba(75,208,139,.16);color:var(--good);}
+  .badge.no{background:rgba(255,107,122,.16);color:var(--bad);}
+  .det{font-size:1.05rem;font-weight:700;}
+  .flowstep{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin:8px 0;}
+  .flowstep .lbl{color:var(--accent);}
+  .btn{background:var(--accent-dark);border:1px solid var(--accent);color:#fff;
+    padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.88rem;}
+  .btn.ghost{background:var(--panel2);border-color:var(--line);color:var(--ink);}
+  .facts li{margin-bottom:8px;}
+  .facts code, code.k{background:var(--panel2);padding:1px 6px;border-radius:6px;
+    font-family:"Cascadia Code",Consolas,monospace;font-size:.86rem;color:#ffd479;}
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-bottom:12px;}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0;}
+  .quiz .opt{background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    padding:8px 12px;cursor:pointer;font-size:.9rem;transition:.12s;}
+  .quiz .opt:hover{border-color:var(--accent);}
+  .quiz .opt.correct{background:rgba(75,208,139,.18);border-color:var(--good);}
+  .quiz .opt.wrong{background:rgba(255,107,122,.18);border-color:var(--bad);}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:6px;}
+  .eqline{font-size:.95rem;margin:6px 0;font-variant-numeric:tabular-nums;}
+  .sol{font-size:1.05rem;font-weight:700;color:var(--good);}
+  .warn{color:var(--bad);font-weight:600;}
+  .note{background:rgba(124,156,255,.1);border:1px solid var(--accent);border-radius:10px;
+    padding:10px 12px;font-size:.86rem;margin:10px 0;}
+  @media(max-width:400px){
+    table.mat input{width:46px;height:40px;font-size:.9rem;}
+    .wrap{padding:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Matrix Inverse Lab</h1>
+    <p>NIOS Class 12 Mathematics &mdash; Ch22: Inverse of a Matrix and its Applications</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="inv">Find the Inverse</div>
+    <div class="tab" data-tab="sys">Solve Systems</div>
+    <div class="tab" data-tab="prop">Properties</div>
+    <div class="tab" data-tab="quiz">Quiz</div>
+  </div>
+
+  <!-- ================= FIND INVERSE ================= -->
+  <section id="inv" class="tabpage">
+    <div class="panel">
+      <h2>1 &middot; Find the inverse:&nbsp; A<sup>&minus;1</sup> = adj(A) / det(A)</h2>
+      <div class="sizectl">
+        <button class="sizebtn on" data-size="2">2 &times; 2</button>
+        <button class="sizebtn" data-size="3">3 &times; 3</button>
+        <button class="btn ghost" id="inv-rand" style="margin-left:auto">Random</button>
+      </div>
+      <div class="lbl">Enter matrix A (edit any cell):</div>
+      <div class="matwrap">
+        <div class="bracket bl"></div>
+        <table class="mat" id="inv-input"></table>
+        <div class="bracket br"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Determinant</h2>
+      <div class="det" id="inv-det"></div>
+      <div id="inv-detwork" class="muted" style="margin-top:6px"></div>
+      <div style="margin-top:8px" id="inv-status"></div>
+    </div>
+
+    <div class="panel" id="inv-steps">
+      <h2>Step-by-step</h2>
+      <div id="inv-flow"></div>
+    </div>
+  </section>
+
+  <!-- ================= SOLVE SYSTEMS ================= -->
+  <section id="sys" class="tabpage hide">
+    <div class="panel">
+      <h2>2 &middot; Matrix method:&nbsp; AX = B &rArr; X = A<sup>&minus;1</sup>B</h2>
+      <div class="sizectl">
+        <button class="sizebtn on" data-ssize="2">2 unknowns</button>
+        <button class="sizebtn" data-ssize="3">3 unknowns</button>
+        <button class="btn ghost" id="sys-rand" style="margin-left:auto">Random</button>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="lbl">Coefficient matrix A</div>
+          <div class="matwrap">
+            <div class="bracket bl"></div>
+            <table class="mat" id="sys-A"></table>
+            <div class="bracket br"></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="lbl">Constants B</div>
+          <div class="matwrap">
+            <div class="bracket bl"></div>
+            <table class="mat" id="sys-B"></table>
+            <div class="bracket br"></div>
+          </div>
+        </div>
+      </div>
+      <div id="sys-eqs" class="muted" style="margin-top:10px"></div>
+    </div>
+    <div class="panel">
+      <h2>Solution</h2>
+      <div id="sys-out"></div>
+    </div>
+  </section>
+
+  <!-- ================= PROPERTIES ================= -->
+  <section id="prop" class="tabpage hide">
+    <div class="panel">
+      <h2>3 &middot; Properties of the inverse &amp; adjoint</h2>
+      <ul class="facts">
+        <li><b>Reversal law:</b> <code class="k">(AB)&#8315;&#185; = B&#8315;&#185;A&#8315;&#185;</code>
+            &mdash; the inverse of a product is the product of inverses in <i>reverse</i> order.</li>
+        <li><b>Double inverse:</b> <code class="k">(A&#8315;&#185;)&#8315;&#185; = A</code>.</li>
+        <li><b>Transpose:</b> <code class="k">(A&#7488;)&#8315;&#185; = (A&#8315;&#185;)&#7488;</code>.</li>
+        <li><b>Scalar:</b> <code class="k">(kA)&#8315;&#185; = (1/k) A&#8315;&#185;</code>, k &ne; 0.</li>
+        <li><b>Determinant:</b> <code class="k">det(A&#8315;&#185;) = 1 / det(A)</code>.</li>
+        <li><b>Adjoint:</b> <code class="k">A &middot; adj(A) = adj(A) &middot; A = det(A) I</code>.</li>
+        <li><b>Adjoint det (nxn):</b> <code class="k">det(adj A) = det(A)&#8319;&#8315;&#185;</code>.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Check the reversal law numerically</h2>
+      <p class="muted">Two random 2&times;2 matrices A and B. Verify (AB)<sup>&minus;1</sup> = B<sup>&minus;1</sup>A<sup>&minus;1</sup>.</p>
+      <button class="btn" id="prop-run">New A &amp; B</button>
+      <div id="prop-out" style="margin-top:12px"></div>
+    </div>
+    <div class="panel facts">
+      <h2>Facts panel</h2>
+      <h3>Adjoint (adjugate)</h3>
+      <p class="muted">adj(A) is the <b>transpose of the cofactor matrix</b>. Cofactor
+        C<sub>ij</sub> = (&minus;1)<sup>i+j</sup> M<sub>ij</sub>, where M<sub>ij</sub> is the
+        minor (determinant left after deleting row i, column j).</p>
+      <h3>Inverse formula</h3>
+      <p class="muted">A<sup>&minus;1</sup> = adj(A) / det(A), valid only when det(A) &ne; 0
+        (A is then <b>non-singular / invertible</b>). If det(A) = 0, A is
+        <b>singular</b> and has no inverse.</p>
+      <h3>Matrix method for AX = B</h3>
+      <p class="muted">If det(A) &ne; 0: unique solution X = A<sup>&minus;1</sup>B.
+        If det(A) = 0 and (adj A)B = 0: infinitely many solutions.
+        If det(A) = 0 and (adj A)B &ne; 0: no solution (inconsistent).</p>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="quiz" class="tabpage hide">
+    <div class="panel quiz" id="quizbox">
+      <h2>4 &middot; Quick quiz</h2>
+      <p class="muted">Tap an option to reveal the answer.</p>
+    </div>
+  </section>
+
+  <p class="muted" style="text-align:center;margin:18px 0">
+    All computations are exact (fractions shown in lowest terms).
+  </p>
+</div>
+
+<script>
+"use strict";
+/* ---------- exact rational arithmetic ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
+function fr(n,d){ // returns normalized fraction {n,d}
+  if(d===0) d=1;
+  if(d<0){n=-n;d=-d;}
+  var g=gcd(n,d); return {n:n/g,d:d/g};
+}
+function fAdd(a,b){return fr(a.n*b.d+b.n*a.d,a.d*b.d);}
+function fSub(a,b){return fr(a.n*b.d-b.n*a.d,a.d*b.d);}
+function fMul(a,b){return fr(a.n*b.n,a.d*b.d);}
+function fInt(x){return {n:x,d:1};}
+function fStr(f){ if(f.n===0)return "0"; return f.d===1?(""+f.n):(f.n+"/"+f.d); }
+function isZero(f){return f.n===0;}
+
+/* ---------- matrix helpers (integer input) ---------- */
+function minor(M,r,c){ // determinant of submatrix removing row r col c (integers)
+  var rows=[],n=M.length;
+  for(var i=0;i<n;i++){if(i===r)continue;var row=[];for(var j=0;j<n;j++){if(j===c)continue;row.push(M[i][j]);}rows.push(row);}
+  return detInt(rows);
+}
+function detInt(M){
+  var n=M.length;
+  if(n===1)return M[0][0];
+  if(n===2)return M[0][0]*M[1][1]-M[0][1]*M[1][0];
+  var s=0;
+  for(var j=0;j<n;j++){ s+=((j%2===0)?1:-1)*M[0][j]*minor(M,0,j); }
+  return s;
+}
+function cofactorMat(M){
+  var n=M.length,C=[];
+  for(var i=0;i<n;i++){C[i]=[];for(var j=0;j<n;j++){C[i][j]=((i+j)%2===0?1:-1)*minor(M,i,j);}}
+  return C;
+}
+function minorMat(M){
+  var n=M.length,C=[];
+  for(var i=0;i<n;i++){C[i]=[];for(var j=0;j<n;j++){C[i][j]=minor(M,i,j);}}
+  return C;
+}
+function transpose(M){var n=M.length,T=[];for(var i=0;i<n;i++){T[i]=[];for(var j=0;j<n;j++)T[i][j]=M[j][i];}return T;}
+function matToFrac(M){return M.map(function(r){return r.map(function(v){return fInt(v);});});}
+
+/* HTML for a matrix of strings */
+function showMatrix(M,fmt,idFlag){
+  var html='<div class="matwrap"><div class="bracket bl"></div><table class="showmat"><tbody>';
+  for(var i=0;i<M.length;i++){
+    html+='<tr>';
+    for(var j=0;j<M[i].length;j++){
+      var cls="";
+      if(idFlag && idFlag(i,j)) cls=' class="id"';
+      html+='<td'+cls+'>'+(fmt?fmt(M[i][j]):M[i][j])+'</td>';
+    }
+    html+='</tr>';
+  }
+  html+='</tbody></table><div class="bracket br"></div></div>';
+  return html;
+}
+
+/* fraction inverse of integer matrix, given det */
+function inverseFrac(M,det){
+  var adj=transpose(cofactorMat(M)); // integers
+  return adj.map(function(row){return row.map(function(v){return fr(v,det);});});
+}
+/* multiply fraction matrix by integer matrix -> fraction matrix */
+function mulFracInt(F,M){
+  var n=F.length,R=[];
+  for(var i=0;i<n;i++){R[i]=[];for(var j=0;j<n;j++){
+    var s=fInt(0);
+    for(var k=0;k<n;k++){ s=fAdd(s,fMul(F[i][k],fInt(M[k][j]))); }
+    R[i][j]=s;
+  }}
+  return R;
+}
+/* fraction matrix * fraction matrix */
+function mulFF(A,B){
+  var n=A.length,R=[];
+  for(var i=0;i<n;i++){R[i]=[];for(var j=0;j<n;j++){
+    var s=fInt(0);for(var k=0;k<n;k++)s=fAdd(s,fMul(A[i][k],B[k][j]));R[i][j]=s;
+  }}
+  return R;
+}
+/* fraction matrix * integer column vector -> fraction column */
+function mulFracVec(F,b){
+  var n=F.length,R=[];
+  for(var i=0;i<n;i++){var s=fInt(0);for(var k=0;k<n;k++)s=fAdd(s,fMul(F[i][k],fInt(b[k])));R.push(s);}
+  return R;
+}
+
+/* ---------- read matrix from input table ---------- */
+function readMat(tableId,n){
+  var t=document.getElementById(tableId),M=[];
+  var inputs=t.querySelectorAll("input");
+  var k=0;
+  for(var i=0;i<n;i++){M[i]=[];for(var j=0;j<n;j++){
+    var v=parseFloat(inputs[k].value);M[i][j]=isNaN(v)?0:Math.round(v);k++;
+  }}
+  return M;
+}
+function readVec(tableId,n){
+  var t=document.getElementById(tableId),inputs=t.querySelectorAll("input"),v=[];
+  for(var i=0;i<n;i++){var x=parseFloat(inputs[i].value);v.push(isNaN(x)?0:Math.round(x));}
+  return v;
+}
+function buildInput(tableId,n,vals){
+  var t=document.getElementById(tableId),html="";
+  var k=0;
+  for(var i=0;i<n;i++){html+="<tr>";for(var j=0;j<n;j++){
+    var val=vals?vals[k]:"";k++;
+    html+='<td><input type="number" step="1" inputmode="numeric" value="'+val+'"></td>';
+  }html+="</tr>";}
+  t.innerHTML=html;
+}
+function buildVecInput(tableId,n,vals){
+  var t=document.getElementById(tableId),html="";
+  for(var i=0;i<n;i++){var val=vals?vals[i]:"";
+    html+='<tr><td><input type="number" step="1" inputmode="numeric" value="'+val+'"></td></tr>';}
+  t.innerHTML=html;
+}
+
+/* =================== TAB 1: FIND INVERSE =================== */
+var invSize=2;
+function defaultInv(n){ return n===2?[4,7,2,6]:[1,2,3,0,1,4,5,6,0]; }
+function initInv(n){ invSize=n; buildInput("inv-input",n,defaultInv(n)); computeInv(); }
+function randInv(){
+  var n=invSize,vals=[];
+  for(var i=0;i<n*n;i++)vals.push(Math.floor(Math.random()*9)-3);
+  buildInput("inv-input",n,vals); computeInv();
+}
+function computeInv(){
+  var n=invSize,M=readMat("inv-input",n);
+  var det=detInt(M);
+  document.getElementById("inv-det").innerHTML="det(A) = <b>"+det+"</b>";
+  // determinant working
+  var dw="";
+  if(n===2){ dw="= ("+M[0][0]+")("+M[1][1]+") &minus; ("+M[0][1]+")("+M[1][0]+") = "+
+    (M[0][0]*M[1][1])+" &minus; "+(M[0][1]*M[1][0])+" = "+det; }
+  else{
+    var terms=[];
+    for(var j=0;j<3;j++){var c=minor(M,0,j);terms.push((j%2===0?"+":"&minus;")+" ("+M[0][j]+")&middot;("+c+")");}
+    dw="expand along row 1: = "+terms.join(" ")+" = "+det;
+  }
+  document.getElementById("inv-detwork").innerHTML=dw;
+
+  var status=document.getElementById("inv-status");
+  var flow=document.getElementById("inv-flow");
+  if(det===0){
+    status.innerHTML='<span class="badge no">SINGULAR &mdash; no inverse (det = 0)</span>';
+    flow.innerHTML='<p class="warn">Because det(A) = 0, A is singular and A<sup>&minus;1</sup> does not exist.</p>';
+    return;
+  }
+  status.innerHTML='<span class="badge ok">NON-SINGULAR &mdash; inverse exists</span>';
+
+  var mins=minorMat(M), cof=cofactorMat(M), adj=transpose(cof);
+  var inv=inverseFrac(M,det);
+  var prod=mulFracInt(inv,M); // should be I
+
+  var html="";
+  html+='<div class="flowstep"><div class="lbl">Step 1 &mdash; Matrix of minors M<sub>ij</sub></div>'+
+        showMatrix(mins,function(v){return v;})+'</div>';
+  html+='<div class="flowstep"><div class="lbl">Step 2 &mdash; Cofactors C<sub>ij</sub> = (&minus;1)<sup>i+j</sup>M<sub>ij</sub></div>'+
+        showMatrix(cof,function(v){return v;})+'</div>';
+  html+='<div class="flowstep"><div class="lbl">Step 3 &mdash; Adjoint = transpose of cofactor matrix</div>'+
+        showMatrix(adj,function(v){return v;})+'</div>';
+  html+='<div class="flowstep"><div class="lbl">Step 4 &mdash; A<sup>&minus;1</sup> = adj(A) &divide; det(A) = adj(A) &divide; ('+det+')</div>'+
+        showMatrix(inv,fStr)+'</div>';
+  html+='<div class="flowstep"><div class="lbl">Verify &mdash; A &middot; A<sup>&minus;1</sup> = I</div>'+
+        showMatrix(prod,fStr,function(i,j){return i===j;})+
+        '<p class="muted" style="margin:6px 0 0">Product is the identity matrix &#10003;</p></div>';
+  flow.innerHTML=html;
+}
+
+/* =================== TAB 2: SOLVE SYSTEMS =================== */
+var sysSize=2;
+function defaultSysA(n){return n===2?[2,3,1,-1]:[2,1,1,1,-1,2,1,2,-1];}
+function defaultSysB(n){return n===2?[8,1]:[3,3,4];}
+function initSys(n){
+  sysSize=n;
+  buildInput("sys-A",n,defaultSysA(n));
+  buildVecInput("sys-B",n,defaultSysB(n));
+  computeSys();
+}
+function randSys(){
+  var n=sysSize,A=[],B=[];
+  for(var i=0;i<n*n;i++)A.push(Math.floor(Math.random()*7)-3);
+  for(var i=0;i<n;i++)B.push(Math.floor(Math.random()*11)-5);
+  buildInput("sys-A",n,A);buildVecInput("sys-B",n,B);computeSys();
+}
+function computeSys(){
+  var n=sysSize,A=readMat("sys-A",n),B=readVec("sys-B",n);
+  var vars=["x","y","z"];
+  // equations
+  var eqs="";
+  for(var i=0;i<n;i++){
+    var parts=[];
+    for(var j=0;j<n;j++){
+      var c=A[i][j];
+      var term=(c<0?" &minus; ":(j>0?" + ":""))+Math.abs(c)+vars[j];
+      parts.push(term);
+    }
+    eqs+='<div class="eqline">'+parts.join("")+" = "+B[i]+"</div>";
+  }
+  document.getElementById("sys-eqs").innerHTML="<b>System:</b>"+eqs;
+
+  var det=detInt(A);
+  var out=document.getElementById("sys-out");
+  var h='<div class="eqline">det(A) = <b>'+det+'</b></div>';
+  if(det!==0){
+    var inv=inverseFrac(A,det);
+    var X=mulFracVec(inv,B);
+    h+='<div class="note">det(A) &ne; 0 &rArr; unique solution X = A<sup>&minus;1</sup>B.</div>';
+    h+='<div class="lbl">A<sup>&minus;1</sup></div>'+showMatrix(inv,fStr);
+    h+='<div class="sol" style="margin-top:10px">';
+    for(var i=0;i<n;i++){ h+=vars[i]+" = "+fStr(X[i])+((i<n-1)?" ,&nbsp; ":""); }
+    h+='</div>';
+  }else{
+    // det = 0: check (adj A) B
+    var adj=transpose(cofactorMat(A));
+    var ab=[];var allZero=true;
+    for(var i=0;i<n;i++){var s=0;for(var k=0;k<n;k++)s+=adj[i][k]*B[k];ab.push(s);if(s!==0)allZero=false;}
+    if(allZero){
+      h+='<div class="note warn">det(A) = 0 and (adj A)&middot;B = 0 &rArr; the system has '+
+         '<b>infinitely many solutions</b> (dependent equations).</div>';
+    }else{
+      h+='<div class="note warn">det(A) = 0 and (adj A)&middot;B &ne; 0 &rArr; the system has '+
+         '<b>no solution</b> (inconsistent). A<sup>&minus;1</sup> does not exist, so the matrix method fails.</div>';
+    }
+  }
+  out.innerHTML=h;
+}
+
+/* =================== TAB 3: PROPERTIES CHECK =================== */
+function randNonSing2(){
+  while(true){
+    var M=[[0,0],[0,0]];
+    for(var i=0;i<2;i++)for(var j=0;j<2;j++)M[i][j]=Math.floor(Math.random()*7)-3;
+    if(detInt(M)!==0)return M;
+  }
+}
+function propRun(){
+  var A=randNonSing2(),B=randNonSing2();
+  var AB=[[0,0],[0,0]];
+  for(var i=0;i<2;i++)for(var j=0;j<2;j++){var s=0;for(var k=0;k<2;k++)s+=A[i][k]*B[k][j];AB[i][j]=s;}
+  var dAB=detInt(AB);
+  var invAB=inverseFrac(AB,dAB);
+  var invA=inverseFrac(A,detInt(A));
+  var invB=inverseFrac(B,detInt(B));
+  var BinvAinv=mulFF(invB,invA);
+  var h="";
+  h+='<div class="row"><div class="col"><div class="lbl">A</div>'+showMatrix(A,function(v){return v;})+'</div>';
+  h+='<div class="col"><div class="lbl">B</div>'+showMatrix(B,function(v){return v;})+'</div></div>';
+  h+='<div class="lbl">(AB)<sup>&minus;1</sup></div>'+showMatrix(invAB,fStr);
+  h+='<div class="lbl">B<sup>&minus;1</sup>A<sup>&minus;1</sup></div>'+showMatrix(BinvAinv,fStr);
+  // compare
+  var same=true;
+  for(var i=0;i<2;i++)for(var j=0;j<2;j++){if(invAB[i][j].n!==BinvAinv[i][j].n||invAB[i][j].d!==BinvAinv[i][j].d)same=false;}
+  h+='<div style="margin-top:10px"><span class="badge '+(same?"ok":"no")+'">'+
+     (same?"Equal &#10003; &nbsp;(AB)⁻¹ = B⁻¹A⁻¹":"Mismatch")+'</span></div>';
+  document.getElementById("prop-out").innerHTML=h;
+}
+
+/* =================== TAB 4: QUIZ =================== */
+var QUIZ=[
+  {q:"If det(A) = 0, then the matrix A is:",
+   opts:["Invertible","Singular (no inverse)","Orthogonal","Identity"],a:1,
+   e:"An inverse exists only when det(A) ≠ 0. det = 0 means A is singular."},
+  {q:"The inverse of a matrix A is given by:",
+   opts:["adj(A) × det(A)","det(A) / adj(A)","adj(A) / det(A)","Aᵀ / det(A)"],a:2,
+   e:"A⁻¹ = adj(A) / det(A), the adjoint divided by the determinant."},
+  {q:"For invertible A and B, (AB)⁻¹ equals:",
+   opts:["A⁻¹B⁻¹","B⁻¹A⁻¹","(BA)⁻¹","AB"],a:1,
+   e:"Reversal law: (AB)⁻¹ = B⁻¹A⁻¹ — order reverses."}
+];
+function buildQuiz(){
+  var box=document.getElementById("quizbox");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var opts='<div class="opts">';
+    item.opts.forEach(function(o,oi){opts+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</div>';});
+    opts+='</div><div class="exp hide">'+item.e+'</div>';
+    d.innerHTML='<b>Q'+(qi+1)+'.</b> '+item.q+opts;
+    box.appendChild(d);
+  });
+  box.addEventListener("click",function(ev){
+    var t=ev.target;if(!t.classList.contains("opt"))return;
+    var qi=+t.getAttribute("data-q"),oi=+t.getAttribute("data-o");
+    var q=t.closest(".q");
+    if(q.getAttribute("data-done"))return;
+    q.setAttribute("data-done","1");
+    q.querySelectorAll(".opt").forEach(function(op){
+      var o=+op.getAttribute("data-o");
+      if(o===QUIZ[qi].a)op.classList.add("correct");
+      else if(o===oi)op.classList.add("wrong");
+    });
+    q.querySelector(".exp").classList.remove("hide");
+  });
+}
+
+/* =================== WIRING =================== */
+function switchTab(name){
+  document.querySelectorAll(".tab").forEach(function(t){t.classList.toggle("active",t.getAttribute("data-tab")===name);});
+  document.querySelectorAll(".tabpage").forEach(function(p){p.classList.toggle("hide",p.id!==name);});
+}
+document.querySelectorAll(".tab").forEach(function(t){
+  t.addEventListener("click",function(){switchTab(t.getAttribute("data-tab"));});
+});
+/* inverse size buttons */
+document.querySelectorAll("#inv .sizebtn").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#inv .sizebtn").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");initInv(+b.getAttribute("data-size"));
+  });
+});
+document.getElementById("inv-input").addEventListener("input",computeInv);
+document.getElementById("inv-rand").addEventListener("click",randInv);
+/* system size buttons */
+document.querySelectorAll("#sys .sizebtn").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#sys .sizebtn").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");initSys(+b.getAttribute("data-ssize"));
+  });
+});
+document.getElementById("sys-A").addEventListener("input",computeSys);
+document.getElementById("sys-B").addEventListener("input",computeSys);
+document.getElementById("sys-rand").addEventListener("click",randSys);
+document.getElementById("prop-run").addEventListener("click",propRun);
+
+/* init */
+initInv(2);
+initSys(2);
+propRun();
+buildQuiz();
+</script>
+</body>
+</html>

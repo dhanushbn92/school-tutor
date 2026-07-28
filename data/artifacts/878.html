@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Determinants Lab — Determinants (NIOS Class 12 Maths, Ch 21)</title>
+<style>
+  :root{
+    --bg:#111520;
+    --panel:#1a2031;
+    --panel2:#222b40;
+    --ink:#e9edf7;
+    --muted:#96a1ba;
+    --accent:#6fc7ff;
+    --accent-soft:rgba(111,199,255,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2d3750;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:14px 0 8px;color:var(--ink)}
+  .view{display:none}
+  .view.active{display:block}
+  .sub{color:var(--muted);font-size:.86rem;margin-bottom:12px}
+
+  .seg{display:flex;gap:8px;margin-bottom:14px}
+  .seg button{flex:1;min-height:42px;border:1px solid var(--line);border-radius:12px;
+    background:var(--panel2);color:var(--muted);font-weight:600;cursor:pointer;touch-action:manipulation}
+  .seg button.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .mtx{display:inline-grid;gap:8px;padding:10px 14px;border-left:3px solid var(--accent);
+    border-right:3px solid var(--accent);border-radius:6px;background:var(--panel2)}
+  .mtx input{width:58px;height:44px;text-align:center;font-size:1rem;border:1px solid var(--line);
+    border-radius:10px;background:var(--bg);color:var(--ink);font-weight:600}
+  .mtx input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .mtx input.hl{border-color:var(--accent);background:var(--accent-soft)}
+  .mtx-wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+
+  .rowsel{display:flex;gap:8px;margin:12px 0;align-items:center;flex-wrap:wrap}
+  .rowsel span{color:var(--muted);font-size:.86rem}
+  .chip{border:1px solid var(--line);border-radius:20px;background:var(--panel2);color:var(--muted);
+    padding:6px 14px;cursor:pointer;font-weight:600;font-size:.85rem;touch-action:manipulation}
+  .chip.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .res{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+  .res .big{font-size:1.5rem;font-weight:700;color:var(--accent);margin-top:4px}
+  .mono{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:.9rem}
+  .step{margin:6px 0;color:var(--muted);font-size:.9rem}
+  .step b{color:var(--ink)}
+  .pos{color:var(--good)}
+  .neg{color:var(--bad)}
+
+  canvas{width:100%;max-width:420px;height:auto;background:var(--bg);border:1px solid var(--line);
+    border-radius:12px;display:block;margin:10px auto;touch-action:none}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+
+  .facts details{border:1px solid var(--line);border-radius:12px;background:var(--panel2);
+    margin-bottom:10px;padding:0 14px}
+  .facts summary{cursor:pointer;padding:12px 0;font-weight:600;color:var(--accent);list-style:none}
+  .facts summary::-webkit-details-marker{display:none}
+  .facts summary::before{content:"▸ ";color:var(--muted)}
+  .facts details[open] summary::before{content:"▾ "}
+  .facts .body{padding:0 0 12px;color:var(--muted);font-size:.9rem}
+  .facts .body .mono{color:var(--ink)}
+
+  .q{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:14px;margin-bottom:12px}
+  .q p{font-weight:600;margin-bottom:10px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;
+    background:var(--bg);color:var(--ink);padding:11px 12px;margin-bottom:8px;cursor:pointer;
+    font-size:.92rem;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14)}
+  .expl{font-size:.86rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+  label.fld{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  select,.tin{border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);
+    padding:8px 10px;font-size:.9rem;font-weight:600}
+  .kbd{font-family:ui-monospace,monospace;background:var(--bg);border:1px solid var(--line);
+    border-radius:6px;padding:1px 6px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Determinants</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Chapter 21 — compute, visualise area, and apply Cramer's rule.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="compute">Compute</button>
+    <button class="tab-btn" data-tab="geo">Geometric</button>
+    <button class="tab-btn" data-tab="apps">Applications</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ COMPUTE ============ -->
+  <section class="view active" id="compute">
+    <div class="panel">
+      <h2>Compute a determinant</h2>
+      <div class="sub">Edit any entry. The value recomputes instantly. Fractions and decimals allowed.</div>
+      <div class="seg">
+        <button class="active" data-size="2">2 × 2</button>
+        <button data-size="3">3 × 3</button>
+      </div>
+
+      <div id="c-mwrap" class="mtx-wrap"></div>
+
+      <div id="c-rowsel" class="rowsel" style="display:none">
+        <span>Expand along:</span>
+        <button class="chip active" data-row="0">Row 1</button>
+        <button class="chip" data-row="1">Row 2</button>
+        <button class="chip" data-row="2">Row 3</button>
+      </div>
+
+      <div class="res" id="c-res"></div>
+    </div>
+  </section>
+
+  <!-- ============ GEOMETRIC ============ -->
+  <section class="view" id="geo">
+    <div class="panel">
+      <h2>Geometric meaning (2 × 2)</h2>
+      <div class="sub">|det| equals the area of the parallelogram spanned by the two <b>column</b> vectors
+        <span class="mono">u = (a, c)</span> and <span class="mono">v = (b, d)</span>.</div>
+      <div class="mtx-wrap"><div id="g-mwrap"></div></div>
+      <canvas id="g-canvas" width="420" height="420"></canvas>
+      <div class="res" id="g-res"></div>
+    </div>
+  </section>
+
+  <!-- ============ APPLICATIONS ============ -->
+  <section class="view" id="apps">
+    <div class="panel">
+      <h2>Cramer's rule — solve a linear system</h2>
+      <div class="sub">Replace a column of the coefficient matrix by the constants to get Δx, Δy (Δz).</div>
+      <div class="seg">
+        <button class="active" data-sys="2">2 equations</button>
+        <button data-sys="3">3 equations</button>
+      </div>
+      <div id="s-eqs"></div>
+      <div class="res" id="s-res"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Area of a triangle</h2>
+      <div class="sub">From vertices A(x₁,y₁), B(x₂,y₂), C(x₃,y₃):
+        Area = ½ |x₁(y₂−y₃) + x₂(y₃−y₁) + x₃(y₁−y₂)|.</div>
+      <div class="grid2" id="tri-inputs"></div>
+      <div class="res" id="tri-res"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Properties (quick note)</h2>
+      <div class="facts">
+        <details><summary>Row/column operations</summary>
+          <div class="body">
+            • Swapping two rows (or columns) <b>flips the sign</b> of the determinant.<br>
+            • Multiplying one row by k multiplies det by k.<br>
+            • Adding a multiple of one row to another <b>leaves det unchanged</b>.<br>
+            • If two rows (or columns) are equal (or proportional), det = 0.<br>
+            • det(Aᵀ) = det(A);  det(AB) = det(A)·det(B).
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section class="view" id="facts">
+    <div class="panel facts">
+      <h2>Key facts</h2>
+      <details open><summary>2 × 2 determinant</summary>
+        <div class="body"><span class="mono">|A| = a·d − b·c</span> for
+          A = [[a, b], [c, d]].</div>
+      </details>
+      <details><summary>3 × 3 by cofactor expansion (Row 1)</summary>
+        <div class="body"><span class="mono">|A| = a₁₁M₁₁ − a₁₂M₁₂ + a₁₃M₁₃</span><br>
+          where each minor M is the 2×2 determinant left after deleting that entry's row &amp; column.</div>
+      </details>
+      <details><summary>Minors &amp; cofactors, sign pattern</summary>
+        <div class="body">Minor Mᵢⱼ = det of the submatrix after deleting row i, column j.<br>
+          Cofactor Cᵢⱼ = (−1)^(i+j) · Mᵢⱼ. Sign board:<br>
+          <span class="mono">+ − +<br>− + −<br>+ − +</span></div>
+      </details>
+      <details><summary>Cramer's rule</summary>
+        <div class="body">For AX = B with Δ = det(A) ≠ 0:
+          <span class="mono">x = Δx/Δ, y = Δy/Δ, z = Δz/Δ</span>,
+          where Δx replaces the x-column of A by B, and so on. If Δ = 0 the system has no unique solution.</div>
+      </details>
+      <details><summary>Triangle area &amp; collinearity</summary>
+        <div class="body">Area = ½|det| with rows (x₁ y₁ 1),(x₂ y₂ 1),(x₃ y₃ 1). Area = 0 ⇒ the three points are collinear.</div>
+      </details>
+    </div>
+
+    <div class="panel">
+      <h2>Quick quiz</h2>
+      <div class="sub">Tap an option to check. Explanations reveal on click.</div>
+      <div id="quiz"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+function parseNum(s){
+  s=(""+s).trim();
+  if(s==="") return 0;
+  if(s.indexOf("/")>-1){
+    var p=s.split("/"); var n=parseFloat(p[0]), d=parseFloat(p[1]);
+    if(isFinite(n)&&isFinite(d)&&d!==0) return n/d;
+    return NaN;
+  }
+  var v=parseFloat(s);
+  return isFinite(v)?v:NaN;
+}
+function fmt(x){
+  if(!isFinite(x)) return "?";
+  var r=Math.round(x);
+  if(Math.abs(x-r)<1e-9) return ""+r;
+  return (Math.round(x*1000)/1000).toString();
+}
+function sgnSpan(x){ // returns "+"/"−" span with class
+  return x>=0? '<span class="pos">+</span>' : '<span class="neg">−</span>';
+}
+function det2(a,b,c,d){ return a*d-b*c; }
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll(".tab-btn").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll(".tab-btn").forEach(function(x){x.classList.remove("active");});
+    document.querySelectorAll(".view").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    document.getElementById(b.dataset.tab).classList.add("active");
+  });
+});
+
+/* ================= COMPUTE ================= */
+var cSize=2, cRow=0;
+var cDefault2=[[3,2],[1,4]];
+var cDefault3=[[2,-1,3],[0,4,1],[5,2,-2]];
+function buildMatrix(container,n,vals,cls,onInput){
+  container.innerHTML="";
+  var g=document.createElement("div");
+  g.className="mtx";
+  g.style.gridTemplateColumns="repeat("+n+",auto)";
+  for(var i=0;i<n;i++)for(var j=0;j<n;j++){
+    var inp=document.createElement("input");
+    inp.type="text"; inp.inputMode="decimal";
+    inp.value=vals[i][j];
+    inp.dataset.i=i; inp.dataset.j=j;
+    inp.className=cls;
+    inp.addEventListener("input",onInput);
+    g.appendChild(inp);
+  }
+  container.appendChild(g);
+  return g;
+}
+function readMatrix(g,n){
+  var m=[]; var inps=g.querySelectorAll("input");
+  for(var i=0;i<n;i++){m.push([]);for(var j=0;j<n;j++)m[i].push(0);}
+  inps.forEach(function(inp){ m[+inp.dataset.i][+inp.dataset.j]=parseNum(inp.value); });
+  return m;
+}
+var cGrid;
+function renderCompute(){
+  var mwrap=document.getElementById("c-mwrap");
+  cGrid=buildMatrix(mwrap,cSize, cSize===2?cDefault2:cDefault3,"", computeDet);
+  document.getElementById("c-rowsel").style.display= cSize===3?"flex":"none";
+  computeDet();
+}
+document.querySelectorAll("#compute .seg button").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#compute .seg button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active"); cSize=+b.dataset.size; cRow=0;
+    document.querySelectorAll("#c-rowsel .chip").forEach(function(x,idx){x.classList.toggle("active",idx===0);});
+    renderCompute();
+  });
+});
+document.querySelectorAll("#c-rowsel .chip").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#c-rowsel .chip").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active"); cRow=+b.dataset.row; computeDet();
+  });
+});
+function clearHl(){ cGrid.querySelectorAll("input").forEach(function(x){x.classList.remove("hl");}); }
+function computeDet(){
+  var m=readMatrix(cGrid,cSize);
+  var res=document.getElementById("c-res");
+  var bad=false; m.forEach(function(r){r.forEach(function(v){if(!isFinite(v))bad=true;});});
+  if(bad){ res.innerHTML='<span class="neg">Enter valid numbers (e.g. 3, -2, 1/2).</span>'; return; }
+  clearHl();
+  if(cSize===2){
+    var a=m[0][0],b=m[0][1],c=m[1][0],d=m[1][1];
+    var D=det2(a,b,c,d);
+    res.innerHTML=
+      '<div class="mono">|A| = a·d − b·c</div>'+
+      '<div class="step mono">= ('+fmt(a)+')('+fmt(d)+') − ('+fmt(b)+')('+fmt(c)+')</div>'+
+      '<div class="step mono">= '+fmt(a*d)+' − '+fmt(b*c)+'</div>'+
+      '<div>det = <span class="big">'+fmt(D)+'</span></div>';
+  } else {
+    var r=cRow;
+    var terms=[], sum=0, html='';
+    html+='<div class="mono">Expand along Row '+(r+1)+':  |A| = Σ (−1)^(i+j) aᵢⱼ Mᵢⱼ</div>';
+    for(var j=0;j<3;j++){
+      var sign=((r+j)%2===0)?1:-1;
+      // minor: delete row r, col j
+      var rows=[0,1,2].filter(function(x){return x!==r;});
+      var cols=[0,1,2].filter(function(x){return x!==j;});
+      var mm=det2(m[rows[0]][cols[0]],m[rows[0]][cols[1]],m[rows[1]][cols[0]],m[rows[1]][cols[1]]);
+      var a=m[r][j];
+      var cof=sign*mm;
+      sum+=a*cof;
+      // highlight the pivot entry
+      html+='<div class="step">'+
+        'term '+(j+1)+': '+(sign>0?'<span class="pos">+</span>':'<span class="neg">−</span>')+
+        ' a<sub>'+(r+1)+(j+1)+'</sub>='+fmt(a)+
+        ', minor M<sub>'+(r+1)+(j+1)+'</sub>=det['+
+        fmt(m[rows[0]][cols[0]])+' '+fmt(m[rows[0]][cols[1]])+'; '+
+        fmt(m[rows[1]][cols[0]])+' '+fmt(m[rows[1]][cols[1]])+']='+fmt(mm)+
+        ', cofactor C<sub>'+(r+1)+(j+1)+'</sub>='+fmt(cof)+
+        ' → '+fmt(a*cof)+'</div>';
+    }
+    html+='<div class="step mono">sum = '+
+      [0,1,2].map(function(j){
+        var sign=((r+j)%2===0)?1:-1;
+        var rows=[0,1,2].filter(function(x){return x!==r;});
+        var cols=[0,1,2].filter(function(x){return x!==j;});
+        var mm=det2(m[rows[0]][cols[0]],m[rows[0]][cols[1]],m[rows[1]][cols[0]],m[rows[1]][cols[1]]);
+        return fmt(m[r][j]*sign*mm);
+      }).join(" + ").replace(/\+ -/g,"− ")+'</div>';
+    html+='<div>det = <span class="big">'+fmt(sum)+'</span></div>';
+    res.innerHTML=html;
+    // highlight the expansion row
+    cGrid.querySelectorAll("input").forEach(function(inp){
+      if(+inp.dataset.i===r) inp.classList.add("hl");
+    });
+  }
+}
+
+/* ================= GEOMETRIC ================= */
+var gGrid, gDefault=[[3,1],[1,3]];
+function renderGeo(){
+  gGrid=buildMatrix(document.getElementById("g-mwrap"),2,gDefault,"",drawGeo);
+  drawGeo();
+}
+function drawGeo(){
+  var m=readMatrix(gGrid,2);
+  var a=m[0][0],b=m[0][1],c=m[1][0],d=m[1][1];
+  var res=document.getElementById("g-res");
+  if([a,b,c,d].some(function(v){return !isFinite(v);})){
+    res.innerHTML='<span class="neg">Enter valid numbers.</span>'; return;
+  }
+  var D=det2(a,b,c,d);
+  var cv=document.getElementById("g-canvas"), ctx=cv.getContext("2d");
+  var W=cv.width,H=cv.height, ox=W/2, oy=H/2;
+  // scale to fit vectors
+  var maxc=Math.max(1,Math.abs(a),Math.abs(b),Math.abs(a+b),Math.abs(c),Math.abs(d),Math.abs(c+d));
+  var sc=(Math.min(W,H)/2-30)/maxc;
+  function px(x){return ox+x*sc;} function py(y){return oy-y*sc;}
+  ctx.clearRect(0,0,W,H);
+  // grid
+  ctx.strokeStyle="#2d3750"; ctx.lineWidth=1;
+  for(var gx=-Math.ceil(maxc);gx<=Math.ceil(maxc);gx++){
+    ctx.beginPath();ctx.moveTo(px(gx),0);ctx.lineTo(px(gx),H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,py(gx));ctx.lineTo(W,py(gx));ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle="#657191"; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(W,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,0);ctx.lineTo(ox,H);ctx.stroke();
+  // parallelogram O, u, u+v, v  where u=(a,c), v=(b,d)
+  var ux=a,uy=c, vx=b,vy=d;
+  ctx.beginPath();
+  ctx.moveTo(px(0),py(0));
+  ctx.lineTo(px(ux),py(uy));
+  ctx.lineTo(px(ux+vx),py(uy+vy));
+  ctx.lineTo(px(vx),py(vy));
+  ctx.closePath();
+  ctx.fillStyle="rgba(111,199,255,.20)"; ctx.fill();
+  ctx.strokeStyle="#6fc7ff"; ctx.lineWidth=2; ctx.stroke();
+  // vectors
+  function arrow(x,y,col){
+    ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(px(0),py(0));ctx.lineTo(px(x),py(y));ctx.stroke();
+    var ang=Math.atan2(-(py(y)-py(0)),px(x)-px(0));
+    ctx.beginPath();
+    ctx.moveTo(px(x),py(y));
+    ctx.lineTo(px(x)-10*Math.cos(ang-0.4),py(y)+10*Math.sin(ang-0.4));
+    ctx.lineTo(px(x)-10*Math.cos(ang+0.4),py(y)+10*Math.sin(ang+0.4));
+    ctx.closePath();ctx.fill();
+  }
+  arrow(ux,uy,"#5fd68b");
+  arrow(vx,vy,"#ffb454");
+  ctx.font="13px system-ui";
+  ctx.fillStyle="#5fd68b"; ctx.fillText("u=("+fmt(a)+","+fmt(c)+")",px(ux)+4,py(uy)-4);
+  ctx.fillStyle="#ffb454"; ctx.fillText("v=("+fmt(b)+","+fmt(d)+")",px(vx)+4,py(vy)-4);
+  var area=Math.abs(D);
+  var msg;
+  if(Math.abs(D)<1e-9){
+    msg='<div class="step"><span class="neg">det = 0</span> → the column vectors are collinear, so the parallelogram is degenerate (area = 0).</div>';
+  } else {
+    msg='<div class="step">The two columns span a parallelogram whose signed area is det.</div>';
+  }
+  res.innerHTML=
+    '<div class="mono">det = ('+fmt(a)+')('+fmt(d)+') − ('+fmt(b)+')('+fmt(c)+') = '+fmt(D)+'</div>'+
+    '<div>Area = |det| = <span class="big">'+fmt(area)+'</span></div>'+msg;
+}
+
+/* ================= CRAMER ================= */
+var sSize=2;
+var sDef2={A:[[2,1],[1,-1]],B:[3,0]};
+var sDef3={A:[[1,1,1],[0,2,5],[2,5,-1]],B:[6,-4,27]};
+function renderSystem(){
+  var n=sSize, def=(n===2?sDef2:sDef3);
+  var wrap=document.getElementById("s-eqs");
+  wrap.innerHTML="";
+  var vars=["x","y","z"];
+  for(var i=0;i<n;i++){
+    var row=document.createElement("div");
+    row.style.cssText="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px";
+    var html="";
+    for(var j=0;j<n;j++){
+      html+='<input class="tin s-a" data-i="'+i+'" data-j="'+j+'" style="width:52px;text-align:center" value="'+def.A[i][j]+'"> '+
+        '<span class="mono">'+vars[j]+'</span>'+(j<n-1?' <span class="mono">+</span> ':'');
+    }
+    html+=' <span class="mono">=</span> <input class="tin s-b" data-i="'+i+'" style="width:52px;text-align:center" value="'+def.B[i]+'">';
+    row.innerHTML=html;
+    wrap.appendChild(row);
+  }
+  wrap.querySelectorAll("input").forEach(function(inp){inp.addEventListener("input",solveSystem);});
+  solveSystem();
+}
+document.querySelectorAll("#apps .seg button[data-sys]").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#apps .seg button[data-sys]").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active"); sSize=+b.dataset.sys; renderSystem();
+  });
+});
+function detN(M){
+  var n=M.length;
+  if(n===2) return det2(M[0][0],M[0][1],M[1][0],M[1][1]);
+  // 3x3 expansion along row 0
+  var s=0;
+  for(var j=0;j<3;j++){
+    var sign=(j%2===0)?1:-1;
+    var cols=[0,1,2].filter(function(x){return x!==j;});
+    var mm=det2(M[1][cols[0]],M[1][cols[1]],M[2][cols[0]],M[2][cols[1]]);
+    s+=sign*M[0][j]*mm;
+  }
+  return s;
+}
+function replaceCol(A,B,col){
+  return A.map(function(row,i){ return row.map(function(v,j){ return j===col?B[i]:v; }); });
+}
+function solveSystem(){
+  var n=sSize, wrap=document.getElementById("s-eqs");
+  var A=[], B=[];
+  for(var i=0;i<n;i++){A.push([]);for(var j=0;j<n;j++)A[i].push(0);B.push(0);}
+  wrap.querySelectorAll(".s-a").forEach(function(inp){A[+inp.dataset.i][+inp.dataset.j]=parseNum(inp.value);});
+  wrap.querySelectorAll(".s-b").forEach(function(inp){B[+inp.dataset.i]=parseNum(inp.value);});
+  var res=document.getElementById("s-res");
+  var bad=false; A.forEach(function(r){r.forEach(function(v){if(!isFinite(v))bad=true;});}); B.forEach(function(v){if(!isFinite(v))bad=true;});
+  if(bad){res.innerHTML='<span class="neg">Enter valid numbers.</span>';return;}
+  var D=detN(A);
+  var vars=["x","y","z"];
+  var html='<div class="mono">Δ = det(A) = '+fmt(D)+'</div>';
+  if(Math.abs(D)<1e-9){
+    html+='<div class="step"><span class="neg">Δ = 0</span> → Cramer\'s rule does not apply (no unique solution: the system is either inconsistent or has infinitely many solutions).</div>';
+    res.innerHTML=html; return;
+  }
+  for(var k=0;k<n;k++){
+    var Dk=detN(replaceCol(A,B,k));
+    html+='<div class="step mono">Δ'+vars[k]+' = '+fmt(Dk)+'  →  '+vars[k]+' = Δ'+vars[k]+'/Δ = '+fmt(Dk)+'/'+fmt(D)+' = <b>'+fmt(Dk/D)+'</b></div>';
+  }
+  res.innerHTML=html;
+}
+
+/* ================= TRIANGLE ================= */
+var triDef=[[1,1],[4,1],[2,5]];
+function renderTri(){
+  var box=document.getElementById("tri-inputs");
+  box.innerHTML="";
+  var labs=["A","B","C"];
+  for(var i=0;i<3;i++){
+    var d=document.createElement("div");
+    d.innerHTML='<label class="fld">Vertex '+labs[i]+' (x, y)</label>'+
+      '<input class="tin tri-x" data-i="'+i+'" style="width:60px;text-align:center" value="'+triDef[i][0]+'"> '+
+      '<input class="tin tri-y" data-i="'+i+'" style="width:60px;text-align:center" value="'+triDef[i][1]+'">';
+    box.appendChild(d);
+  }
+  box.querySelectorAll("input").forEach(function(inp){inp.addEventListener("input",solveTri);});
+  solveTri();
+}
+function solveTri(){
+  var box=document.getElementById("tri-inputs");
+  var x=[0,0,0],y=[0,0,0];
+  box.querySelectorAll(".tri-x").forEach(function(inp){x[+inp.dataset.i]=parseNum(inp.value);});
+  box.querySelectorAll(".tri-y").forEach(function(inp){y[+inp.dataset.i]=parseNum(inp.value);});
+  var res=document.getElementById("tri-res");
+  if(x.concat(y).some(function(v){return !isFinite(v);})){res.innerHTML='<span class="neg">Enter valid numbers.</span>';return;}
+  var det=x[0]*(y[1]-y[2])+x[1]*(y[2]-y[0])+x[2]*(y[0]-y[1]);
+  var area=Math.abs(det)/2;
+  var html='<div class="mono">det = x₁(y₂−y₃)+x₂(y₃−y₁)+x₃(y₁−y₂) = '+fmt(det)+'</div>'+
+    '<div>Area = ½|det| = <span class="big">'+fmt(area)+'</span></div>';
+  if(Math.abs(det)<1e-9) html+='<div class="step"><span class="neg">Area = 0</span> → the three points are collinear.</div>';
+  res.innerHTML=html;
+}
+
+/* ================= QUIZ ================= */
+var QUIZ=[
+  {q:"What is the determinant of [[2, 3],[1, 4]]?",
+   opts:["5","11","8","−5"], ans:0,
+   ex:"ad − bc = (2)(4) − (3)(1) = 8 − 3 = 5."},
+  {q:"For a 2×2 matrix, det = 0 means the two column vectors are…",
+   opts:["Perpendicular","Collinear (parallel)","Unit length","Always equal"], ans:1,
+   ex:"det = 0 ⇒ zero parallelogram area ⇒ the columns are parallel/collinear."},
+  {q:"In Cramer's rule, x equals…",
+   opts:["Δ/Δx","Δx·Δ","Δx/Δ","Δ − Δx"], ans:2,
+   ex:"x = Δx/Δ, where Δx replaces the x-column of A by the constants B (and Δ ≠ 0)."}
+];
+(function buildQuiz(){
+  var box=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var h='<p>'+(qi+1)+'. '+item.q+'</p>';
+    item.opts.forEach(function(o,oi){
+      h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+    });
+    h+='<div class="expl" id="ex-'+qi+'">'+item.ex+'</div>';
+    d.innerHTML=h;
+    box.appendChild(d);
+  });
+  box.querySelectorAll(".opt").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var qi=+btn.dataset.q, oi=+btn.dataset.o, item=QUIZ[qi];
+      var opts=btn.parentNode.querySelectorAll(".opt");
+      opts.forEach(function(o){o.classList.remove("correct","wrong");});
+      if(oi===item.ans){ btn.classList.add("correct"); }
+      else { btn.classList.add("wrong"); opts[item.ans].classList.add("correct"); }
+      document.getElementById("ex-"+qi).classList.add("show");
+    });
+  });
+})();
+
+/* init */
+renderCompute();
+renderGeo();
+renderSystem();
+renderTri();
+</script>
+</body>
+</html>

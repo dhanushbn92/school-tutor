@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limits &amp; Continuity Lab — NIOS Class 12 Maths (Ch 25)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#1a2032;
+    --panel2:#232b40;
+    --ink:#e9edf8;
+    --muted:#9aa5bd;
+    --accent:#59c2ff;
+    --accent-soft:rgba(89,194,255,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffce6b;
+    --line:#2d3750;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 30%;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px;color:var(--ink)}
+  .hide{display:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--accent);font-weight:600}
+
+  select{width:100%;min-height:44px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;padding:0 10px;font-size:.95rem}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:none}
+
+  table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+  th,td{padding:5px 6px;text-align:right;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600}
+  td:first-child,th:first-child{text-align:left}
+  .mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,"Cascadia Code",Consolas,monospace}
+
+  .stat{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .chip{flex:1 1 140px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+  .chip .k{font-size:.74rem;color:var(--muted)}
+  .chip .v{font-size:1.02rem;font-weight:700;margin-top:2px}
+  .v.good{color:var(--good)} .v.bad{color:var(--bad)} .v.warn{color:var(--warn)} .v.acc{color:var(--accent)}
+
+  .verdict{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel2);font-size:.92rem}
+  .verdict b{color:var(--accent)}
+
+  .facts{font-size:.86rem}
+  .facts li{margin:5px 0 5px 18px}
+  .facts code{background:var(--panel2);padding:1px 5px;border-radius:6px;color:var(--warn)}
+
+  .quiz .q{margin-bottom:14px}
+  .quiz .q p{font-weight:600;margin-bottom:6px}
+  .quiz .opts button{display:block;width:100%;text-align:left;margin:5px 0;min-height:42px;
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    padding:8px 12px;cursor:pointer;font-size:.9rem;touch-action:manipulation}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.16);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{font-size:.83rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:42px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;padding:0 10px;touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Limits &amp; Continuity</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch 25 — Limits and Continuity</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="explore">Limit Explorer</button>
+    <button class="tab-btn" data-tab="special">Special Cases</button>
+    <button class="tab-btn" data-tab="cont">Continuity Checker</button>
+  </div>
+
+  <!-- ============ LIMIT EXPLORER ============ -->
+  <section id="explore" class="tab">
+    <div class="panel">
+      <h2>Limit Explorer</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Function f(x)</label>
+          <select id="ex-fn">
+            <option value="poly">f(x) = x² + 1</option>
+            <option value="lin">f(x) = 2x − 3</option>
+            <option value="recip">f(x) = 1 / x</option>
+            <option value="root">f(x) = √x</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Approach point a = <span class="val" id="ex-aVal">1</span></label>
+          <input type="range" id="ex-a" min="-3" max="4" step="0.5" value="1">
+        </div>
+        <div class="ctrl">
+          <label>Distance from a: |x − a| = <span class="val" id="ex-hVal">0.5000</span></label>
+          <input type="range" id="ex-h" min="0" max="1" step="1" value="0">
+        </div>
+      </div>
+      <canvas id="ex-canvas" width="900" height="440"></canvas>
+      <div class="stat">
+        <div class="chip"><div class="k">Left-hand limit  f(a⁻)</div><div class="v acc" id="ex-lhl">–</div></div>
+        <div class="chip"><div class="k">Right-hand limit f(a⁺)</div><div class="v acc" id="ex-rhl">–</div></div>
+        <div class="chip"><div class="k">Limit L (x→a)</div><div class="v" id="ex-lim">–</div></div>
+      </div>
+      <div class="verdict" id="ex-verdict"></div>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+        <div style="flex:1 1 240px">
+          <h3>x → a⁻ (from the left)</h3>
+          <table><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody id="ex-tblL"></tbody></table>
+        </div>
+        <div style="flex:1 1 240px">
+          <h3>x → a⁺ (from the right)</h3>
+          <table><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody id="ex-tblR"></tbody></table>
+        </div>
+      </div>
+      <p class="note">The dashed vertical line sits at x = a. Blue dots on the left and right march toward a; watch both f-columns close in on the same value L.</p>
+    </div>
+  </section>
+
+  <!-- ============ SPECIAL CASES ============ -->
+  <section id="special" class="tab hide">
+    <div class="panel">
+      <h2>Special Cases</h2>
+      <div class="seg" id="sp-seg">
+        <button class="on" data-sp="removable">Removable hole</button>
+        <button data-sp="jump">Jump</button>
+        <button data-sp="sinc">lim sin x / x = 1</button>
+      </div>
+      <canvas id="sp-canvas" width="900" height="440" style="margin-top:12px"></canvas>
+      <div class="verdict" id="sp-verdict"></div>
+      <div class="stat">
+        <div class="chip"><div class="k">LHL</div><div class="v acc" id="sp-lhl">–</div></div>
+        <div class="chip"><div class="k">RHL</div><div class="v acc" id="sp-rhl">–</div></div>
+        <div class="chip"><div class="k">Limit exists?</div><div class="v" id="sp-ex">–</div></div>
+      </div>
+      <table style="margin-top:12px"><thead><tr><th>x → a</th><th>f(x)</th></tr></thead><tbody id="sp-tbl"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ============ CONTINUITY CHECKER ============ -->
+  <section id="cont" class="tab hide">
+    <div class="panel">
+      <h2>Continuity Checker</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Function</label>
+          <select id="ct-fn">
+            <option value="cont">f(x) = x² − 2x   (smooth)</option>
+            <option value="removable">f(x) = (x²−1)/(x−1)  at x=1</option>
+            <option value="jump">Step / sign jump  at x=0</option>
+            <option value="infinite">f(x) = 1/(x−1)  at x=1</option>
+            <option value="piece">Piecewise (tune k to fix)</option>
+          </select>
+        </div>
+        <div class="ctrl">
+          <label>Check point a = <span class="val" id="ct-aVal">1</span></label>
+          <input type="range" id="ct-a" min="-2" max="3" step="0.5" value="1">
+        </div>
+        <div class="ctrl" id="ct-kwrap">
+          <label>Parameter k = <span class="val" id="ct-kVal">2</span></label>
+          <input type="range" id="ct-k" min="-2" max="6" step="0.5" value="2">
+        </div>
+      </div>
+      <canvas id="ct-canvas" width="900" height="440"></canvas>
+      <div class="stat">
+        <div class="chip"><div class="k">1 · f(a) defined?</div><div class="v" id="ct-c1">–</div></div>
+        <div class="chip"><div class="k">2 · limit exists? (LHL=RHL)</div><div class="v" id="ct-c2">–</div></div>
+        <div class="chip"><div class="k">3 · limit = f(a)?</div><div class="v" id="ct-c3">–</div></div>
+      </div>
+      <div class="verdict" id="ct-verdict"></div>
+      <p class="note" id="ct-hint"></p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel facts">
+    <h2>Facts &amp; Formulas</h2>
+    <ul>
+      <li><b>Limit:</b> <code>lim x→a f(x) = L</code> means f(x) gets arbitrarily close to L as x nears a (from either side), x ≠ a.</li>
+      <li><b>LHL &amp; RHL:</b> the limit exists only if the left-hand limit <code>f(a⁻)</code> equals the right-hand limit <code>f(a⁺)</code>.</li>
+      <li><b>Continuity at a</b> needs all three: (1) f(a) is defined, (2) <code>lim x→a f(x)</code> exists, (3) the limit equals <code>f(a)</code>.</li>
+      <li><b>Removable</b> discontinuity: limit exists but ≠ f(a) (or f(a) undefined) — a single "hole".</li>
+      <li><b>Jump:</b> LHL ≠ RHL, both finite. <b>Infinite:</b> f blows up (a vertical asymptote).</li>
+      <li><b>Standard limits:</b> <code>lim x→0 (sin x)/x = 1</code>, <code>lim x→0 (1−cos x)/x = 0</code>, <code>lim x→0 (eˣ−1)/x = 1</code>, <code>lim x→a (xⁿ−aⁿ)/(x−a) = n·aⁿ⁻¹</code>.</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick Quiz</h2>
+    <div class="q" data-a="1">
+      <p>1. For f(x) = (x²−1)/(x−1), what is lim x→1 f(x)?</p>
+      <div class="opts">
+        <button>Does not exist</button>
+        <button>2</button>
+        <button>0</button>
+        <button>1</button>
+      </div>
+      <div class="exp">Factor: (x²−1)/(x−1) = (x+1) for x≠1, so the limit is 1+1 = 2. There is a removable hole at x=1.</div>
+    </div>
+    <div class="q" data-a="2">
+      <p>2. If LHL = 3 and RHL = 5 at x = a, then at x = a the function has a…</p>
+      <div class="opts">
+        <button>Removable discontinuity</button>
+        <button>Infinite discontinuity</button>
+        <button>Jump discontinuity</button>
+        <button>Continuous point</button>
+      </div>
+      <div class="exp">Both one-sided limits are finite but unequal (3 ≠ 5), so the limit fails to exist — a jump discontinuity.</div>
+    </div>
+    <div class="q" data-a="0">
+      <p>3. The value of lim x→0 (sin x)/x is:</p>
+      <div class="opts">
+        <button>1</button>
+        <button>0</button>
+        <button>∞</button>
+        <button>Undefined</button>
+      </div>
+      <div class="exp">This is a standard limit: lim x→0 (sin x)/x = 1 (with x in radians).</div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+var fmt = function(v){ if(v===null||v===undefined||!isFinite(v)) return "—"; return (Math.round(v*10000)/10000).toString(); };
+var fmt2 = function(v){ if(!isFinite(v)) return "—"; return v.toFixed(4); };
+
+/* ---------- Tabs ---------- */
+var tabBtns = document.querySelectorAll('.tab-btn');
+tabBtns.forEach(function(b){
+  b.addEventListener('click', function(){
+    tabBtns.forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    document.querySelectorAll('.tab').forEach(function(s){s.classList.add('hide');});
+    document.getElementById(b.dataset.tab).classList.remove('hide');
+  });
+});
+
+/* ---------- Generic plotter ---------- */
+function makePlot(canvas){
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  return function draw(opts){
+    // opts: xmin,xmax,ymin,ymax, curves:[{f, seg:[from,to], color}], marks:[{x,y,type,color}], vline:a
+    var xmin=opts.xmin, xmax=opts.xmax, ymin=opts.ymin, ymax=opts.ymax;
+    var padL=40, padB=28, padT=14, padR=14;
+    var pw = W-padL-padR, ph = H-padT-padB;
+    var X = function(x){ return padL + (x-xmin)/(xmax-xmin)*pw; };
+    var Y = function(y){ return padT + (ymax-y)/(ymax-ymin)*ph; };
+    ctx.clearRect(0,0,W,H);
+    // grid
+    ctx.strokeStyle="#2d3750"; ctx.fillStyle="#7c88a6"; ctx.lineWidth=1;
+    ctx.font="12px system-ui"; ctx.textAlign="center"; ctx.textBaseline="top";
+    var stepX = niceStep(xmax-xmin);
+    for(var gx=Math.ceil(xmin/stepX)*stepX; gx<=xmax+1e-9; gx+=stepX){
+      var px=X(gx);
+      ctx.beginPath(); ctx.moveTo(px,padT); ctx.lineTo(px,padT+ph); ctx.stroke();
+      if(Math.abs(gx)>1e-9) ctx.fillText(fmt(gx), px, padT+ph+4);
+    }
+    ctx.textAlign="right"; ctx.textBaseline="middle";
+    var stepY = niceStep(ymax-ymin);
+    for(var gy=Math.ceil(ymin/stepY)*stepY; gy<=ymax+1e-9; gy+=stepY){
+      var py=Y(gy);
+      ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(padL+pw,py); ctx.stroke();
+      if(Math.abs(gy)>1e-9) ctx.fillText(fmt(gy), padL-4, py);
+    }
+    // axes
+    ctx.strokeStyle="#59688a"; ctx.lineWidth=1.4;
+    if(0>=ymin&&0<=ymax){ ctx.beginPath(); ctx.moveTo(padL,Y(0)); ctx.lineTo(padL+pw,Y(0)); ctx.stroke(); }
+    if(0>=xmin&&0<=xmax){ ctx.beginPath(); ctx.moveTo(X(0),padT); ctx.lineTo(X(0),padT+ph); ctx.stroke(); }
+    // vline
+    if(opts.vline!==undefined){
+      ctx.save(); ctx.setLineDash([6,5]); ctx.strokeStyle="#ffce6b"; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(X(opts.vline),padT); ctx.lineTo(X(opts.vline),padT+ph); ctx.stroke();
+      ctx.restore();
+    }
+    // curves
+    (opts.curves||[]).forEach(function(c){
+      ctx.strokeStyle=c.color||"#59c2ff"; ctx.lineWidth=2.4; ctx.beginPath();
+      var started=false, N=600;
+      var lo=c.seg[0], hi=c.seg[1];
+      for(var i=0;i<=N;i++){
+        var x=lo+(hi-lo)*i/N;
+        var y=c.f(x);
+        if(!isFinite(y)||y<ymin-8||y>ymax+8){ started=false; continue; }
+        var px=X(x), py=Y(y);
+        if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+    });
+    // marks
+    (opts.marks||[]).forEach(function(m){
+      var px=X(m.x), py=Y(m.y);
+      ctx.lineWidth=2;
+      if(m.type==='open'){
+        ctx.fillStyle="#1a2032"; ctx.strokeStyle=m.color||"#ff7b7b";
+        ctx.beginPath(); ctx.arc(px,py,6,0,7); ctx.fill(); ctx.stroke();
+      } else if(m.type==='filled'){
+        ctx.fillStyle=m.color||"#5fd68b";
+        ctx.beginPath(); ctx.arc(px,py,6,0,7); ctx.fill();
+      } else { // dot
+        ctx.fillStyle=m.color||"#59c2ff";
+        ctx.beginPath(); ctx.arc(px,py,4.5,0,7); ctx.fill();
+      }
+    });
+  };
+}
+function niceStep(range){
+  var raw=range/8, p=Math.pow(10,Math.floor(Math.log(raw)/Math.LN10));
+  var n=raw/p; var s = n<1.5?1:n<3?2:n<7?5:10;
+  return s*p;
+}
+
+/* ================= LIMIT EXPLORER ================= */
+(function(){
+  var draw = makePlot(document.getElementById('ex-canvas'));
+  var fns = {
+    poly:{f:function(x){return x*x+1;}, name:"x² + 1", dom:function(){return true;}},
+    lin:{f:function(x){return 2*x-3;}, name:"2x − 3", dom:function(){return true;}},
+    recip:{f:function(x){return 1/x;}, name:"1 / x", dom:function(x){return Math.abs(x)>1e-9;}},
+    root:{f:function(x){return Math.sqrt(x);}, name:"√x", dom:function(x){return x>=0;}}
+  };
+  var selFn=document.getElementById('ex-fn'), aR=document.getElementById('ex-a'), hR=document.getElementById('ex-h');
+  var seq=[0.5,0.2,0.1,0.05,0.01]; // approach distances (independent of the coarse slider)
+  function render(){
+    var key=selFn.value, fn=fns[key], a=parseFloat(aR.value);
+    document.getElementById('ex-aVal').textContent=a;
+    // slider chooses starting closeness index for the animation feel
+    var hIdx=parseInt(hR.value,10); // 0 or 1 -> maps to start of sequence
+    document.getElementById('ex-hVal').textContent = fmt2(seq[0]);
+    // range
+    var xmin=a-3, xmax=a+3;
+    // determine y-range from samples
+    var ys=[]; for(var i=0;i<=60;i++){var x=xmin+(xmax-xmin)*i/60; if(fn.dom(x)){var y=fn.f(x); if(isFinite(y))ys.push(y);}}
+    var ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
+    if(!isFinite(ymin)){ymin=-5;ymax=5;}
+    var pad=(ymax-ymin)*0.2+0.5; ymin-=pad; ymax+=pad;
+    // one-sided limits by evaluation near a
+    var lhl = fn.dom(a-1e-6)? fn.f(a-1e-6): NaN;
+    var rhl = fn.dom(a+1e-6)? fn.f(a+1e-6): NaN;
+    // build tables
+    var tblL=document.getElementById('ex-tblL'), tblR=document.getElementById('ex-tblR');
+    tblL.innerHTML=""; tblR.innerHTML="";
+    seq.forEach(function(h){
+      var xl=a-h, xr=a+h;
+      var rowL=document.createElement('tr');
+      rowL.innerHTML="<td class='mono'>"+fmt2(xl)+"</td><td class='mono'>"+(fn.dom(xl)?fmt2(fn.f(xl)):"—")+"</td>";
+      tblL.appendChild(rowL);
+      var rowR=document.createElement('tr');
+      rowR.innerHTML="<td class='mono'>"+fmt2(xr)+"</td><td class='mono'>"+(fn.dom(xr)?fmt2(fn.f(xr)):"—")+"</td>";
+      tblR.appendChild(rowR);
+    });
+    // marks: dots marching in
+    var marks=[];
+    seq.forEach(function(h,idx){
+      var alpha=1;
+      if(fn.dom(a-h)) marks.push({x:a-h,y:fn.f(a-h),type:'dot',color:"#59c2ff"});
+      if(fn.dom(a+h)) marks.push({x:a+h,y:fn.f(a+h),type:'dot',color:"#5fd68b"});
+    });
+    // limit exists?
+    var exists = isFinite(lhl)&&isFinite(rhl)&&Math.abs(lhl-rhl)<1e-4;
+    var L = exists? (lhl+rhl)/2 : NaN;
+    if(exists && fn.dom(a)) marks.push({x:a,y:fn.f(a),type:'filled',color:"#ffce6b"});
+    else if(exists) marks.push({x:a,y:L,type:'open',color:"#ffce6b"});
+    draw({xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,vline:a,
+      curves:[{f:fn.f, seg:[xmin,xmax], color:"#59c2ff"}], marks:marks});
+    document.getElementById('ex-lhl').textContent=isFinite(lhl)?fmt(lhl):"—";
+    document.getElementById('ex-rhl').textContent=isFinite(rhl)?fmt(rhl):"—";
+    var limEl=document.getElementById('ex-lim');
+    if(exists){limEl.textContent=fmt(L); limEl.className="v good";}
+    else {limEl.textContent="does not exist"; limEl.className="v bad";}
+    var vd=document.getElementById('ex-verdict');
+    if(!fn.dom(a)){
+      vd.innerHTML="At a = "+a+", f(x) = "+fn.name+" is <b>undefined here</b> (e.g. 1/x at 0), but the two-sided limit "+(exists?("still equals <b>"+fmt(L)+"</b>."):"<b>does not exist</b> (sides disagree or diverge).");
+    } else if(exists){
+      vd.innerHTML="LHL = RHL = <b>"+fmt(L)+"</b>, so <b>lim x→"+a+" "+fn.name+" = "+fmt(L)+"</b>. The limit exists.";
+    } else {
+      vd.innerHTML="LHL ("+fmt(lhl)+") ≠ RHL ("+fmt(rhl)+"), so the limit <b>does not exist</b> at x = "+a+".";
+    }
+  }
+  [selFn,aR,hR].forEach(function(el){el.addEventListener('input',render);});
+  render();
+})();
+
+/* ================= SPECIAL CASES ================= */
+(function(){
+  var draw=makePlot(document.getElementById('sp-canvas'));
+  var mode='removable';
+  document.querySelectorAll('#sp-seg button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#sp-seg button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); mode=b.dataset.sp; render();
+    });
+  });
+  function render(){
+    var vd=document.getElementById('sp-verdict'), tbl=document.getElementById('sp-tbl');
+    tbl.innerHTML="";
+    var lhl,rhl,L,exists,a,opts;
+    if(mode==='removable'){
+      a=1;
+      var f=function(x){return (x*x-1)/(x-1);}; // = x+1, hole at 1
+      lhl=2; rhl=2; exists=true; L=2;
+      opts={xmin:-2,xmax:4,ymin:-2,ymax:6,vline:1,
+        curves:[{f:function(x){return x+1;},seg:[-2,4],color:"#59c2ff"}],
+        marks:[{x:1,y:2,type:'open',color:"#ff7b7b"}]};
+      vd.innerHTML="<b>Removable discontinuity.</b> (x²−1)/(x−1) = x+1 for x≠1, so LHL = RHL = <b>2</b>. The limit exists (=2) but f(1) is undefined — a single hole you could 'fill'.";
+      [0.5,0.2,0.1,0.05,0.01].forEach(function(h){
+        addRow(tbl, "1−"+h+" & 1+"+h, fmt2(f(1-h))+" , "+fmt2(f(1+h)));
+      });
+    } else if(mode==='jump'){
+      a=0;
+      var f=function(x){return x<0? x-1 : x+2;}; // LHL=-1, RHL=2
+      lhl=-1; rhl=2; exists=false;
+      opts={xmin:-3,xmax:3,ymin:-4,ymax:5,vline:0,
+        curves:[{f:function(x){return x-1;},seg:[-3,0],color:"#59c2ff"},
+                {f:function(x){return x+2;},seg:[0,3],color:"#5fd68b"}],
+        marks:[{x:0,y:-1,type:'open',color:"#59c2ff"},{x:0,y:2,type:'filled',color:"#5fd68b"}]};
+      vd.innerHTML="<b>Jump discontinuity.</b> LHL = <b>−1</b>, RHL = <b>2</b>. Both finite but unequal, so lim x→0 f(x) <b>does not exist</b>. The graph 'jumps'.";
+      [0.5,0.2,0.1,0.05,0.01].forEach(function(h){
+        addRow(tbl,"0−"+h+" & 0+"+h, fmt2(f(-h))+" , "+fmt2(f(h)));
+      });
+    } else { // sinc
+      a=0;
+      var f=function(x){ return Math.abs(x)<1e-9? 1 : Math.sin(x)/x; };
+      lhl=1; rhl=1; exists=true; L=1;
+      opts={xmin:-8,xmax:8,ymin:-0.5,ymax:1.4,vline:0,
+        curves:[{f:function(x){return Math.abs(x)<1e-6?1:Math.sin(x)/x;},seg:[-8,8],color:"#59c2ff"}],
+        marks:[{x:0,y:1,type:'open',color:"#ffce6b"}]};
+      vd.innerHTML="<b>Standard limit.</b> sin(x)/x is undefined at x=0 (0/0), yet as x→0 both sides approach <b>1</b>: lim x→0 (sin x)/x = <b>1</b> (x in radians).";
+      [0.5,0.2,0.1,0.05,0.01].forEach(function(h){
+        addRow(tbl,"±"+h, fmt2(f(h)));
+      });
+    }
+    draw(opts);
+    document.getElementById('sp-lhl').textContent=fmt(lhl);
+    document.getElementById('sp-rhl').textContent=fmt(rhl);
+    var e=document.getElementById('sp-ex');
+    e.textContent = exists? "Yes, L = "+fmt(lhl):"No";
+    e.className = exists? "v good":"v bad";
+  }
+  function addRow(tbl,x,fx){var r=document.createElement('tr');r.innerHTML="<td class='mono'>"+x+"</td><td class='mono'>"+fx+"</td>";tbl.appendChild(r);}
+  render();
+})();
+
+/* ================= CONTINUITY CHECKER ================= */
+(function(){
+  var draw=makePlot(document.getElementById('ct-canvas'));
+  var selFn=document.getElementById('ct-fn'), aR=document.getElementById('ct-a'),
+      kR=document.getElementById('ct-k'), kWrap=document.getElementById('ct-kwrap');
+  function render(){
+    var key=selFn.value, a=parseFloat(aR.value), k=parseFloat(kR.value);
+    document.getElementById('ct-aVal').textContent=a;
+    document.getElementById('ct-kVal').textContent=k;
+    kWrap.style.display = key==='piece'? "" : "none";
+    aR.disabled = (key!=='cont' && key!=='piece'); // fixed points for the special demos
+
+    var model = build(key,a,k);
+    a = model.a; document.getElementById('ct-aVal').textContent=a;
+    draw(model.plot);
+
+    setChip('ct-c1', model.c1, model.c1?"f(a) = "+fmt(model.fa):"undefined");
+    setChip('ct-c2', model.c2, model.c2?"L = "+fmt(model.L):"no (LHL≠RHL / ∞)");
+    setChip('ct-c3', model.c3, model.c3?"L = f(a)":"L ≠ f(a)");
+    document.getElementById('ct-verdict').innerHTML = model.verdict;
+    document.getElementById('ct-hint').textContent = model.hint||"";
+  }
+  function setChip(id,ok,txt){
+    var el=document.getElementById(id);
+    el.textContent=(ok?"✓ ":"✗ ")+txt;
+    el.className="v "+(ok?"good":"bad");
+  }
+  function build(key,a,k){
+    if(key==='cont'){
+      var f=function(x){return x*x-2*x;};
+      var fa=f(a), L=f(a);
+      return {a:a,fa:fa,L:L,c1:true,c2:true,c3:true,
+        plot:{xmin:a-3,xmax:a+3,ymin:Math.min(-2,fa-4),ymax:Math.max(4,fa+4),vline:a,
+          curves:[{f:f,seg:[a-3,a+3],color:"#59c2ff"}],marks:[{x:a,y:fa,type:'filled',color:"#5fd68b"}]},
+        verdict:"<b>Continuous at x = "+a+".</b> A polynomial is continuous everywhere: f(a) exists, the limit exists, and both equal "+fmt(fa)+".",
+        hint:"Try any point — polynomials pass all three tests at every real x."};
+    }
+    if(key==='removable'){
+      a=1;
+      var f=function(x){return x+1;}; // limit form
+      var L=2, fa=null;
+      return {a:a,fa:fa,L:L,c1:false,c2:true,c3:false,
+        plot:{xmin:-2,xmax:4,ymin:-2,ymax:6,vline:1,
+          curves:[{f:f,seg:[-2,4],color:"#59c2ff"}],marks:[{x:1,y:2,type:'open',color:"#ff7b7b"}]},
+        verdict:"<b>Removable discontinuity at x = 1.</b> Limit = 2 exists, but f(1) is undefined (0/0). Test 1 fails, so f is discontinuous — yet 'removable' by defining f(1)=2.",
+        hint:"Redefining f(1)=2 would plug the hole and make f continuous."};
+    }
+    if(key==='jump'){
+      a=0;
+      var f=function(x){return x<0? -1 : 1;}; // sign-like, f(0)=1
+      var fa=1, lhl=-1, rhl=1;
+      return {a:a,fa:fa,L:null,c1:true,c2:false,c3:false,
+        plot:{xmin:-3,xmax:3,ymin:-2.5,ymax:2.5,vline:0,
+          curves:[{f:function(x){return -1;},seg:[-3,0],color:"#59c2ff"},
+                  {f:function(x){return 1;},seg:[0,3],color:"#5fd68b"}],
+          marks:[{x:0,y:-1,type:'open',color:"#59c2ff"},{x:0,y:1,type:'filled',color:"#5fd68b"}]},
+        verdict:"<b>Jump discontinuity at x = 0.</b> f(0) = 1 is defined, but LHL = −1 ≠ RHL = 1, so the limit does not exist. Test 2 fails.",
+        hint:"No single value of f(0) can fix a jump — the two sides disagree."};
+    }
+    if(key==='infinite'){
+      a=1;
+      var f=function(x){return 1/(x-1);};
+      return {a:a,fa:null,L:null,c1:false,c2:false,c3:false,
+        plot:{xmin:-1,xmax:3,ymin:-8,ymax:8,vline:1,
+          curves:[{f:f,seg:[-1,0.98],color:"#59c2ff"},{f:f,seg:[1.02,3],color:"#59c2ff"}],marks:[]},
+        verdict:"<b>Infinite discontinuity at x = 1.</b> f(1) is undefined and f → −∞ from the left, +∞ from the right (a vertical asymptote). No finite limit.",
+        hint:"The graph shoots off to ±∞ near x = 1 — this cannot be removed."};
+    }
+    // piecewise: f(x)= x+3 for x<1 ; k for x=1 ; 2x+2 for x>1... make continuous when k=4 (both sides ->4)
+    a=1;
+    var lhl=1+3, rhl=2*1+2; // =4 and 4  -> limit 4, continuous iff k=4
+    var f=function(x){ if(x<1) return x+3; if(x>1) return 2*x+2; return k; };
+    var fa=k, L=4;
+    var c1=true, c2=Math.abs(lhl-rhl)<1e-9, c3=c2 && Math.abs(L-fa)<1e-9;
+    var marks=[{x:1,y:fa,type:'filled',color: c3?"#5fd68b":"#ff7b7b"}];
+    // show the two open-side approach values
+    marks.push({x:1,y:4,type:'open',color:"#ffce6b"});
+    var verdict, hint;
+    if(c3){
+      verdict="<b>Continuous at x = 1 ✓</b> Both branches approach 4 and you set f(1) = k = "+fmt(k)+" = 4. All three tests pass.";
+      hint="Perfect: LHL = RHL = f(1) = 4.";
+    } else {
+      verdict="<b>Discontinuous at x = 1.</b> LHL = RHL = 4 (limit exists), but f(1) = k = "+fmt(k)+" ≠ 4, so test 3 fails (removable).";
+      hint="Slide k to 4 to make f continuous — that matches the common limit of both branches.";
+    }
+    return {a:a,fa:fa,L:L,c1:c1,c2:c2,c3:c3,
+      plot:{xmin:-2,xmax:4,ymin:-1,ymax:9,vline:1,
+        curves:[{f:function(x){return x+3;},seg:[-2,1],color:"#59c2ff"},
+                {f:function(x){return 2*x+2;},seg:[1,4],color:"#5fd68b"}],
+        marks:marks},
+      verdict:verdict, hint:hint};
+  }
+  [selFn,aR,kR].forEach(function(el){el.addEventListener('input',render);});
+  render();
+})();
+
+/* ================= QUIZ ================= */
+document.querySelectorAll('#quiz .q').forEach(function(q){
+  var ans=parseInt(q.dataset.a,10);
+  var opts=q.querySelectorAll('.opts button');
+  var exp=q.querySelector('.exp');
+  opts.forEach(function(btn,i){
+    btn.addEventListener('click',function(){
+      opts.forEach(function(b){b.disabled=true;});
+      if(i===ans) btn.classList.add('correct');
+      else { btn.classList.add('wrong'); opts[ans].classList.add('correct'); }
+      exp.classList.add('show');
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inverse Trig Functions Lab — NIOS Class 12 Ch24</title>
+<style>
+  :root{
+    --bg:#12161f; --panel:#1b2231; --panel2:#222b3d; --ink:#e8edf6; --mut:#9aa8bf;
+    --accent:#5bd6c0; --accent-d:#2fae98; --line:#2e394f; --good:#7fe0a0; --bad:#f08a8a;
+    --grid:#2a344a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;padding:14px}
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--mut);font-size:.86rem;margin-bottom:12px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:9px 14px;border-radius:12px;cursor:pointer;font-size:.9rem;transition:.15s;flex:1 1 auto;min-width:120px}
+  .tab:hover{border-color:var(--accent-d)}
+  .tab.active{background:var(--accent);color:#0c1017;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .panel h2{margin:0 0 8px;font-size:1.05rem}
+  .panel h3{margin:14px 0 6px;font-size:.95rem;color:var(--accent)}
+  .mode{display:none}
+  .mode.active{display:block}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:manipulation}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+  .row>label{font-size:.85rem;color:var(--mut)}
+  select,input[type=text],input[type=number]{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:.9rem}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .chip{display:inline-flex;gap:6px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:.85rem;user-select:none}
+  .chip input{accent-color:var(--accent)}
+  button.act{background:var(--accent);color:#0c1017;border:none;border-radius:10px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:.9rem}
+  button.act:hover{background:var(--accent-d)}
+  button.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 16px;cursor:pointer;font-size:.9rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:620px){.grid2{grid-template-columns:1fr}}
+  .out{font-family:ui-monospace,Consolas,monospace;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:.9rem;white-space:pre-wrap}
+  .facts{font-size:.86rem}
+  .facts code{background:var(--panel2);padding:1px 6px;border-radius:6px;color:var(--accent)}
+  .facts li{margin:4px 0}
+  table.pv{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:6px}
+  table.pv th,table.pv td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  table.pv th{background:var(--panel2);color:var(--accent)}
+  .q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+  .q:first-of-type{border-top:none;padding-top:0;margin-top:0}
+  .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;font-size:.88rem}
+  .opt.correct{border-color:var(--good);background:rgba(127,224,160,.12)}
+  .opt.wrong{border-color:var(--bad);background:rgba(240,138,138,.12)}
+  .expl{font-size:.83rem;color:var(--mut);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .verdict{font-size:.9rem;font-weight:600;margin-top:8px}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);color:var(--mut);margin-left:6px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--mut);margin-top:6px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+  .note{font-size:.82rem;color:var(--mut)}
+</style>
+</head>
+<body>
+<h1>Inverse Trigonometric Functions Lab</h1>
+<div class="sub">NIOS Class 12 Mathematics · Chapter 24 — graphs, principal values, domain restriction, identities & quiz</div>
+
+<div class="tabs">
+  <button class="tab active" data-mode="graphs">Graphs &amp; Principal Values</button>
+  <button class="tab" data-mode="restrict">Why Restrict?</button>
+  <button class="tab" data-mode="ident">Identities</button>
+</div>
+
+<!-- ================= MODE 1: GRAPHS ================= -->
+<div class="mode active" id="m-graphs">
+  <div class="panel">
+    <h2>Graph of an inverse trig function</h2>
+    <div class="row">
+      <label>Function:</label>
+      <select id="gfn">
+        <option value="asin">y = sin⁻¹x  (arcsin)</option>
+        <option value="acos">y = cos⁻¹x  (arccos)</option>
+        <option value="atan">y = tan⁻¹x  (arctan)</option>
+      </select>
+      <label class="chip"><input type="checkbox" id="showBase" checked> show restricted trig graph</label>
+      <label class="chip"><input type="checkbox" id="showLine" checked> show y = x</label>
+    </div>
+    <canvas id="gcanvas" width="700" height="520"></canvas>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--accent)"></i> inverse function</span>
+      <span><i class="sw" style="background:#8fa9ff"></i> restricted trig graph</span>
+      <span><i class="sw" style="background:#f0c674"></i> y = x (mirror line)</span>
+    </div>
+    <p class="note" id="gnote"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Value calculator</h2>
+    <div class="row">
+      <label>x =</label>
+      <input type="number" id="xin" value="0.5" step="0.05" style="width:110px">
+      <button class="act" id="calcBtn">Evaluate</button>
+    </div>
+    <div class="out" id="calcOut">Enter x and press Evaluate.</div>
+    <p class="note" id="domNote"></p>
+  </div>
+</div>
+
+<!-- ================= MODE 2: RESTRICT ================= -->
+<div class="mode" id="m-restrict">
+  <div class="panel">
+    <h2>Why restrict the domain?</h2>
+    <p class="note">A function has an inverse only if it is <b>one-one</b> (each output comes from just one input). Over all real numbers, sin x repeats, so a horizontal line hits it many times — not one-one. Drag the horizontal line and watch how many times it cuts the curve.</p>
+    <div class="row">
+      <label>Base function:</label>
+      <select id="rfn">
+        <option value="sin">sin x</option>
+        <option value="cos">cos x</option>
+        <option value="tan">tan x</option>
+      </select>
+      <label class="chip"><input type="checkbox" id="restrictOn"> restrict to principal branch</label>
+    </div>
+    <div class="row">
+      <label>Horizontal test line&nbsp; y = <span id="yval">0.50</span></label>
+      <input type="range" id="ytest" min="-1.2" max="1.2" step="0.01" value="0.5">
+    </div>
+    <canvas id="rcanvas" width="700" height="440"></canvas>
+    <div class="out" id="rOut"></div>
+  </div>
+</div>
+
+<!-- ================= MODE 3: IDENTITIES ================= -->
+<div class="mode" id="m-ident">
+  <div class="panel">
+    <h2>Identity verifier</h2>
+    <div class="row">
+      <label>Identity:</label>
+      <select id="idsel">
+        <option value="sc">sin⁻¹x + cos⁻¹x = π/2</option>
+        <option value="tc">tan⁻¹x + cot⁻¹x = π/2</option>
+        <option value="csc">sec⁻¹x + csc⁻¹x = π/2</option>
+        <option value="oddsin">sin⁻¹(−x) = −sin⁻¹x</option>
+        <option value="oddtan">tan⁻¹(−x) = −tan⁻¹x</option>
+        <option value="evencos">cos⁻¹(−x) = π − cos⁻¹x</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>x =</label>
+      <input type="range" id="idx" min="-2" max="2" step="0.01" value="0.6" style="flex:1">
+      <span class="badge" id="idxval">x = 0.60</span>
+    </div>
+    <div class="grid2">
+      <div class="out" id="lhsOut">LHS</div>
+      <div class="out" id="rhsOut">RHS</div>
+    </div>
+    <div class="verdict" id="idVerdict"></div>
+    <p class="note" id="idDomain"></p>
+  </div>
+</div>
+
+<!-- ================= FACTS PANEL ================= -->
+<div class="panel facts">
+  <h2>Facts &amp; principal values</h2>
+  <table class="pv">
+    <tr><th>Function</th><th>Domain</th><th>Principal value range</th></tr>
+    <tr><td>sin⁻¹x</td><td>[−1, 1]</td><td>[−π/2, π/2]</td></tr>
+    <tr><td>cos⁻¹x</td><td>[−1, 1]</td><td>[0, π]</td></tr>
+    <tr><td>tan⁻¹x</td><td>(−∞, ∞)</td><td>(−π/2, π/2)</td></tr>
+    <tr><td>cot⁻¹x</td><td>(−∞, ∞)</td><td>(0, π)</td></tr>
+    <tr><td>sec⁻¹x</td><td>|x| ≥ 1</td><td>[0, π] \ {π/2}</td></tr>
+    <tr><td>csc⁻¹x</td><td>|x| ≥ 1</td><td>[−π/2, π/2] \ {0}</td></tr>
+  </table>
+  <h3>Key identities</h3>
+  <ul>
+    <li><code>sin⁻¹x + cos⁻¹x = π/2</code>, for x ∈ [−1, 1]</li>
+    <li><code>tan⁻¹x + cot⁻¹x = π/2</code>, for all real x</li>
+    <li><code>sec⁻¹x + csc⁻¹x = π/2</code>, for |x| ≥ 1</li>
+    <li><code>sin⁻¹(−x) = −sin⁻¹x</code>, <code>tan⁻¹(−x) = −tan⁻¹x</code> (odd)</li>
+    <li><code>cos⁻¹(−x) = π − cos⁻¹x</code>, <code>cot⁻¹(−x) = π − cot⁻¹x</code></li>
+    <li><code>sin⁻¹(1/x) = csc⁻¹x</code>, <code>cos⁻¹(1/x) = sec⁻¹x</code> (|x| ≥ 1)</li>
+  </ul>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div class="panel">
+  <h2>Quick quiz <span class="badge">tap an option</span></h2>
+  <div id="quiz"></div>
+</div>
+
+<script>
+"use strict";
+var PI = Math.PI;
+
+/* ---------- tab switching ---------- */
+var tabs = document.querySelectorAll('.tab');
+tabs.forEach(function(t){
+  t.addEventListener('click', function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    document.querySelectorAll('.mode').forEach(function(m){m.classList.remove('active');});
+    document.getElementById('m-'+t.dataset.mode).classList.add('active');
+    if(t.dataset.mode==='graphs') drawGraph();
+    if(t.dataset.mode==='restrict') drawRestrict();
+    if(t.dataset.mode==='ident') updateIdent();
+  });
+});
+
+/* helper: format radians as a nice multiple of pi where possible */
+function fmtRad(v){
+  if(Math.abs(v)<1e-9) return "0";
+  var frac = v/PI;
+  var denoms=[1,2,3,4,6];
+  for(var i=0;i<denoms.length;i++){
+    var d=denoms[i]; var n=frac*d;
+    if(Math.abs(n-Math.round(n))<1e-6 && Math.round(n)!==0){
+      n=Math.round(n);
+      var s=(n<0?"−":"")+(Math.abs(n)===1?"":Math.abs(n))+"π";
+      return d===1? s : s+"/"+d;
+    }
+  }
+  return v.toFixed(4);
+}
+function deg(v){ return (v*180/PI).toFixed(2)+"°"; }
+
+/* =================================================================
+   MODE 1 — GRAPHS
+   ================================================================= */
+var gc = document.getElementById('gcanvas');
+var G = gc.getContext('2d');
+
+var GFN = {
+  asin:{ inv:Math.asin, base:Math.sin, dom:[-1,1], range:[-PI/2,PI/2],
+         baseDom:[-PI/2,PI/2], label:"sin⁻¹x", rangeTxt:"[−π/2, π/2]", domTxt:"[−1, 1]"},
+  acos:{ inv:Math.acos, base:Math.cos, dom:[-1,1], range:[0,PI],
+         baseDom:[0,PI], label:"cos⁻¹x", rangeTxt:"[0, π]", domTxt:"[−1, 1]"},
+  atan:{ inv:Math.atan, base:Math.tan, dom:[-6,6], range:[-PI/2,PI/2],
+         baseDom:[-PI/2+0.001,PI/2-0.001], label:"tan⁻¹x", rangeTxt:"(−π/2, π/2)", domTxt:"(−∞, ∞)"}
+};
+
+function drawGraph(){
+  var key=document.getElementById('gfn').value;
+  var f=GFN[key];
+  var W=gc.width,H=gc.height;
+  G.clearRect(0,0,W,H);
+  // world bounds — square-ish so reflection reads correctly
+  var lim = key==='atan'? 6 : PI/2+0.6;
+  if(key==='acos') lim = PI+0.4;
+  var minX=-lim, maxX=lim, minY=-lim, maxY=lim;
+  function X(x){ return (x-minX)/(maxX-minX)*W; }
+  function Y(y){ return H-(y-minY)/(maxY-minY)*H; }
+
+  // grid
+  G.strokeStyle=getVar('--grid'); G.lineWidth=1;
+  G.font="11px system-ui"; G.fillStyle=getVar('--mut'); G.textAlign="center";
+  for(var gx=Math.ceil(minX); gx<=maxX; gx++){
+    G.beginPath();G.moveTo(X(gx),0);G.lineTo(X(gx),H);G.stroke();
+  }
+  for(var gy=Math.ceil(minY); gy<=maxY; gy++){
+    G.beginPath();G.moveTo(0,Y(gy));G.lineTo(W,Y(gy));G.stroke();
+  }
+  // axes
+  G.strokeStyle="#5b6b86"; G.lineWidth=1.5;
+  G.beginPath();G.moveTo(0,Y(0));G.lineTo(W,Y(0));G.stroke();
+  G.beginPath();G.moveTo(X(0),0);G.lineTo(X(0),H);G.stroke();
+  // axis ticks/labels at integers
+  for(var tx=Math.ceil(minX);tx<=maxX;tx++){ if(tx!==0) G.fillText(tx,X(tx),Y(0)+14); }
+  G.textAlign="right";
+  for(var ty=Math.ceil(minY);ty<=maxY;ty++){ if(ty!==0) G.fillText(ty,X(0)-5,Y(ty)+4); }
+  G.textAlign="center";
+
+  // y = x mirror line
+  if(document.getElementById('showLine').checked){
+    G.strokeStyle="#f0c674"; G.lineWidth=1.4; G.setLineDash([6,5]);
+    G.beginPath();G.moveTo(X(minX),Y(minX));G.lineTo(X(maxX),Y(maxX));G.stroke();
+    G.setLineDash([]);
+  }
+
+  // restricted trig graph (x over baseDom -> point (t, base(t)))
+  if(document.getElementById('showBase').checked){
+    G.strokeStyle="#8fa9ff"; G.lineWidth=2.2;
+    G.beginPath(); var started=false;
+    for(var t=f.baseDom[0]; t<=f.baseDom[1]+1e-9; t+=(f.baseDom[1]-f.baseDom[0])/400){
+      var yy=f.base(t);
+      if(key==='atan' && Math.abs(yy)>lim){ started=false; continue; }
+      var px=X(t), py=Y(yy);
+      if(!started){G.moveTo(px,py);started=true;} else G.lineTo(px,py);
+    }
+    G.stroke();
+  }
+
+  // inverse function (x over dom -> (x, inv(x)))
+  G.strokeStyle=getVar('--accent'); G.lineWidth=2.6;
+  G.beginPath(); var st=false;
+  var d0=f.dom[0], d1=f.dom[1];
+  for(var x=d0; x<=d1+1e-9; x+=(d1-d0)/500){
+    var v=f.inv(Math.max(-1,Math.min(1, key==='atan'?x:x)));
+    if(key==='atan') v=Math.atan(x);
+    var px2=X(x), py2=Y(v);
+    if(!st){G.moveTo(px2,py2);st=true;} else G.lineTo(px2,py2);
+  }
+  G.stroke();
+
+  // mark range boundaries on y-axis
+  G.fillStyle=getVar('--accent'); G.strokeStyle=getVar('--accent'); G.lineWidth=1;
+  [f.range[0],f.range[1]].forEach(function(ry){
+    G.setLineDash([3,4]);
+    G.beginPath();G.moveTo(X(minX),Y(ry));G.lineTo(X(maxX),Y(ry));G.stroke();
+    G.setLineDash([]);
+    G.textAlign="left";
+    G.fillText("y="+fmtRad(ry), 6, Y(ry)-4);
+  });
+  G.textAlign="center";
+
+  document.getElementById('gnote').innerHTML =
+    "The teal curve <b>"+f.label+"</b> is the mirror image of the blue restricted "+
+    key.replace('a','')+" graph in the line y = x. Principal value range = <b>"+f.rangeTxt+"</b>, domain = <b>"+f.domTxt+"</b>.";
+}
+
+function getVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+document.getElementById('gfn').addEventListener('change',drawGraph);
+document.getElementById('showBase').addEventListener('change',drawGraph);
+document.getElementById('showLine').addEventListener('change',drawGraph);
+
+/* value calculator */
+function calc(){
+  var x=parseFloat(document.getElementById('xin').value);
+  var key=document.getElementById('gfn').value;
+  var f=GFN[key];
+  var out=document.getElementById('calcOut');
+  if(isNaN(x)){ out.textContent="Please enter a number."; return; }
+  if((key==='asin'||key==='acos') && (x<-1||x>1)){
+    out.innerHTML = f.label+"("+x+") is <b>undefined</b> — domain is [−1, 1].";
+    return;
+  }
+  var v = key==='asin'?Math.asin(x): key==='acos'?Math.acos(x):Math.atan(x);
+  out.innerHTML =
+    f.label+"("+x+") =\n  "+fmtRad(v)+"  rad  ≈  "+v.toFixed(6)+" rad\n  = "+deg(v);
+  document.getElementById('domNote').innerHTML =
+    "Result lies in the principal value range "+f.rangeTxt+".";
+}
+document.getElementById('calcBtn').addEventListener('click',calc);
+document.getElementById('xin').addEventListener('input',calc);
+
+/* =================================================================
+   MODE 2 — WHY RESTRICT
+   ================================================================= */
+var rc=document.getElementById('rcanvas');
+var R=rc.getContext('2d');
+
+function drawRestrict(){
+  var key=document.getElementById('rfn').value;
+  var restrict=document.getElementById('restrictOn').checked;
+  var yline=parseFloat(document.getElementById('ytest').value);
+  document.getElementById('yval').textContent=yline.toFixed(2);
+  var W=rc.width,H=rc.height;
+  R.clearRect(0,0,W,H);
+  var minX=-2*PI, maxX=2*PI, minY=-2.2, maxY=2.2;
+  function X(x){ return (x-minX)/(maxX-minX)*W; }
+  function Y(y){ return H-(y-minY)/(maxY-minY)*H; }
+  var fn = key==='sin'?Math.sin: key==='cos'?Math.cos:Math.tan;
+  var pbranch = key==='sin'?[-PI/2,PI/2]: key==='cos'?[0,PI]:[-PI/2,PI/2];
+
+  // grid + axes
+  R.strokeStyle=getVar('--grid');R.lineWidth=1;
+  for(var gx=Math.ceil(minX/(PI/2))*(PI/2); gx<=maxX; gx+=PI/2){
+    R.beginPath();R.moveTo(X(gx),0);R.lineTo(X(gx),H);R.stroke();
+  }
+  R.strokeStyle="#5b6b86";R.lineWidth=1.4;
+  R.beginPath();R.moveTo(0,Y(0));R.lineTo(W,Y(0));R.stroke();
+  R.beginPath();R.moveTo(X(0),0);R.lineTo(X(0),H);R.stroke();
+  R.fillStyle=getVar('--mut');R.font="11px system-ui";R.textAlign="center";
+  var labs=[[-2*PI,"−2π"],[-PI,"−π"],[PI,"π"],[2*PI,"2π"]];
+  labs.forEach(function(L){R.fillText(L[1],X(L[0]),Y(0)+14);});
+
+  // shaded principal branch strip
+  if(restrict){
+    R.fillStyle="rgba(91,214,192,.10)";
+    R.fillRect(X(pbranch[0]),0,X(pbranch[1])-X(pbranch[0]),H);
+    R.strokeStyle=getVar('--accent');R.setLineDash([4,4]);R.lineWidth=1;
+    [pbranch[0],pbranch[1]].forEach(function(bx){
+      R.beginPath();R.moveTo(X(bx),0);R.lineTo(X(bx),H);R.stroke();
+    });
+    R.setLineDash([]);
+  }
+
+  // full curve (dim if restricting)
+  R.strokeStyle= restrict? "#4a5670" : "#8fa9ff";
+  R.lineWidth=2; R.beginPath(); var st=false;
+  for(var x=minX;x<=maxX;x+=(maxX-minX)/1200){
+    var yy=fn(x);
+    if(key==='tan' && Math.abs(yy)>maxY){ st=false; continue; }
+    var px=X(x),py=Y(yy);
+    if(!st){R.moveTo(px,py);st=true;}else R.lineTo(px,py);
+  }
+  R.stroke();
+
+  // highlighted principal branch curve
+  if(restrict){
+    R.strokeStyle=getVar('--accent');R.lineWidth=2.8;R.beginPath();st=false;
+    for(var x2=pbranch[0];x2<=pbranch[1];x2+=(pbranch[1]-pbranch[0])/300){
+      var yy2=fn(x2);
+      if(key==='tan'&&Math.abs(yy2)>maxY){st=false;continue;}
+      var px2=X(x2),py2=Y(yy2);
+      if(!st){R.moveTo(px2,py2);st=true;}else R.lineTo(px2,py2);
+    }
+    R.stroke();
+  }
+
+  // horizontal test line
+  R.strokeStyle="#f0c674";R.lineWidth=1.8;
+  R.beginPath();R.moveTo(0,Y(yline));R.lineTo(W,Y(yline));R.stroke();
+
+  // count intersections & mark them
+  var roots = solveRoots(key,fn,yline,minX,maxX,restrict?pbranch:null);
+  R.fillStyle="#f0c674";
+  roots.forEach(function(rt){
+    R.beginPath();R.arc(X(rt),Y(yline),4.5,0,2*PI);R.fill();
+  });
+
+  var out=document.getElementById('rOut');
+  var reachable = true;
+  if((key==='sin'||key==='cos') && Math.abs(yline)>1) reachable=false;
+  if(!restrict){
+    out.innerHTML = reachable
+      ? "Over all reals, y = "+yline.toFixed(2)+" meets the curve <b>"+roots.length+"</b> time(s) (many). One output → many inputs, so "+key+" x is <b>not one-one</b> — it has no inverse function here."
+      : "y = "+yline.toFixed(2)+" never meets "+key+" x (range is [−1,1]).";
+  }else{
+    out.innerHTML = reachable
+      ? "Restricted to the principal branch (shaded), y = "+yline.toFixed(2)+" meets the curve <b>"+roots.length+"</b> time — exactly one input. Now "+key+" is one-one, so the inverse "+key+"⁻¹ is a genuine function."
+      : "y = "+yline.toFixed(2)+" is outside [−1,1]; no solution even on the branch.";
+  }
+}
+
+function solveRoots(key,fn,yline,a,b,branch){
+  var roots=[]; var lo=a,hi=b;
+  if(branch){lo=branch[0];hi=branch[1];}
+  var N=2000, prevX=lo, prevV=fn(lo)-yline;
+  for(var i=1;i<=N;i++){
+    var x=lo+(hi-lo)*i/N;
+    var v=fn(x)-yline;
+    if(key==='tan' && Math.abs(fn(x))>50){ prevX=x;prevV=v;continue; }
+    if(prevV===0){ roots.push(prevX); }
+    else if(prevV*v<0 && Math.abs(prevV-v)<10){
+      // bisection refine
+      var xa=prevX,xb=x;
+      for(var k=0;k<40;k++){var xm=(xa+xb)/2;var vm=fn(xm)-yline; if((fn(xa)-yline)*vm<=0)xb=xm;else xa=xm;}
+      roots.push((xa+xb)/2);
+    }
+    prevX=x;prevV=v;
+  }
+  return roots;
+}
+
+document.getElementById('rfn').addEventListener('change',drawRestrict);
+document.getElementById('restrictOn').addEventListener('change',drawRestrict);
+document.getElementById('ytest').addEventListener('input',drawRestrict);
+
+/* =================================================================
+   MODE 3 — IDENTITIES
+   ================================================================= */
+var acot=function(x){ return PI/2 - Math.atan(x); };      // cot^-1 principal (0,π)
+var asec=function(x){ return Math.acos(1/x); };
+var acsc=function(x){ return Math.asin(1/x); };
+
+var IDENT = {
+  sc:{ lhs:function(x){return "sin⁻¹("+x.toFixed(2)+") + cos⁻¹("+x.toFixed(2)+")\n= "+fmtRad(Math.asin(x))+" + "+fmtRad(Math.acos(x));},
+       lv:function(x){return Math.asin(x)+Math.acos(x);}, rv:function(){return PI/2;}, rtxt:"π/2",
+       dom:[-1,1], domTxt:"valid for x ∈ [−1, 1]"},
+  tc:{ lhs:function(x){return "tan⁻¹("+x.toFixed(2)+") + cot⁻¹("+x.toFixed(2)+")\n= "+fmtRad(Math.atan(x))+" + "+fmtRad(acot(x));},
+       lv:function(x){return Math.atan(x)+acot(x);}, rv:function(){return PI/2;}, rtxt:"π/2",
+       dom:[-99,99], domTxt:"valid for all real x"},
+  csc:{ lhs:function(x){return "sec⁻¹("+x.toFixed(2)+") + csc⁻¹("+x.toFixed(2)+")\n= "+fmtRad(asec(x))+" + "+fmtRad(acsc(x));},
+       lv:function(x){return asec(x)+acsc(x);}, rv:function(){return PI/2;}, rtxt:"π/2",
+       dom:[1,99], domTxt:"valid for |x| ≥ 1", absdom:true},
+  oddsin:{ lhs:function(x){return "sin⁻¹(−"+x.toFixed(2)+") = "+fmtRad(Math.asin(-x));},
+       lv:function(x){return Math.asin(-x);}, rv:function(x){return -Math.asin(x);}, rtxt2:function(x){return "−sin⁻¹("+x.toFixed(2)+") = "+fmtRad(-Math.asin(x));},
+       dom:[-1,1], domTxt:"valid for x ∈ [−1, 1]"},
+  oddtan:{ lhs:function(x){return "tan⁻¹(−"+x.toFixed(2)+") = "+fmtRad(Math.atan(-x));},
+       lv:function(x){return Math.atan(-x);}, rv:function(x){return -Math.atan(x);}, rtxt2:function(x){return "−tan⁻¹("+x.toFixed(2)+") = "+fmtRad(-Math.atan(x));},
+       dom:[-99,99], domTxt:"valid for all real x"},
+  evencos:{ lhs:function(x){return "cos⁻¹(−"+x.toFixed(2)+") = "+fmtRad(Math.acos(-x));},
+       lv:function(x){return Math.acos(-x);}, rv:function(x){return PI-Math.acos(x);}, rtxt2:function(x){return "π − cos⁻¹("+x.toFixed(2)+") = "+fmtRad(PI-Math.acos(x));},
+       dom:[-1,1], domTxt:"valid for x ∈ [−1, 1]"}
+};
+
+function updateIdent(){
+  var key=document.getElementById('idsel').value;
+  var f=IDENT[key];
+  var x=parseFloat(document.getElementById('idx').value);
+  document.getElementById('idxval').textContent="x = "+x.toFixed(2);
+  var lhsEl=document.getElementById('lhsOut'), rhsEl=document.getElementById('rhsOut');
+  var vEl=document.getElementById('idVerdict'), dEl=document.getElementById('idDomain');
+  dEl.textContent=f.domTxt;
+
+  // domain check
+  var inDom = f.absdom ? Math.abs(x)>=1 : (x>=f.dom[0] && x<=f.dom[1]);
+  if(!inDom){
+    lhsEl.innerHTML="LHS: undefined here";
+    rhsEl.innerHTML="RHS: —";
+    vEl.innerHTML="<span style='color:var(--bad)'>✗ x is outside the domain — the identity does not apply here.</span>";
+    return;
+  }
+  var lv=f.lv(x), rv=f.rv(x);
+  lhsEl.innerHTML="LHS =\n"+f.lhs(x)+"\n= "+fmtRad(lv)+"  ≈ "+lv.toFixed(5);
+  var rtxt = f.rtxt2? f.rtxt2(x) : f.rtxt;
+  rhsEl.innerHTML="RHS =\n"+rtxt+ (f.rtxt2? "  ≈ "+rv.toFixed(5) : "  = "+fmtRad(rv)+" ≈ "+rv.toFixed(5));
+  var ok=Math.abs(lv-rv)<1e-6;
+  vEl.innerHTML= ok
+    ? "<span style='color:var(--good)'>✓ Verified: LHS = RHS = "+fmtRad(rv)+"  (difference "+Math.abs(lv-rv).toExponential(1)+")</span>"
+    : "<span style='color:var(--bad)'>✗ Mismatch: difference "+(lv-rv).toFixed(5)+"</span>";
+}
+document.getElementById('idsel').addEventListener('change',updateIdent);
+document.getElementById('idx').addEventListener('input',updateIdent);
+
+/* =================================================================
+   QUIZ
+   ================================================================= */
+var QUIZ=[
+  {q:"What is the principal value of cos⁻¹(−1/2)?",
+   opts:["π/3","2π/3","−π/3","5π/6"], a:1,
+   e:"cos⁻¹ has range [0, π]. cos(2π/3) = −1/2, and 2π/3 lies in [0, π]. So cos⁻¹(−1/2) = 2π/3."},
+  {q:"For all x ∈ [−1, 1], sin⁻¹x + cos⁻¹x equals:",
+   opts:["0","π","π/2","1"], a:2,
+   e:"This is a standard identity: sin⁻¹x + cos⁻¹x = π/2 for every x in [−1, 1]."},
+  {q:"Why do we restrict sin x to [−π/2, π/2] before defining sin⁻¹?",
+   opts:["To make it continuous","To make it one-one so an inverse function exists","To make it periodic","To keep values positive"], a:1,
+   e:"Over all reals sin x is not one-one (a horizontal line cuts it many times). Restricting to [−π/2, π/2] makes it one-one, so the inverse is a well-defined function."}
+];
+var quizEl=document.getElementById('quiz');
+QUIZ.forEach(function(item,qi){
+  var d=document.createElement('div');d.className='q';
+  var h=document.createElement('div');h.innerHTML="<b>Q"+(qi+1)+".</b> "+item.q;
+  d.appendChild(h);
+  var opts=document.createElement('div');opts.className='opts';
+  item.opts.forEach(function(o,oi){
+    var b=document.createElement('div');b.className='opt';b.textContent=o;
+    b.addEventListener('click',function(){
+      if(d.dataset.done) return;
+      d.dataset.done="1";
+      var kids=opts.children;
+      for(var i=0;i<kids.length;i++){
+        if(i===item.a) kids[i].classList.add('correct');
+        else if(i===oi) kids[i].classList.add('wrong');
+      }
+      d.querySelector('.expl').classList.add('show');
+    });
+    opts.appendChild(b);
+  });
+  d.appendChild(opts);
+  var ex=document.createElement('div');ex.className='expl';ex.innerHTML="<b>"+(item.opts[item.a])+"</b> — "+item.e;
+  d.appendChild(ex);
+  quizEl.appendChild(d);
+});
+
+/* ---------- responsive canvas backing store ---------- */
+function fitCanvas(cv){
+  var wrap=cv.parentElement;
+  var cssW=Math.min(wrap.clientWidth-2, 700);
+  var ratio = cv===gc? 520/700 : 440/700;
+  cv.width=Math.round(cssW);
+  cv.height=Math.round(cssW*ratio);
+}
+function redrawAll(){
+  fitCanvas(gc); fitCanvas(rc);
+  drawGraph(); drawRestrict();
+}
+window.addEventListener('resize',function(){ redrawAll(); });
+
+/* init */
+fitCanvas(gc); fitCanvas(rc);
+drawGraph(); calc(); drawRestrict(); updateIdent();
+</script>
+</body>
+</html>
