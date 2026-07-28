@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circles Lab — Circles (NIOS Class 10, Ch 15)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#57c7ff;
+    --accent-soft:rgba(87,199,255,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:70px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+
+  .stage{width:100%;background:radial-gradient(circle at 50% 40%,#141a29,#0d1119);
+    border:1px solid var(--line);border-radius:14px;display:block;touch-action:none}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .hint b{color:var(--accent)}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 12px;font-size:.86rem;min-width:120px}
+  .chip .v{display:block;font-size:1.12rem;font-weight:700;color:var(--accent);margin-top:2px}
+  .chip .v.g{color:var(--good)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.8rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:14px;height:4px;border-radius:2px;display:inline-block}
+
+  details.fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;margin-bottom:10px}
+  details.fact summary{cursor:pointer;font-weight:600;color:var(--ink);font-size:.95rem}
+  details.fact[open] summary{color:var(--accent)}
+  details.fact p,details.fact li{font-size:.88rem;color:var(--muted);margin-top:6px}
+  details.fact ul{margin-left:18px}
+  .mono{font-family:ui-monospace,Consolas,monospace;color:var(--ink)}
+
+  .quiz-q{margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .quiz-q:last-child{border-bottom:none}
+  .quiz-q p.q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:7px;cursor:pointer;
+    font-size:.9rem;touch-action:manipulation}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:#c9f5d8}
+  .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:#ffd3d3}
+  .verdict{font-size:.85rem;margin-top:4px;min-height:18px}
+  .verdict.g{color:var(--good)}
+  .verdict.b{color:var(--bad)}
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Circles</span> Lab</h1>
+    <p>NIOS Class 10 Mathematics · Chapter 15 — parts, chord properties &amp; measures. Drag the dots.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="parts">Parts of a circle</button>
+    <button class="tab-btn" data-mode="chord">Chord properties</button>
+    <button class="tab-btn" data-mode="measure">Basic measures</button>
+  </div>
+
+  <!-- ===== MODE 1: PARTS ===== -->
+  <section class="panel" id="panel-parts">
+    <h2>Parts of a circle</h2>
+    <div class="seg" id="partsToggles">
+      <button data-p="basic" class="on">Centre &amp; radius</button>
+      <button data-p="diameter" class="on">Diameter</button>
+      <button data-p="chord" class="on">Chord</button>
+      <button data-p="arc" class="on">Arcs</button>
+      <button data-p="sector">Sector</button>
+      <button data-p="segment">Segment</button>
+    </div>
+    <svg class="stage" id="svgParts" viewBox="0 0 400 340" role="img" aria-label="Interactive circle"></svg>
+    <p class="hint">Drag the two blue dots <b>A</b> and <b>B</b> on the circle to reshape the chord and arcs. Toggle labels above.</p>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>chord / diameter</span>
+      <span><i style="background:#ff9f45"></i>minor arc</span>
+      <span><i style="background:#8a7bff"></i>radius</span>
+      <span><i style="background:#5fd68b"></i>sector / segment</span>
+    </div>
+  </section>
+
+  <!-- ===== MODE 2: CHORD ===== -->
+  <section class="panel hidden" id="panel-chord">
+    <h2>Chord properties</h2>
+    <div class="seg" id="chordToggles">
+      <button data-c="perp" class="on">Perpendicular bisects</button>
+      <button data-c="equal">Equal chords equidistant</button>
+    </div>
+    <svg class="stage" id="svgChord" viewBox="0 0 400 340" role="img" aria-label="Chord properties"></svg>
+    <p class="hint" id="chordHint"></p>
+    <div class="readout" id="chordReadout"></div>
+  </section>
+
+  <!-- ===== MODE 3: MEASURES ===== -->
+  <section class="panel hidden" id="panel-measure">
+    <h2>Basic measures</h2>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Radius r = <output id="rOut">6</output> cm</label>
+        <input type="range" id="rSlider" min="1" max="10" step="0.5" value="6">
+      </div>
+      <div class="ctrl">
+        <label>Angle θ = <output id="aOut">90</output>°</label>
+        <input type="range" id="aSlider" min="0" max="360" step="5" value="90">
+      </div>
+    </div>
+    <svg class="stage" id="svgMeasure" viewBox="0 0 400 340" role="img" aria-label="Circle measures"></svg>
+    <div class="readout">
+      <div class="chip">Circumference = 2πr<span class="v" id="mCirc">—</span></div>
+      <div class="chip">Area = πr²<span class="v" id="mArea">—</span></div>
+      <div class="chip">Arc length = (θ/360)·2πr<span class="v g" id="mArc">—</span></div>
+      <div class="chip">Sector area = (θ/360)·πr²<span class="v g" id="mSec">—</span></div>
+    </div>
+    <p class="hint">The <b>orange wedge</b> is the sector spanning angle θ; its curved edge is the arc.</p>
+  </section>
+
+  <!-- ===== FACTS ===== -->
+  <section class="panel">
+    <h2>Key facts</h2>
+    <details class="fact"><summary>Parts of a circle</summary>
+      <ul>
+        <li><b>Centre</b> — fixed point O, equidistant from all points on the circle.</li>
+        <li><b>Radius</b> (r) — segment from centre to the circle.</li>
+        <li><b>Diameter</b> (d = 2r) — chord through the centre; the longest chord.</li>
+        <li><b>Chord</b> — segment joining any two points on the circle.</li>
+        <li><b>Arc</b> — part of the circle between two points; the shorter is the <i>minor</i> arc, the longer the <i>major</i> arc.</li>
+        <li><b>Circumference</b> — the whole boundary (perimeter) of the circle.</li>
+        <li><b>Sector</b> — region bounded by two radii and an arc.</li>
+        <li><b>Segment</b> — region bounded by a chord and its arc.</li>
+      </ul>
+    </details>
+    <details class="fact"><summary>Chord properties</summary>
+      <ul>
+        <li>The perpendicular from the centre to a chord <b>bisects</b> the chord (and vice versa).</li>
+        <li>Equal chords of a circle are <b>equidistant</b> from the centre.</li>
+        <li>Chords equidistant from the centre are equal in length.</li>
+        <li>If half-chord = a and distance from centre = d, then <span class="mono">r² = a² + d²</span>, so a longer chord lies closer to the centre.</li>
+      </ul>
+    </details>
+    <details class="fact"><summary>Circumference &amp; area</summary>
+      <p><span class="mono">Circumference = 2πr = πd</span></p>
+      <p><span class="mono">Area = πr²</span> &nbsp;(π ≈ 3.14159)</p>
+    </details>
+    <details class="fact"><summary>Arc length &amp; sector area</summary>
+      <p>For a central angle θ (degrees):</p>
+      <p><span class="mono">Arc length = (θ/360) × 2πr</span></p>
+      <p><span class="mono">Sector area = (θ/360) × πr²</span></p>
+    </details>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section class="panel">
+    <h2>Quick quiz</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <footer>Circles Lab · self-contained · geometry &amp; formulas exact.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TAU = Math.PI*2;
+  function svgEl(t){return document.createElementNS("http://www.w3.org/2000/svg",t);}
+  function round(x,n){var f=Math.pow(10,n||2);return Math.round(x*f)/f;}
+  function fmt(x){return (Math.round(x*100)/100).toFixed(2);}
+
+  /* ---------- Tabs ---------- */
+  var panels={parts:document.getElementById("panel-parts"),
+              chord:document.getElementById("panel-chord"),
+              measure:document.getElementById("panel-measure")};
+  var tabBtns=document.querySelectorAll(".tab-btn");
+  tabBtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      var m=b.getAttribute("data-mode");
+      for(var k in panels){panels[k].classList.toggle("hidden",k!==m);}
+      if(m==="measure")drawMeasure();
+      if(m==="chord")drawChord();
+      if(m==="parts")drawParts();
+    });
+  });
+
+  /* ---------- Shared drag helper ---------- */
+  function makeDraggable(svg,handle,onMove){
+    function pt(ev){
+      var r=svg.getBoundingClientRect();
+      var vb=svg.viewBox.baseVal;
+      var cx=(ev.touches?ev.touches[0].clientX:ev.clientX);
+      var cy=(ev.touches?ev.touches[0].clientY:ev.clientY);
+      return {x:(cx-r.left)/r.width*vb.width, y:(cy-r.top)/r.height*vb.height};
+    }
+    var dragging=false;
+    function down(ev){dragging=true;ev.preventDefault();onMove(pt(ev));}
+    function move(ev){if(!dragging)return;ev.preventDefault();onMove(pt(ev));}
+    function up(){dragging=false;}
+    handle.addEventListener("mousedown",down);
+    handle.addEventListener("touchstart",down,{passive:false});
+    window.addEventListener("mousemove",move);
+    window.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("mouseup",up);
+    window.addEventListener("touchend",up);
+  }
+
+  /* =====================================================================
+     MODE 1 — PARTS OF A CIRCLE
+  ===================================================================== */
+  var C={x:200,y:170,r:120};           // circle in view coords
+  var svgP=document.getElementById("svgParts");
+  var angA=-0.7, angB=2.2;             // point angles (radians)
+  var show={basic:true,diameter:true,chord:true,arc:true,sector:false,segment:false};
+
+  document.querySelectorAll("#partsToggles button").forEach(function(b){
+    b.addEventListener("click",function(){
+      var p=b.getAttribute("data-p");
+      show[p]=!show[p];
+      b.classList.toggle("on",show[p]);
+      drawParts();
+    });
+  });
+
+  function ptOnCircle(a){return {x:C.x+C.r*Math.cos(a),y:C.y+C.r*Math.sin(a)};}
+  function angleOf(x,y){return Math.atan2(y-C.y,x-C.x);}
+
+  function arcPath(a0,a1,rr){
+    var p0={x:C.x+rr*Math.cos(a0),y:C.y+rr*Math.sin(a0)};
+    var p1={x:C.x+rr*Math.cos(a1),y:C.y+rr*Math.sin(a1)};
+    var d=a1-a0; while(d<0)d+=TAU; while(d>=TAU)d-=TAU;
+    var large=d>Math.PI?1:0;
+    return "M"+round(p0.x)+" "+round(p0.y)+" A"+rr+" "+rr+" 0 "+large+" 1 "+round(p1.x)+" "+round(p1.y);
+  }
+
+  function drawParts(){
+    while(svgP.firstChild)svgP.removeChild(svgP.firstChild);
+    var A=ptOnCircle(angA), B=ptOnCircle(angB);
+
+    // base circle
+    var circ=svgEl("circle");
+    circ.setAttribute("cx",C.x);circ.setAttribute("cy",C.y);circ.setAttribute("r",C.r);
+    circ.setAttribute("fill","none");
+    circ.setAttribute("stroke","#4a5779");circ.setAttribute("stroke-width","2");
+    svgP.appendChild(circ);
+
+    // arc span from A to B (minor = shorter)
+    var d=angB-angA; while(d<0)d+=TAU; while(d>=TAU)d-=TAU;
+    var minorFirst = d<=Math.PI;
+    var a0=minorFirst?angA:angB, a1=minorFirst?angB:angA;
+
+    if(show.segment){
+      var segd=arcPath(a0,a1,C.r)+" L"+round(minorFirst?A.x:B.x)+" "+round(minorFirst?A.y:B.y)+" Z";
+      var seg=svgEl("path");seg.setAttribute("d",segd);
+      seg.setAttribute("fill","rgba(95,214,139,.20)");seg.setAttribute("stroke","none");
+      svgP.appendChild(seg);
+    }
+    if(show.sector){
+      var secStart=ptOnCircle(a0), secEnd=ptOnCircle(a1);
+      var secd="M"+C.x+" "+C.y+" L"+round(secStart.x)+" "+round(secStart.y)+" "+
+               arcPath(a0,a1,C.r).replace(/^M[^A]*/,"")+" Z";
+      var sec=svgEl("path");sec.setAttribute("d",secd);
+      sec.setAttribute("fill","rgba(95,214,139,.16)");sec.setAttribute("stroke","#5fd68b");
+      sec.setAttribute("stroke-width","1.5");
+      svgP.appendChild(sec);
+    }
+
+    // arcs highlighted
+    if(show.arc){
+      var minor=svgEl("path");minor.setAttribute("d",arcPath(a0,a1,C.r));
+      minor.setAttribute("fill","none");minor.setAttribute("stroke","#ff9f45");
+      minor.setAttribute("stroke-width","5");minor.setAttribute("stroke-linecap","round");
+      svgP.appendChild(minor);
+      var major=svgEl("path");major.setAttribute("d",arcPath(a1,a0,C.r));
+      major.setAttribute("fill","none");major.setAttribute("stroke","#6a4f2f");
+      major.setAttribute("stroke-width","3");major.setAttribute("stroke-dasharray","2 6");
+      svgP.appendChild(major);
+    }
+
+    // diameter
+    if(show.diameter){
+      var dl=svgEl("line");
+      dl.setAttribute("x1",C.x-C.r);dl.setAttribute("y1",C.y);
+      dl.setAttribute("x2",C.x+C.r);dl.setAttribute("y2",C.y);
+      dl.setAttribute("stroke","#57c7ff");dl.setAttribute("stroke-width","1.6");
+      dl.setAttribute("stroke-dasharray","5 5");dl.setAttribute("opacity",".7");
+      svgP.appendChild(dl);
+      label(svgP,C.x-C.r-6,C.y-8,"diameter","#57c7ff","end");
+    }
+
+    // chord AB
+    if(show.chord){
+      var ch=svgEl("line");
+      ch.setAttribute("x1",A.x);ch.setAttribute("y1",A.y);
+      ch.setAttribute("x2",B.x);ch.setAttribute("y2",B.y);
+      ch.setAttribute("stroke","#57c7ff");ch.setAttribute("stroke-width","3");
+      svgP.appendChild(ch);
+      label(svgP,(A.x+B.x)/2,(A.y+B.y)/2-8,"chord","#57c7ff","middle");
+    }
+
+    // centre & radius
+    if(show.basic){
+      var rl=svgEl("line");
+      rl.setAttribute("x1",C.x);rl.setAttribute("y1",C.y);
+      rl.setAttribute("x2",A.x);rl.setAttribute("y2",A.y);
+      rl.setAttribute("stroke","#8a7bff");rl.setAttribute("stroke-width","2");
+      svgP.appendChild(rl);
+      label(svgP,(C.x+A.x)/2+4,(C.y+A.y)/2,"radius","#8a7bff","start");
+      var o=svgEl("circle");o.setAttribute("cx",C.x);o.setAttribute("cy",C.y);
+      o.setAttribute("r",4);o.setAttribute("fill","#e8ecf6");svgP.appendChild(o);
+      label(svgP,C.x+8,C.y+4,"O (centre)","#e8ecf6","start");
+    }
+
+    // draggable handles A,B
+    [{p:A,name:"A",a:"angA"},{p:B,name:"B",a:"angB"}].forEach(function(h){
+      var g=svgEl("circle");
+      g.setAttribute("cx",h.p.x);g.setAttribute("cy",h.p.y);g.setAttribute("r",11);
+      g.setAttribute("fill","rgba(87,199,255,.25)");g.setAttribute("stroke","#57c7ff");
+      g.setAttribute("stroke-width","2");g.style.cursor="grab";
+      svgP.appendChild(g);
+      label(svgP,h.p.x+(h.p.x>C.x?12:-12),h.p.y+(h.p.y>C.y?18:-10),h.name,"#57c7ff",h.p.x>C.x?"start":"end");
+      makeDraggable(svgP,g,function(pos){
+        var a=angleOf(pos.x,pos.y);
+        if(h.a==="angA")angA=a;else angB=a;
+        drawParts();
+      });
+    });
+  }
+  function label(svg,x,y,txt,color,anchor){
+    var t=svgEl("text");t.setAttribute("x",round(x));t.setAttribute("y",round(y));
+    t.setAttribute("fill",color||"#e8ecf6");t.setAttribute("font-size","12");
+    t.setAttribute("font-weight","600");t.setAttribute("text-anchor",anchor||"start");
+    t.setAttribute("paint-order","stroke");t.setAttribute("stroke","#0d1119");
+    t.setAttribute("stroke-width","3");t.textContent=txt;svg.appendChild(t);
+  }
+
+  /* =====================================================================
+     MODE 2 — CHORD PROPERTIES
+  ===================================================================== */
+  var svgC=document.getElementById("svgChord");
+  var CC={x:200,y:170,r:120};
+  var cMode="perp";
+  var pA=-0.5, pB=2.0;                 // chord endpoints (perp mode)
+  var eqAng=0.9;                       // half-angle for equal-chord mode
+
+  document.querySelectorAll("#chordToggles button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#chordToggles button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      cMode=b.getAttribute("data-c");
+      drawChord();
+    });
+  });
+
+  function onC(a){return {x:CC.x+CC.r*Math.cos(a),y:CC.y+CC.r*Math.sin(a)};}
+  function angC(x,y){return Math.atan2(y-CC.y,x-CC.x);}
+
+  function baseCircle(svg,c){
+    var circ=svgEl("circle");
+    circ.setAttribute("cx",c.x);circ.setAttribute("cy",c.y);circ.setAttribute("r",c.r);
+    circ.setAttribute("fill","none");circ.setAttribute("stroke","#4a5779");
+    circ.setAttribute("stroke-width","2");svg.appendChild(circ);
+    var o=svgEl("circle");o.setAttribute("cx",c.x);o.setAttribute("cy",c.y);
+    o.setAttribute("r",4);o.setAttribute("fill","#e8ecf6");svg.appendChild(o);
+  }
+  function lineEl(svg,x1,y1,x2,y2,col,w,dash){
+    var l=svgEl("line");l.setAttribute("x1",round(x1));l.setAttribute("y1",round(y1));
+    l.setAttribute("x2",round(x2));l.setAttribute("y2",round(y2));
+    l.setAttribute("stroke",col);l.setAttribute("stroke-width",w);
+    if(dash)l.setAttribute("stroke-dasharray",dash);svg.appendChild(l);return l;
+  }
+  function dot(svg,x,y,r,fill,stroke){
+    var d=svgEl("circle");d.setAttribute("cx",round(x));d.setAttribute("cy",round(y));
+    d.setAttribute("r",r);d.setAttribute("fill",fill);
+    if(stroke){d.setAttribute("stroke",stroke);d.setAttribute("stroke-width","2");}
+    svg.appendChild(d);return d;
+  }
+
+  function drawChord(){
+    while(svgC.firstChild)svgC.removeChild(svgC.firstChild);
+    baseCircle(svgC,CC);
+    var ro=document.getElementById("chordReadout");
+    var hint=document.getElementById("chordHint");
+
+    if(cMode==="perp"){
+      var A=onC(pA), B=onC(pB);
+      // chord
+      lineEl(svgC,A.x,A.y,B.x,B.y,"#57c7ff",3);
+      // midpoint
+      var M={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+      // perpendicular from centre = line centre->M (this is guaranteed perpendicular & bisecting)
+      lineEl(svgC,CC.x,CC.y,M.x,M.y,"#ff9f45",2.5);
+      // right-angle marker at M
+      var half=Math.hypot(A.x-M.x,A.y-M.y);
+      if(half>0.5){
+        var ux=(A.x-M.x)/half, uy=(A.y-M.y)/half;      // along chord
+        var dcm=Math.hypot(M.x-CC.x,M.y-CC.y);
+        if(dcm>0.5){
+          var vx=(CC.x-M.x)/dcm, vy=(CC.y-M.y)/dcm;    // toward centre
+          var s=12;
+          var p1={x:M.x+ux*s,y:M.y+uy*s};
+          var p2={x:p1.x+vx*s,y:p1.y+vy*s};
+          var p3={x:M.x+vx*s,y:M.y+vy*s};
+          var mk=svgEl("path");
+          mk.setAttribute("d","M"+round(p1.x)+" "+round(p1.y)+" L"+round(p2.x)+" "+round(p2.y)+" L"+round(p3.x)+" "+round(p3.y));
+          mk.setAttribute("fill","none");mk.setAttribute("stroke","#ff9f45");mk.setAttribute("stroke-width","1.5");
+          svgC.appendChild(mk);
+        }
+      }
+      // equal-half ticks
+      dot(svgC,M.x,M.y,3.5,"#ff9f45");
+      label(svgC,M.x,M.y-10,"M (midpoint)","#ff9f45","middle");
+      dot(svgC,A.x,A.y,10,"rgba(87,199,255,.25)","#57c7ff");
+      dot(svgC,B.x,B.y,10,"rgba(87,199,255,.25)","#57c7ff");
+      label(svgC,A.x+(A.x>CC.x?12:-12),A.y-8,"A","#57c7ff",A.x>CC.x?"start":"end");
+      label(svgC,B.x+(B.x>CC.x?12:-12),B.y-8,"B","#57c7ff",B.x>CC.x?"start":"end");
+      label(svgC,CC.x+8,CC.y+4,"O","#e8ecf6","start");
+
+      makeDraggable(svgC,svgC.querySelectorAll("circle")[2],function(pos){pA=angC(pos.x,pos.y);drawChord();});
+      makeDraggable(svgC,svgC.querySelectorAll("circle")[3],function(pos){pB=angC(pos.x,pos.y);drawChord();});
+
+      var scale=6/CC.r; // 1 unit = ? we treat r as 6 "cm" for display
+      var AM=fmt(half*scale), dCM=fmt(Math.hypot(M.x-CC.x,M.y-CC.y)*scale);
+      hint.innerHTML="Drag <b>A</b> and <b>B</b>. OM ⟂ AB and <b>AM = MB</b> always — the perpendicular from the centre bisects the chord.";
+      ro.innerHTML=
+        '<div class="chip">AM (half)<span class="v g">'+AM+' cm</span></div>'+
+        '<div class="chip">MB (half)<span class="v g">'+AM+' cm</span></div>'+
+        '<div class="chip">OM (distance)<span class="v">'+dCM+' cm</span></div>'+
+        '<div class="chip">check r² = AM²+OM²<span class="v">'+fmt((half*scale)*(half*scale)+(Math.hypot(M.x-CC.x,M.y-CC.y)*scale)*(Math.hypot(M.x-CC.x,M.y-CC.y)*scale))+'</span></div>';
+    } else {
+      // EQUAL CHORDS: two chords of same length, symmetric -> equidistant.
+      // Half-angle eqAng in (0.1, PI-0.1). chord length = 2 r sin(eqAng); distance = r cos(eqAng)
+      var ea=Math.max(0.15,Math.min(Math.PI-0.15,eqAng));
+      // chord 1 near top (centred on angle -90deg), chord 2 on right (centred on 0deg)
+      function chordAt(centreAng){
+        var a1=centreAng-ea, a2=centreAng+ea;
+        var P=onC(a1), Q=onC(a2);
+        lineEl(svgC,P.x,P.y,Q.x,Q.y,"#57c7ff",3);
+        var Mx=(P.x+Q.x)/2,My=(P.y+Q.y)/2;
+        lineEl(svgC,CC.x,CC.y,Mx,My,"#ff9f45",2,"4 3");
+        dot(svgC,Mx,My,3,"#ff9f45");
+        return {len:Math.hypot(P.x-Q.x,P.y-Q.y),dist:Math.hypot(Mx-CC.x,My-CC.y),P:P,Q:Q,mid:{x:Mx,y:My}};
+      }
+      var c1=chordAt(-Math.PI/2);
+      var c2=chordAt(0.15);
+      label(svgC,c1.mid.x,c1.mid.y-8,"chord 1","#57c7ff","middle");
+      label(svgC,c2.mid.x+10,c2.mid.y,"chord 2","#57c7ff","start");
+      label(svgC,CC.x-8,CC.y+16,"O","#e8ecf6","end");
+
+      // draggable handle to change common half-angle (drag endpoint of chord1)
+      var hd=dot(svgC,c1.Q.x,c1.Q.y,10,"rgba(87,199,255,.25)","#57c7ff");
+      makeDraggable(svgC,hd,function(pos){
+        var a=angC(pos.x,pos.y);
+        var da=a-(-Math.PI/2); while(da>Math.PI)da-=TAU; while(da<-Math.PI)da+=TAU;
+        eqAng=Math.abs(da);drawChord();
+      });
+
+      var scale2=6/CC.r;
+      hint.innerHTML="Drag the blue dot to resize <b>both</b> chords together. Equal chords stay <b>equidistant</b> from O (equal orange distances).";
+      ro.innerHTML=
+        '<div class="chip">chord length<span class="v">'+fmt(c1.len*scale2)+' cm</span></div>'+
+        '<div class="chip">dist O→chord 1<span class="v g">'+fmt(c1.dist*scale2)+' cm</span></div>'+
+        '<div class="chip">dist O→chord 2<span class="v g">'+fmt(c2.dist*scale2)+' cm</span></div>'+
+        '<div class="chip">equal &amp; equidistant<span class="v">✓</span></div>';
+    }
+  }
+
+  /* =====================================================================
+     MODE 3 — BASIC MEASURES
+  ===================================================================== */
+  var svgM=document.getElementById("svgMeasure");
+  var MC={x:200,y:170,r:120};
+  var rSlider=document.getElementById("rSlider"),
+      aSlider=document.getElementById("aSlider");
+
+  function drawMeasure(){
+    while(svgM.firstChild)svgM.removeChild(svgM.firstChild);
+    var r=parseFloat(rSlider.value), theta=parseFloat(aSlider.value);
+    document.getElementById("rOut").textContent=r;
+    document.getElementById("aOut").textContent=theta;
+
+    // visual radius scales with r (1..10 -> 40..120)
+    var vr=40+(r-1)/9*80;
+    MC.r=vr;
+    baseCircle(svgM,MC);
+
+    // sector wedge from angle 0 (right) going clockwise for theta degrees.
+    var start=-Math.PI/2;                 // start at top for a natural look
+    var end=start+theta*Math.PI/180;
+    var s=onC2(start), e=onC2(end);
+    if(theta>0){
+      var large=theta>180?1:0;
+      var d="M"+MC.x+" "+MC.y+" L"+round(s.x)+" "+round(s.y)+
+            " A"+vr+" "+vr+" 0 "+large+" 1 "+round(e.x)+" "+round(e.y)+" Z";
+      var wedge=svgEl("path");wedge.setAttribute("d",d);
+      wedge.setAttribute("fill","rgba(255,159,69,.22)");
+      wedge.setAttribute("stroke","#ff9f45");wedge.setAttribute("stroke-width","2");
+      svgM.appendChild(wedge);
+    }
+    // radius line
+    lineEl(svgM,MC.x,MC.y,s.x,s.y,"#8a7bff",2);
+    label(svgM,(MC.x+s.x)/2-6,(MC.y+s.y)/2,"r","#8a7bff","end");
+
+    // compute
+    var circ=TAU*r, area=Math.PI*r*r;
+    var arc=(theta/360)*TAU*r, sec=(theta/360)*Math.PI*r*r;
+    document.getElementById("mCirc").textContent=fmt(circ)+" cm";
+    document.getElementById("mArea").textContent=fmt(area)+" cm²";
+    document.getElementById("mArc").textContent=fmt(arc)+" cm";
+    document.getElementById("mSec").textContent=fmt(sec)+" cm²";
+  }
+  function onC2(a){return {x:MC.x+MC.r*Math.cos(a),y:MC.y+MC.r*Math.sin(a)};}
+  rSlider.addEventListener("input",drawMeasure);
+  aSlider.addEventListener("input",drawMeasure);
+
+  /* =====================================================================
+     QUIZ
+  ===================================================================== */
+  var QUIZ=[
+    {q:"A chord that passes through the centre of a circle is called its —",
+     opts:["radius","diameter","arc","sector"],ans:1,
+     why:"A chord through the centre is the diameter, the longest chord (d = 2r)."},
+    {q:"The perpendicular drawn from the centre of a circle to a chord —",
+     opts:["is equal to the radius","bisects the chord","is parallel to the chord","doubles the chord"],ans:1,
+     why:"The perpendicular from the centre to a chord always bisects it."},
+    {q:"For a circle of radius 7 cm, a sector of central angle 90° has area (π ≈ 22/7) —",
+     opts:["154 cm²","77 cm²","38.5 cm²","11 cm²"],ans:2,
+     why:"Sector area = (90/360)·πr² = ¼·(22/7)·49 = 38.5 cm²."}
+  ];
+  var qc=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var box=document.createElement("div");box.className="quiz-q";
+    var p=document.createElement("p");p.className="q";p.textContent=(qi+1)+". "+item.q;box.appendChild(p);
+    var verdict=document.createElement("div");verdict.className="verdict";
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=opt;
+      b.addEventListener("click",function(){
+        var btns=box.querySelectorAll(".opt");
+        btns.forEach(function(x){x.disabled=true;});
+        if(oi===item.ans){b.classList.add("correct");verdict.className="verdict g";
+          verdict.textContent="Correct! "+item.why;}
+        else{b.classList.add("wrong");btns[item.ans].classList.add("correct");
+          verdict.className="verdict b";verdict.textContent="Not quite. "+item.why;}
+      });
+      box.appendChild(b);
+    });
+    box.appendChild(verdict);qc.appendChild(box);
+  });
+
+  /* ---------- init ---------- */
+  drawParts();
+})();
+</script>
+</body>
+</html>

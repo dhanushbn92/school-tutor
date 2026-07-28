@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Similar Triangles Lab — Similarity of Triangles (NIOS Class 10, Ch 14)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#5ec9c9;
+    --accent-soft:rgba(94,201,201,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hidden{display:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:150px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 80px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+
+  canvas{width:100%;height:auto;display:block;background:#0c1019;border:1px solid var(--line);
+    border-radius:12px;touch-action:manipulation}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;font-size:.88rem;min-width:120px}
+  .chip b{color:var(--accent);display:block;font-size:1.05rem}
+  .chip.good b{color:var(--good)}
+  .note{color:var(--muted);font-size:.86rem;margin-top:10px}
+  .verdict{margin-top:12px;padding:10px 12px;border-radius:12px;font-weight:600;font-size:.95rem}
+  .verdict.sim{background:rgba(95,214,139,.14);border:1px solid var(--good);color:var(--good)}
+  .verdict.cong{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent)}
+
+  .facts ul{list-style:none;display:grid;gap:8px}
+  .facts li{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.9rem}
+  .facts li b{color:var(--accent)}
+
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .q p.stem{font-weight:600;margin-bottom:8px}
+  .opts{display:grid;gap:6px}
+  .opts button{text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:10px;padding:9px 12px;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.16)}
+  .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14)}
+  .explain{margin-top:8px;font-size:.86rem;color:var(--muted);display:none}
+  .explain.show{display:block}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Similar Triangles</span> Lab</h1>
+    <p>NIOS Class 10 Mathematics · Ch 14 — Similarity of Triangles</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="crit">1 · Similarity Criteria</button>
+    <button class="tab-btn" data-tab="bpt">2 · Thales (BPT)</button>
+    <button class="tab-btn" data-tab="area">3 · Areas &amp; Applications</button>
+    <button class="tab-btn" data-tab="facts">Facts</button>
+    <button class="tab-btn" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ========== TAB 1: CRITERIA ========== -->
+  <section class="panel" id="tab-crit">
+    <h2>Similarity criteria &amp; the scale factor k</h2>
+    <div class="controls">
+      <div class="ctrl" style="flex:1 1 100%">
+        <label>Similarity criterion demonstrated</label>
+        <div class="seg" id="critSeg">
+          <button data-c="AA" class="on">AA (AAA)</button>
+          <button data-c="SSS">SSS</button>
+          <button data-c="SAS">SAS</button>
+        </div>
+      </div>
+      <div class="ctrl" style="flex:1 1 100%">
+        <label>Scale factor k = <span class="val" id="kVal">1.60</span>  (△DEF sides = k × △ABC sides)</label>
+        <input type="range" id="kSlider" min="0.5" max="2.2" step="0.05" value="1.6">
+      </div>
+    </div>
+    <canvas id="critCanvas" width="900" height="480"></canvas>
+    <div class="readout" id="critReadout"></div>
+    <div class="verdict sim" id="critVerdict"></div>
+    <p class="note" id="critNote"></p>
+  </section>
+
+  <!-- ========== TAB 2: BPT ========== -->
+  <section class="panel hidden" id="tab-bpt">
+    <h2>Basic Proportionality Theorem (Thales)</h2>
+    <p class="note">Line DE is drawn parallel to base BC of △ABC. It cuts AB at D and AC at E.
+      BPT: <b>AD/DB = AE/EC</b>. Move the slider to slide DE up or down — the two ratios stay equal.</p>
+    <div class="controls">
+      <div class="ctrl" style="flex:1 1 100%">
+        <label>Position of DE (fraction AD/AB) = <span class="val" id="tVal">0.45</span></label>
+        <input type="range" id="tSlider" min="0.15" max="0.85" step="0.01" value="0.45">
+      </div>
+    </div>
+    <canvas id="bptCanvas" width="900" height="480"></canvas>
+    <div class="readout" id="bptReadout"></div>
+    <div class="verdict sim" id="bptVerdict"></div>
+  </section>
+
+  <!-- ========== TAB 3: AREAS & APPLICATIONS ========== -->
+  <section class="panel hidden" id="tab-area">
+    <h2>Ratio of areas &amp; a shadow application</h2>
+    <div class="controls">
+      <div class="ctrl" style="flex:1 1 100%">
+        <label>View</label>
+        <div class="seg" id="areaSeg">
+          <button data-v="ratio" class="on">Area = k²</button>
+          <button data-v="shadow">Shadow / height</button>
+        </div>
+      </div>
+      <div class="ctrl" id="areaKWrap" style="flex:1 1 100%">
+        <label>Scale factor k = <span class="val" id="akVal">1.50</span></label>
+        <input type="range" id="akSlider" min="0.6" max="2.2" step="0.05" value="1.5">
+      </div>
+      <div class="ctrl hidden" id="poleWrap" style="flex:1 1 100%">
+        <label>Pole height = <span class="val" id="poleVal">6.0</span> m  (stick 1.8 m casts 2.4 m shadow)</label>
+        <input type="range" id="poleSlider" min="3" max="12" step="0.5" value="6">
+      </div>
+    </div>
+    <canvas id="areaCanvas" width="900" height="480"></canvas>
+    <div class="readout" id="areaReadout"></div>
+    <div class="verdict sim" id="areaVerdict"></div>
+  </section>
+
+  <!-- ========== FACTS ========== -->
+  <section class="panel hidden facts" id="tab-facts">
+    <h2>Facts panel</h2>
+    <ul>
+      <li><b>Similar triangles (~):</b> same shape, not necessarily same size. Corresponding angles equal AND corresponding sides in the same ratio k.</li>
+      <li><b>AA (AAA) similarity:</b> if two angles of one triangle equal two angles of another, the triangles are similar.</li>
+      <li><b>SSS similarity:</b> if the three pairs of corresponding sides are in the same ratio, the triangles are similar.</li>
+      <li><b>SAS similarity:</b> if two pairs of sides are in the same ratio and the included angles are equal, the triangles are similar.</li>
+      <li><b>Basic Proportionality Theorem (Thales):</b> a line parallel to one side of a triangle divides the other two sides in the same ratio — AD/DB = AE/EC.</li>
+      <li><b>Ratio of areas:</b> for similar triangles, area(△DEF)/area(△ABC) = k² = (ratio of any pair of corresponding sides)².</li>
+      <li><b>Congruent = special case:</b> congruent triangles are similar with k = 1 (same shape and same size).</li>
+    </ul>
+  </section>
+
+  <!-- ========== QUIZ ========== -->
+  <section class="panel hidden" id="tab-quiz">
+    <h2>Quick quiz — tap an option</h2>
+    <div id="quizHost"></div>
+    <footer>Similar Triangles Lab · self-contained · NIOS Class 10 Ch 14</footer>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id);}
+function fmt(x,n){return Number(x).toFixed(n===undefined?2:n);}
+
+/* ---------- tab switching ---------- */
+var tabs=document.querySelectorAll(".tab-btn");
+var panelIds={crit:"tab-crit",bpt:"tab-bpt",area:"tab-area",facts:"tab-facts",quiz:"tab-quiz"};
+tabs.forEach(function(b){
+  b.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    for(var k in panelIds){$(panelIds[k]).classList.add("hidden");}
+    $(panelIds[b.dataset.tab]).classList.remove("hidden");
+    redrawAll();
+  });
+});
+
+/* generic hi-dpi canvas prep -> returns {ctx,w,h} in CSS px */
+function prep(cv){
+  var ctx=cv.getContext("2d");
+  var cssW=cv.clientWidth||cv.width;
+  var ratio=cv.height/cv.width;
+  var cssH=cssW*ratio;
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  if(cv.width!==Math.round(cssW*dpr)||cv.height!==Math.round(cssH*dpr)){
+    cv.width=Math.round(cssW*dpr);
+    cv.height=Math.round(cssH*dpr);
+  }
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cssW,cssH);
+  return {ctx:ctx,w:cssW,h:cssH};
+}
+function line(ctx,a,b,col,wd){ctx.strokeStyle=col;ctx.lineWidth=wd||2;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+function tri(ctx,p,fill,stroke,wd){
+  ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);ctx.lineTo(p[1][0],p[1][1]);ctx.lineTo(p[2][0],p[2][1]);ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  ctx.strokeStyle=stroke;ctx.lineWidth=wd||2.4;ctx.stroke();
+}
+function dot(ctx,p,col,r){ctx.fillStyle=col;ctx.beginPath();ctx.arc(p[0],p[1],r||4,0,7);ctx.fill();}
+function label(ctx,p,t,col,dx,dy,size){
+  ctx.fillStyle=col;ctx.font=(size||14)+"px system-ui,Arial";ctx.textBaseline="middle";
+  ctx.fillText(t,p[0]+(dx||0),p[1]+(dy||0));
+}
+function dist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1]);}
+/* angle at vertex B given points A,B,C in degrees */
+function angleAt(A,B,C){
+  var v1=[A[0]-B[0],A[1]-B[1]],v2=[C[0]-B[0],C[1]-B[1]];
+  var d=(v1[0]*v2[0]+v1[1]*v2[1])/(Math.hypot(v1[0],v1[1])*Math.hypot(v2[0],v2[1]));
+  d=Math.max(-1,Math.min(1,d));
+  return Math.acos(d)*180/Math.PI;
+}
+
+var INK="#e8ecf6",MUTED="#9aa5bd",ACC="#5ec9c9",GOOD="#5fd68b",WARM="#ffb454",LINE="#2e3852";
+
+/* ================= TAB 1 : CRITERIA ================= */
+var critC=$("critCanvas");
+var critMode="AA";
+var kVal=1.6;
+/* base triangle ABC (canvas coords, y-down). A top-ish, geometry: AB, BC, CA */
+var baseTri=[[70,60],[40,300],[300,270]]; // will offset
+
+function drawCrit(){
+  var P=prep(critC),ctx=P.ctx,W=P.w,H=P.h;
+  var k=kVal;
+  /* Define a reference triangle in "math" units, then place two copies. */
+  var A=[0,0],B=[0,2.4],C=[2.6,2.1]; // sides AB=2.4, others computed
+  // scale to fit left half
+  var unit=Math.min(W,H)/ (5.6*(k>1.6?1.15:1));
+  unit=Math.min(unit, (W/2-30)/3.2 );
+  var offL=[26, 34];
+  function place(pt,off,sc){return [off[0]+pt[0]*sc, off[1]+pt[1]*sc];}
+  var scL=unit;
+  var Aa=place(A,offL,scL),Bb=place(B,offL,scL),Cc=place(C,offL,scL);
+  // right triangle = scaled by k, same shape
+  var scR=unit*k;
+  var offR=[W/2+18, 34];
+  var Dd=place(A,offR,scR),Ee=place(B,offR,scR),Ff=place(C,offR,scR);
+
+  // divider
+  line(ctx,[W/2,20],[W/2,H-20],LINE,1);
+  label(ctx,[W/4-40,H-14],"△ABC (original)",MUTED,0,0,13);
+  label(ctx,[3*W/4-40,H-14],"△DEF (scaled ×k)",MUTED,0,0,13);
+
+  // draw base triangle
+  tri(ctx,[Aa,Bb,Cc],"rgba(94,201,201,.10)",ACC,2.6);
+  dot(ctx,Aa,ACC);dot(ctx,Bb,ACC);dot(ctx,Cc,ACC);
+  label(ctx,Aa,"A",INK,-16,-6);label(ctx,Bb,"B",INK,-16,6);label(ctx,Cc,"C",INK,8,4);
+
+  // draw scaled triangle
+  var col = Math.abs(k-1)<0.001 ? WARM : GOOD;
+  tri(ctx,[Dd,Ee,Ff],"rgba(95,214,139,.10)",col,2.6);
+  dot(ctx,Dd,col);dot(ctx,Ee,col);dot(ctx,Ff,col);
+  label(ctx,Dd,"D",INK,-16,-6);label(ctx,Ee,"E",INK,-16,6);label(ctx,Ff,"F",INK,8,4);
+
+  // side lengths in math units
+  var ab=dist(A,B),bc=dist(B,C),ca=dist(C,A);
+  var angA=angleAt(B,A,C),angB=angleAt(A,B,C),angC=angleAt(A,C,B);
+
+  // highlight what the criterion "checks"
+  function mid(p,q){return [(p[0]+q[0])/2,(p[1]+q[1])/2];}
+  if(critMode==="AA"){
+    // mark two equal angles on both
+    label(ctx,Aa,"∠A="+fmt(angA,0)+"°",WARM,10,20,12);
+    label(ctx,Bb,"∠B="+fmt(angB,0)+"°",WARM,10,-18,12);
+    label(ctx,Dd,"∠D="+fmt(angA,0)+"°",WARM,10,20,12);
+    label(ctx,Ee,"∠E="+fmt(angB,0)+"°",WARM,10,-18,12);
+  } else if(critMode==="SSS"){
+    line(ctx,Aa,Bb,WARM,4);line(ctx,Bb,Cc,WARM,4);line(ctx,Cc,Aa,WARM,4);
+    line(ctx,Dd,Ee,WARM,4);line(ctx,Ee,Ff,WARM,4);line(ctx,Ff,Dd,WARM,4);
+  } else { // SAS
+    line(ctx,Aa,Bb,WARM,4);line(ctx,Aa,Cc,WARM,4);
+    line(ctx,Dd,Ee,WARM,4);line(ctx,Dd,Ff,WARM,4);
+    label(ctx,Aa,"∠A",WARM,12,22,12);label(ctx,Dd,"∠D",WARM,12,22,12);
+  }
+  tri(ctx,[Aa,Bb,Cc],null,ACC,2.6);
+  tri(ctx,[Dd,Ee,Ff],null,col,2.6);
+
+  // readouts
+  var ro=$("critReadout");
+  ro.innerHTML=
+    chip("AB : DE","1 : "+fmt(k)) +
+    chip("BC : EF","1 : "+fmt(k)) +
+    chip("CA : FD","1 : "+fmt(k)) +
+    chip("∠A = ∠D","equal ("+fmt(angA,0)+"°)") +
+    chip("∠B = ∠E","equal ("+fmt(angB,0)+"°)") +
+    chip("∠C = ∠F","equal ("+fmt(angC,0)+"°)");
+
+  var v=$("critVerdict");
+  var crit=critMode==="AA"?"AA (AAA)":critMode;
+  if(Math.abs(k-1)<0.001){
+    v.className="verdict cong";
+    v.textContent="k = 1 → △ABC ≅ △DEF. Congruent is the special case of similar with equal size.";
+  }else{
+    v.className="verdict sim";
+    v.textContent="By "+crit+" similarity, △ABC ~ △DEF. Same shape; every side of DEF is "+fmt(k)+"× the matching side of ABC.";
+  }
+  var note=$("critNote");
+  var msg={
+    "AA":"AA: two equal angles force the third (angle sum 180°), so all three angles match → similar. The side ratio then comes out constant = k.",
+    "SSS":"SSS: all three side pairs share the ratio k (highlighted), which alone guarantees similarity.",
+    "SAS":"SAS: two side pairs share ratio k and the angle between them is equal (∠A = ∠D) → similar."
+  };
+  note.textContent=msg[critMode];
+}
+function chip(t,b,good){return '<div class="chip'+(good?' good':'')+'">'+t+'<b>'+b+'</b></div>';}
+
+$("critSeg").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  critMode=b.dataset.c;
+  Array.prototype.forEach.call(this.children,function(x){x.classList.remove("on");});
+  b.classList.add("on");
+  drawCrit();
+});
+$("kSlider").addEventListener("input",function(){
+  kVal=parseFloat(this.value);$("kVal").textContent=fmt(kVal);drawCrit();
+});
+
+/* ================= TAB 2 : BPT ================= */
+var bptC=$("bptCanvas");
+var tFrac=0.45;
+function drawBpt(){
+  var P=prep(bptC),ctx=P.ctx,W=P.w,H=P.h;
+  var pad=54;
+  // triangle ABC : A apex top, B bottom-left, C bottom-right
+  var A=[W*0.30,pad];
+  var B=[pad,H-pad];
+  var C=[W-pad,H-pad*0.9];
+  var t=tFrac; // AD/AB
+  // D on AB, E on AC at same fraction t (that's what parallel line gives)
+  var D=[A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t];
+  var E=[A[0]+(C[0]-A[0])*t, A[1]+(C[1]-A[1])*t];
+
+  tri(ctx,[A,B,C],"rgba(94,201,201,.08)",ACC,2.6);
+  // parallel line DE
+  line(ctx,D,E,GOOD,3.2);
+  // segments emphasized
+  line(ctx,A,D,WARM,3);   // AD
+  line(ctx,A,E,WARM,3);   // AE
+  dot(ctx,A,ACC,5);dot(ctx,B,ACC,5);dot(ctx,C,ACC,5);
+  dot(ctx,D,GOOD,5);dot(ctx,E,GOOD,5);
+  label(ctx,A,"A",INK,-6,-16);
+  label(ctx,B,"B",INK,-18,8);
+  label(ctx,C,"C",INK,8,8);
+  label(ctx,D,"D",INK,-20,0);
+  label(ctx,E,"E",INK,10,0);
+  // little "parallel" ticks
+  label(ctx,[(D[0]+E[0])/2,(D[1]+E[1])/2],"DE ∥ BC",GOOD,-24,-16,12);
+
+  // measured ratios (in canvas px = true geometric lengths)
+  var AD=dist(A,D),DB=dist(D,B),AE=dist(A,E),EC=dist(E,C);
+  var r1=AD/DB, r2=AE/EC;
+  var ro=$("bptReadout");
+  ro.innerHTML=
+    chip("AD","" +fmt(AD,0)+" px")+
+    chip("DB","" +fmt(DB,0)+" px")+
+    chip("AE","" +fmt(AE,0)+" px")+
+    chip("EC","" +fmt(EC,0)+" px")+
+    chip("AD / DB",fmt(r1,3))+
+    chip("AE / EC",fmt(r2,3),true);
+  var v=$("bptVerdict");
+  v.className="verdict sim";
+  v.textContent="AD/DB = "+fmt(r1,3)+" and AE/EC = "+fmt(r2,3)+" — equal. The parallel line splits AB and AC in the same ratio. (Also △ADE ~ △ABC by AA.)";
+}
+$("tSlider").addEventListener("input",function(){
+  tFrac=parseFloat(this.value);$("tVal").textContent=fmt(tFrac);drawBpt();
+});
+
+/* ================= TAB 3 : AREAS & APPLICATIONS ================= */
+var areaC=$("areaCanvas");
+var areaView="ratio";
+var akVal=1.5;
+var poleH=6.0;
+
+function drawArea(){
+  if(areaView==="ratio")drawAreaRatio();
+  else drawShadow();
+}
+function drawAreaRatio(){
+  var P=prep(areaC),ctx=P.ctx,W=P.w,H=P.h;
+  var k=akVal;
+  line(ctx,[W/2,20],[W/2,H-20],LINE,1);
+  // base triangle unit shape
+  var A=[0,0],B=[0,2.2],C=[2.4,1.9];
+  var unit=Math.min((W/2-40)/ (3.2*Math.max(1,k)), (H-90)/(2.6*Math.max(1,k)));
+  function place(p,off,sc){return[off[0]+p[0]*sc,off[1]+p[1]*sc];}
+  var scL=unit, offL=[30,34];
+  var Aa=place(A,offL,scL),Bb=place(B,offL,scL),Cc=place(C,offL,scL);
+  var scR=unit*k, offR=[W/2+24,34];
+  var Dd=place(A,offR,scR),Ee=place(B,offR,scR),Ff=place(C,offR,scR);
+  tri(ctx,[Aa,Bb,Cc],"rgba(94,201,201,.16)",ACC,2.6);
+  tri(ctx,[Dd,Ee,Ff],"rgba(95,214,139,.16)",GOOD,2.6);
+  label(ctx,[W/4-30,H-16],"△ABC",MUTED,0,0,13);
+  label(ctx,[3*W/4-30,H-16],"△DEF ~ △ABC",MUTED,0,0,13);
+
+  // exact areas from math units (scaled by unit^2 & k^2)
+  var baseArea=0.5*Math.abs((B[0]-A[0])*(C[1]-A[1])-(C[0]-A[0])*(B[1]-A[1])); // in unit^2
+  var areaABC=baseArea, areaDEF=baseArea*k*k;
+  var ro=$("areaReadout");
+  ro.innerHTML=
+    chip("Side ratio k",fmt(k))+
+    chip("k²",fmt(k*k,3))+
+    chip("Area ABC","" +fmt(areaABC,2)+" u²")+
+    chip("Area DEF","" +fmt(areaDEF,2)+" u²")+
+    chip("Area DEF / Area ABC",fmt(areaDEF/areaABC,3),true);
+  var v=$("areaVerdict");
+  v.className="verdict sim";
+  v.textContent="Ratio of areas = "+fmt(areaDEF/areaABC,3)+" = k² = ("+fmt(k)+")². Areas of similar triangles are in the squared ratio of corresponding sides.";
+}
+
+function drawShadow(){
+  var P=prep(areaC),ctx=P.ctx,W=P.w,H=P.h;
+  // Sun rays make equal angle -> stick and pole form similar right triangles.
+  // stick: 1.8 m -> shadow 2.4 m. pole: poleH -> shadow = poleH * (2.4/1.8)
+  var stickH=1.8, stickS=2.4;
+  var ratio=stickS/stickH; // shadow per metre
+  var poleS=poleH*ratio;
+  var ground=H-56;
+  // scale metres to px so the taller pole + shadow fit
+  var maxSpanX = poleS + stickS + 3; // metres wide
+  var maxH = poleH+1;
+  var pxX=(W-70)/maxSpanX;
+  var pxY=(ground-40)/maxH;
+  var px=Math.min(pxX,pxY);
+  function gx(m){return 40+m*px;}
+  function gy(m){return ground-m*px;}
+  // ground
+  line(ctx,[20,ground],[W-20,ground],LINE,2);
+  // pole (left) with its shadow
+  var poleBase=[gx(0.5),ground];
+  var poleTop=[gx(0.5),gy(poleH)];
+  line(ctx,poleBase,poleTop,WARM,5);
+  var poleShadowEnd=[gx(0.5+poleS),ground];
+  // sun ray (hypotenuse) top of pole -> shadow tip
+  line(ctx,poleTop,poleShadowEnd,"rgba(255,180,84,.7)",2);
+  line(ctx,poleBase,poleShadowEnd,GOOD,3); // shadow
+  label(ctx,[gx(0.5)-6,gy(poleH/2)],"pole",WARM,-40,0,13);
+  label(ctx,[gx(0.5)+6,gy(poleH)],"?",INK,0,-14,15);
+  label(ctx,[gx(0.5+poleS/2),ground],"shadow "+fmt(poleS,1)+" m",GOOD,-40,18,12);
+
+  // stick (right) with its shadow
+  var sx=0.5+poleS+2;
+  var stickBase=[gx(sx),ground];
+  var stickTop=[gx(sx),gy(stickH)];
+  line(ctx,stickBase,stickTop,ACC,5);
+  var stickShadowEnd=[gx(sx+stickS),ground];
+  line(ctx,stickTop,stickShadowEnd,"rgba(255,180,84,.7)",2);
+  line(ctx,stickBase,stickShadowEnd,GOOD,3);
+  label(ctx,[gx(sx)+6,gy(stickH)],fmt(stickH,1)+" m",INK,4,-2,12);
+  label(ctx,[gx(sx+stickS/2),ground],fmt(stickS,1)+" m",GOOD,-24,18,12);
+  label(ctx,[gx(sx)-6,gy(stickH/2)],"stick",ACC,-46,0,13);
+
+  // sun
+  ctx.fillStyle="rgba(255,180,84,.9)";ctx.beginPath();ctx.arc(W-46,30,14,0,7);ctx.fill();
+  label(ctx,[W-46,30],"☀",INK,-7,1,16);
+
+  var ro=$("areaReadout");
+  ro.innerHTML=
+    chip("Stick height","1.8 m")+
+    chip("Stick shadow","2.4 m")+
+    chip("Pole shadow","" +fmt(poleS,2)+" m")+
+    chip("height / shadow","" +fmt(1/ratio,3))+
+    chip("Pole height",fmt(poleH,1)+" m",true);
+  var v=$("areaVerdict");
+  v.className="verdict sim";
+  v.textContent="Both triangles are similar (equal sun angle, right angles). So pole/shadow = stick/stick-shadow → pole = "+fmt(poleH,1)+" = shadow "+fmt(poleS,2)+" × (1.8/2.4). Check: 1.8/2.4 = "+fmt(stickH/stickS,3)+" and "+fmt(poleH,1)+"/"+fmt(poleS,2)+" = "+fmt(poleH/poleS,3)+".";
+}
+
+$("areaSeg").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  areaView=b.dataset.v;
+  Array.prototype.forEach.call(this.children,function(x){x.classList.remove("on");});
+  b.classList.add("on");
+  $("areaKWrap").classList.toggle("hidden",areaView!=="ratio");
+  $("poleWrap").classList.toggle("hidden",areaView!=="shadow");
+  drawArea();
+});
+$("akSlider").addEventListener("input",function(){
+  akVal=parseFloat(this.value);$("akVal").textContent=fmt(akVal);drawArea();
+});
+$("poleSlider").addEventListener("input",function(){
+  poleH=parseFloat(this.value);$("poleVal").textContent=fmt(poleH,1);drawArea();
+});
+
+/* ================= QUIZ ================= */
+var quiz=[
+  {q:"In △ABC, DE ∥ BC with D on AB, E on AC. If AD = 3, DB = 2, AE = 4.5, then EC = ?",
+   opts:["2","3","4","6"], ans:1,
+   ex:"By BPT, AD/DB = AE/EC ⇒ 3/2 = 4.5/EC ⇒ EC = 4.5×2/3 = 3."},
+  {q:"Two similar triangles have corresponding sides in the ratio 2 : 3. The ratio of their areas is:",
+   opts:["2 : 3","4 : 9","8 : 27","√2 : √3"], ans:1,
+   ex:"Ratio of areas = (ratio of sides)² = 2² : 3² = 4 : 9."},
+  {q:"Which condition is NOT by itself sufficient to prove two triangles are similar?",
+   opts:["AA (two angles equal)","SSS (three sides proportional)","SAS (two sides proportional, included angle equal)","SSA (two sides proportional, a non-included angle equal)"],
+   ans:3,
+   ex:"SSA is not a valid similarity criterion; the equal angle must be the included one (SAS)."}
+];
+function buildQuiz(){
+  var host=$("quizHost");host.innerHTML="";
+  quiz.forEach(function(item,qi){
+    var box=document.createElement("div");box.className="q";
+    var p=document.createElement("p");p.className="stem";p.textContent=(qi+1)+". "+item.q;box.appendChild(p);
+    var opts=document.createElement("div");opts.className="opts";
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement("button");b.textContent=String.fromCharCode(65+oi)+". "+o;
+      b.addEventListener("click",function(){
+        if(box.dataset.done)return;box.dataset.done="1";
+        Array.prototype.forEach.call(opts.children,function(btn,bi){
+          if(bi===item.ans)btn.classList.add("correct");
+          else if(bi===oi)btn.classList.add("wrong");
+        });
+        ex.classList.add("show");
+      });
+      opts.appendChild(b);
+    });
+    box.appendChild(opts);
+    var ex=document.createElement("div");ex.className="explain";
+    ex.textContent=(oi_correct(item))+" "+item.ex;
+    box.appendChild(ex);
+    host.appendChild(box);
+  });
+}
+function oi_correct(item){return "Answer: "+String.fromCharCode(65+item.ans)+".";}
+
+/* ---------- init & resize ---------- */
+function redrawAll(){
+  if(!$("tab-crit").classList.contains("hidden"))drawCrit();
+  if(!$("tab-bpt").classList.contains("hidden"))drawBpt();
+  if(!$("tab-area").classList.contains("hidden"))drawArea();
+}
+buildQuiz();
+window.addEventListener("resize",redrawAll);
+window.addEventListener("load",redrawAll);
+redrawAll();
+</script>
+</body>
+</html>

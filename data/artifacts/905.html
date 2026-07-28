@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geometric Constructions Lab — NIOS Class 10 Maths Ch18</title>
+<style>
+  :root{
+    --bg:#0f151c; --panel:#182029; --panel2:#1e2732; --line:#2b3846;
+    --ink:#e8eef4; --muted:#9db0c2; --accent:#57c7b8; --accent-dim:#2f6f68;
+    --arc:#e0a44a; --draw:#8fd3ff; --pt:#ff6b8a; --ok:#6fdc8c; --bad:#ff7a7a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:14px}
+  header{text-align:center;padding:6px 0 12px}
+  header h1{font-size:1.32rem;margin:0 0 4px}
+  header p{margin:0;color:var(--muted);font-size:.86rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+  .tab{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:9px 13px;border-radius:11px;cursor:pointer;font-size:.85rem;
+    transition:.15s;min-height:42px;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent);color:#06110f;border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+  .mode{display:none}
+  .mode.active{display:block}
+  h2{font-size:1.05rem;margin:2px 0 10px;color:var(--accent)}
+  h3{font-size:.92rem;margin:14px 0 6px}
+  canvas{
+    width:100%;height:auto;display:block;background:#0c1218;
+    border:1px solid var(--line);border-radius:12px;touch-action:manipulation;
+  }
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  button.btn{
+    background:var(--accent);color:#06110f;border:none;padding:10px 15px;
+    border-radius:10px;cursor:pointer;font-size:.86rem;font-weight:600;min-height:44px;
+  }
+  button.btn:hover{filter:brightness(1.08)}
+  button.btn.sec{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  button.btn:disabled{opacity:.4;cursor:not-allowed}
+  select,.seg{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    padding:9px 11px;border-radius:10px;font-size:.85rem;min-height:44px;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+  .row label{font-size:.82rem;color:var(--muted)}
+  input[type=range]{accent-color:var(--accent);height:32px}
+  .step{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin-top:10px;font-size:.9rem;min-height:52px;
+  }
+  .step b{color:var(--accent)}
+  .prog{font-size:.78rem;color:var(--muted);margin-left:auto}
+  .facts{background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:.85rem;color:var(--muted)}
+  .facts b{color:var(--ink)}
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:10px}
+  .quiz .qq{font-weight:600;margin-bottom:8px;font-size:.9rem}
+  .opt{
+    display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:6px 0;
+    cursor:pointer;font-size:.85rem;min-height:44px;
+  }
+  .opt:hover{border-color:var(--accent)}
+  .opt.right{background:var(--accent-dim);border-color:var(--ok);color:#eafff5}
+  .opt.wrong{background:#3a2226;border-color:var(--bad)}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  footer{text-align:center;color:var(--muted);font-size:.75rem;padding:8px 0 20px}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.75rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Geometric Constructions Lab</h1>
+    <p>NIOS Class 10 Mathematics · Ch18 Constructions · compass &amp; straightedge, step by step</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-m="basic">Basic constructions</button>
+    <button class="tab" data-m="ratio">Divide segment m:n</button>
+    <button class="tab" data-m="tangent">Tangents to a circle</button>
+  </div>
+
+  <!-- MODE 1: BASIC -->
+  <section class="mode active" data-mode="basic">
+    <div class="panel">
+      <h2>Basic constructions</h2>
+      <div class="row">
+        <label for="basicSel">Choose:</label>
+        <select id="basicSel" class="seg">
+          <option value="perpbis">Perpendicular bisector of a segment</option>
+          <option value="bisect">Bisect an angle</option>
+          <option value="ang60">Construct 60° angle</option>
+          <option value="ang90">Construct 90° angle</option>
+          <option value="ang30">Construct 30° angle</option>
+          <option value="ang45">Construct 45° angle</option>
+          <option value="perppt">Perpendicular to a line from a point</option>
+        </select>
+      </div>
+      <canvas id="cBasic" width="760" height="440" aria-label="Basic construction canvas"></canvas>
+      <div class="controls">
+        <button class="btn" id="bNext">Next step ▸</button>
+        <button class="btn sec" id="bPlay">Auto-play</button>
+        <button class="btn sec" id="bReset">Reset</button>
+        <span class="prog" id="bProg">Step 0</span>
+      </div>
+      <div class="step" id="bStep">Pick a construction and press <b>Next step</b> to begin.</div>
+      <div class="legend">
+        <span><i style="background:var(--draw)"></i>Given / lines</span>
+        <span><i style="background:var(--arc)"></i>Compass arcs</span>
+        <span><i style="background:var(--pt)"></i>Key points</span>
+        <span><i style="background:var(--accent)"></i>Result</span>
+      </div>
+      <div class="facts" id="bFacts"></div>
+    </div>
+  </section>
+
+  <!-- MODE 2: RATIO -->
+  <section class="mode" data-mode="ratio">
+    <div class="panel">
+      <h2>Divide a segment in ratio m : n</h2>
+      <p style="font-size:.84rem;color:var(--muted);margin:0 0 8px">
+        Parallel-lines (ray) method: draw an acute ray, mark <b>m+n</b> equal steps, join the last to B, and draw a parallel through the m-th point.</p>
+      <div class="row">
+        <label>m = <b id="mVal">2</b></label>
+        <input type="range" id="mR" min="1" max="6" value="2">
+        <label>n = <b id="nVal">3</b></label>
+        <input type="range" id="nR" min="1" max="6" value="3">
+      </div>
+      <canvas id="cRatio" width="760" height="440" aria-label="Segment division canvas"></canvas>
+      <div class="controls">
+        <button class="btn" id="rNext">Next step ▸</button>
+        <button class="btn sec" id="rPlay">Auto-play</button>
+        <button class="btn sec" id="rReset">Reset</button>
+        <span class="prog" id="rProg">Step 0</span>
+      </div>
+      <div class="step" id="rStep">Set m and n, then press <b>Next step</b>.</div>
+      <div class="facts" id="rFacts">
+        <b>Why it works:</b> The equal steps on the ray cut off equal segments; the parallel line through the m-th point cuts AB in the same ratio (Basic Proportionality / Thales theorem), so AP : PB = m : n exactly.</div>
+    </div>
+  </section>
+
+  <!-- MODE 3: TANGENT -->
+  <section class="mode" data-mode="tangent">
+    <div class="panel">
+      <h2>Tangents to a circle from an external point</h2>
+      <p style="font-size:.84rem;color:var(--muted);margin:0 0 8px">
+        Join centre O to external point P, find the midpoint M of OP, draw the circle on OP as diameter — it meets the given circle at the tangent points.</p>
+      <canvas id="cTan" width="760" height="440" aria-label="Tangent construction canvas"></canvas>
+      <div class="controls">
+        <button class="btn" id="tNext">Next step ▸</button>
+        <button class="btn sec" id="tPlay">Auto-play</button>
+        <button class="btn sec" id="tReset">Reset</button>
+        <span class="prog" id="tProg">Step 0</span>
+      </div>
+      <div class="step" id="tStep">Press <b>Next step</b> to construct both tangents.</div>
+      <div class="facts" id="tFacts">
+        <b>Why it works:</b> Any angle in a semicircle is 90° (Thales). Since T lies on the circle with diameter OP, angle OTP = 90°, so OT ⟂ PT. A radius perpendicular to a line at a circle point means that line is a tangent — hence PT touches the circle.</div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel quiz">
+    <h2>Quick check (3 questions)</h2>
+    <div id="quiz"></div>
+  </section>
+
+  <footer>Self-contained canvas simulation · animation pauses when the tab is hidden.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- helpers ---------- */
+  var TAU = Math.PI*2;
+  function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+  function mid(a,b){return {x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
+  function lerp(a,b,t){return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t};}
+  function ang(a,b){return Math.atan2(b.y-a.y,b.x-a.x);}
+  // circle-circle intersection; returns array of points (0,1,2)
+  function circInt(c0,r0,c1,r1){
+    var dx=c1.x-c0.x, dy=c1.y-c0.y, d=Math.hypot(dx,dy);
+    if(d> r0+r1+1e-6 || d< Math.abs(r0-r1)-1e-6 || d===0) return [];
+    var a=(r0*r0-r1*r1+d*d)/(2*d);
+    var h2=r0*r0-a*a; if(h2<0) h2=0;
+    var h=Math.sqrt(h2);
+    var xm=c0.x+a*dx/d, ym=c0.y+a*dy/d;
+    var rx=-dy*(h/d), ry=dx*(h/d);
+    return [{x:xm+rx,y:ym+ry},{x:xm-rx,y:ym-ry}];
+  }
+
+  /* ---------- shared animation engine ---------- */
+  function makeEngine(canvas, buildSteps, stepEl, progEl){
+    var ctx = canvas.getContext("2d");
+    var steps=[], idx=0, anim=null, playing=false;
+
+    function fit(){
+      // hi-dpi crisp
+      var cssW = canvas.clientWidth || canvas.width;
+      var scale = cssW/canvas.width;
+      var dpr = Math.min(window.devicePixelRatio||1, 2);
+      canvas.style.height = (canvas.height*scale)+"px";
+    }
+
+    function draw(){
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#0c1218"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      // draw all committed steps up to idx-1 fully, current step partially
+      for(var i=0;i<idx;i++){ steps[i].render(ctx,1); }
+      if(idx<steps.length && anim){ steps[idx].render(ctx, anim.t); }
+    }
+
+    function setText(){
+      var s = (idx<steps.length)?steps[idx]:steps[steps.length-1];
+      var n = Math.min(idx+1,steps.length);
+      if(idx>=steps.length){ n=steps.length; }
+      stepEl.innerHTML = "<b>Step "+Math.min(idx+ (anim?1:0),steps.length)+"/"+steps.length+":</b> "+
+        (steps[Math.min(idx,steps.length-1)] ? steps[Math.min(idx,steps.length-1)].text : "");
+      progEl.textContent = "Step "+Math.min(idx+(anim?1:0),steps.length)+" / "+steps.length;
+    }
+
+    function animateStep(cb){
+      if(idx>=steps.length){ if(cb)cb(); return; }
+      var st=steps[idx];
+      var dur = st.instant?0:520;
+      var start=null;
+      anim={t:0};
+      setText();
+      function frame(ts){
+        if(document.hidden){ anim._raf=requestAnimationFrame(frame); return; }
+        if(start===null) start=ts;
+        var e=ts-start;
+        anim.t = dur? Math.min(1,e/dur):1;
+        draw();
+        if(anim.t<1){ anim._raf=requestAnimationFrame(frame); }
+        else { idx++; anim=null; draw(); setText(); if(cb)cb(); }
+      }
+      anim._raf=requestAnimationFrame(frame);
+    }
+
+    function next(){
+      if(playing) return;
+      if(anim) return;
+      if(idx>=steps.length) return;
+      animateStep();
+    }
+    function play(){
+      if(playing){ playing=false; return; }
+      playing=true;
+      function loop(){
+        if(!playing) return;
+        if(idx>=steps.length){ playing=false; return; }
+        animateStep(function(){
+          if(playing) setTimeout(loop, 420);
+        });
+      }
+      loop();
+    }
+    function reset(){
+      playing=false;
+      if(anim && anim._raf) cancelAnimationFrame(anim._raf);
+      anim=null; idx=0;
+      steps = buildSteps();
+      draw();
+      stepEl.innerHTML = steps.length? ("<b>Ready.</b> Press <b>Next step</b> to begin. ("+steps.length+" steps)") : "";
+      progEl.textContent = "Step 0 / "+steps.length;
+    }
+    document.addEventListener("visibilitychange",function(){
+      if(!document.hidden){ draw(); }
+    });
+    fit();
+    window.addEventListener("resize",fit);
+    return {next:next,play:play,reset:reset,isDone:function(){return idx>=steps.length;}};
+  }
+
+  /* ---------- drawing primitives for step render ---------- */
+  function line(ctx,a,b,col,w){ ctx.strokeStyle=col;ctx.lineWidth=w||2;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke(); }
+  function ray(ctx,a,b,len,col,w){ var d=ang(a,b); var e={x:a.x+Math.cos(d)*len,y:a.y+Math.sin(d)*len}; line(ctx,a,e,col,w); }
+  function dot(ctx,p,col,r){ ctx.fillStyle=col||"#ff6b8a";ctx.beginPath();ctx.arc(p.x,p.y,r||4.5,0,TAU);ctx.fill(); }
+  function label(ctx,p,txt,dx,dy,col){ ctx.fillStyle=col||"#e8eef4";ctx.font="14px system-ui,Arial";ctx.fillText(txt,p.x+(dx||6),p.y+(dy||-6)); }
+  function fullCircle(ctx,c,r,col,w){ ctx.strokeStyle=col;ctx.lineWidth=w||1.5;ctx.beginPath();ctx.arc(c.x,c.y,r,0,TAU);ctx.stroke(); }
+  // arc from angle a0 sweeping to a1, fraction t of the sweep
+  function arcT(ctx,c,r,a0,a1,t,col,w){
+    ctx.strokeStyle=col||"#e0a44a";ctx.lineWidth=w||1.6;
+    ctx.beginPath();
+    var end=a0+(a1-a0)*t;
+    ctx.arc(c.x,c.y,r, a0, end, (a1<a0));
+    ctx.stroke();
+  }
+  function COL(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  var C_DRAW="#8fd3ff", C_ARC="#e0a44a", C_PT="#ff6b8a", C_ACC="#57c7b8", C_INK="#e8eef4", C_MUT="#9db0c2";
+
+  /* ================= MODE 1: BASIC ================= */
+  var basicSel = document.getElementById("basicSel");
+  var bStepEl=document.getElementById("bStep"), bProg=document.getElementById("bProg"), bFacts=document.getElementById("bFacts");
+
+  var FACTS = {
+    perpbis:"<b>Why it works:</b> Arcs of equal radius from A and B give two points each equidistant from A and B. Every point equidistant from the endpoints lies on the perpendicular bisector, so the line through them is that bisector.",
+    bisect:"<b>Why it works:</b> The first arc marks equal distances along both arms. Equal arcs from those two marks meet at a point equidistant from both arms — that point, joined to the vertex, bisects the angle (the two triangles are congruent by SSS).",
+    ang60:"<b>Why it works:</b> The construction builds an equilateral triangle: OA = OB = AB (all equal radius), so every angle is 60°.",
+    ang90:"<b>Why it works:</b> A 60° arc and a 120° arc are marked; bisecting the 60°–120° gap gives 90°. Equivalently it erects the perpendicular at O.",
+    ang30:"<b>Why it works:</b> First a 60° angle is built, then its bisector halves it to 30° (congruent triangles by SSS).",
+    ang45:"<b>Why it works:</b> A 90° angle is constructed and then bisected, giving 45°.",
+    perppt:"<b>Why it works:</b> An arc from P cuts the line at two points equidistant from P; the perpendicular bisector of that chord passes through P and is perpendicular to the line."
+  };
+
+  function buildBasic(){
+    var kind = basicSel.value;
+    var steps=[];
+    if(kind==="perpbis"){
+      var A={x:150,y:250}, B={x:610,y:250};
+      var r=dist(A,B)*0.66;
+      var ps=circInt(A,r,B,r); var P=ps[0], Q=ps[1];
+      steps.push({text:"Draw the given segment AB.",render:function(ctx,t){
+        line(ctx,A,lerp(A,B,t),C_DRAW,2.5); if(t>0.99){dot(ctx,A,C_PT);dot(ctx,B,C_PT);label(ctx,A,"A",-16,4);label(ctx,B,"B",8,4);} }});
+      steps.push({text:"With centre A and radius more than half AB, draw an arc.",render:function(ctx,t){
+        commitPB(ctx);var d0=ang(A,P)-0.9,d1=ang(A,Q)+0.9; arcT(ctx,A,r,d0,d1,t,C_ARC); }});
+      steps.push({text:"With the same radius and centre B, draw an arc cutting the first at P and Q.",render:function(ctx,t){
+        commitPB(ctx);drawArcA(ctx);var d0=ang(B,P)-0.9,d1=ang(B,Q)+0.9;arcT(ctx,B,r,d1,d0,t,C_ARC);
+        if(t>0.99){dot(ctx,P,C_PT);dot(ctx,Q,C_PT);label(ctx,P,"P",6,-4);label(ctx,Q,"Q",6,14);} }});
+      steps.push({instant:false,text:"Join P and Q. This line is the perpendicular bisector of AB (it passes through the midpoint at 90°).",render:function(ctx,t){
+        commitPB(ctx);drawArcA(ctx);drawArcB(ctx);dot(ctx,P,C_PT);dot(ctx,Q,C_PT);
+        var e=lerp(P,Q,t); line(ctx,P,e,C_ACC,2.6);
+        if(t>0.99){dot(ctx,mid(A,B),C_ACC,4);sq(ctx,mid(A,B),A,P);} }});
+      function commitPB(ctx){line(ctx,A,B,C_DRAW,2.5);dot(ctx,A,C_PT);dot(ctx,B,C_PT);label(ctx,A,"A",-16,4);label(ctx,B,"B",8,4);}
+      function drawArcA(ctx){arcT(ctx,A,r,ang(A,P)-0.9,ang(A,Q)+0.9,1,C_ARC);}
+      function drawArcB(ctx){arcT(ctx,B,r,ang(B,Q)-0.9,ang(B,P)+0.9,1,C_ARC);}
+    }
+    else if(kind==="bisect"){
+      var O={x:170,y:360};
+      var arm1={x:660,y:360};              // horizontal arm
+      var arm2={x:170+490*Math.cos(-1.05),y:360+490*Math.sin(-1.05)};
+      var a1=ang(O,arm1), a2=ang(O,arm2);
+      var r1=170;
+      var X={x:O.x+r1*Math.cos(a1),y:O.y+r1*Math.sin(a1)};
+      var Y={x:O.x+r1*Math.cos(a2),y:O.y+r1*Math.sin(a2)};
+      var r2=r1*0.95;
+      var mp=circInt(X,r2,Y,r2);
+      // choose intersection inside the angle (closer to bisector direction)
+      var bis=(a1+a2)/2;
+      var M = mp.length? (Math.hypot(mp[0].x-(O.x+Math.cos(bis)*300),mp[0].y-(O.y+Math.sin(bis)*300)) <
+                          Math.hypot(mp[1].x-(O.x+Math.cos(bis)*300),mp[1].y-(O.y+Math.sin(bis)*300)) ? mp[0]:mp[1]) : {x:O.x+Math.cos(bis)*250,y:O.y+Math.sin(bis)*250};
+      function base(ctx){ray(ctx,O,arm1,500,C_DRAW,2.4);ray(ctx,O,arm2,500,C_DRAW,2.4);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);}
+      steps.push({text:"Draw the angle with vertex O and its two arms.",render:function(ctx,t){
+        ray(ctx,O,arm1,500*t,C_DRAW,2.4);ray(ctx,O,arm2,500*t,C_DRAW,2.4);dot(ctx,O,C_PT);if(t>.99)label(ctx,O,"O",-16,6);}});
+      steps.push({text:"With centre O, draw an arc cutting both arms at X and Y.",render:function(ctx,t){
+        base(ctx);arcT(ctx,O,r1,a1,a2,t,C_ARC);if(t>.99){dot(ctx,X,C_PT);dot(ctx,Y,C_PT);label(ctx,X,"X",6,4);label(ctx,Y,"Y",8,0);}}});
+      steps.push({text:"From X and Y, draw equal arcs that meet inside the angle at M.",render:function(ctx,t){
+        base(ctx);arcT(ctx,O,r1,a1,a2,1,C_ARC);dot(ctx,X,C_PT);dot(ctx,Y,C_PT);
+        var bx0=ang(X,M)-0.7,bx1=ang(X,M)+0.7; arcT(ctx,X,r2,bx0,bx1,t,C_ARC);
+        var by0=ang(Y,M)-0.7,by1=ang(Y,M)+0.7; arcT(ctx,Y,r2,by0,by1,t,C_ARC);
+        if(t>.99){dot(ctx,M,C_PT);label(ctx,M,"M",8,-4);}}});
+      steps.push({text:"Join O to M. Ray OM bisects the angle into two equal parts.",render:function(ctx,t){
+        base(ctx);arcT(ctx,O,r1,a1,a2,1,C_ARC);dot(ctx,X,C_PT);dot(ctx,Y,C_PT);dot(ctx,M,C_PT);
+        var e=lerp(O,{x:O.x+(M.x-O.x)*2.2,y:O.y+(M.y-O.y)*2.2},t); line(ctx,O,e,C_ACC,2.6);}});
+    }
+    else if(kind==="ang60"){
+      var O={x:150,y:360}, base={x:660,y:360};
+      var r=200;
+      var A={x:O.x+r,y:O.y};
+      var B={x:O.x+r*Math.cos(-Math.PI/3),y:O.y+r*Math.sin(-Math.PI/3)};
+      function bl(ctx){line(ctx,O,base,C_DRAW,2.4);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);}
+      steps.push({text:"Draw base ray from vertex O.",render:function(ctx,t){line(ctx,O,lerp(O,base,t),C_DRAW,2.4);dot(ctx,O,C_PT);if(t>.99)label(ctx,O,"O",-16,6);}});
+      steps.push({text:"With centre O, draw an arc cutting the base at A.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,t,C_ARC);if(t>.99){dot(ctx,A,C_PT);label(ctx,A,"A",4,18);}}});
+      steps.push({text:"With centre A and the same radius, cut the arc at B.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,1,C_ARC);dot(ctx,A,C_PT);var d=ang(A,O);arcT(ctx,A,r,d+0.2,d-0.9,t,C_ARC);if(t>.99){dot(ctx,B,C_PT);label(ctx,B,"B",8,-2);}}});
+      steps.push({text:"Join OB. Angle AOB = 60° (OAB is equilateral).",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);var e=lerp(O,{x:O.x+(B.x-O.x)*2.3,y:O.y+(B.y-O.y)*2.3},t);line(ctx,O,e,C_ACC,2.6);if(t>.99)angMark(ctx,O,A,B,"60°");}});
+    }
+    else if(kind==="ang90"){
+      var O={x:150,y:360}, base={x:660,y:360};
+      var r=180;
+      var A={x:O.x+r,y:O.y};
+      var B={x:O.x+r*Math.cos(-Math.PI/3),y:O.y+r*Math.sin(-Math.PI/3)}; //60
+      var C={x:O.x+r*Math.cos(-2*Math.PI/3),y:O.y+r*Math.sin(-2*Math.PI/3)};//120
+      var mp=circInt(B,r,C,r); var D = mp[0].y<mp[1].y?mp[0]:mp[1]; // upper
+      function bl(ctx){line(ctx,O,base,C_DRAW,2.4);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);}
+      steps.push({text:"Draw base ray from O.",render:function(ctx,t){line(ctx,O,lerp(O,base,t),C_DRAW,2.4);dot(ctx,O,C_PT);if(t>.99)label(ctx,O,"O",-16,6);}});
+      steps.push({text:"Arc from O cuts base at A; mark B (60°) and C (120°) with the same radius.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,t,C_ARC);if(t>.99){dot(ctx,A,C_PT);dot(ctx,B,C_PT);dot(ctx,C,C_PT);label(ctx,A,"A",2,18);label(ctx,B,"B",6,-2);label(ctx,C,"C",-16,-2);}}});
+      steps.push({text:"Equal arcs from B and C meet at D.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);dot(ctx,C,C_PT);var db=ang(B,D),dc=ang(C,D);arcT(ctx,B,r,db-0.6,db+0.6,t,C_ARC);arcT(ctx,C,r,dc-0.6,dc+0.6,t,C_ARC);if(t>.99){dot(ctx,D,C_PT);label(ctx,D,"D",8,-2);}}});
+      steps.push({text:"Join OD. Angle AOD = 90°.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);dot(ctx,C,C_PT);dot(ctx,D,C_PT);var e=lerp(O,{x:O.x+(D.x-O.x)*2.2,y:O.y+(D.y-O.y)*2.2},t);line(ctx,O,e,C_ACC,2.6);if(t>.99){sq(ctx,O,A,D);angMark(ctx,O,A,D,"90°");}}});
+    }
+    else if(kind==="ang30"){
+      var O={x:150,y:360}, base={x:660,y:360};
+      var r=190;
+      var A={x:O.x+r,y:O.y};
+      var B={x:O.x+r*Math.cos(-Math.PI/3),y:O.y+r*Math.sin(-Math.PI/3)};
+      var mp=circInt(A,r*0.95,B,r*0.95); var M=mp[0].y<mp[1].y?mp[0]:mp[1];
+      function bl(ctx){line(ctx,O,base,C_DRAW,2.4);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);}
+      steps.push({text:"Draw base ray from O.",render:function(ctx,t){line(ctx,O,lerp(O,base,t),C_DRAW,2.4);dot(ctx,O,C_PT);if(t>.99)label(ctx,O,"O",-16,6);}});
+      steps.push({text:"Build a 60° angle: arc cuts base at A, then arc from A gives B.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,t,C_ARC);if(t>.99){dot(ctx,A,C_PT);dot(ctx,B,C_PT);label(ctx,A,"A",2,18);label(ctx,B,"B",6,-2);}}});
+      steps.push({text:"Bisect the 60° angle: equal arcs from A and B meet at M.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);var da=ang(A,M),db=ang(B,M);arcT(ctx,A,r*0.95,da-0.5,da+0.5,t,C_ARC);arcT(ctx,B,r*0.95,db-0.5,db+0.5,t,C_ARC);if(t>.99){dot(ctx,M,C_PT);label(ctx,M,"M",8,-2);}}});
+      steps.push({text:"Join OM. Angle AOM = 30°.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI/3-0.25,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);dot(ctx,M,C_PT);var e=lerp(O,{x:O.x+(M.x-O.x)*2.3,y:O.y+(M.y-O.y)*2.3},t);line(ctx,O,e,C_ACC,2.6);if(t>.99)angMark(ctx,O,A,M,"30°");}});
+    }
+    else if(kind==="ang45"){
+      var O={x:150,y:360}, base={x:660,y:360};
+      var r=170;
+      var A={x:O.x+r,y:O.y};
+      var B={x:O.x+r*Math.cos(-Math.PI/3),y:O.y+r*Math.sin(-Math.PI/3)};
+      var C={x:O.x+r*Math.cos(-2*Math.PI/3),y:O.y+r*Math.sin(-2*Math.PI/3)};
+      var mpd=circInt(B,r,C,r); var D=mpd[0].y<mpd[1].y?mpd[0]:mpd[1]; // 90 dir point
+      var d90=ang(O,D);
+      var P90={x:O.x+r*Math.cos(d90),y:O.y+r*Math.sin(d90)}; // on arc at 90
+      var mpm=circInt(A,r*0.98,P90,r*0.98); var M=mpm[0].y<mpm[1].y?mpm[0]:mpm[1];
+      function bl(ctx){line(ctx,O,base,C_DRAW,2.4);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);}
+      steps.push({text:"Draw base ray from O.",render:function(ctx,t){line(ctx,O,lerp(O,base,t),C_DRAW,2.4);dot(ctx,O,C_PT);if(t>.99)label(ctx,O,"O",-16,6);}});
+      steps.push({text:"Construct a 90° angle (OD) first.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,1,C_ARC);dot(ctx,A,C_PT);var e=lerp(O,{x:O.x+(D.x-O.x)*2,y:O.y+(D.y-O.y)*2},t);line(ctx,O,e,C_DRAW,2.2);if(t>.99){dot(ctx,P90,C_PT);label(ctx,A,"A",2,18);sq(ctx,O,A,D);}}});
+      steps.push({text:"Bisect the 90° angle: equal arcs from A and the 90° mark meet at M.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,1,C_ARC);ray(ctx,O,D,r*2,C_DRAW,2.2);dot(ctx,A,C_PT);dot(ctx,P90,C_PT);var da=ang(A,M),dp=ang(P90,M);arcT(ctx,A,r*0.98,da-0.5,da+0.5,t,C_ARC);arcT(ctx,P90,r*0.98,dp-0.5,dp+0.5,t,C_ARC);if(t>.99){dot(ctx,M,C_PT);label(ctx,M,"M",8,-2);}}});
+      steps.push({text:"Join OM. Angle AOM = 45°.",render:function(ctx,t){bl(ctx);arcT(ctx,O,r,0,-Math.PI,1,C_ARC);ray(ctx,O,D,r*2,C_DRAW,2.2);dot(ctx,A,C_PT);dot(ctx,M,C_PT);var e=lerp(O,{x:O.x+(M.x-O.x)*2.4,y:O.y+(M.y-O.y)*2.4},t);line(ctx,O,e,C_ACC,2.6);if(t>.99)angMark(ctx,O,A,M,"45°");}});
+    }
+    else if(kind==="perppt"){
+      var L1={x:120,y:300}, L2={x:660,y:300};
+      var P={x:390,y:130};
+      var r=dist(P,{x:390,y:300})+70; // reach line
+      // intersection of circle(P,r) with the line y=300
+      var dx=Math.sqrt(Math.max(0,r*r-(300-P.y)*(300-P.y)));
+      var A={x:P.x-dx,y:300}, B={x:P.x+dx,y:300};
+      var r2=dist(A,B)*0.62;
+      var mp=circInt(A,r2,B,r2); // one above one below
+      var Q=mp[0].y>mp[1].y?mp[0]:mp[1]; // below the line
+      var foot={x:P.x,y:300};
+      function bl(ctx){line(ctx,L1,L2,C_DRAW,2.4);dot(ctx,P,C_PT);label(ctx,P,"P",8,-6);}
+      steps.push({text:"Given line and external point P.",render:function(ctx,t){line(ctx,L1,lerp(L1,L2,t),C_DRAW,2.4);dot(ctx,P,C_PT);if(t>.99)label(ctx,P,"P",8,-6);}});
+      steps.push({text:"With centre P, draw an arc cutting the line at A and B.",render:function(ctx,t){bl(ctx);var da=ang(P,A),db=ang(P,B);arcT(ctx,P,r,da-0.1,db+0.1,t,C_ARC);if(t>.99){dot(ctx,A,C_PT);dot(ctx,B,C_PT);label(ctx,A,"A",-16,18);label(ctx,B,"B",6,18);}}});
+      steps.push({text:"Equal arcs from A and B meet at Q on the far side.",render:function(ctx,t){bl(ctx);arcT(ctx,P,r,ang(P,A)-0.1,ang(P,B)+0.1,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);var da=ang(A,Q),db=ang(B,Q);arcT(ctx,A,r2,da-0.6,da+0.6,t,C_ARC);arcT(ctx,B,r2,db-0.6,db+0.6,t,C_ARC);if(t>.99){dot(ctx,Q,C_PT);label(ctx,Q,"Q",8,12);}}});
+      steps.push({text:"Join PQ — it is perpendicular to the line and passes through P.",render:function(ctx,t){bl(ctx);arcT(ctx,P,r,ang(P,A)-0.1,ang(P,B)+0.1,1,C_ARC);dot(ctx,A,C_PT);dot(ctx,B,C_PT);dot(ctx,Q,C_PT);var e=lerp(P,Q,t);line(ctx,P,e,C_ACC,2.6);if(t>.99){dot(ctx,foot,C_ACC,4);sq(ctx,foot,A,P);}}});
+    }
+    return steps;
+  }
+
+  // small right-angle square marker at corner c along directions toward p and q
+  function sq(ctx,c,p,q){
+    var s=14;
+    var u=unit(c,p), v=unit(c,q);
+    var a={x:c.x+u.x*s,y:c.y+u.y*s};
+    var b={x:c.x+v.x*s,y:c.y+v.y*s};
+    var d={x:c.x+u.x*s+v.x*s,y:c.y+u.y*s+v.y*s};
+    ctx.strokeStyle=C_ACC;ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(d.x,d.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  function unit(a,b){var d=Math.hypot(b.x-a.x,b.y-a.y)||1;return {x:(b.x-a.x)/d,y:(b.y-a.y)/d};}
+  function angMark(ctx,O,A,B,txt){
+    var r=42;var a0=ang(O,A),a1=ang(O,B);
+    ctx.strokeStyle=C_ACC;ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(O.x,O.y,r,a0,a1,(a1<a0));ctx.stroke();
+    var am=(a0+a1)/2;ctx.fillStyle=C_ACC;ctx.font="13px system-ui,Arial";ctx.fillText(txt,O.x+Math.cos(am)*(r+16)-8,O.y+Math.sin(am)*(r+16)+4);
+  }
+
+  var basicEngine = makeEngine(document.getElementById("cBasic"), buildBasic, bStepEl, bProg);
+  function refreshBasicFacts(){ bFacts.innerHTML = FACTS[basicSel.value]; }
+  basicSel.addEventListener("change",function(){ basicEngine.reset(); refreshBasicFacts(); });
+  document.getElementById("bNext").onclick=function(){basicEngine.next();};
+  document.getElementById("bPlay").onclick=function(){basicEngine.play();};
+  document.getElementById("bReset").onclick=function(){basicEngine.reset();};
+  basicEngine.reset(); refreshBasicFacts();
+
+  /* ================= MODE 2: RATIO ================= */
+  var mR=document.getElementById("mR"), nR=document.getElementById("nR");
+  var mVal=document.getElementById("mVal"), nVal=document.getElementById("nVal");
+  var rStepEl=document.getElementById("rStep"), rProg=document.getElementById("rProg");
+
+  function buildRatio(){
+    var m=+mR.value, n=+nR.value, k=m+n;
+    var A={x:130,y:150}, B={x:660,y:150};
+    var rayDir=2.05; // radians downward-right
+    var stepLen=Math.min(58, 430/k);
+    var rayPts=[]; // A1..Ak
+    for(var i=1;i<=k;i++){ rayPts.push({x:A.x+Math.cos(rayDir)*stepLen*i, y:A.y+Math.sin(rayDir)*stepLen*i}); }
+    var Ak=rayPts[k-1], Am=rayPts[m-1];
+    // P divides AB in m:n => P = A + (m/k)*(B-A)
+    var P={x:A.x+(B.x-A.x)*m/k, y:A.y+(B.y-A.y)*m/k};
+    var steps=[];
+    function segAB(ctx){line(ctx,A,B,C_DRAW,2.5);dot(ctx,A,C_PT);dot(ctx,B,C_PT);label(ctx,A,"A",-16,4);label(ctx,B,"B",8,4);}
+    function theRay(ctx,frac){var end={x:A.x+Math.cos(rayDir)*stepLen*k*frac,y:A.y+Math.sin(rayDir)*stepLen*k*frac};line(ctx,A,end,C_MUT,1.8);}
+    steps.push({text:"Draw the segment AB to be divided.",render:function(ctx,t){line(ctx,A,lerp(A,B,t),C_DRAW,2.5);dot(ctx,A,C_PT);if(t>.99){dot(ctx,B,C_PT);label(ctx,A,"A",-16,4);label(ctx,B,"B",8,4);}}});
+    steps.push({text:"From A, draw an acute-angle ray AX.",render:function(ctx,t){segAB(ctx);theRay(ctx,t);if(t>.99)label(ctx,rayPts[k-1],"X",8,10,C_MUT);}});
+    steps.push({text:"On the ray, mark "+k+" equal points (m+n = "+m+"+"+n+") using a fixed compass width.",render:function(ctx,t){
+      segAB(ctx);theRay(ctx,1);
+      var show=Math.round(k*t);
+      for(var i=0;i<show;i++){dot(ctx,rayPts[i],C_ARC,4);label(ctx,rayPts[i],"A"+(i+1),6,-4,C_MUT);}
+    }});
+    steps.push({text:"Join the last point A"+k+" to B.",render:function(ctx,t){
+      segAB(ctx);theRay(ctx,1);for(var i=0;i<k;i++){dot(ctx,rayPts[i],(i===m-1)?C_PT:C_ARC,(i===m-1)?5:4);}
+      line(ctx,Ak,lerp(Ak,B,t),C_ARC,2);
+    }});
+    steps.push({text:"Through A"+m+", draw a line parallel to A"+k+"B; it meets AB at P.",render:function(ctx,t){
+      segAB(ctx);theRay(ctx,1);for(var i=0;i<k;i++){dot(ctx,rayPts[i],(i===m-1)?C_PT:C_ARC,(i===m-1)?5:4);}
+      line(ctx,Ak,B,C_ARC,2);
+      var e=lerp(Am,P,t); line(ctx,Am,e,C_ACC,2.4);
+      if(t>.99){dot(ctx,P,C_ACC,5.5);label(ctx,P,"P",-4,-10,C_ACC);}
+    }});
+    steps.push({instant:true,text:"Done: AP : PB = "+m+" : "+n+".  P divides AB in the required ratio.",render:function(ctx,t){
+      segAB(ctx);theRay(ctx,1);for(var i=0;i<k;i++){dot(ctx,rayPts[i],(i===m-1)?C_PT:C_ARC,(i===m-1)?5:4);}
+      line(ctx,Ak,B,C_ARC,2);line(ctx,Am,P,C_ACC,2.4);dot(ctx,P,C_ACC,5.5);label(ctx,P,"P",-4,-10,C_ACC);
+      ctx.fillStyle=C_ACC;ctx.font="15px system-ui,Arial";ctx.fillText("AP : PB = "+m+" : "+n, 260, 60);
+    }});
+    return steps;
+  }
+  var ratioEngine = makeEngine(document.getElementById("cRatio"), buildRatio, rStepEl, rProg);
+  function ratioReset(){mVal.textContent=mR.value;nVal.textContent=nR.value;ratioEngine.reset();}
+  mR.addEventListener("input",ratioReset);
+  nR.addEventListener("input",ratioReset);
+  document.getElementById("rNext").onclick=function(){ratioEngine.next();};
+  document.getElementById("rPlay").onclick=function(){ratioEngine.play();};
+  document.getElementById("rReset").onclick=function(){ratioEngine.reset();};
+  ratioReset();
+
+  /* ================= MODE 3: TANGENT ================= */
+  var tStepEl=document.getElementById("tStep"), tProg=document.getElementById("tProg");
+  function buildTangent(){
+    var O={x:300,y:230}, R=110;
+    var P={x:640,y:300};
+    var M=mid(O,P), rM=dist(O,P)/2;
+    var ts=circInt(O,R,M,rM); // two tangent points
+    var T1=ts[0], T2=ts[1];
+    var steps=[];
+    function baseC(ctx){fullCircle(ctx,O,R,C_DRAW,2);dot(ctx,O,C_PT);label(ctx,O,"O",-16,6);dot(ctx,P,C_PT);label(ctx,P,"P",8,6);}
+    steps.push({text:"Given circle with centre O and external point P.",render:function(ctx,t){
+      fullCircle(ctx,O,R*Math.min(1,t*1.2),C_DRAW,2);dot(ctx,O,C_PT);if(t>.99){label(ctx,O,"O",-16,6);dot(ctx,P,C_PT);label(ctx,P,"P",8,6);}}});
+    steps.push({text:"Join O to P.",render:function(ctx,t){baseC(ctx);line(ctx,O,lerp(O,P,t),C_ARC,2);}});
+    steps.push({text:"Bisect OP to find its midpoint M (perpendicular-bisector arcs).",render:function(ctx,t){
+      baseC(ctx);line(ctx,O,P,C_ARC,2);
+      var rr=dist(O,P)*0.62; var mp=circInt(O,rr,P,rr);
+      var d1=ang(O,mp[0]),d2=ang(O,mp[1]);
+      arcT(ctx,O,rr,d1-0.05,d2+0.05,t,C_ARC);arcT(ctx,P,rr,ang(P,mp[0])+0.05,ang(P,mp[1])-0.05,t,C_ARC);
+      if(t>.99){dot(ctx,M,C_PT);label(ctx,M,"M",-4,-10);}
+    }});
+    steps.push({text:"With centre M and radius MO = MP, draw a circle on OP as diameter.",render:function(ctx,t){
+      baseC(ctx);line(ctx,O,P,C_ARC,1.5);dot(ctx,M,C_PT);label(ctx,M,"M",-4,-10);
+      ctx.strokeStyle=C_ARC;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(M.x,M.y,rM,-Math.PI/2,-Math.PI/2+TAU*t);ctx.stroke();
+    }});
+    steps.push({text:"This circle meets the given circle at T₁ and T₂ (the tangent points).",render:function(ctx,t){
+      baseC(ctx);line(ctx,O,P,C_ARC,1.5);dot(ctx,M,C_PT);fullCircle(ctx,M,rM,C_ARC,1.6);
+      if(t>.4){dot(ctx,T1,C_PT);label(ctx,T1,"T₁",6,-6);}
+      if(t>.7){dot(ctx,T2,C_PT);label(ctx,T2,"T₂",6,16);}
+    }});
+    steps.push({text:"Join P to T₁ and P to T₂ — the two tangents. (OT ⟂ PT since ∠OTP is in a semicircle.)",render:function(ctx,t){
+      baseC(ctx);fullCircle(ctx,M,rM,C_ARC,1.2);dot(ctx,M,C_PT);dot(ctx,T1,C_PT);dot(ctx,T2,C_PT);
+      label(ctx,T1,"T₁",6,-6);label(ctx,T2,"T₂",6,16);
+      line(ctx,P,lerp(P,T1,t),C_ACC,2.6);line(ctx,P,lerp(P,T2,t),C_ACC,2.6);
+      if(t>.99){line(ctx,O,T1,C_MUT,1.2);line(ctx,O,T2,C_MUT,1.2);sq(ctx,T1,O,P);sq(ctx,T2,O,P);}
+    }});
+    return steps;
+  }
+  var tanEngine = makeEngine(document.getElementById("cTan"), buildTangent, tStepEl, tProg);
+  document.getElementById("tNext").onclick=function(){tanEngine.next();};
+  document.getElementById("tPlay").onclick=function(){tanEngine.play();};
+  document.getElementById("tReset").onclick=function(){tanEngine.reset();};
+  tanEngine.reset();
+
+  /* ================= TABS ================= */
+  var tabs=document.querySelectorAll(".tab");
+  var modes=document.querySelectorAll(".mode");
+  tabs.forEach(function(tb){
+    tb.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      tb.classList.add("active");
+      var m=tb.getAttribute("data-m");
+      modes.forEach(function(sec){sec.classList.toggle("active",sec.getAttribute("data-mode")===m);});
+    });
+  });
+
+  /* ================= QUIZ ================= */
+  var QUIZ=[
+    {q:"To construct the perpendicular bisector of AB, the compass radius must be:",
+     opts:["Exactly equal to AB","More than half of AB","Less than half of AB","Exactly one-third of AB"],
+     a:1, e:"The arcs from A and B must intersect, which only happens when the radius exceeds ½·AB."},
+    {q:"In the ray method to divide AB in ratio 3:2, how many equal points are marked on the ray?",
+     opts:["2","3","5","6"],
+     a:2, e:"You mark m+n = 3+2 = 5 equal points, then draw a parallel through the 3rd point."},
+    {q:"Tangents from an external point P are found using the circle on OP as diameter because:",
+     opts:["∠OTP = 90° (angle in a semicircle), so OT ⟂ PT","OP is always equal to the radius","P lies on the given circle","The tangents are always parallel"],
+     a:0, e:"T lies on the circle with diameter OP, so ∠OTP is a right angle; a radius perpendicular to PT makes PT a tangent."}
+  ];
+  var quizEl=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var h=document.createElement("div");h.className="qq";h.textContent=(qi+1)+". "+item.q;d.appendChild(h);
+    var ex=document.createElement("div");ex.className="expl";ex.textContent="Explanation: "+item.e;
+    item.opts.forEach(function(op,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=op;
+      b.onclick=function(){
+        if(d.getAttribute("data-done"))return;
+        d.setAttribute("data-done","1");
+        var btns=d.querySelectorAll(".opt");
+        btns.forEach(function(x,xi){
+          if(xi===item.a)x.classList.add("right");
+          else if(xi===oi)x.classList.add("wrong");
+          x.style.cursor="default";
+        });
+        ex.classList.add("show");
+      };
+      d.appendChild(b);
+    });
+    d.appendChild(ex);
+    quizEl.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

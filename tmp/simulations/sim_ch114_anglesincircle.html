@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angles in a Circle Lab — NIOS Class 10 Mathematics, Ch 16</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#57c4ff;
+    --accent-soft:rgba(87,196,255,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffcf6e;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.35rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 130px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.92rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:6px;color:var(--accent)}
+  .view{display:none}
+  .view.active{display:block}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;touch-action:none}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:10px}
+
+  .grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 100px;min-width:92px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-size:1.2rem;font-weight:700;margin-top:2px}
+  .stat.c1 .v{color:var(--warn)}
+  .stat.c2 .v{color:var(--accent)}
+  .stat.c3 .v{color:var(--good)}
+
+  .checkline{margin-top:12px;padding:11px 12px;border-radius:12px;background:var(--panel2);
+    border:1px solid var(--line);font-size:.92rem}
+  .checkline b{color:var(--good)}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);
+    padding:9px 14px;font-size:.88rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .btn:active{transform:scale(.98)}
+  .btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  ul.facts{list-style:none;margin-top:4px}
+  ul.facts li{position:relative;padding:7px 6px 7px 26px;font-size:.9rem;border-bottom:1px solid var(--line)}
+  ul.facts li:last-child{border-bottom:none}
+  ul.facts li::before{content:"◆";position:absolute;left:6px;top:7px;color:var(--accent);font-size:.7rem}
+  ul.facts b{color:var(--warn)}
+
+  .quiz .q{border-bottom:1px solid var(--line);padding:12px 0}
+  .quiz .q:last-child{border-bottom:none}
+  .quiz .q p{font-weight:600;margin-bottom:8px;font-size:.94rem}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:10px;
+    background:var(--panel2);color:var(--ink);padding:9px 12px;margin:6px 0;font-size:.88rem;
+    cursor:pointer;touch-action:manipulation}
+  .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:var(--bad)}
+  .opt:disabled{cursor:default}
+  .expl{font-size:.84rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Angles in a Circle <span>Lab</span></h1>
+    <p>NIOS Class 10 Mathematics · Chapter 16 — drag the points and watch the theorems hold.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="0">Centre vs Inscribed</button>
+    <button class="tab-btn" data-mode="1">Same Segment</button>
+    <button class="tab-btn" data-mode="2">Cyclic Quadrilateral</button>
+  </div>
+
+  <!-- MODE 0 -->
+  <section class="panel view active" id="view0">
+    <h2>Angle at the centre = 2 × angle at the circumference</h2>
+    <canvas id="cv0"></canvas>
+    <div class="grid">
+      <div class="stat c1"><div class="k">∠AOB centre</div><div class="v" id="s0_centre">–</div></div>
+      <div class="stat c2"><div class="k">∠APB circumference</div><div class="v" id="s0_insc">–</div></div>
+      <div class="stat c3"><div class="k">2 × ∠APB</div><div class="v" id="s0_two">–</div></div>
+    </div>
+    <div class="checkline" id="s0_check">Drag <b>P</b> around the arc — the inscribed angle stays half the central angle.</div>
+    <p class="hint">Drag the yellow points <b>A</b>, <b>B</b> (arc ends) or the blue point <b>P</b> on the circle. O is the centre.</p>
+  </section>
+
+  <!-- MODE 1 -->
+  <section class="panel view" id="view1">
+    <h2>Angles in the same segment · Angle in a semicircle</h2>
+    <canvas id="cv1"></canvas>
+    <div class="grid">
+      <div class="stat c2"><div class="k">∠AP₁B</div><div class="v" id="s1_p1">–</div></div>
+      <div class="stat c2"><div class="k">∠AP₂B</div><div class="v" id="s1_p2">–</div></div>
+      <div class="stat c2"><div class="k">∠AP₃B</div><div class="v" id="s1_p3">–</div></div>
+    </div>
+    <div class="checkline" id="s1_check">All three subtend the same chord AB — so all three angles are equal.</div>
+    <div class="btnrow">
+      <button class="btn" id="s1_diam">Make AB a diameter (Thales)</button>
+    </div>
+    <p class="hint">Drag <b>A</b>, <b>B</b> or the three blue points P₁,P₂,P₃ (kept on the same arc). Make AB a diameter to see every angle = 90°.</p>
+  </section>
+
+  <!-- MODE 2 -->
+  <section class="panel view" id="view2">
+    <h2>Cyclic quadrilateral · opposite angles are supplementary</h2>
+    <canvas id="cv2"></canvas>
+    <div class="grid">
+      <div class="stat c1"><div class="k">∠A + ∠C</div><div class="v" id="s2_ac">–</div></div>
+      <div class="stat c3"><div class="k">∠B + ∠D</div><div class="v" id="s2_bd">–</div></div>
+    </div>
+    <div class="grid">
+      <div class="stat c2"><div class="k">∠A</div><div class="v" id="s2_a">–</div></div>
+      <div class="stat c2"><div class="k">∠B</div><div class="v" id="s2_b">–</div></div>
+      <div class="stat c2"><div class="k">∠C</div><div class="v" id="s2_c">–</div></div>
+      <div class="stat c2"><div class="k">∠D</div><div class="v" id="s2_d">–</div></div>
+    </div>
+    <div class="checkline" id="s2_check">Opposite angles of a cyclic quadrilateral add up to 180°.</div>
+    <p class="hint">Drag any of the four vertices A, B, C, D around the circle.</p>
+  </section>
+
+  <!-- FACTS -->
+  <section class="panel">
+    <h2>Key facts</h2>
+    <ul class="facts">
+      <li>The angle subtended by an arc at the <b>centre</b> is <b>twice</b> the angle it subtends at any point on the remaining circumference. ∠centre = 2 × ∠circumference.</li>
+      <li>Angles in the <b>same segment</b> of a circle are <b>equal</b> (they subtend the same chord).</li>
+      <li>The angle in a <b>semicircle</b> is a <b>right angle (90°)</b> — Thales' theorem. (Central angle of a diameter = 180°, so inscribed = 90°.)</li>
+      <li>In a <b>cyclic quadrilateral</b>, opposite angles are <b>supplementary</b>: ∠A + ∠C = 180° and ∠B + ∠D = 180°.</li>
+    </ul>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel quiz" id="quiz">
+    <h2>Quick check — 3 questions</h2>
+    <div class="q" data-correct="1">
+      <p>1. An arc subtends an angle of 80° at the centre of a circle. What angle does it subtend at a point on the remaining circumference?</p>
+      <button class="opt">160°</button>
+      <button class="opt">40°</button>
+      <button class="opt">80°</button>
+      <div class="expl">Angle at circumference = ½ × angle at centre = ½ × 80° = 40°.</div>
+    </div>
+    <div class="q" data-correct="2">
+      <p>2. AB is a diameter of a circle and P is any other point on the circle. What is ∠APB?</p>
+      <button class="opt">45°</button>
+      <button class="opt">180°</button>
+      <button class="opt">90°</button>
+      <div class="expl">The angle in a semicircle is a right angle (Thales' theorem), so ∠APB = 90°.</div>
+    </div>
+    <div class="q" data-correct="0">
+      <p>3. In a cyclic quadrilateral ABCD, ∠A = 70°. What is ∠C?</p>
+      <button class="opt">110°</button>
+      <button class="opt">70°</button>
+      <button class="opt">20°</button>
+      <div class="expl">Opposite angles of a cyclic quadrilateral are supplementary: ∠C = 180° − 70° = 110°.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var TAU = Math.PI*2, D = 180/Math.PI;
+  var ringCol = "#48557a", chordCol="#6f7fb0", inkCol="#e8ecf6", mutedCol="#9aa5bd";
+  var accent="#57c4ff", warn="#ffcf6e", good="#5fd68b";
+
+  // ---------- generic canvas / geometry helpers ----------
+  function setup(canvas){
+    var ctx = canvas.getContext("2d");
+    function size(){
+      var cssW = canvas.clientWidth || 320;
+      var cssH = Math.min(Math.max(cssW*0.78, 280), 460);
+      var dpr = Math.min(window.devicePixelRatio||1, 2.5);
+      canvas.width = Math.round(cssW*dpr);
+      canvas.height = Math.round(cssH*dpr);
+      canvas.style.height = cssH+"px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      return {w:cssW,h:cssH};
+    }
+    return {ctx:ctx,size:size};
+  }
+  function geom(w,h){
+    var cx=w/2, cy=h/2, R=Math.min(w,h)*0.37;
+    return {cx:cx,cy:cy,R:R};
+  }
+  function ptAt(g,ang){ return {x:g.cx+g.R*Math.cos(ang), y:g.cy+g.R*Math.sin(ang), a:ang}; }
+  function angleAt(g,x,y){ return Math.atan2(y-g.cy, x-g.cx); }
+  function norm(a){ a%=TAU; if(a<0)a+=TAU; return a; }
+
+  // angle APB using vectors (0..PI)
+  function vertexAngle(vx,vy,ax,ay,bx,by){
+    var a1=Math.atan2(ay-vy,ax-vx), a2=Math.atan2(by-vy,bx-vx);
+    var d=Math.abs(a1-a2); if(d>Math.PI) d=TAU-d; return d;
+  }
+
+  function drawCircle(ctx,g){
+    ctx.lineWidth=2; ctx.strokeStyle=ringCol;
+    ctx.beginPath(); ctx.arc(g.cx,g.cy,g.R,0,TAU); ctx.stroke();
+  }
+  function drawSeg(ctx,x1,y1,x2,y2,col,wdt){
+    ctx.strokeStyle=col; ctx.lineWidth=wdt||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  function dot(ctx,x,y,r,col,label,lcol){
+    ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+    ctx.strokeStyle="rgba(16,20,31,.7)"; ctx.lineWidth=2; ctx.stroke();
+    if(label){
+      ctx.fillStyle=lcol||inkCol; ctx.font="bold 14px system-ui,sans-serif";
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+    }
+  }
+  function labelAt(ctx,x,y,txt,col){
+    ctx.fillStyle=col||inkCol; ctx.font="bold 14px system-ui,sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(txt,x,y);
+  }
+  // draw an angle marker arc at vertex v between rays to points 1 and 2,
+  // choosing sweep so its measure equals `measureDeg`
+  function angleMark(ctx,vx,vy,x1,y1,x2,y2,rad,measureDeg,col){
+    var a1=Math.atan2(y1-vy,x1-vx), a2=Math.atan2(y2-vy,x2-vx);
+    var ccw = norm(a2-a1); // 0..TAU sweeping ccw from a1 to a2
+    var target = measureDeg/D;
+    var anticw;
+    // if going ccw from a1 to a2 matches target measure use it, else go cw
+    if(Math.abs(ccw-target) < Math.abs((TAU-ccw)-target)) anticw=false; else anticw=true;
+    ctx.strokeStyle=col; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(vx,vy,rad,a1,a2,anticw); ctx.stroke();
+    // fill faint wedge
+    ctx.fillStyle=col.replace("rgb","rgba").replace(")",",0.13)");
+  }
+  function fmt(a){ return a.toFixed(1)+"°"; }
+
+  // hit-test nearest draggable point
+  function pickNearest(pts,x,y,maxd){
+    var best=-1, bd=maxd*maxd;
+    for(var i=0;i<pts.length;i++){
+      var dx=pts[i].x-x, dy=pts[i].y-y, d=dx*dx+dy*dy;
+      if(d<bd){bd=d;best=i;}
+    }
+    return best;
+  }
+  function eventPos(canvas,e){
+    var r=canvas.getBoundingClientRect();
+    var t = e.touches && e.touches[0] ? e.touches[0] : e;
+    return {x:t.clientX-r.left, y:t.clientY-r.top};
+  }
+
+  // ======================================================
+  //  MODE 0 : central vs inscribed
+  // ======================================================
+  var M0 = (function(){
+    var cv=document.getElementById("cv0");
+    var S=setup(cv);
+    var st={A:-2.4, B:-0.6, P:1.4}; // angles
+    var drag=-1, keys=["A","B","P"];
+    function draw(){
+      var d=S.size(), ctx=S.ctx, g=geom(d.w,d.h);
+      ctx.clearRect(0,0,d.w,d.h);
+      drawCircle(ctx,g);
+      var A=ptAt(g,st.A), B=ptAt(g,st.B), P=ptAt(g,st.P), O={x:g.cx,y:g.cy};
+      // chords / radii
+      drawSeg(ctx,A.x,A.y,B.x,B.y,chordCol,1.5);            // chord AB
+      drawSeg(ctx,O.x,O.y,A.x,A.y,warn,2);                  // OA
+      drawSeg(ctx,O.x,O.y,B.x,B.y,warn,2);                  // OB
+      drawSeg(ctx,P.x,P.y,A.x,A.y,accent,2);                // PA
+      drawSeg(ctx,P.x,P.y,B.x,B.y,accent,2);                // PB
+
+      // inscribed angle at P
+      var insc = vertexAngle(P.x,P.y,A.x,A.y,B.x,B.y)*D;
+      // central angle = arc AB NOT containing P (0..360)
+      var arcAB = norm(st.B-st.A);
+      var pOnCcw = norm(st.P-st.A) < arcAB; // P on ccw arc A->B ?
+      var central = pOnCcw ? (TAU-arcAB)*D : arcAB*D;
+
+      // markers
+      angleMark(ctx,O.x,O.y,A.x,A.y,B.x,B.y,26,central,"rgb(255,207,110)");
+      angleMark(ctx,P.x,P.y,A.x,A.y,B.x,B.y,30,insc,"rgb(87,196,255)");
+
+      dot(ctx,O.x,O.y,5,mutedCol); labelAt(ctx,O.x-14,O.y+14,"O",mutedCol);
+      dot(ctx,A.x,A.y,8,warn); labelAt(ctx,A.x+(A.x>g.cx?16:-16),A.y+(A.y>g.cy?12:-12),"A",warn);
+      dot(ctx,B.x,B.y,8,warn); labelAt(ctx,B.x+(B.x>g.cx?16:-16),B.y+(B.y>g.cy?12:-12),"B",warn);
+      dot(ctx,P.x,P.y,9,accent); labelAt(ctx,P.x+(P.x>g.cx?16:-16),P.y+(P.y>g.cy?12:-12),"P",accent);
+
+      document.getElementById("s0_centre").textContent=fmt(central);
+      document.getElementById("s0_insc").textContent=fmt(insc);
+      document.getElementById("s0_two").textContent=fmt(2*insc);
+      var ok=Math.abs(central-2*insc)<0.6;
+      document.getElementById("s0_check").innerHTML= ok
+        ? "∠AOB = <b>"+fmt(central)+"</b> = 2 × "+fmt(insc)+" = 2 × ∠APB ✓"
+        : "Drag P onto the major arc so it lies opposite the arc AB.";
+      return g;
+    }
+    function down(e){
+      var g=draw(); var p=eventPos(cv,e);
+      var pts=keys.map(function(k){return ptAt(g,st[k]);});
+      drag=pickNearest(pts,p.x,p.y,26);
+      if(drag>=0){e.preventDefault(); move(e);}
+    }
+    function move(e){
+      if(drag<0)return; e.preventDefault();
+      var d=S.size(), g=geom(d.w,d.h), p=eventPos(cv,e);
+      st[keys[drag]] = angleAt(g,p.x,p.y);
+      draw();
+    }
+    function up(){drag=-1;}
+    cv.addEventListener("mousedown",down); window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    cv.addEventListener("touchstart",down,{passive:false}); cv.addEventListener("touchmove",move,{passive:false}); cv.addEventListener("touchend",up);
+    return {draw:draw};
+  })();
+
+  // ======================================================
+  //  MODE 1 : same segment / semicircle
+  // ======================================================
+  var M1 = (function(){
+    var cv=document.getElementById("cv1");
+    var S=setup(cv);
+    var st={A:Math.PI-0.5, B:0.5, P1:-2.2, P2:-1.57, P3:-0.9};
+    var drag=-1, keys=["A","B","P1","P2","P3"];
+    function draw(){
+      var d=S.size(), ctx=S.ctx, g=geom(d.w,d.h);
+      ctx.clearRect(0,0,d.w,d.h);
+      drawCircle(ctx,g);
+      var A=ptAt(g,st.A), B=ptAt(g,st.B);
+      drawSeg(ctx,A.x,A.y,B.x,B.y,chordCol,2); // chord AB
+      var cols=["rgb(87,196,255)","rgb(95,214,139)","rgb(255,207,110)"];
+      var names=["P₁","P₂","P₃"], pk=["P1","P2","P3"], out=["s1_p1","s1_p2","s1_p3"];
+      var vals=[];
+      for(var i=0;i<3;i++){
+        var P=ptAt(g,st[pk[i]]);
+        drawSeg(ctx,P.x,P.y,A.x,A.y,cols[i],1.6);
+        drawSeg(ctx,P.x,P.y,B.x,B.y,cols[i],1.6);
+        var ang=vertexAngle(P.x,P.y,A.x,A.y,B.x,B.y)*D;
+        vals.push(ang);
+        angleMark(ctx,P.x,P.y,A.x,A.y,B.x,B.y,24,ang,cols[i]);
+        dot(ctx,P.x,P.y,8,cols[i]);
+        labelAt(ctx,P.x+(P.x>g.cx?15:-15),P.y+(P.y>g.cy?13:-13),names[i],cols[i]);
+        document.getElementById(out[i]).textContent=fmt(ang);
+      }
+      dot(ctx,A.x,A.y,8,warn); labelAt(ctx,A.x+(A.x>g.cx?16:-16),A.y+(A.y>g.cy?12:-12),"A",warn);
+      dot(ctx,B.x,B.y,8,warn); labelAt(ctx,B.x+(B.x>g.cx?16:-16),B.y+(B.y>g.cy?12:-12),"B",warn);
+      var mx=Math.max.apply(null,vals), mn=Math.min.apply(null,vals);
+      var equal=(mx-mn)<0.8;
+      var near90=Math.abs(vals[0]-90)<1.2 && Math.abs(vals[1]-90)<1.2;
+      var msg;
+      if(near90) msg="AB is a diameter — every inscribed angle = <b>90°</b> (angle in a semicircle).";
+      else if(equal) msg="Same chord, same segment → all angles equal ≈ <b>"+fmt((mx+mn)/2)+"</b> ✓";
+      else msg="Keep P₁,P₂,P₃ on the <b>same</b> arc (side) of AB to see equal angles.";
+      document.getElementById("s1_check").innerHTML=msg;
+      return g;
+    }
+    function down(e){
+      var g=draw(); var p=eventPos(cv,e);
+      var pts=keys.map(function(k){return ptAt(g,st[k]);});
+      drag=pickNearest(pts,p.x,p.y,26);
+      if(drag>=0){e.preventDefault(); move(e);}
+    }
+    function move(e){
+      if(drag<0)return; e.preventDefault();
+      var d=S.size(), g=geom(d.w,d.h), p=eventPos(cv,e);
+      st[keys[drag]] = angleAt(g,p.x,p.y);
+      draw();
+    }
+    function up(){drag=-1;}
+    cv.addEventListener("mousedown",down); window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    cv.addEventListener("touchstart",down,{passive:false}); cv.addEventListener("touchmove",move,{passive:false}); cv.addEventListener("touchend",up);
+    document.getElementById("s1_diam").addEventListener("click",function(){
+      st.A=Math.PI; st.B=0;                 // AB horizontal diameter
+      st.P1=-2.3; st.P2=-1.57; st.P3=-0.85; // all on upper arc
+      draw();
+    });
+    return {draw:draw};
+  })();
+
+  // ======================================================
+  //  MODE 2 : cyclic quadrilateral
+  // ======================================================
+  var M2 = (function(){
+    var cv=document.getElementById("cv2");
+    var S=setup(cv);
+    var st={A:-2.5, B:-1.0, C:0.5, D:2.3};
+    var drag=-1, keys=["A","B","C","D"];
+    function draw(){
+      var d=S.size(), ctx=S.ctx, g=geom(d.w,d.h);
+      ctx.clearRect(0,0,d.w,d.h);
+      drawCircle(ctx,g);
+      // order vertices by angle so polygon is a simple cyclic quad
+      var arr=keys.map(function(k){return {k:k,a:norm(st[k])};});
+      arr.sort(function(p,q){return p.a-q.a;});
+      var P={}; arr.forEach(function(o){P[o.k]=ptAt(g,st[o.k]);});
+      var order=arr.map(function(o){return o.k;});
+      // draw quad edges in sorted order
+      ctx.fillStyle="rgba(87,196,255,.08)"; ctx.strokeStyle=accent; ctx.lineWidth=2;
+      ctx.beginPath();
+      for(var i=0;i<4;i++){var pt=P[order[i]]; if(i===0)ctx.moveTo(pt.x,pt.y);else ctx.lineTo(pt.x,pt.y);}
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // interior angle at each vertex from its neighbours in the ordered ring
+      var ang={};
+      for(var j=0;j<4;j++){
+        var v=order[j], prev=order[(j+3)%4], nxt=order[(j+1)%4];
+        ang[v]=vertexAngle(P[v].x,P[v].y,P[prev].x,P[prev].y,P[nxt].x,P[nxt].y)*D;
+        angleMark(ctx,P[v].x,P[v].y,P[prev].x,P[prev].y,P[nxt].x,P[nxt].y,22,ang[v],
+          (j%2===0)?"rgb(255,207,110)":"rgb(95,214,139)");
+      }
+      var cols={A:warn,B:good,C:warn,D:good};
+      keys.forEach(function(k){
+        var pt=P[k]; dot(ctx,pt.x,pt.y,8,accent);
+        labelAt(ctx,pt.x+(pt.x>g.cx?16:-16),pt.y+(pt.y>g.cy?13:-13),k,inkCol);
+      });
+      document.getElementById("s2_a").textContent=fmt(ang.A);
+      document.getElementById("s2_b").textContent=fmt(ang.B);
+      document.getElementById("s2_c").textContent=fmt(ang.C);
+      document.getElementById("s2_d").textContent=fmt(ang.D);
+      var ac=ang.A+ang.C, bd=ang.B+ang.D;
+      document.getElementById("s2_ac").textContent=fmt(ac);
+      document.getElementById("s2_bd").textContent=fmt(bd);
+      var ok=Math.abs(ac-180)<1 && Math.abs(bd-180)<1;
+      document.getElementById("s2_check").innerHTML= ok
+        ? "∠A + ∠C = <b>"+fmt(ac)+"</b> and ∠B + ∠D = <b>"+fmt(bd)+"</b> — both 180° ✓"
+        : "Opposite angles of a cyclic quadrilateral add up to 180°.";
+      return g;
+    }
+    function down(e){
+      var g=draw(); var p=eventPos(cv,e);
+      var pts=keys.map(function(k){return ptAt(g,st[k]);});
+      drag=pickNearest(pts,p.x,p.y,26);
+      if(drag>=0){e.preventDefault(); move(e);}
+    }
+    function move(e){
+      if(drag<0)return; e.preventDefault();
+      var d=S.size(), g=geom(d.w,d.h), p=eventPos(cv,e);
+      st[keys[drag]] = angleAt(g,p.x,p.y);
+      draw();
+    }
+    function up(){drag=-1;}
+    cv.addEventListener("mousedown",down); window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    cv.addEventListener("touchstart",down,{passive:false}); cv.addEventListener("touchmove",move,{passive:false}); cv.addEventListener("touchend",up);
+    return {draw:draw};
+  })();
+
+  // ---------- tabs ----------
+  var modes=[M0,M1,M2];
+  var tabs=document.querySelectorAll(".tab-btn");
+  var views=[document.getElementById("view0"),document.getElementById("view1"),document.getElementById("view2")];
+  function activate(m){
+    tabs.forEach(function(t,i){t.classList.toggle("active",i===m);});
+    views.forEach(function(v,i){v.classList.toggle("active",i===m);});
+    // draw after layout so clientWidth is correct
+    requestAnimationFrame(function(){ modes[m].draw(); });
+  }
+  tabs.forEach(function(t){ t.addEventListener("click",function(){activate(+t.dataset.mode);}); });
+
+  // ---------- quiz ----------
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var correct=+q.dataset.correct;
+    var opts=q.querySelectorAll(".opt");
+    var expl=q.querySelector(".expl");
+    opts.forEach(function(o,i){
+      o.addEventListener("click",function(){
+        opts.forEach(function(x){x.disabled=true;});
+        opts[correct].classList.add("correct");
+        if(i!==correct) o.classList.add("wrong");
+        expl.classList.add("show");
+      });
+    });
+  });
+
+  // ---------- initial + resize ----------
+  activate(0);
+  var rt;
+  window.addEventListener("resize",function(){
+    clearTimeout(rt);
+    rt=setTimeout(function(){
+      var m=0; tabs.forEach(function(t,i){if(t.classList.contains("active"))m=i;});
+      modes[m].draw();
+    },120);
+  });
+})();
+</script>
+</body>
+</html>

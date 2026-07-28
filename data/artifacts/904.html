@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secants &amp; Tangents Lab — NIOS Class 10 Maths (Ch 17)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#181e2e;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#9aa5bd;
+    --accent:#5ad1c8;
+    --accent-soft:rgba(90,209,200,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffcf6b;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 150px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:8px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hint{color:var(--muted);font-size:.86rem;margin-bottom:10px}
+
+  .stage{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;
+    touch-action:none;display:block}
+  .readout{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:8px 11px;font-size:.85rem;color:var(--muted);flex:1 1 auto;min-width:120px}
+  .chip b{color:var(--ink);font-weight:600}
+  .chip.state{font-weight:700}
+  .chip.secant{color:var(--warn);border-color:var(--warn)}
+  .chip.tangent{color:var(--good);border-color:var(--good)}
+  .chip.none{color:var(--muted)}
+
+  .hidden{display:none}
+
+  .facts li{margin:6px 0 6px 18px;font-size:.9rem}
+  .facts b{color:var(--accent)}
+
+  .quiz .q{margin-bottom:16px}
+  .quiz .q p{font-weight:600;margin-bottom:8px;font-size:.94rem}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);border-radius:10px;padding:11px 12px;
+    margin-bottom:7px;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .quiz .opt:active{transform:scale(.995)}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15);color:var(--good)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15);color:var(--bad)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:4px;min-height:1em}
+
+  footer{color:var(--muted);font-size:.8rem;text-align:center;padding:10px}
+  .btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:10px;padding:9px 14px;font-size:.88rem;cursor:pointer;font-weight:600}
+  .btn:active{transform:scale(.98)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Secants &amp; Tangents <span>Lab</span></h1>
+    <p>NIOS Class 10 Mathematics · Ch 17 — Secants, Tangents and Their Properties</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-mode="0">Secant vs Tangent</button>
+    <button class="tab-btn" data-mode="1">Tangents from a Point</button>
+    <button class="tab-btn" data-mode="2">Tangent Length</button>
+  </div>
+
+  <!-- MODE 0 -->
+  <section class="panel mode" data-mode="0">
+    <h2>Secant vs Tangent</h2>
+    <p class="hint">Drag the <b>line handle</b> up/down. A line that cuts the circle at 2 points is a <b>secant</b>; touching at exactly 1 point is a <b>tangent</b>; otherwise it misses. At the tangent, watch the radius meet the line at a right angle.</p>
+    <canvas class="stage" id="c0" width="600" height="380"></canvas>
+    <div class="readout" id="r0"></div>
+    <div style="margin-top:12px"><button class="btn" id="snap0">Snap to tangent</button></div>
+  </section>
+
+  <!-- MODE 1 -->
+  <section class="panel mode hidden" data-mode="1">
+    <h2>Two Tangents from an External Point</h2>
+    <p class="hint">Drag point <b>P</b> outside the circle. The two tangents from P are drawn to their points of contact. They are <b>equal in length</b>, and line <b>PO</b> bisects the angle between them.</p>
+    <canvas class="stage" id="c1" width="600" height="380"></canvas>
+    <div class="readout" id="r1"></div>
+  </section>
+
+  <!-- MODE 2 -->
+  <section class="panel mode hidden" data-mode="2">
+    <h2>Tangent Length = √(d² − r²)</h2>
+    <p class="hint">Drag <b>P</b>. Triangle O–T–P is right-angled at the point of contact T. So PT = √(d² − r²), where d = OP and r = radius. Slide the radius too.</p>
+    <canvas class="stage" id="c2" width="600" height="380"></canvas>
+    <div class="ctrl" style="margin-top:12px">
+      <label style="display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px">Radius r = <output id="rout">80</output> px</label>
+      <input type="range" id="rslider" min="40" max="130" value="80" style="width:100%">
+    </div>
+    <div class="readout" id="r2"></div>
+    <p class="hint" style="margin-top:10px"><b>Alternate segment:</b> the angle between a tangent and a chord drawn from the point of contact equals the inscribed angle in the alternate segment.</p>
+  </section>
+
+  <!-- FACTS -->
+  <section class="panel facts">
+    <h2>Key Facts</h2>
+    <ul>
+      <li><b>Tangent ⟂ radius:</b> the tangent at any point of a circle is perpendicular to the radius drawn to the point of contact.</li>
+      <li><b>Equal tangents:</b> the two tangents drawn from an external point to a circle are equal in length.</li>
+      <li><b>Angle bisected:</b> the line joining the external point to the centre bisects the angle between the two tangents.</li>
+      <li><b>Tangent length:</b> from a point at distance <b>d</b> from the centre, tangent length = <b>√(d² − r²)</b>.</li>
+      <li><b>Alternate segment:</b> tangent–chord angle = inscribed angle in the alternate segment.</li>
+    </ul>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel quiz" id="quiz">
+    <h2>Quick Quiz</h2>
+    <p class="hint">Tap an option to check your answer.</p>
+  </section>
+
+  <footer>Secants &amp; Tangents Lab · geometry-accurate · self-contained</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- helpers ----------
+  function clamp(v,a,b){return v<a?a:v>b?b:v;}
+  function dist(ax,ay,bx,by){return Math.hypot(ax-bx,ay-by);}
+  function setupHiDPI(cv){
+    var dpr=window.devicePixelRatio||1;
+    var cssW=cv.clientWidth||cv.width;
+    var ratio=cv.height/cv.width; // keep aspect
+    var cssH=cssW*ratio;
+    cv.style.height=cssH+"px";
+    cv.width=Math.round(cssW*dpr);
+    cv.height=Math.round(cssH*dpr);
+    var ctx=cv.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    cv._cssW=cssW; cv._cssH=cssH;
+    return ctx;
+  }
+  function evtPos(cv,e){
+    var rect=cv.getBoundingClientRect();
+    var p=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;
+    return {x:(p.clientX-rect.left), y:(p.clientY-rect.top)};
+  }
+  var COL={ink:"#e9edf7",muted:"#9aa5bd",accent:"#5ad1c8",good:"#5fd68b",
+           bad:"#ff7b7b",warn:"#ffcf6b",line:"#2c3650",circle:"#7f8db3"};
+
+  function circle(ctx,x,y,r,stroke,fill,w){
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.lineWidth=w||2;ctx.strokeStyle=stroke;ctx.stroke();}
+  }
+  function dot(ctx,x,y,r,c){circle(ctx,x,y,r,null,c);}
+  function seg(ctx,ax,ay,bx,by,c,w,dash){
+    ctx.beginPath();ctx.setLineDash(dash||[]);
+    ctx.moveTo(ax,ay);ctx.lineTo(bx,by);
+    ctx.lineWidth=w||2;ctx.strokeStyle=c;ctx.stroke();ctx.setLineDash([]);
+  }
+  function label(ctx,txt,x,y,c,size,align){
+    ctx.fillStyle=c||COL.ink;ctx.font=(size||13)+"px system-ui,Segoe UI,Arial";
+    ctx.textAlign=align||"left";ctx.textBaseline="middle";ctx.fillText(txt,x,y);
+    ctx.textAlign="left";
+  }
+  // right-angle marker at corner V with arms toward A and B
+  function rightAngle(ctx,vx,vy,ax,ay,bx,by,size,c){
+    var s=size||12;
+    var u1=norm(ax-vx,ay-vy), u2=norm(bx-vx,by-vy);
+    var p1x=vx+u1.x*s, p1y=vy+u1.y*s;
+    var p2x=vx+u2.x*s, p2y=vy+u2.y*s;
+    var cx=p1x+u2.x*s, cy=p1y+u2.y*s;
+    ctx.beginPath();ctx.moveTo(p1x,p1y);ctx.lineTo(cx,cy);ctx.lineTo(p2x,p2y);
+    ctx.lineWidth=1.6;ctx.strokeStyle=c||COL.good;ctx.stroke();
+  }
+  function norm(x,y){var m=Math.hypot(x,y)||1;return {x:x/m,y:y/m};}
+
+  // =========================================================
+  // MODE 0 : secant vs tangent
+  // =========================================================
+  var c0=document.getElementById("c0"), ctx0, r0=document.getElementById("r0");
+  var m0={cx:300,cy:190,r:95, lineY:90, drag:false};
+  function draw0(){
+    ctx0=ctx0||c0.getContext("2d");
+    var W=c0._cssW,H=c0._cssH;
+    // rescale geometry to css size (design coords 600x380)
+    var sx=W/600, sy=H/380, s=Math.min(sx,sy);
+    var cx=300*sx, cy=190*sy, r=m0.r*s;
+    var ly=m0.lineY*sy; // handle y in css
+    ctx0.clearRect(0,0,W,H);
+    // circle
+    circle(ctx0,cx,cy,r,COL.circle,null,2.5);
+    dot(ctx0,cx,cy,3.5,COL.muted); label(ctx0,"O",cx+8,cy-8,COL.muted,13);
+    // horizontal line at y=ly across full width
+    var d=Math.abs(ly-cy); // distance centre to line
+    var state, sc;
+    if(d < r-0.5){ state="SECANT — cuts at 2 points"; sc="secant"; }
+    else if(Math.abs(d-r)<=0.5){ state="TANGENT — touches at 1 point"; sc="tangent"; }
+    else { state="No intersection"; sc="none"; }
+    var lineCol = sc==="tangent"?COL.good:(sc==="secant"?COL.warn:COL.muted);
+    seg(ctx0,0,ly,W,ly,lineCol,3);
+    // handle
+    dot(ctx0,cx,ly,10,lineCol);
+    dot(ctx0,cx,ly,5,COL.ink);
+    // intersection markers
+    if(sc==="secant"){
+      var dx=Math.sqrt(Math.max(0,r*r-d*d));
+      dot(ctx0,cx-dx,ly,5,COL.warn); dot(ctx0,cx+dx,ly,5,COL.warn);
+    } else if(sc==="tangent"){
+      // point of contact directly above/below centre
+      var ty = ly<cy? cy-r : cy+r;
+      dot(ctx0,cx,ty,6,COL.good);
+      label(ctx0,"T (point of contact)",cx+10,ty+(ly<cy?-4:12),COL.good,12);
+      // radius O->T
+      seg(ctx0,cx,cy,cx,ty,COL.accent,2.5);
+      // right angle marker at T between radius (toward O) and line (horizontal)
+      rightAngle(ctx0,cx,ty,cx,cy,cx+30,ty,12,COL.good);
+      label(ctx0,"radius ⟂ tangent",cx-r-6,cy,COL.accent,12,"right");
+    }
+    // readouts
+    r0.innerHTML=
+      '<div class="chip state '+sc+'">'+state+'</div>'+
+      '<div class="chip">distance centre→line <b>'+(d/s).toFixed(0)+'</b> px</div>'+
+      '<div class="chip">radius r <b>'+m0.r+'</b> px</div>';
+  }
+  function pick0(e){
+    var p=evtPos(c0,e); var sy=(c0._cssH)/380;
+    // only grab if near the line
+    if(Math.abs(p.y-m0.lineY*sy)<40){ m0.drag=true; move0(e); }
+  }
+  function move0(e){
+    if(!m0.drag)return;
+    var p=evtPos(c0,e); var sy=(c0._cssH)/380;
+    m0.lineY=clamp(p.y/sy,10,370); draw0();
+    if(e.cancelable)e.preventDefault();
+  }
+  function up0(){m0.drag=false;}
+
+  document.getElementById("snap0").addEventListener("click",function(){
+    m0.lineY = 190 - m0.r; draw0();  // tangent above centre
+  });
+
+  // =========================================================
+  // MODE 1 : two tangents from external point
+  // =========================================================
+  var c1=document.getElementById("c1"), ctx1, r1=document.getElementById("r1");
+  var m1={cx:230,cy:190,r:80, px:470,py:120, drag:false};
+  function tangentPoints(cx,cy,r,px,py){
+    var dx=px-cx, dy=py-cy, d=Math.hypot(dx,dy);
+    if(d<=r) return null;
+    var L=Math.sqrt(d*d-r*r);              // tangent length
+    var a=Math.atan2(dy,dx);               // angle to P
+    var alpha=Math.acos(r/d);              // half-angle at O between OP and OT
+    var t1={x:cx+r*Math.cos(a+alpha), y:cy+r*Math.sin(a+alpha)};
+    var t2={x:cx+r*Math.cos(a-alpha), y:cy+r*Math.sin(a-alpha)};
+    return {t1:t1,t2:t2,L:L,d:d};
+  }
+  function draw1(){
+    ctx1=ctx1||c1.getContext("2d");
+    var W=c1._cssW,H=c1._cssH; var s=Math.min(W/600,H/380);
+    ctx1.clearRect(0,0,W,H);
+    var cx=m1.cx*s, cy=m1.cy*s, r=m1.r*s, px=m1.px*s, py=m1.py*s;
+    circle(ctx1,cx,cy,r,COL.circle,null,2.5);
+    dot(ctx1,cx,cy,3.5,COL.muted); label(ctx1,"O",cx-14,cy-4,COL.muted,13);
+    // PO line
+    seg(ctx1,px,py,cx,cy,COL.line,1.5,[5,5]);
+    var tp=tangentPoints(cx,cy,r,px,py);
+    if(tp){
+      // tangents
+      seg(ctx1,px,py,tp.t1.x,tp.t1.y,COL.accent,2.5);
+      seg(ctx1,px,py,tp.t2.x,tp.t2.y,COL.accent,2.5);
+      // radii to contact points
+      seg(ctx1,cx,cy,tp.t1.x,tp.t1.y,COL.warn,1.6,[3,4]);
+      seg(ctx1,cx,cy,tp.t2.x,tp.t2.y,COL.warn,1.6,[3,4]);
+      dot(ctx1,tp.t1.x,tp.t1.y,5,COL.good); label(ctx1,"A",tp.t1.x+6,tp.t1.y-6,COL.good,12);
+      dot(ctx1,tp.t2.x,tp.t2.y,5,COL.good); label(ctx1,"B",tp.t2.x+6,tp.t2.y+8,COL.good,12);
+      // right angles at contact
+      rightAngle(ctx1,tp.t1.x,tp.t1.y,cx,cy,px,py,10,COL.good);
+      rightAngle(ctx1,tp.t2.x,tp.t2.y,cx,cy,px,py,10,COL.good);
+      var Lpx=tp.L/s;
+      r1.innerHTML=
+        '<div class="chip tangent">PA = PB = <b>'+Lpx.toFixed(1)+'</b> px (equal)</div>'+
+        '<div class="chip">OP = d = <b>'+(tp.d/s).toFixed(1)+'</b> px</div>'+
+        '<div class="chip">∠OPA = ∠OPB (PO bisects)</div>';
+    } else {
+      r1.innerHTML='<div class="chip none">P is inside the circle — move it outside to draw tangents.</div>';
+    }
+    dot(ctx1,px,py,10,COL.accent); dot(ctx1,px,py,5,COL.ink);
+    label(ctx1,"P",px+12,py,COL.ink,14);
+  }
+  function pick1(e){
+    var p=evtPos(c1,e); var s=Math.min(c1._cssW/600,c1._cssH/380);
+    if(dist(p.x,p.y,m1.px*s,m1.py*s)<34){ m1.drag=true; }
+  }
+  function move1(e){
+    if(!m1.drag)return;
+    var p=evtPos(c1,e); var s=Math.min(c1._cssW/600,c1._cssH/380);
+    m1.px=clamp(p.x/s,10,590); m1.py=clamp(p.y/s,10,370); draw1();
+    if(e.cancelable)e.preventDefault();
+  }
+  function up1(){m1.drag=false;}
+
+  // =========================================================
+  // MODE 2 : tangent length
+  // =========================================================
+  var c2=document.getElementById("c2"), ctx2, r2=document.getElementById("r2");
+  var m2={cx:230,cy:200,r:80, px:470,py:130, drag:false};
+  var rslider=document.getElementById("rslider"), rout=document.getElementById("rout");
+  function draw2(){
+    ctx2=ctx2||c2.getContext("2d");
+    var W=c2._cssW,H=c2._cssH; var s=Math.min(W/600,H/380);
+    ctx2.clearRect(0,0,W,H);
+    var cx=m2.cx*s, cy=m2.cy*s, r=m2.r*s, px=m2.px*s, py=m2.py*s;
+    circle(ctx2,cx,cy,r,COL.circle,null,2.5);
+    dot(ctx2,cx,cy,3.5,COL.muted); label(ctx2,"O",cx-14,cy-4,COL.muted,13);
+    var tp=tangentPoints(cx,cy,r,px,py);
+    if(tp){
+      var T=tp.t1;
+      // triangle O-T-P
+      seg(ctx2,cx,cy,px,py,COL.warn,2,[6,5]);      // hypotenuse d = OP
+      seg(ctx2,cx,cy,T.x,T.y,COL.accent,2.5);       // radius r
+      seg(ctx2,T.x,T.y,px,py,COL.good,2.5);         // tangent PT
+      rightAngle(ctx2,T.x,T.y,cx,cy,px,py,12,COL.good);
+      dot(ctx2,T.x,T.y,5,COL.good); label(ctx2,"T",T.x+8,T.y-6,COL.good,13);
+      // midpoint labels
+      label(ctx2,"r",(cx+T.x)/2-4,(cy+T.y)/2-8,COL.accent,13);
+      label(ctx2,"d",(cx+px)/2,(cy+py)/2+12,COL.warn,13);
+      label(ctx2,"PT",(T.x+px)/2+6,(T.y+py)/2,COL.good,13);
+      var dPx=tp.d/s, LPx=tp.L/s;
+      r2.innerHTML=
+        '<div class="chip">d = OP = <b>'+dPx.toFixed(1)+'</b></div>'+
+        '<div class="chip">r = <b>'+m2.r+'</b></div>'+
+        '<div class="chip tangent">PT = √(d²−r²) = <b>'+LPx.toFixed(1)+'</b> px</div>';
+    } else {
+      r2.innerHTML='<div class="chip none">P is inside — move it outside the circle.</div>';
+    }
+    dot(ctx2,px,py,10,COL.accent); dot(ctx2,px,py,5,COL.ink);
+    label(ctx2,"P",px+12,py,COL.ink,14);
+  }
+  function pick2(e){
+    var p=evtPos(c2,e); var s=Math.min(c2._cssW/600,c2._cssH/380);
+    if(dist(p.x,p.y,m2.px*s,m2.py*s)<34){ m2.drag=true; }
+  }
+  function move2(e){
+    if(!m2.drag)return;
+    var p=evtPos(c2,e); var s=Math.min(c2._cssW/600,c2._cssH/380);
+    m2.px=clamp(p.x/s,10,590); m2.py=clamp(p.y/s,10,370); draw2();
+    if(e.cancelable)e.preventDefault();
+  }
+  function up2(){m2.drag=false;}
+  rslider.addEventListener("input",function(){
+    m2.r=parseInt(rslider.value,10); rout.textContent=m2.r; draw2();
+  });
+
+  // ---------- wire pointer events ----------
+  function bind(cv,pick,move,up){
+    cv.addEventListener("mousedown",pick);
+    window.addEventListener("mousemove",move);
+    window.addEventListener("mouseup",up);
+    cv.addEventListener("touchstart",pick,{passive:false});
+    cv.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("touchend",up);
+  }
+  bind(c0,pick0,move0,up0);
+  bind(c1,pick1,move1,up1);
+  bind(c2,pick2,move2,up2);
+
+  // ---------- tabs ----------
+  var modes=document.querySelectorAll(".mode");
+  var tabBtns=document.querySelectorAll(".tab-btn");
+  function showMode(m){
+    tabBtns.forEach(function(b){b.classList.toggle("active",b.dataset.mode==String(m));});
+    modes.forEach(function(sec){sec.classList.toggle("hidden",sec.dataset.mode!=String(m));});
+    resizeAll(); redraw(m);
+  }
+  tabBtns.forEach(function(b){b.addEventListener("click",function(){showMode(b.dataset.mode);});});
+
+  function resizeAll(){
+    setupHiDPI(c0); setupHiDPI(c1); setupHiDPI(c2);
+  }
+  function redraw(m){
+    if(m==0)draw0(); else if(m==1)draw1(); else draw2();
+  }
+  window.addEventListener("resize",function(){ resizeAll(); draw0();draw1();draw2(); });
+
+  // ---------- quiz ----------
+  var QUIZ=[
+    {q:"A line touching a circle at exactly one point is called a:",
+     opts:["Secant","Tangent","Chord","Diameter"],a:1,
+     e:"A tangent meets the circle at exactly one point (the point of contact)."},
+    {q:"The tangent to a circle is ____ to the radius at the point of contact.",
+     opts:["Parallel","Equal","Perpendicular","At 45°"],a:2,
+     e:"Tangent ⟂ radius: they meet at a right angle at the point of contact."},
+    {q:"From a point 13 cm from the centre of a circle of radius 5 cm, the length of a tangent is:",
+     opts:["8 cm","12 cm","18 cm","√194 cm"],a:1,
+     e:"PT = √(d²−r²) = √(169−25) = √144 = 12 cm."}
+  ];
+  var quiz=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    var exp=document.createElement("div"); exp.className="exp";
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered)return; answered=true;
+        if(oi===item.a){ b.classList.add("correct"); }
+        else{ b.classList.add("wrong");
+          var btns=d.querySelectorAll(".opt"); btns[item.a].classList.add("correct"); }
+        exp.textContent=item.e;
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(exp); quiz.appendChild(d);
+  });
+
+  // ---------- init ----------
+  resizeAll();
+  draw0(); draw1(); draw2();
+})();
+</script>
+</body>
+</html>
