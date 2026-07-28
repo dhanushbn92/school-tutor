@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complex Numbers Lab — NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#1a2131; --panel2:#222c40; --line:#2c3852;
+    --ink:#e6ecf7; --muted:#93a1bd; --accent:#5ad1c0; --accent2:#f2a65a;
+    --grid:#22304a; --axis:#57688a; --z1:#5ad1c0; --z2:#f2a65a;
+    --ok:#63d98a; --bad:#f27b7b;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 6px;text-align:center}
+  header h1{margin:0;font-size:clamp(1.2rem,4vw,1.7rem);letter-spacing:.3px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+  .wrap{max-width:1080px;margin:0 auto;padding:12px 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+  .tabs button{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:12px;font-size:.9rem;cursor:pointer;
+    transition:.15s;font-weight:600;
+  }
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.active{background:var(--accent);color:#08211d;border-color:var(--accent)}
+  .mode{display:none}
+  .mode.active{display:block}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:14px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .panel h2{margin:0 0 8px;font-size:1rem;color:var(--accent)}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;background:var(--bg);touch-action:none}
+  .stat{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+  .stat:last-child{border-bottom:none}
+  .stat b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .k{color:var(--muted)}
+  .val{font-variant-numeric:tabular-nums;color:var(--accent)}
+  .z1c{color:var(--z1)}
+  .z2c{color:var(--z2)}
+  .controls{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+  .row{display:flex;align-items:center;gap:10px;font-size:.88rem;flex-wrap:wrap}
+  label{color:var(--muted)}
+  input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+  select,button.btn{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:.88rem;cursor:pointer}
+  .facts{font-size:.86rem;color:var(--muted)}
+  .facts li{margin:6px 0}
+  .facts b{color:var(--accent)}
+  .hint{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .quiz .q{margin:12px 0;padding:12px;background:var(--panel2);border-radius:12px}
+  .quiz .q p{margin:0 0 8px;font-weight:600}
+  .quiz .opt{display:block;width:100%;text-align:left;margin:5px 0;padding:9px 11px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);cursor:pointer;font-size:.88rem}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:#173a2a;border-color:var(--ok);color:#c6f6d5}
+  .quiz .opt.wrong{background:#3a1d1d;border-color:#f27b7b;color:#f8c9c9}
+  .quiz .exp{font-size:.82rem;color:var(--muted);margin-top:8px;display:none}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:20px;background:var(--panel2);color:var(--muted);margin-left:6px}
+  .full{grid-column:1/-1}
+</style>
+</head>
+<body>
+<header>
+  <h1>Complex Numbers Lab</h1>
+  <p>NIOS Class 12 Mathematics · Ch 8 — drag the points, watch the maths</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button data-m="argand" class="active">Argand Plane</button>
+    <button data-m="ops">Operations</button>
+    <button data-m="powers">Powers &amp; Roots</button>
+    <button data-m="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ARGAND -->
+  <section class="mode active" id="m-argand">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Argand plane <span class="badge">drag the teal dot</span></h2>
+        <canvas id="cvA" width="620" height="620"></canvas>
+        <p class="hint">Drag <b class="z1c">z</b> anywhere. The dashed dot is the conjugate <b>z&#772;</b>. The arc shows arg(z).</p>
+      </div>
+      <div class="panel">
+        <h2>z = a + bi</h2>
+        <div id="statA"></div>
+        <div class="controls">
+          <div class="row"><label>Snap to grid</label><input type="checkbox" id="snapA"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPERATIONS -->
+  <section class="mode" id="m-ops">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Operations <span class="badge">drag z&#8321; &amp; z&#8322;</span></h2>
+        <canvas id="cvO" width="620" height="620"></canvas>
+        <p class="hint">Multiplication rotates &amp; scales: |z&#8321;z&#8322;| = |z&#8321;||z&#8322;|, arg adds.</p>
+      </div>
+      <div class="panel">
+        <h2>Live results</h2>
+        <div class="row" style="margin-bottom:8px">
+          <label>Show</label>
+          <select id="opSel">
+            <option value="add">Addition z&#8321;+z&#8322;</option>
+            <option value="sub">Subtraction z&#8321;&minus;z&#8322;</option>
+            <option value="mul">Multiplication z&#8321;&middot;z&#8322;</option>
+            <option value="div">Division z&#8321;&divide;z&#8322;</option>
+          </select>
+        </div>
+        <div id="statO"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POWERS -->
+  <section class="mode" id="m-powers">
+    <div class="grid2">
+      <div class="panel">
+        <h2>De Moivre &amp; roots of unity</h2>
+        <canvas id="cvP" width="620" height="620"></canvas>
+        <p class="hint">Blue trail = z, z&sup2;, &hellip; z&#8319; (De Moivre). Orange dots = the n-th roots of unity.</p>
+      </div>
+      <div class="panel">
+        <h2>Controls</h2>
+        <div class="controls">
+          <div class="row"><label>|z| = r</label><input type="range" id="pR" min="0.6" max="1.35" step="0.01" value="1.06"><span class="val" id="pRv"></span></div>
+          <div class="row"><label>arg(z) = &theta;&deg;</label><input type="range" id="pT" min="0" max="180" step="1" value="35"><span class="val" id="pTv"></span></div>
+          <div class="row"><label>power n</label><input type="range" id="pN" min="1" max="10" step="1" value="5"><span class="val" id="pNv"></span></div>
+          <div class="row"><label>roots of unity: n</label><input type="range" id="pK" min="2" max="12" step="1" value="6"><span class="val" id="pKv"></span></div>
+        </div>
+        <div id="statP" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARN -->
+  <section class="mode" id="m-learn">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Key facts</h2>
+        <ul class="facts">
+          <li><b>i&sup2; = &minus;1</b>; a complex number is z = a + bi with a = Re(z), b = Im(z).</li>
+          <li><b>Modulus</b>: |z| = &radic;(a&sup2;+b&sup2;) — the distance from the origin.</li>
+          <li><b>Argument</b>: arg(z) = atan2(b, a), the angle from the positive real axis.</li>
+          <li><b>Conjugate</b>: z&#772; = a &minus; bi; reflects z across the real axis, and z&middot;z&#772; = |z|&sup2;.</li>
+          <li><b>Polar form</b>: z = r(cos&theta; + i sin&theta;), where r = |z|, &theta; = arg(z).</li>
+          <li><b>Products</b>: moduli multiply, arguments add: |z&#8321;z&#8322;| = |z&#8321;||z&#8322;|, arg(z&#8321;z&#8322;) = arg z&#8321; + arg z&#8322;.</li>
+          <li><b>De Moivre</b>: z&#8319; = r&#8319;(cos n&theta; + i sin n&theta;).</li>
+          <li><b>Roots of unity</b>: solutions of z&#8319; = 1 are cos(2&pi;k/n) + i sin(2&pi;k/n), k = 0&hellip;n&minus;1 — vertices of a regular n-gon on the unit circle.</li>
+        </ul>
+      </div>
+      <div class="panel quiz" id="quiz">
+        <h2>Quick quiz <span class="badge">tap an answer</span></h2>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- shared math helpers ----------
+  var TAU = Math.PI*2;
+  function fmt(x, d){ d = d===undefined?2:d; if(Math.abs(x)<5e-4) x=0; return x.toFixed(d); }
+  function cstr(a,b){ // a + bi string
+    var ar=fmt(a), br=fmt(Math.abs(b));
+    var sign = b<0 ? " − " : " + ";
+    return ar + sign + br + "i";
+  }
+  function mod(a,b){ return Math.hypot(a,b); }
+  function argDeg(a,b){ return Math.atan2(b,a)*180/Math.PI; }
+
+  // ---------- generic Argand canvas plotter ----------
+  function makePlane(canvas, opts){
+    opts = opts||{};
+    var ctx = canvas.getContext("2d");
+    var range = opts.range || 6;      // units shown from center to edge
+    var css = getComputedStyle(document.documentElement);
+    var C = {
+      grid: css.getPropertyValue('--grid').trim(),
+      axis: css.getPropertyValue('--axis').trim(),
+      ink: css.getPropertyValue('--ink').trim(),
+      muted: css.getPropertyValue('--muted').trim(),
+      z1: css.getPropertyValue('--z1').trim(),
+      z2: css.getPropertyValue('--z2').trim(),
+      accent: css.getPropertyValue('--accent').trim()
+    };
+    var W, H, cx, cy, scale, dpr;
+    function resize(){
+      dpr = window.devicePixelRatio||1;
+      var rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.width; // square
+      canvas.width = Math.round(W*dpr);
+      canvas.height = Math.round(H*dpr);
+      canvas.style.height = W+"px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      cx = W/2; cy = H/2; scale = (W/2)/range;
+    }
+    function toPx(a,b){ return [cx + a*scale, cy - b*scale]; }
+    function toUnit(px,py){ return [(px-cx)/scale, (cy-py)/scale]; }
+    function clear(){
+      ctx.clearRect(0,0,W,H);
+      // grid
+      ctx.lineWidth=1; ctx.strokeStyle=C.grid;
+      var r = Math.ceil(range);
+      for(var g=-r; g<=r; g++){
+        if(g===0) continue;
+        var p1=toPx(g,-range), p2=toPx(g,range);
+        ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.stroke();
+        var q1=toPx(-range,g), q2=toPx(range,g);
+        ctx.beginPath(); ctx.moveTo(q1[0],q1[1]); ctx.lineTo(q2[0],q2[1]); ctx.stroke();
+      }
+      // axes
+      ctx.lineWidth=1.5; ctx.strokeStyle=C.axis;
+      var ax=toPx(-range,0), bx=toPx(range,0);
+      ctx.beginPath(); ctx.moveTo(ax[0],ax[1]); ctx.lineTo(bx[0],bx[1]); ctx.stroke();
+      var ay=toPx(0,-range), by=toPx(0,range);
+      ctx.beginPath(); ctx.moveTo(ay[0],ay[1]); ctx.lineTo(by[0],by[1]); ctx.stroke();
+      ctx.fillStyle=C.muted; ctx.font="12px system-ui"; ctx.textAlign="left";
+      ctx.fillText("Re", bx[0]-22, bx[1]-6);
+      ctx.textAlign="left";
+      ctx.fillText("Im", ay[0]+6, ay[1]+14);
+    }
+    function vector(a,b,color,label,dashed,dot){
+      var o=toPx(0,0), p=toPx(a,b);
+      ctx.strokeStyle=color; ctx.fillStyle=color;
+      ctx.lineWidth=2.4;
+      if(dashed) ctx.setLineDash([5,5]); else ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(o[0],o[1]); ctx.lineTo(p[0],p[1]); ctx.stroke();
+      ctx.setLineDash([]);
+      // arrow head
+      var ang=Math.atan2(-(b),(a));
+      var hl=9;
+      ctx.beginPath();
+      ctx.moveTo(p[0],p[1]);
+      ctx.lineTo(p[0]-hl*Math.cos(ang-0.4), p[1]+hl*Math.sin(ang-0.4));
+      ctx.lineTo(p[0]-hl*Math.cos(ang+0.4), p[1]+hl*Math.sin(ang+0.4));
+      ctx.closePath(); ctx.fill();
+      if(dot!==false){
+        ctx.beginPath(); ctx.arc(p[0],p[1], dashed?4:6, 0, TAU); ctx.fill();
+      }
+      if(label){
+        ctx.font="bold 13px system-ui"; ctx.textAlign="left";
+        ctx.fillText(label, p[0]+8, p[1]-8);
+      }
+    }
+    function point(a,b,color,rad){
+      var p=toPx(a,b); ctx.fillStyle=color;
+      ctx.beginPath(); ctx.arc(p[0],p[1],rad||5,0,TAU); ctx.fill();
+    }
+    function arc(a,b,color){ // argument arc from +Re axis
+      var ang=Math.atan2(b,a);
+      var o=toPx(0,0);
+      ctx.strokeStyle=color; ctx.lineWidth=2;
+      ctx.beginPath();
+      // canvas y is inverted -> sweep with -ang
+      ctx.arc(o[0],o[1], 26, 0, -ang, ang>0);
+      ctx.stroke();
+    }
+    function circle(rUnits,color,dash){
+      var o=toPx(0,0);
+      ctx.strokeStyle=color; ctx.lineWidth=1.4;
+      if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(o[0],o[1], rUnits*scale, 0, TAU); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    function poly(pts,color){
+      if(pts.length<2) return;
+      ctx.strokeStyle=color; ctx.lineWidth=1.6; ctx.setLineDash([]);
+      ctx.beginPath();
+      var s=toPx(pts[0][0],pts[0][1]); ctx.moveTo(s[0],s[1]);
+      for(var i=1;i<pts.length;i++){var q=toPx(pts[i][0],pts[i][1]); ctx.lineTo(q[0],q[1]);}
+      ctx.closePath(); ctx.stroke();
+    }
+    function segment(x1,y1,x2,y2,color,dash){
+      var p=toPx(x1,y1), q=toPx(x2,y2);
+      ctx.strokeStyle=color; ctx.lineWidth=1.6;
+      if(dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(p[0],p[1]); ctx.lineTo(q[0],q[1]); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    return {ctx:ctx, resize:resize, clear:clear, toPx:toPx, toUnit:toUnit,
+            vector:vector, point:point, arc:arc, circle:circle, poly:poly,
+            segment:segment, colors:C,
+            get range(){return range;}, get W(){return W;}, get scale(){return scale;}};
+  }
+
+  // ---------- drag handling ----------
+  function attachDrag(canvas, plane, handles, onChange){
+    // handles: array of {get:()=>[a,b], set:(a,b)=>{}}
+    var active=-1;
+    function evPos(e){
+      var rect=canvas.getBoundingClientRect();
+      var t = e.touches && e.touches[0] ? e.touches[0] : e;
+      return [t.clientX-rect.left, t.clientY-rect.top];
+    }
+    function pick(px,py){
+      var best=-1, bd=26;
+      for(var i=0;i<handles.length;i++){
+        var v=handles[i].get(); var p=plane.toPx(v[0],v[1]);
+        var d=Math.hypot(px-p[0],py-p[1]);
+        if(d<bd){bd=d;best=i;}
+      }
+      return best;
+    }
+    function down(e){
+      var pos=evPos(e); active=pick(pos[0],pos[1]);
+      if(active>=0){ e.preventDefault(); move(e); }
+    }
+    function move(e){
+      if(active<0) return;
+      e.preventDefault();
+      var pos=evPos(e); var u=plane.toUnit(pos[0],pos[1]);
+      var a=u[0], b=u[1];
+      var lim=plane.range-0.15;
+      a=Math.max(-lim,Math.min(lim,a)); b=Math.max(-lim,Math.min(lim,b));
+      handles[active].set(a,b);
+      onChange();
+    }
+    function up(){ active=-1; }
+    canvas.addEventListener("mousedown",down);
+    window.addEventListener("mousemove",move);
+    window.addEventListener("mouseup",up);
+    canvas.addEventListener("touchstart",down,{passive:false});
+    canvas.addEventListener("touchmove",move,{passive:false});
+    window.addEventListener("touchend",up);
+  }
+
+  function statLine(k,v,cls){
+    return '<div class="stat"><span class="k">'+k+'</span><b class="'+(cls||'val')+'">'+v+'</b></div>';
+  }
+
+  // =========================================================
+  // MODE 1: ARGAND
+  // =========================================================
+  var A = { a:3, b:2, snap:false };
+  var cvA = document.getElementById("cvA");
+  var planeA = makePlane(cvA,{range:6});
+  function drawA(){
+    planeA.clear();
+    var a=A.a,b=A.b;
+    planeA.circle(mod(a,b), planeA.colors.z1, [3,4]);
+    planeA.arc(a,b, planeA.colors.accent);
+    // conjugate
+    planeA.vector(a,-b, planeA.colors.muted, "z̄", true);
+    // z
+    planeA.vector(a,b, planeA.colors.z1, "z", false);
+    // projections
+    planeA.segment(a,b,a,0, planeA.colors.z1, [2,3]);
+    planeA.segment(a,b,0,b, planeA.colors.z1, [2,3]);
+    // stats
+    var r=mod(a,b), ph=Math.atan2(b,a);
+    var h='';
+    h+=statLine("z", cstr(a,b),"val");
+    h+=statLine("Re(z) = a", fmt(a),"val");
+    h+=statLine("Im(z) = b", fmt(b),"val");
+    h+=statLine("conjugate z̄", cstr(a,-b),"val");
+    h+=statLine("modulus |z|", fmt(r),"val");
+    h+=statLine("argument", fmt(argDeg(a,b),1)+"°  ("+fmt(ph,2)+" rad)","val");
+    h+=statLine("polar form", fmt(r)+"(cos "+fmt(argDeg(a,b),0)+"° + i sin "+fmt(argDeg(a,b),0)+"°)","val");
+    document.getElementById("statA").innerHTML=h;
+  }
+  attachDrag(cvA, planeA, [{
+    get:function(){return [A.a,A.b];},
+    set:function(a,b){ if(A.snap){a=Math.round(a);b=Math.round(b);} A.a=a;A.b=b; }
+  }], drawA);
+  document.getElementById("snapA").addEventListener("change",function(e){A.snap=e.target.checked; if(A.snap){A.a=Math.round(A.a);A.b=Math.round(A.b);} drawA();});
+
+  // =========================================================
+  // MODE 2: OPERATIONS
+  // =========================================================
+  var O = { z1:[2.5,1.5], z2:[1,2], op:"add" };
+  var cvO=document.getElementById("cvO");
+  var planeO=makePlane(cvO,{range:6});
+  function cmul(p,q){ return [p[0]*q[0]-p[1]*q[1], p[0]*q[1]+p[1]*q[0]]; }
+  function cdiv(p,q){ var d=q[0]*q[0]+q[1]*q[1]; return [(p[0]*q[0]+p[1]*q[1])/d,(p[1]*q[0]-p[0]*q[1])/d]; }
+  function drawO(){
+    planeO.clear();
+    var z1=O.z1, z2=O.z2, res, o=planeO;
+    o.vector(z1[0],z1[1], o.colors.z1, "z₁", false);
+    o.vector(z2[0],z2[1], o.colors.z2, "z₂", false);
+    if(O.op==="add"){
+      res=[z1[0]+z2[0], z1[1]+z2[1]];
+      // parallelogram
+      o.segment(z1[0],z1[1],res[0],res[1], o.colors.z2, [4,4]);
+      o.segment(z2[0],z2[1],res[0],res[1], o.colors.z1, [4,4]);
+      o.vector(res[0],res[1], o.colors.accent, "z₁+z₂", false);
+    } else if(O.op==="sub"){
+      res=[z1[0]-z2[0], z1[1]-z2[1]];
+      o.vector(res[0],res[1], o.colors.accent, "z₁−z₂", false);
+      // show as z1 + (-z2)
+      o.vector(-z2[0],-z2[1], o.colors.muted, "−z₂", true);
+      o.segment(-z2[0],-z2[1],res[0],res[1], o.colors.z1, [4,4]);
+    } else if(O.op==="mul"){
+      res=cmul(z1,z2);
+      o.vector(res[0],res[1], o.colors.accent, "z₁z₂", false);
+    } else {
+      res=cdiv(z1,z2);
+      o.vector(res[0],res[1], o.colors.accent, "z₁/z₂", false);
+    }
+    // stats
+    var r1=mod(z1[0],z1[1]), r2=mod(z2[0],z2[1]);
+    var a1=argDeg(z1[0],z1[1]), a2=argDeg(z2[0],z2[1]);
+    var h='';
+    h+=statLine("z₁", cstr(z1[0],z1[1]),"z1c");
+    h+=statLine("z₂", cstr(z2[0],z2[1]),"z2c");
+    var name={add:"z₁ + z₂",sub:"z₁ − z₂",mul:"z₁ · z₂",div:"z₁ ÷ z₂"}[O.op];
+    h+=statLine(name, cstr(res[0],res[1]),"val");
+    h+=statLine("|result|", fmt(mod(res[0],res[1])),"val");
+    h+=statLine("arg(result)", fmt(argDeg(res[0],res[1]),1)+"°","val");
+    if(O.op==="mul"){
+      h+=statLine("check |z₁||z₂|", fmt(r1)+" × "+fmt(r2)+" = "+fmt(r1*r2),"val");
+      h+=statLine("check arg₁+arg₂", fmt(a1,1)+"° + "+fmt(a2,1)+"° = "+fmt(a1+a2,1)+"°","val");
+    } else if(O.op==="div"){
+      h+=statLine("check |z₁|/|z₂|", fmt(r1)+" / "+fmt(r2)+" = "+fmt(r1/r2),"val");
+      h+=statLine("check arg₁−arg₂", fmt(a1,1)+"° − "+fmt(a2,1)+"° = "+fmt(a1-a2,1)+"°","val");
+    }
+    document.getElementById("statO").innerHTML=h;
+  }
+  attachDrag(cvO, planeO, [
+    {get:function(){return O.z1;}, set:function(a,b){O.z1=[a,b];}},
+    {get:function(){return O.z2;}, set:function(a,b){O.z2=[a,b];}}
+  ], drawO);
+  document.getElementById("opSel").addEventListener("change",function(e){O.op=e.target.value; drawO();});
+
+  // =========================================================
+  // MODE 3: POWERS & ROOTS
+  // =========================================================
+  var P = { r:1.06, t:35, n:5, k:6 };
+  var cvP=document.getElementById("cvP");
+  var planeP=makePlane(cvP,{range:2.6});
+  function drawP(){
+    planeP.clear();
+    var o=planeP;
+    o.circle(1, o.colors.muted, [2,4]); // unit circle
+    // roots of unity
+    var pts=[];
+    for(var k=0;k<P.k;k++){
+      var ang=TAU*k/P.k;
+      pts.push([Math.cos(ang), Math.sin(ang)]);
+    }
+    o.poly(pts, o.colors.z2);
+    for(var i=0;i<pts.length;i++){ o.point(pts[i][0],pts[i][1], o.colors.z2, 4.5); }
+    // De Moivre trail: z, z^2 ... z^n
+    var th=P.t*Math.PI/180;
+    var prev=null;
+    for(var m=1;m<=P.n;m++){
+      var rr=Math.pow(P.r,m), aa=m*th;
+      var x=rr*Math.cos(aa), y=rr*Math.sin(aa);
+      if(prev){ o.segment(prev[0],prev[1],x,y, o.colors.z1, [1,3]); }
+      o.point(x,y, o.colors.z1, m===P.n?6:3.5);
+      prev=[x,y];
+    }
+    // base z vector
+    o.vector(P.r*Math.cos(th), P.r*Math.sin(th), o.colors.accent, "z", false, false);
+    // z^n label
+    var rn=Math.pow(P.r,P.n), an=P.n*th;
+    o.ctx.fillStyle=o.colors.z1; o.ctx.font="bold 12px system-ui"; o.ctx.textAlign="left";
+    var pp=o.toPx(rn*Math.cos(an), rn*Math.sin(an));
+    o.ctx.fillText("z"+supN(P.n), pp[0]+8, pp[1]-6);
+
+    // stats
+    var h='';
+    h+=statLine("z (polar)", fmt(P.r)+"(cos "+P.t+"° + i sin "+P.t+"°)","val");
+    h+=statLine("z (a+bi)", cstr(P.r*Math.cos(th), P.r*Math.sin(th)),"val");
+    var deg=((P.n*P.t)%360+360)%360;
+    h+=statLine("z"+supN(P.n)+" modulus", fmt(rn,3),"val");
+    h+=statLine("z"+supN(P.n)+" argument", fmt(P.n*P.t,0)+"° ≡ "+fmt(deg,0)+"°","val");
+    h+=statLine("z"+supN(P.n), cstr(rn*Math.cos(an), rn*Math.sin(an)),"val");
+    h+=statLine("roots of unity", P.k+" vertices, spacing "+fmt(360/P.k,1)+"°","z2c");
+    document.getElementById("statP").innerHTML=h;
+  }
+  function supN(n){
+    var map={"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+    return (""+n).split("").map(function(c){return map[c];}).join("");
+  }
+  function bindRange(id,valId,key,suffix){
+    var el=document.getElementById(id), lab=document.getElementById(valId);
+    function upd(){ P[key]=parseFloat(el.value); lab.textContent=el.value+(suffix||""); drawP(); }
+    el.addEventListener("input",upd); upd();
+  }
+  bindRange("pR","pRv","r","");
+  bindRange("pT","pTv","t","°");
+  bindRange("pN","pNv","n","");
+  bindRange("pK","pKv","k","");
+
+  // =========================================================
+  // QUIZ
+  // =========================================================
+  var quizData=[
+    {q:"If z = 3 + 4i, what is |z|?",
+     opts:["5","7","√7","25"], correct:0,
+     exp:"|z| = √(3²+4²) = √25 = 5."},
+    {q:"For z₁, z₂ in polar form, arg(z₁z₂) equals:",
+     opts:["arg z₁ − arg z₂","arg z₁ + arg z₂","arg z₁ × arg z₂","0"], correct:1,
+     exp:"When you multiply, moduli multiply and arguments add."},
+    {q:"By De Moivre, (cosθ + i sinθ)⁵ equals:",
+     opts:["cos5θ + i sin5θ","5(cosθ + i sinθ)","cosθ⁵ + i sinθ⁵","cos(θ/5)+i sin(θ/5)"], correct:0,
+     exp:"zⁿ = rⁿ(cos nθ + i sin nθ); here r=1, n=5."}
+  ];
+  (function buildQuiz(){
+    var box=document.getElementById("quiz");
+    quizData.forEach(function(item,qi){
+      var d=document.createElement("div"); d.className="q";
+      var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+      item.opts.forEach(function(opt,oi){
+        var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+        b.addEventListener("click",function(){
+          var kids=d.querySelectorAll(".opt");
+          kids.forEach(function(k){k.disabled=true;});
+          if(oi===item.correct){ b.classList.add("correct"); }
+          else { b.classList.add("wrong"); kids[item.correct].classList.add("correct"); }
+          d.querySelector(".exp").style.display="block";
+        });
+        d.appendChild(b);
+      });
+      var ex=document.createElement("div"); ex.className="exp"; ex.textContent="Why: "+item.exp;
+      d.appendChild(ex);
+      box.appendChild(d);
+    });
+  })();
+
+  // =========================================================
+  // TABS + RESIZE
+  // =========================================================
+  var modes={argand:drawA, ops:drawO, powers:drawP, learn:function(){}};
+  var planes={argand:planeA, ops:planeO, powers:planeP};
+  var current="argand";
+  document.getElementById("tabs").addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    var m=b.getAttribute("data-m");
+    document.querySelectorAll(".tabs button").forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    document.querySelectorAll(".mode").forEach(function(x){x.classList.remove("active");});
+    document.getElementById("m-"+m).classList.add("active");
+    current=m;
+    if(planes[m]){ planes[m].resize(); }
+    modes[m]();
+  });
+
+  function resizeAll(){
+    planeA.resize(); planeO.resize(); planeP.resize();
+    drawA(); drawO(); drawP();
+  }
+  window.addEventListener("resize",function(){
+    // resize only active for perf but keep others valid
+    if(planes[current]) planes[current].resize();
+    if(modes[current]) modes[current]();
+  });
+
+  // initial layout (elements measured after CSS applied)
+  resizeAll();
+  window.addEventListener("load", resizeAll);
+})();
+</script>
+</body>
+</html>

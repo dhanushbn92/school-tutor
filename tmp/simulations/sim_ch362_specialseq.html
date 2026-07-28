@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Special Sequences Lab — Some Special Sequences (NIOS Class 12, Ch 7)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212940;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#5ad1a8;
+    --accent-soft:rgba(90,209,168,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --dot:#5ad1a8;
+    --line:#2b3450;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .view{display:none}
+  .view.on{display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--accent);font-weight:700}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .seg button{flex:1 1 90px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  input[type=text]{width:100%;min-height:46px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;color:var(--ink);font-size:1rem;padding:0 12px;font-family:inherit}
+  input[type=text]:focus{outline:none;border-color:var(--accent)}
+
+  .cards{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .card{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .card .lbl{font-size:.78rem;color:var(--muted)}
+  .card .num{font-size:1.25rem;font-weight:700;margin-top:2px;word-break:break-word}
+  .card .num.acc{color:var(--accent)}
+  .match{font-size:.85rem;margin-top:8px}
+  .match .ok{color:var(--good);font-weight:600}
+  .match .no{color:var(--bad);font-weight:600}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin-top:8px}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;
+    font-family:"Cambria Math",Georgia,serif;font-size:1.02rem;margin:6px 0}
+  .formula b{color:var(--accent)}
+
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.9rem}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:right}
+  th{color:var(--muted);font-weight:600;background:var(--panel2)}
+  td:first-child,th:first-child{text-align:left}
+  .tblwrap{overflow-x:auto}
+
+  .facts{font-size:.9rem;color:var(--muted)}
+  .facts li{margin:6px 0 6px 18px}
+  .facts b{color:var(--ink)}
+
+  .quiz .q{margin-bottom:14px}
+  .quiz .q p{font-weight:600;margin-bottom:6px}
+  .quiz .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;margin:5px 0;color:var(--ink);cursor:pointer;font-size:.92rem;font-family:inherit}
+  .quiz .opt:active{transform:scale(.995)}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(95,214,139,.16)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.16)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:4px;display:none}
+  .quiz .exp.show{display:block}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .badge{display:inline-block;font-size:.78rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:6px}
+  .badge.on{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Special Sequences <span>Lab</span></h1>
+    <p>NIOS Class 12 Mathematics · Ch 7 — Some Special Sequences</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="sums">Sums of Series</button>
+    <button class="tab-btn" data-view="fig">Figurate &amp; Fibonacci</button>
+    <button class="tab-btn" data-view="builder">Series Builder</button>
+    <button class="tab-btn" data-view="quiz">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ VIEW 1: SUMS ============ -->
+  <section class="view on" id="view-sums">
+    <div class="panel">
+      <h2>Sums of Special Series</h2>
+      <div class="seg" id="sumSeg">
+        <button class="on" data-s="1">&Sigma; n</button>
+        <button data-s="2">&Sigma; n&sup2;</button>
+        <button data-s="3">&Sigma; n&sup3;</button>
+      </div>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Upper limit n = <span class="val" id="sumNval">10</span></label>
+          <input type="range" id="sumN" min="1" max="40" step="1" value="10">
+        </div>
+      </div>
+      <div class="formula" id="sumFormula"></div>
+      <div class="cards">
+        <div class="card"><div class="lbl">Running sum (term by term)</div><div class="num" id="sumRun">55</div></div>
+        <div class="card"><div class="lbl">Closed-form value</div><div class="num acc" id="sumClosed">55</div></div>
+      </div>
+      <div class="match" id="sumMatch"></div>
+      <h3 style="margin-top:14px">Dot triangle (each row k has k dots)</h3>
+      <p class="hint" id="sumVisHint">Triangular number T&#8345; = &Sigma;n — total dots below.</p>
+      <canvas id="sumCanvas" width="640" height="300"></canvas>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: FIGURATE & FIBONACCI ============ -->
+  <section class="view" id="view-fig">
+    <div class="panel">
+      <h2>Figurate Numbers</h2>
+      <div class="seg" id="figSeg">
+        <button class="on" data-f="tri">Triangular</button>
+        <button data-f="sq">Square</button>
+      </div>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>n = <span class="val" id="figNval">6</span></label>
+          <input type="range" id="figN" min="1" max="12" step="1" value="6">
+        </div>
+      </div>
+      <div class="formula" id="figFormula"></div>
+      <canvas id="figCanvas" width="640" height="300"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>Fibonacci &amp; the Golden Ratio</h2>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>Number of terms = <span class="val" id="fibNval">12</span></label>
+          <input type="range" id="fibN" min="3" max="24" step="1" value="12">
+        </div>
+      </div>
+      <div class="formula">F&#8321;=1, F&#8322;=1, &nbsp; <b>F&#8345; = F&#8345;&#8331;&#8321; + F&#8345;&#8331;&#8322;</b></div>
+      <p class="hint">Sequence:</p>
+      <p id="fibSeq" style="font-family:monospace;word-break:break-word;margin:4px 0 10px;color:var(--ink)"></p>
+      <div class="cards">
+        <div class="card"><div class="lbl">Latest ratio F&#8345;/F&#8345;&#8331;&#8321;</div><div class="num acc" id="fibRatio"></div></div>
+        <div class="card"><div class="lbl">Golden ratio &phi;</div><div class="num">1.6180339887</div></div>
+      </div>
+      <p class="hint">Ratio of consecutive terms approaches &phi; = (1+&radic;5)/2:</p>
+      <canvas id="fibCanvas" width="640" height="240"></canvas>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: SERIES BUILDER ============ -->
+  <section class="view" id="view-builder">
+    <div class="panel">
+      <h2>Series Builder</h2>
+      <p class="hint">Enter a general term a(n) using <b>n</b>. Allowed: + - * / ^ ( ) and functions n, n^2, etc. Example: <b>2*n+1</b>, <b>3*2^(n-1)</b>, <b>n^2</b>.</p>
+      <div class="controls">
+        <div class="ctrl" style="flex:1 1 100%">
+          <label>General term a(n) =</label>
+          <input type="text" id="bldExpr" value="2*n+1" spellcheck="false" autocomplete="off">
+        </div>
+        <div class="ctrl">
+          <label>Number of terms = <span class="val" id="bldNval">8</span></label>
+          <input type="range" id="bldN" min="2" max="15" step="1" value="8">
+        </div>
+      </div>
+      <div id="bldError" style="color:var(--bad);font-size:.88rem;min-height:1.1em"></div>
+      <div class="match" style="margin-top:6px">Detected type:
+        <span class="badge" id="bldType">—</span>
+      </div>
+      <div class="tblwrap">
+        <table id="bldTable">
+          <thead><tr><th>n</th><th>a(n)</th><th>Partial sum S&#8345;</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: FACTS & QUIZ ============ -->
+  <section class="view" id="view-quiz">
+    <div class="panel">
+      <h2>Facts Panel</h2>
+      <ul class="facts">
+        <li><b>Sum of naturals:</b> &Sigma;<sub>k=1</sub><sup>n</sup> k = n(n+1)/2</li>
+        <li><b>Sum of squares:</b> &Sigma;<sub>k=1</sub><sup>n</sup> k&sup2; = n(n+1)(2n+1)/6</li>
+        <li><b>Sum of cubes:</b> &Sigma;<sub>k=1</sub><sup>n</sup> k&sup3; = [n(n+1)/2]&sup2; = (&Sigma;k)&sup2;</li>
+        <li><b>Triangular number:</b> T&#8345; = n(n+1)/2 = 1, 3, 6, 10, 15, …</li>
+        <li><b>Square number:</b> n&sup2; = 1, 4, 9, 16, 25, … &nbsp;(also T&#8345; + T&#8345;&#8331;&#8321;)</li>
+        <li><b>Fibonacci:</b> 1, 1, 2, 3, 5, 8, 13, 21, … with F&#8345;=F&#8345;&#8331;&#8321;+F&#8345;&#8331;&#8322;</li>
+        <li><b>Golden ratio:</b> &phi; = (1+&radic;5)/2 &asymp; 1.618, the limit of F&#8345;/F&#8345;&#8331;&#8321;</li>
+      </ul>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz (tap an option)</h2>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- Tab switching ----------
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var views = {sums:'view-sums', fig:'view-fig', builder:'view-builder', quiz:'view-quiz'};
+  tabBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      tabBtns.forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      Object.keys(views).forEach(function(k){
+        document.getElementById(views[k]).classList.toggle('on', k===b.dataset.view);
+      });
+      // redraw canvases that may have been hidden (0-size) at init
+      if(b.dataset.view==='sums') drawSums();
+      if(b.dataset.view==='fig'){ drawFig(); drawFib(); }
+    });
+  });
+
+  // ---------- helpers ----------
+  function T(n){ return n*(n+1)/2; }
+  function sumSq(n){ return n*(n+1)*(2*n+1)/6; }
+  function sumCube(n){ var t=T(n); return t*t; }
+  function fmt(x){
+    if(Number.isInteger(x)) return x.toLocaleString('en-US');
+    return (Math.round(x*1e6)/1e6).toString();
+  }
+
+  // ================= VIEW 1: SUMS =================
+  var sumSeg = document.getElementById('sumSeg');
+  var sumN = document.getElementById('sumN');
+  var sumNval = document.getElementById('sumNval');
+  var sumCanvas = document.getElementById('sumCanvas');
+  var currentS = 1;
+
+  sumSeg.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      sumSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      btn.classList.add('on');
+      currentS = parseInt(btn.dataset.s,10);
+      updateSums();
+    });
+  });
+  sumN.addEventListener('input', updateSums);
+
+  function updateSums(){
+    var n = parseInt(sumN.value,10);
+    sumNval.textContent = n;
+    var run=0, closed=0, ftext='';
+    if(currentS===1){
+      for(var k=1;k<=n;k++) run+=k;
+      closed=T(n);
+      ftext='&Sigma;n = <b>n(n+1)/2</b> = '+n+'&middot;'+(n+1)+'/2 = <b>'+fmt(closed)+'</b>';
+      document.getElementById('sumVisHint').innerHTML='Triangular number T&#8345; = &Sigma;n — total dots below.';
+    } else if(currentS===2){
+      for(var k2=1;k2<=n;k2++) run+=k2*k2;
+      closed=sumSq(n);
+      ftext='&Sigma;n&sup2; = <b>n(n+1)(2n+1)/6</b> = '+n+'&middot;'+(n+1)+'&middot;'+(2*n+1)+'/6 = <b>'+fmt(closed)+'</b>';
+      document.getElementById('sumVisHint').innerHTML='Rows grow as squares 1, 4, 9, … (row k has k&sup2; dots, capped for display).';
+    } else {
+      for(var k3=1;k3<=n;k3++) run+=k3*k3*k3;
+      closed=sumCube(n);
+      ftext='&Sigma;n&sup3; = <b>[n(n+1)/2]&sup2;</b> = ['+fmt(T(n))+']&sup2; = <b>'+fmt(closed)+'</b>';
+      document.getElementById('sumVisHint').innerHTML='&Sigma;n&sup3; equals the square of the triangular number T&#8345;.';
+    }
+    document.getElementById('sumFormula').innerHTML=ftext;
+    document.getElementById('sumRun').textContent=fmt(run);
+    document.getElementById('sumClosed').textContent=fmt(closed);
+    var ok = Math.abs(run-closed) < 1e-6;
+    document.getElementById('sumMatch').innerHTML = ok
+      ? 'Term-by-term sum <span class="ok">matches</span> the closed form &check;'
+      : 'Mismatch <span class="no">&times;</span>';
+    drawSums();
+  }
+
+  function drawSums(){
+    var n = parseInt(sumN.value,10);
+    var c = sumCanvas, ctx = c.getContext('2d');
+    var W = c.width, H = c.height;
+    ctx.clearRect(0,0,W,H);
+    var accent = '#5ad1a8';
+    // For Σn: triangle of dots, row k has k dots.
+    // For Σn²: row k has k² dots (capped). For Σn³: draw T(n) squared as a big square of side T(n)? cap.
+    var rows = n;
+    // choose dot count per row
+    function dotsInRow(k){
+      if(currentS===1) return k;
+      if(currentS===2) return k*k;
+      return k; // for cubes, show triangle but note visual uses square interpretation via label
+    }
+    var maxDots = 0;
+    for(var k=1;k<=rows;k++) maxDots = Math.max(maxDots, dotsInRow(k));
+    if(currentS===3){
+      // draw a square grid of side T(n) representation (cap side)
+      drawSquareGrid(ctx,W,H,accent, T(n));
+      return;
+    }
+    var pad = 16;
+    var cols = Math.max(maxDots, rows);
+    var gx = (W - 2*pad) / cols;
+    var gy = (H - 2*pad) / rows;
+    var g = Math.min(gx, gy);
+    var r = Math.max(2, Math.min(9, g*0.32));
+    var cap = 900, drawn=0;
+    for(var row=1; row<=rows; row++){
+      var d = dotsInRow(row);
+      for(var i=0;i<d;i++){
+        if(drawn++>cap){ break; }
+        var x = pad + i*g + g/2;
+        var y = pad + (row-1)*g + g/2;
+        ctx.beginPath();
+        ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = 0.9;
+        ctx.fill();
+      }
+      if(drawn>cap) break;
+    }
+    ctx.globalAlpha=1;
+  }
+
+  function drawSquareGrid(ctx,W,H,accent, total){
+    // total = T(n); represent Σn³ = (T(n))² as a square of side T(n) (capped)
+    var side = Math.round(Math.sqrt(total)); // = T(n) if perfect square (it is)
+    var cap = 60;
+    var shown = Math.min(side, cap);
+    var pad=16;
+    var g = Math.min((W-2*pad), (H-2*pad))/shown;
+    var r = Math.max(1.5, g*0.32);
+    for(var yy=0; yy<shown; yy++){
+      for(var xx=0; xx<shown; xx++){
+        var x = pad + xx*g + g/2;
+        var y = pad + yy*g + g/2;
+        ctx.beginPath();
+        ctx.arc(x,y,r,0,Math.PI*2);
+        ctx.fillStyle=accent; ctx.globalAlpha=0.85; ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
+    ctx.fillStyle='#9aa5bd'; ctx.font='13px system-ui';
+    ctx.fillText('Square of side T = '+total+(side>cap?'  (showing '+cap+'×'+cap+')':'  ('+side+'×'+side+' dots = Σn³)'), pad, H-6);
+  }
+
+  // ================= VIEW 2: FIGURATE =================
+  var figSeg = document.getElementById('figSeg');
+  var figN = document.getElementById('figN');
+  var figNval = document.getElementById('figNval');
+  var figCanvas = document.getElementById('figCanvas');
+  var figType = 'tri';
+
+  figSeg.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      figSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      btn.classList.add('on');
+      figType = btn.dataset.f;
+      updateFig();
+    });
+  });
+  figN.addEventListener('input', updateFig);
+
+  function updateFig(){
+    var n = parseInt(figN.value,10);
+    figNval.textContent = n;
+    if(figType==='tri'){
+      document.getElementById('figFormula').innerHTML='Triangular T&#8345; = <b>n(n+1)/2</b> = <b>'+T(n)+'</b> dots';
+    } else {
+      document.getElementById('figFormula').innerHTML='Square S&#8345; = <b>n&sup2;</b> = <b>'+(n*n)+'</b> dots = T&#8345; + T&#8345;&#8331;&#8321;';
+    }
+    drawFig();
+  }
+
+  function drawFig(){
+    var n = parseInt(figN.value,10);
+    var c = figCanvas, ctx=c.getContext('2d');
+    var W=c.width, H=c.height;
+    ctx.clearRect(0,0,W,H);
+    var accent='#5ad1a8';
+    var pad=20;
+    if(figType==='tri'){
+      var g = Math.min((W-2*pad)/n, (H-2*pad)/n);
+      var r = Math.max(3, g*0.3);
+      for(var row=1; row<=n; row++){
+        var offset = (W - row*g)/2;
+        for(var i=0;i<row;i++){
+          var x = offset + i*g + g/2;
+          var y = pad + (row-1)*g + g/2;
+          ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+          ctx.fillStyle=accent; ctx.globalAlpha=0.9; ctx.fill();
+        }
+      }
+    } else {
+      var g2 = Math.min((W-2*pad)/n, (H-2*pad)/n);
+      var r2 = Math.max(3, g2*0.3);
+      var ox = (W - n*g2)/2, oy = pad;
+      for(var yy=0; yy<n; yy++){
+        for(var xx=0; xx<n; xx++){
+          var x2 = ox + xx*g2 + g2/2;
+          var y2 = oy + yy*g2 + g2/2;
+          // colour split to show T_n + T_{n-1}: upper-left incl diagonal one tone
+          var upper = xx <= (n-1-yy); // partition
+          ctx.beginPath(); ctx.arc(x2,y2,r2,0,Math.PI*2);
+          ctx.fillStyle = upper ? accent : '#f2b45a';
+          ctx.globalAlpha=0.9; ctx.fill();
+        }
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // ================= FIBONACCI =================
+  var fibN = document.getElementById('fibN');
+  var fibNval = document.getElementById('fibNval');
+  var fibCanvas = document.getElementById('fibCanvas');
+  var PHI = (1+Math.sqrt(5))/2;
+
+  fibN.addEventListener('input', updateFib);
+  function fibSeries(cnt){
+    var a=[1,1];
+    while(a.length<cnt) a.push(a[a.length-1]+a[a.length-2]);
+    return a.slice(0,cnt);
+  }
+  function updateFib(){
+    var cnt = parseInt(fibN.value,10);
+    fibNval.textContent = cnt;
+    var s = fibSeries(cnt);
+    document.getElementById('fibSeq').textContent = s.join(', ');
+    var ratio = s[s.length-1]/s[s.length-2];
+    document.getElementById('fibRatio').textContent = (Math.round(ratio*1e10)/1e10).toString();
+    drawFib();
+  }
+  function drawFib(){
+    var cnt = parseInt(fibN.value,10);
+    var s = fibSeries(cnt);
+    var ratios=[];
+    for(var i=1;i<s.length;i++) ratios.push(s[i]/s[i-1]);
+    var c=fibCanvas, ctx=c.getContext('2d');
+    var W=c.width, H=c.height;
+    ctx.clearRect(0,0,W,H);
+    var padL=40,padR=14,padT=14,padB=26;
+    var pw=W-padL-padR, ph=H-padT-padB;
+    // y range around phi
+    var yMin=1.0, yMax=2.1;
+    function X(i){ return padL + (ratios.length<=1?0:(i/(ratios.length-1))*pw); }
+    function Y(v){ return padT + (1-(v-yMin)/(yMax-yMin))*ph; }
+    // phi line
+    ctx.strokeStyle='#f2b45a'; ctx.setLineDash([5,5]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(padL,Y(PHI)); ctx.lineTo(W-padR,Y(PHI)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#f2b45a'; ctx.font='12px system-ui';
+    ctx.fillText('φ ≈ 1.618', W-padR-70, Y(PHI)-6);
+    // axes labels
+    ctx.fillStyle='#9aa5bd'; ctx.font='11px system-ui';
+    ctx.fillText('2.0', 6, Y(2.0)+4);
+    ctx.fillText('1.5', 6, Y(1.5)+4);
+    ctx.fillText('1.0', 6, Y(1.0)+4);
+    // ratio curve
+    ctx.strokeStyle='#5ad1a8'; ctx.lineWidth=2; ctx.beginPath();
+    ratios.forEach(function(v,i){ var x=X(i),y=Y(v); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+    ctx.stroke();
+    ctx.fillStyle='#5ad1a8';
+    ratios.forEach(function(v,i){ ctx.beginPath(); ctx.arc(X(i),Y(v),3,0,Math.PI*2); ctx.fill(); });
+  }
+
+  // ================= VIEW 3: BUILDER =================
+  var bldExpr = document.getElementById('bldExpr');
+  var bldN = document.getElementById('bldN');
+  var bldNval = document.getElementById('bldNval');
+
+  bldExpr.addEventListener('input', updateBuilder);
+  bldN.addEventListener('input', updateBuilder);
+
+  // safe evaluator: allow digits n + - * / ^ ( ) . and spaces
+  function makeTerm(expr){
+    var cleaned = expr.replace(/\s+/g,'');
+    if(!/^[0-9n+\-*/^().]+$/.test(cleaned)) throw new Error('Only n, digits and + - * / ^ ( ) allowed.');
+    // convert ^ to **
+    var js = cleaned.replace(/\^/g,'**');
+    // guard: no letters other than n
+    if(/[a-mo-zA-Z]/.test(js.replace(/n/g,''))) throw new Error('Unknown symbol.');
+    /* eslint-disable no-new-func */
+    var f = new Function('n','return ('+js+');');
+    // test
+    var t = f(1);
+    if(typeof t!=='number' || !isFinite(t)) throw new Error('Expression did not evaluate to a number.');
+    return f;
+  }
+
+  function detectType(vals){
+    if(vals.length<3) return '—';
+    var difs=[], allInt=true;
+    for(var i=1;i<vals.length;i++) difs.push(vals[i]-vals[i-1]);
+    var apConst = difs.every(function(d){ return Math.abs(d-difs[0])<1e-9; });
+    if(apConst){
+      return 'Arithmetic (AP), common difference d = '+fmt(difs[0]);
+    }
+    // GP: ratios constant and non-zero terms
+    var nonzero = vals.every(function(v){ return Math.abs(v)>1e-12; });
+    if(nonzero){
+      var r0 = vals[1]/vals[0], gp=true;
+      for(var j=1;j<vals.length;j++){ if(Math.abs(vals[j]/vals[j-1]-r0)>1e-9){gp=false;break;} }
+      if(gp) return 'Geometric (GP), common ratio r = '+fmt(Math.round(r0*1e6)/1e6);
+    }
+    // second difference constant -> quadratic
+    var d2=[];
+    for(var k=1;k<difs.length;k++) d2.push(difs[k]-difs[k-1]);
+    if(d2.length && d2.every(function(d){return Math.abs(d-d2[0])<1e-9;}))
+      return 'Quadratic (second differences constant)';
+    return 'Other sequence';
+  }
+
+  function updateBuilder(){
+    var cnt = parseInt(bldN.value,10);
+    bldNval.textContent = cnt;
+    var errEl = document.getElementById('bldError');
+    var tbody = document.querySelector('#bldTable tbody');
+    var typeEl = document.getElementById('bldType');
+    try{
+      var f = makeTerm(bldExpr.value);
+      errEl.textContent='';
+      var rows='', s=0, vals=[];
+      for(var n=1;n<=cnt;n++){
+        var a=f(n);
+        vals.push(a); s+=a;
+        rows+='<tr><td>'+n+'</td><td>'+fmt(Math.round(a*1e6)/1e6)+'</td><td>'+fmt(Math.round(s*1e6)/1e6)+'</td></tr>';
+      }
+      tbody.innerHTML=rows;
+      var t = detectType(vals);
+      typeEl.textContent = t;
+      typeEl.classList.toggle('on', t!=='—' && t!=='Other sequence');
+    }catch(e){
+      errEl.textContent = e.message;
+      typeEl.textContent='—'; typeEl.classList.remove('on');
+    }
+  }
+
+  // ================= QUIZ =================
+  var quizData=[
+    {q:'What is 1 + 2 + 3 + … + 100 (Σn for n=100)?',
+     opts:['5050','10100','5000','2550'], ans:0,
+     exp:'Σn = n(n+1)/2 = 100·101/2 = 5050.'},
+    {q:'Σn³ for n = 4 equals?',
+     opts:['100','64','36','1296'], ans:0,
+     exp:'Σn³ = [n(n+1)/2]² = [4·5/2]² = 10² = 100.'},
+    {q:'The ratio of consecutive Fibonacci numbers approaches:',
+     opts:['φ ≈ 1.618','π ≈ 3.1416','e ≈ 2.718','√2 ≈ 1.414'], ans:0,
+     exp:'F_n / F_{n-1} → φ = (1+√5)/2 ≈ 1.618, the golden ratio.'}
+  ];
+  var quizEl = document.getElementById('quiz');
+  quizData.forEach(function(item, qi){
+    var div=document.createElement('div'); div.className='q';
+    var p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; div.appendChild(p);
+    item.opts.forEach(function(opt, oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.addEventListener('click', function(){
+        var chosen=div.querySelectorAll('.opt');
+        chosen.forEach(function(x){ x.classList.remove('correct','wrong'); });
+        chosen[item.ans].classList.add('correct');
+        if(oi!==item.ans) b.classList.add('wrong');
+        div.querySelector('.exp').classList.add('show');
+      });
+      div.appendChild(b);
+    });
+    var exp=document.createElement('div'); exp.className='exp'; exp.textContent='Answer: '+item.exp;
+    div.appendChild(exp);
+    quizEl.appendChild(div);
+  });
+
+  // ---------- init ----------
+  updateSums();
+  updateFig();
+  updateFib();
+  updateBuilder();
+})();
+</script>
+</body>
+</html>

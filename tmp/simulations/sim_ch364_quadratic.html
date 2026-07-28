@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quadratics &amp; Inequalities Lab — NIOS Class 12 Maths Ch9</title>
+<style>
+  :root{
+    --bg:#12151c; --panel:#1b2029; --panel2:#232a36; --ink:#e7ecf4;
+    --muted:#9aa6ba; --accent:#5fd1c9; --accent2:#3a7d78;
+    --grid:#2b3340; --axis:#5b6678; --good:#7fe0a0; --bad:#f2896b;
+    --warn:#f6c860; --line:#5fd1c9; --shade:rgba(95,209,201,.20);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.25rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 12px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .tab{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--grid);
+    padding:8px 12px;border-radius:10px;cursor:pointer;font-size:.85rem;
+    min-height:40px;touch-action:manipulation;
+  }
+  .tab.active{background:var(--accent);color:#0c2725;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--grid);border-radius:14px;
+    padding:14px;margin-bottom:14px;
+  }
+  .mode{display:none}
+  .mode.active{display:block}
+  canvas{
+    width:100%;height:auto;display:block;background:var(--panel2);
+    border-radius:10px;border:1px solid var(--grid);touch-action:none;
+  }
+  .row{display:flex;flex-wrap:wrap;gap:12px}
+  .col{flex:1 1 300px;min-width:0}
+  label.ctrl{display:block;margin:10px 0 4px;font-size:.82rem;color:var(--muted)}
+  .ctrlval{color:var(--accent);font-weight:700}
+  input[type=range]{width:100%;height:30px;accent-color:var(--accent);touch-action:manipulation}
+  input[type=number],input[type=text],select{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--grid);
+    border-radius:8px;padding:8px;font-size:.9rem;width:100%;min-height:40px;
+  }
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+  .stat{background:var(--panel2);border:1px solid var(--grid);border-radius:10px;padding:8px 10px}
+  .stat .k{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+  .stat .v{font-size:.98rem;font-weight:700;margin-top:2px;word-break:break-word}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:600}
+  .b-good{background:rgba(127,224,160,.15);color:var(--good)}
+  .b-warn{background:rgba(246,200,96,.15);color:var(--warn)}
+  .b-bad{background:rgba(242,137,107,.15);color:var(--bad)}
+  .facts{font-size:.85rem}
+  .facts h3{margin:6px 0 4px;font-size:.95rem;color:var(--accent)}
+  .facts ul{margin:4px 0 10px;padding-left:18px}
+  .facts code{background:var(--panel2);padding:1px 5px;border-radius:5px;color:var(--ink)}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+  .seg button{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--grid);
+    border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.8rem;min-height:38px;
+  }
+  .seg button.active{background:var(--accent);color:#0c2725;border-color:var(--accent);font-weight:600}
+  .quiz .q{margin-bottom:14px}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--grid);border-radius:8px;padding:9px 11px;margin:5px 0;
+    cursor:pointer;font-size:.86rem;min-height:40px;
+  }
+  .quiz .opt.correct{background:rgba(127,224,160,.2);border-color:var(--good)}
+  .quiz .opt.wrong{background:rgba(242,137,107,.2);border-color:var(--bad)}
+  .quiz .expl{font-size:.8rem;color:var(--muted);margin-top:5px;display:none}
+  .quiz .expl.show{display:block}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+  .eq{font-size:1.05rem;font-weight:700;color:var(--ink);margin:4px 0}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<h1>Quadratics &amp; Inequalities Lab</h1>
+<p class="sub">NIOS Class 12 Mathematics · Ch 9 — Quadratic Equations &amp; Linear Inequalities</p>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-m="explorer">Quadratic Explorer</button>
+  <button class="tab" data-m="nature">Nature of Roots</button>
+  <button class="tab" data-m="ineq">Linear Inequalities</button>
+  <button class="tab" data-m="facts">Facts</button>
+  <button class="tab" data-m="quiz">Quiz</button>
+</div>
+
+<!-- ===================== EXPLORER ===================== -->
+<section class="mode active" id="m-explorer">
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <canvas id="cvExp" width="640" height="480" aria-label="Parabola plot"></canvas>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--line)"></i>y = ax²+bx+c</span>
+          <span><i class="dot" style="background:var(--warn)"></i>vertex</span>
+          <span><i class="dot" style="background:var(--good)"></i>roots</span>
+          <span><i class="dot" style="background:var(--axis)"></i>axis of symmetry</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <div class="eq" id="eqExp"></div>
+        <label class="ctrl">a = <span class="ctrlval" id="vA">1</span>
+          <input type="range" id="sA" min="-5" max="5" step="0.1" value="1"></label>
+        <label class="ctrl">b = <span class="ctrlval" id="vB">0</span>
+          <input type="range" id="sB" min="-10" max="10" step="0.1" value="0"></label>
+        <label class="ctrl">c = <span class="ctrlval" id="vC">-4</span>
+          <input type="range" id="sC" min="-10" max="10" step="0.1" value="-4"></label>
+        <div class="stats" id="statsExp"></div>
+        <div class="note">If a = 0 it is not a quadratic — a is nudged to a tiny non-zero value for plotting.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== NATURE ===================== -->
+<section class="mode" id="m-nature">
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <canvas id="cvNat" width="640" height="480" aria-label="Discriminant plot"></canvas>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <p style="margin-top:0;font-size:.9rem">Pick a discriminant case to see how the parabola meets the x-axis.</p>
+        <div class="seg" id="natSeg">
+          <button data-case="pos" class="active">D &gt; 0 (two real)</button>
+          <button data-case="zero">D = 0 (equal)</button>
+          <button data-case="neg">D &lt; 0 (complex)</button>
+        </div>
+        <label class="ctrl">Adjust a (opens up/down) = <span class="ctrlval" id="vNatA">1</span>
+          <input type="range" id="sNatA" min="-4" max="4" step="0.1" value="1"></label>
+        <div class="eq" id="eqNat"></div>
+        <div class="stats" id="statsNat"></div>
+        <div class="note" id="noteNat"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== INEQUALITIES ===================== -->
+<section class="mode" id="m-ineq">
+  <div class="panel">
+    <div class="seg" id="ineqSeg">
+      <button data-k="one" class="active">1-variable (number line)</button>
+      <button data-k="two">2-variable (half-plane)</button>
+      <button data-k="sys">System (feasible region)</button>
+    </div>
+  </div>
+
+  <!-- one variable -->
+  <div class="row ineqCase" id="ic-one">
+    <div class="col"><div class="panel"><canvas id="cvLine" width="640" height="200" aria-label="Number line"></canvas></div></div>
+    <div class="col"><div class="panel">
+      <div class="eq">Solve: <span id="oneEq"></span></div>
+      <label class="ctrl">coefficient p (px)  = <span class="ctrlval" id="vP">2</span>
+        <input type="range" id="oneP" min="-6" max="6" step="1" value="2"></label>
+      <label class="ctrl">relation</label>
+      <select id="oneRel">
+        <option value="lt">&lt;</option><option value="le">&le;</option>
+        <option value="gt" selected>&gt;</option><option value="ge">&ge;</option>
+      </select>
+      <label class="ctrl">constant q = <span class="ctrlval" id="vQ">4</span>
+        <input type="range" id="oneQ" min="-12" max="12" step="1" value="4"></label>
+      <div class="stats" id="oneStats"></div>
+      <div class="note">Rule: multiplying/dividing by a negative flips the inequality sign.</div>
+    </div></div>
+  </div>
+
+  <!-- two variable -->
+  <div class="row ineqCase" id="ic-two" style="display:none">
+    <div class="col"><div class="panel"><canvas id="cvHalf" width="640" height="480" aria-label="Half-plane plot"></canvas></div></div>
+    <div class="col"><div class="panel">
+      <div class="eq" id="twoEq"></div>
+      <label class="ctrl">a = <span class="ctrlval" id="v2A">1</span><input type="range" id="two2A" min="-4" max="4" step="0.5" value="1"></label>
+      <label class="ctrl">b = <span class="ctrlval" id="v2B">1</span><input type="range" id="two2B" min="-4" max="4" step="0.5" value="1"></label>
+      <label class="ctrl">relation</label>
+      <select id="twoRel"><option value="le" selected>&le;</option><option value="lt">&lt;</option><option value="ge">&ge;</option><option value="gt">&gt;</option></select>
+      <label class="ctrl">c = <span class="ctrlval" id="v2C">3</span><input type="range" id="two2C" min="-10" max="10" step="0.5" value="3"></label>
+      <div class="legend"><span><i class="dot" style="background:var(--shade)"></i>solution half-plane</span>
+        <span><i class="dot" style="background:var(--line)"></i>boundary ax+by=c</span></div>
+      <div class="note">Dashed boundary = strict (&lt; or &gt;); solid = includes equality (&le; or &ge;).</div>
+    </div></div>
+  </div>
+
+  <!-- system -->
+  <div class="row ineqCase" id="ic-sys" style="display:none">
+    <div class="col"><div class="panel"><canvas id="cvSys" width="640" height="480" aria-label="Feasible region plot"></canvas></div></div>
+    <div class="col"><div class="panel">
+      <div class="eq">System of inequalities</div>
+      <div class="stats" id="sysStats"></div>
+      <div class="legend"><span><i class="dot" style="background:var(--shade)"></i>feasible region</span></div>
+      <p style="font-size:.85rem;color:var(--muted)">Constraints (x, y ≥ 0 assumed):</p>
+      <ul style="font-size:.85rem;color:var(--muted);margin:0;padding-left:18px" id="sysList"></ul>
+      <div class="note">The shaded overlap satisfies every constraint simultaneously — the feasible region used in linear programming.</div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ===================== FACTS ===================== -->
+<section class="mode" id="m-facts">
+  <div class="panel facts">
+    <h3>Quadratic equation</h3>
+    <ul>
+      <li>Standard form: <code>ax² + bx + c = 0</code>, with <code>a ≠ 0</code>.</li>
+      <li>Quadratic formula: <code>x = (−b ± √(b²−4ac)) / (2a)</code>.</li>
+    </ul>
+    <h3>Discriminant  D = b² − 4ac</h3>
+    <ul>
+      <li><code>D &gt; 0</code> → two distinct real roots (parabola cuts x-axis twice).</li>
+      <li><code>D = 0</code> → two equal real roots (parabola touches x-axis).</li>
+      <li><code>D &lt; 0</code> → no real roots; two complex conjugate roots (no x-intercept).</li>
+    </ul>
+    <h3>Sum &amp; product of roots</h3>
+    <ul>
+      <li>If roots are α, β then <code>α + β = −b/a</code> and <code>α·β = c/a</code>.</li>
+      <li>Equation from roots: <code>x² − (α+β)x + αβ = 0</code>.</li>
+    </ul>
+    <h3>Vertex &amp; axis</h3>
+    <ul>
+      <li>Axis of symmetry: <code>x = −b/(2a)</code>. Vertex y = <code>c − b²/(4a)</code>.</li>
+      <li>a &gt; 0 opens upward (minimum); a &lt; 0 opens downward (maximum).</li>
+    </ul>
+    <h3>Linear inequality rules</h3>
+    <ul>
+      <li>Add/subtract the same number to both sides — sign unchanged.</li>
+      <li>Multiply/divide by a <b>positive</b> number — sign unchanged.</li>
+      <li>Multiply/divide by a <b>negative</b> number — <b>reverse</b> the sign.</li>
+      <li>Open circle for strict (&lt;, &gt;); closed circle for &le;, &ge;.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section class="mode" id="m-quiz">
+  <div class="panel quiz" id="quizBox"></div>
+</section>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabs=document.getElementById("tabs");
+  tabs.addEventListener("click",function(e){
+    var b=e.target.closest(".tab"); if(!b) return;
+    [].forEach.call(tabs.children,function(t){t.classList.remove("active");});
+    b.classList.add("active");
+    [].forEach.call(document.querySelectorAll(".mode"),function(m){m.classList.remove("active");});
+    document.getElementById("m-"+b.dataset.m).classList.add("active");
+    redrawAll();
+  });
+
+  function fmt(n,d){ if(!isFinite(n)) return "—"; d=(d===undefined)?2:d;
+    var r=Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+    if(Object.is(r,-0)) r=0; return String(r); }
+
+  // Generic world->pixel plotter helpers
+  function makeView(cv, xmin,xmax,ymin,ymax){
+    var ctx=cv.getContext("2d"), W=cv.width, H=cv.height;
+    var pad=34;
+    function X(x){ return pad + (x-xmin)/(xmax-xmin)*(W-2*pad); }
+    function Y(y){ return H-pad - (y-ymin)/(ymax-ymin)*(H-2*pad); }
+    return {ctx:ctx,W:W,H:H,pad:pad,xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,X:X,Y:Y};
+  }
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+  function drawGrid(v,opts){
+    var ctx=v.ctx; ctx.clearRect(0,0,v.W,v.H);
+    ctx.lineWidth=1; ctx.strokeStyle=css("--grid"); ctx.fillStyle=css("--muted");
+    ctx.font="11px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    var i;
+    for(i=Math.ceil(v.xmin);i<=Math.floor(v.xmax);i++){
+      var px=v.X(i); ctx.beginPath(); ctx.moveTo(px,v.pad); ctx.lineTo(px,v.H-v.pad); ctx.stroke();
+    }
+    for(i=Math.ceil(v.ymin);i<=Math.floor(v.ymax);i++){
+      if((i-Math.ceil(v.ymin))% (opts&&opts.ystep?opts.ystep:1)!==0) continue;
+      var py=v.Y(i); ctx.beginPath(); ctx.moveTo(v.pad,py); ctx.lineTo(v.W-v.pad,py); ctx.stroke();
+    }
+    // axes
+    ctx.strokeStyle=css("--axis"); ctx.lineWidth=1.6;
+    var y0=v.Y(0), x0=v.X(0);
+    if(0>=v.ymin&&0<=v.ymax){ctx.beginPath();ctx.moveTo(v.pad,y0);ctx.lineTo(v.W-v.pad,y0);ctx.stroke();}
+    if(0>=v.xmin&&0<=v.xmax){ctx.beginPath();ctx.moveTo(x0,v.pad);ctx.lineTo(x0,v.H-v.pad);ctx.stroke();}
+    // labels along x
+    ctx.fillStyle=css("--muted");
+    for(i=Math.ceil(v.xmin);i<=Math.floor(v.xmax);i++){
+      if(i===0) continue;
+      if(i%2!==0 && (v.xmax-v.xmin)>14) continue;
+      ctx.fillText(String(i), v.X(i), (0>=v.ymin&&0<=v.ymax)? y0+11 : v.H-v.pad+11);
+    }
+  }
+
+  // ================= EXPLORER =================
+  var sA=document.getElementById("sA"),sB=document.getElementById("sB"),sC=document.getElementById("sC");
+  var cvExp=document.getElementById("cvExp");
+  function quad(){
+    var a=parseFloat(sA.value),b=parseFloat(sB.value),c=parseFloat(sC.value);
+    document.getElementById("vA").textContent=fmt(a,1);
+    document.getElementById("vB").textContent=fmt(b,1);
+    document.getElementById("vC").textContent=fmt(c,1);
+    var ae=a; if(Math.abs(ae)<1e-6) ae=1e-6;
+    return {a:a,ae:ae,b:b,c:c};
+  }
+  function drawExplorer(){
+    var q=quad(), a=q.ae, b=q.b, c=q.c;
+    document.getElementById("eqExp").innerHTML =
+      "y = "+fmt(q.a,1)+"x² "+(b<0?"− ":"+ ")+fmt(Math.abs(b),1)+"x "+(c<0?"− ":"+ ")+fmt(Math.abs(c),1);
+    var v=makeView(cvExp,-10,10,-12,12);
+    // scale y to keep curve visible
+    var vx=-b/(2*a), vy=c-b*b/(4*a);
+    var ymin=-12,ymax=12;
+    if(vy<ymin) ymin=Math.floor(vy)-2;
+    if(vy>ymax) ymax=Math.ceil(vy)+2;
+    v=makeView(cvExp,-10,10,ymin,ymax);
+    drawGrid(v,{ystep:Math.max(1,Math.round((ymax-ymin)/12))});
+    // parabola
+    var ctx=v.ctx; ctx.strokeStyle=css("--line"); ctx.lineWidth=2.4; ctx.beginPath();
+    var started=false;
+    for(var px=v.pad;px<=v.W-v.pad;px++){
+      var x=v.xmin+(px-v.pad)/(v.W-2*v.pad)*(v.xmax-v.xmin);
+      var y=a*x*x+b*x+c, py=v.Y(y);
+      if(py<v.pad-200||py>v.H-v.pad+200){started=false;continue;}
+      if(!started){ctx.moveTo(px,py);started=true;} else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // axis of symmetry
+    if(vx>=v.xmin&&vx<=v.xmax){
+      ctx.strokeStyle=css("--axis");ctx.lineWidth=1;ctx.setLineDash([5,5]);
+      ctx.beginPath();ctx.moveTo(v.X(vx),v.pad);ctx.lineTo(v.X(vx),v.H-v.pad);ctx.stroke();ctx.setLineDash([]);
+    }
+    // roots
+    var D=b*b-4*a*c;
+    if(D>=0){
+      var r1=(-b+Math.sqrt(D))/(2*a), r2=(-b-Math.sqrt(D))/(2*a);
+      [r1,r2].forEach(function(r){
+        if(r>=v.xmin&&r<=v.xmax){ctx.fillStyle=css("--good");
+          ctx.beginPath();ctx.arc(v.X(r),v.Y(0),5,0,7);ctx.fill();}
+      });
+    }
+    // vertex
+    ctx.fillStyle=css("--warn");
+    ctx.beginPath();ctx.arc(v.X(vx),v.Y(vy),5,0,7);ctx.fill();
+
+    // stats
+    var st=document.getElementById("statsExp");
+    var dtxt,dcls;
+    if(D>0){dtxt="Two real roots";dcls="b-good";}
+    else if(Math.abs(D)<1e-9){dtxt="Equal roots";dcls="b-warn";}
+    else {dtxt="Complex roots";dcls="b-bad";}
+    var rootStr;
+    if(D>=0){
+      var s1=(-b+Math.sqrt(Math.abs(D)))/(2*a), s2=(-b-Math.sqrt(Math.abs(D)))/(2*a);
+      rootStr="x = "+fmt(s1)+",  "+fmt(s2);
+    } else {
+      var re=-b/(2*a), im=Math.sqrt(-D)/(2*a);
+      rootStr="x = "+fmt(re)+" ± "+fmt(Math.abs(im))+" i";
+    }
+    st.innerHTML=
+      cell("Discriminant D","<span class='badge "+dcls+"'>"+fmt(D)+" · "+dtxt+"</span>")+
+      cell("Roots (x-int.)",rootStr)+
+      cell("Vertex","("+fmt(vx)+", "+fmt(vy)+")")+
+      cell("Axis of symmetry","x = "+fmt(vx))+
+      cell("Sum of roots (−b/a)",fmt(-b/a))+
+      cell("Product of roots (c/a)",fmt(c/a))+
+      cell("Opens", q.a>=0?"Upward (min)":"Downward (max)");
+  }
+  function cell(k,v){return "<div class='stat'><div class='k'>"+k+"</div><div class='v'>"+v+"</div></div>";}
+  [sA,sB,sC].forEach(function(s){s.addEventListener("input",drawExplorer);});
+
+  // ================= NATURE =================
+  var natCase="pos", sNatA=document.getElementById("sNatA");
+  document.getElementById("natSeg").addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    [].forEach.call(this.children,function(x){x.classList.remove("active");});
+    b.classList.add("active"); natCase=b.dataset.case; drawNature();
+  });
+  sNatA.addEventListener("input",drawNature);
+  function drawNature(){
+    var a=parseFloat(sNatA.value); if(Math.abs(a)<0.1)a=(a<0?-0.1:0.1);
+    document.getElementById("vNatA").textContent=fmt(a,1);
+    // choose b,c to produce chosen D sign, roots symmetric around 0 for clarity
+    var b,c,D;
+    if(natCase==="pos"){ b=0; c=-3*Math.sign(a)*Math.abs(a); D=b*b-4*a*c; }      // roots ±√3
+    else if(natCase==="zero"){ b=0; c=0; D=0; }                                   // touches at 0
+    else { b=0; c=3*Math.sign(a)*Math.abs(a); D=b*b-4*a*c; }                        // no real roots
+    var v=makeView(document.getElementById("cvNat"),-8,8,-10,10);
+    drawGrid(v,{ystep:2});
+    var ctx=v.ctx; ctx.strokeStyle=css("--line"); ctx.lineWidth=2.4; ctx.beginPath();
+    var started=false;
+    for(var px=v.pad;px<=v.W-v.pad;px++){
+      var x=v.xmin+(px-v.pad)/(v.W-2*v.pad)*(v.xmax-v.xmin);
+      var y=a*x*x+b*x+c, py=v.Y(y);
+      if(py<v.pad-200||py>v.H-v.pad+200){started=false;continue;}
+      if(!started){ctx.moveTo(px,py);started=true;}else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // intersection markers
+    if(D>0){var r1=Math.sqrt(D)/(2*a)*1, s1=(-b+Math.sqrt(D))/(2*a),s2=(-b-Math.sqrt(D))/(2*a);
+      [s1,s2].forEach(function(r){ctx.fillStyle=css("--good");ctx.beginPath();ctx.arc(v.X(r),v.Y(0),6,0,7);ctx.fill();});}
+    else if(D===0){var r=-b/(2*a);ctx.fillStyle=css("--warn");ctx.beginPath();ctx.arc(v.X(r),v.Y(0),6,0,7);ctx.fill();}
+    document.getElementById("eqNat").innerHTML="y = "+fmt(a,1)+"x² "+(c<0?"− ":"+ ")+fmt(Math.abs(c),1);
+    var dtxt,dcls,note;
+    if(D>0){dtxt="D > 0";dcls="b-good";note="The parabola crosses the x-axis at two distinct points → two distinct real roots.";}
+    else if(D===0){dtxt="D = 0";dcls="b-warn";note="The vertex sits exactly on the x-axis → the parabola touches it once → equal (repeated) roots.";}
+    else {dtxt="D < 0";dcls="b-bad";note="The parabola never reaches the x-axis → no real roots, only a pair of complex conjugates.";}
+    document.getElementById("statsNat").innerHTML=
+      cell("Discriminant","<span class='badge "+dcls+"'>"+dtxt+" ("+fmt(D)+")</span>")+
+      cell("x-axis intersections", D>0?"2":(D===0?"1 (tangent)":"0"))+
+      cell("Root type", D>0?"Two real":(D===0?"Equal real":"Complex"));
+    document.getElementById("noteNat").textContent=note;
+  }
+
+  // ================= INEQUALITIES =================
+  var ineqCase="one";
+  document.getElementById("ineqSeg").addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    [].forEach.call(this.children,function(x){x.classList.remove("active");});
+    b.classList.add("active"); ineqCase=b.dataset.k;
+    document.getElementById("ic-one").style.display=(ineqCase==="one")?"":"none";
+    document.getElementById("ic-two").style.display=(ineqCase==="two")?"":"none";
+    document.getElementById("ic-sys").style.display=(ineqCase==="sys")?"":"none";
+    drawIneq();
+  });
+  var relSym={lt:"<",le:"≤",gt:">",ge:"≥"};
+  var relFlip={lt:"gt",le:"ge",gt:"lt",ge:"le"};
+
+  // -- one variable --
+  var oneP=document.getElementById("oneP"),oneQ=document.getElementById("oneQ"),oneRel=document.getElementById("oneRel");
+  [oneP,oneQ,oneRel].forEach(function(s){s.addEventListener("input",drawOne);});
+  function drawOne(){
+    var p=parseInt(oneP.value,10),q=parseInt(oneQ.value,10),rel=oneRel.value;
+    document.getElementById("vP").textContent=p;
+    document.getElementById("vQ").textContent=q;
+    document.getElementById("oneEq").textContent=p+"x "+relSym[rel]+" "+q;
+    // solve p*x rel q  -> x rel' q/p
+    var bound=null, outRel=rel, degenerate=null;
+    if(p!==0){
+      bound=q/p;
+      if(p<0) outRel=relFlip[rel];
+    } else {
+      // 0 rel q
+      var t=(rel==="lt")?(0<q):(rel==="le")?(0<=q):(rel==="gt")?(0>q):(0>=q);
+      degenerate=t?"All real x (always true)":"No solution (never true)";
+    }
+    // number line
+    var cv=document.getElementById("cvLine"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    var xmin=-14,xmax=14,pad=30,y=H/2;
+    function X(x){return pad+(x-xmin)/(xmax-xmin)*(W-2*pad);}
+    ctx.strokeStyle=css("--axis");ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();
+    // arrows
+    ctx.fillStyle=css("--axis");
+    ctx.beginPath();ctx.moveTo(W-pad,y);ctx.lineTo(W-pad-10,y-6);ctx.lineTo(W-pad-10,y+6);ctx.fill();
+    ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(pad+10,y-6);ctx.lineTo(pad+10,y+6);ctx.fill();
+    ctx.fillStyle=css("--muted");ctx.font="11px system-ui";ctx.textAlign="center";ctx.textBaseline="top";
+    for(var i=xmin+2;i<=xmax-2;i+=2){ctx.beginPath();ctx.moveTo(X(i),y-4);ctx.lineTo(X(i),y+4);ctx.strokeStyle=css("--grid");ctx.stroke();ctx.fillText(String(i),X(i),y+8);}
+    var solTxt;
+    if(degenerate){
+      if(degenerate.indexOf("All")===0){ctx.strokeStyle=css("--accent");ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(pad+6,y);ctx.lineTo(W-pad-6,y);ctx.stroke();}
+      solTxt=degenerate;
+    } else {
+      var closed=(outRel==="le"||outRel==="ge");
+      var goRight=(outRel==="gt"||outRel==="ge");
+      var bx=X(bound);
+      ctx.strokeStyle=css("--accent");ctx.lineWidth=6;ctx.beginPath();
+      if(goRight){ctx.moveTo(bx,y);ctx.lineTo(W-pad-6,y);}else{ctx.moveTo(bx,y);ctx.lineTo(pad+6,y);}
+      ctx.stroke();
+      // circle at bound
+      ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(bx,y,7,0,7);
+      if(closed){ctx.fillStyle=css("--accent");ctx.fill();}else{ctx.fillStyle=css("--panel2");ctx.fill();ctx.strokeStyle=css("--accent");ctx.stroke();}
+      ctx.fillStyle=css("--ink");ctx.textBaseline="bottom";ctx.fillText(fmt(bound),bx,y-12);
+      solTxt="x "+relSym[outRel]+" "+fmt(bound);
+    }
+    document.getElementById("oneStats").innerHTML=
+      cell("Rearranged", degenerate?("0 "+relSym[rel]+" "+q):("x "+relSym[outRel]+" "+fmt(bound)))+
+      cell("Solution set", solTxt)+
+      cell("Sign flipped?", (p<0&&!degenerate)?"Yes (÷ by negative)":"No");
+  }
+
+  // -- two variable half-plane --
+  var t2A=document.getElementById("two2A"),t2B=document.getElementById("two2B"),t2C=document.getElementById("two2C"),twoRel=document.getElementById("twoRel");
+  [t2A,t2B,t2C,twoRel].forEach(function(s){s.addEventListener("input",drawTwo);});
+  function drawTwo(){
+    var a=parseFloat(t2A.value),b=parseFloat(t2B.value),c=parseFloat(t2C.value),rel=twoRel.value;
+    document.getElementById("v2A").textContent=fmt(a,1);
+    document.getElementById("v2B").textContent=fmt(b,1);
+    document.getElementById("v2C").textContent=fmt(c,1);
+    document.getElementById("twoEq").innerHTML=fmt(a,1)+"x "+(b<0?"− ":"+ ")+fmt(Math.abs(b),1)+"y "+relSym[rel]+" "+fmt(c,1);
+    var v=makeView(document.getElementById("cvHalf"),-10,10,-10,10);
+    drawGrid(v,{ystep:2});
+    var ctx=v.ctx;
+    var strict=(rel==="lt"||rel==="gt");
+    // shade half-plane: test each grid pixel coarsely
+    ctx.fillStyle=css("--shade");
+    var step=6;
+    for(var px=v.pad;px<v.W-v.pad;px+=step){
+      for(var py=v.pad;py<v.H-v.pad;py+=step){
+        var x=v.xmin+(px-v.pad)/(v.W-2*v.pad)*(v.xmax-v.xmin);
+        var y=v.ymin+((v.H-v.pad-py)/(v.H-2*v.pad))*(v.ymax-v.ymin);
+        var val=a*x+b*y;
+        var ok=(rel==="lt")?(val<c):(rel==="le")?(val<=c):(rel==="gt")?(val>c):(val>=c);
+        if(ok) ctx.fillRect(px,py,step,step);
+      }
+    }
+    // boundary line ax+by=c
+    ctx.strokeStyle=css("--line");ctx.lineWidth=2.4;
+    if(strict) ctx.setLineDash([7,6]); else ctx.setLineDash([]);
+    ctx.beginPath();
+    var pts=[];
+    if(Math.abs(b)>1e-9){
+      var x1=v.xmin,y1=(c-a*x1)/b,x2=v.xmax,y2=(c-a*x2)/b;
+      pts=[[x1,y1],[x2,y2]];
+    } else if(Math.abs(a)>1e-9){
+      var xv=c/a; pts=[[xv,v.ymin],[xv,v.ymax]];
+    }
+    if(pts.length){ctx.moveTo(v.X(pts[0][0]),v.Y(pts[0][1]));ctx.lineTo(v.X(pts[1][0]),v.Y(pts[1][1]));ctx.stroke();}
+    ctx.setLineDash([]);
+  }
+
+  // -- system feasible region --
+  // constraints: x>=0, y>=0, x+y<=6, 2x+y<=8  (classic LP)
+  var sysCons=[
+    {a:1,b:0,c:0,rel:"ge",label:"x ≥ 0"},
+    {a:0,b:1,c:0,rel:"ge",label:"y ≥ 0"},
+    {a:1,b:1,c:6,rel:"le",label:"x + y ≤ 6"},
+    {a:2,b:1,c:8,rel:"le",label:"2x + y ≤ 8"}
+  ];
+  function satisfy(con,x,y){var val=con.a*x+con.b*y;
+    return con.rel==="le"?(val<=con.c+1e-9):con.rel==="ge"?(val>=con.c-1e-9):con.rel==="lt"?(val<con.c):(val>con.c);}
+  function drawSys(){
+    var v=makeView(document.getElementById("cvSys"),-1,9,-1,9);
+    drawGrid(v,{ystep:1});
+    var ctx=v.ctx; ctx.fillStyle=css("--shade");
+    var step=5;
+    for(var px=v.pad;px<v.W-v.pad;px+=step){
+      for(var py=v.pad;py<v.H-v.pad;py+=step){
+        var x=v.xmin+(px-v.pad)/(v.W-2*v.pad)*(v.xmax-v.xmin);
+        var y=v.ymin+((v.H-v.pad-py)/(v.H-2*v.pad))*(v.ymax-v.ymin);
+        var all=true;
+        for(var k=0;k<sysCons.length;k++){if(!satisfy(sysCons[k],x,y)){all=false;break;}}
+        if(all) ctx.fillRect(px,py,step,step);
+      }
+    }
+    // boundary lines for the two slanted constraints
+    ctx.lineWidth=2;ctx.strokeStyle=css("--line");
+    [[1,1,6],[2,1,8]].forEach(function(L){
+      var a=L[0],b=L[1],c=L[2];
+      var x1=v.xmin,y1=(c-a*x1)/b,x2=v.xmax,y2=(c-a*x2)/b;
+      ctx.beginPath();ctx.moveTo(v.X(x1),v.Y(y1));ctx.lineTo(v.X(x2),v.Y(y2));ctx.stroke();
+    });
+    // corner points of feasible region: (0,0),(4,0),(2,4),(0,6)
+    var corners=[[0,0],[4,0],[2,4],[0,6]];
+    ctx.fillStyle=css("--warn");
+    corners.forEach(function(p){ctx.beginPath();ctx.arc(v.X(p[0]),v.Y(p[1]),5,0,7);ctx.fill();});
+    document.getElementById("sysList").innerHTML=sysCons.map(function(c){return "<li>"+c.label+"</li>";}).join("");
+    document.getElementById("sysStats").innerHTML=
+      cell("Corner points","(0,0) (4,0) (2,4) (0,6)")+
+      cell("Region type","Bounded convex polygon");
+  }
+
+  function drawIneq(){ if(ineqCase==="one")drawOne(); else if(ineqCase==="two")drawTwo(); else drawSys(); }
+
+  // ================= QUIZ =================
+  var quiz=[
+    {q:"For x² − 5x + 6 = 0, the discriminant D equals:",
+     o:["1","25","−1","49"],c:0,
+     e:"D = b²−4ac = (−5)² − 4·1·6 = 25 − 24 = 1 (> 0, two real roots 2 and 3)."},
+    {q:"If the roots of ax²+bx+c=0 are α and β, then α·β equals:",
+     o:["−b/a","c/a","b/a","−c/a"],c:1,
+     e:"Product of roots = c/a; sum of roots = −b/a."},
+    {q:"Solving −2x > 6 gives:",
+     o:["x > −3","x < −3","x > 3","x < 3"],c:1,
+     e:"Divide both sides by −2 and REVERSE the sign: x < −3."}
+  ];
+  function buildQuiz(){
+    var box=document.getElementById("quizBox");
+    box.innerHTML=quiz.map(function(item,qi){
+      var opts=item.o.map(function(o,oi){
+        return "<button class='opt' data-q='"+qi+"' data-o='"+oi+"'>"+String.fromCharCode(65+oi)+". "+o+"</button>";
+      }).join("");
+      return "<div class='q'><div style='font-weight:600;margin-bottom:4px'>Q"+(qi+1)+". "+item.q+"</div>"+opts+
+             "<div class='expl' id='ex"+qi+"'>"+item.e+"</div></div>";
+    }).join("");
+    box.addEventListener("click",function(e){
+      var b=e.target.closest(".opt"); if(!b) return;
+      var qi=+b.dataset.q, oi=+b.dataset.o;
+      var q=box.querySelectorAll(".opt[data-q='"+qi+"']");
+      [].forEach.call(q,function(btn){btn.classList.remove("correct","wrong");});
+      if(oi===quiz[qi].c){b.classList.add("correct");}
+      else{b.classList.add("wrong"); q[quiz[qi].c].classList.add("correct");}
+      document.getElementById("ex"+qi).classList.add("show");
+    });
+  }
+
+  // ---------- redraw all ----------
+  function redrawAll(){ drawExplorer(); drawNature(); drawIneq(); }
+  buildQuiz();
+  redrawAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematical Induction Lab &mdash; NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#182031; --panel2:#1e283d; --edge:#2b3752;
+    --ink:#e7ecf6; --mut:#9aa8c4; --accent:#5fd4b4; --accent2:#3aa88f;
+    --good:#5fd4b4; --bad:#f2839a; --warn:#f2c46b;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1100px 700px at 80% -10%,#1a2338 0%,var(--bg) 60%);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    line-height:1.5; padding:16px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.5rem;margin:0 0 2px}
+  h2{font-size:1.1rem;margin:0 0 10px}
+  .sub{color:var(--mut);font-size:.9rem;margin:0 0 16px}
+  .wrap{max-width:960px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .tab{
+    background:var(--panel);border:1px solid var(--edge);color:var(--mut);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    transition:.15s;flex:1 1 auto;min-width:120px;text-align:center;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.on{background:linear-gradient(180deg,var(--accent),var(--accent2));color:#08120e;border-color:transparent;font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:var(--radius);
+    padding:18px;margin-bottom:16px;
+  }
+  .view{display:none}
+  .view.on{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  button.act{
+    background:linear-gradient(180deg,var(--accent),var(--accent2));color:#08120e;
+    border:none;border-radius:10px;padding:9px 15px;font-weight:600;cursor:pointer;font-size:.9rem;
+  }
+  button.act:active{transform:translateY(1px)}
+  button.ghost{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--edge);
+    border-radius:10px;padding:9px 15px;cursor:pointer;font-size:.9rem;
+  }
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;border:1px solid var(--edge)}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+  .fact{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:12px}
+  .fact h3{margin:0 0 6px;font-size:.95rem;color:var(--accent)}
+  .fact p{margin:0;color:var(--mut);font-size:.86rem}
+  select,input[type=range]{accent-color:var(--accent)}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--edge);border-radius:9px;padding:8px 10px;font-size:.9rem}
+  .stepbox{background:var(--panel2);border:1px solid var(--edge);border-radius:12px;padding:14px;margin-top:12px}
+  .stepbox .lbl{color:var(--accent);font-weight:600;font-size:.85rem;letter-spacing:.03em;text-transform:uppercase;margin-bottom:6px}
+  .eq{font-family:"Cambria Math","Georgia",serif;font-size:1.05rem;overflow-x:auto;padding:4px 0}
+  .eq .hl{color:var(--warn)}
+  .mono{font-family:"Consolas",monospace}
+  .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:.78rem;font-weight:600}
+  .pill.ok{background:rgba(95,212,180,.16);color:var(--good)}
+  .pill.no{background:rgba(242,131,154,.16);color:var(--bad)}
+  .chk{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .chip{background:var(--panel2);border:1px solid var(--edge);border-radius:8px;padding:6px 9px;font-size:.82rem;min-width:64px;text-align:center}
+  .chip.t{border-color:var(--good);color:var(--good)}
+  .chip.f{border-color:var(--bad);color:var(--bad)}
+  .q{margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed var(--edge)}
+  .q:last-child{border:none;margin-bottom:0;padding-bottom:0}
+  .q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:var(--panel2);
+    border:1px solid var(--edge);color:var(--ink);border-radius:9px;padding:9px 11px;cursor:pointer;font-size:.88rem}
+  .q .opt:hover{border-color:var(--accent)}
+  .q .opt.right{border-color:var(--good);background:rgba(95,212,180,.13)}
+  .q .opt.wrong{border-color:var(--bad);background:rgba(242,131,154,.13)}
+  .expl{font-size:.84rem;color:var(--mut);margin-top:8px;display:none}
+  .expl.show{display:block}
+  label.slbl{font-size:.85rem;color:var(--mut)}
+  .big{font-size:1.15rem;font-weight:700}
+  .note{font-size:.82rem;color:var(--mut);margin-top:8px}
+  .banner{border-radius:12px;padding:12px 14px;margin-top:12px;font-size:.9rem}
+  .banner.good{background:rgba(95,212,180,.12);border:1px solid var(--accent2)}
+  .banner.warn{background:rgba(242,196,107,.12);border:1px solid var(--warn)}
+  @media(max-width:420px){ h1{font-size:1.25rem} body{padding:11px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mathematical Induction Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics &middot; Chapter 10 &mdash; Principle of Mathematical Induction</p>
+
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-v="dom">🁢 Dominoes</div>
+    <div class="tab" data-v="proof">📝 Proof Stepper</div>
+    <div class="tab" data-v="verify">🔍 Verify vs Prove</div>
+    <div class="tab" data-v="quiz">✔ Quiz</div>
+  </div>
+
+  <!-- DOMINO VIEW -->
+  <section class="view on" id="v-dom">
+    <div class="panel">
+      <h2>The Domino Intuition</h2>
+      <p class="sub" style="margin-bottom:10px">Induction works like a line of dominoes. Two things guarantee <b>all</b> of them fall:</p>
+      <canvas id="cv" width="900" height="300" aria-label="Row of falling dominoes"></canvas>
+      <div class="row" style="margin-top:12px">
+        <button class="act" id="knock">Base case: knock domino 1</button>
+        <button class="ghost" id="reset">Reset</button>
+        <span id="domStatus" class="note" style="margin-top:0"></span>
+      </div>
+      <div class="facts" style="margin-top:16px">
+        <div class="fact"><h3>1. Base case</h3><p>We physically push the first domino. This is <b>P(1)</b> &mdash; we prove the statement is true for n = 1.</p></div>
+        <div class="fact"><h3>2. Inductive step</h3><p>Each domino is close enough that <b>if</b> domino k falls, it topples k+1. This is &ldquo;P(k) &rArr; P(k+1)&rdquo;.</p></div>
+        <div class="fact"><h3>The conclusion</h3><p>Base + step &rArr; every domino falls. So P(n) is true for <b>all</b> n &ge; 1, no matter how long the row.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF STEPPER -->
+  <section class="view" id="v-proof">
+    <div class="panel">
+      <h2>Interactive Proof Stepper</h2>
+      <div class="row">
+        <label class="slbl" for="stmt">Statement to prove:</label>
+        <select id="stmt"></select>
+      </div>
+      <div class="eq" id="claim" style="margin-top:10px"></div>
+
+      <div class="stepbox" id="s1"></div>
+      <div class="stepbox" id="s2"></div>
+      <div class="stepbox" id="s3"></div>
+
+      <div class="banner good" style="margin-top:14px">
+        <b>Therefore</b>, by the Principle of Mathematical Induction, the statement is true for every natural number n &ge; 1. &#9632;
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Numeric Checker</h2>
+      <p class="sub" style="margin-bottom:8px">Slide n and confirm both sides (or the divisibility) actually agree.</p>
+      <div class="row">
+        <label class="slbl" for="nslide">n =</label>
+        <input type="range" id="nslide" min="1" max="30" value="5" style="flex:1;min-width:150px">
+        <span class="big mono" id="nval">5</span>
+      </div>
+      <div class="eq" id="numOut" style="margin-top:10px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="facts">
+        <div class="fact"><h3>Base case</h3><p>Verify P(1) directly with numbers. This anchors the chain.</p></div>
+        <div class="fact"><h3>Inductive hypothesis</h3><p>Assume P(k) is true for some arbitrary k &ge; 1. We are allowed to <i>use</i> it.</p></div>
+        <div class="fact"><h3>Inductive step</h3><p>Using P(k), derive P(k+1). If this always works, the statement is proved for all n.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFY VS PROVE -->
+  <section class="view" id="v-verify">
+    <div class="panel">
+      <h2>Checking Cases &ne; Proving</h2>
+      <p class="sub">Testing many values of n builds confidence, but it is <b>never</b> a proof &mdash; a statement can hold for the first thousand cases and still fail. Only the base case + inductive step covers <i>all</i> n at once.</p>
+
+      <div class="row">
+        <span class="slbl">Test statement:&nbsp;</span>
+        <button class="ghost" id="vTrue">True claim: 1+3+&hellip;+(2n&minus;1)=n&sup2;</button>
+        <button class="ghost" id="vFalse">Trap claim: n&sup2;+n+41 is always prime</button>
+      </div>
+      <p class="note" id="vDesc"></p>
+      <div class="chk" id="vChips"></div>
+      <div class="banner" id="vBanner"></div>
+    </div>
+
+    <div class="panel">
+      <div class="facts">
+        <div class="fact"><h3>The trap</h3><p>n&sup2;+n+41 (Euler) is prime for n = 0,1,2,&hellip;,39 &mdash; forty straight hits! But at n = 40 it equals 41&sup2;. Checking cases missed it.</p></div>
+        <div class="fact"><h3>Why induction is stronger</h3><p>The inductive step P(k)&rArr;P(k+1) is a single argument that <i>simultaneously</i> covers infinitely many n. No finite table can.</p></div>
+        <div class="fact"><h3>Both parts are essential</h3><p>Base case without the step, or step without the base, proves nothing. You need both links to topple the whole row.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="v-quiz">
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p class="sub">Tap an answer to reveal whether it is correct.</p>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <p class="note" style="text-align:center;opacity:.7">Self-contained interactive lab &middot; animation pauses when the tab is hidden.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Tab switching ---------- */
+var tabs = document.getElementById('tabs');
+tabs.addEventListener('click', function(e){
+  var t = e.target.closest('.tab'); if(!t) return;
+  var v = t.getAttribute('data-v');
+  [].forEach.call(tabs.children, function(c){ c.classList.toggle('on', c===t); });
+  ['dom','proof','verify','quiz'].forEach(function(id){
+    document.getElementById('v-'+id).classList.toggle('on', id===v);
+  });
+});
+
+/* ---------- Domino animation ---------- */
+var cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+var W = cv.width, H = cv.height;
+var N = 14, baseY = 250, dw = 14, dh = 78, gap;
+var dominoes = [];
+function initDom(){
+  dominoes = [];
+  gap = (W - 80) / N;
+  for(var i=0;i<N;i++){
+    dominoes.push({ x: 50 + i*gap, angle:0, falling:false, done:false });
+  }
+}
+initDom();
+var domStatus = document.getElementById('domStatus');
+
+function drawDom(){
+  ctx.clearRect(0,0,W,H);
+  // floor
+  ctx.strokeStyle = '#2b3752'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(20,baseY); ctx.lineTo(W-20,baseY); ctx.stroke();
+  for(var i=0;i<N;i++){
+    var d = dominoes[i];
+    ctx.save();
+    ctx.translate(d.x, baseY);
+    ctx.rotate(-d.angle); // tilt to the right
+    var grd = ctx.createLinearGradient(0,-dh,0,0);
+    if(d.done || d.angle>1.3){ grd.addColorStop(0,'#3aa88f'); grd.addColorStop(1,'#2b7d69'); }
+    else { grd.addColorStop(0,'#5fd4b4'); grd.addColorStop(1,'#3aa88f'); }
+    ctx.fillStyle = grd;
+    ctx.strokeStyle = 'rgba(8,18,14,.5)'; ctx.lineWidth=1.5;
+    roundRect(ctx, -dw/2, -dh, dw, dh, 3);
+    ctx.fill(); ctx.stroke();
+    // label
+    ctx.rotate(d.angle);
+    ctx.fillStyle = '#9aa8c4'; ctx.font = '12px Consolas,monospace';
+    ctx.textAlign='center';
+    ctx.fillText((i+1), 0, 20);
+    ctx.restore();
+  }
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath();
+}
+
+var running = false;
+function animate(){
+  var active = false;
+  for(var i=0;i<N;i++){
+    var d = dominoes[i];
+    if(d.falling && d.angle < 1.45){
+      d.angle += 0.09; active = true;
+      // when leaned enough, trigger next (inductive step)
+      if(d.angle > 0.75 && i < N-1 && !dominoes[i+1].falling){
+        dominoes[i+1].falling = true;
+      }
+      if(d.angle >= 1.45){ d.angle = 1.45; d.done = true; }
+    } else if(d.falling){ d.done = true; }
+    if(d.falling && !d.done) active = true;
+  }
+  drawDom();
+  var fallen = dominoes.filter(function(x){return x.done;}).length;
+  if(running) domStatus.textContent = fallen + ' / ' + N + ' fallen';
+  if(active && !document.hidden){
+    requestAnimationFrame(animate);
+  } else if(active && document.hidden){
+    running = active; // will resume on visibility
+  } else {
+    running = false;
+    if(fallen === N) domStatus.textContent = 'All ' + N + ' fell — P(n) holds for every n. ✔';
+  }
+}
+document.getElementById('knock').addEventListener('click', function(){
+  initDom(); dominoes[0].falling = true; running = true; requestAnimationFrame(animate);
+});
+document.getElementById('reset').addEventListener('click', function(){
+  initDom(); running=false; drawDom(); domStatus.textContent='';
+});
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && running){ requestAnimationFrame(animate); }
+});
+drawDom();
+
+/* ---------- Proof stepper data ---------- */
+var STMTS = [
+  {
+    id:'sum',
+    label:'1 + 2 + … + n = n(n+1)/2',
+    claim:'P(n): &nbsp; 1 + 2 + 3 + … + n = <b>n(n+1)/2</b>',
+    base:'P(1): LHS = 1. &nbsp; RHS = 1·(1+1)/2 = 1. &nbsp; LHS = RHS ✓',
+    hyp:'Assume P(k): &nbsp; 1 + 2 + … + k = k(k+1)/2',
+    step:[
+      'Add (k+1) to both sides of the hypothesis:',
+      '1 + 2 + … + k + (k+1) = k(k+1)/2 + <span class="hl">(k+1)</span>',
+      '= (k+1)·[ k/2 + 1 ] = (k+1)·<span class="hl">(k+2)/2</span>',
+      '= (k+1)((k+1)+1)/2 &nbsp; — this is exactly P(k+1). ✓'
+    ],
+    lhs:function(n){var s=0;for(var i=1;i<=n;i++)s+=i;return s;},
+    rhs:function(n){return n*(n+1)/2;},
+    show:function(n){ return '1 + 2 + … + '+n+' = <b>'+this.lhs(n)+'</b> &nbsp;&nbsp; '+n+'('+n+'+1)/2 = <b>'+this.rhs(n)+'</b>'; }
+  },
+  {
+    id:'odd',
+    label:'1 + 3 + 5 + … + (2n−1) = n²',
+    claim:'P(n): &nbsp; 1 + 3 + 5 + … + (2n−1) = <b>n²</b>',
+    base:'P(1): LHS = 1. &nbsp; RHS = 1² = 1. &nbsp; LHS = RHS ✓',
+    hyp:'Assume P(k): &nbsp; 1 + 3 + … + (2k−1) = k²',
+    step:[
+      'The next odd term is 2(k+1)−1 = 2k+1. Add it to both sides:',
+      '1 + 3 + … + (2k−1) + (2k+1) = k² + <span class="hl">(2k+1)</span>',
+      '= k² + 2k + 1 = <span class="hl">(k+1)²</span>',
+      'which is exactly P(k+1). ✓'
+    ],
+    lhs:function(n){var s=0;for(var i=1;i<=n;i++)s+=(2*i-1);return s;},
+    rhs:function(n){return n*n;},
+    show:function(n){ return '1 + 3 + … + (2·'+n+'−1) = <b>'+this.lhs(n)+'</b> &nbsp;&nbsp; '+n+'² = <b>'+this.rhs(n)+'</b>'; }
+  },
+  {
+    id:'sq',
+    label:'1² + 2² + … + n² = n(n+1)(2n+1)/6',
+    claim:'P(n): &nbsp; 1² + 2² + … + n² = <b>n(n+1)(2n+1)/6</b>',
+    base:'P(1): LHS = 1² = 1. &nbsp; RHS = 1·2·3/6 = 1. &nbsp; LHS = RHS ✓',
+    hyp:'Assume P(k): &nbsp; 1² + … + k² = k(k+1)(2k+1)/6',
+    step:[
+      'Add (k+1)² to both sides:',
+      'Σ = k(k+1)(2k+1)/6 + <span class="hl">(k+1)²</span> = (k+1)·[ k(2k+1) + 6(k+1) ] / 6',
+      '= (k+1)(2k² + 7k + 6)/6 = (k+1)·<span class="hl">(k+2)(2k+3)</span>/6',
+      '= (k+1)((k+1)+1)(2(k+1)+1)/6 — exactly P(k+1). ✓'
+    ],
+    lhs:function(n){var s=0;for(var i=1;i<=n;i++)s+=i*i;return s;},
+    rhs:function(n){return n*(n+1)*(2*n+1)/6;},
+    show:function(n){ return '1² + … + '+n+'² = <b>'+this.lhs(n)+'</b> &nbsp;&nbsp; '+n+'·'+(n+1)+'·'+(2*n+1)+'/6 = <b>'+this.rhs(n)+'</b>'; }
+  },
+  {
+    id:'div',
+    label:'n³ − n is divisible by 6',
+    claim:'P(n): &nbsp; 6 divides <b>n³ − n</b>',
+    base:'P(1): 1³ − 1 = 0, and 6 | 0. ✓',
+    hyp:'Assume P(k): &nbsp; k³ − k = 6m for some integer m',
+    step:[
+      'Expand (k+1)³ − (k+1):',
+      '= k³ + 3k² + 3k + 1 − k − 1 = (k³ − k) + <span class="hl">3k² + 3k</span>',
+      '= 6m + 3k(k+1). &nbsp; Now k(k+1) is a product of consecutive integers, so it is even ⇒ 3k(k+1) is a multiple of 6.',
+      'Thus (k+1)³ − (k+1) = 6m + 6t = 6(m+t), divisible by 6 — exactly P(k+1). ✓'
+    ],
+    lhs:function(n){return n*n*n - n;},
+    rhs:function(n){return (n*n*n - n)/6;},
+    show:function(n){ var v=n*n*n-n; return n+'³ − '+n+' = <b>'+v+'</b> = 6 × <b>'+(v/6)+'</b> &nbsp; (integer ⇒ divisible by 6 ✓)'; }
+  }
+];
+
+var sel = document.getElementById('stmt');
+STMTS.forEach(function(s,i){ var o=document.createElement('option'); o.value=i; o.textContent=s.label; sel.appendChild(o); });
+var cur = STMTS[0];
+
+function renderProof(){
+  document.getElementById('claim').innerHTML = '<div class="eq">'+cur.claim+'</div>';
+  var s1 = document.getElementById('s1');
+  s1.innerHTML = '<div class="lbl">Step 1 — Base case</div><div class="eq">'+cur.base+'</div>';
+  var s2 = document.getElementById('s2');
+  s2.innerHTML = '<div class="lbl">Step 2 — Inductive hypothesis</div><div class="eq">'+cur.hyp+'</div>';
+  var s3 = document.getElementById('s3');
+  var steps = cur.step.map(function(t){ return '<div class="eq">'+t+'</div>'; }).join('');
+  s3.innerHTML = '<div class="lbl">Step 3 — Inductive step (show P(k+1))</div>'+steps;
+  updateNum();
+}
+sel.addEventListener('change', function(){ cur = STMTS[+sel.value]; renderProof(); });
+
+var nslide = document.getElementById('nslide'), nval=document.getElementById('nval'), numOut=document.getElementById('numOut');
+function updateNum(){
+  var n = +nslide.value; nval.textContent = n;
+  var ok = (cur.id==='div') ? ((cur.lhs(n))%6===0) : (cur.lhs(n)===cur.rhs(n));
+  var pill = ok ? '<span class="pill ok">agrees ✓</span>' : '<span class="pill no">mismatch</span>';
+  numOut.innerHTML = cur.show(n) + ' &nbsp; ' + pill;
+}
+nslide.addEventListener('input', updateNum);
+renderProof();
+
+/* ---------- Verify vs Prove ---------- */
+var vDesc=document.getElementById('vDesc'), vChips=document.getElementById('vChips'), vBanner=document.getElementById('vBanner');
+function isPrime(x){ if(x<2)return false; for(var i=2;i*i<=x;i++){ if(x%i===0)return false;} return true; }
+function showVerify(kind){
+  vChips.innerHTML=''; var n, cnt=12;
+  if(kind==='true'){
+    vDesc.innerHTML = 'Checking 1+3+…+(2n−1) = n² for n = 1…'+cnt+'. It holds every time here — <b>and</b> a valid induction proof exists, so it truly holds for all n.';
+    for(n=1;n<=cnt;n++){
+      var lhs=0; for(var i=1;i<=n;i++)lhs+=(2*i-1);
+      var ok = lhs===n*n;
+      vChips.innerHTML += '<span class="chip '+(ok?'t':'f')+'">n='+n+'<br>'+(ok?'T':'F')+'</span>';
+    }
+    vBanner.className='banner good';
+    vBanner.innerHTML='All cases pass — but the <b>reason</b> we trust it for every n is the inductive step, not the table.';
+  } else {
+    vDesc.innerHTML = 'Checking whether n²+n+41 is prime for n = 0…41. Watch how far the streak runs before it breaks.';
+    for(n=0;n<=41;n++){
+      var v=n*n+n+41; var p=isPrime(v);
+      vChips.innerHTML += '<span class="chip '+(p?'t':'f')+'">n='+n+'<br>'+(p?'prime':'NOT')+'</span>';
+    }
+    vBanner.className='banner warn';
+    vBanner.innerHTML='40 primes in a row (n=0…39), then n=40 gives 1681 = 41² — <b>not</b> prime. A pile of confirming cases proved nothing.';
+  }
+}
+document.getElementById('vTrue').addEventListener('click', function(){ showVerify('true'); });
+document.getElementById('vFalse').addEventListener('click', function(){ showVerify('false'); });
+showVerify('true');
+
+/* ---------- Quiz ---------- */
+var QUIZ = [
+  {
+    q:'In the inductive step, the "inductive hypothesis" is the assumption that…',
+    opts:['P(1) is true','P(k) is true for some particular k','P(n) is true for all n','P(k+1) is true'],
+    a:1,
+    e:'We assume P(k) holds for an arbitrary k, then use it to derive P(k+1). Assuming P(n) for all n would be assuming what we want to prove.'
+  },
+  {
+    q:'Why is verifying a statement for n = 1, 2, 3, …, 1000 not a proof?',
+    opts:['Because 1000 is too small a sample','Because a statement can hold for many cases yet fail later (e.g. n²+n+41)','Because computers make rounding errors','It actually is a valid proof'],
+    a:1,
+    e:'Finite checking can never cover infinitely many n. n²+n+41 is prime for n=0…39 but fails at 40 — a classic warning.'
+  },
+  {
+    q:'A proof by induction is INVALID if we…',
+    opts:['Prove the base case but skip showing P(k)⇒P(k+1)','Use P(k) while proving P(k+1)','Start the base case at n = 1','Write the algebra out fully'],
+    a:0,
+    e:'Both parts are required. Without the inductive step (P(k)⇒P(k+1)) the "chain" is broken — like dominoes spaced too far apart.'
+  }
+];
+var quizEl = document.getElementById('quiz');
+QUIZ.forEach(function(item, qi){
+  var div=document.createElement('div'); div.className='q';
+  var h=document.createElement('div'); h.innerHTML='<b>Q'+(qi+1)+'.</b> '+item.q; div.appendChild(h);
+  var answered=false;
+  item.opts.forEach(function(opt, oi){
+    var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+    b.addEventListener('click', function(){
+      if(answered) return; answered=true;
+      var kids=div.querySelectorAll('.opt');
+      kids[item.a].classList.add('right');
+      if(oi!==item.a) b.classList.add('wrong');
+      div.querySelector('.expl').classList.add('show');
+    });
+    div.appendChild(b);
+  });
+  var ex=document.createElement('div'); ex.className='expl'; ex.innerHTML='<b>'+(item.a>-1?'Answer: '+item.opts[item.a]:'')+'.</b> '+item.e;
+  div.appendChild(ex);
+  quizEl.appendChild(div);
+});
+
+})();
+</script>
+</body>
+</html>

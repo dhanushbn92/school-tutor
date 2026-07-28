@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequences &amp; Series Lab — NIOS Class 12 Maths (Ch 6)</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#191f30;
+    --panel2:#212940;
+    --ink:#e9edf7;
+    --muted:#98a2bd;
+    --accent:#5fd6c8;
+    --accent-soft:rgba(95,214,200,.16);
+    --good:#63d68b;
+    --bad:#ff7f8a;
+    --line:#2c3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:1rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:8px;color:var(--ink)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl label b{color:var(--ink);font-weight:700}
+  .ctrl output{color:var(--accent);font-weight:700}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  input[type=number],input[type=text]{width:100%;min-height:44px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;color:var(--ink);font-size:1rem;
+    padding:8px 12px;font-family:inherit}
+  input:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+  .terms{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:6px 10px;font-size:.92rem;font-variant-numeric:tabular-nums}
+  .chip b{color:var(--accent)}
+
+  .stat-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .stat{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;word-break:break-word}
+  .stat .f{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;touch-action:pan-y}
+
+  .calc{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-top:10px}
+  .calc .ctrl{flex:1 1 120px;min-width:110px}
+  button.act{min-height:46px;padding:0 18px;border:1px solid var(--accent);border-radius:12px;
+    background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.95rem;
+    cursor:pointer;touch-action:manipulation}
+  button.act:active{transform:scale(.98)}
+  .out-line{margin-top:10px;font-size:.95rem;color:var(--ink);background:var(--panel2);
+    border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-variant-numeric:tabular-nums}
+  .out-line b{color:var(--accent)}
+
+  .facts{font-size:.9rem;color:var(--muted)}
+  .facts ul{list-style:none;margin-top:4px}
+  .facts li{padding:6px 0;border-bottom:1px dashed var(--line)}
+  .facts li:last-child{border-bottom:none}
+  .facts code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+    padding:1px 6px;color:var(--accent);font-size:.9rem}
+
+  .verdict{font-size:1.05rem;font-weight:700;margin-top:8px}
+  .verdict.ap{color:var(--accent)}
+  .verdict.gp{color:var(--good)}
+  .verdict.neither{color:var(--bad)}
+  .verdict.small{font-size:.85rem;font-weight:500;color:var(--muted);margin-top:4px}
+
+  .quiz .q{margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+  .quiz .q:last-child{border-bottom:none;margin-bottom:0}
+  .quiz p.qtext{font-weight:600;margin-bottom:8px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opt{min-height:44px;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;padding:8px 12px;font-size:.95rem;cursor:pointer;
+    touch-action:manipulation;font-family:inherit}
+  .opt.correct{border-color:var(--good);background:rgba(99,214,139,.16);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,127,138,.14);color:var(--bad)}
+  .expl{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .expl.show{display:block}
+
+  .hide{display:none}
+  .note{font-size:.82rem;color:var(--muted);margin-top:6px}
+  .warn{color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Sequences &amp; Series <span>Lab</span></h1>
+    <p>NIOS Class 12 Mathematics · Chapter 6 — Sequences and Series</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="ap">Arithmetic (AP)</button>
+    <button class="tab-btn" data-mode="gp">Geometric (GP)</button>
+    <button class="tab-btn" data-mode="explore">Explore</button>
+  </div>
+
+  <!-- ============ AP ============ -->
+  <section id="mode-ap">
+    <div class="panel">
+      <h2>Arithmetic Progression</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>First term <b>a</b> = <output id="apAout">2</output></label>
+          <input type="range" id="apA" min="-20" max="20" step="1" value="2">
+        </div>
+        <div class="ctrl">
+          <label>Common difference <b>d</b> = <output id="apDout">3</output></label>
+          <input type="range" id="apD" min="-10" max="10" step="1" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Number of terms <b>n</b> = <output id="apNout">8</output></label>
+          <input type="range" id="apN" min="2" max="20" step="1" value="8">
+        </div>
+      </div>
+      <h3>Terms</h3>
+      <div class="terms" id="apTerms"></div>
+      <div class="stat-row">
+        <div class="stat"><div class="k">nth term aₙ = a + (n−1)d</div><div class="v" id="apAn">—</div><div class="f" id="apAnF"></div></div>
+        <div class="stat"><div class="k">Sum Sₙ = n/2·[2a + (n−1)d]</div><div class="v" id="apSn">—</div><div class="f" id="apSnF"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Plot of terms</h2>
+      <canvas id="apCanvas" width="900" height="320"></canvas>
+      <p class="note">Points lie on a straight line — the hallmark of an AP (constant difference).</p>
+    </div>
+    <div class="panel">
+      <h2>Term / Sum calculator</h2>
+      <div class="calc">
+        <div class="ctrl"><label>k</label><input type="number" id="apK" value="10" step="1"></div>
+        <button class="act" id="apCalcTerm">Find aₖ</button>
+        <button class="act" id="apCalcSum">Find Sₖ</button>
+      </div>
+      <div class="out-line" id="apCalcOut">Uses current a and d above.</div>
+    </div>
+  </section>
+
+  <!-- ============ GP ============ -->
+  <section id="mode-gp" class="hide">
+    <div class="panel">
+      <h2>Geometric Progression</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>First term <b>a</b> = <output id="gpAout">3</output></label>
+          <input type="range" id="gpA" min="-10" max="10" step="1" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Common ratio <b>r</b> = <output id="gpRout">0.5</output></label>
+          <input type="range" id="gpR" min="-2" max="2" step="0.1" value="0.5">
+        </div>
+        <div class="ctrl">
+          <label>Number of terms <b>n</b> = <output id="gpNout">8</output></label>
+          <input type="range" id="gpN" min="2" max="16" step="1" value="8">
+        </div>
+      </div>
+      <h3>Terms</h3>
+      <div class="terms" id="gpTerms"></div>
+      <div class="stat-row">
+        <div class="stat"><div class="k">nth term aₙ = a·rⁿ⁻¹</div><div class="v" id="gpAn">—</div><div class="f" id="gpAnF"></div></div>
+        <div class="stat"><div class="k">Sum Sₙ</div><div class="v" id="gpSn">—</div><div class="f" id="gpSnF"></div></div>
+        <div class="stat"><div class="k">Infinite sum S∞ = a/(1−r)</div><div class="v" id="gpSinf">—</div><div class="f" id="gpSinfF"></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Convergence &amp; plot</h2>
+      <canvas id="gpCanvas" width="900" height="320"></canvas>
+      <p class="note" id="gpConvNote"></p>
+    </div>
+    <div class="panel">
+      <h2>Term / Sum calculator</h2>
+      <div class="calc">
+        <div class="ctrl"><label>k</label><input type="number" id="gpK" value="6" step="1"></div>
+        <button class="act" id="gpCalcTerm">Find aₖ</button>
+        <button class="act" id="gpCalcSum">Find Sₖ</button>
+      </div>
+      <div class="out-line" id="gpCalcOut">Uses current a and r above.</div>
+    </div>
+  </section>
+
+  <!-- ============ EXPLORE ============ -->
+  <section id="mode-explore" class="hide">
+    <div class="panel">
+      <h2>Identify the sequence</h2>
+      <div class="ctrl">
+        <label>Enter numbers separated by commas</label>
+        <input type="text" id="exSeq" value="2, 6, 18, 54">
+      </div>
+      <button class="act" id="exCheck" style="margin-top:10px">Identify</button>
+      <div id="exResult"></div>
+    </div>
+    <div class="panel">
+      <h2>Means between two numbers</h2>
+      <div class="calc">
+        <div class="ctrl"><label>x</label><input type="number" id="exX" value="4" step="any"></div>
+        <div class="ctrl"><label>y</label><input type="number" id="exY" value="9" step="any"></div>
+        <button class="act" id="exMean">Compute AM &amp; GM</button>
+      </div>
+      <div class="out-line" id="exMeanOut">AM = (x+y)/2 · GM = √(xy) (needs xy ≥ 0)</div>
+      <p class="note">For positive numbers AM ≥ GM, with equality only when x = y.</p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel facts">
+    <h2>Facts &amp; formulas</h2>
+    <ul>
+      <li><b>AP</b> — constant difference d. Terms: a, a+d, a+2d, … · nth term <code>aₙ = a + (n−1)d</code></li>
+      <li><b>AP sum</b> — <code>Sₙ = n/2·[2a + (n−1)d]</code> = <code>n/2·(a + aₙ)</code></li>
+      <li><b>GP</b> — constant ratio r. Terms: a, ar, ar², … · nth term <code>aₙ = a·rⁿ⁻¹</code></li>
+      <li><b>GP sum</b> (r ≠ 1) — <code>Sₙ = a(rⁿ − 1)/(r − 1)</code></li>
+      <li><b>Infinite GP</b> — converges only when <code>|r| &lt; 1</code>: <code>S∞ = a/(1 − r)</code></li>
+      <li><b>Means</b> — Arithmetic mean <code>AM = (x+y)/2</code> · Geometric mean <code>GM = √(xy)</code> · <code>AM ≥ GM</code></li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick quiz</h2>
+    <div class="q" data-answer="1">
+      <p class="qtext">1. The 10th term of the AP 3, 7, 11, … is:</p>
+      <div class="opts">
+        <button class="opt">36</button>
+        <button class="opt">39</button>
+        <button class="opt">43</button>
+      </div>
+      <p class="expl">a = 3, d = 4 → a₁₀ = 3 + 9·4 = 39.</p>
+    </div>
+    <div class="q" data-answer="2">
+      <p class="qtext">2. For the GP 1, ½, ¼, … the infinite sum S∞ equals:</p>
+      <div class="opts">
+        <button class="opt">1</button>
+        <button class="opt">3/2</button>
+        <button class="opt">2</button>
+      </div>
+      <p class="expl">a = 1, r = ½, |r| &lt; 1 → S∞ = 1/(1 − ½) = 2.</p>
+    </div>
+    <div class="q" data-answer="0">
+      <p class="qtext">3. The geometric mean of 4 and 16 is:</p>
+      <div class="opts">
+        <button class="opt">8</button>
+        <button class="opt">10</button>
+        <button class="opt">12</button>
+      </div>
+      <p class="expl">GM = √(4·16) = √64 = 8.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var css = getComputedStyle(document.documentElement);
+  var COL = {
+    accent: css.getPropertyValue('--accent').trim() || '#5fd6c8',
+    ink: css.getPropertyValue('--ink').trim() || '#e9edf7',
+    muted: css.getPropertyValue('--muted').trim() || '#98a2bd',
+    line: css.getPropertyValue('--line').trim() || '#2c3550',
+    good: css.getPropertyValue('--good').trim() || '#63d68b',
+    bad: css.getPropertyValue('--bad').trim() || '#ff7f8a'
+  };
+  var $ = function(id){ return document.getElementById(id); };
+  function fmt(x){
+    if(!isFinite(x)) return '∞';
+    if(Math.abs(x) >= 1e6 || (x !== 0 && Math.abs(x) < 1e-4)) return x.toExponential(3);
+    var r = Math.round(x*1e6)/1e6;
+    return (Object.is(r,-0)?0:r).toString();
+  }
+
+  /* ---------- Tabs ---------- */
+  var modes = { ap:$('mode-ap'), gp:$('mode-gp'), explore:$('mode-explore') };
+  var btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      btns.forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      var m = b.getAttribute('data-mode');
+      for(var k in modes){ modes[k].classList.toggle('hide', k !== m); }
+      if(m==='ap') drawAP();
+      if(m==='gp') drawGP();
+    });
+  });
+
+  /* ---------- shared canvas plot ---------- */
+  function setupCanvas(cv){
+    var ratio = window.devicePixelRatio || 1;
+    var cssW = cv.clientWidth || 900;
+    var cssH = Math.round(cssW * 320/900);
+    cv.width = Math.round(cssW*ratio);
+    cv.height = Math.round(cssH*ratio);
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    return { ctx:ctx, w:cssW, h:cssH };
+  }
+  function plotTerms(cv, values, label){
+    var s = setupCanvas(cv), ctx = s.ctx, W = s.w, H = s.h;
+    ctx.clearRect(0,0,W,H);
+    var padL=44, padR=14, padT=16, padB=28;
+    var n = values.length;
+    var lo = Math.min.apply(null, values.concat([0]));
+    var hi = Math.max.apply(null, values.concat([0]));
+    if(hi === lo){ hi = lo + 1; lo = lo - 1; }
+    var span = hi - lo, m = span*0.08; lo -= m; hi += m; span = hi - lo;
+    function X(i){ return padL + (n<=1?0:(i/(n-1))*(W-padL-padR)); }
+    function Y(v){ return padT + (1-(v-lo)/span)*(H-padT-padB); }
+    // zero axis
+    ctx.strokeStyle = COL.line; ctx.lineWidth = 1;
+    if(lo < 0 && hi > 0){
+      ctx.beginPath(); ctx.moveTo(padL, Y(0)); ctx.lineTo(W-padR, Y(0)); ctx.stroke();
+      ctx.fillStyle = COL.muted; ctx.font = '11px system-ui'; ctx.textAlign='right';
+      ctx.fillText('0', padL-6, Y(0)+4);
+    }
+    // baseline
+    ctx.beginPath(); ctx.moveTo(padL, padT); ctx.lineTo(padL, H-padB); ctx.stroke();
+    // connecting line
+    ctx.strokeStyle = COL.accent; ctx.lineWidth = 2; ctx.globalAlpha=.45;
+    ctx.beginPath();
+    values.forEach(function(v,i){ var x=X(i),y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke(); ctx.globalAlpha=1;
+    // bars + dots
+    values.forEach(function(v,i){
+      var x=X(i), y=Y(v), y0=Y(0);
+      ctx.strokeStyle = COL.line; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y); ctx.stroke();
+      ctx.fillStyle = COL.accent;
+      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+    });
+    // x labels (indices)
+    ctx.fillStyle = COL.muted; ctx.font='11px system-ui'; ctx.textAlign='center';
+    var step = Math.ceil(n/10);
+    for(var i=0;i<n;i+=step){ ctx.fillText((i+1).toString(), X(i), H-10); }
+    ctx.textAlign='left';
+    ctx.fillText(label||'', padL, padT-4);
+  }
+
+  /* ---------- AP ---------- */
+  function apVals(){
+    return { a:+$('apA').value, d:+$('apD').value, n:+$('apN').value };
+  }
+  function drawAP(){
+    var v = apVals();
+    $('apAout').textContent = v.a;
+    $('apDout').textContent = v.d;
+    $('apNout').textContent = v.n;
+    var terms = [];
+    for(var i=0;i<v.n;i++) terms.push(v.a + i*v.d);
+    var tc = $('apTerms'); tc.innerHTML='';
+    terms.forEach(function(t,i){
+      var c = document.createElement('span'); c.className='chip';
+      c.innerHTML = '<b>a'+(i+1)+'</b> = '+fmt(t);
+      tc.appendChild(c);
+    });
+    var an = v.a + (v.n-1)*v.d;
+    var sn = v.n/2*(2*v.a + (v.n-1)*v.d);
+    $('apAn').textContent = fmt(an);
+    $('apAnF').textContent = 'a'+v.n+' = '+v.a+' + '+(v.n-1)+'·'+v.d;
+    $('apSn').textContent = fmt(sn);
+    $('apSnF').textContent = 'S'+v.n+' = '+v.n+'/2·['+(2*v.a)+' + '+((v.n-1)*v.d)+']';
+    plotTerms($('apCanvas'), terms, 'AP terms (n = '+v.n+')');
+  }
+  ['apA','apD','apN'].forEach(function(id){ $(id).addEventListener('input', drawAP); });
+  $('apCalcTerm').addEventListener('click', function(){
+    var v = apVals(), k = Math.round(+$('apK').value);
+    if(!isFinite(k)||k<1){ $('apCalcOut').innerHTML='<span class="warn">Enter a whole number k ≥ 1.</span>'; return; }
+    var ak = v.a + (k-1)*v.d;
+    $('apCalcOut').innerHTML = 'a<sub>'+k+'</sub> = '+v.a+' + ('+k+'−1)·'+v.d+' = <b>'+fmt(ak)+'</b>';
+  });
+  $('apCalcSum').addEventListener('click', function(){
+    var v = apVals(), k = Math.round(+$('apK').value);
+    if(!isFinite(k)||k<1){ $('apCalcOut').innerHTML='<span class="warn">Enter a whole number k ≥ 1.</span>'; return; }
+    var sk = k/2*(2*v.a + (k-1)*v.d);
+    $('apCalcOut').innerHTML = 'S<sub>'+k+'</sub> = '+k+'/2·[2·'+v.a+' + ('+k+'−1)·'+v.d+'] = <b>'+fmt(sk)+'</b>';
+  });
+
+  /* ---------- GP ---------- */
+  function gpVals(){
+    return { a:+$('gpA').value, r:+$('gpR').value, n:+$('gpN').value };
+  }
+  function gpSum(a,r,n){
+    if(r===1) return a*n;
+    return a*(Math.pow(r,n)-1)/(r-1);
+  }
+  function drawGP(){
+    var v = gpVals();
+    $('gpAout').textContent = v.a;
+    $('gpRout').textContent = v.r.toFixed(1);
+    $('gpNout').textContent = v.n;
+    var terms = [];
+    for(var i=0;i<v.n;i++) terms.push(v.a*Math.pow(v.r,i));
+    var tc = $('gpTerms'); tc.innerHTML='';
+    terms.forEach(function(t,i){
+      var c = document.createElement('span'); c.className='chip';
+      c.innerHTML = '<b>a'+(i+1)+'</b> = '+fmt(t);
+      tc.appendChild(c);
+    });
+    var an = v.a*Math.pow(v.r, v.n-1);
+    var sn = gpSum(v.a, v.r, v.n);
+    $('gpAn').textContent = fmt(an);
+    $('gpAnF').textContent = 'a'+v.n+' = '+v.a+'·('+v.r.toFixed(1)+')^'+(v.n-1);
+    $('gpSn').textContent = fmt(sn);
+    $('gpSnF').textContent = (v.r===1)? ('r = 1 → S = a·n') : ('a(rⁿ−1)/(r−1)');
+    if(Math.abs(v.r) < 1){
+      var sinf = v.a/(1-v.r);
+      $('gpSinf').textContent = fmt(sinf);
+      $('gpSinfF').textContent = '|r| < 1 → converges';
+    } else {
+      $('gpSinf').textContent = 'diverges';
+      $('gpSinfF').textContent = '|r| ≥ 1 → no finite sum';
+    }
+    drawGPCanvas(v, terms);
+  }
+  function drawGPCanvas(v, terms){
+    if(Math.abs(v.r) < 1){
+      // convergence visual: partial sums approaching S∞
+      var partials = [], run = 0;
+      for(var i=0;i<terms.length;i++){ run += terms[i]; partials.push(run); }
+      var sinf = v.a/(1-v.r);
+      drawConvergence($('gpCanvas'), partials, sinf);
+      $('gpConvNote').innerHTML = 'Partial sums Sₙ (bars) climb toward the dashed line S∞ = a/(1−r) = <b>'+fmt(sinf)+'</b> because |r| &lt; 1.';
+    } else {
+      plotTerms($('gpCanvas'), terms, 'GP terms (n = '+v.n+')');
+      $('gpConvNote').innerHTML = '|r| = '+Math.abs(v.r).toFixed(1)+' ≥ 1, so the terms do not shrink and the infinite series diverges.';
+    }
+  }
+  function drawConvergence(cv, partials, sinf){
+    var s = setupCanvas(cv), ctx = s.ctx, W = s.w, H = s.h;
+    ctx.clearRect(0,0,W,H);
+    var padL=48, padR=14, padT=18, padB=28;
+    var n = partials.length;
+    var vals = partials.concat([sinf, 0]);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if(hi===lo){ hi=lo+1; lo=lo-1; }
+    var span=hi-lo, m=span*0.1; lo-=m; hi+=m; span=hi-lo;
+    function X(i){ return padL + (n<=1?0:(i/(n-1))*(W-padL-padR)); }
+    function Y(val){ return padT + (1-(val-lo)/span)*(H-padT-padB); }
+    // S∞ line
+    ctx.strokeStyle = COL.good; ctx.lineWidth=1.5; ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(padL, Y(sinf)); ctx.lineTo(W-padR, Y(sinf)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = COL.good; ctx.font='11px system-ui'; ctx.textAlign='left';
+    ctx.fillText('S∞ = '+fmt(sinf), padL+4, Y(sinf)-5);
+    // zero axis
+    if(lo<0 && hi>0){ ctx.strokeStyle=COL.line; ctx.beginPath(); ctx.moveTo(padL,Y(0)); ctx.lineTo(W-padR,Y(0)); ctx.stroke(); }
+    // baseline
+    ctx.strokeStyle=COL.line; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,H-padB); ctx.stroke();
+    // partial sum points/line
+    ctx.strokeStyle = COL.accent; ctx.lineWidth=2;
+    ctx.beginPath();
+    partials.forEach(function(p,i){ var x=X(i),y=Y(p); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke();
+    partials.forEach(function(p,i){
+      var x=X(i), y=Y(p);
+      ctx.fillStyle=COL.accent; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+    });
+    // x labels
+    ctx.fillStyle=COL.muted; ctx.font='11px system-ui'; ctx.textAlign='center';
+    var step = Math.ceil(n/10);
+    for(var i=0;i<n;i+=step){ ctx.fillText((i+1).toString(), X(i), H-10); }
+    ctx.textAlign='left'; ctx.fillText('Partial sums Sₙ', padL, padT-5);
+  }
+  ['gpA','gpR','gpN'].forEach(function(id){ $(id).addEventListener('input', drawGP); });
+  $('gpCalcTerm').addEventListener('click', function(){
+    var v = gpVals(), k = Math.round(+$('gpK').value);
+    if(!isFinite(k)||k<1){ $('gpCalcOut').innerHTML='<span class="warn">Enter a whole number k ≥ 1.</span>'; return; }
+    var ak = v.a*Math.pow(v.r, k-1);
+    $('gpCalcOut').innerHTML = 'a<sub>'+k+'</sub> = '+v.a+'·('+v.r.toFixed(1)+')^('+k+'−1) = <b>'+fmt(ak)+'</b>';
+  });
+  $('gpCalcSum').addEventListener('click', function(){
+    var v = gpVals(), k = Math.round(+$('gpK').value);
+    if(!isFinite(k)||k<1){ $('gpCalcOut').innerHTML='<span class="warn">Enter a whole number k ≥ 1.</span>'; return; }
+    var sk = gpSum(v.a, v.r, k);
+    var f = (v.r===1)? (v.a+'·'+k) : (v.a+'·(('+v.r.toFixed(1)+')^'+k+'−1)/('+v.r.toFixed(1)+'−1)');
+    $('gpCalcOut').innerHTML = 'S<sub>'+k+'</sub> = '+f+' = <b>'+fmt(sk)+'</b>';
+  });
+
+  /* ---------- Explore: identify ---------- */
+  $('exCheck').addEventListener('click', function(){
+    var raw = $('exSeq').value.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length; });
+    var nums = raw.map(Number);
+    var box = $('exResult');
+    if(nums.length < 3 || nums.some(function(x){ return !isFinite(x); })){
+      box.innerHTML = '<div class="verdict neither">Need at least 3 valid numbers.</div>';
+      return;
+    }
+    var EPS = 1e-9;
+    // AP check
+    var d = nums[1]-nums[0], isAP = true;
+    for(var i=2;i<nums.length;i++){ if(Math.abs((nums[i]-nums[i-1]) - d) > EPS*(1+Math.abs(d))){ isAP=false; break; } }
+    // GP check (no zero terms)
+    var isGP = nums.every(function(x){ return Math.abs(x) > EPS; });
+    var r = isGP ? nums[1]/nums[0] : NaN;
+    if(isGP){
+      for(var j=2;j<nums.length;j++){ if(Math.abs(nums[j]/nums[j-1] - r) > 1e-7*(1+Math.abs(r))){ isGP=false; break; } }
+    }
+    var html = '';
+    if(isAP){
+      html += '<div class="verdict ap">Arithmetic Progression (AP)</div>';
+      html += '<div class="verdict small">Common difference d = '+fmt(d)+' · next term would be '+fmt(nums[nums.length-1]+d)+'</div>';
+    }
+    if(isGP){
+      html += '<div class="verdict gp">Geometric Progression (GP)</div>';
+      html += '<div class="verdict small">Common ratio r = '+fmt(r)+' · next term would be '+fmt(nums[nums.length-1]*r)+'</div>';
+    }
+    if(!isAP && !isGP){
+      html += '<div class="verdict neither">Neither AP nor GP</div>';
+      html += '<div class="verdict small">Differences and ratios are not constant.</div>';
+    }
+    box.innerHTML = html;
+  });
+
+  /* ---------- Explore: means ---------- */
+  $('exMean').addEventListener('click', function(){
+    var x = +$('exX').value, y = +$('exY').value;
+    if(!isFinite(x)||!isFinite(y)){ $('exMeanOut').innerHTML='<span class="warn">Enter two valid numbers.</span>'; return; }
+    var am = (x+y)/2;
+    var prod = x*y;
+    var out = 'AM = ('+fmt(x)+' + '+fmt(y)+')/2 = <b>'+fmt(am)+'</b>';
+    if(prod >= 0){
+      var gm = Math.sqrt(prod);
+      out += ' &nbsp;·&nbsp; GM = √('+fmt(x)+'·'+fmt(y)+') = <b>'+fmt(gm)+'</b>';
+      if(x>0 && y>0){ out += ' &nbsp;·&nbsp; AM ≥ GM ✓'; }
+    } else {
+      out += ' &nbsp;·&nbsp; <span class="warn">GM undefined (xy &lt; 0)</span>';
+    }
+    $('exMeanOut').innerHTML = out;
+  });
+
+  /* ---------- Quiz ---------- */
+  document.querySelectorAll('.quiz .q').forEach(function(q){
+    var ans = +q.getAttribute('data-answer');
+    var opts = q.querySelectorAll('.opt');
+    var expl = q.querySelector('.expl');
+    opts.forEach(function(opt, idx){
+      opt.addEventListener('click', function(){
+        opts.forEach(function(o){ o.classList.remove('correct','wrong'); });
+        opts[ans].classList.add('correct');
+        if(idx !== ans) opt.classList.add('wrong');
+        expl.classList.add('show');
+      });
+    });
+  });
+
+  /* ---------- init ---------- */
+  drawAP();
+  window.addEventListener('resize', function(){
+    if(!modes.ap.classList.contains('hide')) drawAP();
+    if(!modes.gp.classList.contains('hide')) drawGP();
+  });
+})();
+</script>
+</body>
+</html>
