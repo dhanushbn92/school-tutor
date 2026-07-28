@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>पत्रं लिखामः &middot; Sanskrit Letter Builder | Patram Likhamah</title>
+<style>
+  :root{
+    --accent:#c05a2e;
+    --accent-soft:#fbeadf;
+    --accent-dark:#9c3f1c;
+    --bg:#faf4ee;
+    --panel:#fffaf5;
+    --ink:#33281f;
+    --muted:#7a6a5c;
+    --good:#2f8f5b;
+    --good-soft:#e3f5ea;
+    --bad:#d0455f;
+    --bad-soft:#fdeaef;
+    --line:#eaddd0;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#faf4ee 0%,#fbeadf 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.6vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent-dark);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.6rem,6vw,2.3rem);color:var(--accent-dark);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(150,80,40,.10);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(192,90,46,.35);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(150,80,40,.10);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Format Explorer ---- */
+  .parts-strip{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;}
+  .part-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    border:1px solid var(--line);border-radius:999px;
+    padding:5px 12px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .part-pill:hover{border-color:var(--accent);}
+  .part-pill.on{background:var(--accent);color:#fff;}
+  .part-card{
+    background:var(--accent-soft);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .part-num{
+    display:inline-block;background:var(--accent);color:#fff;
+    width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;
+    font-size:.85rem;font-weight:700;margin-right:8px;
+  }
+  .part-deva{
+    font-family:var(--deva);font-size:clamp(1.35rem,5vw,1.8rem);
+    color:var(--accent-dark);font-weight:600;vertical-align:middle;
+  }
+  .part-translit{color:var(--muted);font-style:italic;font-size:.9rem;margin:6px 0 2px;}
+  .part-role{color:var(--ink);font-size:.95rem;margin:8px 0 12px;}
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .sample-box{
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:6px;font-size:.95rem;
+  }
+  .sample-box .s-line{margin:4px 0;}
+  .sample-box .s-deva{font-family:var(--deva);font-size:1.12rem;color:var(--accent-dark);}
+  .sample-box .s-en{color:var(--muted);font-size:.88rem;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#fff;
+    padding:11px 18px;border-radius:12px;font-weight:600;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Model letter ---- */
+  .model-toggle{margin-top:16px;}
+  .letter-sheet{
+    background:#fff;border:1px solid var(--line);border-radius:14px;
+    padding:18px 16px;margin-top:12px;line-height:1.7;
+  }
+  .letter-sheet .l-deva{font-family:var(--deva);font-size:1.08rem;color:var(--ink);}
+  .letter-sheet .l-right{text-align:right;}
+  .letter-sheet .l-en{color:var(--muted);font-size:.85rem;font-style:italic;}
+  .letter-sheet .l-block{margin-bottom:12px;padding-bottom:8px;border-bottom:1px dashed var(--line);}
+  .letter-sheet .l-block:last-child{border-bottom:none;}
+
+  /* ---- Builder game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .build-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .bank,.slots{min-height:60px;}
+  .tile{
+    display:block;width:100%;text-align:left;cursor:pointer;
+    border:2px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin-bottom:9px;background:#fff;
+    font-size:.9rem;transition:.15s;color:var(--ink);
+  }
+  .tile:hover{border-color:var(--accent);}
+  .tile .t-deva{font-family:var(--deva);font-size:1.05rem;color:var(--accent-dark);display:block;}
+  .tile .t-role{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+  .slot{
+    border:2px dashed var(--line);border-radius:12px;
+    padding:8px 10px;margin-bottom:9px;min-height:46px;
+    display:flex;align-items:center;gap:8px;background:#fff;
+  }
+  .slot .slot-idx{
+    flex:0 0 auto;width:22px;height:22px;line-height:22px;text-align:center;
+    background:var(--accent-soft);color:var(--accent-dark);border-radius:50%;
+    font-size:.78rem;font-weight:700;
+  }
+  .slot .slot-fill{flex:1 1 auto;cursor:pointer;}
+  .slot .slot-fill .t-deva{font-family:var(--deva);font-size:1.02rem;color:var(--accent-dark);display:block;}
+  .slot .slot-fill .t-role{font-size:.7rem;color:var(--muted);text-transform:uppercase;}
+  .slot.empty .slot-fill{color:var(--muted);font-size:.82rem;}
+  .slot.correct{border-style:solid;border-color:#bfe6cf;background:var(--good-soft);}
+  .slot.wrong{border-style:solid;border-color:var(--bad);background:var(--bad-soft);}
+  .build-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .btn-outline{
+    border:2px solid var(--accent);background:#fff;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #bfe6cf;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-q{
+    font-size:1.02rem;text-align:center;line-height:1.6;
+    background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .quiz-q .q-deva{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-row{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    border:2px solid var(--line);background:#fff;border-radius:12px;
+    padding:11px 14px;cursor:pointer;color:var(--ink);font-weight:600;
+    transition:.15s;text-align:left;font-size:.95rem;
+  }
+  .opt-btn .o-deva{font-family:var(--deva);font-size:1.05rem;color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#bfe6cf;background:var(--good-soft);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .build-cols{grid-template-columns:1fr;gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">पत्रं लिखामः</div>
+    <h1>Sanskrit Letter Builder &middot; Patram Likhamah</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 24 &middot; पत्रलेखनम् (Letter Writing)</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📜 Format Explorer</button>
+    <button class="tab-btn" data-mode="build">🧩 Arrange the Letter</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Convention Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: FORMAT EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Letter Format Explorer</h2>
+      <p class="mode-sub">The six parts of a Sanskrit letter, in order. Tap a part or use Prev / Next.</p>
+      <div class="parts-strip" id="partsStrip"></div>
+      <div class="part-card" id="partCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+
+      <div class="model-toggle">
+        <button class="btn-outline" id="modelBtn">📄 Show full model letter (अवकाशार्थं प्रार्थनापत्रम्)</button>
+        <div id="modelWrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: BUILDER ============ -->
+  <section class="mode" id="build">
+    <div class="panel">
+      <h2 class="mode-title">Arrange the Letter</h2>
+      <p class="mode-sub">Tap a jumbled tile to place it in the next slot. Fill all six, then check the order.</p>
+      <div class="score-row">
+        <span class="score-pill" id="buildScore">Placed: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="buildFeedback">&nbsp;</div>
+      <div class="build-cols">
+        <div>
+          <div class="col-title">विकीर्णानि खण्डानि (Jumbled parts)</div>
+          <div class="bank" id="bank"></div>
+        </div>
+        <div>
+          <div class="col-title">पत्रक्रमः (Letter order)</div>
+          <div class="slots" id="slots"></div>
+        </div>
+      </div>
+      <div class="build-actions">
+        <button class="nav-btn" id="checkBtn">✓ Check Order</button>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शोभनम्! The letter is arranged correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Convention Quiz</h2>
+      <p class="mode-sub">Three questions on Sanskrit letter-writing conventions. Read the explanation after answering.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Standard Sanskrit पत्रलेखनम् conventions &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: LETTER PARTS ---------------- */
+var PARTS = [
+  {
+    deva:"स्थानम् / दिनाङ्कः",
+    translit:"sthānam / dināṅkaḥ",
+    role:"Sender's place and date — written at the top right of the page.",
+    samples:[
+      {d:"वाराणसीतः,", e:"From Varanasi,"},
+      {d:"दिनाङ्कः – २०.०७.२०२६", e:"Date – 20.07.2026"}
+    ]
+  },
+  {
+    deva:"सम्बोधनम्",
+    translit:"sambodhanam",
+    role:"Salutation — how you address the reader. Formal for elders/officials, affectionate for friends.",
+    samples:[
+      {d:"मान्यवर! / माननीय महोदय!", e:"Respected Sir! (formal)"},
+      {d:"प्रियमित्र! / प्रियसखे!", e:"Dear friend! (informal)"},
+      {d:"पूज्यपितृचरणेषु,", e:"To my revered father, (to elders)"}
+    ]
+  },
+  {
+    deva:"अभिवादनम्",
+    translit:"abhivādanam",
+    role:"Greeting line — a courteous opening after the salutation.",
+    samples:[
+      {d:"सादरं नमस्कारः।", e:"Respectful salutations. (to elders)"},
+      {d:"सप्रेम नमः। / स्नेहपूर्वकं नमः।", e:"With love, greetings. (to friends)"}
+    ]
+  },
+  {
+    deva:"विषयः / पत्रस्य कलेवरम्",
+    translit:"viṣayaḥ / patrasya kalevaram",
+    role:"Body — the main matter of the letter: the request, news, or subject, written in a few clear sentences.",
+    samples:[
+      {d:"भवन्तं ज्ञापयितुम् इच्छामि यत् अहम् अद्य ज्वरपीडितः अस्मि।", e:"I wish to inform you that I am suffering from fever today."},
+      {d:"अतः त्रिदिनस्य अवकाशं प्रयच्छतु इति प्रार्थये।", e:"Therefore I request three days' leave."}
+    ]
+  },
+  {
+    deva:"समापनम् (भवदीयः)",
+    translit:"samāpanam (bhavadīyaḥ)",
+    role:"Closing / subscription — a respectful sign-off phrase before the signature.",
+    samples:[
+      {d:"भवदीयः / भवतः शुभचिन्तकः", e:"Yours faithfully / Your well-wisher (formal)"},
+      {d:"भवदीयः मित्रम् / तव सखा", e:"Your friend (informal)"}
+    ]
+  },
+  {
+    deva:"हस्ताक्षरम् / नाम",
+    translit:"hastākṣaram / nāma",
+    role:"Signature and name — written below the closing. In practice a placeholder name (क.ख.ग.) is used in exams.",
+    samples:[
+      {d:"अ. ब. स. (नाम)", e:"A. B. C. (name)"},
+      {d:"क.ख.ग. — छात्रः", e:"K.Kh.G. — student"}
+    ]
+  }
+];
+
+/* ---------------- MODEL LETTER ---------------- */
+var MODEL = [
+  {right:true, d:"राजकीयविद्यालयः, वाराणसी", e:"Government School, Varanasi"},
+  {right:true, d:"दिनाङ्कः – २०.०७.२०२६", e:"Date – 20 July 2026"},
+  {d:"सेवायाम्,", e:"To,"},
+  {d:"माननीयः प्रधानाचार्यः,", e:"The Respected Headmaster,"},
+  {d:"राजकीयविद्यालयः, वाराणसी।", e:"Government School, Varanasi."},
+  {d:"विषयः – अवकाशार्थं प्रार्थनापत्रम्।", e:"Subject – Application for leave."},
+  {d:"मान्यवर,", e:"Respected Sir,"},
+  {d:"सविनयं निवेदयामि यत् अहं भवतः विद्यालयस्य दशमकक्षायाः छात्रः अस्मि। अद्य प्रातःकालात् अहं तीव्रज्वरेण पीडितः अस्मि, अतः विद्यालयम् आगन्तुं न शक्नोमि।", e:"I respectfully submit that I am a student of Class Ten of your school. Since this morning I have been suffering from a high fever, so I am unable to come to school."},
+  {d:"अतः भवन्तं सविनयं प्रार्थये यत् मह्यं त्रिदिनस्य (२०.०७.२०२६ तः २२.०७.२०२६ पर्यन्तम्) अवकाशं प्रदातुं कृपां कुर्वन्तु। अहं भवतः महती कृपा भविष्यति।", e:"Therefore I humbly request you to kindly grant me three days' leave (from 20.07.2026 to 22.07.2026). I shall be very grateful to you."},
+  {d:"सधन्यवादम्।", e:"With thanks."},
+  {d:"भवदीयः आज्ञाकारी छात्रः,", e:"Your obedient student,"},
+  {d:"अ. ब. स.", e:"A. B. C. (name)"},
+  {d:"दशमी कक्षा, अनुक्रमाङ्कः – १५", e:"Class Ten, Roll No. – 15"}
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var pIndex = 0;
+var partCard = document.getElementById("partCard");
+var partsStrip = document.getElementById("partsStrip");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderPart(){
+  var p = PARTS[pIndex];
+  var samples = p.samples.map(function(s){
+    return '<div class="s-line"><div class="s-deva">'+s.d+'</div><div class="s-en">'+s.e+'</div></div>';
+  }).join("");
+  partCard.innerHTML =
+    '<div><span class="part-num">'+(pIndex+1)+'</span><span class="part-deva">'+p.deva+'</span></div>'+
+    '<div class="part-translit">'+p.translit+'</div>'+
+    '<div class="part-role">'+p.role+'</div>'+
+    '<div class="block-label">उदाहरणानि &middot; Sample phrases</div>'+
+    '<div class="sample-box">'+samples+'</div>';
+  var strip = "";
+  for(var i=0;i<PARTS.length;i++){
+    strip += '<button class="part-pill'+(i===pIndex?" on":"")+'" data-i="'+i+'">'+(i+1)+'. '+PARTS[i].deva+'</button>';
+  }
+  partsStrip.innerHTML = strip;
+  partsStrip.querySelectorAll(".part-pill").forEach(function(el){
+    el.addEventListener("click", function(){ pIndex = parseInt(el.dataset.i,10); renderPart(); });
+  });
+  prevBtn.disabled = (pIndex===0);
+  nextBtn.disabled = (pIndex===PARTS.length-1);
+  var d="";
+  for(var j=0;j<PARTS.length;j++){ d += '<span class="dot'+(j===pIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(pIndex>0){pIndex--;renderPart();} });
+nextBtn.addEventListener("click", function(){ if(pIndex<PARTS.length-1){pIndex++;renderPart();} });
+renderPart();
+
+var modelBtn = document.getElementById("modelBtn");
+var modelWrap = document.getElementById("modelWrap");
+var modelShown = false;
+modelBtn.addEventListener("click", function(){
+  modelShown = !modelShown;
+  if(modelShown){
+    var rows = MODEL.map(function(m){
+      return '<div class="l-block'+(m.right?" l-right":"")+'">'+
+             '<div class="l-deva">'+m.d+'</div>'+
+             '<div class="l-en">'+m.e+'</div></div>';
+    }).join("");
+    modelWrap.innerHTML = '<div class="letter-sheet">'+rows+'</div>';
+    modelBtn.textContent = "🔽 Hide model letter";
+  } else {
+    modelWrap.innerHTML = "";
+    modelBtn.textContent = "📄 Show full model letter (अवकाशार्थं प्रार्थनापत्रम्)";
+  }
+});
+
+/* ---------------- MODE 2: BUILDER ---------------- */
+/* Correct order 0..5 */
+var BUILD_ITEMS = [
+  {id:0, deva:"वाराणसीतः, दिनाङ्कः – २०.०७.२०२६", role:"स्थानम् / दिनाङ्कः (Place & date)"},
+  {id:1, deva:"मान्यवर! (माननीय महोदय!)", role:"सम्बोधनम् (Salutation)"},
+  {id:2, deva:"सादरं नमस्कारः।", role:"अभिवादनम् (Greeting)"},
+  {id:3, deva:"अद्य अहं ज्वरपीडितः, अतः त्रिदिनस्य अवकाशं प्रार्थये।", role:"विषयः (Body)"},
+  {id:4, deva:"भवदीयः शुभचिन्तकः", role:"समापनम् (Closing)"},
+  {id:5, deva:"अ. ब. स. (नाम)", role:"हस्ताक्षरम् (Signature)"}
+];
+var bankEl = document.getElementById("bank");
+var slotsEl = document.getElementById("slots");
+var buildScore = document.getElementById("buildScore");
+var buildFeedback = document.getElementById("buildFeedback");
+var winBanner = document.getElementById("winBanner");
+var placement = [];  // slot index -> item id (or null)
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setBuildFeedback(txt, cls){
+  buildFeedback.textContent = txt;
+  buildFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function itemById(id){ for(var i=0;i<BUILD_ITEMS.length;i++){ if(BUILD_ITEMS[i].id===id) return BUILD_ITEMS[i]; } return null; }
+
+function buildGame(){
+  placement = [null,null,null,null,null,null];
+  winBanner.classList.remove("show");
+  setBuildFeedback(" ","");
+  var order = shuffle(BUILD_ITEMS);
+  // guard: avoid already-sorted arrangement
+  var sorted = order.every(function(it,i){ return it.id===i; });
+  if(sorted) order = shuffle(BUILD_ITEMS);
+  bankEl.innerHTML = order.map(function(it){
+    return '<button class="tile" data-id="'+it.id+'"><span class="t-role">'+it.role+'</span><span class="t-deva">'+it.deva+'</span></button>';
+  }).join("");
+  bankEl.querySelectorAll(".tile").forEach(function(el){
+    el.addEventListener("click", function(){ placeFromBank(el); });
+  });
+  renderSlots();
+  updateBuildScore();
+}
+function renderSlots(){
+  var html="";
+  for(var i=0;i<6;i++){
+    var id = placement[i];
+    if(id===null || id===undefined){
+      html += '<div class="slot empty" data-slot="'+i+'"><span class="slot-idx">'+(i+1)+'</span><span class="slot-fill">— tap a tile —</span></div>';
+    } else {
+      var it = itemById(id);
+      html += '<div class="slot" data-slot="'+i+'"><span class="slot-idx">'+(i+1)+'</span>'+
+              '<span class="slot-fill" data-slot="'+i+'"><span class="t-role">'+it.role+'</span><span class="t-deva">'+it.deva+'</span></span></div>';
+    }
+  }
+  slotsEl.innerHTML = html;
+  slotsEl.querySelectorAll(".slot-fill[data-slot]").forEach(function(el){
+    el.addEventListener("click", function(){ returnToBank(parseInt(el.dataset.slot,10)); });
+  });
+}
+function placeFromBank(el){
+  var id = parseInt(el.dataset.id,10);
+  var next = placement.indexOf(null);
+  if(next===-1){ setBuildFeedback("All slots are full — remove one or check the order.", "bad"); return; }
+  placement[next] = id;
+  el.remove();
+  renderSlots();
+  updateBuildScore();
+  setBuildFeedback(" ","");
+}
+function returnToBank(slot){
+  var id = placement[slot];
+  if(id===null || id===undefined) return;
+  placement[slot] = null;
+  var it = itemById(id);
+  var btn = document.createElement("button");
+  btn.className = "tile"; btn.setAttribute("data-id", id);
+  btn.innerHTML = '<span class="t-role">'+it.role+'</span><span class="t-deva">'+it.deva+'</span>';
+  btn.addEventListener("click", function(){ placeFromBank(btn); });
+  bankEl.appendChild(btn);
+  renderSlots();
+  updateBuildScore();
+  winBanner.classList.remove("show");
+}
+function updateBuildScore(){
+  var filled = placement.filter(function(x){ return x!==null && x!==undefined; }).length;
+  buildScore.textContent = "Placed: "+filled+" / 6";
+}
+document.getElementById("checkBtn").addEventListener("click", function(){
+  var filled = placement.filter(function(x){ return x!==null && x!==undefined; }).length;
+  if(filled<6){ setBuildFeedback("Fill all six slots first.", "bad"); return; }
+  var correct = 0;
+  var slotEls = slotsEl.querySelectorAll(".slot");
+  for(var i=0;i<6;i++){
+    slotEls[i].classList.remove("correct","wrong");
+    if(placement[i]===i){ slotEls[i].classList.add("correct"); correct++; }
+    else { slotEls[i].classList.add("wrong"); }
+  }
+  if(correct===6){
+    setBuildFeedback("✓ शोभनम्! Perfect letter order!", "good");
+    winBanner.classList.add("show");
+  } else {
+    setBuildFeedback("✗ "+correct+" / 6 in the right place. Red slots are out of order — try again.", "bad");
+  }
+});
+document.getElementById("shuffleBtn").addEventListener("click", buildGame);
+buildGame();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'Which salutation (<span class="q-deva">सम्बोधनम्</span>) best fits a formal letter to your Headmaster?',
+    options:[
+      {t:'<span class="o-deva">प्रियमित्र!</span> (Dear friend!)', ok:false},
+      {t:'<span class="o-deva">मान्यवर! / माननीय महोदय!</span> (Respected Sir!)', ok:true},
+      {t:'<span class="o-deva">रे भोः!</span> (Hey you!)', ok:false}
+    ],
+    explain:'For an official or elder, use a respectful salutation such as <b>मान्यवर</b> or <b>माननीय महोदय</b>. <b>प्रियमित्र</b> is only for a friend.'
+  },
+  {
+    q:'A formal letter should be signed off (closing / <span class="q-deva">समापनम्</span>) with which phrase?',
+    options:[
+      {t:'<span class="o-deva">भवदीयः / भवतः शुभचिन्तकः</span> (Yours faithfully)', ok:true},
+      {t:'<span class="o-deva">नमस्ते</span> (Hello)', ok:false},
+      {t:'<span class="o-deva">अलम्</span> (Enough)', ok:false}
+    ],
+    explain:'The closing before the signature is <b>भवदीयः</b> (yours) or <b>भवतः शुभचिन्तकः</b> (your well-wisher). <b>नमस्ते</b> is a greeting, not a sign-off.'
+  },
+  {
+    q:'What is the correct order of the parts of a Sanskrit letter?',
+    options:[
+      {t:'Body → Salutation → Date → Signature', ok:false},
+      {t:'Place &amp; Date → Salutation → Greeting → Body → Closing → Signature', ok:true},
+      {t:'Signature → Body → Salutation → Date', ok:false}
+    ],
+    explain:'A letter runs top to bottom: <b>स्थानम्/दिनाङ्कः</b> (place &amp; date) → <b>सम्बोधनम्</b> (salutation) → <b>अभिवादनम्</b> (greeting) → <b>विषयः</b> (body) → <b>समापनम्</b> (closing) → <b>हस्ताक्षरम्</b> (signature).'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-i="'+i+'">'+o.t+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="opt-row">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){ qIndex++; renderQuiz(); });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b,i){
+    b.disabled = true;
+    if(q.options[i].ok) b.classList.add("correct");
+    else if(i===chosen) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

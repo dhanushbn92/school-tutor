@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>हृदयपरिवर्तनम् | Ratnakara to Valmiki — Sanskrit Learning Game</title>
+<style>
+  :root{
+    --accent:#e0894a;
+    --accent-soft:#3a2b1f;
+    --accent-bright:#f0a35f;
+    --accent-dark:#f4b878;
+    --bg:#1c1712;
+    --panel:#282019;
+    --panel-2:#31281f;
+    --ink:#f3e9dd;
+    --muted:#b8a892;
+    --good:#5bbf8a;
+    --good-soft:#20362a;
+    --bad:#e07070;
+    --bad-soft:#3a201f;
+    --line:#40342a;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#1c1712 0%,#241c14 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.5;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:18px;}
+  header.top h1{
+    font-size:clamp(1.3rem,4.6vw,1.9rem);
+    margin:0 0 4px;
+    color:var(--accent-dark);
+  }
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6vw,2.4rem);color:var(--accent-bright);}
+  header.top p{margin:2px 0;color:var(--muted);font-size:.92rem;}
+
+  .tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 16px;border-radius:999px;
+    font-size:.92rem;font-weight:600;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#1c1712;box-shadow:0 4px 12px rgba(224,137,74,.4);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Story Explorer ---- */
+  .verse-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .stage-name{text-align:center;font-family:var(--deva);font-size:1.15rem;color:var(--accent-bright);margin-bottom:10px;}
+  .verse-card{
+    background:var(--accent-soft);
+    border-radius:18px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .verse-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.25rem,4.6vw,1.7rem);
+    line-height:1.75;
+    text-align:center;
+    color:var(--accent-dark);
+    margin-bottom:6px;
+  }
+  .verse-translit{
+    text-align:center;font-style:italic;color:var(--muted);
+    font-size:.92rem;margin-bottom:16px;
+  }
+  .block-label{
+    font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent-bright);font-weight:700;margin-bottom:6px;
+  }
+  .shabda-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .shabda-chip{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:6px 10px;font-size:.9rem;
+  }
+  .shabda-chip b{font-family:var(--deva);font-size:1.1rem;color:var(--accent-dark);}
+  .shabda-chip span{color:var(--muted);}
+  .trans-box,.moral-box{
+    background:var(--panel-2);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.95rem;
+  }
+  .moral-box{background:var(--good-soft);border-color:#2f5140;}
+  .moral-box .block-label{color:var(--good);}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#1c1712;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-bright);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.25);}
+
+  /* ---- Match Game ---- */
+  .score-row{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;gap:10px;flex-wrap:wrap;
+  }
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.9rem;
+  }
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .match-col-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;font-weight:700;}
+  .word-item,.mean-item{
+    display:block;width:100%;text-align:center;cursor:pointer;
+    border:2px solid var(--line);border-radius:14px;
+    padding:12px 8px;margin-bottom:10px;background:var(--panel-2);
+    font-size:.98rem;transition:.15s;color:var(--ink);
+  }
+  .word-item{font-family:var(--deva);font-size:1.3rem;color:var(--accent-dark);font-weight:600;}
+  .word-item:hover,.mean-item:hover{border-color:var(--accent);}
+  .word-item.sel,.mean-item.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px rgba(224,137,74,.22);}
+  .word-item.done,.mean-item.done{
+    border-color:#2f5140;background:var(--good-soft);color:var(--good);
+    cursor:default;opacity:.85;
+  }
+  .word-item.done{color:var(--good);}
+  .word-item.wrong,.mean-item.wrong{animation:shake .35s;border-color:var(--bad);background:var(--bad-soft);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:12px 0;font-size:.95rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.9rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .win-banner{
+    text-align:center;background:var(--good-soft);border:1px solid #2f5140;
+    border-radius:14px;padding:14px;margin-top:14px;color:var(--good);font-weight:700;
+    display:none;
+  }
+  .win-banner.show{display:block;}
+
+  /* ---- Quiz ---- */
+  .quiz-verse{
+    font-family:var(--deva);font-size:clamp(1.1rem,4vw,1.35rem);
+    text-align:center;line-height:1.7;color:var(--accent-dark);
+    background:var(--accent-soft);border-radius:14px;padding:16px;margin-bottom:16px;
+  }
+  .opt-col{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    font-size:1rem;text-align:left;
+    border:2px solid var(--line);background:var(--panel-2);border-radius:12px;
+    padding:12px 16px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s;
+  }
+  .opt-btn .deva{font-family:var(--deva);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:#2f5140;background:var(--good-soft);color:var(--good);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.92rem;margin-bottom:8px;
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.78rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .match-grid{gap:10px;}
+    .nav-btn{padding:10px 12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">हृदयपरिवर्तनम्</div>
+    <h1>Ratnakara to Valmiki — A Change of Heart</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 23 &middot; The First Poet (आदिकविः)</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">📖 Story Explorer</button>
+    <button class="tab-btn" data-mode="match">🔗 Shabdartha Match</button>
+    <button class="tab-btn" data-mode="quiz">✍️ MCQ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: STORY EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Story Explorer</h2>
+      <p class="mode-sub">Follow the legend of Ratnakara the highwayman, whose heart changed and who became Valmiki, the first poet.</p>
+      <div class="verse-count" id="verseCount"></div>
+      <div class="stage-name" id="stageName"></div>
+      <div class="verse-card" id="verseCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MATCH ============ -->
+  <section class="mode" id="match">
+    <div class="panel">
+      <h2 class="mode-title">Shabdartha Match Game</h2>
+      <p class="mode-sub">Tap a Sanskrit word, then tap its English meaning to match them.</p>
+      <div class="score-row">
+        <span class="score-pill" id="matchScore">Matched: 0 / 6</span>
+        <button class="btn-outline" id="shuffleBtn">🔀 Shuffle &amp; Restart</button>
+      </div>
+      <div class="feedback" id="matchFeedback">&nbsp;</div>
+      <div class="match-grid">
+        <div>
+          <div class="match-col-title">शब्द (Word)</div>
+          <div id="wordCol"></div>
+        </div>
+        <div>
+          <div class="match-col-title">अर्थ (Meaning)</div>
+          <div id="meanCol"></div>
+        </div>
+      </div>
+      <div class="win-banner" id="winBanner">🎉 शाबाश! All 6 matched correctly!</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">MCQ Quiz</h2>
+      <p class="mode-sub">Answer three questions on the story and the first shloka of Sanskrit poetry.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Based on the Valmiki-Ramayana legend of the आदिकवि &middot; Built for learning</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- MODE 1 DATA: STORY STAGES ---------------- */
+var VERSES = [
+  {
+    stage: "1. रत्नाकरः चौरः — The Highwayman",
+    deva: "पुरा रत्नाकरः नाम व्याधः वने अवसत्। सः पथिकान् लुण्ठित्वा स्वकुटुम्बं पोषयति स्म।",
+    translit: "purā ratnākaraḥ nāma vyādhaḥ vane avasat; saḥ pathikān luṇṭhitvā svakuṭumbaṁ poṣayati sma",
+    words: [
+      {w:"पुरा", m:"long ago"},
+      {w:"व्याधः", m:"hunter / robber"},
+      {w:"पथिकान्", m:"travellers"},
+      {w:"लुण्ठित्वा", m:"having robbed"}
+    ],
+    trans: "Long ago a hunter named Ratnakara lived in the forest. He used to rob travellers to feed his family.",
+    moral: "Ratnakara believed his violent deeds were justified because they supported those he loved."
+  },
+  {
+    stage: "2. नारदस्य प्रश्नः — Narada's Question",
+    deva: "एकदा नारदमुनिः तं प्राह — “येषां कृते पापं करोषि, ते किं तव पापस्य भागिनः भविष्यन्ति?”",
+    translit: "ekadā nāradamuniḥ taṁ prāha — “yeṣāṁ kṛte pāpaṁ karoṣi, te kiṁ tava pāpasya bhāginaḥ bhaviṣyanti?”",
+    words: [
+      {w:"नारदमुनिः", m:"the sage Narada"},
+      {w:"पापम्", m:"sin"},
+      {w:"भागिनः", m:"sharers / partakers"},
+      {w:"प्राह", m:"said, spoke"}
+    ],
+    trans: "One day the sage Narada asked him: “Those for whose sake you sin — will they share in your sin?”",
+    moral: "A single wise question forced Ratnakara to examine whether his crimes were truly for others."
+  },
+  {
+    stage: "3. कुटुम्बस्य निषेधः — The Family Refuses",
+    deva: "रत्नाकरः गृहं गत्वा अपृच्छत्। कुटुम्बं तु अवदत् — “पापं तव एव, वयं तु न भागिनः।”",
+    translit: "ratnākaraḥ gṛhaṁ gatvā apṛcchat; kuṭumbaṁ tu avadat — “pāpaṁ tava eva, vayaṁ tu na bhāginaḥ”",
+    words: [
+      {w:"गृहम्", m:"home"},
+      {w:"अपृच्छत्", m:"he asked"},
+      {w:"कुटुम्बम्", m:"family"},
+      {w:"वयम्", m:"we"}
+    ],
+    trans: "Ratnakara went home and asked them. But his family said: “The sin is yours alone; we do not share it.”",
+    moral: "The truth shattered his excuse — each person alone bears the fruit of their own deeds."
+  },
+  {
+    stage: "4. तपस्या — Repentance and Austerity",
+    deva: "पश्चात्तापेन पीडितः सः नारदेन दत्तं रामनाम अजपत्। दीर्घकालं तपस्यन् सः वल्मीकेन आवृतः अभवत्।",
+    translit: "paścāttāpena pīḍitaḥ saḥ nāradena dattaṁ rāmanāma ajapat; dīrghakālaṁ tapasyan saḥ valmīkena āvṛtaḥ abhavat",
+    words: [
+      {w:"पश्चात्तापः", m:"repentance"},
+      {w:"रामनाम", m:"the name of Rama"},
+      {w:"तपस्यन्", m:"performing austerity"},
+      {w:"वल्मीकः", m:"an anthill"}
+    ],
+    trans: "Struck with repentance, he chanted the name of Rama given by Narada. Meditating for a long time, he was covered by an anthill (valmika).",
+    moral: "Because a valmika (anthill) grew over him during his long tapas, he came to be called Valmiki."
+  },
+  {
+    stage: "5. आदिकविः वाल्मीकिः — Valmiki, the First Poet",
+    deva: "क्रौञ्चवधं दृष्ट्वा शोकः श्लोकत्वम् आगच्छत्। एवं वाल्मीकिः आदिकविः अभवत्, रामायणस्य रचयिता।",
+    translit: "krauñcavadhaṁ dṛṣṭvā śokaḥ ślokatvam āgacchat; evaṁ vālmīkiḥ ādikaviḥ abhavat, rāmāyaṇasya racayitā",
+    words: [
+      {w:"क्रौञ्चवधम्", m:"the killing of the krauncha bird"},
+      {w:"शोकः", m:"grief"},
+      {w:"श्लोकः", m:"verse"},
+      {w:"आदिकविः", m:"the first poet"}
+    ],
+    trans: "Seeing a krauncha bird killed, his grief (shoka) turned into a verse (shloka). Thus Valmiki became the first poet, author of the Ramayana.",
+    moral: "From a robber's heart came the first shloka — grief transformed into poetry (शोक → श्लोक)."
+  },
+  {
+    stage: "★ प्रथमश्लोकः — The First Shloka",
+    deva: "मा निषाद प्रतिष्ठां त्वमगमः शाश्वतीः समाः।\nयत्क्रौञ्चमिथुनादेकमवधीः काममोहितम्॥",
+    translit: "mā niṣāda pratiṣṭhāṁ tvam agamaḥ śāśvatīḥ samāḥ; yat krauñca-mithunād ekam avadhīḥ kāma-mohitam",
+    words: [
+      {w:"मा", m:"do not / may you not"},
+      {w:"निषाद", m:"O hunter (fowler)"},
+      {w:"प्रतिष्ठाम्", m:"honour, resting-place"},
+      {w:"शाश्वतीः समाः", m:"for endless years"},
+      {w:"क्रौञ्चमिथुनात्", m:"from the pair of krauncha birds"},
+      {w:"अवधीः", m:"you killed"},
+      {w:"काममोहितम्", m:"lost in love / passion"}
+    ],
+    trans: "“O hunter, may you never find peace for endless years, since you killed one of a pair of krauncha birds lost in love.”",
+    anvaya: "अन्वयः — निषाद! यत् (त्वम्) काममोहितम् एकम् क्रौञ्चमिथुनात् अवधीः, (तत्) मा शाश्वतीः समाः प्रतिष्ठाम् त्वम् अगमः।",
+    moral: "This is the first shloka of Sanskrit poetry — spoken in grief, it set the anushtubh metre. Valmiki's shoka (grief) literally became the shloka (verse) of the Ramayana."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var vIndex = 0;
+var verseCard = document.getElementById("verseCard");
+var verseCount = document.getElementById("verseCount");
+var stageName = document.getElementById("stageName");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderVerse(){
+  var v = VERSES[vIndex];
+  var chips = v.words.map(function(x){
+    return '<span class="shabda-chip"><b>'+x.w+'</b> <span>= '+x.m+'</span></span>';
+  }).join("");
+  var devaHtml = v.deva.replace(/\n/g, "<br>");
+  var html =
+    '<div class="verse-deva">'+devaHtml+'</div>'+
+    '<div class="verse-translit">'+v.translit+'</div>'+
+    '<div class="block-label">शब्दार्थ &middot; Word Meanings</div>'+
+    '<div class="shabda-list">'+chips+'</div>'+
+    '<div class="trans-box"><div class="block-label">Translation</div>'+v.trans+'</div>';
+  if(v.anvaya){
+    html += '<div class="trans-box"><div class="block-label">अन्वयः &middot; Prose Order</div><span style="font-family:var(--deva);">'+v.anvaya+'</span></div>';
+  }
+  html += '<div class="moral-box"><div class="block-label">'+(v.anvaya?"Significance":"Note")+'</div>'+v.moral+'</div>';
+  verseCard.innerHTML = html;
+  verseCount.textContent = "Stage "+(vIndex+1)+" of "+VERSES.length;
+  stageName.textContent = v.stage;
+  prevBtn.disabled = (vIndex===0);
+  nextBtn.disabled = (vIndex===VERSES.length-1);
+  var d = "";
+  for(var i=0;i<VERSES.length;i++){ d += '<span class="dot'+(i===vIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(vIndex>0){vIndex--;renderVerse();} });
+nextBtn.addEventListener("click", function(){ if(vIndex<VERSES.length-1){vIndex++;renderVerse();} });
+renderVerse();
+
+/* ---------------- MODE 2: MATCH ---------------- */
+var MATCH_PAIRS = [
+  {w:"हृदयम्", m:"heart"},
+  {w:"परिवर्तनम्", m:"change"},
+  {w:"कविः", m:"poet"},
+  {w:"तपस्", m:"austerity"},
+  {w:"पापम्", m:"sin"},
+  {w:"ज्ञानम्", m:"wisdom"}
+];
+var wordCol = document.getElementById("wordCol");
+var meanCol = document.getElementById("meanCol");
+var matchScore = document.getElementById("matchScore");
+var matchFeedback = document.getElementById("matchFeedback");
+var winBanner = document.getElementById("winBanner");
+var selWord = null, selMean = null, matched = 0;
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t = arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function setFeedback(txt, cls){
+  matchFeedback.textContent = txt;
+  matchFeedback.className = "feedback" + (cls?(" "+cls):"");
+}
+function buildMatch(){
+  matched = 0; selWord = null; selMean = null;
+  winBanner.classList.remove("show");
+  setFeedback(" ","");
+  matchScore.textContent = "Matched: 0 / "+MATCH_PAIRS.length;
+  var wOrder = shuffle(MATCH_PAIRS);
+  var mOrder = shuffle(MATCH_PAIRS);
+  wordCol.innerHTML = wOrder.map(function(p){
+    return '<button class="word-item" data-key="'+p.w+'">'+p.w+'</button>';
+  }).join("");
+  meanCol.innerHTML = mOrder.map(function(p){
+    return '<button class="mean-item" data-key="'+p.w+'">'+p.m+'</button>';
+  }).join("");
+  wordCol.querySelectorAll(".word-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickWord(el); });
+  });
+  meanCol.querySelectorAll(".mean-item").forEach(function(el){
+    el.addEventListener("click", function(){ pickMean(el); });
+  });
+}
+function clearSel(){
+  if(selWord) selWord.classList.remove("sel");
+  if(selMean) selMean.classList.remove("sel");
+  selWord = null; selMean = null;
+}
+function pickWord(el){
+  if(el.classList.contains("done")) return;
+  if(selWord) selWord.classList.remove("sel");
+  selWord = el; el.classList.add("sel");
+  tryMatch();
+}
+function pickMean(el){
+  if(el.classList.contains("done")) return;
+  if(selMean) selMean.classList.remove("sel");
+  selMean = el; el.classList.add("sel");
+  tryMatch();
+}
+function tryMatch(){
+  if(!selWord || !selMean) return;
+  if(selWord.dataset.key === selMean.dataset.key){
+    selWord.classList.add("done"); selMean.classList.add("done");
+    selWord.classList.remove("sel"); selMean.classList.remove("sel");
+    selWord = null; selMean = null;
+    matched++;
+    matchScore.textContent = "Matched: "+matched+" / "+MATCH_PAIRS.length;
+    setFeedback("✓ Correct! सम्यक्!", "good");
+    if(matched===MATCH_PAIRS.length){
+      winBanner.classList.add("show");
+      setFeedback("🎉 All matched!", "good");
+    }
+  } else {
+    var a = selWord, b = selMean;
+    a.classList.add("wrong"); b.classList.add("wrong");
+    setFeedback("✗ Try again! पुनः प्रयत्नः।", "bad");
+    clearSel();
+    setTimeout(function(){
+      a.classList.remove("wrong"); b.classList.remove("wrong");
+    }, 400);
+  }
+}
+document.getElementById("shuffleBtn").addEventListener("click", buildMatch);
+buildMatch();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:"By what name was the sage Valmiki known before his change of heart?",
+    options:["रत्नाकरः (Ratnakara)","नारदः (Narada)","वसिष्ठः (Vasishtha)","भरद्वाजः (Bharadvaja)"],
+    answer:0,
+    explain:"Before his transformation Valmiki was the highwayman <b>रत्नाकरः</b>. Narada's question changed his heart and he took to tapas."
+  },
+  {
+    q:"What question of Narada caused Ratnakara's change of heart?",
+    options:[
+      "“Will your family share in your sin?”",
+      "“Who is stronger than you?”",
+      "“Where is the road to Ayodhya?”",
+      "“Why do you not chant the Vedas?”"
+    ],
+    answer:0,
+    explain:"Narada asked whether those he robbed for would <b>share his पापम् (sin)</b>. When his family refused to, Ratnakara realised he alone bore his sin."
+  },
+  {
+    q:"Why is Valmiki called the आदिकविः, and what is his first shloka?",
+    options:[
+      "His grief at the krauncha bird's killing became the first verse “मा निषाद...”",
+      "He was the first to recite the four Vedas",
+      "He composed the Bhagavad Gita on a battlefield",
+      "He wrote the first Sanskrit dictionary"
+    ],
+    answer:0,
+    explain:"Seeing a hunter kill one of a pair of krauncha birds, Valmiki's <b>शोक (grief)</b> spontaneously flowed as the <b>श्लोक</b> “मा निषाद प्रतिष्ठां...” — the first shloka of Sanskrit poetry, making him the आदिकविः."
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o, i){
+    return '<button class="opt-btn" data-i="'+i+'"><span class="deva">'+o+'</span></button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-verse" style="font-family:inherit;color:var(--ink);">'+q.q+'</div>'+
+    '<div class="opt-col">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.i, 10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b){
+    b.disabled = true;
+    var bi = parseInt(b.dataset.i, 10);
+    if(bi === q.answer) b.classList.add("correct");
+    else if(b === el) b.classList.add("incorrect");
+  });
+  if(chosen === q.answer) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (chosen===q.answer ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>परियोजना-निर्माणम् | Building a Sanskrit Project</title>
+<style>
+  :root{
+    --accent:#4fd1c5;
+    --accent-soft:#173a3a;
+    --accent-dark:#7fe9df;
+    --bg:#0f1720;
+    --panel:#182430;
+    --panel-2:#1f2e3c;
+    --ink:#e6edf3;
+    --muted:#93a4b3;
+    --good:#4ade80;
+    --good-soft:#153826;
+    --bad:#f87171;
+    --bad-soft:#3a1c1f;
+    --line:#2b3a49;
+    --deva:"Nirmala UI","Noto Sans Devanagari","Sanskrit 2003","Mangal",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(160deg,#0f1720 0%,#132029 100%);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+    padding:16px;
+  }
+  .wrap{max-width:820px;margin:0 auto;}
+  header.top{text-align:center;margin-bottom:16px;}
+  header.top .deva-title{font-family:var(--deva);font-size:clamp(1.7rem,6.5vw,2.5rem);color:var(--accent-dark);}
+  header.top h1{
+    font-size:clamp(1.1rem,4vw,1.5rem);
+    margin:2px 0 4px;
+    color:var(--ink);
+    font-weight:600;
+  }
+  header.top p{margin:2px 0;color:var(--muted);font-size:.9rem;}
+
+  .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0;}
+  .tab-btn{
+    border:none;cursor:pointer;
+    background:var(--panel);color:var(--muted);
+    padding:10px 15px;border-radius:999px;
+    font-size:.9rem;font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    transition:.18s;
+  }
+  .tab-btn:hover{color:var(--accent-dark);}
+  .tab-btn.active{background:var(--accent);color:#08211f;box-shadow:0 4px 14px rgba(79,209,197,.35);}
+
+  .panel{
+    background:var(--panel);
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  section.mode{display:none;}
+  section.mode.active{display:block;animation:fade .3s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  h2.mode-title{margin:0 0 4px;font-size:1.15rem;color:var(--accent-dark);}
+  .mode-sub{color:var(--muted);font-size:.88rem;margin:0 0 16px;}
+
+  /* ---- Steps Explorer ---- */
+  .step-count{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:10px;}
+  .step-card{
+    background:var(--panel-2);
+    border-radius:16px;
+    padding:20px 18px;
+    border:1px solid var(--line);
+  }
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--accent);color:#08211f;font-weight:800;font-size:1.05rem;
+    margin-bottom:10px;
+  }
+  .step-deva{
+    font-family:var(--deva);
+    font-size:clamp(1.4rem,5.5vw,1.9rem);
+    line-height:1.5;
+    color:var(--accent-dark);
+    margin-bottom:2px;
+  }
+  .step-translit{font-style:italic;color:var(--muted);font-size:.92rem;margin-bottom:4px;}
+  .step-en{font-weight:600;margin-bottom:14px;font-size:1rem;}
+  .block-label{
+    font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--accent);font-weight:700;margin-bottom:6px;
+  }
+  .desc-box{
+    background:var(--panel);border-radius:12px;padding:12px 14px;margin-bottom:12px;
+    border:1px solid var(--line);font-size:.94rem;color:var(--ink);
+  }
+  .phrase-box{
+    background:var(--accent-soft);border-radius:12px;padding:12px 14px;margin-bottom:4px;
+    border:1px solid #23524f;
+  }
+  .phrase-deva{font-family:var(--deva);font-size:1.2rem;color:var(--accent-dark);line-height:1.6;}
+  .phrase-en{color:var(--muted);font-size:.88rem;margin-top:3px;}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px;}
+  .nav-btn{
+    border:none;cursor:pointer;background:var(--accent);color:#08211f;
+    padding:11px 18px;border-radius:12px;font-weight:700;font-size:.95rem;transition:.15s;
+  }
+  .nav-btn:hover{background:var(--accent-dark);}
+  .nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.2s;}
+  .dot.on{background:var(--accent);transform:scale(1.3);}
+
+  .example-toggle{
+    margin-top:18px;border-top:1px dashed var(--line);padding-top:16px;
+  }
+  .example-toggle h3{margin:0 0 10px;font-size:1rem;color:var(--accent-dark);}
+  .example-toggle .deva-inline{font-family:var(--deva);}
+  .outline-item{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:10px;
+  }
+  .outline-item .ol-head{font-family:var(--deva);font-size:1.15rem;color:var(--accent-dark);font-weight:600;}
+  .outline-item .ol-head span{font-family:inherit;font-size:.85rem;color:var(--muted);font-style:italic;}
+  .outline-item .ol-body{font-size:.92rem;margin-top:5px;}
+  .outline-item .ol-en{color:var(--muted);font-size:.85rem;margin-top:3px;}
+
+  /* ---- Builder / Arrange game ---- */
+  .score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap;}
+  .score-pill{
+    background:var(--accent-soft);color:var(--accent-dark);
+    padding:6px 14px;border-radius:999px;font-weight:700;font-size:.88rem;
+  }
+  .builder-help{color:var(--muted);font-size:.86rem;margin-bottom:12px;}
+  .round-tag{font-size:.8rem;color:var(--muted);margin-bottom:8px;}
+  .round-tag b{color:var(--accent-dark);font-family:var(--deva);}
+
+  .slots{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+  .slot{
+    display:flex;align-items:center;gap:10px;
+    min-height:52px;border:2px dashed var(--line);border-radius:12px;
+    padding:8px 10px;background:var(--panel-2);
+  }
+  .slot .slot-idx{
+    flex:none;width:26px;height:26px;border-radius:50%;
+    background:var(--line);color:var(--muted);font-weight:700;font-size:.85rem;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .slot .slot-fill{flex:1;color:var(--muted);font-size:.9rem;}
+  .slot.filled{border-style:solid;border-color:var(--accent);background:var(--accent-soft);}
+  .slot.filled .slot-idx{background:var(--accent);color:#08211f;}
+  .slot.ok{border-color:var(--good);background:var(--good-soft);}
+  .slot.err{border-color:var(--bad);background:var(--bad-soft);}
+  .tile-deva{font-family:var(--deva);font-size:1.1rem;color:var(--accent-dark);font-weight:600;}
+  .tile-en{color:var(--muted);font-size:.8rem;margin-left:6px;}
+
+  .bank{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;min-height:52px;}
+  .tile{
+    cursor:pointer;border:2px solid var(--line);border-radius:12px;
+    padding:10px 12px;background:var(--panel);transition:.15s;text-align:left;
+  }
+  .tile:hover{border-color:var(--accent);}
+  .tile:disabled{opacity:.25;cursor:default;}
+  .btn-outline{
+    border:2px solid var(--accent);background:transparent;color:var(--accent-dark);
+    padding:9px 15px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.88rem;
+  }
+  .btn-outline:hover{background:var(--accent-soft);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .feedback{min-height:24px;text-align:center;font-weight:600;margin:10px 0;font-size:.94rem;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:var(--bad);}
+
+  /* ---- Quiz ---- */
+  .quiz-progress{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:12px;}
+  .quiz-q{
+    font-size:1.02rem;line-height:1.6;
+    background:var(--panel-2);border-radius:14px;padding:16px;margin-bottom:14px;
+    border:1px solid var(--line);
+  }
+  .quiz-q .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-col{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+  .opt-btn{
+    text-align:left;border:2px solid var(--line);background:var(--panel);border-radius:12px;
+    padding:11px 14px;cursor:pointer;color:var(--ink);font-size:.95rem;transition:.15s;
+  }
+  .opt-btn .deva-inline{font-family:var(--deva);color:var(--accent-dark);}
+  .opt-btn:hover{border-color:var(--accent);}
+  .opt-btn.correct{border-color:var(--good);background:var(--good-soft);}
+  .opt-btn.incorrect{border-color:var(--bad);background:var(--bad-soft);}
+  .opt-btn:disabled{cursor:default;}
+  .explain{
+    display:none;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.9rem;margin-bottom:8px;color:var(--ink);
+  }
+  .explain.show{display:block;}
+  .explain b{font-family:var(--deva);color:var(--accent-dark);}
+  .quiz-done{text-align:center;padding:10px;}
+  .quiz-done h3{color:var(--accent-dark);margin:6px 0;}
+
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin:18px 0 6px;}
+  @media(max-width:420px){
+    .panel{padding:16px;}
+    .nav-btn{padding:10px 12px;}
+    .tile-en{display:block;margin-left:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="deva-title">परियोजना-निर्माणम्</div>
+    <h1>Pariyojana-Nirmanam &middot; Building a Sanskrit Project</h1>
+    <p>NIOS Class 12 Sanskrit &middot; Chapter 25 &middot; Project / Skill Builder</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-mode="explore">🧭 Steps Explorer</button>
+    <button class="tab-btn" data-mode="builder">🧩 Arrange the Steps</button>
+    <button class="tab-btn" data-mode="quiz">✍️ Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: EXPLORER ============ -->
+  <section class="mode active" id="explore">
+    <div class="panel">
+      <h2 class="mode-title">Project Steps Explorer</h2>
+      <p class="mode-sub">The stages of making a Sanskrit project (परियोजना), in order. Read the term, its meaning, and a sample phrase.</p>
+      <div class="step-count" id="stepCount"></div>
+      <div class="step-card" id="stepCard"></div>
+      <div class="nav-row">
+        <button class="nav-btn" id="prevBtn">&larr; Prev</button>
+        <div class="dots" id="dots"></div>
+        <button class="nav-btn" id="nextBtn">Next &rarr;</button>
+      </div>
+
+      <div class="example-toggle">
+        <h3>📄 Worked Example &mdash; a mini project outline</h3>
+        <p class="mode-sub">Topic: <span class="deva-inline" style="color:var(--accent-dark)">मम विद्यालयः</span> (Mama Vidyalayah &mdash; "My School"). How the parts fit together:</p>
+        <div id="outlineBox"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: BUILDER ============ -->
+  <section class="mode" id="builder">
+    <div class="panel">
+      <h2 class="mode-title">Arrange-the-Steps Builder</h2>
+      <p class="mode-sub">Put the jumbled tiles into the correct order. Tap a tile in the bank to drop it into the next slot; tap a filled slot to send it back.</p>
+      <div class="score-row">
+        <span class="score-pill" id="builderScore">Score: 0</span>
+        <div class="btn-row">
+          <button class="btn-outline" id="switchRoundBtn">🔁 Switch Set</button>
+          <button class="btn-outline" id="shuffleBtn">🔀 Shuffle</button>
+        </div>
+      </div>
+      <div class="round-tag" id="roundTag"></div>
+      <div class="slots" id="slots"></div>
+      <div class="block-label">Bank &middot; tap to place</div>
+      <div class="bank" id="bank"></div>
+      <div class="feedback" id="builderFeedback">&nbsp;</div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="nav-btn" id="checkBtn">Check Order ✔</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2 class="mode-title">Method &amp; Terms Quiz</h2>
+      <p class="mode-sub">Three questions on the project method and the Sanskrit section terms. Pick an answer to reveal the explanation.</p>
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+      <div class="quiz-done" id="quizDone" style="display:none;">
+        <h3 id="quizScore"></h3>
+        <button class="btn-outline" id="quizRestart">↻ Try Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Sanskrit project-writing method &middot; Built for NIOS Class 12 learners</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------------- DATA: PROJECT STAGES ---------------- */
+var STEPS = [
+  {
+    deva:"विषयचयनम्", translit:"viṣaya-cayanam", en:"Choosing the topic",
+    desc:"First, select a clear, interesting topic that suits the assignment. It should be neither too broad nor too narrow.",
+    phrase:"अहं मम परियोजनायाः विषयं चिनोमि।",
+    phraseEn:"I choose the topic for my project."
+  },
+  {
+    deva:"सामग्रीसङ्ग्रहः", translit:"sāmagrī-saṅgrahaḥ", en:"Gathering material",
+    desc:"Collect information from books, dictionaries, teachers and reliable sources. Note down words, quotations and references.",
+    phrase:"पुस्तकेभ्यः सामग्रीं सङ्गृह्णामि।",
+    phraseEn:"I gather material from books."
+  },
+  {
+    deva:"विभाजनम्", translit:"vibhājanam", en:"Organizing into sections",
+    desc:"Divide the material into parts: प्रस्तावना (introduction), मुख्यभागः (main body) and उपसंहारः (conclusion).",
+    phrase:"सामग्रीं प्रस्तावना-मुख्यभाग-उपसंहारेषु विभजामि।",
+    phraseEn:"I divide the material into introduction, body and conclusion."
+  },
+  {
+    deva:"लेखनम्", translit:"lekhanam", en:"Writing the draft",
+    desc:"Write each section in clear, grammatically correct Sanskrit. Keep sentences simple and the ideas in a logical flow.",
+    phrase:"शुद्धसंस्कृतेन परियोजनां लिखामि।",
+    phraseEn:"I write the project in correct Sanskrit."
+  },
+  {
+    deva:"संशोधनम् प्रस्तुतिः च", translit:"saṁśodhanam prastutiḥ ca", en:"Reviewing & presenting",
+    desc:"Revise for spelling and grammar, add a सन्दर्भसूची (reference list), then present the finished project neatly.",
+    phrase:"परियोजनां संशोध्य प्रस्तौमि।",
+    phraseEn:"Having revised the project, I present it."
+  }
+];
+
+/* Worked mini-project outline: मम विद्यालयः */
+var OUTLINE = [
+  {
+    head:"प्रस्तावना", sub:"prastāvanā &middot; Introduction",
+    deva:"मम विद्यालयः रमणीयः अस्ति। सः नगरस्य मध्ये विद्यते।",
+    en:"My school is beautiful. It is situated in the middle of the town."
+  },
+  {
+    head:"मुख्यभागः", sub:"mukhya-bhāgaḥ &middot; Main body",
+    deva:"अत्र बहवः अध्यापकाः छात्राः च सन्ति। पुस्तकालयः क्रीडाङ्गणं च अपि स्तः। वयं संस्कृतम् अपि पठामः।",
+    en:"Here there are many teachers and students. There are a library and a playground too. We study Sanskrit as well."
+  },
+  {
+    head:"उपसंहारः", sub:"upasaṁhāraḥ &middot; Conclusion",
+    deva:"अहं मम विद्यालयं बहु स्निह्यामि। अत्र अध्ययनेन अहं गौरवम् अनुभवामि।",
+    en:"I love my school very much. I feel proud studying here."
+  },
+  {
+    head:"सन्दर्भसूची", sub:"sandarbha-sūcī &middot; References",
+    deva:"पाठ्यपुस्तकम्, संस्कृतशब्दकोशः, अध्यापकस्य सहायता।",
+    en:"Textbook, Sanskrit dictionary, teacher's help."
+  }
+];
+
+/* ---------------- MODE SWITCH ---------------- */
+var tabBtns = document.querySelectorAll(".tab-btn");
+var modes = document.querySelectorAll(".mode");
+tabBtns.forEach(function(btn){
+  btn.addEventListener("click", function(){
+    tabBtns.forEach(function(b){b.classList.remove("active");});
+    modes.forEach(function(m){m.classList.remove("active");});
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.mode).classList.add("active");
+  });
+});
+
+/* ---------------- MODE 1: EXPLORER ---------------- */
+var sIndex = 0;
+var stepCard = document.getElementById("stepCard");
+var stepCount = document.getElementById("stepCount");
+var dotsBox = document.getElementById("dots");
+var prevBtn = document.getElementById("prevBtn");
+var nextBtn = document.getElementById("nextBtn");
+
+function renderStep(){
+  var s = STEPS[sIndex];
+  stepCard.innerHTML =
+    '<div class="step-num">'+(sIndex+1)+'</div>'+
+    '<div class="step-deva">'+s.deva+'</div>'+
+    '<div class="step-translit">'+s.translit+'</div>'+
+    '<div class="step-en">'+s.en+'</div>'+
+    '<div class="desc-box"><div class="block-label">What to do</div>'+s.desc+'</div>'+
+    '<div class="phrase-box"><div class="block-label">Sample phrase</div>'+
+      '<div class="phrase-deva">'+s.phrase+'</div>'+
+      '<div class="phrase-en">'+s.phraseEn+'</div>'+
+    '</div>';
+  stepCount.textContent = "Stage "+(sIndex+1)+" of "+STEPS.length;
+  prevBtn.disabled = (sIndex===0);
+  nextBtn.disabled = (sIndex===STEPS.length-1);
+  var d="";
+  for(var i=0;i<STEPS.length;i++){ d += '<span class="dot'+(i===sIndex?" on":"")+'"></span>'; }
+  dotsBox.innerHTML = d;
+}
+prevBtn.addEventListener("click", function(){ if(sIndex>0){sIndex--;renderStep();} });
+nextBtn.addEventListener("click", function(){ if(sIndex<STEPS.length-1){sIndex++;renderStep();} });
+renderStep();
+
+/* outline render */
+(function(){
+  var box = document.getElementById("outlineBox");
+  box.innerHTML = OUTLINE.map(function(o){
+    return '<div class="outline-item">'+
+      '<div class="ol-head">'+o.head+' <span>('+o.sub+')</span></div>'+
+      '<div class="ol-body">'+o.deva+'</div>'+
+      '<div class="ol-en">'+o.en+'</div>'+
+    '</div>';
+  }).join("");
+})();
+
+/* ---------------- MODE 2: BUILDER ---------------- */
+var ROUNDS = [
+  {
+    label:"परियोजना-सोपानानि",
+    title:"The 5 steps of making a project",
+    items:[
+      {deva:"विषयचयनम्", en:"choose topic"},
+      {deva:"सामग्रीसङ्ग्रहः", en:"gather material"},
+      {deva:"विभाजनम्", en:"organize sections"},
+      {deva:"लेखनम्", en:"write draft"},
+      {deva:"संशोधनम्", en:"review & present"}
+    ]
+  },
+  {
+    label:"परियोजनायाः भागाः",
+    title:"The parts of a written project",
+    items:[
+      {deva:"प्रस्तावना", en:"introduction"},
+      {deva:"मुख्यभागः", en:"main body"},
+      {deva:"उपसंहारः", en:"conclusion"},
+      {deva:"सन्दर्भसूची", en:"reference list"}
+    ]
+  }
+];
+var roundIdx = 0;
+var order = [];            // current correct-order copy of items
+var bankOrder = [];        // shuffled indices in bank
+var placed = [];          // array of item-index or null per slot
+var bScore = 0;
+
+var slotsEl = document.getElementById("slots");
+var bankEl = document.getElementById("bank");
+var builderFeedback = document.getElementById("builderFeedback");
+var builderScore = document.getElementById("builderScore");
+var roundTag = document.getElementById("roundTag");
+
+function shuffle(a){
+  var arr = a.slice();
+  for(var i=arr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=arr[i];arr[i]=arr[j];arr[j]=t;
+  }
+  return arr;
+}
+function setBFeedback(txt,cls){
+  builderFeedback.textContent = txt;
+  builderFeedback.className = "feedback"+(cls?(" "+cls):"");
+}
+function buildRound(){
+  var r = ROUNDS[roundIdx];
+  order = r.items.slice();
+  placed = order.map(function(){return null;});
+  // shuffle bank until not already fully sorted
+  var idxs = order.map(function(_,i){return i;});
+  do { bankOrder = shuffle(idxs); } while(order.length>1 && bankOrder.every(function(v,i){return v===i;}));
+  roundTag.innerHTML = "Set: <b>"+r.label+"</b> &mdash; "+r.title;
+  setBFeedback(" ","");
+  renderBuilder();
+}
+function renderBuilder(){
+  builderScore.textContent = "Score: "+bScore;
+  // slots
+  slotsEl.innerHTML = order.map(function(_,i){
+    var pIdx = placed[i];
+    var cls = "slot";
+    var content;
+    if(pIdx===null){
+      content = '<span class="slot-fill">tap a tile below…</span>';
+    } else {
+      cls += " filled";
+      var it = order[pIdx];
+      content = '<span class="slot-fill"><span class="tile-deva">'+it.deva+'</span>'+
+                '<span class="tile-en">'+it.en+'</span></span>';
+    }
+    return '<div class="'+cls+'" data-slot="'+i+'">'+
+      '<span class="slot-idx">'+(i+1)+'</span>'+content+'</div>';
+  }).join("");
+  // bank
+  bankEl.innerHTML = bankOrder.map(function(pIdx){
+    var used = placed.indexOf(pIdx)!==-1;
+    var it = order[pIdx];
+    return '<button class="tile" data-item="'+pIdx+'"'+(used?" disabled":"")+'>'+
+      '<span class="tile-deva">'+it.deva+'</span>'+
+      '<span class="tile-en">'+it.en+'</span></button>';
+  }).join("");
+  slotsEl.querySelectorAll(".slot").forEach(function(el){
+    el.addEventListener("click", function(){ unplace(parseInt(el.dataset.slot,10)); });
+  });
+  bankEl.querySelectorAll(".tile").forEach(function(el){
+    if(el.disabled) return;
+    el.addEventListener("click", function(){ place(parseInt(el.dataset.item,10)); });
+  });
+}
+function place(pIdx){
+  if(placed.indexOf(pIdx)!==-1) return;
+  var slot = placed.indexOf(null);
+  if(slot===-1) return;
+  placed[slot] = pIdx;
+  setBFeedback(" ","");
+  renderBuilder();
+}
+function unplace(slot){
+  if(placed[slot]===null) return;
+  placed[slot] = null;
+  setBFeedback(" ","");
+  renderBuilder();
+}
+function checkOrder(){
+  if(placed.indexOf(null)!==-1){
+    setBFeedback("Fill every slot first. रिक्तं स्थानं पूरयतु।","bad");
+    return;
+  }
+  var correct = placed.every(function(v,i){return v===i;});
+  var slotEls = slotsEl.querySelectorAll(".slot");
+  placed.forEach(function(v,i){
+    slotEls[i].classList.remove("ok","err");
+    slotEls[i].classList.add(v===i ? "ok" : "err");
+  });
+  if(correct){
+    bScore += 10;
+    builderScore.textContent = "Score: "+bScore;
+    setBFeedback("🎉 सम्यक् क्रमः! Correct order! (+10)","good");
+  } else {
+    setBFeedback("✗ Not the right order yet. पुनः प्रयत्नः।","bad");
+  }
+}
+document.getElementById("checkBtn").addEventListener("click", checkOrder);
+document.getElementById("shuffleBtn").addEventListener("click", buildRound);
+document.getElementById("switchRoundBtn").addEventListener("click", function(){
+  roundIdx = (roundIdx+1)%ROUNDS.length;
+  buildRound();
+});
+buildRound();
+
+/* ---------------- MODE 3: QUIZ ---------------- */
+var QUIZ = [
+  {
+    q:'Which is the correct order of the main steps in making a project?',
+    options:[
+      {t:'Gather material → choose topic → write → organize', ok:false},
+      {t:'Choose topic → gather material → organize sections → write → review', ok:true},
+      {t:'Write → choose topic → review → gather material', ok:false}
+    ],
+    explain:'The method flows logically: <b>विषयचयनम्</b> (choose topic) → <b>सामग्रीसङ्ग्रहः</b> (gather material) → <b>विभाजनम्</b> (organize) → <b>लेखनम्</b> (write) → <b>संशोधनम्</b> (review &amp; present).'
+  },
+  {
+    q:'A project is divided into three main sections. Which set names them correctly (in order)?',
+    options:[
+      {t:'प्रस्तावना, मुख्यभागः, उपसंहारः (introduction, body, conclusion)', ok:true, deva:true},
+      {t:'उपसंहारः, प्रस्तावना, सन्दर्भः (conclusion, introduction, reference)', ok:false, deva:true},
+      {t:'मुख्यभागः, सूची, प्रस्तावना (body, list, introduction)', ok:false, deva:true}
+    ],
+    explain:'A written project opens with the <b>प्रस्तावना</b> (introduction), develops in the <b>मुख्यभागः</b> (main body), and closes with the <b>उपसंहारः</b> (conclusion).'
+  },
+  {
+    q:'What does the term सन्दर्भसूची (sandarbha-sūcī) mean, and where does it belong?',
+    options:[
+      {t:'The topic heading, placed at the very top', ok:false},
+      {t:'The list of references/sources, placed at the end', ok:true},
+      {t:'A summary of the introduction, placed in the middle', ok:false}
+    ],
+    explain:'<b>सन्दर्भसूची</b> is the reference list &mdash; the books, dictionaries and sources you used. It comes after the उपसंहारः, at the end of the project.'
+  }
+];
+var quizBody = document.getElementById("quizBody");
+var quizProgress = document.getElementById("quizProgress");
+var quizDone = document.getElementById("quizDone");
+var quizScore = document.getElementById("quizScore");
+var qIndex = 0, qScore = 0, qAnswered = false;
+
+function fmt(txt, deva){
+  return deva ? '<span class="deva-inline">'+txt+'</span>' : txt;
+}
+function renderQuiz(){
+  if(qIndex >= QUIZ.length){
+    quizBody.innerHTML = "";
+    quizProgress.textContent = "";
+    quizDone.style.display = "block";
+    quizScore.textContent = "Your Score: "+qScore+" / "+QUIZ.length +
+      (qScore===QUIZ.length ? "  🌟 उत्तमम्!" : "");
+    return;
+  }
+  quizDone.style.display = "none";
+  qAnswered = false;
+  var q = QUIZ[qIndex];
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+  var opts = q.options.map(function(o,i){
+    return '<button class="opt-btn" data-opt="'+i+'">'+fmt(o.t, o.deva)+'</button>';
+  }).join("");
+  quizBody.innerHTML =
+    '<div class="quiz-q">'+q.q+'</div>'+
+    '<div class="opt-col">'+opts+'</div>'+
+    '<div class="explain" id="explainBox"></div>'+
+    '<div style="text-align:center;"><button class="nav-btn" id="nextQ" style="display:none;">Next &rarr;</button></div>';
+  quizBody.querySelectorAll(".opt-btn").forEach(function(el){
+    el.addEventListener("click", function(){ answerQuiz(el); });
+  });
+  document.getElementById("nextQ").addEventListener("click", function(){
+    qIndex++; renderQuiz();
+  });
+}
+function answerQuiz(el){
+  if(qAnswered) return;
+  qAnswered = true;
+  var q = QUIZ[qIndex];
+  var chosen = parseInt(el.dataset.opt,10);
+  var btns = quizBody.querySelectorAll(".opt-btn");
+  btns.forEach(function(b,i){
+    b.disabled = true;
+    if(q.options[i].ok) b.classList.add("correct");
+    else if(i===chosen) b.classList.add("incorrect");
+  });
+  if(q.options[chosen].ok) qScore++;
+  var ex = document.getElementById("explainBox");
+  ex.innerHTML = (q.options[chosen].ok ? "✓ Correct! " : "✗ Not quite. ") + q.explain;
+  ex.classList.add("show");
+  document.getElementById("nextQ").style.display = "inline-block";
+  quizProgress.textContent = "Question "+(qIndex+1)+" of "+QUIZ.length+"  ·  Score: "+qScore;
+}
+document.getElementById("quizRestart").addEventListener("click", function(){
+  qIndex=0; qScore=0; renderQuiz();
+});
+renderQuiz();
+</script>
+</body>
+</html>
