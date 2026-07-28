@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semiconductor Devices Lab - NIOS Class 12 Physics (Ch25)</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#161f2e; --panel2:#1d283a; --line:#2b384d;
+    --txt:#e6edf6; --muted:#93a2b8; --accent:#38d39f; --accentdim:#1f8f6d;
+    --hi:#ffcf5c; --lo:#41506b; --danger:#ff6b6b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 6px;max-width:1000px;margin:0 auto}
+  h1{font-size:1.35rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 10px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 16px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    min-height:40px;
+  }
+  .tab.active{background:var(--accentdim);color:#fff;border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{font-size:1.05rem;margin:0 0 10px}
+  .row{display:flex;flex-wrap:wrap;gap:14px}
+  .col{flex:1 1 300px;min-width:0}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;touch-action:manipulation}
+  label.ctl{display:block;margin:12px 0 4px;font-size:.85rem;color:var(--muted)}
+  input[type=range]{width:100%;height:34px;accent-color:var(--accent)}
+  .btn{
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:10px;padding:9px 14px;cursor:pointer;font-size:.9rem;min-height:40px;
+  }
+  .btn.on{background:var(--accentdim);border-color:var(--accent);color:#fff}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+  .val{color:var(--accent);font-weight:600}
+  .readout{font-size:.9rem;color:var(--muted);margin-top:8px}
+  .readout b{color:var(--txt)}
+  table{border-collapse:collapse;width:100%;font-size:.85rem;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  th{background:var(--panel2);color:var(--muted)}
+  .gate-io{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+  .toggle{
+    width:56px;height:40px;border-radius:10px;border:1px solid var(--line);
+    background:var(--lo);color:#fff;font-weight:700;font-size:1.1rem;cursor:pointer;
+  }
+  .toggle.hi{background:var(--accent);color:#04231a}
+  .lamp{
+    width:56px;height:40px;border-radius:10px;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:700;
+    background:var(--lo);
+  }
+  .lamp.hi{background:var(--hi);color:#3a2a00}
+  .facts{font-size:.88rem}
+  .facts li{margin:4px 0}
+  .quiz .q{margin:12px 0;padding:12px;background:var(--panel2);border-radius:10px}
+  .quiz .opts button{
+    display:block;width:100%;text-align:left;margin:5px 0;background:var(--panel);
+    border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px 12px;
+    cursor:pointer;min-height:40px;font-size:.88rem
+  }
+  .quiz .opts button.correct{background:var(--accentdim);border-color:var(--accent)}
+  .quiz .opts button.wrong{background:#4a2330;border-color:var(--danger)}
+  .explain{margin-top:8px;font-size:.82rem;color:var(--muted);display:none}
+  .explain.show{display:block}
+  .hide{display:none}
+  .badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);margin-left:6px}
+  .legend{font-size:.78rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:middle;margin-right:4px}
+  @media (max-width:420px){h1{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Semiconductor Devices Lab</h1>
+  <p class="sub">NIOS Class 12 Physics - Ch25: Applications of Semiconductor Devices</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="rect">Rectifiers</button>
+    <button class="tab" data-mode="trans">Transistor</button>
+    <button class="tab" data-mode="logic">Logic Gates</button>
+    <button class="tab" data-mode="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===================== RECTIFIERS ===================== -->
+  <section id="mode-rect">
+    <div class="panel">
+      <h2>Rectifier <span class="badge" id="rectTypeBadge">Half-wave</span></h2>
+      <div class="chips">
+        <button class="btn on" id="btnHalf">Half-wave</button>
+        <button class="btn" id="btnFull">Full-wave (bridge)</button>
+        <button class="btn" id="btnCap">Smoothing capacitor: OFF</button>
+      </div>
+      <canvas id="rectCanvas" width="900" height="420" aria-label="Rectifier waveform"></canvas>
+      <div class="legend">
+        <span><span class="swatch" style="background:#6db3ff"></span>AC input v(t)</span>
+        <span><span class="swatch" style="background:#38d39f"></span>Rectified DC output</span>
+        <span><span class="swatch" style="background:#ffcf5c"></span>Conducting diode</span>
+      </div>
+      <div class="readout" id="rectRead"></div>
+      <label class="ctl">Smoothing capacitor size: <span class="val" id="capVal">medium</span></label>
+      <input type="range" id="capRange" min="1" max="4" step="1" value="2">
+    </div>
+  </section>
+
+  <!-- ===================== TRANSISTOR ===================== -->
+  <section id="mode-trans" class="hide">
+    <div class="panel">
+      <h2>NPN Transistor: Switch &amp; Amplifier</h2>
+      <div class="row">
+        <div class="col">
+          <canvas id="transCanvas" width="900" height="420" aria-label="Transistor circuit"></canvas>
+        </div>
+        <div class="col">
+          <label class="ctl">Base current I<sub>B</sub>: <span class="val" id="ibVal">20 &micro;A</span></label>
+          <input type="range" id="ibRange" min="0" max="120" step="1" value="20">
+          <label class="ctl">Current gain &beta; (h<sub>FE</sub>): <span class="val" id="betaVal">100</span></label>
+          <input type="range" id="betaRange" min="20" max="300" step="10" value="100">
+          <div class="readout" id="transRead"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LOGIC GATES ===================== -->
+  <section id="mode-logic" class="hide">
+    <div class="panel">
+      <h2>Logic Gates <span class="badge" id="gateBadge">AND</span></h2>
+      <div class="chips">
+        <button class="btn on" data-gate="AND">AND</button>
+        <button class="btn" data-gate="OR">OR</button>
+        <button class="btn" data-gate="NOT">NOT</button>
+        <button class="btn" data-gate="NAND">NAND</button>
+      </div>
+      <div class="row">
+        <div class="col">
+          <canvas id="gateCanvas" width="900" height="360" aria-label="Logic gate"></canvas>
+          <div class="gate-io">
+            <span>Inputs:</span>
+            <button class="toggle" id="inA">0</button>
+            <button class="toggle" id="inB">0</button>
+            <span>&rarr; Output:</span>
+            <span class="lamp" id="outY">0</span>
+          </div>
+          <p class="readout" id="gateRead"></p>
+        </div>
+        <div class="col">
+          <h2 style="font-size:.95rem">Truth Table</h2>
+          <div id="truth"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FACTS & QUIZ ===================== -->
+  <section id="mode-learn" class="hide">
+    <div class="panel facts">
+      <h2>Facts &amp; Formulas</h2>
+      <ul>
+        <li><b>Diode:</b> conducts only when forward-biased; used to convert AC to DC (rectification).</li>
+        <li><b>Half-wave rectifier:</b> one diode, output only on positive half-cycles. Ripple frequency = supply frequency (50 Hz).</li>
+        <li><b>Full-wave (bridge):</b> four diodes, both half-cycles used. Ripple frequency = 2 &times; supply = 100 Hz.</li>
+        <li><b>Smoothing capacitor:</b> charges at peaks, discharges through the load, reducing ripple toward steady DC.</li>
+        <li><b>Transistor current gain:</b> &beta; = I<sub>C</sub> / I<sub>B</sub>, so I<sub>C</sub> = &beta; &times; I<sub>B</sub>.</li>
+        <li><b>Regions:</b> Cutoff (I<sub>B</sub>&asymp;0, OFF) &middot; Active (linear amplification) &middot; Saturation (fully ON, switch closed).</li>
+        <li><b>Logic:</b> AND = both 1 &middot; OR = any 1 &middot; NOT = invert &middot; NAND = NOT(AND).</li>
+      </ul>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz (tap an option)</h2>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------------- tab switching ---------------- */
+  var mode = "rect";
+  var tabs = document.querySelectorAll(".tab");
+  var sections = {
+    rect: document.getElementById("mode-rect"),
+    trans: document.getElementById("mode-trans"),
+    logic: document.getElementById("mode-logic"),
+    learn: document.getElementById("mode-learn")
+  };
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      mode = t.getAttribute("data-mode");
+      for(var k in sections){ sections[k].classList.toggle("hide", k!==mode); }
+    });
+  });
+
+  var TAU = Math.PI*2;
+
+  /* ============================================================
+     RECTIFIER
+     ============================================================ */
+  var rectC = document.getElementById("rectCanvas");
+  var rctx = rectC.getContext("2d");
+  var rectType = "half";        // "half" | "full"
+  var capOn = false;
+  var capSize = 2;              // 1..4
+  var capVoltage = 0;           // simulated capacitor state
+  var phase = 0;
+
+  var btnHalf = document.getElementById("btnHalf");
+  var btnFull = document.getElementById("btnFull");
+  var btnCap  = document.getElementById("btnCap");
+  var badge   = document.getElementById("rectTypeBadge");
+  var capRange= document.getElementById("capRange");
+  var capValEl= document.getElementById("capVal");
+
+  btnHalf.addEventListener("click", function(){
+    rectType="half"; btnHalf.classList.add("on"); btnFull.classList.remove("on");
+    badge.textContent="Half-wave"; capVoltage=0;
+  });
+  btnFull.addEventListener("click", function(){
+    rectType="full"; btnFull.classList.add("on"); btnHalf.classList.remove("on");
+    badge.textContent="Full-wave (bridge)"; capVoltage=0;
+  });
+  btnCap.addEventListener("click", function(){
+    capOn=!capOn; btnCap.classList.toggle("on",capOn);
+    btnCap.textContent="Smoothing capacitor: "+(capOn?"ON":"OFF"); capVoltage=0;
+  });
+  var capNames=["","small","medium","large","very large"];
+  capRange.addEventListener("input", function(){
+    capSize=parseInt(capRange.value,10); capValEl.textContent=capNames[capSize];
+  });
+
+  // input voltage (normalized 0..1 amplitude) at a given angle
+  function acVal(a){ return Math.sin(a); }
+  // rectified value before smoothing
+  function rectVal(a){
+    var v=Math.sin(a);
+    if(rectType==="half") return v>0? v:0;
+    return Math.abs(v); // full-wave
+  }
+
+  function drawRect(){
+    var W=rectC.width, H=rectC.height;
+    rctx.clearRect(0,0,W,H);
+    var midTop=H*0.30, midBot=H*0.74;    // two waveform baselines
+    var amp=H*0.20;
+    // grid
+    rctx.strokeStyle="#243247"; rctx.lineWidth=1;
+    rctx.beginPath();
+    rctx.moveTo(40,midTop); rctx.lineTo(W-10,midTop);
+    rctx.moveTo(40,midBot); rctx.lineTo(W-10,midBot);
+    rctx.stroke();
+    rctx.fillStyle="#93a2b8"; rctx.font="13px system-ui";
+    rctx.fillText("AC input v(t)",44,midTop-amp-8);
+    rctx.fillText("Rectified DC output",44,midBot-amp-8);
+
+    var cycles=3;                    // window shows 3 supply cycles
+    var span=TAU*cycles;
+    var x0=40, x1=W-10, pw=x1-x0;
+
+    // --- AC input trace ---
+    rctx.strokeStyle="#6db3ff"; rctx.lineWidth=2; rctx.beginPath();
+    for(var i=0;i<=pw;i++){
+      var a=phase + (i/pw)*span;
+      var y=midTop - acVal(a)*amp;
+      if(i===0) rctx.moveTo(x0+i,y); else rctx.lineTo(x0+i,y);
+    }
+    rctx.stroke();
+
+    // --- output trace (with optional smoothing) ---
+    // simulate capacitor: dt per pixel
+    var tauK=[0,0.010,0.028,0.060,0.120][capSize]; // discharge time-const factor
+    var localCap=capVoltage;
+    rctx.strokeStyle="#38d39f"; rctx.lineWidth=2; rctx.beginPath();
+    var ripMin=1e9, ripMax=-1e9;
+    for(var j=0;j<=pw;j++){
+      var ang=phase + (j/pw)*span;
+      var raw=rectVal(ang);
+      var out=raw;
+      if(capOn){
+        // capacitor follows peak, else discharges exponentially
+        if(raw>=localCap){ localCap=raw; }
+        else { localCap = localCap * Math.exp(-(span/pw)/tauK/TAU); }
+        out=localCap;
+      }
+      if(out<ripMin)ripMin=out; if(out>ripMax)ripMax=out;
+      var yo=midBot - out*amp;
+      if(j===0) rctx.moveTo(x0+j,yo); else rctx.lineTo(x0+j,yo);
+    }
+    rctx.stroke();
+    // advance capacitor state for animation continuity
+    (function(){
+      var raw0=rectVal(phase);
+      if(raw0>=capVoltage) capVoltage=raw0;
+      else capVoltage=capVoltage*Math.exp(-0.02/tauK);
+    })();
+
+    // --- diode conduction indicator (current half-cycle at left edge) ---
+    var a0=phase;
+    var s=Math.sin(a0);
+    var conducting = (rectType==="half") ? (s>0) : true;
+    var whichDiode="";
+    if(rectType==="half"){ whichDiode = s>0? "D conducting":"D blocked"; }
+    else { whichDiode = s>=0 ? "D1,D2 conduct" : "D3,D4 conduct"; }
+    // draw diode marker near output baseline start
+    rctx.fillStyle = conducting? "#ffcf5c":"#41506b";
+    rctx.beginPath();
+    // simple diode triangle symbol
+    var dx=W-150, dy=midTop-amp-22;
+    rctx.moveTo(dx,dy-8); rctx.lineTo(dx,dy+8); rctx.lineTo(dx+16,dy); rctx.closePath();
+    rctx.fill();
+    rctx.strokeStyle=conducting?"#ffcf5c":"#41506b"; rctx.lineWidth=3;
+    rctx.beginPath(); rctx.moveTo(dx+16,dy-8); rctx.lineTo(dx+16,dy+8); rctx.stroke();
+    rctx.fillStyle="#93a2b8"; rctx.font="12px system-ui";
+    rctx.fillText(whichDiode, dx-6, dy-14);
+
+    // ripple readout
+    var ripple = capOn ? ((ripMax-ripMin)/ (ripMax||1) *100) : 100;
+    var fRipple = rectType==="half" ? 50 : 100;
+    document.getElementById("rectRead").innerHTML =
+      "Type: <b>"+(rectType==="half"?"Half-wave (1 diode)":"Full-wave bridge (4 diodes)")+"</b> &middot; "+
+      "Ripple frequency <b>"+fRipple+" Hz</b> &middot; "+
+      "Ripple: <b>"+(capOn?ripple.toFixed(0)+"%":"large (unsmoothed)")+"</b>"+
+      (capOn?" &middot; bigger capacitor &rarr; smoother DC":"");
+  }
+
+  /* ============================================================
+     TRANSISTOR
+     ============================================================ */
+  var trC=document.getElementById("transCanvas");
+  var tctx=trC.getContext("2d");
+  var ibRange=document.getElementById("ibRange");
+  var betaRange=document.getElementById("betaRange");
+  var ibVal=document.getElementById("ibVal");
+  var betaVal=document.getElementById("betaVal");
+  var ledPulse=0;
+
+  ibRange.addEventListener("input",updateTransUI);
+  betaRange.addEventListener("input",updateTransUI);
+
+  function transState(){
+    var ib=parseFloat(ibRange.value);      // microamps
+    var beta=parseFloat(betaRange.value);
+    var ic = beta*ib/1000;                 // mA  (beta * uA -> nA/1000=uA? keep mA scale)
+    // treat ic in mA: ic(mA)= beta*ib(uA)/1000
+    var Vcc=9, Rc=1; // kOhm -> Ic_sat = Vcc/Rc mA
+    var icSat=Vcc/Rc;                       // 9 mA saturation
+    var region, on;
+    if(ib<=0.5){ region="Cutoff (OFF)"; on=false; }
+    else if(ic>=icSat){ region="Saturation (fully ON)"; on=true; ic=icSat; }
+    else { region="Active (amplifying)"; on=true; }
+    return {ib:ib,beta:beta,ic:ic,region:region,on:on,icSat:icSat};
+  }
+
+  function updateTransUI(){
+    var s=transState();
+    ibVal.textContent = s.ib.toFixed(0)+" µA";
+    betaVal.textContent = s.beta.toFixed(0);
+    document.getElementById("transRead").innerHTML=
+      "I<sub>C</sub> = &beta; &times; I<sub>B</sub> = "+s.beta.toFixed(0)+" &times; "+s.ib.toFixed(0)+
+      " &micro;A = <b>"+s.ic.toFixed(2)+" mA</b><br>"+
+      "Region: <b>"+s.region+"</b> &middot; LED: <b>"+(s.on?"ON":"OFF")+"</b><br>"+
+      "<span style='color:#93a2b8'>Saturation limit I<sub>C(sat)</sub> = V<sub>CC</sub>/R<sub>C</sub> = "+
+      s.icSat.toFixed(0)+" mA</span>";
+  }
+
+  function drawTrans(){
+    var W=trC.width,H=trC.height;
+    tctx.clearRect(0,0,W,H);
+    var s=transState();
+    // transistor body
+    var cx=W*0.5, cy=H*0.5;
+    tctx.strokeStyle="#93a2b8"; tctx.lineWidth=3;
+    // vertical bar (base)
+    tctx.beginPath(); tctx.moveTo(cx,cy-45); tctx.lineTo(cx,cy+45); tctx.stroke();
+    // base lead
+    tctx.beginPath(); tctx.moveTo(cx-70,cy); tctx.lineTo(cx,cy); tctx.stroke();
+    // collector (top) and emitter (bottom) leads
+    tctx.beginPath(); tctx.moveTo(cx,cy-25); tctx.lineTo(cx+45,cy-55); tctx.lineTo(cx+45,cy-110); tctx.stroke();
+    tctx.beginPath(); tctx.moveTo(cx,cy+25); tctx.lineTo(cx+45,cy+55); tctx.lineTo(cx+45,cy+110); tctx.stroke();
+    // emitter arrow (NPN: arrow points OUT)
+    tctx.fillStyle="#93a2b8";
+    tctx.beginPath();
+    tctx.moveTo(cx+30,cy+38); tctx.lineTo(cx+40,cy+40); tctx.lineTo(cx+33,cy+50); tctx.closePath();
+    tctx.fill();
+    // labels
+    tctx.fillStyle="#93a2b8"; tctx.font="13px system-ui";
+    tctx.fillText("B", cx-64, cy-6);
+    tctx.fillText("C", cx+50, cy-100);
+    tctx.fillText("E", cx+50, cy+108);
+
+    // base current arrow intensity
+    var ibN=Math.min(1,s.ib/120);
+    tctx.strokeStyle="#6db3ff"; tctx.lineWidth=2+ibN*4;
+    tctx.beginPath(); tctx.moveTo(cx-140,cy); tctx.lineTo(cx-72,cy); tctx.stroke();
+    tctx.fillStyle="#6db3ff"; tctx.font="12px system-ui";
+    tctx.fillText("I_B="+s.ib.toFixed(0)+" µA", cx-190, cy-8);
+
+    // collector current arrow intensity (green)
+    var icN=Math.min(1,s.ic/s.icSat);
+    tctx.strokeStyle="#38d39f"; tctx.lineWidth=2+icN*8;
+    tctx.beginPath(); tctx.moveTo(cx+45,cy-160); tctx.lineTo(cx+45,cy-112); tctx.stroke();
+    tctx.fillStyle="#38d39f";
+    tctx.fillText("I_C="+s.ic.toFixed(1)+" mA", cx+60, cy-150);
+
+    // LED at collector top
+    ledPulse+= s.on?0.12:0;
+    var glow = s.on ? (0.6+0.4*Math.abs(Math.sin(ledPulse))) : 0;
+    var lx=cx+45, ly=cy-180;
+    if(s.on){
+      var g=tctx.createRadialGradient(lx,ly,2,lx,ly,26);
+      g.addColorStop(0,"rgba(255,207,92,"+glow+")");
+      g.addColorStop(1,"rgba(255,207,92,0)");
+      tctx.fillStyle=g; tctx.beginPath(); tctx.arc(lx,ly,26,0,TAU); tctx.fill();
+    }
+    tctx.fillStyle=s.on?"#ffcf5c":"#41506b";
+    tctx.beginPath(); tctx.arc(lx,ly,10,0,TAU); tctx.fill();
+    tctx.fillStyle="#93a2b8"; tctx.font="12px system-ui";
+    tctx.fillText("LED "+(s.on?"ON":"OFF"), lx-22, ly-18);
+
+    // region banner
+    tctx.font="bold 15px system-ui";
+    tctx.fillStyle = s.region.indexOf("Cutoff")>=0? "#ff6b6b":
+                     s.region.indexOf("Satur")>=0? "#ffcf5c":"#38d39f";
+    tctx.fillText(s.region, 30, 30);
+
+    // mini transfer curve (Ic vs Ib) bottom-left
+    var bx=30,by=H-30,bw=170,bh=90;
+    tctx.strokeStyle="#2b384d"; tctx.lineWidth=1;
+    tctx.strokeRect(bx,by-bh,bw,bh);
+    tctx.fillStyle="#93a2b8"; tctx.font="11px system-ui";
+    tctx.fillText("I_C vs I_B",bx,by-bh-6);
+    // curve: linear then flat (saturation)
+    tctx.strokeStyle="#38d39f"; tctx.lineWidth=2; tctx.beginPath();
+    for(var p=0;p<=bw;p++){
+      var ibx=(p/bw)*120;
+      var icx=s.beta*ibx/1000;
+      if(icx>s.icSat) icx=s.icSat;
+      var yy=by - (icx/s.icSat)*bh;
+      if(p===0)tctx.moveTo(bx+p,yy); else tctx.lineTo(bx+p,yy);
+    }
+    tctx.stroke();
+    // operating point
+    var opx=bx+(Math.min(120,s.ib)/120)*bw;
+    var opy=by-(s.ic/s.icSat)*bh;
+    tctx.fillStyle="#ffcf5c"; tctx.beginPath(); tctx.arc(opx,opy,4,0,TAU); tctx.fill();
+  }
+
+  /* ============================================================
+     LOGIC GATES
+     ============================================================ */
+  var gC=document.getElementById("gateCanvas");
+  var gctx=gC.getContext("2d");
+  var gate="AND";
+  var inA=0, inB=0;
+  var elA=document.getElementById("inA"), elB=document.getElementById("inB");
+  var elY=document.getElementById("outY");
+  var gateBadge=document.getElementById("gateBadge");
+
+  document.querySelectorAll("[data-gate]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("[data-gate]").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      gate=b.getAttribute("data-gate");
+      gateBadge.textContent=gate;
+      elB.style.display = (gate==="NOT")?"none":"";
+      updateGate();
+    });
+  });
+  elA.addEventListener("click",function(){inA^=1; elA.textContent=inA; elA.classList.toggle("hi",!!inA); updateGate();});
+  elB.addEventListener("click",function(){inB^=1; elB.textContent=inB; elB.classList.toggle("hi",!!inB); updateGate();});
+
+  function compute(a,b,g){
+    switch(g){
+      case "AND": return a&b;
+      case "OR": return a|b;
+      case "NOT": return a?0:1;
+      case "NAND": return (a&b)?0:1;
+    }
+    return 0;
+  }
+  function updateGate(){
+    var y=compute(inA,inB,gate);
+    elY.textContent=y; elY.classList.toggle("hi",!!y);
+    // truth table
+    var rows, header;
+    var t="<table>";
+    if(gate==="NOT"){
+      t+="<tr><th>A</th><th>Y</th></tr>";
+      [0,1].forEach(function(a){
+        var yy=compute(a,0,"NOT");
+        var hl=(a===inA)?" style='background:#1f8f6d;color:#fff'":"";
+        t+="<tr"+hl+"><td>"+a+"</td><td>"+yy+"</td></tr>";
+      });
+    } else {
+      t+="<tr><th>A</th><th>B</th><th>Y</th></tr>";
+      [[0,0],[0,1],[1,0],[1,1]].forEach(function(p){
+        var yy=compute(p[0],p[1],gate);
+        var hl=(p[0]===inA&&p[1]===inB)?" style='background:#1f8f6d;color:#fff'":"";
+        t+="<tr"+hl+"><td>"+p[0]+"</td><td>"+p[1]+"</td><td>"+yy+"</td></tr>";
+      });
+    }
+    t+="</table>";
+    document.getElementById("truth").innerHTML=t;
+    var desc={AND:"Output 1 only when BOTH inputs are 1.",
+              OR:"Output 1 when ANY input is 1.",
+              NOT:"Output is the inverse of the input.",
+              NAND:"Output 0 only when both inputs are 1 (NOT of AND)."};
+    document.getElementById("gateRead").textContent=desc[gate];
+  }
+
+  function drawGate(){
+    var W=gC.width,H=gC.height;
+    gctx.clearRect(0,0,W,H);
+    var cy=H*0.5, gx=W*0.42, gw=150, gh=140;
+    gctx.lineWidth=3; gctx.strokeStyle="#93a2b8"; gctx.fillStyle="#1d283a";
+    var y=compute(inA,inB,gate);
+
+    // input wires
+    function wire(x1,yy,x2,val){
+      gctx.strokeStyle= val? "#38d39f":"#41506b"; gctx.lineWidth=3;
+      gctx.beginPath(); gctx.moveTo(x1,yy); gctx.lineTo(x2,yy); gctx.stroke();
+    }
+    var ay=cy-38, by=cy+38;
+    if(gate==="NOT"){
+      wire(60,cy,gx,inA);
+    } else {
+      wire(60,ay,gx,inA); wire(60,by,gx,inB);
+    }
+
+    gctx.strokeStyle="#93a2b8"; gctx.fillStyle="#1d283a"; gctx.lineWidth=3;
+    var bubble=false, label=gate;
+    // draw gate body
+    if(gate==="AND"||gate==="NAND"){
+      gctx.beginPath();
+      gctx.moveTo(gx,cy-gh/2);
+      gctx.lineTo(gx+gw*0.5,cy-gh/2);
+      gctx.arc(gx+gw*0.5,cy,gh/2,-Math.PI/2,Math.PI/2);
+      gctx.lineTo(gx,cy+gh/2);
+      gctx.closePath(); gctx.fill(); gctx.stroke();
+      bubble=(gate==="NAND");
+    } else if(gate==="OR"){
+      gctx.beginPath();
+      gctx.moveTo(gx,cy-gh/2);
+      gctx.quadraticCurveTo(gx+gw*0.55,cy-gh/2, gx+gw, cy);
+      gctx.quadraticCurveTo(gx+gw*0.55,cy+gh/2, gx, cy+gh/2);
+      gctx.quadraticCurveTo(gx+gw*0.3,cy, gx, cy-gh/2);
+      gctx.closePath(); gctx.fill(); gctx.stroke();
+    } else if(gate==="NOT"){
+      gctx.beginPath();
+      gctx.moveTo(gx,cy-gh/2);
+      gctx.lineTo(gx+gw*0.75,cy);
+      gctx.lineTo(gx,cy+gh/2);
+      gctx.closePath(); gctx.fill(); gctx.stroke();
+      bubble=true;
+    }
+    // inversion bubble
+    var outX = (gate==="OR")? gx+gw : (gate==="NOT")? gx+gw*0.75 : gx+gw;
+    if(bubble){
+      gctx.beginPath(); gctx.arc(outX+10,cy,8,0,TAU); gctx.fillStyle="#1d283a"; gctx.fill(); gctx.stroke();
+      outX+=18;
+    }
+    // gate label
+    gctx.fillStyle="#e6edf6"; gctx.font="bold 18px system-ui"; gctx.textAlign="center";
+    gctx.fillText(label, gx+gw*0.42, cy+6);
+    gctx.textAlign="left";
+
+    // output wire
+    gctx.strokeStyle= y? "#38d39f":"#41506b"; gctx.lineWidth=3;
+    gctx.beginPath(); gctx.moveTo(outX,cy); gctx.lineTo(outX+120,cy); gctx.stroke();
+
+    // input/output value chips on canvas
+    gctx.font="bold 16px system-ui";
+    gctx.fillStyle= inA? "#38d39f":"#93a2b8";
+    if(gate==="NOT"){ gctx.fillText("A="+inA, 24, cy-8); }
+    else { gctx.fillText("A="+inA,24,ay-8); gctx.fillStyle=inB?"#38d39f":"#93a2b8"; gctx.fillText("B="+inB,24,by-8);}
+    gctx.fillStyle= y? "#38d39f":"#93a2b8";
+    gctx.fillText("Y="+y, outX+70, cy-8);
+  }
+
+  /* ============================================================
+     QUIZ
+     ============================================================ */
+  var quizData=[
+    {q:"A full-wave bridge rectifier uses how many diodes?",
+     opts:["1","2","4","6"], ans:2,
+     ex:"A bridge rectifier uses 4 diodes so both half-cycles of AC drive the load in one direction."},
+    {q:"For a transistor with I_B = 30 µA and β = 100, the collector current I_C is:",
+     opts:["3 mA","300 µA","30 mA","0.3 mA"], ans:0,
+     ex:"I_C = β × I_B = 100 × 30 µA = 3000 µA = 3 mA."},
+    {q:"A NAND gate output is 0 only when:",
+     opts:["Any input is 1","Both inputs are 0","Both inputs are 1","Inputs differ"], ans:2,
+     ex:"NAND = NOT(AND). AND is 1 only when both inputs are 1, so NAND is 0 only then."}
+  ];
+  (function buildQuiz(){
+    var box=document.getElementById("quiz");
+    quizData.forEach(function(item,qi){
+      var d=document.createElement("div"); d.className="q";
+      var h=document.createElement("p"); h.innerHTML="<b>Q"+(qi+1)+".</b> "+item.q; d.appendChild(h);
+      var opts=document.createElement("div"); opts.className="opts";
+      item.opts.forEach(function(o,oi){
+        var b=document.createElement("button"); b.textContent=o;
+        b.addEventListener("click",function(){
+          var btns=opts.querySelectorAll("button");
+          btns.forEach(function(x){x.disabled=true;});
+          if(oi===item.ans){ b.classList.add("correct"); }
+          else { b.classList.add("wrong"); btns[item.ans].classList.add("correct"); }
+          ex.classList.add("show");
+        });
+        opts.appendChild(b);
+      });
+      d.appendChild(opts);
+      var ex=document.createElement("div"); ex.className="explain"; ex.textContent="Why: "+item.ex;
+      d.appendChild(ex);
+      box.appendChild(d);
+    });
+  })();
+
+  /* ============================================================
+     ANIMATION LOOP
+     ============================================================ */
+  function frame(){
+    if(!document.hidden){
+      if(mode==="rect"){ phase+=0.04; drawRect(); }
+      else if(mode==="trans"){ drawTrans(); }
+      else if(mode==="logic"){ drawGate(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // init
+  updateTransUI();
+  updateGate();
+  elB.classList.remove("hi");
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

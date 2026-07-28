@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contemporary Physics Explorer — NIOS Class 12 Physics, Ch 28</title>
+<style>
+  :root{
+    --bg:#0e1220;
+    --panel:#171d30;
+    --panel2:#202942;
+    --ink:#e9edf8;
+    --muted:#96a1bd;
+    --accent:#4dd7c4;
+    --accent-soft:rgba(77,215,196,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3450;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 140px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.08rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .panel p{font-size:.92rem;color:var(--ink);margin-bottom:8px}
+  .panel p.muted{color:var(--muted)}
+
+  .view{display:none}
+  .view.active{display:block}
+
+  .stage{width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;display:block;touch-action:manipulation}
+
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:12px 0}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.84rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--accent);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 120px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0e1220;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0e1220}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .card h3{color:var(--accent);font-size:.95rem;margin-bottom:6px}
+  .card p{font-size:.88rem;color:var(--muted);margin:0}
+
+  .facts{list-style:none}
+  .facts li{position:relative;padding:8px 8px 8px 26px;font-size:.9rem;border-bottom:1px solid var(--line)}
+  .facts li:last-child{border-bottom:none}
+  .facts li::before{content:"›";position:absolute;left:8px;color:var(--accent);font-weight:700}
+  .facts b{color:var(--ink)}
+
+  .quiz .q{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .quiz .q:last-child{border-bottom:none;margin-bottom:0}
+  .quiz .qt{font-weight:600;margin-bottom:8px;font-size:.94rem}
+  .quiz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:6px;font-size:.9rem;cursor:pointer;
+    touch-action:manipulation;transition:all .12s}
+  .quiz .opt:active{transform:scale(.99)}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15);color:var(--good)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15);color:var(--bad)}
+  .quiz .fb{font-size:.85rem;color:var(--muted);margin-top:4px;min-height:1em}
+
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+  .pill{font-size:.78rem;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent);
+    border-radius:999px;padding:3px 10px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Contemporary Physics <span>Explorer</span></h1>
+    <p>NIOS Class 12 Physics · Ch 28 — a tour of lasers, the nanoscale, and modern frontiers.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="laser">Lasers</button>
+    <button class="tab-btn" data-view="nano">Nanoscale</button>
+    <button class="tab-btn" data-view="super">Superconductivity</button>
+    <button class="tab-btn" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ LASERS ============ -->
+  <section class="view active" id="view-laser">
+    <div class="panel">
+      <h2>Lasers — Light Amplification by Stimulated Emission of Radiation</h2>
+      <p class="muted">Watch atoms absorb energy, then emit light. A laser needs <b>population inversion</b> (more atoms up than down) so that <b>stimulated emission</b> wins.</p>
+      <canvas class="stage" id="laserCanvas" height="300"></canvas>
+      <div class="legend">
+        <span><i class="dot" style="background:#8899bb"></i>ground state</span>
+        <span><i class="dot" style="background:#4dd7c4"></i>excited state</span>
+        <span><i class="dot" style="background:#ffd24d"></i>emitted photon</span>
+      </div>
+      <div class="seg" style="margin-top:12px" id="laserMode">
+        <button class="on" data-m="spont">Spontaneous emission</button>
+        <button data-m="stim">Stimulated emission</button>
+        <button data-m="cavity">Laser cavity (beam)</button>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Pump power (population inversion) — <output id="pumpOut">60%</output></label>
+          <input type="range" id="pump" min="0" max="100" value="60">
+        </div>
+      </div>
+      <p class="muted" id="laserNote">Spontaneous: excited atoms drop on their own, emitting photons in random directions — like an ordinary lamp.</p>
+    </div>
+    <div class="panel">
+      <h3>Key properties &amp; uses</h3>
+      <div class="grid2">
+        <div class="card"><h3>Monochromatic</h3><p>Nearly a single wavelength / one colour.</p></div>
+        <div class="card"><h3>Coherent</h3><p>Waves march in step (same phase).</p></div>
+        <div class="card"><h3>Directional</h3><p>Narrow beam, spreads very little.</p></div>
+        <div class="card"><h3>Intense</h3><p>Energy concentrated in a tiny area.</p></div>
+      </div>
+      <p class="muted" style="margin-top:10px"><b>Uses:</b> CD/DVD &amp; barcode readers, fibre-optic communication, laser surgery &amp; eye treatment, cutting &amp; welding, distance measurement (LIDAR), holography.</p>
+    </div>
+  </section>
+
+  <!-- ============ NANOSCALE ============ -->
+  <section class="view" id="view-nano">
+    <div class="panel">
+      <h2>The Scale Ladder — down to the nanometre</h2>
+      <p class="muted">"Nano" means one-billionth. <b>1 nm = 10⁻⁹ m</b> (a metre split into a billion pieces). Nanotechnology builds and studies matter at 1–100 nm — where materials gain new properties.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Zoom to scale — <output id="nanoOut"></output></label>
+          <input type="range" id="nano" min="0" max="6" value="0" step="1">
+        </div>
+      </div>
+      <canvas class="stage" id="nanoCanvas" height="300"></canvas>
+      <p class="muted" id="nanoNote"></p>
+    </div>
+    <div class="panel">
+      <h3>Why the nanoscale matters</h3>
+      <ul class="facts">
+        <li>At the nanoscale, a much larger fraction of atoms sit on the <b>surface</b>, changing chemistry and strength.</li>
+        <li><b>Carbon nanotubes</b> and <b>graphene</b> (one atom thick) are extremely strong and conduct well.</li>
+        <li>Nanoparticles are used in <b>sunscreens, drug delivery, sensors, and stain-resistant fabrics</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SUPERCONDUCTIVITY ============ -->
+  <section class="view" id="view-super">
+    <div class="panel">
+      <h2>Superconductivity — zero resistance below T<sub>c</sub></h2>
+      <p class="muted">In a superconductor, electrical resistance drops <b>abruptly to zero</b> when cooled below a <b>critical temperature T<sub>c</sub></b>. Current then flows with no energy loss.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Temperature T — <output id="tempOut">120 K</output></label>
+          <input type="range" id="temp" min="0" max="200" value="120">
+        </div>
+      </div>
+      <canvas class="stage" id="rtCanvas" height="260"></canvas>
+      <p class="muted" id="rtNote"></p>
+    </div>
+    <div class="panel">
+      <h3>Meissner effect — magnetic levitation</h3>
+      <p class="muted">A superconductor <b>expels magnetic field</b> from its interior, so a magnet floats above it. Drag the slider above below T<sub>c</sub> to make the magnet lift off.</p>
+      <canvas class="stage" id="meissCanvas" height="220"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Other modern frontiers</h3>
+      <div class="grid2">
+        <div class="card"><h3>Particle physics</h3><p>The <b>Higgs boson</b> (confirmed 2012 at CERN's LHC) explains how fundamental particles get mass.</p></div>
+        <div class="card"><h3>Quantum computing</h3><p><b>Qubits</b> exploit superposition &amp; entanglement to explore many possibilities at once.</p></div>
+        <div class="card"><h3>Applications of superconductors</h3><p>MRI scanners, maglev trains, and powerful research magnets.</p></div>
+        <div class="card"><h3>Standard Model</h3><p>Our best theory of the known elementary particles and three of the four forces.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="view" id="view-quiz">
+    <div class="panel quiz" id="quiz">
+      <h2>Quick check — 3 questions</h2>
+      <p class="muted">Tap an answer to reveal whether it is correct.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- helpers ---------- */
+  function $(id){return document.getElementById(id);}
+  function dpr(canvas,cssH){
+    var r=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+    var w=canvas.clientWidth||canvas.parentElement.clientWidth;
+    canvas.width=Math.round(w*r);
+    canvas.height=Math.round(cssH*r);
+    var ctx=canvas.getContext("2d");
+    ctx.setTransform(r,0,0,r,0,0);
+    return {ctx:ctx,w:w,h:cssH};
+  }
+  var running=true;
+  document.addEventListener("visibilitychange",function(){running=!document.hidden;});
+
+  /* ---------- tabs ---------- */
+  var tabs=document.querySelectorAll(".tab-btn");
+  var views={laser:$("view-laser"),nano:$("view-nano"),super:$("view-super"),quiz:$("view-quiz")};
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      Object.keys(views).forEach(function(k){views[k].classList.remove("active");});
+      views[t.dataset.view].classList.add("active");
+      resizeAll();
+    });
+  });
+
+  /* ============ LASER ============ */
+  var laserMode="spont";
+  var pump=$("pump"), pumpOut=$("pumpOut");
+  var laserNote=$("laserNote");
+  var laserSeg=$("laserMode");
+  var atoms=[], photons=[], beamPhase=0;
+  var notes={
+    spont:"Spontaneous: excited atoms drop on their own, emitting photons in random directions — like an ordinary lamp.",
+    stim:"Stimulated: an incoming photon triggers an excited atom to emit a second identical photon (same direction, phase, colour). This amplifies light.",
+    cavity:"Cavity: two mirrors bounce photons back and forth. With population inversion, stimulated emission builds up a coherent, directional beam."
+  };
+  function initAtoms(){
+    atoms=[];
+    var cols=8, rows=3;
+    for(var r=0;r<rows;r++) for(var c=0;c<cols;c++){
+      atoms.push({gx:c/(cols-1),gy:r/(rows-1),excited:Math.random()<0.4,t:Math.random()*2});
+    }
+  }
+  initAtoms();
+  laserSeg.querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click",function(){
+      laserSeg.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      laserMode=b.dataset.m;
+      laserNote.textContent=notes[laserMode];
+      photons=[];
+    });
+  });
+  pump.addEventListener("input",function(){pumpOut.textContent=pump.value+"%";});
+
+  function drawLaser(dt){
+    var C=dpr($("laserCanvas"),300),ctx=C.ctx,w=C.w,h=C.h;
+    ctx.clearRect(0,0,w,h);
+    var frac=pump.value/100;
+    if(laserMode==="cavity"){
+      // cavity walls (mirrors)
+      var mx1=30, mx2=w-30, my=h/2, tube=70;
+      ctx.fillStyle="#202942";ctx.fillRect(mx1,my-tube,mx2-mx1,tube*2);
+      ctx.strokeStyle="#2b3450";ctx.strokeRect(mx1,my-tube,mx2-mx1,tube*2);
+      // mirrors
+      ctx.fillStyle="#8899bb";ctx.fillRect(mx1-8,my-tube,8,tube*2);
+      ctx.fillStyle="rgba(136,153,187,.6)";ctx.fillRect(mx2,my-tube,8,tube*2);
+      ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";
+      ctx.fillText("100% mirror",mx1-6,my-tube-8);
+      ctx.fillText("partial mirror →",mx2-40,my-tube-8);
+      // active medium atoms
+      for(var i=0;i<10;i++){
+        var ax=mx1+20+i*((mx2-mx1-40)/9);
+        ctx.beginPath();ctx.arc(ax,my-30+((i%2)*60),6,0,7);
+        ctx.fillStyle=(Math.random()<frac)?"#4dd7c4":"#8899bb";ctx.fill();
+      }
+      // bouncing coherent wave
+      beamPhase+=dt*4*(0.4+frac);
+      ctx.lineWidth=2;
+      var amp=18*frac+3;
+      ctx.strokeStyle="rgba(255,210,77,"+(0.35+0.6*frac)+")";
+      ctx.beginPath();
+      for(var x=mx1;x<=mx2;x+=4){
+        var yy=my+amp*Math.sin((x-mx1)*0.06 - beamPhase);
+        if(x===mx1)ctx.moveTo(x,yy);else ctx.lineTo(x,yy);
+      }
+      ctx.stroke();
+      // output beam
+      if(frac>0.4){
+        ctx.strokeStyle="rgba(255,210,77,"+(0.7*(frac-0.4)/0.6)+")";
+        ctx.lineWidth=6*(frac-0.4)/0.6+1;
+        ctx.beginPath();ctx.moveTo(mx2+8,my);ctx.lineTo(w-4,my);ctx.stroke();
+        ctx.fillStyle="#ffd24d";ctx.font="12px system-ui";
+        ctx.fillText("coherent beam",mx2-2,my+tube+22);
+      } else {
+        ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";
+        ctx.fillText("raise pump power above ~40% for a beam",mx1,my+tube+22);
+      }
+      return;
+    }
+    // spont / stim: atom grid with emissions
+    var pad=40, gw=w-pad*2, gh=h-90;
+    atoms.forEach(function(a){
+      a.t-=dt;
+      var wantExcited=Math.random()<frac;
+      if(a.t<=0){
+        if(a.excited){
+          // emit
+          var px=pad+a.gx*gw, py=45+a.gy*gh;
+          var dir=(laserMode==="stim")? 0 : (Math.random()*Math.PI*2);
+          photons.push({x:px,y:py,vx:Math.cos(dir)*90,vy:Math.sin(dir)*90,life:2.2});
+          a.excited=false;
+        } else {
+          a.excited=wantExcited;
+        }
+        a.t=0.6+Math.random()*0.9;
+      }
+    });
+    // stimulated: incoming seed photons across from left
+    if(laserMode==="stim" && Math.random()<dt*3){
+      photons.push({x:0,y:45+Math.random()*gh,vx:130,vy:0,life:3,seed:true});
+    }
+    // draw atoms
+    atoms.forEach(function(a){
+      var px=pad+a.gx*gw, py=45+a.gy*gh;
+      ctx.beginPath();ctx.arc(px,py,9,0,7);
+      ctx.fillStyle=a.excited?"#4dd7c4":"#8899bb";ctx.fill();
+      if(a.excited){ctx.strokeStyle="rgba(77,215,196,.5)";ctx.lineWidth=2;ctx.beginPath();ctx.arc(px,py,13,0,7);ctx.stroke();}
+    });
+    // draw + move photons
+    ctx.fillStyle="#ffd24d";
+    for(var p=photons.length-1;p>=0;p--){
+      var ph=photons[p];
+      ph.x+=ph.vx*dt;ph.y+=ph.vy*dt;ph.life-=dt;
+      if(ph.life<=0||ph.x<-20||ph.x>w+20||ph.y<-20||ph.y>h+20){photons.splice(p,1);continue;}
+      // stimulation: a seed photon hitting an excited atom spawns a clone
+      if(laserMode==="stim" && ph.seed){
+        for(var k=0;k<atoms.length;k++){
+          var a2=atoms[k];
+          if(!a2.excited)continue;
+          var ax=pad+a2.gx*gw, ay=45+a2.gy*gh;
+          if(Math.abs(ph.x-ax)<10 && Math.abs(ph.y-ay)<10){
+            a2.excited=false;
+            photons.push({x:ax,y:ay,vx:130,vy:0,life:3,seed:true});
+          }
+        }
+      }
+      ctx.beginPath();ctx.arc(ph.x,ph.y,4,0,7);ctx.fill();
+    }
+    ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";
+    if(laserMode==="stim")ctx.fillText("seed photons enter from the left →",pad,h-14);
+    else ctx.fillText("emission is random in direction",pad,h-14);
+  }
+
+  /* ============ NANO ============ */
+  var nano=$("nano"), nanoOut=$("nanoOut"), nanoNote=$("nanoNote");
+  var nanoSteps=[
+    {label:"1 metre (10⁰ m)",obj:"A person / a metre stick",note:"Human scale — the everyday world."},
+    {label:"1 millimetre (10⁻³ m)",obj:"A grain of sand / pinhead",note:"About the smallest thing the naked eye resolves easily."},
+    {label:"~100 micrometre (10⁻⁴ m)",obj:"A human hair (≈80 µm wide)",note:"Micrometre scale — need a light microscope."},
+    {label:"~10 micrometre (10⁻⁵ m)",obj:"A human cell",note:"Living cells; still visible in a light microscope."},
+    {label:"~100 nanometre (10⁻⁷ m)",obj:"A virus",note:"Viruses — the edge of the nanoscale; need an electron microscope."},
+    {label:"~2 nanometre (10⁻⁹ m)",obj:"DNA double helix (≈2 nm wide)",note:"Nanoscale — where nanotechnology works (1–100 nm)."},
+    {label:"~0.1 nanometre (10⁻¹⁰ m)",obj:"A single atom",note:"Atomic scale — 0.1 nm = 1 ångström."}
+  ];
+  nano.addEventListener("input",updateNano);
+  function updateNano(){
+    var s=nanoSteps[+nano.value];
+    nanoOut.textContent=s.label;
+    nanoNote.innerHTML="<b>"+s.obj+"</b> — "+s.note;
+  }
+  updateNano();
+  function drawNano(){
+    var C=dpr($("nanoCanvas"),300),ctx=C.ctx,w=C.w,h=C.h;
+    ctx.clearRect(0,0,w,h);
+    var idx=+nano.value;
+    // scale ladder on the left
+    var lx=40, top=30, bot=h-30, n=nanoSteps.length;
+    ctx.strokeStyle="#2b3450";ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(lx,top);ctx.lineTo(lx,bot);ctx.stroke();
+    for(var i=0;i<n;i++){
+      var y=top+(bot-top)*i/(n-1);
+      var on=(i===idx);
+      ctx.beginPath();ctx.arc(lx,y,on?9:5,0,7);
+      ctx.fillStyle=on?"#4dd7c4":"#4a557a";ctx.fill();
+      ctx.fillStyle=on?"#e9edf8":"#96a1bd";ctx.font=(on?"bold ":"")+"11px system-ui";
+      var t=nanoSteps[i].label.replace(/\s*\(.*\)/,"");
+      ctx.fillText(t,lx+16,y+4);
+    }
+    // illustration on the right: shrinking object relative to a fixed frame
+    var cx=w*0.72, cy=h/2, R=Math.min(w*0.22,90);
+    ctx.strokeStyle="#2b3450";ctx.setLineDash([5,5]);
+    ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#96a1bd";ctx.font="11px system-ui";
+    ctx.fillText("(zoom frame)",cx-30,cy-R-8);
+    // object gets conceptually smaller as we descend, but we keep it visible & label it
+    var rel=[1,0.75,0.6,0.45,0.32,0.2,0.1][idx];
+    ctx.beginPath();ctx.arc(cx,cy,R*rel,0,7);
+    var grd=ctx.createRadialGradient(cx-R*rel*0.3,cy-R*rel*0.3,2,cx,cy,R*rel);
+    grd.addColorStop(0,"#66f0dd");grd.addColorStop(1,"#2f9c8e");
+    ctx.fillStyle=grd;ctx.fill();
+    ctx.fillStyle="#e9edf8";ctx.font="12px system-ui";ctx.textAlign="center";
+    ctx.fillText(nanoSteps[idx].obj.split("(")[0].trim(),cx,cy+R+22);
+    ctx.textAlign="left";
+  }
+
+  /* ============ SUPERCONDUCTIVITY ============ */
+  var temp=$("temp"), tempOut=$("tempOut"), rtNote=$("rtNote");
+  var Tc=90; // critical temperature in K (high-Tc example)
+  temp.addEventListener("input",updateTemp);
+  function updateTemp(){
+    tempOut.textContent=temp.value+" K";
+    var T=+temp.value;
+    if(T<=Tc) rtNote.innerHTML="T = "+T+" K is <b>below T<sub>c</sub> (90 K)</b> — resistance is <b>zero</b>. The material is superconducting and the magnet levitates.";
+    else rtNote.innerHTML="T = "+T+" K is above T<sub>c</sub> — the material behaves like a normal metal with non-zero resistance.";
+  }
+  updateTemp();
+  function drawRT(){
+    var C=dpr($("rtCanvas"),260),ctx=C.ctx,w=C.w,h=C.h;
+    ctx.clearRect(0,0,w,h);
+    var l=44,r=w-16,b=h-34,t=18;
+    // axes
+    ctx.strokeStyle="#2b3450";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(l,t);ctx.lineTo(l,b);ctx.lineTo(r,b);ctx.stroke();
+    ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";
+    ctx.fillText("Resistance",l-38,t+6);
+    ctx.fillText("Temperature (K)",r-96,b+24);
+    ctx.save();
+    // curve: 0 below Tc, then rises roughly linearly above Tc
+    var Tmax=200;
+    function X(T){return l+(r-l)*T/Tmax;}
+    function Y(res){return b-(b-t)*res;}
+    ctx.strokeStyle="#4dd7c4";ctx.lineWidth=3;ctx.beginPath();
+    var started=false;
+    for(var T=0;T<=Tmax;T+=2){
+      var res=(T<=Tc)?0:Math.min(1,(T-Tc)/(Tmax-Tc)*0.9+0.08);
+      var x=X(T),y=Y(res);
+      if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.restore();
+    // Tc marker
+    ctx.strokeStyle="rgba(255,123,123,.7)";ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(X(Tc),t);ctx.lineTo(X(Tc),b);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#ff7b7b";ctx.fillText("Tc = 90 K",X(Tc)+4,t+12);
+    // current T dot
+    var T0=+temp.value;
+    var res0=(T0<=Tc)?0:Math.min(1,(T0-Tc)/(Tmax-Tc)*0.9+0.08);
+    ctx.fillStyle="#ffd24d";ctx.beginPath();ctx.arc(X(T0),Y(res0),6,0,7);ctx.fill();
+  }
+  function drawMeiss(){
+    var C=dpr($("meissCanvas"),220),ctx=C.ctx,w=C.w,h=C.h;
+    ctx.clearRect(0,0,w,h);
+    var T=+temp.value, cold=T<=Tc;
+    var cx=w/2, baseY=h-40;
+    // superconductor slab
+    ctx.fillStyle=cold?"#1c3b3a":"#2a3350";
+    ctx.strokeStyle=cold?"#4dd7c4":"#4a557a";ctx.lineWidth=2;
+    ctx.beginPath();ctx.rect(cx-70,baseY,140,30);ctx.fill();ctx.stroke();
+    ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";ctx.textAlign="center";
+    ctx.fillText(cold?"superconductor (cold)":"normal metal (warm)",cx,baseY+48);
+    // magnet: floats when cold
+    var lift=cold?(60+ (Tc-T)*0.3):6;
+    var my=baseY-lift-16;
+    // field lines expelled when cold
+    if(cold){
+      ctx.strokeStyle="rgba(77,215,196,.5)";ctx.lineWidth=1.5;
+      for(var i=-2;i<=2;i++){
+        ctx.beginPath();
+        ctx.moveTo(cx+i*18,my);
+        ctx.quadraticCurveTo(cx+i*70,(my+baseY)/2,cx+i*30,baseY-2);
+        ctx.stroke();
+      }
+    }
+    // magnet body (N red / S blue)
+    ctx.fillStyle="#ff7b7b";ctx.fillRect(cx-24,my-6,48,12);
+    ctx.fillStyle="#7aa2ff";ctx.fillRect(cx-24,my+6,48,12);
+    ctx.strokeStyle="#0e1220";ctx.lineWidth=1;ctx.strokeRect(cx-24,my-6,48,24);
+    ctx.fillStyle="#fff";ctx.font="bold 11px system-ui";
+    ctx.fillText("N",cx,my+2);ctx.fillText("S",cx,my+15);
+    ctx.fillStyle="#96a1bd";ctx.font="12px system-ui";
+    ctx.fillText(cold?"magnet levitates (Meissner effect)":"magnet rests on surface",cx,24);
+    ctx.textAlign="left";
+  }
+
+  /* ============ QUIZ ============ */
+  var quizData=[
+    {q:"1. In a laser, 'stimulated emission' means:",
+     opts:["An atom absorbs a photon and jumps up",
+           "An incoming photon triggers an excited atom to emit an identical photon",
+           "Atoms emit light in random directions on their own",
+           "Electrons are knocked out of the metal"],
+     a:1,fb:"The emitted photon matches the incoming one in phase, direction and wavelength — that is what makes laser light coherent."},
+    {q:"2. One nanometre (1 nm) equals:",
+     opts:["10⁻³ m","10⁻⁶ m","10⁻⁹ m","10⁻¹² m"],
+     a:2,fb:"1 nm = 10⁻⁹ m — one billionth of a metre. DNA is about 2 nm wide."},
+    {q:"3. Below its critical temperature Tc, a superconductor has:",
+     opts:["Maximum electrical resistance","Zero electrical resistance","The same resistance as copper","Infinite resistance"],
+     a:1,fb:"Below Tc the resistance drops to zero, so current flows without energy loss — and it expels magnetic fields (Meissner effect)."}
+  ];
+  (function buildQuiz(){
+    var box=$("quiz");
+    quizData.forEach(function(item,qi){
+      var d=document.createElement("div");d.className="q";
+      var t=document.createElement("div");t.className="qt";t.textContent=item.q;d.appendChild(t);
+      var fb=document.createElement("div");fb.className="fb";
+      item.opts.forEach(function(o,oi){
+        var b=document.createElement("button");b.className="opt";b.textContent=o;
+        b.addEventListener("click",function(){
+          if(d.dataset.done)return;
+          d.dataset.done="1";
+          var btns=d.querySelectorAll(".opt");
+          btns[item.a].classList.add("correct");
+          if(oi!==item.a)b.classList.add("wrong");
+          fb.textContent=(oi===item.a?"Correct! ":"Not quite. ")+item.fb;
+        });
+        d.appendChild(b);
+      });
+      d.appendChild(fb);
+      box.appendChild(d);
+    });
+  })();
+
+  /* ---------- resize + loop ---------- */
+  function resizeAll(){
+    // one draw at current sizes (canvas dims recomputed each frame anyway)
+    drawNano();drawRT();drawMeiss();
+  }
+  window.addEventListener("resize",resizeAll);
+
+  var last=performance.now();
+  function loop(now){
+    var dt=Math.min(0.05,(now-last)/1000);last=now;
+    if(running){
+      if(views.laser.classList.contains("active")) drawLaser(dt);
+      if(views.nano.classList.contains("active")) drawNano();
+      if(views.super.classList.contains("active")){drawRT();drawMeiss();}
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  resizeAll();
+})();
+</script>
+</body>
+</html>

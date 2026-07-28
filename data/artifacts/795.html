@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universe Explorer — NIOS Physics Ch27</title>
+<style>
+  :root{
+    --bg:#0a0e1a; --panel:#141a2e; --panel2:#1c2440;
+    --ink:#e7ecff; --muted:#93a0c4; --line:#2a3358;
+    --accent:#7cc4ff; --accent2:#ffcf6b;
+    --good:#4fd18b; --bad:#ff7a8a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%, #16203f 0%, var(--bg) 55%);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px}
+  header h1{font-size:clamp(1.3rem,4.5vw,2rem);margin:.2em 0 .1em;letter-spacing:.3px}
+  header p{color:var(--muted);margin:.2em 0 1em;font-size:.95rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    flex:1 1 auto;min-width:120px;cursor:pointer;border:1px solid var(--line);
+    background:var(--panel);color:var(--muted);padding:10px 12px;border-radius:12px;
+    font-size:.9rem;font-weight:600;text-align:center;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab[aria-selected="true"]{background:var(--panel2);color:var(--ink);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{margin:.1em 0 .5em;font-size:1.15rem}
+  .view{display:none}
+  .view.active{display:block}
+  canvas{display:block;width:100%;height:auto;background:#060912;border-radius:12px;border:1px solid var(--line);touch-action:manipulation}
+  label{display:block;font-size:.85rem;color:var(--muted);margin:.6em 0 .25em}
+  input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+  .row{display:flex;flex-wrap:wrap;gap:14px}
+  .col{flex:1 1 260px;min-width:0}
+  .readout{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px}
+  .readout .big{font-size:1.4rem;font-weight:700;color:var(--accent)}
+  .readout .sub{color:var(--muted);font-size:.85rem}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+  .kv:last-child{border-bottom:0}
+  .kv span:last-child{color:var(--accent2);font-weight:600;text-align:right}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  button{
+    cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    padding:9px 14px;border-radius:10px;font-size:.9rem;font-weight:600;transition:.15s;
+  }
+  button:hover{border-color:var(--accent)}
+  button.accent{background:var(--accent);color:#05203a;border-color:var(--accent)}
+  .stages{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+  .stage{
+    flex:1 1 auto;min-width:64px;text-align:center;font-size:.72rem;padding:8px 4px;
+    border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--muted);cursor:pointer;
+  }
+  .stage.on{border-color:var(--accent2);color:var(--ink);box-shadow:0 0 0 1px var(--accent2) inset}
+  .caption{background:var(--panel2);border-left:3px solid var(--accent2);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:.9rem}
+  .facts{columns:2;column-gap:16px}
+  .facts .fact{break-inside:avoid;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:12px}
+  .facts .fact b{color:var(--accent)}
+  .facts .fact p{margin:.35em 0 0;font-size:.85rem;color:var(--muted)}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .q p{margin:0 0 8px;font-weight:600}
+  .opt{display:block;width:100%;text-align:left;margin:5px 0}
+  .opt.correct{background:rgba(79,209,139,.18);border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:rgba(255,122,138,.15);border-color:var(--bad);color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .expl.show{display:block}
+  .pill{display:inline-block;font-size:.72rem;color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin-left:6px}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 24px}
+  @media (max-width:520px){ .facts{columns:1} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Universe Explorer <span class="pill">NIOS Physics · Ch27</span></h1>
+    <p>Zoom across cosmic scales, follow a star's life, and watch the universe expand.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab" role="tab" data-view="scale" aria-selected="true" tabindex="0">Scale of the Universe</div>
+    <div class="tab" role="tab" data-view="star" aria-selected="false" tabindex="0">Stellar Life Cycle</div>
+    <div class="tab" role="tab" data-view="hubble" aria-selected="false" tabindex="0">Expanding Universe</div>
+    <div class="tab" role="tab" data-view="facts" aria-selected="false" tabindex="0">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- SCALE -->
+  <section class="view active" id="view-scale">
+    <div class="panel">
+      <h2>Scale of the Universe</h2>
+      <canvas id="cvScale" width="900" height="360" aria-label="Scale visualisation"></canvas>
+      <label for="scaleSlider">Zoom level: drag to travel outward <span id="scaleName" style="color:var(--accent)"></span></label>
+      <input type="range" id="scaleSlider" min="0" max="6" step="1" value="0">
+      <div class="btnrow">
+        <button id="scalePrev">&larr; Zoom in</button>
+        <button id="scaleNext">Zoom out &rarr;</button>
+      </div>
+      <div class="readout">
+        <div class="big" id="scaleTitle"></div>
+        <div class="sub" id="scaleDesc"></div>
+        <div class="kv"><span>Approx. size / distance</span><span id="scaleDist"></span></div>
+        <div class="kv"><span>Same distance in other units</span><span id="scaleAlt"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAR -->
+  <section class="view" id="view-star">
+    <div class="panel">
+      <h2>Stellar Life Cycle</h2>
+      <label for="massSlider">Star's birth mass: <span id="massVal" style="color:var(--accent)"></span> M<sub>☉</sub> (solar masses)</label>
+      <input type="range" id="massSlider" min="1" max="250" step="1" value="10">
+      <p class="sub" style="color:var(--muted);font-size:.85rem;margin:.2em 0">Value shown as multiples of the Sun's mass (1 M<sub>☉</sub>). Drag to change the star's fate.</p>
+      <canvas id="cvStar" width="900" height="300" aria-label="Star life cycle"></canvas>
+      <div class="stages" id="stageRow"></div>
+      <div class="caption" id="starCaption"></div>
+    </div>
+  </section>
+
+  <!-- HUBBLE -->
+  <section class="view" id="view-hubble">
+    <div class="panel">
+      <h2>Expanding Universe — Hubble's Law</h2>
+      <canvas id="cvHubble" width="900" height="320" aria-label="Expanding universe animation"></canvas>
+      <div class="btnrow">
+        <button id="hubblePlay" class="accent">Pause</button>
+        <button id="hubbleReset">Reset</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="col">
+          <label for="distSlider">Distance to a galaxy: <span id="distVal" style="color:var(--accent)"></span> Mpc</label>
+          <input type="range" id="distSlider" min="1" max="600" step="1" value="100">
+        </div>
+        <div class="col readout" style="margin-top:0">
+          <div class="sub">Recession velocity v = H<sub>0</sub> &times; d</div>
+          <div class="big" id="hubbleVel"></div>
+          <div class="kv"><span>H<sub>0</sub> (Hubble constant)</span><span>70 km/s per Mpc</span></div>
+          <div class="kv"><span>Fraction of light speed</span><span id="hubbleFrac"></span></div>
+        </div>
+      </div>
+      <div class="caption">Farther galaxies recede faster — space itself stretches, so every observer sees others moving away. This uniform expansion is the evidence for the Big Bang.</div>
+    </div>
+  </section>
+
+  <!-- FACTS + QUIZ -->
+  <section class="view" id="view-facts">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="facts">
+        <div class="fact"><b>Light-year (ly)</b><p>Distance light travels in one year in vacuum ≈ 9.46 × 10<sup>12</sup> km. Light speed c ≈ 3 × 10<sup>5</sup> km/s.</p></div>
+        <div class="fact"><b>Parsec (pc)</b><p>Distance at which 1 AU subtends 1 arc-second ≈ 3.26 light-years ≈ 3.086 × 10<sup>13</sup> km.</p></div>
+        <div class="fact"><b>Astronomical Unit (AU)</b><p>Mean Earth–Sun distance ≈ 1.496 × 10<sup>8</sup> km. Used for Solar-System scales.</p></div>
+        <div class="fact"><b>Hubble's Law</b><p>v = H<sub>0</sub>d. Recession speed is proportional to distance; H<sub>0</sub> ≈ 70 km/s/Mpc.</p></div>
+        <div class="fact"><b>Redshift</b><p>Light from receding galaxies is stretched to longer (redder) wavelengths — direct proof of expansion.</p></div>
+        <div class="fact"><b>Observable Universe</b><p>Radius ≈ 46 billion light-years; it holds an estimated 2 trillion galaxies.</p></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Universe Explorer · self-contained interactive · NIOS Class 12 Physics</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  function vis(){ running = !document.hidden; }
+  document.addEventListener("visibilitychange", vis);
+
+  /* ---------- TABS ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  var views = { scale:byId("view-scale"), star:byId("view-star"), hubble:byId("view-hubble"), facts:byId("view-facts") };
+  function byId(id){ return document.getElementById(id); }
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){ select(t); });
+    t.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); select(t);} });
+  });
+  function select(t){
+    tabs.forEach(function(x){ x.setAttribute("aria-selected", x===t ? "true":"false"); });
+    for(var k in views){ views[k].classList.remove("active"); }
+    views[t.dataset.view].classList.add("active");
+    var v=byId("view-"+t.dataset.view); v.classList.add("active");
+  }
+
+  /* ---------- SCALE ---------- */
+  var LY_KM = 9.461e12, AU_KM = 1.496e8, PC_KM = 3.086e13;
+  var scales = [
+    {name:"Earth", title:"Planet Earth", dist_km:1.274e4,
+      desc:"Our home planet — diameter about 12,742 km.", alt:"≈ 8.5 × 10⁻⁵ AU"},
+    {name:"Moon", title:"Earth–Moon distance", dist_km:3.84e5,
+      desc:"The Moon orbits ~384,400 km away — light takes 1.3 seconds.", alt:"≈ 0.0026 AU"},
+    {name:"Solar System", title:"Solar System (to Neptune)", dist_km:4.5e9,
+      desc:"Neptune orbits about 30 AU from the Sun.", alt:"≈ 30 AU ≈ 4.2 light-hours"},
+    {name:"Nearest star", title:"Proxima Centauri", dist_km:4.0e13,
+      desc:"The closest star beyond the Sun, about 4.24 light-years away.", alt:"≈ 4.24 ly ≈ 1.30 pc"},
+    {name:"Milky Way", title:"Our Galaxy — the Milky Way", dist_km:9.46e17,
+      desc:"A spiral galaxy about 100,000 light-years across.", alt:"≈ 100,000 ly ≈ 30,700 pc"},
+    {name:"Galaxy cluster", title:"Local Group & clusters", dist_km:9.46e19,
+      desc:"Galaxies gather in groups and clusters spanning ~10 million ly.", alt:"≈ 10⁷ ly ≈ 3.07 Mpc"},
+    {name:"Observable Universe", title:"The Observable Universe", dist_km:8.7e23,
+      desc:"Radius ≈ 46 billion light-years — the limit of what we can see.", alt:"≈ 4.6 × 10¹⁰ ly ≈ 14,100 Mpc"}
+  ];
+  var cvS = byId("cvScale"), ctxS = cvS.getContext("2d");
+  var scaleSlider = byId("scaleSlider");
+  var scaleStars = [];
+  (function initScaleStars(){ for(var i=0;i<160;i++){ scaleStars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+0.3,p:Math.random()*6.28}); } })();
+
+  function fmtKm(km){
+    if(km>=1e9) return (km).toExponential(2).replace("e+","×10^")+" km";
+    if(km>=1e4) return (km/1).toLocaleString("en-US",{maximumFractionDigits:0})+" km";
+    return km.toLocaleString("en-US")+" km";
+  }
+  function fmtDist(km){
+    // choose a readable unit set
+    var parts = [];
+    if(km >= 0.1*LY_KM){
+      parts.push((km/LY_KM).toExponential(2).replace("e+","×10^")+" ly");
+    } else if(km >= AU_KM){
+      parts.push((km/AU_KM).toLocaleString("en-US",{maximumFractionDigits:1})+" AU");
+    }
+    parts.push(sci(km)+" km");
+    return parts.join("  |  ");
+  }
+  function sci(n){
+    if(n<1e4) return n.toLocaleString("en-US",{maximumFractionDigits:0});
+    var e=Math.floor(Math.log10(n)); var m=n/Math.pow(10,e);
+    return m.toFixed(2)+"×10^"+e;
+  }
+  function drawScale(){
+    var w=cvS.width,h=cvS.height, t=performance.now()/1000;
+    ctxS.clearRect(0,0,w,h);
+    ctxS.fillStyle="#060912"; ctxS.fillRect(0,0,w,h);
+    // twinkling starfield
+    for(var i=0;i<scaleStars.length;i++){ var s=scaleStars[i];
+      var a=0.4+0.6*Math.abs(Math.sin(t+s.p));
+      ctxS.globalAlpha=a; ctxS.fillStyle="#cdd8ff";
+      ctxS.beginPath(); ctxS.arc(s.x*w,s.y*h,s.r,0,6.283); ctxS.fill();
+    }
+    ctxS.globalAlpha=1;
+    var idx=+scaleSlider.value;
+    var cx=w/2, cy=h/2;
+    // nested rings representing scale steps
+    for(var k=scales.length-1;k>=0;k--){
+      var rr = 24 + k*(Math.min(w,h)*0.5/scales.length);
+      ctxS.beginPath(); ctxS.arc(cx,cy,rr,0,6.283);
+      ctxS.strokeStyle = k===idx ? "#7cc4ff" : "rgba(124,196,255,0.18)";
+      ctxS.lineWidth = k===idx ? 2.5 : 1;
+      ctxS.stroke();
+    }
+    // central object glow
+    var g=ctxS.createRadialGradient(cx,cy,2,cx,cy,60);
+    g.addColorStop(0,"#ffcf6b"); g.addColorStop(1,"rgba(255,207,107,0)");
+    ctxS.fillStyle=g; ctxS.beginPath(); ctxS.arc(cx,cy,60,0,6.283); ctxS.fill();
+    ctxS.fillStyle="#fff"; ctxS.beginPath(); ctxS.arc(cx,cy,7,0,6.283); ctxS.fill();
+    // highlight current ring marker
+    var hr = 24 + idx*(Math.min(w,h)*0.5/scales.length);
+    var ang=t*0.6;
+    ctxS.fillStyle="#7cc4ff";
+    ctxS.beginPath(); ctxS.arc(cx+Math.cos(ang)*hr, cy+Math.sin(ang)*hr, 6,0,6.283); ctxS.fill();
+    // label
+    ctxS.fillStyle="#e7ecff"; ctxS.font="600 16px system-ui,sans-serif"; ctxS.textAlign="center";
+    ctxS.fillText(scales[idx].name, cx, 26);
+  }
+  function updateScale(){
+    var s=scales[+scaleSlider.value];
+    byId("scaleName").textContent="— "+s.name;
+    byId("scaleTitle").textContent=s.title;
+    byId("scaleDesc").textContent=s.desc;
+    byId("scaleDist").textContent=fmtDist(s.dist_km);
+    byId("scaleAlt").textContent=s.alt;
+  }
+  scaleSlider.addEventListener("input", updateScale);
+  byId("scalePrev").addEventListener("click", function(){ scaleSlider.value=Math.max(0,+scaleSlider.value-1); updateScale(); });
+  byId("scaleNext").addEventListener("click", function(){ scaleSlider.value=Math.min(6,+scaleSlider.value+1); updateScale(); });
+  updateScale();
+
+  /* ---------- STAR ---------- */
+  var cvSt=byId("cvStar"), ctxSt=cvSt.getContext("2d");
+  var massSlider=byId("massSlider");
+  var stageRow=byId("stageRow");
+  function fate(m){
+    // returns {stages:[...], caption, endColor}
+    if(m < 8){
+      return { end:"White Dwarf",
+        stages:["Nebula","Main Sequence","Red Giant","Planetary Nebula","White Dwarf"],
+        color:"#dfe9ff",
+        cap:"Low / Sun-like mass (< 8 M☉): burns for billions of years, swells into a red giant, sheds its outer layers as a planetary nebula, and leaves a dense White Dwarf that slowly cools." };
+    } else if(m < 25){
+      return { end:"Neutron Star",
+        stages:["Nebula","Main Sequence","Red Supergiant","Supernova","Neutron Star"],
+        color:"#a8d8ff",
+        cap:"Massive star (8–25 M☉): lives fast, becomes a red supergiant, then explodes as a Supernova. The crushed core survives as a tiny, ultra-dense Neutron Star (a teaspoon weighs billions of tonnes)." };
+    } else {
+      return { end:"Black Hole",
+        stages:["Nebula","Main Sequence","Red Supergiant","Supernova","Black Hole"],
+        color:"#7c6bff",
+        cap:"Very massive star (> 25 M☉): after a supernova the core collapses completely — gravity wins and forms a Black Hole, from which not even light escapes." };
+    }
+  }
+  var starStars=[]; for(var i=0;i<120;i++){ starStars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.2+0.3,p:Math.random()*6.28}); }
+  function drawStar(){
+    var w=cvSt.width,h=cvSt.height,t=performance.now()/1000;
+    ctxSt.clearRect(0,0,w,h); ctxSt.fillStyle="#060912"; ctxSt.fillRect(0,0,w,h);
+    for(var i=0;i<starStars.length;i++){ var s=starStars[i];
+      ctxSt.globalAlpha=0.4+0.6*Math.abs(Math.sin(t+s.p)); ctxSt.fillStyle="#cdd8ff";
+      ctxSt.beginPath(); ctxSt.arc(s.x*w,s.y*h,s.r,0,6.283); ctxSt.fill(); }
+    ctxSt.globalAlpha=1;
+    var m=+massSlider.value, f=fate(m);
+    var n=f.stages.length, gap=w/(n+1);
+    for(var k=0;k<n;k++){
+      var x=gap*(k+1), y=h*0.5;
+      var base=14+ (k*4);
+      var rad=base;
+      var col="#ffcf6b";
+      var label=f.stages[k];
+      if(label.indexOf("Nebula")>=0 && k===0){ col="#8fbcff"; rad=26+Math.sin(t*1.5+k)*3; }
+      else if(label.indexOf("Main")>=0){ col="#fff3c9"; rad=16; }
+      else if(label.indexOf("Red")>=0){ col="#ff8a5c"; rad=30+Math.sin(t*1.2)*3; }
+      else if(label.indexOf("Supernova")>=0){ col="#fff"; rad=20+Math.abs(Math.sin(t*3))*14; }
+      else if(label.indexOf("Planetary")>=0){ col="#8fe0ff"; rad=24; }
+      else if(label.indexOf("White")>=0){ col="#dfe9ff"; rad=8; }
+      else if(label.indexOf("Neutron")>=0){ col="#a8d8ff"; rad=6; }
+      else if(label.indexOf("Black")>=0){ col="#000"; rad=12; }
+      // glow
+      var g=ctxSt.createRadialGradient(x,y,1,x,y,rad+18);
+      g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)");
+      ctxSt.fillStyle=g; ctxSt.beginPath(); ctxSt.arc(x,y,rad+18,0,6.283); ctxSt.fill();
+      ctxSt.fillStyle=col; ctxSt.beginPath(); ctxSt.arc(x,y,rad,0,6.283); ctxSt.fill();
+      if(label.indexOf("Black")>=0){ // accretion ring
+        ctxSt.strokeStyle="#7c6bff"; ctxSt.lineWidth=3;
+        ctxSt.beginPath(); ctxSt.arc(x,y,rad+6,0,6.283); ctxSt.stroke();
+      }
+      // arrow
+      if(k<n-1){ ctxSt.strokeStyle="rgba(147,160,196,.7)"; ctxSt.lineWidth=2;
+        ctxSt.beginPath(); ctxSt.moveTo(x+rad+8,y); ctxSt.lineTo(x+gap-rad-8,y); ctxSt.stroke();
+        ctxSt.beginPath(); ctxSt.moveTo(x+gap-rad-8,y); ctxSt.lineTo(x+gap-rad-14,y-5); ctxSt.lineTo(x+gap-rad-14,y+5); ctxSt.closePath(); ctxSt.fillStyle="rgba(147,160,196,.7)"; ctxSt.fill();
+      }
+      ctxSt.fillStyle="#cdd8ff"; ctxSt.font="11px system-ui,sans-serif"; ctxSt.textAlign="center";
+      ctxSt.fillText(label, x, h-14);
+    }
+  }
+  function updateStar(){
+    var m=+massSlider.value, f=fate(m);
+    byId("massVal").textContent=m;
+    byId("starCaption").innerHTML="<b>Fate: "+f.end+"</b><br>"+f.cap;
+    stageRow.innerHTML="";
+    f.stages.forEach(function(st){
+      var d=document.createElement("div"); d.className="stage on"; d.textContent=st; stageRow.appendChild(d);
+    });
+  }
+  massSlider.addEventListener("input", updateStar);
+  updateStar();
+
+  /* ---------- HUBBLE ---------- */
+  var cvH=byId("cvHubble"), ctxH=cvH.getContext("2d");
+  var H0=70; // km/s/Mpc
+  var C=299792; // km/s
+  var distSlider=byId("distSlider");
+  var galaxies=[], hubblePlaying=true, expand=1;
+  (function initGal(){ for(var i=0;i<26;i++){ var ang=Math.random()*6.283; var d=0.12+Math.random()*0.85;
+    galaxies.push({ang:ang,d:d,rot:Math.random()*6.28,sz:4+Math.random()*7,hue:Math.random()}); } })();
+  function drawHubble(){
+    var w=cvH.width,h=cvH.height,cx=w/2,cy=h/2;
+    ctxH.clearRect(0,0,w,h); ctxH.fillStyle="#060912"; ctxH.fillRect(0,0,w,h);
+    var maxR=Math.min(w,h)*0.46;
+    // observer at center
+    var og=ctxH.createRadialGradient(cx,cy,1,cx,cy,16);
+    og.addColorStop(0,"#ffcf6b"); og.addColorStop(1,"rgba(255,207,107,0)");
+    ctxH.fillStyle=og; ctxH.beginPath(); ctxH.arc(cx,cy,16,0,6.283); ctxH.fill();
+    for(var i=0;i<galaxies.length;i++){ var gx=galaxies[i];
+      var r=gx.d*expand*maxR;
+      if(r>maxR*1.15){ continue; }
+      var x=cx+Math.cos(gx.ang)*r, y=cy+Math.sin(gx.ang)*r;
+      // redshift tint: farther -> redder
+      var frac=Math.min(1, r/maxR);
+      var red=Math.round(150+105*frac), blue=Math.round(230-150*frac);
+      ctxH.fillStyle="rgba("+red+",150,"+blue+",0.95)";
+      ctxH.save(); ctxH.translate(x,y); ctxH.rotate(gx.rot);
+      ctxH.beginPath(); ctxH.ellipse(0,0,gx.sz,gx.sz*0.5,0,0,6.283); ctxH.fill();
+      ctxH.restore();
+    }
+    // ring showing selected distance
+    ctxH.strokeStyle="rgba(124,196,255,.35)"; ctxH.setLineDash([5,5]);
+    var selR=(+distSlider.value/600)*maxR*0.95;
+    ctxH.beginPath(); ctxH.arc(cx,cy,selR,0,6.283); ctxH.stroke(); ctxH.setLineDash([]);
+    ctxH.fillStyle="#93a0c4"; ctxH.font="11px system-ui,sans-serif"; ctxH.textAlign="center";
+    ctxH.fillText("you (observer)", cx, cy+30);
+  }
+  function updateHubble(){
+    var d=+distSlider.value; var v=H0*d;
+    byId("distVal").textContent=d;
+    byId("hubbleVel").textContent=v.toLocaleString("en-US")+" km/s";
+    byId("hubbleFrac").textContent=(v/C*100).toFixed(1)+"% of c";
+  }
+  distSlider.addEventListener("input", updateHubble);
+  byId("hubblePlay").addEventListener("click", function(){
+    hubblePlaying=!hubblePlaying; this.textContent=hubblePlaying?"Pause":"Play";
+  });
+  byId("hubbleReset").addEventListener("click", function(){ expand=1; });
+  updateHubble();
+
+  /* ---------- QUIZ ---------- */
+  var quiz=[
+    {q:"1 parsec is approximately equal to:",
+     opts:["1 light-year","3.26 light-years","1 AU","1 million km"], a:1,
+     e:"A parsec ≈ 3.26 light-years ≈ 3.086 × 10¹³ km."},
+    {q:"According to Hubble's law (v = H₀d), a galaxy twice as far away recedes:",
+     opts:["at the same speed","half as fast","twice as fast","not at all"], a:2,
+     e:"Velocity is proportional to distance, so doubling d doubles v."},
+    {q:"A star far more massive than the Sun (> 25 M☉) is most likely to end as a:",
+     opts:["White dwarf","Planet","Black hole","Comet"], a:2,
+     e:"Very massive stars supernova and their cores collapse into black holes."}
+  ];
+  var quizEl=byId("quiz");
+  quiz.forEach(function(item, qi){
+    var box=document.createElement("div"); box.className="q";
+    var p=document.createElement("p"); p.textContent=item.q; box.appendChild(p);
+    var expl=document.createElement("div"); expl.className="expl"; expl.textContent="Explanation: "+item.e;
+    item.opts.forEach(function(opt, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        var btns=box.querySelectorAll(".opt");
+        btns.forEach(function(x){ x.disabled=true; });
+        if(oi===item.a){ b.classList.add("correct"); }
+        else { b.classList.add("wrong"); btns[item.a].classList.add("correct"); }
+        expl.classList.add("show");
+      });
+      box.appendChild(b);
+    });
+    box.appendChild(expl);
+    quizEl.appendChild(box);
+  });
+
+  /* ---------- ANIMATION LOOP ---------- */
+  function loop(){
+    if(running){
+      drawScale(); drawStar(); drawHubble();
+      if(hubblePlaying){ expand+=0.0016; if(expand>1.9) expand=1; }
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

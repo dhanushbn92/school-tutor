@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communication Systems Lab — NIOS Class 12 Physics (Ch 26)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#181e2c;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#4fd0c8;
+    --accent-soft:rgba(79,208,200,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 6px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:10px 0 6px}
+  .panel p.note{color:var(--muted);font-size:.88rem;margin-top:8px}
+
+  .view{display:none}
+  .view.active{display:block}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;touch-action:manipulation}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:12px 0 4px}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:.82rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:16px;height:4px;border-radius:2px;display:inline-block}
+
+  .blocks{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin-top:6px}
+  .block{flex:1 1 120px;min-width:110px;min-height:64px;border:1px solid var(--line);
+    border-radius:12px;background:var(--panel2);color:var(--ink);cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:8px 6px;font-weight:600;font-size:.88rem;transition:all .15s;touch-action:manipulation}
+  .block .sub{font-size:.72rem;color:var(--muted);font-weight:500;margin-top:3px}
+  .block.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .block.sel .sub{color:var(--accent)}
+  .arrow{align-self:center;color:var(--muted);font-size:1.2rem}
+  .desc{margin-top:12px;padding:12px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;font-size:.9rem;min-height:52px}
+  .desc b{color:var(--accent)}
+
+  .bands{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .band{flex:1 1 80px;min-width:70px;min-height:52px;border:1px solid var(--line);border-radius:10px;
+    cursor:pointer;color:#0d1017;font-weight:700;font-size:.82rem;display:flex;align-items:center;
+    justify-content:center;transition:transform .12s;touch-action:manipulation}
+  .band:active{transform:scale(.97)}
+  .band.sel{outline:3px solid var(--ink);outline-offset:-3px}
+  .specinfo{margin-top:12px;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;font-size:.9rem}
+  .specinfo table{width:100%;border-collapse:collapse;margin-top:6px}
+  .specinfo td{padding:4px 6px;border-bottom:1px solid var(--line);font-size:.87rem}
+  .specinfo td:first-child{color:var(--muted);width:42%}
+
+  .facts{font-size:.9rem}
+  .facts .row{padding:9px 0;border-bottom:1px solid var(--line)}
+  .facts .row:last-child{border-bottom:none}
+  .facts b{color:var(--accent)}
+  .facts code{background:var(--panel2);padding:2px 7px;border-radius:6px;font-size:.9em;color:var(--ink)}
+
+  .q{margin-bottom:14px}
+  .q p.stem{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:11px 12px;margin-bottom:7px;cursor:pointer;
+    font-size:.9rem;touch-action:manipulation;transition:all .12s}
+  .opt:active{transform:scale(.995)}
+  .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:4px;display:none}
+  .expl.show{display:block}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;padding:10px 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Communication</span> Systems Lab</h1>
+    <p>NIOS Class 12 Physics · Chapter 26 · AM/FM · block diagram · EM spectrum</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="mod">Modulation</button>
+    <button class="tab-btn" data-view="block">Block Diagram</button>
+    <button class="tab-btn" data-view="spec">EM Spectrum</button>
+    <button class="tab-btn" data-view="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===== MODULATION ===== -->
+  <section class="view active" id="view-mod">
+    <div class="panel">
+      <h2>AM vs FM — live waveforms</h2>
+      <canvas id="modCanvas" width="900" height="440"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#8fb7ff"></i> Message (audio) signal</span>
+        <span><i class="swatch" style="background:#98a3bd"></i> Carrier wave</span>
+        <span><i class="swatch" style="background:#4fd0c8"></i> AM output</span>
+        <span><i class="swatch" style="background:#ffb454"></i> FM output</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Carrier frequency f<sub>c</sub>: <output id="fcOut">12</output> (rel. units)</label>
+          <input type="range" id="fc" min="6" max="26" step="1" value="12">
+        </div>
+        <div class="ctrl">
+          <label>Modulation index m<sub>a</sub>: <output id="miOut">0.7</output></label>
+          <input type="range" id="mi" min="0" max="1" step="0.05" value="0.7">
+        </div>
+        <div class="ctrl">
+          <label>Message frequency f<sub>m</sub>: <output id="fmOut">1.5</output> (rel. units)</label>
+          <input type="range" id="fm" min="1" max="4" step="0.5" value="1.5">
+        </div>
+      </div>
+      <p class="note">In <b>AM</b> the carrier <b>amplitude</b> tracks the message (envelope, dashed). In <b>FM</b>
+      the carrier <b>frequency</b> tracks the message — amplitude stays constant, so FM resists amplitude noise better.
+      Over-modulation (m<sub>a</sub>&gt;1) distorts AM.</p>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK DIAGRAM ===== -->
+  <section class="view" id="view-block">
+    <div class="panel">
+      <h2>Transmitter → Channel → Receiver</h2>
+      <p class="note" style="margin-top:0">Tap any block to read what it does.</p>
+      <div class="blocks" id="txChain"></div>
+      <div class="arrow" style="text-align:center;margin:6px 0">↓ channel (free space / cable) ↓</div>
+      <div class="blocks" id="rxChain"></div>
+      <div class="desc" id="blockDesc">Select a block above to see its function.</div>
+    </div>
+  </section>
+
+  <!-- ===== EM SPECTRUM ===== -->
+  <section class="view" id="view-spec">
+    <div class="panel">
+      <h2>EM spectrum band picker</h2>
+      <p class="note" style="margin-top:0">All EM waves travel at c ≈ 3×10⁸ m/s. Tap a band.</p>
+      <div class="bands" id="bandRow"></div>
+      <div class="specinfo" id="specInfo"></div>
+      <h3>Wave propagation modes</h3>
+      <div class="facts">
+        <div class="row"><b>Ground (surface) wave</b> — follows Earth's curvature; used below ~2 MHz (AM broadcast, local range).</div>
+        <div class="row"><b>Sky wave</b> — reflected by the ionosphere; ~3–30 MHz (short-wave), enables long-distance HF radio.</div>
+        <div class="row"><b>Space (line-of-sight) wave</b> — travels straight; above ~30 MHz (TV, FM, satellite), needs tall antennas or relays.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FACTS & QUIZ ===== -->
+  <section class="view" id="view-facts">
+    <div class="panel">
+      <h2>Key facts &amp; formulas</h2>
+      <div class="facts">
+        <div class="row"><b>Wave speed:</b> <code>c = f λ</code> — c = 3×10⁸ m/s; f in Hz, λ in metres.</div>
+        <div class="row"><b>Modulation index (AM):</b> <code>m<sub>a</sub> = A<sub>m</sub> / A<sub>c</sub></code>; keep m<sub>a</sub> ≤ 1 to avoid distortion.</div>
+        <div class="row"><b>AM signal:</b> carrier amplitude varies with the message; three components — carrier + two sidebands.</div>
+        <div class="row"><b>AM bandwidth:</b> <code>BW = 2 f<sub>m</sub></code> (f<sub>m</sub> = highest message frequency).</div>
+        <div class="row"><b>FM signal:</b> carrier frequency varies with the message; constant amplitude → better noise immunity, wider bandwidth.</div>
+        <div class="row"><b>Modulation:</b> impressing a low-frequency message onto a high-frequency carrier for efficient antenna radiation and transmission.</div>
+        <div class="row"><b>Antenna size:</b> ~ λ/4; high carrier frequency ⇒ short λ ⇒ practical antenna.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Quick quiz (tap an answer)</h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Self-contained interactive demo · relative units used for waveform clarity.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tabs ---------- */
+  var tabs = document.querySelectorAll('.tab-btn');
+  var views = {mod:'view-mod', block:'view-block', spec:'view-spec', facts:'view-facts'};
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      Object.keys(views).forEach(function(k){
+        document.getElementById(views[k]).classList.toggle('active', k===t.dataset.view);
+      });
+    });
+  });
+
+  /* ---------- Modulation canvas ---------- */
+  var cv = document.getElementById('modCanvas');
+  var ctx = cv.getContext('2d');
+  var fcEl=document.getElementById('fc'), miEl=document.getElementById('mi'), fmEl=document.getElementById('fm');
+  var fcOut=document.getElementById('fcOut'), miOut=document.getElementById('miOut'), fmOut=document.getElementById('fmOut');
+
+  function sync(){ fcOut.textContent=fcEl.value; miOut.textContent=parseFloat(miEl.value).toFixed(2); fmOut.textContent=parseFloat(fmEl.value).toFixed(1); }
+  [fcEl,miEl,fmEl].forEach(function(e){e.addEventListener('input',sync);});
+  sync();
+
+  var phase = 0;
+  function drawMod(){
+    var W=cv.width, H=cv.height;
+    var fc=parseFloat(fcEl.value), ma=parseFloat(miEl.value), fm=parseFloat(fmEl.value);
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#212a3d'; ctx.fillRect(0,0,W,H);
+
+    var lanes=4, lh=H/lanes;
+    var labels=['Message','Carrier','AM output','FM output'];
+    var colors=['#8fb7ff','#98a3bd','#4fd0c8','#ffb454'];
+
+    // grid + baselines
+    ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1;
+    for(var i=0;i<lanes;i++){
+      var mid=lh*i+lh/2;
+      ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(W,mid); ctx.stroke();
+    }
+
+    var TWO=Math.PI*2;
+    var amp=lh*0.34;
+    // integral of message for FM: message = cos(2pi fm t) -> integral ~ sin/ (2pi fm)
+    for(var lane=0;lane<lanes;lane++){
+      var mid=lh*lane+lh/2;
+      ctx.strokeStyle=colors[lane]; ctx.lineWidth=2; ctx.beginPath();
+      for(var x=0;x<=W;x++){
+        var t=x/W;                       // 0..1 across screen
+        var msg=Math.cos(TWO*fm*t + phase*fm);   // message signal
+        var car=Math.cos(TWO*fc*t + phase*fc);   // carrier
+        var y;
+        if(lane===0){ y=mid - amp*msg; }
+        else if(lane===1){ y=mid - amp*car; }
+        else if(lane===2){ // AM: (1 + ma*msg)*carrier
+          var env=(1+ma*msg);
+          y=mid - amp*0.62*env*car;
+        } else { // FM: constant amp, phase varies with integral of msg
+          var beta=fc*0.9; // freq deviation scale
+          var fmPhase=TWO*fc*t + phase*fc + (ma*4.0)*Math.sin(TWO*fm*t + phase*fm);
+          y=mid - amp*Math.cos(fmPhase);
+        }
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      // AM envelope (dashed)
+      if(lane===2){
+        ctx.save();
+        ctx.setLineDash([5,5]); ctx.strokeStyle='rgba(143,183,255,.75)'; ctx.lineWidth=1.4;
+        for(var s=0;s<2;s++){
+          ctx.beginPath();
+          for(var xx=0;xx<=W;xx++){
+            var tt=xx/W; var mm=Math.cos(TWO*fm*tt+phase*fm);
+            var ee=(1+ma*mm); var yy=mid - (s===0?1:-1)*amp*0.62*ee;
+            if(xx===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // label
+      ctx.fillStyle=colors[lane]; ctx.font='600 13px system-ui,Arial';
+      ctx.fillText(labels[lane], 8, lh*lane+16);
+    }
+  }
+
+  /* ---------- Animation loop with pause on hidden ---------- */
+  var running=true;
+  function loop(){
+    if(!document.hidden){
+      phase += 0.02;
+      if(document.getElementById('view-mod').classList.contains('active')) drawMod();
+    }
+    requestAnimationFrame(loop);
+  }
+  // resize canvas backing store to be crisp
+  function fit(){
+    var w=cv.clientWidth||900;
+    cv.width=Math.max(320,Math.round(w));
+    cv.height=Math.round(Math.min(460, Math.max(360, w*0.5)));
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  requestAnimationFrame(loop);
+
+  /* ---------- Block diagram ---------- */
+  var tx=[
+    {n:'Message source',s:'audio / data',d:'Produces the <b>information signal</b> — e.g. voice or music. It is a low-frequency (baseband) signal that cannot be radiated efficiently on its own.'},
+    {n:'Transducer',s:'mic → electrical',d:'Converts sound (or other input) into an <b>electrical signal</b> that the electronic circuits can process.'},
+    {n:'Modulator',s:'+ carrier',d:'Combines the message with a high-frequency <b>carrier</b> (AM or FM). This shifts the signal to a band suitable for radiation and lets many stations share the spectrum.'},
+    {n:'Transmitter + antenna',s:'radiate',d:'Amplifies the modulated signal and the <b>antenna</b> converts it into electromagnetic waves launched into the channel. Antenna length ≈ λ/4.'}
+  ];
+  var rx=[
+    {n:'Receiving antenna',s:'pick up',d:'Intercepts a tiny fraction of the transmitted EM wave and converts it back to a weak electrical signal.'},
+    {n:'Amplifier / tuner',s:'select station',d:'Selects (tunes to) the wanted carrier frequency and <b>amplifies</b> the very weak received signal.'},
+    {n:'Demodulator',s:'recover msg',d:'<b>Detects / demodulates</b> the signal — separates the original message from the carrier (the reverse of modulation).'},
+    {n:'Output transducer',s:'speaker',d:'Converts the recovered electrical signal back into sound (loudspeaker) or the original form for the user.'}
+  ];
+  function buildChain(arr, container){
+    container.innerHTML='';
+    arr.forEach(function(b,i){
+      var el=document.createElement('div'); el.className='block';
+      el.innerHTML='<div>'+b.n+'</div><div class="sub">'+b.s+'</div>';
+      el.addEventListener('click', function(){
+        document.querySelectorAll('.block').forEach(function(x){x.classList.remove('sel');});
+        el.classList.add('sel');
+        document.getElementById('blockDesc').innerHTML='<b>'+b.n+':</b> '+b.d;
+      });
+      container.appendChild(el);
+      if(i<arr.length-1){ var a=document.createElement('div'); a.className='arrow'; a.textContent='→'; container.appendChild(a); }
+    });
+  }
+  buildChain(tx, document.getElementById('txChain'));
+  buildChain(rx, document.getElementById('rxChain'));
+
+  /* ---------- EM spectrum ---------- */
+  var bands=[
+    {n:'Radio',c:'#ff7b7b',wl:'>1 m',f:'<300 MHz',use:'AM/FM broadcast, TV, mobile — sky & ground wave communication.'},
+    {n:'Microwave',c:'#ffb454',wl:'1 m – 1 mm',f:'300 MHz – 300 GHz',use:'Satellite links, radar, Wi-Fi, mobile, microwave ovens.'},
+    {n:'Infrared',c:'#f4d35e',wl:'1 mm – 700 nm',f:'300 GHz – 430 THz',use:'Remote controls, optical fibre, thermal imaging, night vision.'},
+    {n:'Visible',c:'#8ce99a',wl:'700 – 400 nm',f:'430 – 750 THz',use:'Human sight, optical fibre communication, photography.'},
+    {n:'Ultraviolet',c:'#74c0fc',wl:'400 – 10 nm',f:'750 THz – 30 PHz',use:'Sterilisation, fluorescence; mostly absorbed by ozone.'},
+    {n:'X-ray',c:'#b197fc',wl:'10 – 0.01 nm',f:'30 PHz – 30 EHz',use:'Medical imaging, security scanning, crystallography.'},
+    {n:'Gamma',c:'#ffa8d9',wl:'<0.01 nm',f:'>30 EHz',use:'Cancer therapy, sterilising equipment; from nuclei & space.'}
+  ];
+  var bandRow=document.getElementById('bandRow'), specInfo=document.getElementById('specInfo');
+  function selBand(idx){
+    var b=bands[idx];
+    document.querySelectorAll('.band').forEach(function(x,i){x.classList.toggle('sel', i===idx);});
+    specInfo.innerHTML='<b style="color:'+b.c+'">'+b.n+' waves</b>'+
+      '<table><tr><td>Wavelength (λ)</td><td>'+b.wl+'</td></tr>'+
+      '<tr><td>Frequency (f)</td><td>'+b.f+'</td></tr>'+
+      '<tr><td>Typical use</td><td>'+b.use+'</td></tr></table>'+
+      '<p class="note" style="margin-top:8px">λ decreases (energy increases) from radio → gamma; c = f λ holds throughout.</p>';
+  }
+  bands.forEach(function(b,i){
+    var el=document.createElement('div'); el.className='band'; el.style.background=b.c; el.textContent=b.n;
+    el.addEventListener('click', function(){ selBand(i); });
+    bandRow.appendChild(el);
+  });
+  selBand(0);
+
+  /* ---------- Quiz ---------- */
+  var quiz=[
+    {q:'In amplitude modulation (AM), what property of the carrier changes with the message?',
+     opts:['Its frequency','Its amplitude','Its speed','Its wavelength only'],a:1,
+     e:'AM varies the carrier amplitude; the frequency stays fixed.'},
+    {q:'Why is FM generally more resistant to noise than AM?',
+     opts:['It uses lower frequencies','Information is in the amplitude','Information is in the frequency, and amplitude noise can be clipped','It needs no carrier'],a:2,
+     e:'FM carries info in frequency; amplitude disturbances (noise) can be limited out.'},
+    {q:'Using c = f λ, an FM station at 100 MHz has a wavelength of about:',
+     opts:['3 m','30 m','0.3 m','300 m'],a:0,
+     e:'λ = c/f = 3×10⁸ / 1×10⁸ = 3 m.'}
+  ];
+  var qc=document.getElementById('quiz');
+  quiz.forEach(function(item,qi){
+    var wrap=document.createElement('div'); wrap.className='q';
+    var stem=document.createElement('p'); stem.className='stem'; stem.textContent=(qi+1)+'. '+item.q; wrap.appendChild(stem);
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.addEventListener('click', function(){
+        if(answered) return; answered=true;
+        var btns=wrap.querySelectorAll('.opt');
+        btns.forEach(function(x,xi){ if(xi===item.a) x.classList.add('correct'); });
+        if(oi!==item.a) b.classList.add('wrong');
+        wrap.querySelector('.expl').classList.add('show');
+      });
+      wrap.appendChild(b);
+    });
+    var ex=document.createElement('div'); ex.className='expl'; ex.textContent='✓ '+item.e; wrap.appendChild(ex);
+    qc.appendChild(wrap);
+  });
+
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) fit(); });
+})();
+</script>
+</body>
+</html>
