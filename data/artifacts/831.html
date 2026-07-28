@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tissues Lab - NIOS Class 12 Biology (Ch 5)</title>
+<style>
+  :root{
+    --accent:#5bd6a6;
+    --accent-dark:#37b184;
+    --bg:#101821;
+    --bg2:#16212d;
+    --panel:#1b2836;
+    --panel2:#223142;
+    --ink:#e7eef6;
+    --muted:#93a4b7;
+    --line:#2c3d50;
+    --good:#4fd18b;
+    --bad:#ef7a7a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2735,#101821);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);border:2px solid transparent;
+    padding:11px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08201a;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.06rem;margin:2px 0 10px;}
+  h3{font-size:.98rem;margin:0 0 8px;}
+  .lead{color:var(--muted);font-size:.86rem;margin:0 0 12px;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .chip{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    padding:8px 13px;border-radius:999px;font-size:.83rem;font-weight:600;cursor:pointer;transition:.15s;}
+  .chip:hover{border-color:var(--accent);}
+  .chip.on{background:var(--accent);color:#08201a;border-color:var(--accent-dark);}
+  .subhead{color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;
+    font-weight:700;margin:6px 4px 4px;width:100%;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .diagram{flex:1 1 320px;min-width:280px;background:var(--bg2);border-radius:14px;
+    padding:10px;border:1px solid var(--line);}
+  .info{flex:1 1 300px;min-width:260px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .info-card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .info-card h3{color:var(--accent);}
+  .info-card .row{margin:8px 0;font-size:.87rem;}
+  .info-card .row b{color:var(--ink);}
+  .info-card .row span{color:var(--muted);}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;
+    background:rgba(91,214,166,.16);color:var(--accent);margin-bottom:6px;}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:10px;}
+  .facts{background:var(--panel2);border-left:3px solid var(--accent);border-radius:10px;
+    padding:12px 14px;margin-top:14px;font-size:.85rem;}
+  .facts b{color:var(--accent);}
+  button.btn{background:var(--accent);color:#08201a;border:none;padding:9px 16px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.87rem;transition:.15s;}
+  button.btn:hover{background:var(--accent-dark);}
+  button.btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  /* levels */
+  .levels{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;}
+  .lvl{flex:1 1 150px;min-width:140px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:14px;padding:12px;cursor:pointer;transition:.15s;text-align:center;}
+  .lvl:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .lvl.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(91,214,166,.3);}
+  .lvl .n{font-size:.72rem;color:var(--accent);font-weight:700;}
+  .lvl .t{font-weight:700;margin:4px 0;font-size:.95rem;}
+  .lvl .e{color:var(--muted);font-size:.78rem;}
+  .arrowline{text-align:center;color:var(--muted);font-size:.8rem;margin:6px 0;}
+  /* match game */
+  .game{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 240px;min-width:220px;}
+  .item{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;
+    margin-bottom:8px;font-size:.85rem;cursor:pointer;transition:.15s;}
+  .item:hover{border-color:var(--accent);}
+  .item.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(91,214,166,.3);}
+  .item.done{opacity:.45;cursor:default;border-color:var(--good);}
+  .item.wrong{border-color:var(--bad);animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .score{font-weight:700;color:var(--accent);}
+  /* quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+  .q p{margin:0 0 10px;font-weight:600;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:10px 12px;border-radius:9px;margin-bottom:7px;cursor:pointer;
+    font-size:.85rem;transition:.15s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(79,209,139,.18);border-color:var(--good);}
+  .opt.incorrect{background:rgba(239,122,122,.16);border-color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none;}
+  .expl.show{display:block;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{opacity:.82;}
+  .hot.sel{stroke:#fff;stroke-width:2.4;stroke-dasharray:5 3;}
+  .lbl{font-size:11px;fill:var(--muted);font-weight:600;}
+  @media(max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Tissues Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 5: Tissues &amp; other Levels of Organization</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="plant" role="tab">Plant Tissues</div>
+    <div class="tab" data-tab="animal" role="tab">Animal Tissues</div>
+    <div class="tab" data-tab="levels" role="tab">Levels &amp; Game</div>
+    <div class="tab" data-tab="quiz" role="tab">Quiz</div>
+  </div>
+
+  <!-- ===================== PLANT ===================== -->
+  <section class="panel" id="tab-plant">
+    <h2>Plant Tissues</h2>
+    <p class="lead">Tap a tissue type, then click a labelled region in the diagram to read its structure, function and location.</p>
+    <div class="chips" id="plantChips"></div>
+    <div class="stage">
+      <div class="diagram"><div id="plantSvg"></div></div>
+      <div class="info">
+        <div class="info-card" id="plantInfo"></div>
+        <div class="facts" id="plantFact"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ANIMAL ===================== -->
+  <section class="panel hidden" id="tab-animal">
+    <h2>Animal Tissues</h2>
+    <p class="lead">Choose a category, then a tissue to see its labelled diagram, function and location.</p>
+    <div class="chips" id="animalChips"></div>
+    <div class="stage">
+      <div class="diagram"><div id="animalSvg"></div></div>
+      <div class="info">
+        <div class="info-card" id="animalInfo"></div>
+        <div class="facts" id="animalFact"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEVELS + GAME ===================== -->
+  <section class="panel hidden" id="tab-levels">
+    <h2>Levels of Organization</h2>
+    <p class="lead">Life is organised in a hierarchy. Tap each level for an example.</p>
+    <div class="levels" id="levelRow"></div>
+    <div class="arrowline">cell &rarr; tissue &rarr; organ &rarr; organ system &rarr; organism</div>
+    <div class="info-card" id="levelInfo" style="margin-top:12px;"></div>
+
+    <h2 style="margin-top:22px;">Match Tissue &rarr; Function</h2>
+    <p class="lead">Tap a tissue on the left, then its correct function on the right. <span class="score" id="matchScore">0 / 6</span></p>
+    <div class="game">
+      <div class="col" id="matchLeft"></div>
+      <div class="col" id="matchRight"></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn ghost" id="matchReset">Reset Game</button>
+      <span id="matchMsg" class="hint"></span>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="panel hidden" id="tab-quiz">
+    <h2>Quick Quiz</h2>
+    <p class="lead">Three questions. Click an option to reveal the answer and explanation.</p>
+    <div id="quizBox"></div>
+    <div class="facts"><b>Score:</b> <span id="quizScore">0 / 3</span></div>
+  </section>
+
+  <p class="hint" style="text-align:center;">Self-contained interactive &middot; no internet required</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- tab switching ---------- */
+var tabs = document.querySelectorAll('.tab');
+tabs.forEach(function(t){
+  t.addEventListener('click', function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    ['plant','animal','levels','quiz'].forEach(function(id){
+      document.getElementById('tab-'+id).classList.toggle('hidden', id!==t.dataset.tab);
+    });
+  });
+});
+
+/* ================= PLANT TISSUES ================= */
+/* Each entry: label, structure, function, location, category */
+var plantData = {
+  apical:{name:'Apical meristem',cat:'Meristematic',
+    structure:'Small, thin-walled, isodiametric cells with dense cytoplasm, large nucleus and no vacuoles; actively dividing.',
+    fn:'Causes primary growth - increase in length of root and shoot.',
+    loc:'Tips of roots and shoots (growing apices).'},
+  lateral:{name:'Lateral meristem',cat:'Meristematic',
+    structure:'Cylinder of dividing cells running along the length of the axis (e.g. cambium, cork cambium).',
+    fn:'Secondary growth - increase in girth/thickness of stems and roots.',
+    loc:'Along the sides of stem and root (vascular cambium, cork cambium).'},
+  intercalary:{name:'Intercalary meristem',cat:'Meristematic',
+    structure:'Meristematic cells left behind by apical meristem, located between mature tissues.',
+    fn:'Helps in elongation/regrowth (e.g. of grass leaves and internodes after grazing/cutting).',
+    loc:'At the base of internodes and leaves, especially in grasses.'},
+  parenchyma:{name:'Parenchyma',cat:'Simple permanent',
+    structure:'Living, thin-walled cells with intercellular spaces; oval/round; large central vacuole.',
+    fn:'Storage of food and water, photosynthesis (chlorenchyma), buoyancy (aerenchyma), healing.',
+    loc:'Cortex, pith, mesophyll of leaves, pulp of fruits.'},
+  collenchyma:{name:'Collenchyma',cat:'Simple permanent',
+    structure:'Living cells with cellulose+pectin thickened corners; elongated, little intercellular space.',
+    fn:'Provides mechanical support with flexibility to young growing parts.',
+    loc:'Below epidermis of dicot stems and leaf stalks (petioles).'},
+  sclerenchyma:{name:'Sclerenchyma',cat:'Simple permanent',
+    structure:'Dead cells with thick, uniformly lignified walls; fibres (long) and sclereids (short, stony).',
+    fn:'Gives rigidity, hardness and mechanical strength.',
+    loc:'Husk of coconut, hard nut shells, vascular bundles, stem.'},
+  xylem:{name:'Xylem',cat:'Complex permanent',
+    structure:'Tracheids, vessels (dead, lignified tubes), xylem parenchyma (living) and xylem fibres.',
+    fn:'Conducts water and minerals upward from root to leaves; also gives support.',
+    loc:'Vascular bundles of root, stem and leaves.'},
+  phloem:{name:'Phloem',cat:'Complex permanent',
+    structure:'Sieve tubes, companion cells, phloem parenchyma and phloem fibres; mostly living.',
+    fn:'Translocates food (sugars) from leaves to all parts (bidirectional).',
+    loc:'Vascular bundles, on the outer side of xylem in stems.'}
+};
+var plantOrder = ['apical','lateral','intercalary','parenchyma','collenchyma','sclerenchyma','xylem','phloem'];
+var plantFacts = {
+  apical:'Root apical meristem is protected by a root cap.',
+  lateral:'Annual rings in wood are produced by the vascular cambium.',
+  intercalary:'This is why a mowed lawn keeps growing back from the base.',
+  parenchyma:'Aerenchyma in aquatic plants stores air and provides buoyancy.',
+  collenchyma:'It is the only supporting tissue that is both living and stretchable.',
+  sclerenchyma:'Jute and flax fibres are commercial sclerenchyma fibres.',
+  xylem:'Water rises in tall trees mainly by transpiration pull through xylem.',
+  phloem:'Only phloem sieve tubes have companion cells to keep them alive.'
+};
+
+/* build a schematic plant-stem cross-section SVG with clickable zones */
+function buildPlantSvg(){
+  return ''
+  +'<svg viewBox="0 0 340 300" role="img" aria-label="Plant tissues diagram">'
+  +'<defs></defs>'
+  +'<text x="170" y="16" text-anchor="middle" class="lbl" style="fill:#e7eef6;font-size:12px;">Young dicot stem (schematic)</text>'
+  /* shoot tip with apical meristem */
+  +'<g id="p-apical" class="hot"><path d="M170 30 L150 60 L190 60 Z" fill="#8fd694" stroke="#37b184"/>'
+  +'<circle cx="170" cy="46" r="6" fill="#37b184"/></g>'
+  +'<text x="205" y="46" class="lbl">apical</text>'
+  /* intercalary at node */
+  +'<g id="p-intercalary" class="hot"><rect x="160" y="60" width="20" height="10" rx="2" fill="#c8e6a0" stroke="#8ab84f"/></g>'
+  +'<text x="185" y="70" class="lbl">intercalary</text>'
+  /* stem outer ring: cross-section circle */
+  +'<circle cx="150" cy="180" r="95" fill="#12303a" stroke="#2c3d50"/>'
+  /* epidermis / collenchyma just under */
+  +'<g id="p-collenchyma" class="hot"><circle cx="150" cy="180" r="88" fill="none" stroke="#e0b060" stroke-width="9"/></g>'
+  +'<text x="150" y="98" text-anchor="middle" class="lbl">collenchyma</text>'
+  /* parenchyma cortex */
+  +'<g id="p-parenchyma" class="hot"><circle cx="150" cy="180" r="70" fill="#3a5a4c" stroke="#4fd18b"/></g>'
+  +'<text x="150" y="150" text-anchor="middle" class="lbl" style="fill:#cfe;">parenchyma</text>'
+  /* sclerenchyma bundle caps */
+  +'<g id="p-sclerenchyma" class="hot"><circle cx="150" cy="118" r="9" fill="#9a6b3f" stroke="#c98"/>'
+  +'<circle cx="98" cy="205" r="9" fill="#9a6b3f" stroke="#c98"/><circle cx="205" cy="205" r="9" fill="#9a6b3f" stroke="#c98"/></g>'
+  /* lateral meristem (cambium ring) */
+  +'<g id="p-lateral" class="hot"><circle cx="150" cy="180" r="42" fill="none" stroke="#f0d060" stroke-width="4" stroke-dasharray="4 3"/></g>'
+  +'<text x="150" y="230" text-anchor="middle" class="lbl">lateral (cambium)</text>'
+  /* xylem inner */
+  +'<g id="p-xylem" class="hot"><circle cx="150" cy="180" r="30" fill="#6d4b8f" stroke="#b28fd0"/></g>'
+  +'<text x="150" y="184" text-anchor="middle" class="lbl" style="fill:#e6d6f5;">xylem</text>'
+  /* phloem ring between cambium and cortex */
+  +'<g id="p-phloem" class="hot"><circle cx="150" cy="180" r="36" fill="none" stroke="#4fb0d1" stroke-width="6"/></g>'
+  +'</svg>';
+}
+
+/* ================= ANIMAL TISSUES ================= */
+var animalData = {
+  squamous:{name:'Squamous epithelium',cat:'Epithelial',
+    structure:'Single layer of flat, thin, tile-like cells; simple (one layer) or stratified (many).',
+    fn:'Protection and diffusion/filtration across thin surfaces.',
+    loc:'Lining of alveoli, blood vessels, mouth (stratified skin).'},
+  cuboidal:{name:'Cuboidal epithelium',cat:'Epithelial',
+    structure:'Cube-shaped cells as tall as they are wide, with central nucleus.',
+    fn:'Secretion and absorption.',
+    loc:'Kidney tubules, ducts of salivary glands, thyroid follicles.'},
+  columnar:{name:'Columnar epithelium',cat:'Epithelial',
+    structure:'Tall, pillar-like cells with nuclei at the base.',
+    fn:'Absorption and secretion.',
+    loc:'Inner lining of stomach and intestine.'},
+  ciliated:{name:'Ciliated epithelium',cat:'Epithelial',
+    structure:'Columnar/cuboidal cells bearing hair-like cilia on their free surface.',
+    fn:'Movement of mucus, particles or fluid in one direction.',
+    loc:'Respiratory tract (trachea, bronchi), oviducts.'},
+  glandular:{name:'Glandular epithelium',cat:'Epithelial',
+    structure:'Epithelial cells specialised and folded inward to form glands.',
+    fn:'Secretion of enzymes, hormones, mucus, sweat (exocrine/endocrine).',
+    loc:'Salivary glands, sweat glands, gastric glands.'},
+  areolar:{name:'Areolar tissue',cat:'Connective',
+    structure:'Loose matrix with fibroblasts, collagen &amp; elastic fibres, macrophages, mast cells.',
+    fn:'Fills spaces, supports organs, repairs tissues.',
+    loc:'Beneath skin, around blood vessels, nerves and muscles.'},
+  adipose:{name:'Adipose tissue',cat:'Connective',
+    structure:'Cells (adipocytes) filled with fat globules pushing nucleus to the side.',
+    fn:'Stores fat, insulates the body, cushions organs.',
+    loc:'Below skin, around kidneys and heart.'},
+  bone:{name:'Bone',cat:'Connective',
+    structure:'Hard matrix of calcium salts &amp; collagen; osteocytes in lacunae, arranged in Haversian systems.',
+    fn:'Rigid framework, support, protection and muscle attachment.',
+    loc:'Skeleton - limbs, skull, ribs, vertebrae.'},
+  cartilage:{name:'Cartilage',cat:'Connective',
+    structure:'Solid yet flexible matrix (chondrin) with chondrocytes in lacunae.',
+    fn:'Support with flexibility; smooths joint surfaces.',
+    loc:'Nose tip, ear pinna, ends of long bones, trachea rings.'},
+  blood:{name:'Blood',cat:'Connective',
+    structure:'Fluid matrix (plasma) with RBCs, WBCs and platelets.',
+    fn:'Transports gases, nutrients, wastes, hormones; defence &amp; clotting.',
+    loc:'Circulates within heart and blood vessels.'},
+  skeletal:{name:'Skeletal (striated) muscle',cat:'Muscular',
+    structure:'Long, cylindrical, unbranched, multinucleate fibres with light-dark striations.',
+    fn:'Voluntary movement of the body; fast, powerful, tires quickly.',
+    loc:'Attached to bones (biceps, limb muscles).'},
+  smooth:{name:'Smooth (unstriated) muscle',cat:'Muscular',
+    structure:'Spindle-shaped, uninucleate cells without striations.',
+    fn:'Involuntary, slow, sustained contraction (peristalsis).',
+    loc:'Walls of stomach, intestine, blood vessels, urinary bladder.'},
+  cardiac:{name:'Cardiac muscle',cat:'Muscular',
+    structure:'Branched, uninucleate, striated fibres joined by intercalated discs.',
+    fn:'Involuntary rhythmic contraction, never fatigues, pumps blood lifelong.',
+    loc:'Wall of the heart (myocardium) only.'},
+  nervous:{name:'Nervous tissue',cat:'Nervous',
+    structure:'Neurons (cell body, dendrites, long axon) supported by neuroglia.',
+    fn:'Receives stimuli and conducts electrical impulses; controls &amp; coordinates.',
+    loc:'Brain, spinal cord and nerves.'}
+};
+var animalCats = {
+  Epithelial:['squamous','cuboidal','columnar','ciliated','glandular'],
+  Connective:['areolar','adipose','bone','cartilage','blood'],
+  Muscular:['skeletal','smooth','cardiac'],
+  Nervous:['nervous']
+};
+var animalFacts = {
+  squamous:'Alveolar squamous cells are so thin that O2 diffuses across in <1 second.',
+  cuboidal:'Kidney tubule cuboidal cells reabsorb glucose back into blood.',
+  columnar:'Goblet cells among columnar cells secrete protective mucus.',
+  ciliated:'Cilia sweep dust-laden mucus up the windpipe - the mucociliary escalator.',
+  glandular:'Endocrine glands are ductless and pour secretions into blood.',
+  areolar:'It is the most widely distributed connective tissue in the body.',
+  adipose:'Brown adipose tissue in infants generates heat (thermogenesis).',
+  bone:'Bone marrow inside bones makes new blood cells.',
+  cartilage:'Cartilage has no blood vessels; it heals slowly.',
+  blood:'A mammalian RBC has no nucleus, maximising haemoglobin space.',
+  skeletal:'Also called voluntary muscle because it is under conscious control.',
+  smooth:'Peristalsis pushing food along the gut is smooth-muscle action.',
+  cardiac:'Intercalated discs let the whole heart contract as one unit.',
+  nervous:'The longest human axon runs from the spine to the big toe (~1 m).'
+};
+
+/* draw a simple representative SVG for each animal tissue */
+function animalSvg(key){
+  var head='<svg viewBox="0 0 340 220" role="img" aria-label="tissue diagram">'
+    +'<rect x="0" y="0" width="340" height="220" fill="#12212c" rx="10"/>';
+  var end='</svg>';
+  var g={
+    squamous:'<text x="170" y="20" text-anchor="middle" class="lbl">Squamous - flat cells</text>'
+      +'<g class="hot" id="a-cell">'
+      +tile(40,60)+tile(120,55)+tile(205,62)+tile(80,120)+tile(170,115)+tile(250,120)
+      +'</g><text x="170" y="205" text-anchor="middle" class="lbl">thin flat plates with central nucleus</text>',
+    cuboidal:'<text x="170" y="20" text-anchor="middle" class="lbl">Cuboidal - cube cells around a tubule</text>'
+      +'<g class="hot" id="a-cell">'+ring(cube)+'</g>',
+    columnar:'<text x="170" y="20" text-anchor="middle" class="lbl">Columnar - tall pillar cells</text>'
+      +'<g class="hot" id="a-cell">'+cols(false)+'</g>',
+    ciliated:'<text x="170" y="20" text-anchor="middle" class="lbl">Ciliated - cilia on free surface</text>'
+      +'<g class="hot" id="a-cell">'+cols(true)+'</g>',
+    glandular:'<text x="170" y="20" text-anchor="middle" class="lbl">Glandular - infolded secretory cells</text>'
+      +'<g class="hot" id="a-cell"><path d="M40 60 H300 V90 H210 C210 150 130 150 130 90 H40 Z" fill="#4fd18b" stroke="#2d8f63"/>'
+      +'<circle cx="170" cy="150" r="22" fill="#2a6f52" stroke="#4fd18b"/><circle cx="163" cy="145" r="3" fill="#cfe"/>'
+      +'<circle cx="177" cy="152" r="3" fill="#cfe"/></g><text x="170" y="200" text-anchor="middle" class="lbl">secretion droplet</text>',
+    areolar:'<text x="170" y="20" text-anchor="middle" class="lbl">Areolar - loose fibres in matrix</text>'
+      +'<g class="hot" id="a-cell">'+fibres()+'</g>',
+    adipose:'<text x="170" y="20" text-anchor="middle" class="lbl">Adipose - fat-filled cells</text>'
+      +'<g class="hot" id="a-cell">'+fat(70,90)+fat(160,80)+fat(250,95)+fat(115,155)+fat(210,150)+'</g>',
+    bone:'<text x="170" y="20" text-anchor="middle" class="lbl">Bone - Haversian system</text>'
+      +'<g class="hot" id="a-cell"><circle cx="170" cy="120" r="80" fill="#3a4a58" stroke="#7f96ab"/>'
+      +'<circle cx="170" cy="120" r="16" fill="#12212c" stroke="#7f96ab"/>'
+      +ring2(170,120,50)+ring2(170,120,68)+'</g><text x="170" y="212" text-anchor="middle" class="lbl">central canal + lacunae (osteocytes)</text>',
+    cartilage:'<text x="170" y="20" text-anchor="middle" class="lbl">Cartilage - chondrocytes in lacunae</text>'
+      +'<g class="hot" id="a-cell"><rect x="40" y="45" width="260" height="150" rx="14" fill="#274a52" stroke="#6fbccb"/>'
+      +lac(95,90)+lac(190,85)+lac(255,110)+lac(120,150)+lac(220,155)+'</g>',
+    blood:'<text x="170" y="20" text-anchor="middle" class="lbl">Blood - cells in plasma</text>'
+      +'<g class="hot" id="a-cell"><rect x="30" y="40" width="280" height="160" rx="16" fill="#3a1720" stroke="#a24"/>'
+      +rbc(80,90)+rbc(150,130)+rbc(230,95)+rbc(190,170)+rbc(110,165)
+      +'<circle cx="255" cy="150" r="14" fill="#dfe" stroke="#9ab"/><circle cx="255" cy="150" r="6" fill="#7a6fb0"/>'
+      +'<circle cx="120" cy="70" r="4" fill="#fca"/><circle cx="210" cy="60" r="4" fill="#fca"/>'
+      +'</g><text x="170" y="212" text-anchor="middle" class="lbl">RBC (biconcave), WBC, platelets</text>',
+    skeletal:'<text x="170" y="20" text-anchor="middle" class="lbl">Skeletal - long striated fibres</text>'
+      +'<g class="hot" id="a-cell">'+musc(60,true,true)+musc(110,true,true)+musc(160,true,true)+'</g>',
+    smooth:'<text x="170" y="20" text-anchor="middle" class="lbl">Smooth - spindle cells</text>'
+      +'<g class="hot" id="a-cell">'+spindle(60)+spindle(105)+spindle(150)+'</g>',
+    cardiac:'<text x="170" y="20" text-anchor="middle" class="lbl">Cardiac - branched, intercalated discs</text>'
+      +'<g class="hot" id="a-cell"><path d="M40 90 H150 V70 H250 V110 H150 V130 H300" fill="none" stroke="#d98" stroke-width="16"/>'
+      +'<line x1="150" y1="62" x2="150" y2="118" stroke="#8a3" stroke-width="3"/>'
+      +'<line x1="250" y1="62" x2="250" y2="118" stroke="#8a3" stroke-width="3"/>'
+      +'<circle cx="95" cy="90" r="4" fill="#42323a"/><circle cx="200" cy="90" r="4" fill="#42323a"/>'
+      +'</g><text x="170" y="180" text-anchor="middle" class="lbl">green lines = intercalated discs</text>',
+    nervous:'<text x="170" y="20" text-anchor="middle" class="lbl">Neuron</text>'
+      +'<g class="hot" id="a-cell"><circle cx="90" cy="120" r="26" fill="#e0b060" stroke="#a87b2f"/>'
+      +'<circle cx="90" cy="120" r="9" fill="#7a5b1f"/>'
+      +'<line x1="64" y1="100" x2="30" y2="80" stroke="#e0b060" stroke-width="3"/>'
+      +'<line x1="64" y1="140" x2="30" y2="160" stroke="#e0b060" stroke-width="3"/>'
+      +'<line x1="70" y1="150" x2="45" y2="175" stroke="#e0b060" stroke-width="3"/>'
+      +'<rect x="116" y="114" width="150" height="12" rx="6" fill="#e0b060"/>'
+      +'<rect x="150" y="112" width="18" height="16" rx="4" fill="#8fd694"/>'
+      +'<rect x="200" y="112" width="18" height="16" rx="4" fill="#8fd694"/>'
+      +'<path d="M266 120 l16 -10 M266 120 l16 10 M266 120 l18 0" stroke="#e0b060" stroke-width="3" fill="none"/>'
+      +'</g><text x="90" y="176" text-anchor="middle" class="lbl">dendrites + cell body</text>'
+      +'<text x="240" y="150" text-anchor="middle" class="lbl">axon + myelin</text>'
+  };
+  return head+(g[key]||'')+end;
+}
+/* small svg helpers */
+function tile(x,y){return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="34" ry="16" fill="#4fd18b" stroke="#2d8f63"/><circle cx="'+x+'" cy="'+y+'" r="5" fill="#0c3b28"/></g>';}
+function cube(x,y){return '<g><rect x="'+x+'" y="'+y+'" width="34" height="34" fill="#4fd18b" stroke="#2d8f63"/><circle cx="'+(x+17)+'" cy="'+(y+17)+'" r="6" fill="#0c3b28"/></g>';}
+function ring(fn){var s='<circle cx="170" cy="120" r="70" fill="none" stroke="#2c3d50" stroke-width="2"/>';var i;for(i=0;i<8;i++){var a=i/8*Math.PI*2;var x=170+Math.cos(a)*70-17;var y=120+Math.sin(a)*70-17;s+=fn(x,y);}return s;}
+function cols(cilia){var s='',i;for(i=0;i<5;i++){var x=45+i*58;s+='<rect x="'+x+'" y="70" width="42" height="90" rx="6" fill="#4fd18b" stroke="#2d8f63"/><circle cx="'+(x+21)+'" cy="145" r="7" fill="#0c3b28"/>';if(cilia){var j;for(j=0;j<5;j++){var cx=x+6+j*8;s+='<line x1="'+cx+'" y1="70" x2="'+cx+'" y2="52" stroke="#8fd694" stroke-width="2"/>';}}}return s;}
+function fibres(){var s='<rect x="30" y="40" width="280" height="150" rx="12" fill="#2a3f4d" stroke="#4a6"/>';var i;for(i=0;i<7;i++){var y=55+i*18;s+='<path d="M40 '+y+' Q170 '+(y+14)+' 300 '+y+'" stroke="#8fb" stroke-width="1.6" fill="none"/>';}s+='<circle cx="110" cy="90" r="6" fill="#e0b060"/><circle cx="220" cy="140" r="6" fill="#e0b060"/><circle cx="180" cy="80" r="6" fill="#d98"/>';return s;}
+function fat(x,y){return '<g><circle cx="'+x+'" cy="'+y+'" r="30" fill="#f0d060" stroke="#b89020"/><circle cx="'+(x+18)+'" cy="'+(y+18)+'" r="6" fill="#7a5b1f"/></g>';}
+function ring2(cx,cy,r){var s='',i;for(i=0;i<8;i++){var a=i/8*Math.PI*2;s+='<circle cx="'+(cx+Math.cos(a)*r)+'" cy="'+(cy+Math.sin(a)*r)+'" r="4" fill="#12212c" stroke="#bcd"/>';}return s;}
+function lac(x,y){return '<g><ellipse cx="'+x+'" cy="'+y+'" rx="16" ry="12" fill="#12212c" stroke="#6fbccb"/><circle cx="'+x+'" cy="'+y+'" r="5" fill="#8fd694"/></g>';}
+function rbc(x,y){return '<g><circle cx="'+x+'" cy="'+y+'" r="15" fill="#c0392b" stroke="#e35"/><circle cx="'+x+'" cy="'+y+'" r="5" fill="#7a1f18"/></g>';}
+function musc(y,stri,multi){var s='<rect x="30" y="'+y+'" width="280" height="30" rx="6" fill="#d98" stroke="#a65"/>';if(stri){var i;for(i=0;i<18;i++){var x=40+i*15;s+='<line x1="'+x+'" y1="'+y+'" x2="'+x+'" y2="'+(y+30)+'" stroke="#a65" stroke-width="2"/>';}}if(multi){var j;for(j=0;j<4;j++){s+='<circle cx="'+(70+j*70)+'" cy="'+(y+6)+'" r="3.5" fill="#42323a"/>';}}return s;}
+function spindle(y){return '<g><path d="M30 '+(y+12)+' Q170 '+(y-14)+' 310 '+(y+12)+' Q170 '+(y+38)+' 30 '+(y+12)+' Z" fill="#d98" stroke="#a65"/><circle cx="170" cy="'+(y+12)+'" r="5" fill="#42323a"/></g>';}
+
+/* ================= build UI ================= */
+var plantSel=null, animalSel=null, animalCatSel='Epithelial';
+
+function renderPlantChips(){
+  var el=document.getElementById('plantChips');
+  var cats=['Meristematic','Simple permanent','Complex permanent'];
+  var html='';
+  cats.forEach(function(c){
+    html+='<div class="subhead">'+c+'</div>';
+    plantOrder.forEach(function(k){
+      if(plantData[k].cat===c) html+='<div class="chip" data-k="'+k+'">'+plantData[k].name+'</div>';
+    });
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click',function(){selectPlant(c.dataset.k);});
+  });
+}
+function selectPlant(k){
+  plantSel=k;
+  document.querySelectorAll('#plantChips .chip').forEach(function(c){c.classList.toggle('on',c.dataset.k===k);});
+  highlightPlantSvg(k);
+  showPlantInfo(k);
+}
+function highlightPlantSvg(k){
+  document.querySelectorAll('#plantSvg .hot').forEach(function(g){g.classList.toggle('sel',g.id==='p-'+k);});
+}
+function showPlantInfo(k){
+  var d=plantData[k];
+  document.getElementById('plantInfo').innerHTML=
+    '<span class="badge">'+d.cat+'</span><h3>'+d.name+'</h3>'
+    +'<div class="row"><b>Structure:</b> <span>'+d.structure+'</span></div>'
+    +'<div class="row"><b>Function:</b> <span>'+d.fn+'</span></div>'
+    +'<div class="row"><b>Location:</b> <span>'+d.loc+'</span></div>';
+  document.getElementById('plantFact').innerHTML='<b>Did you know?</b> '+plantFacts[k];
+}
+function initPlantSvg(){
+  document.getElementById('plantSvg').innerHTML=buildPlantSvg();
+  document.querySelectorAll('#plantSvg .hot').forEach(function(g){
+    g.addEventListener('click',function(){selectPlant(g.id.slice(2));});
+  });
+}
+
+function renderAnimalChips(){
+  var el=document.getElementById('animalChips');
+  var html='';
+  Object.keys(animalCats).forEach(function(cat){
+    html+='<div class="subhead">'+cat+'</div>';
+    animalCats[cat].forEach(function(k){
+      html+='<div class="chip" data-k="'+k+'">'+animalData[k].name.replace(/ epithelium| tissue| \(.*?\)/,'')+'</div>';
+    });
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click',function(){selectAnimal(c.dataset.k);});
+  });
+}
+function selectAnimal(k){
+  animalSel=k;
+  document.querySelectorAll('#animalChips .chip').forEach(function(c){c.classList.toggle('on',c.dataset.k===k);});
+  document.getElementById('animalSvg').innerHTML=animalSvg(k);
+  var d=animalData[k];
+  document.getElementById('animalInfo').innerHTML=
+    '<span class="badge">'+d.cat+'</span><h3>'+d.name+'</h3>'
+    +'<div class="row"><b>Structure:</b> <span>'+d.structure+'</span></div>'
+    +'<div class="row"><b>Function:</b> <span>'+d.fn+'</span></div>'
+    +'<div class="row"><b>Location:</b> <span>'+d.loc+'</span></div>';
+  document.getElementById('animalFact').innerHTML='<b>Did you know?</b> '+animalFacts[k];
+}
+
+/* ================= LEVELS ================= */
+var levels=[
+  {n:'Level 1',t:'Cell',e:'Basic unit of life. e.g. a nerve cell (neuron).',
+    d:'A cell is the smallest structural and functional unit of life. Example: a single neuron, muscle cell or RBC.'},
+  {n:'Level 2',t:'Tissue',e:'Group of similar cells. e.g. nervous tissue.',
+    d:'A tissue is a group of similar cells performing a common function. Example: nervous tissue made of many neurons + glia.'},
+  {n:'Level 3',t:'Organ',e:'Different tissues together. e.g. brain.',
+    d:'An organ is made of several tissue types working together for a specific job. Example: the brain contains nervous, connective and epithelial tissues.'},
+  {n:'Level 4',t:'Organ system',e:'Organs working together. e.g. nervous system.',
+    d:'An organ system is a group of organs coordinating one major function. Example: the nervous system = brain + spinal cord + nerves.'},
+  {n:'Level 5',t:'Organism',e:'All systems together. e.g. a human being.',
+    d:'An organism is a complete individual formed by all organ systems working together. Example: a human, integrating nervous, digestive, circulatory systems etc.'}
+];
+function renderLevels(){
+  var row=document.getElementById('levelRow');
+  row.innerHTML=levels.map(function(l,i){
+    return '<div class="lvl" data-i="'+i+'"><div class="n">'+l.n+'</div><div class="t">'+l.t+'</div><div class="e">'+l.e+'</div></div>';
+  }).join('');
+  row.querySelectorAll('.lvl').forEach(function(el){
+    el.addEventListener('click',function(){
+      row.querySelectorAll('.lvl').forEach(function(x){x.classList.remove('on');});
+      el.classList.add('on');
+      var l=levels[el.dataset.i];
+      document.getElementById('levelInfo').innerHTML='<h3>'+l.t+'</h3><div class="row"><span>'+l.d+'</span></div>';
+    });
+  });
+  document.getElementById('levelInfo').innerHTML='<span class="row" style="color:var(--muted)">Tap a level above to see its explanation.</span>';
+}
+
+/* ================= MATCH GAME ================= */
+var matchPairs=[
+  {t:'Xylem',f:'Conducts water and minerals upward'},
+  {t:'Phloem',f:'Transports food made in leaves'},
+  {t:'Cardiac muscle',f:'Pumps blood; contracts rhythmically without tiring'},
+  {t:'Adipose tissue',f:'Stores fat and insulates the body'},
+  {t:'Nervous tissue',f:'Conducts electrical impulses'},
+  {t:'Sclerenchyma',f:'Dead cells giving hardness and rigidity'}
+];
+var mLeftSel=null, mDone=0;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function renderMatch(){
+  mLeftSel=null; mDone=0;
+  document.getElementById('matchScore').textContent='0 / '+matchPairs.length;
+  document.getElementById('matchMsg').textContent='';
+  var L=document.getElementById('matchLeft'), R=document.getElementById('matchRight');
+  L.innerHTML='<div class="subhead">Tissue</div>'+matchPairs.map(function(p,i){return '<div class="item" data-i="'+i+'">'+p.t+'</div>';}).join('');
+  var order=shuffle(matchPairs.map(function(p,i){return i;}));
+  R.innerHTML='<div class="subhead">Function</div>'+order.map(function(i){return '<div class="item" data-f="'+i+'">'+matchPairs[i].f+'</div>';}).join('');
+  L.querySelectorAll('.item').forEach(function(el){
+    el.addEventListener('click',function(){
+      if(el.classList.contains('done'))return;
+      L.querySelectorAll('.item').forEach(function(x){x.classList.remove('sel');});
+      el.classList.add('sel'); mLeftSel=+el.dataset.i;
+    });
+  });
+  R.querySelectorAll('.item').forEach(function(el){
+    el.addEventListener('click',function(){
+      if(el.classList.contains('done')||mLeftSel===null)return;
+      if(+el.dataset.f===mLeftSel){
+        el.classList.add('done');
+        L.querySelector('.item[data-i="'+mLeftSel+'"]').classList.add('done');
+        L.querySelector('.item.sel')&&L.querySelector('.item.sel').classList.remove('sel');
+        mLeftSel=null; mDone++;
+        document.getElementById('matchScore').textContent=mDone+' / '+matchPairs.length;
+        document.getElementById('matchMsg').textContent = mDone===matchPairs.length ? 'All matched. Well done!' : 'Correct!';
+      }else{
+        el.classList.add('wrong');
+        document.getElementById('matchMsg').textContent='Not a match - try again.';
+        setTimeout(function(){el.classList.remove('wrong');},350);
+      }
+    });
+  });
+}
+document.getElementById('matchReset').addEventListener('click',renderMatch);
+
+/* ================= QUIZ ================= */
+var quiz=[
+  {q:'Which plant meristem is responsible for increase in the girth (thickness) of a stem?',
+   opts:['Apical meristem','Lateral meristem','Intercalary meristem','Apical + intercalary'],
+   ans:1,expl:'Lateral meristem (vascular & cork cambium) causes secondary growth, adding thickness.'},
+  {q:'Squamous epithelium lining the alveoli is best suited for which function?',
+   opts:['Secretion of enzymes','Rapid diffusion of gases','Movement of mucus','Storage of fat'],
+   ans:1,expl:'Its extremely thin, flat cells allow gases to diffuse quickly across the alveolar wall.'},
+  {q:'Which feature is unique to cardiac muscle?',
+   opts:['Multinucleate fibres','Spindle-shaped cells','Intercalated discs','Non-striated appearance'],
+   ans:2,expl:'Branched, striated cardiac fibres are joined end-to-end by intercalated discs, so the heart contracts as one unit.'}
+];
+var quizScore=0, quizAnswered=[];
+function renderQuiz(){
+  quizScore=0; quizAnswered=[];
+  document.getElementById('quizScore').textContent='0 / '+quiz.length;
+  var box=document.getElementById('quizBox');
+  box.innerHTML=quiz.map(function(q,qi){
+    return '<div class="q"><p>'+(qi+1)+'. '+q.q+'</p>'
+      +q.opts.map(function(o,oi){return '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';}).join('')
+      +'<div class="expl" id="expl-'+qi+'"></div></div>';
+  }).join('');
+  box.querySelectorAll('.opt').forEach(function(b){
+    b.addEventListener('click',function(){
+      var qi=+b.dataset.q, oi=+b.dataset.o;
+      if(quizAnswered[qi])return;
+      quizAnswered[qi]=true;
+      var q=quiz[qi];
+      document.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(x){
+        var xo=+x.dataset.o;
+        if(xo===q.ans)x.classList.add('correct');
+        else if(xo===oi)x.classList.add('incorrect');
+      });
+      if(oi===q.ans)quizScore++;
+      document.getElementById('quizScore').textContent=quizScore+' / '+quiz.length;
+      var e=document.getElementById('expl-'+qi);
+      e.textContent=(oi===q.ans?'Correct. ':'Answer: '+q.opts[q.ans]+'. ')+q.expl;
+      e.classList.add('show');
+    });
+  });
+}
+
+/* ================= init ================= */
+renderPlantChips();
+initPlantSvg();
+selectPlant('parenchyma');
+renderAnimalChips();
+selectAnimal('squamous');
+renderLevels();
+renderMatch();
+renderQuiz();
+</script>
+</body>
+</html>

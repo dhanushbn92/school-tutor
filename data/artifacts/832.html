@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Root System Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --bg:#0e1620; --panel:#16202c; --panel2:#1d2937; --line:#2a3a4c;
+    --txt:#dde7f1; --muted:#8ba0b6; --accent:#5ec8a0; --accent-soft:#5ec8a022;
+    --gold:#e8b24c; --xy:#c96f5a; --ph:#7ea8e0; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.5;padding:14px;-webkit-text-size-adjust:100%}
+  header{max-width:940px;margin:0 auto 12px}
+  h1{font-size:1.35rem;font-weight:700}
+  .sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+  main{max-width:940px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;font-size:.9rem;cursor:pointer;
+    transition:.15s;flex:1 1 auto;min-width:120px;text-align:center}
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  .view{display:none}
+  .view.active{display:block}
+  h2{font-size:1.05rem;margin-bottom:4px}
+  .hint{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  .toggle-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .toggle-row .tab{flex:0 1 auto;min-width:100px}
+  .lab{display:flex;flex-direction:column;gap:14px}
+  @media(min-width:720px){.lab{flex-direction:row}.svg-box{flex:1 1 54%}.info-box{flex:1 1 46%}}
+  .svg-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation}
+  .hot{cursor:pointer;transition:opacity .15s,filter .15s}
+  .hot:hover{opacity:.82}
+  .hot.sel{stroke:var(--accent);stroke-width:3;filter:drop-shadow(0 0 4px var(--accent))}
+  .lbl{font-size:11px;fill:var(--txt);pointer-events:none;font-family:system-ui,sans-serif}
+  .lblm{font-size:10px;fill:var(--muted);pointer-events:none;font-family:system-ui,sans-serif}
+  .info-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:150px}
+  .info-box h3{font-size:1.05rem;color:var(--accent);margin-bottom:6px}
+  .info-box .fn{font-size:.92rem}
+  .info-box .tag{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:.7rem;
+    font-weight:700;padding:2px 8px;border-radius:999px;margin-bottom:8px}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:10px;display:flex;flex-wrap:wrap;gap:10px}
+  .legend span{display:inline-flex;align-items:center;gap:4px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .cards{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.cards{grid-template-columns:1fr 1fr}}
+  @media(min-width:820px){.cards{grid-template-columns:1fr 1fr 1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .card svg{height:96px;margin-bottom:6px}
+  .card h4{font-size:.95rem;margin-bottom:2px}
+  .card .ex{font-size:.78rem;color:var(--muted)}
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+  .facts h3{font-size:.95rem;color:var(--gold);margin-bottom:8px}
+  .facts ul{list-style:none}
+  .facts li{font-size:.86rem;padding:5px 0 5px 18px;position:relative;border-top:1px solid var(--line)}
+  .facts li:first-child{border-top:none}
+  .facts li::before{content:"\25B8";position:absolute;left:0;color:var(--accent)}
+  .quiz .q{border-top:1px solid var(--line);padding:14px 0}
+  .quiz .q:first-of-type{border-top:none}
+  .quiz .qtxt{font-weight:600;font-size:.94rem;margin-bottom:9px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);padding:9px 12px;border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:.88rem;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .opt.wrong{border-color:var(--xy);background:#c96f5a22;color:#e79b8c}
+  .opt:disabled{cursor:default}
+  .expl{font-size:.83rem;color:var(--muted);margin-top:4px;display:none}
+  .expl.show{display:block}
+  .score{margin-top:10px;font-weight:600;color:var(--accent);font-size:.9rem}
+  footer{max-width:940px;margin:16px auto 0;color:var(--muted);font-size:.75rem;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Root System Lab</h1>
+  <div class="sub">NIOS Class 12 Biology &bull; Chapter 6: The Root System &mdash; morphology, anatomy &amp; modifications</div>
+</header>
+<main>
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-v="external">1 &middot; Types &amp; Regions</div>
+    <div class="tab" data-v="internal">2 &middot; Internal Structure</div>
+    <div class="tab" data-v="mods">3 &middot; Modifications</div>
+    <div class="tab" data-v="quiz">4 &middot; Quiz</div>
+  </div>
+
+  <!-- ============ VIEW 1: EXTERNAL ============ -->
+  <section class="view active" id="v-external">
+    <div class="panel">
+      <h2>Root Types &amp; External Regions</h2>
+      <p class="hint">Switch root systems, then tap a labelled region of the young root to read its function.</p>
+      <div class="toggle-row" id="rootToggle">
+        <div class="tab active" data-root="tap">Tap root (dicot)</div>
+        <div class="tab" data-root="fib">Fibrous root (monocot)</div>
+      </div>
+      <div class="lab">
+        <div class="svg-box">
+          <svg id="extSvg" viewBox="0 0 300 380" aria-label="Root system diagram"></svg>
+        </div>
+        <div class="info-box" id="extInfo">
+          <span class="tag">Tap a region</span>
+          <h3>Regions of the root</h3>
+          <div class="fn">The root grows only at its tip. Four zones lie behind the tip &mdash; tap each to explore how a root elongates and absorbs.</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#caa06a"></i>root cap</span>
+        <span><i style="background:#9c7bd4"></i>meristem</span>
+        <span><i style="background:#5ec8a0"></i>elongation</span>
+        <span><i style="background:#e8b24c"></i>maturation / hairs</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2: INTERNAL ============ -->
+  <section class="view" id="v-internal">
+    <div class="panel">
+      <h2>Internal Structure (Transverse Section)</h2>
+      <p class="hint">Compare a dicot vs monocot root T.S. Tap any tissue ring to see its structure and role.</p>
+      <div class="toggle-row" id="tsToggle">
+        <div class="tab active" data-ts="dicot">Dicot root</div>
+        <div class="tab" data-ts="monocot">Monocot root</div>
+      </div>
+      <div class="lab">
+        <div class="svg-box">
+          <svg id="tsSvg" viewBox="0 0 300 300" aria-label="Root cross section"></svg>
+        </div>
+        <div class="info-box" id="tsInfo">
+          <span class="tag">Tap a tissue</span>
+          <h3 id="tsTitle">Radial vascular bundles</h3>
+          <div class="fn" id="tsFn">Roots have a <b>radial</b> arrangement: xylem and phloem sit on separate radii. Xylem is <b>exarch</b> (protoxylem points outward). Tap a ring to learn more.</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#6fae6f"></i>epidermis</span>
+        <span><i style="background:#bcd7a0"></i>cortex</span>
+        <span><i style="background:#e2a04a"></i>endodermis</span>
+        <span><i style="background:#8fa8c8"></i>pericycle</span>
+        <span><i style="background:#c96f5a"></i>xylem</span>
+        <span><i style="background:#7ea8e0"></i>phloem</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3: MODS ============ -->
+  <section class="view" id="v-mods">
+    <div class="panel">
+      <h2>Modifications &amp; Functions</h2>
+      <p class="hint">Roots are modified for special jobs. Tap a card to see the adaptation and the plants that show it.</p>
+      <div class="cards" id="modCards"></div>
+      <div class="info-box" id="modInfo" style="margin-top:12px">
+        <span class="tag">Tap a modification</span>
+        <h3>Why roots change shape</h3>
+        <div class="fn">Beyond anchorage and absorption, roots are remodelled for storage, breathing, extra support and more. Explore each above.</div>
+      </div>
+      <div class="facts">
+        <h3>Core functions of every root</h3>
+        <ul>
+          <li><b>Anchorage:</b> fixes the plant firmly in soil against wind and pull.</li>
+          <li><b>Absorption:</b> root hairs take up water and dissolved minerals by osmosis and active transport.</li>
+          <li><b>Conduction:</b> the vascular cylinder passes water up to the stem.</li>
+          <li><b>Storage:</b> parenchyma of cortex/pith may store food (starch), giving fleshy roots.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4: QUIZ ============ -->
+  <section class="view" id="v-quiz">
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Check</h2>
+      <p class="hint">Three questions. Tap an option to reveal the answer.</p>
+      <div id="quizBody"></div>
+      <div class="score" id="score"></div>
+    </div>
+  </section>
+</main>
+<footer>Root System Lab &bull; self-contained interactive &bull; NIOS Class 12 Biology</footer>
+
+<script>
+"use strict";
+/* ---------- tab navigation ---------- */
+var tabs=document.querySelectorAll('#tabs .tab');
+tabs.forEach(function(t){
+  t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
+    document.getElementById('v-'+t.dataset.v).classList.add('active');
+  });
+});
+
+/* ---------- helper ---------- */
+function el(tag,attrs){
+  var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(var k in attrs){e.setAttribute(k,attrs[k]);}
+  return e;
+}
+
+/* ================= VIEW 1: EXTERNAL ================= */
+var extSvg=document.getElementById('extSvg');
+var extInfo=document.getElementById('extInfo');
+var regionData={
+  cap:{t:'Root cap (calyptra)',tag:'Protective zone',
+    d:'A thimble of loose parenchyma covering the tip. Its cells secrete slimy mucilage that lubricates the root as it pushes through soil, and are worn away and continuously replaced. It also perceives gravity (positive geotropism).'},
+  mer:{t:'Region of meristematic activity',tag:'Cell division',
+    d:'Just behind the cap. Small, thin-walled, densely cytoplasmic cells with no vacuoles divide repeatedly by mitosis to add new cells. This apical meristem is the source of all the tissues of the root.'},
+  elo:{t:'Region of elongation',tag:'Cell enlargement',
+    d:'Cells produced by the meristem here rapidly enlarge and vacuolate, increasing the length of the root and driving the tip deeper into the soil. Little absorption occurs in this smooth zone.'},
+  mat:{t:'Region of maturation (root hairs)',tag:'Absorption',
+    d:'Cells differentiate into permanent tissues. Epidermal (epiblema) cells grow tubular unicellular root hairs that vastly enlarge the surface area for absorbing water and minerals. Older parts become the zone of lateral roots.'}
+};
+function drawExt(type){
+  extSvg.innerHTML='';
+  // ground line
+  extSvg.appendChild(el('line',{x1:10,y1:70,x2:290,y2:70,stroke:'#3a4a5c','stroke-width':2,'stroke-dasharray':'4 4'}));
+  extSvg.appendChild(el('rect',{x:0,y:0,width:300,height:70,fill:'#12303f',opacity:.35}));
+  var shootLbl=el('text',{x:150,y:22,class:'lblm','text-anchor':'middle'});shootLbl.textContent='shoot / collar above soil';extSvg.appendChild(shootLbl);
+  // stem stub
+  extSvg.appendChild(el('rect',{x:145,y:30,width:10,height:40,fill:'#5c8a4a',rx:3}));
+  var g=el('g',{});
+  if(type==='tap'){
+    // primary tap root: thick tapering central axis
+    var main=el('path',{d:'M150 70 C150 130 148 200 150 300 C151 200 152 130 152 70 Z',fill:'none'});
+    // draw tap root as tapering shape
+    g.appendChild(el('path',{d:'M144 70 L156 70 L152 300 L148 300 Z',fill:'#c9a06a'}));
+    // secondary (lateral) roots
+    [[150,120,-1],[150,160,1],[150,200,-1],[150,235,1]].forEach(function(p){
+      var dir=p[2];
+      g.appendChild(el('path',{d:'M150 '+p[1]+' q '+(dir*35)+' 8 '+(dir*55)+' 34',fill:'none',stroke:'#c9a06a','stroke-width':4,'stroke-linecap':'round'}));
+    });
+    extSvg.appendChild(g);
+    var pl=el('text',{x:200,y:150,class:'lblm'});pl.textContent='lateral roots';extSvg.appendChild(pl);
+    // zones on the tip of primary root (near 300)
+    // maturation (with hairs)
+    var mat=el('rect',{x:145,y:230,width:12,height:40,rx:4,class:'hot',fill:'#e8b24c','data-r':'mat'});
+    // draw root hairs
+    var hairs=el('g',{});
+    for(var i=0;i<7;i++){var yy=234+i*5;hairs.appendChild(el('line',{x1:145,y1:yy,x2:135,y2:yy-2,stroke:'#e8b24c','stroke-width':1}));hairs.appendChild(el('line',{x1:157,y1:yy,x2:167,y2:yy-2,stroke:'#e8b24c','stroke-width':1}));}
+    hairs.setAttribute('pointer-events','none');
+    var elo=el('rect',{x:146,y:270,width:10,height:16,rx:3,class:'hot',fill:'#5ec8a0','data-r':'elo'});
+    var mer=el('rect',{x:147,y:286,width:8,height:9,rx:2,class:'hot',fill:'#9c7bd4','data-r':'mer'});
+    var cap=el('path',{d:'M147 295 Q151 306 155 295 Z',class:'hot',fill:'#caa06a','data-r':'cap'});
+    extSvg.appendChild(mat);extSvg.appendChild(hairs);extSvg.appendChild(elo);extSvg.appendChild(mer);extSvg.appendChild(cap);
+    addZoneLabels(230);
+    var tt=el('text',{x:150,y:60,class:'lbl','text-anchor':'middle'});tt.textContent='Tap root system';extSvg.appendChild(tt);
+    var pr=el('text',{x:118,y:150,class:'lblm','text-anchor':'end'});pr.textContent='primary';extSvg.appendChild(pr);
+  } else {
+    // fibrous: cluster of similar thin roots from base
+    var offs=[-40,-25,-10,5,20,38];
+    offs.forEach(function(o){
+      g.appendChild(el('path',{d:'M150 70 C'+(150+o)+' 140 '+(150+o*1.4)+' 210 '+(150+o*1.8)+' 285',fill:'none',stroke:'#c9a06a','stroke-width':3.5,'stroke-linecap':'round'}));
+    });
+    extSvg.appendChild(g);
+    var tt2=el('text',{x:150,y:60,class:'lbl','text-anchor':'middle'});tt2.textContent='Fibrous root system';extSvg.appendChild(tt2);
+    var fl=el('text',{x:245,y:200,class:'lblm','text-anchor':'end'});fl.textContent='many thin roots';extSvg.appendChild(fl);
+    // put the four zones on the central-most root tip (~150,285)
+    var mat2=el('rect',{x:150,y:250,width:11,height:32,rx:4,class:'hot',fill:'#e8b24c','data-r':'mat'});
+    var hairs2=el('g',{});for(var j=0;j<6;j++){var y2=254+j*5;hairs2.appendChild(el('line',{x1:161,y1:y2,x2:170,y2:y2-2,stroke:'#e8b24c','stroke-width':1}));}
+    hairs2.setAttribute('pointer-events','none');
+    var elo2=el('rect',{x:151,y:282,width:9,height:12,rx:3,class:'hot',fill:'#5ec8a0','data-r':'elo'});
+    var mer2=el('rect',{x:152,y:294,width:7,height:7,rx:2,class:'hot',fill:'#9c7bd4','data-r':'mer'});
+    var cap2=el('path',{d:'M152 301 Q155 310 159 301 Z',class:'hot',fill:'#caa06a','data-r':'cap'});
+    extSvg.appendChild(mat2);extSvg.appendChild(hairs2);extSvg.appendChild(elo2);extSvg.appendChild(mer2);extSvg.appendChild(cap2);
+    addZoneLabels(250,true);
+  }
+  extSvg.querySelectorAll('.hot').forEach(function(h){
+    h.addEventListener('click',function(){
+      extSvg.querySelectorAll('.hot').forEach(function(x){x.classList.remove('sel')});
+      h.classList.add('sel');
+      var r=regionData[h.getAttribute('data-r')];
+      extInfo.innerHTML='<span class="tag">'+r.tag+'</span><h3>'+r.t+'</h3><div class="fn">'+r.d+'</div>';
+    });
+  });
+}
+function addZoneLabels(topY,right){
+  var xs=right?70:230, anchor=right?'start':'end';
+  var rows=[['maturation (root hairs)',topY+6],['elongation',topY+40],['meristem',topY+50],['root cap',topY+58]];
+  rows.forEach(function(rw){
+    var t=el('text',{x:xs,y:rw[1],class:'lblm','text-anchor':anchor});t.textContent=rw[0];extSvg.appendChild(t);
+  });
+}
+document.querySelectorAll('#rootToggle .tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('#rootToggle .tab').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');drawExt(t.dataset.root);
+    extInfo.innerHTML='<span class="tag">Tap a region</span><h3>Regions of the root</h3><div class="fn">The root grows only at its tip. Four zones lie behind the tip &mdash; tap each to explore.</div>';
+  });
+});
+drawExt('tap');
+
+/* ================= VIEW 2: INTERNAL ================= */
+var tsSvg=document.getElementById('tsSvg');
+var tsInfo=document.getElementById('tsInfo');
+var tissueData={
+  epi:{t:'Epidermis (epiblema / piliferous layer)',tag:'Outermost',
+    d:'A single layer of thin-walled cells lacking cuticle and stomata. Some cells extend as unicellular root hairs. It is the main absorbing surface of the young root.'},
+  cor:{t:'Cortex',tag:'Ground tissue',
+    d:'Several layers of loosely packed, thin-walled parenchyma with intercellular spaces. It stores food and passes absorbed water inward toward the vascular cylinder.'},
+  end:{t:'Endodermis (with Casparian strips)',tag:'Cortex boundary',
+    d:'The innermost cortical layer, a single ring of barrel-shaped cells. Their radial and transverse walls bear water-impermeable Casparian strips of suberin, forcing water to pass through the cell membranes and regulating what enters the stele.'},
+  per:{t:'Pericycle',tag:'Outer stele',
+    d:'One or few layers just inside the endodermis. It is meristematic in roots: it gives rise to lateral (branch) roots and, in dicots, contributes to the vascular cambium and cork cambium during secondary growth.'},
+  xyl:{t:'Xylem (radial, exarch)',tag:'Water transport',
+    d:'Xylem occurs in separate radial strands alternating with phloem. Protoxylem lies toward the outside and metaxylem toward the centre &mdash; this outward-facing (exarch) pattern is characteristic of roots. It conducts water and minerals upward.'},
+  phl:{t:'Phloem',tag:'Food transport',
+    d:'Phloem strands lie on separate radii, alternating with the xylem arms. It conducts sugars made in the shoot down to the storing and growing cells of the root.'},
+  pith:{t:'Pith',tag:'Centre',
+    d:'In a monocot root a large central parenchymatous pith is present because the many xylem groups do not reach the centre. A typical dicot root has little or no pith (xylem meets at the centre, often forming an X).'}
+};
+function showTissue(key){
+  var d=tissueData[key];
+  document.getElementById('tsTitle').textContent=d.t;
+  tsInfo.querySelector('.tag').textContent=d.tag;
+  document.getElementById('tsFn').innerHTML=d.d;
+}
+function drawTS(type){
+  tsSvg.innerHTML='';
+  var cx=150,cy=150;
+  var monocot=(type==='monocot');
+  var arms=monocot?7:4; // xylem groups: dicot tetrarch, monocot polyarch
+  // outer to inner rings
+  tsSvg.appendChild(ring(cx,cy,132,'#bcd7a0','cor','Cortex'));          // cortex fill
+  tsSvg.appendChild(ring(cx,cy,140,'#6fae6f','epi','Epidermis'));       // epidermis (drawn first? we layer bigger under)
+  // Actually layer largest first: redo order
+  tsSvg.innerHTML='';
+  tsSvg.appendChild(el('circle',{cx:cx,cy:cy,r:142,fill:'#12202c'}));
+  var epi=el('circle',{cx:cx,cy:cy,r:140,fill:'#6fae6f',class:'hot','data-k':'epi'});tsSvg.appendChild(epi);
+  var cor=el('circle',{cx:cx,cy:cy,r:132,fill:'#bcd7a0',class:'hot','data-k':'cor'});tsSvg.appendChild(cor);
+  var end=el('circle',{cx:cx,cy:cy,r:78,fill:'#e2a04a',class:'hot','data-k':'end'});tsSvg.appendChild(end);
+  var per=el('circle',{cx:cx,cy:cy,r:70,fill:'#8fa8c8',class:'hot','data-k':'per'});tsSvg.appendChild(per);
+  var stele=el('circle',{cx:cx,cy:cy,r:64,fill:'#eef4ee',class:'hot','data-k':monocot?'pith':'xyl'});tsSvg.appendChild(stele);
+  // Casparian dots on endodermis
+  var cas=el('g',{'pointer-events':'none'});
+  for(var a=0;a<24;a++){var ang=a/24*2*Math.PI;cas.appendChild(el('circle',{cx:cx+74*Math.cos(ang),cy:cy+74*Math.sin(ang),r:1.6,fill:'#7a4a12'}));}
+  tsSvg.appendChild(cas);
+  // vascular: xylem arms (radial) + phloem between; exarch => protoxylem tip outward
+  var vg=el('g',{});
+  var R=monocot?58:56;
+  for(var i=0;i<arms;i++){
+    var ang=(i/arms)*2*Math.PI - Math.PI/2;
+    // xylem radial strand (line of cells from near centre to periphery of stele)
+    var x1=cx+ (monocot?24:8)*Math.cos(ang), y1=cy+ (monocot?24:8)*Math.sin(ang);
+    var x2=cx+ R*Math.cos(ang), y2=cy+ R*Math.sin(ang);
+    vg.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'#c96f5a','stroke-width':9,'stroke-linecap':'round',class:'hot','data-k':'xyl'}));
+    // protoxylem knob at outer tip (exarch)
+    vg.appendChild(el('circle',{cx:x2,cy:y2,r:4,fill:'#a5432f','pointer-events':'none'}));
+    // phloem patch between arms
+    var pang=ang+Math.PI/arms;
+    var px=cx+ (R-10)*Math.cos(pang), py=cy+ (R-10)*Math.sin(pang);
+    vg.appendChild(el('circle',{cx:px,cy:py,r:8,fill:'#7ea8e0',class:'hot','data-k':'phl'}));
+  }
+  tsSvg.appendChild(vg);
+  if(!monocot){
+    // dicot: xylem meets at centre -> small central hub
+    tsSvg.appendChild(el('circle',{cx:cx,cy:cy,r:7,fill:'#c96f5a','pointer-events':'none'}));
+  } else {
+    var pt=el('text',{x:cx,y:cy+3,class:'lblm','text-anchor':'middle'});pt.textContent='pith';tsSvg.appendChild(pt);
+  }
+  // title label
+  var tl=el('text',{x:cx,y:18,class:'lbl','text-anchor':'middle'});
+  tl.textContent=(monocot?'Monocot root — polyarch, large pith':'Dicot root — tetrarch, no pith');
+  tsSvg.appendChild(tl);
+  var pro=el('text',{x:cx,y:292,class:'lblm','text-anchor':'middle'});
+  pro.textContent='xylem exarch: protoxylem (dark) points outward';tsSvg.appendChild(pro);
+  tsSvg.querySelectorAll('.hot').forEach(function(h){
+    h.addEventListener('click',function(){
+      tsSvg.querySelectorAll('.hot').forEach(function(x){x.classList.remove('sel')});
+      h.classList.add('sel');showTissue(h.getAttribute('data-k'));
+    });
+  });
+}
+function ring(cx,cy,r,fill,k){return el('circle',{cx:cx,cy:cy,r:r,fill:fill,class:'hot','data-k':k});}
+document.querySelectorAll('#tsToggle .tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('#tsToggle .tab').forEach(function(x){x.classList.remove('active')});
+    t.classList.add('active');drawTS(t.dataset.ts);
+    document.getElementById('tsTitle').textContent='Radial vascular bundles';
+    tsInfo.querySelector('.tag').textContent='Tap a tissue';
+    document.getElementById('tsFn').innerHTML='Roots have a <b>radial</b> arrangement: xylem and phloem sit on separate radii. Xylem is <b>exarch</b> (protoxylem points outward). Tap a ring to learn more.';
+  });
+});
+drawTS('dicot');
+
+/* ================= VIEW 3: MODIFICATIONS ================= */
+var mods=[
+  {k:'carrot',n:'Conical (carrot)',ex:'Carrot',cat:'Storage',
+   d:'A fleshy <b>tap root</b> swollen with stored food (sugars/carotene). Broad at the top and tapering below &mdash; a conical storage root. Stores food for the biennial to flower in its second year.',
+   svg:'<path d="M50 12 L64 12 L52 92 L48 92 Z" fill="#e07b3a"/><path d="M50 12 q-10 -8 -4 -10" stroke="#4f8a3a" stroke-width="3" fill="none"/><path d="M60 12 q10 -8 4 -10" stroke="#4f8a3a" stroke-width="3" fill="none"/>'},
+  {k:'turnip',n:'Napiform (turnip)',ex:'Turnip / beet',cat:'Storage',
+   d:'A <b>tap root</b> that is spherical/globular at the top and abruptly narrows to a point &mdash; napiform. Swollen cortex and pith store food.',
+   svg:'<circle cx="57" cy="45" r="26" fill="#d9c7e0"/><path d="M52 68 L62 68 L57 92 Z" fill="#d9c7e0"/><path d="M50 22 q-6 -12 0 -16 M64 22 q6 -12 0 -16" stroke="#4f8a3a" stroke-width="3" fill="none"/>'},
+  {k:'sweet',n:'Fasciculated (sweet potato)',ex:'Sweet potato',cat:'Storage',
+   d:'Swollen <b>adventitious</b> roots that arise in clusters (fascicles) from the nodes of the stem, storing food. Unlike carrot, storage is in adventitious &mdash; not tap &mdash; roots.',
+   svg:'<ellipse cx="40" cy="55" rx="12" ry="24" fill="#b0642f"/><ellipse cx="62" cy="60" rx="13" ry="26" fill="#c07338"/><ellipse cx="80" cy="52" rx="10" ry="20" fill="#b0642f"/><line x1="35" y1="28" x2="80" y2="28" stroke="#4f8a3a" stroke-width="3"/>'},
+  {k:'pneu',n:'Pneumatophores',ex:'Mangroves (Rhizophora)',cat:'Respiration',
+   d:'In marshy, saline, oxygen-poor mud, some roots grow <b>vertically upward</b> out of the soil. Their tips bear pores (pneumathodes / lenticels) through which the plant takes in air for the submerged roots.',
+   svg:'<rect x="8" y="60" width="100" height="12" fill="#4a5a3a" opacity=".5"/><g stroke="#8a6a3a" stroke-width="5" stroke-linecap="round"><line x1="30" y1="62" x2="30" y2="26"/><line x1="50" y1="62" x2="50" y2="18"/><line x1="70" y1="62" x2="70" y2="30"/><line x1="88" y1="62" x2="88" y2="22"/></g>'},
+  {k:'prop',n:'Prop / pillar roots',ex:'Banyan tree',cat:'Support',
+   d:'Thick <b>adventitious</b> roots hang down from horizontal branches, enter the soil and become pillar-like, giving mechanical support to the huge spreading crown.',
+   svg:'<path d="M6 20 h104" stroke="#5c8a4a" stroke-width="8"/><g stroke="#8a6a3a" stroke-width="5" stroke-linecap="round"><line x1="25" y1="24" x2="25" y2="88"/><line x1="55" y1="24" x2="55" y2="88"/><line x1="85" y1="24" x2="85" y2="88"/></g>'},
+  {k:'stilt',n:'Stilt roots',ex:'Maize, sugarcane',cat:'Support',
+   d:'Short, thick <b>adventitious</b> roots that arise obliquely from the lower nodes of the stem and enter the soil, bracing the tall shoot &mdash; like guy-ropes.',
+   svg:'<rect x="52" y="12" width="10" height="60" fill="#5c8a4a"/><g stroke="#8a6a3a" stroke-width="4" stroke-linecap="round"><line x1="54" y1="40" x2="28" y2="86"/><line x1="54" y1="52" x2="36" y2="86"/><line x1="60" y1="40" x2="86" y2="86"/><line x1="60" y1="52" x2="78" y2="86"/></g>'}
+];
+var modCards=document.getElementById('modCards');
+var modInfo=document.getElementById('modInfo');
+mods.forEach(function(m){
+  var c=document.createElement('div');c.className='card';
+  c.innerHTML='<svg viewBox="0 0 116 96">'+m.svg+'</svg><h4>'+m.n+'</h4><div class="ex">'+m.cat+' &bull; '+m.ex+'</div>';
+  c.addEventListener('click',function(){
+    modCards.querySelectorAll('.card').forEach(function(x){x.classList.remove('sel')});
+    c.classList.add('sel');
+    modInfo.innerHTML='<span class="tag">'+m.cat+'</span><h3>'+m.n+'</h3><div class="fn">'+m.d+' <br><br><b>Example:</b> '+m.ex+'.</div>';
+  });
+  modCards.appendChild(c);
+});
+
+/* ================= VIEW 4: QUIZ ================= */
+var quiz=[
+  {q:'In a typical dicot root, the vascular tissue arrangement and xylem maturation are:',
+   o:['Conjoint, collateral and endarch','Radial, with exarch xylem','Radial, with endarch xylem','Scattered bundles, mesarch'],
+   a:1,e:'Roots are radial (xylem & phloem on separate radii) and the xylem is exarch — protoxylem lies toward the periphery.'},
+  {q:'The Casparian strips that regulate water entry into the stele are found in the:',
+   o:['Epiblema','Cortex parenchyma','Endodermis','Pericycle'],
+   a:2,e:'The endodermis bears suberised Casparian strips on its radial/tangential walls, forcing water through the cell membranes.'},
+  {q:'Pneumatophores are a root modification chiefly for:',
+   o:['Food storage','Extra mechanical support','Gaseous exchange (respiration)','Photosynthesis'],
+   a:2,e:'Mangrove roots grow upward into the air and take in oxygen through pores — an adaptation for respiration in waterlogged soil.'}
+];
+var qb=document.getElementById('quizBody');var answered=0,correct=0;
+quiz.forEach(function(item,qi){
+  var wrap=document.createElement('div');wrap.className='q';
+  var qt=document.createElement('div');qt.className='qtxt';qt.textContent=(qi+1)+'. '+item.q;wrap.appendChild(qt);
+  var ex=document.createElement('div');ex.className='expl';ex.textContent=item.e;
+  item.o.forEach(function(opt,oi){
+    var b=document.createElement('button');b.className='opt';b.textContent=opt;
+    b.addEventListener('click',function(){
+      if(wrap.dataset.done)return;wrap.dataset.done='1';answered++;
+      var btns=wrap.querySelectorAll('.opt');
+      btns.forEach(function(x){x.disabled=true});
+      btns[item.a].classList.add('correct');
+      if(oi===item.a){correct++;}else{b.classList.add('wrong');}
+      ex.classList.add('show');
+      document.getElementById('score').textContent='Score: '+correct+' / '+answered+(answered===quiz.length?' — quiz complete':'');
+    });
+    wrap.appendChild(b);
+  });
+  wrap.appendChild(ex);qb.appendChild(wrap);
+});
+</script>
+</body>
+</html>

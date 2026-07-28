@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Origin &amp; Evolution Lab - NIOS Class 12 Biology Ch1</title>
+<style>
+  :root{
+    --accent:#6fae8f;
+    --accent-dark:#4f8b6e;
+    --bg:#141c22;
+    --panel:#1e2932;
+    --panel2:#26343f;
+    --ink:#e7eef2;
+    --muted:#9db0bd;
+    --line:#33454f;
+    --good:#67c088;
+    --bad:#e08a7a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#141c22,#101720);
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.4rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;
+    background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#0e1519;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .panel h2{font-size:1.08rem;margin:0 0 4px;}
+  .panel .sub{color:var(--muted);font-size:.85rem;margin:0 0 14px;}
+  .hidden{display:none;}
+  .btn{
+    background:var(--accent);color:#0e1519;border:none;
+    padding:9px 14px;border-radius:10px;font-weight:600;
+    cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#0e1519;border-color:var(--accent-dark);}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+
+  /* Timeline */
+  .tl-track{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tl-node{
+    flex:1 1 140px;min-width:120px;background:var(--panel2);
+    border:2px solid var(--line);border-radius:12px;padding:10px;
+    cursor:pointer;transition:.15s;text-align:left;
+  }
+  .tl-node:hover{border-color:var(--accent);}
+  .tl-node.sel{border-color:var(--accent);background:#2c3d3a;}
+  .tl-node .era{font-size:.72rem;color:var(--accent);font-weight:700;letter-spacing:.02em;}
+  .tl-node .ttl{font-size:.86rem;font-weight:600;margin-top:2px;}
+  .note{
+    background:var(--panel2);border-left:4px solid var(--accent);
+    border-radius:10px;padding:12px 14px;font-size:.9rem;min-height:70px;
+  }
+  .note h3{margin:0 0 4px;font-size:.98rem;}
+  .note p{margin:0;color:var(--muted);}
+
+  /* Cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+  .card{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;cursor:pointer;transition:.15s;
+  }
+  .card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .card .tag{font-size:.7rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);}
+  .card h4{margin:3px 0 5px;font-size:.95rem;}
+  .card p{margin:0;font-size:.82rem;color:var(--muted);}
+  .card .more{display:none;margin-top:8px;font-size:.82rem;color:var(--ink);border-top:1px dashed var(--line);padding-top:8px;}
+  .card.open .more{display:block;}
+
+  /* Natural selection sim */
+  .ns-wrap{display:flex;flex-wrap:wrap;gap:16px;}
+  .ns-stage{flex:1 1 300px;min-width:280px;}
+  .ns-ctrl{flex:1 1 220px;min-width:220px;}
+  .ctrl-row{margin-bottom:12px;}
+  .ctrl-row label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px;}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  select{
+    width:100%;padding:8px;border-radius:8px;background:var(--panel2);
+    color:var(--ink);border:1px solid var(--line);font-size:.85rem;
+  }
+  .stat{display:flex;justify-content:space-between;font-size:.85rem;padding:5px 0;border-bottom:1px solid var(--line);}
+  .stat b{color:var(--accent);}
+
+  /* Classification */
+  .hier{display:flex;flex-direction:column;gap:6px;}
+  .rank{
+    display:flex;align-items:center;gap:10px;background:var(--panel2);
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;transition:.15s;
+  }
+  .rank:hover{border-color:var(--accent);}
+  .rank .bar{height:12px;border-radius:6px;background:var(--accent);flex:0 0 auto;}
+  .rank .rk{font-weight:600;font-size:.88rem;width:78px;flex:0 0 auto;}
+  .rank .ex{font-size:.8rem;color:var(--muted);font-style:italic;}
+  .binom{background:var(--panel2);border-radius:10px;padding:12px;margin-top:12px;font-size:.88rem;}
+  .binom i{color:var(--accent);}
+
+  /* Facts */
+  .fact{background:var(--panel2);border-radius:10px;padding:12px;margin-bottom:10px;}
+  .fact h4{margin:0 0 4px;font-size:.92rem;color:var(--accent);}
+  .fact p{margin:0;font-size:.85rem;color:var(--muted);}
+
+  /* Quiz */
+  .q{background:var(--panel2);border-radius:12px;padding:14px;margin-bottom:12px;}
+  .q p.qt{margin:0 0 10px;font-weight:600;font-size:.92rem;}
+  .opt{
+    display:block;width:100%;text-align:left;background:var(--panel);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;
+    margin-bottom:7px;cursor:pointer;font-size:.86rem;color:var(--ink);transition:.12s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:#274536;border-color:var(--good);color:#dff5e8;}
+  .opt.wrong{background:#4a2f2b;border-color:var(--bad);color:#fadfd8;}
+  .expl{margin-top:8px;font-size:.83rem;color:var(--muted);display:none;}
+  .expl.show{display:block;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Origin &amp; Evolution Lab</h1>
+    <p>NIOS Class 12 Biology - Chapter 1: Origin and Evolution of Life and Introduction to Classification</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="timeline">Origin of Life</div>
+    <div class="tab" data-t="evo">Evidence &amp; Selection</div>
+    <div class="tab" data-t="class">Classification</div>
+    <div class="tab" data-t="facts">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ============ TIMELINE ============ -->
+  <section class="panel" id="p-timeline">
+    <h2>Origin of Life - Interactive Timeline</h2>
+    <p class="sub">Tap a stage to read how life is thought to have arisen and diversified over ~4 billion years.</p>
+    <div class="tl-track" id="tlTrack"></div>
+    <div class="note" id="tlNote">
+      <h3>Select a stage</h3>
+      <p>The timeline runs from a lifeless early Earth to complex multicellular organisms.</p>
+    </div>
+    <p class="legend">Ages are approximate (bya = billion years ago). Order of events, not exact dates, is what NIOS expects you to know.</p>
+  </section>
+
+  <!-- ============ EVOLUTION ============ -->
+  <section class="panel hidden" id="p-evo">
+    <h2>Evidence &amp; Mechanisms of Evolution</h2>
+    <p class="sub">Tap any card to expand. Then run the natural-selection experiment below.</p>
+    <h4 style="margin:6px 0;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;">Evidence for evolution</h4>
+    <div class="grid" id="evCards"></div>
+    <h4 style="margin:16px 0 6px;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;">Mechanisms</h4>
+    <div class="grid" id="mechCards"></div>
+
+    <h2 style="margin-top:20px;">Natural Selection: Peppered Moth</h2>
+    <p class="sub">Set how sooty the tree bark is. Birds spot moths that contrast with the bark. Watch which colour survives across generations.</p>
+    <div class="ns-wrap">
+      <div class="ns-stage">
+        <svg id="mothSvg" viewBox="0 0 320 200" role="img" aria-label="Moths resting on tree bark"></svg>
+        <div class="stat"><span>Light-form moths</span><b id="lightPct">50%</b></div>
+        <div class="stat"><span>Dark (melanic) moths</span><b id="darkPct">50%</b></div>
+        <div class="stat"><span>Generation</span><b id="genN">0</b></div>
+      </div>
+      <div class="ns-ctrl">
+        <div class="ctrl-row">
+          <label>Bark darkness (pollution / soot): <span id="sootVal">50%</span></label>
+          <input type="range" id="soot" min="0" max="100" value="50">
+        </div>
+        <div class="ctrl-row">
+          <label>Predation pressure (bird sharpness)</label>
+          <input type="range" id="pred" min="10" max="90" value="55">
+        </div>
+        <button class="btn" id="stepBtn">Advance 1 generation</button>
+        <button class="btn ghost" id="resetNs" style="margin-top:8px;">Reset</button>
+        <div class="note" id="nsNote" style="margin-top:12px;min-height:auto;">
+          <p>Clean bark favours light moths; sooty bark favours dark ones. This is <b>directional selection</b> acting on existing variation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLASSIFICATION ============ -->
+  <section class="panel hidden" id="p-class">
+    <h2>Introduction to Classification</h2>
+    <p class="sub">Tap a rank to see how the honey bee is classified. Ranks go broad (top) to specific (bottom).</p>
+    <div class="hier" id="hier"></div>
+    <div class="note" id="clNote" style="margin-top:12px;min-height:auto;">
+      <p>Taxonomy groups organisms by shared features. Broader ranks contain more, less-similar organisms.</p>
+    </div>
+
+    <h2 style="margin-top:18px;">Kingdoms &amp; Domains</h2>
+    <p class="sub">Tap a group for its distinguishing features.</p>
+    <div class="grid" id="kingCards"></div>
+
+    <div class="binom">
+      <b>Binomial nomenclature (Carl Linnaeus, 1758):</b> every species gets a two-word Latin name -
+      <i>Genus species</i>. Genus is capitalised, species is lower-case, both italicised (or underlined when handwritten).
+      Example: the honey bee is <i>Apis mellifera</i>; humans are <i>Homo sapiens</i>.
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section class="panel hidden" id="p-facts">
+    <h2>Key Facts</h2>
+    <p class="sub">The names and ideas NIOS most often tests.</p>
+    <div id="factList"></div>
+
+    <h2 style="margin-top:18px;">Quick Quiz</h2>
+    <p class="sub">Choose an answer to reveal whether it is correct and why.</p>
+    <div id="quiz"></div>
+    <div class="stat" style="border:none;margin-top:6px;"><span>Score</span><b id="score">0 / 3</b></div>
+  </section>
+
+  <footer>Origin &amp; Evolution Lab - self-contained study simulation. Ages are approximate; biology follows the NIOS senior-secondary syllabus.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tabs ---------- */
+  var tabs=document.getElementById("tabs");
+  var panels={timeline:"p-timeline",evo:"p-evo",class:"p-class",facts:"p-facts"};
+  tabs.addEventListener("click",function(e){
+    var t=e.target.closest(".tab"); if(!t)return;
+    [].forEach.call(tabs.children,function(c){c.classList.remove("active");});
+    t.classList.add("active");
+    for(var k in panels){document.getElementById(panels[k]).classList.add("hidden");}
+    document.getElementById(panels[t.dataset.t]).classList.remove("hidden");
+  });
+
+  /* ---------- Timeline ---------- */
+  var stages=[
+    {era:"~4.0 bya",ttl:"Chemical evolution",h:"Primordial soup (Oparin-Haldane)",
+     p:"A.I. Oparin and J.B.S. Haldane independently proposed that the early atmosphere was reducing (rich in methane, ammonia, hydrogen, water vapour) and had almost no free oxygen. Energy from lightning, UV and heat drove simple molecules to combine into organic monomers - amino acids, sugars, nucleotides - that accumulated in the warm oceans as a 'primordial soup'. This is abiogenesis: chemical, not biological, evolution."},
+    {era:"1953",ttl:"Miller-Urey test",h:"Testing the soup in the lab",
+     p:"Stanley Miller and Harold Urey sealed methane, ammonia, hydrogen and water vapour in glass apparatus and passed electric sparks through it to mimic lightning. Within days, amino acids and other organic molecules formed - experimental support that building blocks of life can arise from inorganic matter under early-Earth conditions."},
+    {era:"~3.5 bya",ttl:"First cells",h:"Prokaryotes appear",
+     p:"Organic molecules assembled into self-replicating systems (an 'RNA world' is one idea) enclosed by membranes, forming the first cells. The earliest were anaerobic prokaryotes - simple cells without a nucleus or membrane-bound organelles, such as bacteria and archaea."},
+    {era:"~2.7 bya",ttl:"Photosynthesis",h:"Oxygen enters the air",
+     p:"Cyanobacteria evolved oxygen-releasing photosynthesis. Over hundreds of millions of years, O2 built up in the atmosphere - the Great Oxidation Event. This was toxic to many anaerobes but paved the way for efficient aerobic respiration and an ozone layer."},
+    {era:"~2.0 bya",ttl:"Eukaryotes",h:"Endosymbiosis",
+     p:"According to Lynn Margulis's endosymbiotic theory, larger host cells engulfed free-living aerobic bacteria (which became mitochondria) and cyanobacteria (which became chloroplasts). These organelles keep their own DNA and double membranes. The result: complex eukaryotic cells with a true nucleus."},
+    {era:"~1.5-0.6 bya",ttl:"Multicellular life",h:"Cells cooperate",
+     p:"Eukaryotic cells began living in colonies and then as true multicellular organisms with division of labour among cell types. This opened the door to algae, fungi, plants and animals, and eventually the diversity of life we classify today."}
+  ];
+  var tlTrack=document.getElementById("tlTrack");
+  var tlNote=document.getElementById("tlNote");
+  stages.forEach(function(s,i){
+    var d=document.createElement("div");
+    d.className="tl-node"; d.tabIndex=0;
+    d.innerHTML='<div class="era">'+s.era+'</div><div class="ttl">'+s.ttl+'</div>';
+    function sel(){
+      [].forEach.call(tlTrack.children,function(c){c.classList.remove("sel");});
+      d.classList.add("sel");
+      tlNote.innerHTML='<h3>'+s.h+'</h3><p>'+s.p+'</p>';
+    }
+    d.addEventListener("click",sel);
+    d.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sel();}});
+    tlTrack.appendChild(d);
+  });
+
+  /* ---------- Evidence & mechanism cards ---------- */
+  var evidence=[
+    {tag:"Fossils",h:"Fossil record",p:"Preserved remains in dated rock layers.",more:"Fossils in successively younger strata show gradual change and transitional forms (e.g. Archaeopteryx links reptiles and birds), giving a time-ordered record of descent with modification."},
+    {tag:"Anatomy",h:"Homologous organs",p:"Same structure, different function.",more:"The forelimbs of humans, whales, bats and cats share the same bone plan but do different jobs. Common ancestry with divergent evolution - evidence of adaptive radiation."},
+    {tag:"Anatomy",h:"Analogous organs",p:"Different structure, same function.",more:"Wings of insects and birds do the same job but are built differently and have separate origins. This is convergent evolution driven by similar environments, not common ancestry."},
+    {tag:"Anatomy",h:"Vestigial organs",p:"Reduced, functionless remnants.",more:"The human appendix, wisdom teeth and ear muscles were useful in ancestors but are now reduced - leftovers pointing to evolutionary history."},
+    {tag:"Molecular",h:"Molecular evidence",p:"Shared DNA and proteins.",more:"The universal genetic code and similarities in DNA, RNA and proteins (e.g. cytochrome c, haemoglobin) let us build phylogenetic trees. More closely related species share more sequence."}
+  ];
+  var mechanisms=[
+    {tag:"Raw material",h:"Variation",p:"Heritable differences among individuals.",more:"Mutation, recombination and gene flow create genetic variation. Without variation there is nothing for selection to act on."},
+    {tag:"Sorting force",h:"Natural selection",p:"Differential survival & reproduction.",more:"Darwin and Wallace: individuals best suited to their environment leave more offspring, so favourable heritable traits become common over generations. 'Survival of the fittest' means reproductive success, not just strength."},
+    {tag:"Outcome",h:"Adaptation",p:"Traits that fit an organism to its niche.",more:"Accumulated favourable variations make a population better matched to its environment - e.g. Darwin's finches with beak shapes suited to different foods on the Galapagos."}
+  ];
+  function buildCards(list,target){
+    var box=document.getElementById(target);
+    list.forEach(function(c){
+      var el=document.createElement("div");
+      el.className="card";
+      el.innerHTML='<div class="tag">'+c.tag+'</div><h4>'+c.h+'</h4><p>'+c.p+'</p><div class="more">'+c.more+'</div>';
+      el.addEventListener("click",function(){el.classList.toggle("open");});
+      box.appendChild(el);
+    });
+  }
+  buildCards(evidence,"evCards");
+  buildCards(mechanisms,"mechCards");
+
+  /* ---------- Natural selection sim (peppered moth) ---------- */
+  var soot=document.getElementById("soot"),
+      pred=document.getElementById("pred"),
+      sootVal=document.getElementById("sootVal"),
+      mothSvg=document.getElementById("mothSvg"),
+      lightPct=document.getElementById("lightPct"),
+      darkPct=document.getElementById("darkPct"),
+      genN=document.getElementById("genN");
+  var light=0.5, gen=0;   // fraction light-form
+  var mothLayout=[];
+  (function(){ for(var i=0;i<24;i++){mothLayout.push([20+(i%6)*50, 30+Math.floor(i/6)*40]);} })();
+
+  function barkColor(){
+    var s=+soot.value/100;             // 0 clean .. 1 sooty
+    var v=Math.round(190-150*s);       // light->dark grey
+    return "rgb("+v+","+Math.round(v*0.95)+","+Math.round(v*0.9)+")";
+  }
+  function drawMoths(){
+    var s=+soot.value/100;
+    mothSvg.innerHTML=
+      '<rect x="0" y="0" width="320" height="200" fill="'+barkColor()+'"/>'+
+      '<rect x="0" y="0" width="320" height="200" fill="url(#gr)" opacity="0.15"/>';
+    var nLight=Math.round(light*mothLayout.length);
+    mothLayout.forEach(function(pt,i){
+      var isLight = i < nLight;
+      var col = isLight ? "#efe7d8" : "#2b2621";
+      var wing = isLight ? "#d8cdb6" : "#1c1814";
+      mothSvg.innerHTML+=
+        '<g transform="translate('+pt[0]+','+pt[1]+')">'+
+        '<ellipse cx="-5" cy="0" rx="7" ry="4" fill="'+col+'" stroke="'+wing+'"/>'+
+        '<ellipse cx="5" cy="0" rx="7" ry="4" fill="'+col+'" stroke="'+wing+'"/>'+
+        '<rect x="-1.5" y="-5" width="3" height="10" rx="1.5" fill="'+wing+'"/>'+
+        '</g>';
+    });
+    mothSvg.innerHTML+='<text x="8" y="192" font-size="9" fill="#0009">Soot '+soot.value+'%</text>';
+  }
+  function updateStats(){
+    lightPct.textContent=Math.round(light*100)+"%";
+    darkPct.textContent=Math.round((1-light)*100)+"%";
+    genN.textContent=gen;
+  }
+  function step(){
+    var s=+soot.value/100;                 // 0 clean, 1 sooty
+    var p=+pred.value/100;                 // predation strength
+    // conspicuousness = contrast with bark. Light moth stands out on dark bark (high s).
+    var lightExposed = s;                  // 0 (safe on clean) .. 1 (exposed on sooty)
+    var darkExposed  = 1 - s;
+    // survival fitness (higher = better)
+    var wLight = 1 - p*lightExposed;
+    var wDark  = 1 - p*darkExposed;
+    var dark = 1 - light;
+    var num = light*wLight;
+    light = num / (num + dark*wDark);
+    if(light<0.001)light=0.001; if(light>0.999)light=0.999;
+    gen++;
+    drawMoths(); updateStats();
+  }
+  soot.addEventListener("input",function(){sootVal.textContent=soot.value+"%";drawMoths();});
+  document.getElementById("stepBtn").addEventListener("click",step);
+  document.getElementById("resetNs").addEventListener("click",function(){
+    light=0.5;gen=0;soot.value=50;pred.value=55;sootVal.textContent="50%";drawMoths();updateStats();
+  });
+  // gradient def (added once via a hidden svg defs in markup-free way)
+  mothSvg.insertAdjacentHTML("afterbegin",'<defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>');
+  drawMoths(); updateStats();
+
+  /* ---------- Classification hierarchy ---------- */
+  var ranks=[
+    {rk:"Kingdom",ex:"Animalia",w:100,note:"Animalia - all multicellular, heterotrophic organisms without cell walls."},
+    {rk:"Phylum",ex:"Arthropoda",w:84,note:"Arthropoda - jointed legs, exoskeleton of chitin, segmented body."},
+    {rk:"Class",ex:"Insecta",w:68,note:"Insecta - three body parts (head, thorax, abdomen), six legs, usually wings."},
+    {rk:"Order",ex:"Hymenoptera",w:54,note:"Hymenoptera - bees, wasps and ants, often with two pairs of membranous wings."},
+    {rk:"Family",ex:"Apidae",w:42,note:"Apidae - the bee family, including honey bees and bumble bees."},
+    {rk:"Genus",ex:"Apis",w:30,note:"Apis - the honey-bee genus. The first word of the scientific name."},
+    {rk:"Species",ex:"mellifera",w:20,note:"Apis mellifera - the western honey bee. Members interbreed to give fertile offspring."}
+  ];
+  var hier=document.getElementById("hier"), clNote=document.getElementById("clNote");
+  ranks.forEach(function(r){
+    var el=document.createElement("div"); el.className="rank"; el.tabIndex=0;
+    el.innerHTML='<span class="rk">'+r.rk+'</span><span class="bar" style="width:'+r.w+'px"></span><span class="ex"><i>'+r.ex+'</i></span>';
+    function sel(){clNote.innerHTML='<p><b>'+r.rk+':</b> '+r.note+'</p>';}
+    el.addEventListener("click",sel);
+    el.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sel();}});
+    hier.appendChild(el);
+  });
+
+  /* ---------- Kingdoms / domains cards ---------- */
+  var kingdoms=[
+    {tag:"Whittaker 1969",h:"Monera",p:"Prokaryotic, unicellular.",more:"Bacteria and cyanobacteria - no nucleus or membrane-bound organelles. Cell wall present."},
+    {tag:"Five kingdoms",h:"Protista",p:"Eukaryotic, mostly unicellular.",more:"Amoeba, Paramecium, Euglena, algae - the 'first eukaryotes', a diverse group."},
+    {tag:"Five kingdoms",h:"Fungi",p:"Eukaryotic, heterotrophic.",more:"Yeasts, moulds, mushrooms - absorb nutrients, cell wall of chitin, mostly decomposers."},
+    {tag:"Five kingdoms",h:"Plantae",p:"Eukaryotic, autotrophic.",more:"Multicellular photosynthesisers with cellulose cell walls and chloroplasts."},
+    {tag:"Five kingdoms",h:"Animalia",p:"Eukaryotic, heterotrophic.",more:"Multicellular consumers, no cell wall, usually mobile with nervous coordination."},
+    {tag:"Woese - 3 domains",h:"Three domains",p:"Bacteria, Archaea, Eukarya.",more:"Carl Woese used rRNA to split prokaryotes into Bacteria and Archaea; all nucleated organisms form Eukarya. This sits above the kingdom rank."}
+  ];
+  buildCards(kingdoms,"kingCards");
+
+  /* ---------- Facts ---------- */
+  var facts=[
+    {h:"Oparin-Haldane hypothesis",p:"Life arose by chemical evolution from simple molecules in a reducing, oxygen-free early atmosphere - the 'primordial soup'."},
+    {h:"Miller-Urey experiment (1953)",p:"Sparks through methane, ammonia, hydrogen and water vapour produced amino acids - lab support for abiogenesis."},
+    {h:"Darwin & natural selection",p:"Charles Darwin (On the Origin of Species, 1859) and Alfred Wallace proposed natural selection: heritable variation + differential reproduction leads to adaptation."},
+    {h:"Endosymbiotic theory (Margulis)",p:"Mitochondria and chloroplasts descend from once free-living bacteria engulfed by early eukaryotic cells."},
+    {h:"Taxonomy & Linnaeus",p:"Carl Linnaeus founded modern taxonomy and binomial nomenclature. Hierarchy: Kingdom-Phylum-Class-Order-Family-Genus-Species."}
+  ];
+  var fl=document.getElementById("factList");
+  facts.forEach(function(f){
+    var d=document.createElement("div"); d.className="fact";
+    d.innerHTML='<h4>'+f.h+'</h4><p>'+f.p+'</p>'; fl.appendChild(d);
+  });
+
+  /* ---------- Quiz ---------- */
+  var quiz=[
+    {q:"The Miller-Urey experiment provided evidence for which idea?",
+     o:["Spontaneous generation of large animals","Chemical origin of life's building blocks","Inheritance of acquired characters","Endosymbiotic origin of mitochondria"],
+     a:1,e:"Sparks through a simulated early atmosphere formed amino acids, supporting chemical (abiotic) origin of biomolecules."},
+    {q:"Forelimbs of a human, whale and bat share a common bone plan but differ in function. They are:",
+     o:["Analogous organs","Vestigial organs","Homologous organs","Fossil organs"],
+     a:2,e:"Same underlying structure, different functions, from common ancestry = homologous organs (divergent evolution)."},
+    {q:"Which sequence correctly orders taxonomic ranks from broad to specific?",
+     o:["Species-Genus-Family-Order","Kingdom-Phylum-Class-Order-Family-Genus-Species","Genus-Species-Kingdom-Phylum","Order-Class-Phylum-Kingdom"],
+     a:1,e:"The standard hierarchy runs Kingdom > Phylum > Class > Order > Family > Genus > Species."}
+  ];
+  var quizBox=document.getElementById("quiz"), scoreEl=document.getElementById("score");
+  var answered=[], score=0;
+  quiz.forEach(function(item,qi){
+    answered[qi]=false;
+    var d=document.createElement("div"); d.className="q";
+    var html='<p class="qt">'+(qi+1)+'. '+item.q+'</p>';
+    d.innerHTML=html;
+    item.o.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered[qi])return;
+        answered[qi]=true;
+        if(oi===item.a){b.classList.add("correct");score++;}
+        else{
+          b.classList.add("wrong");
+          d.querySelectorAll(".opt")[item.a].classList.add("correct");
+        }
+        scoreEl.textContent=score+" / 3";
+        d.querySelector(".expl").classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="expl";
+    ex.innerHTML="<b>Why:</b> "+item.e; d.appendChild(ex);
+    quizBox.appendChild(d);
+  });
+
+})();
+</script>
+</body>
+</html>

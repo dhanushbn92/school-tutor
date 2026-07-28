@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plantae &amp; Animalia Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#5fd0a8;
+    --accent-dark:#3fae89;
+    --bg:#141b22;
+    --bg2:#0f151b;
+    --panel:#1e2831;
+    --panel2:#25313c;
+    --ink:#e7eef4;
+    --muted:#9db0c0;
+    --line:#324150;
+    --good:#5fd0a8;
+    --bad:#f08a8a;
+    --warn:#f2c471;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1c2833,var(--bg)) fixed;
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);
+    border:1px solid var(--line);padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#0f151b;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:.85rem;margin:0 0 12px;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .treecol{flex:1 1 300px;min-width:260px;}
+  .infocol{flex:1 1 260px;min-width:240px;}
+  .node{
+    display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+    background:var(--panel2);border:1px solid var(--line);border-left:4px solid var(--accent);
+    color:var(--ink);border-radius:12px;padding:10px 12px;margin:0 0 8px;
+    cursor:pointer;font-size:.9rem;font-weight:600;transition:.15s;
+  }
+  .node:hover{background:#2c3a47;}
+  .node.sel{background:var(--accent);color:#0f151b;border-left-color:#0f151b;}
+  .node .emoji{font-size:1.25rem;line-height:1;}
+  .node .lvl{margin-left:auto;font-size:.7rem;color:var(--muted);font-weight:700;}
+  .node.sel .lvl{color:#12321f;}
+  .indent1{margin-left:18px;}
+  .info{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:220px;}
+  .info h3{margin:0 0 4px;font-size:1rem;}
+  .info .tag{display:inline-block;font-size:.7rem;background:var(--accent);color:#0f151b;
+    padding:2px 8px;border-radius:20px;font-weight:700;margin-bottom:8px;}
+  .info ul{margin:8px 0 0;padding-left:18px;font-size:.86rem;}
+  .info li{margin-bottom:4px;}
+  .kv{font-size:.82rem;color:var(--muted);margin:6px 0;}
+  .kv b{color:var(--ink);}
+  .btn{
+    background:var(--accent);color:#0f151b;border:none;padding:9px 16px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost:hover{background:#2c3a47;}
+  .gamecard{text-align:center;padding:8px 0;}
+  .organism{font-size:3.4rem;line-height:1;margin:6px 0;}
+  .oname{font-size:1.1rem;font-weight:700;margin-bottom:2px;}
+  .ohint{color:var(--muted);font-size:.82rem;margin-bottom:14px;}
+  .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;max-width:560px;margin:0 auto;}
+  .choice{
+    background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:11px 8px;border-radius:12px;cursor:pointer;font-weight:600;font-size:.85rem;transition:.15s;
+  }
+  .choice:hover{background:#2c3a47;}
+  .choice.correct{background:var(--good);color:#0f151b;border-color:var(--good);}
+  .choice.wrong{background:var(--bad);color:#0f151b;border-color:var(--bad);}
+  .choice:disabled{cursor:default;}
+  .scorebar{display:flex;justify-content:center;gap:18px;margin:6px 0 12px;font-size:.85rem;color:var(--muted);}
+  .scorebar b{color:var(--accent);font-size:1rem;}
+  .feedback{min-height:22px;font-weight:600;font-size:.88rem;margin:12px 0 4px;}
+  .feedback.ok{color:var(--good);} .feedback.no{color:var(--bad);}
+  .quiz-q{border-top:1px solid var(--line);padding-top:12px;margin-top:12px;}
+  .quiz-q:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+  .quiz-q p{font-weight:600;margin:0 0 8px;font-size:.9rem;}
+  .qopt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);padding:8px 12px;border-radius:10px;margin-bottom:6px;cursor:pointer;font-size:.85rem;transition:.12s;}
+  .qopt:hover{background:#2c3a47;}
+  .qopt.ok{background:var(--good);color:#0f151b;border-color:var(--good);}
+  .qopt.no{background:var(--bad);color:#0f151b;border-color:var(--bad);}
+  .factbox{background:var(--panel2);border:1px dashed var(--accent-dark);border-radius:12px;
+    padding:12px 14px;font-size:.86rem;display:flex;gap:10px;align-items:flex-start;}
+  .factbox .ic{font-size:1.3rem;}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;padding:6px 0 18px;}
+  @media(max-width:420px){
+    header h1{font-size:1.15rem;} .organism{font-size:2.8rem;}
+    .node .lvl{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>&#127807; Plantae &amp; Animalia Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 3 &mdash; Explore how life is classified into two great kingdoms.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="plant">&#127793; Plant Kingdom</button>
+    <button class="tab" data-tab="animal">&#128011; Animal Kingdom</button>
+    <button class="tab" data-tab="game">&#127919; Classify-It Game</button>
+    <button class="tab" data-tab="quiz">&#9998; Quiz</button>
+  </div>
+
+  <!-- PLANT -->
+  <section class="panel" id="tab-plant">
+    <h2>Kingdom Plantae &mdash; a ladder of complexity</h2>
+    <p class="sub">Tap a group. Notice how vascular tissue, seeds and flowers appear step by step.</p>
+    <div class="stage">
+      <div class="treecol" id="plantTree"></div>
+      <div class="infocol"><div class="info" id="plantInfo"></div></div>
+    </div>
+    <div class="factbox" style="margin-top:14px">
+      <span class="ic">&#128161;</span>
+      <span id="plantFact">Plants get more complex from algae &rarr; mosses &rarr; ferns &rarr; seed plants. Each step adds a key innovation.</span>
+    </div>
+  </section>
+
+  <!-- ANIMAL -->
+  <section class="panel hidden" id="tab-animal">
+    <h2>Kingdom Animalia &mdash; the major phyla</h2>
+    <p class="sub">Tap a phylum for its defining features and examples. Chordata includes the vertebrate classes.</p>
+    <div class="stage">
+      <div class="treecol" id="animalTree"></div>
+      <div class="infocol"><div class="info" id="animalInfo"></div></div>
+    </div>
+    <div class="factbox" style="margin-top:14px">
+      <span class="ic">&#128161;</span>
+      <span id="animalFact">Arthropoda is the largest phylum &mdash; over 80% of all known animal species are arthropods!</span>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="panel hidden" id="tab-game">
+    <h2>Classify-It!</h2>
+    <p class="sub">Read the organism, then pick the group it belongs to.</p>
+    <div class="scorebar">
+      <span>Score <b id="gScore">0</b></span>
+      <span>Question <b id="gCount">1</b>/10</span>
+      <span>Streak <b id="gStreak">0</b></span>
+    </div>
+    <div class="gamecard">
+      <div class="organism" id="gEmoji">&#129419;</div>
+      <div class="oname" id="gName">&mdash;</div>
+      <div class="ohint" id="gHint">&mdash;</div>
+      <div class="choices" id="gChoices"></div>
+      <div class="feedback" id="gFeedback"></div>
+      <button class="btn" id="gNext" style="display:none">Next &rarr;</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel hidden" id="tab-quiz">
+    <h2>Quick Quiz</h2>
+    <p class="sub">Tap the answer you think is right &mdash; it reveals instantly.</p>
+    <div id="quizBox"></div>
+  </section>
+
+  <footer>Self-contained interactive &middot; Biology reference: NIOS Senior Secondary Biology</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- PLANT DATA ---------- */
+var PLANTS = [
+  {id:"thallo",name:"Thallophyta (Algae)",emoji:"🌿",lvl:"L1",indent:0,
+   tag:"Simplest plants",
+   vascular:"Absent",seed:"None",flower:"None",body:"Thallus (no true root/stem/leaf)",
+   feats:["Mostly aquatic; body is an undifferentiated thallus","No vascular (conducting) tissue","Reproduce by spores; autotrophic (chlorophyll)","Store food and have simple structure"],
+   ex:["Spirogyra","Ulothrix","Chara","Volvox"]},
+  {id:"bryo",name:"Bryophyta (Mosses)",emoji:"🌱",lvl:"L2",indent:0,
+   tag:"Amphibians of plant kingdom",
+   vascular:"Absent",seed:"None",flower:"None",body:"Thallus / leaf-like; no true roots",
+   feats:["First land plants but need water to reproduce","No vascular tissue — stay small & near water","Rhizoids anchor them (not true roots)","Distinct gametophyte-dominant life cycle"],
+   ex:["Moss (Funaria)","Marchantia","Riccia","Liverworts"]},
+  {id:"pterido",name:"Pteridophyta (Ferns)",emoji:"🌾",lvl:"L3",indent:0,
+   tag:"First vascular plants",
+   vascular:"Present (xylem & phloem)",seed:"None (spores)",flower:"None",body:"True roots, stem & leaves",
+   feats:["First plants with vascular tissue — grow taller","Have true roots, stems and leaves","Reproduce by spores, not seeds","Still need water for fertilisation"],
+   ex:["Fern (Dryopteris)","Marsilea","Equisetum","Selaginella"]},
+  {id:"gymno",name:"Gymnosperms",emoji:"🌲",lvl:"L4",indent:0,
+   tag:"Naked-seed plants",
+   vascular:"Present",seed:"Naked (not in fruit)",flower:"None (cones)",body:"Woody trees & shrubs",
+   feats:["First seed plants — seeds are 'naked' on cone scales","No flowers or fruit; bear cones","No dependence on water for fertilisation","Usually evergreen woody perennials"],
+   ex:["Pinus (pine)","Cycas","Cedar","Ginkgo"]},
+  {id:"angio",name:"Angiosperms",emoji:"🌼",lvl:"L5",indent:0,
+   tag:"Flowering plants",
+   vascular:"Present",seed:"Enclosed in fruit",flower:"Present",body:"Herbs, shrubs, trees",
+   feats:["Most advanced & diverse plants","Bear true flowers; seeds enclosed in a fruit","Double fertilisation forms endosperm","Split into monocots and dicots"],
+   ex:["Mango","Rose","Wheat","Sunflower"]},
+  {id:"mono",name:"Monocots",emoji:"🌾",lvl:"L5a",indent:1,
+   tag:"One cotyledon",
+   vascular:"Scattered bundles",seed:"1 cotyledon",flower:"Parts in 3s",body:"Fibrous roots, parallel veins",
+   feats:["Seed has one cotyledon","Parallel leaf venation","Fibrous root system","Flower parts in multiples of three"],
+   ex:["Wheat","Maize","Rice","Grass","Lily"]},
+  {id:"dicot",name:"Dicots",emoji:"🌱",lvl:"L5b",indent:1,
+   tag:"Two cotyledons",
+   vascular:"Ring of bundles",seed:"2 cotyledons",flower:"Parts in 4s/5s",body:"Tap root, net veins",
+   feats:["Seed has two cotyledons","Reticulate (net) leaf venation","Tap root system","Flower parts in multiples of four or five"],
+   ex:["Gram","Pea","Mango","Rose","Sunflower"]}
+];
+
+/* ---------- ANIMAL DATA ---------- */
+var ANIMALS = [
+  {id:"pori",name:"Porifera",emoji:"🧽",lvl:"",indent:0,tag:"Sponges",
+   sym:"Asymmetrical",body:"Cellular grade, no organs",spec:"Pores (ostia) & canal system",
+   feats:["Simplest multicellular animals; body full of pores","Water canal system with choanocytes (collar cells)","No true tissues or organs","Mostly marine, sessile (fixed)"],
+   ex:["Sycon","Spongilla","Euspongia (bath sponge)"]},
+  {id:"cnid",name:"Cnidaria",emoji:"🪸",lvl:"",indent:0,tag:"Coelenterates",
+   sym:"Radial",body:"Tissue grade; diploblastic",spec:"Stinging cells (cnidoblasts)",
+   feats:["Radial symmetry; two body layers (diploblastic)","Stinging cells (cnidoblasts) for defence/prey","Central gastrovascular cavity, single opening","Polyp & medusa forms"],
+   ex:["Hydra","Jellyfish","Sea anemone","Corals"]},
+  {id:"platy",name:"Platyhelminthes",emoji:"🪱",lvl:"",indent:0,tag:"Flatworms",
+   sym:"Bilateral",body:"Triploblastic, acoelomate, flat",spec:"Dorso-ventrally flattened",
+   feats:["First bilaterally symmetrical, triploblastic animals","Flat, ribbon-like body; no body cavity (acoelomate)","Many are parasites","Flame cells for excretion"],
+   ex:["Planaria","Liver fluke (Fasciola)","Tapeworm (Taenia)"]},
+  {id:"nema",name:"Nematoda",emoji:"🪱",lvl:"",indent:0,tag:"Roundworms",
+   sym:"Bilateral",body:"Triploblastic, pseudocoelomate",spec:"Cylindrical, unsegmented",
+   feats:["Cylindrical, unsegmented worms","False body cavity (pseudocoelom)","Complete digestive tract (mouth to anus)","Many cause diseases in plants/animals"],
+   ex:["Ascaris (roundworm)","Wuchereria (filaria)","Hookworm","Enterobius"]},
+  {id:"anne",name:"Annelida",emoji:"🪱",lvl:"",indent:0,tag:"Segmented worms",
+   sym:"Bilateral",body:"Triploblastic, true coelom",spec:"Metamerically segmented",
+   feats:["Body divided into ring-like segments (metameres)","First animals with a true body cavity (coelom)","Closed circulatory system","Aquatic or terrestrial"],
+   ex:["Earthworm (Pheretima)","Leech (Hirudinaria)","Nereis"]},
+  {id:"arth",name:"Arthropoda",emoji:"🦗",lvl:"Largest",indent:0,tag:"Jointed legs",
+   sym:"Bilateral",body:"Triploblastic, coelomate",spec:"Jointed legs + chitin exoskeleton",
+   feats:["Largest phylum — most animal species on Earth","Jointed appendages (legs/antennae)","Hard chitinous exoskeleton; segmented body","Open circulatory system"],
+   ex:["Cockroach","Butterfly","Prawn","Spider","Housefly"]},
+  {id:"moll",name:"Mollusca",emoji:"🐚",lvl:"",indent:0,tag:"Soft-bodied",
+   sym:"Bilateral",body:"Triploblastic, coelomate",spec:"Soft body, often a shell + muscular foot",
+   feats:["Soft unsegmented body, usually with a calcareous shell","Muscular foot for movement","Mantle secretes shell; rasping radula for feeding","Second largest animal phylum"],
+   ex:["Snail","Octopus","Pila","Mussel","Squid"]},
+  {id:"echi",name:"Echinodermata",emoji:"⭐",lvl:"",indent:0,tag:"Spiny-skinned",
+   sym:"Radial (adult)",body:"Triploblastic, coelomate",spec:"Water-vascular system, tube feet",
+   feats:["Spiny skin with calcareous plates","Unique water-vascular system with tube feet","Radial symmetry as adults (larvae bilateral)","All marine; can regenerate arms"],
+   ex:["Starfish","Sea urchin","Sea cucumber","Brittle star"]},
+  {id:"chor",name:"Chordata",emoji:"🐟",lvl:"",indent:0,tag:"Notochord animals",
+   sym:"Bilateral",body:"Triploblastic, coelomate",spec:"Notochord + dorsal nerve cord + gill slits",
+   feats:["Have a notochord at some life stage","Dorsal hollow nerve cord & pharyngeal gill slits","Post-anal tail; most are vertebrates","Includes fish, amphibians, reptiles, birds, mammals"],
+   ex:["Humans","Fish","Frog","Snake","Sparrow"]},
+  {id:"fish",name:"Pisces (Fish)",emoji:"🐠",lvl:"Vertebrate",indent:1,tag:"Class of Chordata",
+   sym:"Bilateral",body:"Aquatic vertebrate",spec:"Gills, fins, scales; cold-blooded",
+   feats:["Aquatic; breathe through gills","Streamlined body with fins and scales","Cold-blooded (poikilothermic)","Two-chambered heart; mostly lay eggs"],
+   ex:["Rohu","Shark","Catla","Tuna"]},
+  {id:"amph",name:"Amphibia",emoji:"🐸",lvl:"Vertebrate",indent:1,tag:"Class of Chordata",
+   sym:"Bilateral",body:"Land + water vertebrate",spec:"Moist skin; larva in water",
+   feats:["Live both in water and on land","Moist skin used in respiration","Larva (tadpole) lives in water, breathes by gills","Cold-blooded; three-chambered heart"],
+   ex:["Frog","Toad","Salamander"]},
+  {id:"rept",name:"Reptilia",emoji:"🐍",lvl:"Vertebrate",indent:1,tag:"Class of Chordata",
+   sym:"Bilateral",body:"Terrestrial vertebrate",spec:"Dry scaly skin; shelled eggs",
+   feats:["Dry, scaly skin prevents water loss","Lay shelled eggs on land","Cold-blooded; breathe by lungs","Mostly three-chambered heart (four in crocodiles)"],
+   ex:["Snake","Lizard","Turtle","Crocodile"]},
+  {id:"aves",name:"Aves (Birds)",emoji:"🐦",lvl:"Vertebrate",indent:1,tag:"Class of Chordata",
+   sym:"Bilateral",body:"Flying vertebrate",spec:"Feathers, beak, hollow bones",
+   feats:["Body covered with feathers; forelimbs are wings","Warm-blooded (homeothermic)","Beak without teeth; hollow light bones","Four-chambered heart; lay eggs"],
+   ex:["Sparrow","Pigeon","Eagle","Peacock"]},
+  {id:"mamm",name:"Mammalia",emoji:"🐘",lvl:"Vertebrate",indent:1,tag:"Class of Chordata",
+   sym:"Bilateral",body:"Advanced vertebrate",spec:"Hair + mammary glands",
+   feats:["Have hair/fur and mammary glands (milk)","Warm-blooded; four-chambered heart","Most give birth to young ones","Well-developed brain; breathe by lungs"],
+   ex:["Human","Whale","Bat","Lion","Elephant"]}
+];
+
+/* ---------- render trees ---------- */
+function buildTree(list, mountId, infoId, factId){
+  var mount=document.getElementById(mountId);
+  var info=document.getElementById(infoId);
+  list.forEach(function(d){
+    var b=document.createElement("button");
+    b.className="node"+(d.indent?" indent1":"");
+    b.innerHTML='<span class="emoji">'+d.emoji+'</span><span>'+d.name+'</span>'+
+                (d.lvl?'<span class="lvl">'+d.lvl+'</span>':'');
+    b.addEventListener("click",function(){
+      Array.prototype.forEach.call(mount.children,function(c){c.classList.remove("sel");});
+      b.classList.add("sel");
+      showInfo(d,info,list===PLANTS);
+    });
+    mount.appendChild(b);
+  });
+}
+function showInfo(d,info,isPlant){
+  var rows = isPlant
+    ? '<div class="kv"><b>Vascular tissue:</b> '+d.vascular+'</div>'+
+      '<div class="kv"><b>Seeds:</b> '+d.seed+'</div>'+
+      '<div class="kv"><b>Flowers:</b> '+d.flower+'</div>'+
+      '<div class="kv"><b>Body:</b> '+d.body+'</div>'
+    : '<div class="kv"><b>Symmetry:</b> '+d.sym+'</div>'+
+      '<div class="kv"><b>Body plan:</b> '+d.body+'</div>'+
+      '<div class="kv"><b>Special feature:</b> '+d.spec+'</div>';
+  info.innerHTML='<span class="tag">'+d.tag+'</span>'+
+    '<h3>'+d.emoji+' '+d.name+'</h3>'+rows+
+    '<ul>'+d.feats.map(function(f){return '<li>'+f+'</li>';}).join('')+'</ul>'+
+    '<div class="kv" style="margin-top:8px"><b>Examples:</b> '+d.ex.join(', ')+'</div>';
+}
+buildTree(PLANTS,"plantTree","plantInfo");
+buildTree(ANIMALS,"animalTree","animalInfo");
+document.getElementById("plantTree").children[0].click();
+document.getElementById("animalTree").children[0].click();
+
+/* ---------- TABS ---------- */
+var tabs=document.querySelectorAll(".tab");
+var panels={plant:"tab-plant",animal:"tab-animal",game:"tab-game",quiz:"tab-quiz"};
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    for(var k in panels){document.getElementById(panels[k]).classList.add("hidden");}
+    document.getElementById(panels[t.dataset.tab]).classList.remove("hidden");
+  });
+});
+
+/* ---------- GAME ---------- */
+var GAME=[
+  {emoji:"🦑",name:"Octopus",hint:"Soft-bodied sea animal, 8 arms, no bones",ans:"Mollusca"},
+  {emoji:"🌿",name:"Spirogyra",hint:"Green pond alga, no roots or leaves",ans:"Thallophyta"},
+  {emoji:"🐝",name:"Honeybee",hint:"Jointed legs, chitin exoskeleton",ans:"Arthropoda"},
+  {emoji:"🌱",name:"Moss",hint:"Tiny land plant, needs water, no vascular tissue",ans:"Bryophyta"},
+  {emoji:"⭐",name:"Starfish",hint:"Spiny skin, tube feet, marine",ans:"Echinodermata"},
+  {emoji:"🌾",name:"Fern",hint:"Vascular plant, reproduces by spores, no seeds",ans:"Pteridophyta"},
+  {emoji:"🐍",name:"Snake",hint:"Dry scaly skin, shelled eggs, cold-blooded",ans:"Reptilia"},
+  {emoji:"🌲",name:"Pine tree",hint:"Cone-bearing, naked seeds, no flowers",ans:"Gymnosperms"},
+  {emoji:"🦋",name:"Butterfly",hint:"Insect with jointed legs and wings",ans:"Arthropoda"},
+  {emoji:"🪸",name:"Jellyfish",hint:"Radial symmetry, stinging cells",ans:"Cnidaria"}
+];
+var OPTIONS=["Thallophyta","Bryophyta","Pteridophyta","Gymnosperms","Mollusca",
+  "Arthropoda","Echinodermata","Cnidaria","Reptilia","Annelida"];
+var gi=0,score=0,streak=0,answered=false;
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function loadGame(){
+  answered=false;
+  var q=GAME[gi];
+  document.getElementById("gEmoji").innerHTML=q.emoji;
+  document.getElementById("gName").textContent=q.name;
+  document.getElementById("gHint").textContent=q.hint;
+  document.getElementById("gCount").textContent=(gi+1);
+  document.getElementById("gFeedback").textContent="";
+  document.getElementById("gFeedback").className="feedback";
+  document.getElementById("gNext").style.display="none";
+  var opts=[q.ans];
+  var pool=shuffle(OPTIONS.filter(function(o){return o!==q.ans;}));
+  opts=opts.concat(pool.slice(0,3));
+  opts=shuffle(opts);
+  var box=document.getElementById("gChoices");
+  box.innerHTML="";
+  opts.forEach(function(o){
+    var b=document.createElement("button");
+    b.className="choice";b.textContent=o;
+    b.addEventListener("click",function(){pick(b,o,q.ans);});
+    box.appendChild(b);
+  });
+}
+function pick(btn,chosen,correct){
+  if(answered)return;answered=true;
+  var fb=document.getElementById("gFeedback");
+  var all=document.getElementById("gChoices").children;
+  Array.prototype.forEach.call(all,function(c){
+    c.disabled=true;
+    if(c.textContent===correct)c.classList.add("correct");
+    else if(c===btn)c.classList.add("wrong");
+  });
+  if(chosen===correct){
+    score++;streak++;
+    fb.textContent="✔ Correct! "+correct+" it is.";fb.className="feedback ok";
+  }else{
+    streak=0;
+    fb.textContent="✘ It's "+correct+".";fb.className="feedback no";
+  }
+  document.getElementById("gScore").textContent=score;
+  document.getElementById("gStreak").textContent=streak;
+  document.getElementById("gNext").style.display="inline-block";
+}
+var gNextBtn=document.getElementById("gNext");
+function onNext(){
+  gi++;
+  if(gi>=GAME.length){
+    document.getElementById("gChoices").innerHTML="";
+    document.getElementById("gEmoji").innerHTML="🏆";
+    document.getElementById("gName").textContent="Done!";
+    document.getElementById("gHint").textContent="Final score: "+score+" / "+GAME.length;
+    var fb=document.getElementById("gFeedback");
+    fb.textContent=score>=8?"Excellent — you're a classifier!":score>=5?"Good work — revise the tricky ones.":"Keep practising the two trees.";
+    fb.className="feedback ok";
+    gNextBtn.textContent="Play again";
+    gNextBtn.style.display="inline-block";
+    return;
+  }
+  loadGame();
+}
+gNextBtn.addEventListener("click",function(){
+  if(gNextBtn.textContent.indexOf("Play again")>=0){
+    gi=0;score=0;streak=0;
+    document.getElementById("gScore").textContent=0;
+    document.getElementById("gStreak").textContent=0;
+    gNextBtn.textContent="Next →";
+    loadGame();
+    return;
+  }
+  onNext();
+});
+loadGame();
+
+/* ---------- QUIZ ---------- */
+var QUIZ=[
+  {q:"Which group is the FIRST to have true vascular tissue?",
+   opts:["Bryophyta","Pteridophyta","Thallophyta","Angiosperms"],a:1},
+  {q:"'Naked seeds' borne on cones, with no flowers, describe:",
+   opts:["Angiosperms","Monocots","Gymnosperms","Ferns"],a:2},
+  {q:"Which phylum has jointed legs and a chitin exoskeleton, and is the largest?",
+   opts:["Mollusca","Annelida","Echinodermata","Arthropoda"],a:3}
+];
+var qb=document.getElementById("quizBox");
+QUIZ.forEach(function(item,qi){
+  var div=document.createElement("div");div.className="quiz-q";
+  var html='<p>Q'+(qi+1)+'. '+item.q+'</p>';
+  div.innerHTML=html;
+  item.opts.forEach(function(o,oi){
+    var b=document.createElement("button");b.className="qopt";b.textContent=o;
+    b.addEventListener("click",function(){
+      var sibs=div.querySelectorAll(".qopt");
+      sibs.forEach(function(s){s.disabled=true;});
+      if(oi===item.a){b.classList.add("ok");}
+      else{b.classList.add("no");sibs[item.a].classList.add("ok");}
+    });
+    div.appendChild(b);
+  });
+  qb.appendChild(div);
+});
+</script>
+</body>
+</html>

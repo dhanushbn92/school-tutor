@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monera, Protoctista &amp; Fungi Lab</title>
+<style>
+  :root{
+    --bg:#12161f;
+    --panel:#1b2130;
+    --panel2:#232b3d;
+    --line:#323b52;
+    --txt:#e6ebf5;
+    --muted:#9aa6bf;
+    --accent:#4fd1b5;
+    --accent-dim:#2f7f72;
+    --good:#57d38c;
+    --bad:#e8776f;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+  body{padding:14px;max-width:1080px;margin:0 auto}
+  h1{font-size:1.5rem;margin-bottom:2px}
+  h2{font-size:1.1rem;margin:0 0 8px}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:14px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:10px 14px;border-radius:999px;cursor:pointer;font-size:.92rem;font-weight:600;
+    min-height:44px;transition:.15s}
+  .tab:hover{border-color:var(--accent-dim)}
+  .tab.active{background:var(--accent);color:#0c1017;border-color:var(--accent)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px}
+  .grid{display:grid;gap:14px}
+  @media(min-width:760px){.two{grid-template-columns:1.15fr .85fr}}
+  .stage{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px;display:flex;justify-content:center;align-items:center;overflow:hidden}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation}
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px;text-align:center}
+  .infobox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:14px;min-height:120px}
+  .infobox h3{color:var(--accent);font-size:1.05rem;margin-bottom:6px}
+  .infobox p{font-size:.92rem;color:var(--txt)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:8px 12px;border-radius:999px;cursor:pointer;font-size:.86rem;min-height:40px}
+  .chip:hover{border-color:var(--accent)}
+  .chip.active{background:var(--accent-dim);border-color:var(--accent);color:#eafffb}
+  .part{cursor:pointer;transition:.12s}
+  .part:hover{opacity:.85}
+  .facts{list-style:none;font-size:.9rem}
+  .facts li{padding:6px 0;border-bottom:1px dashed var(--line);display:flex;gap:8px}
+  .facts li:last-child{border:none}
+  .facts b{color:var(--accent);min-width:96px;display:inline-block}
+  .cards{display:grid;gap:12px;grid-template-columns:1fr}
+  @media(min-width:560px){.cards{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:.15s}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card h4{color:var(--accent);font-size:1rem;margin-bottom:4px}
+  .card p{font-size:.84rem;color:var(--muted)}
+  .card svg{max-width:120px;margin:0 auto 6px}
+  .quiz .q{margin-bottom:14px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--txt);padding:10px 12px;border-radius:10px;margin:6px 0;cursor:pointer;font-size:.9rem;min-height:44px}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(87,211,140,.18);border-color:var(--good)}
+  .opt.wrong{background:rgba(232,119,111,.18);border-color:var(--bad)}
+  .expl{font-size:.84rem;color:var(--muted);margin-top:8px;display:none}
+  .expl.show{display:block}
+  /* mini-game */
+  .kbins{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  @media(max-width:520px){.kbins{grid-template-columns:1fr}}
+  .bin{border:2px dashed var(--line);border-radius:12px;padding:10px;min-height:110px;background:var(--panel2)}
+  .bin.over{border-color:var(--accent);background:rgba(79,209,181,.08)}
+  .bin h4{font-size:.9rem;color:var(--accent);margin-bottom:6px;text-align:center}
+  .pool{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-height:52px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .org{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;cursor:grab;font-size:.86rem;user-select:none;min-height:40px;display:flex;align-items:center;touch-action:none}
+  .org.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+  .org.placed{opacity:.6}
+  .binitems{display:flex;flex-wrap:wrap;gap:6px}
+  .score{font-weight:700;margin-top:10px}
+  .btn{background:var(--accent);color:#0c1017;border:none;border-radius:10px;padding:10px 16px;
+    font-weight:700;cursor:pointer;min-height:44px;font-size:.9rem}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mode{display:none}
+  .mode.active{display:block}
+  .lbl{font-size:11px;fill:var(--muted);font-family:system-ui,sans-serif}
+  .lblw{font-size:11px;fill:#eef;font-family:system-ui,sans-serif}
+  .msg{font-size:.9rem;margin-top:8px;font-weight:600}
+</style>
+</head>
+<body>
+<h1>Monera, Protoctista &amp; Fungi Lab</h1>
+<p class="sub">NIOS Class 12 Biology &middot; Chapter 2 &middot; explore three kingdoms of the living world</p>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-mode="monera">Bacterium (Monera)</button>
+  <button class="tab" data-mode="protoctista">Protoctista</button>
+  <button class="tab" data-mode="fungi">Fungi</button>
+  <button class="tab" data-mode="game">Sort Game</button>
+  <button class="tab" data-mode="quiz">Quiz</button>
+</div>
+
+<!-- ================= MONERA ================= -->
+<section class="mode active" id="monera">
+  <div class="grid two">
+    <div class="panel">
+      <h2>Bacterial cell &ndash; click a part</h2>
+      <div class="stage">
+        <svg viewBox="0 0 340 240" id="bactSvg" aria-label="Bacterial cell diagram">
+          <!-- capsule -->
+          <ellipse class="part" data-p="capsule" cx="170" cy="120" rx="132" ry="78" fill="#2b3550" stroke="#4a5a80" stroke-width="2"/>
+          <!-- cell wall -->
+          <ellipse class="part" data-p="wall" cx="170" cy="120" rx="118" ry="66" fill="#33507a" stroke="#6f8fc4" stroke-width="4"/>
+          <!-- plasma membrane -->
+          <ellipse class="part" data-p="membrane" cx="170" cy="120" rx="110" ry="59" fill="#3a6b8a" stroke="#8fd0e6" stroke-width="2"/>
+          <!-- cytoplasm -->
+          <ellipse cx="170" cy="120" rx="106" ry="55" fill="#2f5f74"/>
+          <!-- nucleoid -->
+          <path class="part" data-p="nucleoid" d="M120 118 q20 -26 44 -6 q22 20 46 -2 q18 -16 6 12 q-16 24 -44 8 q-24 -14 -46 6 q-16 14 -6 -22 z"
+                fill="none" stroke="#f4c14b" stroke-width="4" stroke-linecap="round"/>
+          <!-- ribosomes -->
+          <g class="part" data-p="ribosome">
+            <circle cx="132" cy="98" r="3.5" fill="#e58fb0"/><circle cx="150" cy="140" r="3.5" fill="#e58fb0"/>
+            <circle cx="196" cy="96" r="3.5" fill="#e58fb0"/><circle cx="210" cy="138" r="3.5" fill="#e58fb0"/>
+            <circle cx="176" cy="150" r="3.5" fill="#e58fb0"/><circle cx="120" cy="128" r="3.5" fill="#e58fb0"/>
+            <circle cx="230" cy="112" r="3.5" fill="#e58fb0"/><circle cx="160" cy="92" r="3.5" fill="#e58fb0"/>
+          </g>
+          <!-- flagellum -->
+          <path class="part" data-p="flagellum" d="M300 120 q22 -14 40 0 q-22 14 -40 28 q22 -14 40 0"
+                fill="none" stroke="#9be6c9" stroke-width="4" stroke-linecap="round"/>
+          <!-- pili -->
+          <g class="part" data-p="pili" stroke="#c7d2f0" stroke-width="2.5" stroke-linecap="round">
+            <line x1="88" y1="70" x2="76" y2="52"/><line x1="130" y1="52" x2="128" y2="32"/>
+            <line x1="210" y1="52" x2="214" y2="32"/><line x1="256" y1="72" x2="270" y2="56"/>
+            <line x1="90" y1="172" x2="78" y2="190"/><line x1="248" y1="174" x2="262" y2="190"/>
+          </g>
+          <text class="lbl" x="8" y="30">pili</text>
+          <text class="lblw" x="150" y="120" text-anchor="middle">nucleoid</text>
+        </svg>
+      </div>
+      <p class="hint">Tap parts. Change body shape below.</p>
+      <div class="chips" id="shapeChips">
+        <button class="chip active" data-s="cocci">Cocci (spheres)</button>
+        <button class="chip" data-s="bacilli">Bacilli (rods)</button>
+        <button class="chip" data-s="spirilla">Spirilla (spiral)</button>
+        <button class="chip" data-s="vibrio">Vibrio (comma)</button>
+      </div>
+      <div class="stage" style="margin-top:6px">
+        <svg viewBox="0 0 340 90" id="shapeSvg" aria-label="Bacterial shape"></svg>
+      </div>
+    </div>
+    <div>
+      <div class="infobox" id="bactInfo">
+        <h3>Monera &mdash; the bacteria</h3>
+        <p>Prokaryotic, single-celled organisms with <b>no true nucleus</b> and no membrane-bound organelles. Tap any labelled part of the cell to learn its job.</p>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h2>Key facts</h2>
+        <ul class="facts">
+          <li><b>Cell type</b> Prokaryotic (no nuclear membrane)</li>
+          <li><b>Genetic material</b> Single circular DNA in the nucleoid; often plasmids too</li>
+          <li><b>Cell wall</b> Made of peptidoglycan (murein)</li>
+          <li><b>Gram +/&minus;</b> Gram-positive keep the stain (thick wall); Gram-negative do not (thin wall)</li>
+          <li><b>Nutrition</b> Autotrophic (photo/chemo) or heterotrophic (saprophytic/parasitic)</li>
+          <li><b>Reproduction</b> Binary fission; genetic exchange by conjugation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROTOCTISTA ================= -->
+<section class="mode" id="protoctista">
+  <div class="grid two">
+    <div class="panel">
+      <h2>Labelled Amoeba &amp; Paramecium</h2>
+      <div class="stage">
+        <svg viewBox="0 0 340 180" id="protSvg" aria-label="Amoeba and Paramecium">
+          <!-- Amoeba -->
+          <path class="part" data-p="pseudopodia" d="M40 90 q-18 -30 8 -34 q6 -22 30 -10 q22 -22 40 4 q30 -8 26 26 q22 18 -6 34 q6 26 -26 22 q-14 24 -38 4 q-30 8 -30 -22 q-20 -12 -4 -18 z"
+                fill="#3a6b8a" stroke="#8fd0e6" stroke-width="3"/>
+          <circle class="part" data-p="nucleus" cx="76" cy="88" r="12" fill="#f4c14b"/>
+          <circle class="part" data-p="foodvac" cx="52" cy="76" r="7" fill="#9be6c9"/>
+          <circle class="part" data-p="convac" cx="98" cy="102" r="8" fill="#e58fb0"/>
+          <text class="lbl" x="20" y="150">Amoeba</text>
+          <!-- Paramecium -->
+          <ellipse class="part" data-p="pellicle" cx="238" cy="90" rx="80" ry="34" fill="#3a6b8a" stroke="#8fd0e6" stroke-width="3" transform="rotate(-12 238 90)"/>
+          <g class="part" data-p="cilia" stroke="#c7d2f0" stroke-width="1.6">
+            <line x1="176" y1="78" x2="168" y2="70"/><line x1="196" y1="66" x2="192" y2="56"/>
+            <line x1="240" y1="58" x2="240" y2="48"/><line x1="286" y1="66" x2="292" y2="58"/>
+            <line x1="308" y1="86" x2="318" y2="84"/><line x1="196" y1="116" x2="190" y2="126"/>
+            <line x1="250" y1="122" x2="252" y2="132"/><line x1="300" y1="106" x2="308" y2="114"/>
+          </g>
+          <ellipse class="part" data-p="oralgroove" cx="228" cy="98" rx="16" ry="7" fill="#274a5c" transform="rotate(-12 228 98)"/>
+          <circle class="part" data-p="macronucleus" cx="252" cy="86" r="11" fill="#f4c14b"/>
+          <text class="lbl" x="205" y="150">Paramecium</text>
+        </svg>
+      </div>
+      <p class="hint">Tap organelles. Open cards to compare protists.</p>
+      <div class="cards" id="protCards">
+        <div class="card" data-k="amoeba">
+          <svg viewBox="0 0 100 80"><path d="M20 40 q-10 -18 6 -20 q4 -14 20 -6 q14 -14 26 2 q18 -4 16 16 q14 12 -4 22 q4 16 -16 14 q-10 14 -24 2 q-18 6 -18 -14 z" fill="#3a6b8a" stroke="#8fd0e6" stroke-width="2"/><circle cx="46" cy="40" r="7" fill="#f4c14b"/></svg>
+          <h4>Amoeba</h4><p>Pseudopodia &middot; holozoic</p>
+        </div>
+        <div class="card" data-k="paramecium">
+          <svg viewBox="0 0 100 80"><ellipse cx="50" cy="40" rx="40" ry="18" fill="#3a6b8a" stroke="#8fd0e6" stroke-width="2"/><circle cx="55" cy="38" r="6" fill="#f4c14b"/></svg>
+          <h4>Paramecium</h4><p>Cilia &middot; holozoic</p>
+        </div>
+        <div class="card" data-k="euglena">
+          <svg viewBox="0 0 100 80"><ellipse cx="50" cy="40" rx="22" ry="30" fill="#3a6b8a" stroke="#8fd0e6" stroke-width="2"/><circle cx="50" cy="34" r="6" fill="#f4c14b"/><path d="M50 10 q14 -8 22 4" fill="none" stroke="#9be6c9" stroke-width="2"/></svg>
+          <h4>Euglena</h4><p>Flagellum &middot; mixotroph</p>
+        </div>
+        <div class="card" data-k="algae">
+          <svg viewBox="0 0 100 80"><rect x="30" y="14" width="14" height="52" rx="6" fill="#3a6b8a" stroke="#57d38c" stroke-width="2"/><rect x="52" y="20" width="14" height="46" rx="6" fill="#3a6b8a" stroke="#57d38c" stroke-width="2"/></svg>
+          <h4>Algae</h4><p>No motion / flagella &middot; photosynthetic</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="infobox" id="protInfo">
+        <h3>Protoctista</h3>
+        <p>Mostly aquatic, eukaryotic organisms &mdash; a true nucleus and membrane-bound organelles. They include animal-like protozoa and plant-like algae. Tap a part or a card.</p>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h2>Key facts</h2>
+        <ul class="facts">
+          <li><b>Cell type</b> Eukaryotic (true nucleus present)</li>
+          <li><b>Body</b> Mostly unicellular; some algae are colonial/multicellular</li>
+          <li><b>Movement</b> Pseudopodia, cilia or flagella</li>
+          <li><b>Nutrition</b> Holozoic, photosynthetic or mixotrophic</li>
+          <li><b>Habitat</b> Water, moist soil, other organisms</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FUNGI ================= -->
+<section class="mode" id="fungi">
+  <div class="grid two">
+    <div class="panel">
+      <h2>Hyphae &amp; mycelium</h2>
+      <div class="stage">
+        <svg viewBox="0 0 340 170" id="fungiSvg" aria-label="Fungal hyphae">
+          <g class="part" data-p="mycelium" stroke="#c9b48a" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M20 40 H320"/><path d="M20 80 H320"/><path d="M20 120 H320"/>
+            <path d="M60 40 Q80 60 60 80"/><path d="M120 80 Q140 100 120 120"/>
+            <path d="M200 40 Q220 60 200 80"/><path d="M260 80 Q280 100 260 120"/>
+          </g>
+          <g class="part" data-p="septa" stroke="#7a684a" stroke-width="2">
+            <line x1="80" y1="34" x2="80" y2="46"/><line x1="140" y1="34" x2="140" y2="46"/>
+            <line x1="220" y1="34" x2="220" y2="46"/><line x1="100" y1="74" x2="100" y2="86"/>
+            <line x1="180" y1="74" x2="180" y2="86"/><line x1="120" y1="114" x2="120" y2="126"/>
+          </g>
+          <g class="part" data-p="spores">
+            <circle cx="300" cy="30" r="6" fill="#e58fb0"/><circle cx="314" cy="42" r="5" fill="#e58fb0"/>
+            <circle cx="304" cy="52" r="4.5" fill="#e58fb0"/>
+          </g>
+          <text class="lbl" x="8" y="150">A hypha is a thread; a mesh of hyphae is the mycelium.</text>
+        </svg>
+      </div>
+      <p class="hint">Tap hyphae, septa or spores. Open examples below.</p>
+      <div class="cards" id="fungiCards">
+        <div class="card" data-k="yeast">
+          <svg viewBox="0 0 100 80"><circle cx="46" cy="42" r="20" fill="#c9b48a" stroke="#e0cfa4" stroke-width="2"/><circle cx="70" cy="30" r="9" fill="#c9b48a" stroke="#e0cfa4" stroke-width="2"/></svg>
+          <h4>Yeast</h4><p>Unicellular &middot; budding</p>
+        </div>
+        <div class="card" data-k="rhizopus">
+          <svg viewBox="0 0 100 80"><line x1="14" y1="60" x2="86" y2="60" stroke="#c9b48a" stroke-width="3"/><line x1="50" y1="60" x2="50" y2="22" stroke="#c9b48a" stroke-width="3"/><circle cx="50" cy="18" r="9" fill="#7a684a"/></svg>
+          <h4>Rhizopus</h4><p>Bread mould &middot; sporangia</p>
+        </div>
+        <div class="card" data-k="mushroom">
+          <svg viewBox="0 0 100 80"><path d="M26 40 Q50 10 74 40 Z" fill="#c9b48a" stroke="#e0cfa4" stroke-width="2"/><rect x="45" y="40" width="10" height="30" fill="#e0cfa4"/></svg>
+          <h4>Mushroom</h4><p>Basidiomycete &middot; fruiting body</p>
+        </div>
+        <div class="card" data-k="penicillium">
+          <svg viewBox="0 0 100 80"><line x1="40" y1="70" x2="40" y2="30" stroke="#c9b48a" stroke-width="3"/><g fill="#e58fb0"><circle cx="52" cy="22" r="4"/><circle cx="60" cy="26" r="4"/><circle cx="56" cy="14" r="4"/></g></svg>
+          <h4>Penicillium</h4><p>Blue mould &middot; antibiotic source</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="infobox" id="fungiInfo">
+        <h3>Fungi</h3>
+        <p>Eukaryotic organisms with cell walls made of <b>chitin</b>. Their body is a network of thread-like hyphae called mycelium. Tap a part or an example.</p>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <h2>Key facts</h2>
+        <ul class="facts">
+          <li><b>Cell type</b> Eukaryotic; cell wall of chitin</li>
+          <li><b>Body</b> Hyphae forming a mycelium (yeast is unicellular)</li>
+          <li><b>Nutrition</b> Heterotrophic &mdash; saprophytic (dead matter) or parasitic (on a host)</li>
+          <li><b>Storage</b> Food stored as glycogen (not starch)</li>
+          <li><b>Reproduction</b> Mainly by spores; also budding &amp; fragmentation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GAME ================= -->
+<section class="mode" id="game">
+  <div class="panel">
+    <h2>Sort each organism into its kingdom</h2>
+    <p class="sub" style="margin-bottom:8px">Tap an organism to select it, then tap a bin. On desktop you can also drag. Then check your answers.</p>
+    <div class="pool" id="pool"></div>
+    <div class="kbins">
+      <div class="bin" data-k="Monera"><h4>Monera</h4><div class="binitems"></div></div>
+      <div class="bin" data-k="Protoctista"><h4>Protoctista</h4><div class="binitems"></div></div>
+      <div class="bin" data-k="Fungi"><h4>Fungi</h4><div class="binitems"></div></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="checkGame">Check answers</button>
+      <button class="btn ghost" id="resetGame">Reset</button>
+      <span class="score" id="gameScore"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="mode" id="quiz">
+  <div class="panel quiz" id="quizPanel"></div>
+</section>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabs=document.querySelectorAll('.tab');
+  var modes=document.querySelectorAll('.mode');
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      modes.forEach(function(m){m.classList.remove('active');});
+      t.classList.add('active');
+      document.getElementById(t.dataset.mode).classList.add('active');
+    });
+  });
+
+  // ---------- bacterium part info ----------
+  var bactData={
+    capsule:["Capsule","A slimy protective outer layer (of polysaccharide). It resists drying, helps the bacterium stick to surfaces and defends against a host's immune cells."],
+    wall:["Cell wall","A rigid wall of peptidoglycan (murein) that gives shape and protection. Its thickness decides whether a bacterium stains Gram-positive or Gram-negative."],
+    membrane:["Plasma membrane","Selectively permeable membrane controlling what enters and leaves. It also carries out respiration, since bacteria have no mitochondria."],
+    nucleoid:["Nucleoid","The region holding a single circular DNA molecule. It is NOT bound by a nuclear membrane – the defining feature of a prokaryote."],
+    ribosome:["Ribosomes","Tiny 70S granules that make proteins. They are the only organelle-like structures present in a bacterial cell."],
+    flagellum:["Flagellum","A whip-like protein filament that rotates to move the cell. Made of the protein flagellin (simpler than eukaryotic flagella)."],
+    pili:["Pili (fimbriae)","Short hair-like projections that help attachment to surfaces. Special sex pili transfer DNA during conjugation."]
+  };
+  wire('bactSvg','bactInfo',bactData);
+
+  var protData={
+    pseudopodia:["Pseudopodia","'False feet' – flowing extensions of cytoplasm in Amoeba used both for creeping movement and to engulf food (holozoic nutrition)."],
+    nucleus:["Nucleus","A membrane-bound nucleus – proof that protists are eukaryotes, unlike bacteria."],
+    foodvac:["Food vacuole","Formed when Amoeba engulfs a food particle; digestion happens inside it."],
+    convac:["Contractile vacuole","Pumps out excess water to keep the cell from bursting (osmoregulation) in fresh water."],
+    pellicle:["Pellicle","A firm but flexible outer covering that gives Paramecium its fixed slipper shape."],
+    cilia:["Cilia","Many short hair-like structures covering Paramecium. Their coordinated beating moves the cell and sweeps food into the oral groove."],
+    oralgroove:["Oral groove","A funnel lined with cilia that directs food particles into the cell to form food vacuoles."],
+    macronucleus:["Macronucleus","The larger nucleus controlling everyday metabolism. Paramecium also has a small micronucleus for reproduction."]
+  };
+  wire('protSvg','protInfo',protData);
+
+  var fungiData={
+    mycelium:["Hyphae & mycelium","Each thread is a hypha; the whole mesh is the mycelium. Hyphae absorb nutrients over a large surface area."],
+    septa:["Septa","Cross-walls dividing a hypha into cells. Fungi with septa are 'septate'; Rhizopus is aseptate (coenocytic)."],
+    spores:["Spores","Tiny reproductive units released in huge numbers. Landing on a suitable substrate, each grows into new mycelium."]
+  };
+  wire('fungiSvg','fungiInfo',fungiData);
+
+  function wire(svgId,infoId,data){
+    var svg=document.getElementById(svgId);
+    var info=document.getElementById(infoId);
+    svg.querySelectorAll('.part').forEach(function(el){
+      el.addEventListener('click',function(){
+        var d=data[el.dataset.p];
+        if(!d)return;
+        info.innerHTML='<h3>'+d[0]+'</h3><p>'+d[1]+'</p>';
+      });
+    });
+  }
+
+  // ---------- bacterial shapes ----------
+  var shapeSvg=document.getElementById('shapeSvg');
+  var shapes={
+    cocci:'<circle cx="90" cy="45" r="20" fill="#4fd1b5"/><circle cx="140" cy="45" r="20" fill="#4fd1b5"/><circle cx="190" cy="45" r="20" fill="#4fd1b5"/><circle cx="240" cy="45" r="20" fill="#4fd1b5"/>',
+    bacilli:'<rect x="70" y="30" width="52" height="30" rx="15" fill="#4fd1b5"/><rect x="150" y="30" width="52" height="30" rx="15" fill="#4fd1b5"/><rect x="230" y="30" width="52" height="30" rx="15" fill="#4fd1b5"/>',
+    spirilla:'<path d="M60 45 q20 -30 40 0 q20 30 40 0 q20 -30 40 0 q20 30 40 0" fill="none" stroke="#4fd1b5" stroke-width="16" stroke-linecap="round"/>',
+    vibrio:'<path d="M110 20 q60 25 0 50" fill="none" stroke="#4fd1b5" stroke-width="16" stroke-linecap="round"/><path d="M210 20 q60 25 0 50" fill="none" stroke="#4fd1b5" stroke-width="16" stroke-linecap="round"/>'
+  };
+  var shapeNames={cocci:'Cocci – spherical bacteria, e.g. Streptococcus.',bacilli:'Bacilli – rod-shaped bacteria, e.g. Bacillus, E. coli.',spirilla:'Spirilla – rigid spiral bacteria.',vibrio:'Vibrio – comma-shaped bacteria, e.g. Vibrio cholerae.'};
+  function drawShape(s){shapeSvg.innerHTML=shapes[s]+'<text class="lbl" x="170" y="82" text-anchor="middle">'+shapeNames[s]+'</text>';}
+  drawShape('cocci');
+  document.querySelectorAll('#shapeChips .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('#shapeChips .chip').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active');drawShape(c.dataset.s);
+    });
+  });
+
+  // ---------- protist & fungi cards ----------
+  var cardInfo={
+    amoeba:["Amoeba","Kingdom Protoctista. Moves and feeds using pseudopodia (holozoic nutrition). Reproduces by binary fission. Lives in fresh water and moist soil."],
+    paramecium:["Paramecium","Kingdom Protoctista. Slipper-shaped, moves with cilia and sweeps food into an oral groove. Has two nuclei and contractile vacuoles."],
+    euglena:["Euglena","Kingdom Protoctista. Swims using a flagellum. Mixotroph: it photosynthesises in light (has chloroplasts) but feeds heterotrophically in the dark."],
+    algae:["Algae","Plant-like protists (e.g. Chlamydomonas, Spirogyra). Photosynthetic with chlorophyll; may be unicellular, colonial or filamentous."],
+    yeast:["Yeast","A unicellular fungus. Reproduces asexually by budding and is used in baking and brewing (fermentation)."],
+    rhizopus:["Rhizopus (bread mould)","A saprophytic fungus. Aseptate hyphae with rhizoids; reproduces by spores made inside sporangia held on tall sporangiophores."],
+    mushroom:["Mushroom","The fruiting body of a large fungus. Grows from underground mycelium; spores are produced on gills under the cap."],
+    penicillium:["Penicillium","A blue-green mould. Produces chains of spores (conidia) and the antibiotic penicillin."]
+  };
+  bindCards('protCards',cardInfo,'protInfo');
+  bindCards('fungiCards',cardInfo,'fungiInfo');
+  function bindCards(wrapId,data,infoId){
+    var info=document.getElementById(infoId);
+    document.querySelectorAll('#'+wrapId+' .card').forEach(function(card){
+      card.addEventListener('click',function(){
+        var d=data[card.dataset.k];
+        info.innerHTML='<h3>'+d[0]+'</h3><p>'+d[1]+'</p>';
+      });
+    });
+  }
+
+  // ---------- sort game ----------
+  var organisms=[
+    {n:"E. coli",k:"Monera"},{n:"Cyanobacteria",k:"Monera"},{n:"Lactobacillus",k:"Monera"},
+    {n:"Amoeba",k:"Protoctista"},{n:"Paramecium",k:"Protoctista"},{n:"Euglena",k:"Protoctista"},
+    {n:"Yeast",k:"Fungi"},{n:"Mushroom",k:"Fungi"},{n:"Rhizopus",k:"Fungi"}
+  ];
+  var pool=document.getElementById('pool');
+  var bins=document.querySelectorAll('.bin');
+  var selected=null;
+  function makeOrg(o){
+    var el=document.createElement('div');
+    el.className='org';el.textContent=o.n;el.dataset.k=o.k;el.draggable=true;
+    el.addEventListener('click',function(){
+      if(selected){selected.classList.remove('sel');}
+      if(selected===el){selected=null;return;}
+      selected=el;el.classList.add('sel');
+    });
+    el.addEventListener('dragstart',function(e){selected=el;e.dataTransfer.setData('text','x');});
+    return el;
+  }
+  function buildGame(){
+    pool.innerHTML='';selected=null;
+    document.getElementById('gameScore').textContent='';
+    bins.forEach(function(b){b.querySelector('.binitems').innerHTML='';b.classList.remove('over');});
+    shuffle(organisms.slice()).forEach(function(o){pool.appendChild(makeOrg(o));});
+  }
+  function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+  bins.forEach(function(b){
+    var items=b.querySelector('.binitems');
+    b.addEventListener('click',function(){
+      if(!selected)return;
+      selected.classList.remove('sel','correct','wrong');
+      selected.style.borderColor='';
+      items.appendChild(selected);selected.classList.add('placed');selected=null;
+    });
+    b.addEventListener('dragover',function(e){e.preventDefault();b.classList.add('over');});
+    b.addEventListener('dragleave',function(){b.classList.remove('over');});
+    b.addEventListener('drop',function(e){
+      e.preventDefault();b.classList.remove('over');
+      if(!selected)return;
+      selected.classList.remove('sel');items.appendChild(selected);selected.classList.add('placed');selected=null;
+    });
+  });
+  document.getElementById('checkGame').addEventListener('click',function(){
+    var correct=0,total=organisms.length;
+    bins.forEach(function(b){
+      b.querySelectorAll('.org').forEach(function(el){
+        if(el.dataset.k===b.dataset.k){el.style.borderColor='#57d38c';correct++;}
+        else{el.style.borderColor='#e8776f';}
+      });
+    });
+    var left=pool.querySelectorAll('.org').length;
+    var msg='Score: '+correct+' / '+total+' correct';
+    if(left)msg+=' – '+left+' still unsorted';
+    document.getElementById('gameScore').textContent=msg;
+  });
+  document.getElementById('resetGame').addEventListener('click',buildGame);
+  buildGame();
+
+  // ---------- quiz ----------
+  var quiz=[
+    {q:"Which feature is unique to Kingdom Monera?",
+     o:["A membrane-bound nucleus","A prokaryotic cell with no true nucleus","Cell wall made of chitin","Movement by cilia"],
+     a:1,e:"Monera (bacteria) are prokaryotes – their DNA lies free in a nucleoid with no nuclear membrane."},
+    {q:"Amoeba moves and captures food using …",
+     o:["Cilia","Flagella","Pseudopodia","Hyphae"],
+     a:2,e:"Amoeba forms pseudopodia ('false feet') for both locomotion and holozoic feeding."},
+    {q:"The body of most fungi is made of thread-like structures called …",
+     o:["Hyphae forming a mycelium","Pseudopodia","Nucleoids","Cilia"],
+     a:0,e:"Fungal hyphae interweave to form the mycelium; their walls are made of chitin."}
+  ];
+  var qp=document.getElementById('quizPanel');
+  quiz.forEach(function(item,qi){
+    var div=document.createElement('div');div.className='q';
+    var html='<p>'+(qi+1)+'. '+item.q+'</p>';
+    item.o.forEach(function(opt,oi){html+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';});
+    html+='<div class="expl" id="expl'+qi+'"></div>';
+    div.innerHTML=html;qp.appendChild(div);
+  });
+  qp.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var qi=+btn.dataset.q,oi=+btn.dataset.o,item=quiz[qi];
+      var group=qp.querySelectorAll('.opt[data-q="'+qi+'"]');
+      group.forEach(function(b){b.disabled=true;b.classList.remove('correct','wrong');});
+      group[item.a].classList.add('correct');
+      if(oi!==item.a)btn.classList.add('wrong');
+      var ex=document.getElementById('expl'+qi);
+      ex.textContent=(oi===item.a?'Correct! ':'Not quite. ')+item.e;
+      ex.classList.add('show');
+    });
+  });
+})();
+</script>
+</body>
+</html>
