@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermal Energy Lab — NIOS Class 10 Science &amp; Technology (Ch 14)</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --panel:#19202f;
+    --panel2:#222b3e;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#ff8a5c;
+    --accent-soft:rgba(255,138,92,.16);
+    --cold:#5aa9ff;
+    --hot:#ff6b57;
+    --good:#5fd68b;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:940px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 6px}
+  header h1{font-size:1.4rem;letter-spacing:.2px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hidden{display:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.84rem;color:var(--muted);margin-bottom:6px}
+  .ctrl .val{color:var(--ink);font-weight:700}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:44px;min-width:74px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:0 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1420;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1420}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px;touch-action:manipulation}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .chip{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .chip .k{font-size:.76rem;color:var(--muted)}
+  .chip .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .chip .v.hot{color:var(--hot)} .chip .v.cold{color:var(--cold)} .chip .v.acc{color:var(--accent)}
+
+  .btnrow{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .btn{min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--accent);
+    background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:.95rem;cursor:pointer;touch-action:manipulation}
+  .btn.ghost{border-color:var(--line);background:var(--panel2);color:var(--muted)}
+  .btn:active{transform:scale(.98)}
+
+  .facts{font-size:.9rem;color:var(--ink)}
+  .facts li{margin:6px 0 6px 18px}
+  .facts code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--accent);font-size:.9em}
+  .note{color:var(--muted);font-size:.85rem;margin-top:8px}
+
+  .quiz-q{margin-bottom:16px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .quiz-q p{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;min-height:44px;margin:6px 0;padding:8px 12px;border-radius:10px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:.92rem;cursor:pointer;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--hot);background:rgba(255,107,87,.14);color:var(--hot)}
+  .explain{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .explain.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Thermal</span> Energy Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Ch 14 &mdash; heat vs temperature, latent heat &amp; thermal expansion</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="heat">1 &middot; Heat vs Temp</button>
+    <button class="tab-btn" data-tab="state">2 &middot; Change of State</button>
+    <button class="tab-btn" data-tab="expand">3 &middot; Expansion</button>
+  </div>
+
+  <!-- ===================== MODE 1: HEAT vs TEMPERATURE ===================== -->
+  <section id="heat" class="mode">
+    <div class="panel">
+      <h2>Heat added &rarr; temperature rise</h2>
+      <p class="note">Heat is <b>energy</b> transferred (joules, J). Temperature is <b>how hot</b> something is (&deg;C or K). Add the same heat to different amounts / materials and watch &Delta;T change: <code>&Delta;T = Q / (m&middot;c)</code>.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Mass <span class="val" id="hMassV">1.0 kg</span></label>
+          <input type="range" id="hMass" min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="ctrl">
+          <label>Heat added Q <span class="val" id="hQV">42 000 J</span></label>
+          <input type="range" id="hQ" min="0" max="500000" step="1000" value="42000">
+        </div>
+      </div>
+      <div class="ctrl" style="margin-bottom:12px">
+        <label>Material (specific heat capacity c)</label>
+        <div class="seg" id="hMat">
+          <button class="on" data-c="4200">Water 4200</button>
+          <button data-c="900">Aluminium 900</button>
+          <button data-c="450">Iron 450</button>
+          <button data-c="130">Lead 130</button>
+        </div>
+      </div>
+      <canvas id="hCanvas" height="220"></canvas>
+      <div class="readout">
+        <div class="chip"><div class="k">Specific heat c</div><div class="v acc" id="hC">4200 J/kg&deg;C</div></div>
+        <div class="chip"><div class="k">Temperature rise &Delta;T</div><div class="v hot" id="hDT">10.0 &deg;C</div></div>
+        <div class="chip"><div class="k">Final temp (from 25&deg;C)</div><div class="v" id="hFinal">35.0 &deg;C</div></div>
+        <div class="chip"><div class="k">Same as</div><div class="v cold" id="hK">308.2 K</div></div>
+      </div>
+      <p class="note">Water needs the <b>most</b> heat for the same rise (high c) &mdash; that is why it heats and cools slowly and moderates climate.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 2: CHANGE OF STATE ===================== -->
+  <section id="state" class="mode hidden">
+    <div class="panel">
+      <h2>Heating curve of water: ice &rarr; water &rarr; steam</h2>
+      <p class="note">Heat 1 kg of ice at a steady rate. At <b>0&deg;C</b> and <b>100&deg;C</b> the temperature <b>stops rising</b> &mdash; the heat becomes <b>latent heat</b> that breaks bonds and changes the state.</p>
+      <canvas id="sCanvas" height="250"></canvas>
+      <div class="readout">
+        <div class="chip"><div class="k">State</div><div class="v acc" id="sState">Solid (ice)</div></div>
+        <div class="chip"><div class="k">Temperature</div><div class="v hot" id="sTemp">-20 &deg;C</div></div>
+        <div class="chip"><div class="k">Heat supplied</div><div class="v" id="sHeat">0 kJ</div></div>
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="sPlay">Pause</button>
+        <button class="btn ghost" id="sReset">Reset</button>
+      </div>
+      <p class="note">Per 1 kg: melting absorbs L<sub>f</sub>=334 kJ at 0&deg;C, boiling absorbs L<sub>v</sub>=2260 kJ at 100&deg;C &mdash; both with <b>no temperature change</b>. Boiling needs far more energy, so its plateau is much longer.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 3: THERMAL EXPANSION ===================== -->
+  <section id="expand" class="mode hidden">
+    <div class="panel">
+      <h2>Thermal expansion &amp; the bimetallic strip</h2>
+      <p class="note">Heating makes particles vibrate more, so solids and liquids <b>expand</b>. Different metals expand by different amounts &mdash; a bonded strip <b>bends</b>, the basis of a thermostat.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Temperature <span class="val" id="eTempV">20 &deg;C</span></label>
+          <input type="range" id="eTemp" min="0" max="200" step="1" value="20">
+        </div>
+      </div>
+      <canvas id="eCanvas" height="260"></canvas>
+      <div class="readout">
+        <div class="chip"><div class="k">Brass rod &Delta;L (1 m)</div><div class="v hot" id="eBrass">0.00 mm</div></div>
+        <div class="chip"><div class="k">Iron rod &Delta;L (1 m)</div><div class="v cold" id="eIron">0.00 mm</div></div>
+        <div class="chip"><div class="k">Strip bend</div><div class="v acc" id="eBend">straight</div></div>
+      </div>
+      <p class="note">Applications: gaps in rail tracks &amp; bridges, thermostats (kettles, irons), thermometers, riveting, fitting metal tyres on wheels. Brass (&alpha;&asymp;19&times;10<sup>-6</sup>/&deg;C) expands more than iron (&alpha;&asymp;12&times;10<sup>-6</sup>/&deg;C), so the strip curls toward the iron side.</p>
+    </div>
+  </section>
+
+  <!-- ===================== FACTS ===================== -->
+  <div class="panel">
+    <h2>Key facts &amp; formulae</h2>
+    <ul class="facts">
+      <li>Heat gained/lost: <code>Q = m &middot; c &middot; &Delta;T</code> &mdash; m in kg, c in J/kg&deg;C, &Delta;T in &deg;C. Q is in joules (J).</li>
+      <li>Specific heat capacity <b>c</b> = heat to raise 1 kg by 1&deg;C. Water c = 4200 J/kg&deg;C (very high).</li>
+      <li>Latent heat (no temperature change): <code>Q = m &middot; L</code>. Water: L<sub>fusion</sub> = 334 kJ/kg, L<sub>vaporisation</sub> = 2260 kJ/kg.</li>
+      <li>Temperature scales: <code>K = &deg;C + 273.15</code>; &deg;C and K change by the same size step; 0 K is absolute zero.</li>
+      <li>Heat &ne; temperature: a spark (high temp, tiny mass) carries little heat; a bathtub of warm water (lower temp, huge mass) carries far more heat energy.</li>
+      <li>Linear expansion: <code>&Delta;L = L&#8320; &middot; &alpha; &middot; &Delta;T</code>. Solids expand least, liquids more, gases most.</li>
+    </ul>
+  </div>
+
+  <!-- ===================== QUIZ ===================== -->
+  <div class="panel">
+    <h2>Quick check (tap an option)</h2>
+    <div id="quiz"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+
+  function fitCanvas(cv){
+    var cssW = cv.clientWidth || cv.parentNode.clientWidth;
+    var cssH = parseInt(cv.getAttribute("height"),10);
+    cv.width = Math.round(cssW*dpr);
+    cv.height = Math.round(cssH*dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {w:cssW, h:cssH, ctx:ctx};
+  }
+  var CSS = getComputedStyle(document.documentElement);
+  function C(n){ return CSS.getPropertyValue(n).trim(); }
+
+  /* ---------- Tabs ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  var modes = {heat:document.getElementById("heat"), state:document.getElementById("state"), expand:document.getElementById("expand")};
+  tabs.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      for(var k in modes) modes[k].classList.add("hidden");
+      modes[b.dataset.tab].classList.remove("hidden");
+      resizeAll();
+    });
+  });
+
+  /* ============================================================
+     MODE 1 — HEAT vs TEMPERATURE
+  ============================================================ */
+  var hMass=document.getElementById("hMass"), hQ=document.getElementById("hQ");
+  var hMassV=document.getElementById("hMassV"), hQV=document.getElementById("hQV");
+  var hC=document.getElementById("hC"), hDT=document.getElementById("hDT");
+  var hFinal=document.getElementById("hFinal"), hK=document.getElementById("hK");
+  var hCanvas=document.getElementById("hCanvas");
+  var hCval=4200;
+  var T0=25;
+
+  document.querySelectorAll("#hMat button").forEach(function(bt){
+    bt.addEventListener("click",function(){
+      document.querySelectorAll("#hMat button").forEach(function(x){x.classList.remove("on");});
+      bt.classList.add("on");
+      hCval=parseFloat(bt.dataset.c);
+      updateHeat();
+    });
+  });
+  hMass.addEventListener("input",updateHeat);
+  hQ.addEventListener("input",updateHeat);
+
+  function fmt(n){ return n.toLocaleString("en-US"); }
+
+  function updateHeat(){
+    var m=parseFloat(hMass.value), Q=parseFloat(hQ.value);
+    var dT = Q/(m*hCval);
+    var Tf = T0 + dT;
+    hMassV.textContent = m.toFixed(1)+" kg";
+    hQV.textContent = fmt(Q)+" J";
+    hC.textContent = hCval+" J/kg°C";
+    hDT.textContent = dT.toFixed(1)+" °C";
+    hFinal.textContent = Tf.toFixed(1)+" °C";
+    hK.textContent = (Tf+273.15).toFixed(1)+" K";
+    drawHeat(dT, Tf);
+  }
+
+  function drawHeat(dT, Tf){
+    var d=fitCanvas(hCanvas), ctx=d.ctx, w=d.w, h=d.h;
+    ctx.clearRect(0,0,w,h);
+    // thermometer visual: bulb + column mapped 0..100C over height
+    var tx = w*0.16, tubeTop=24, tubeBot=h-40, tubeW=26;
+    // scale
+    ctx.strokeStyle=C("--line"); ctx.fillStyle=C("--muted"); ctx.font="11px system-ui"; ctx.textAlign="right";
+    for(var t=0;t<=100;t+=20){
+      var yy = tubeBot - (tubeBot-tubeTop)*(t/100);
+      ctx.beginPath(); ctx.moveTo(tx-tubeW/2-4,yy); ctx.lineTo(tx-tubeW/2-1,yy); ctx.stroke();
+      ctx.fillText(t+"°", tx-tubeW/2-8, yy+4);
+    }
+    // tube
+    ctx.fillStyle=C("--panel2"); ctx.strokeStyle=C("--line"); ctx.lineWidth=2;
+    roundRect(ctx, tx-tubeW/2, tubeTop, tubeW, tubeBot-tubeTop+14, tubeW/2, true, true);
+    // mercury fill by final temp (clamp 0..100 for visual)
+    var vis = Math.max(0, Math.min(100, Tf));
+    var fillY = tubeBot - (tubeBot-tubeTop)*(vis/100);
+    var grad = ctx.createLinearGradient(0,tubeBot,0,tubeTop);
+    grad.addColorStop(0,C("--cold")); grad.addColorStop(1,C("--hot"));
+    ctx.fillStyle=grad;
+    roundRect(ctx, tx-tubeW/2+3, fillY, tubeW-6, tubeBot-fillY+11, (tubeW-6)/2, true, false);
+    ctx.beginPath(); ctx.arc(tx, tubeBot+7, tubeW/2+2, 0, Math.PI*2); ctx.fillStyle=C("--hot"); ctx.fill();
+
+    // right-side energy bar
+    var bx=w*0.42, bw=w*0.5, by=tubeTop+10, bh=h-tubeTop-60;
+    ctx.textAlign="left"; ctx.fillStyle=C("--ink"); ctx.font="600 13px system-ui";
+    ctx.fillText("Heat energy in →", bx, by-14);
+    var m=parseFloat(hMass.value), Q=parseFloat(hQ.value);
+    var frac = Q/500000;
+    ctx.fillStyle=C("--panel2"); ctx.strokeStyle=C("--line");
+    roundRect(ctx, bx, by, bw, 26, 8, true, true);
+    var g2=ctx.createLinearGradient(bx,0,bx+bw,0);
+    g2.addColorStop(0,C("--accent")); g2.addColorStop(1,C("--hot"));
+    ctx.fillStyle=g2; roundRect(ctx, bx, by, Math.max(6,bw*frac), 26, 8, true, false);
+    ctx.fillStyle=C("--ink"); ctx.font="12px system-ui";
+    ctx.fillText("Q = "+fmt(Q)+" J", bx, by+52);
+    ctx.fillStyle=C("--muted");
+    ctx.fillText("ΔT = Q / (m×c) = "+fmt(Q)+" / ("+m.toFixed(1)+"×"+hCval+")", bx, by+74);
+    ctx.fillStyle=C("--hot"); ctx.font="600 15px system-ui";
+    ctx.fillText("ΔT = "+dT.toFixed(1)+" °C", bx, by+100);
+    ctx.fillStyle=C("--muted"); ctx.font="12px system-ui";
+    ctx.fillText("Final = 25°C + ΔT = "+Tf.toFixed(1)+"°C", bx, by+122);
+  }
+
+  function roundRect(ctx,x,y,w,h,r,fill,stroke){
+    if(w<2*r) r=w/2; if(h<2*r) r=h/2;
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+    if(fill) ctx.fill();
+    if(stroke) ctx.stroke();
+  }
+
+  /* ============================================================
+     MODE 2 — CHANGE OF STATE (heating curve)
+     1 kg water. c_ice=2100, c_water=4200, c_steam=2000 J/kg°C
+     Lf=334000 J, Lv=2260000 J. Start ice at -20C.
+     Segment heats (J):
+       heat ice -20->0 : 2100*20 = 42000
+       melt at 0       : 334000
+       heat water 0->100: 4200*100 = 420000
+       boil at 100     : 2260000
+       heat steam 100->120: 2000*20 = 40000
+     Total = 3096000 J
+  ============================================================ */
+  var sCanvas=document.getElementById("sCanvas");
+  var sState=document.getElementById("sState"), sTemp=document.getElementById("sTemp");
+  var sHeat=document.getElementById("sHeat");
+  var sPlay=document.getElementById("sPlay"), sReset=document.getElementById("sReset");
+
+  var SEG = [
+    {q:42000,   t0:-20, t1:0,   label:"Solid (ice)"},
+    {q:334000,  t0:0,   t1:0,   label:"Melting (ice+water)"},
+    {q:420000,  t0:0,   t1:100, label:"Liquid (water)"},
+    {q:2260000, t0:100, t1:100, label:"Boiling (water+steam)"},
+    {q:40000,   t0:100, t1:120, label:"Gas (steam)"}
+  ];
+  var TOTAL_Q = SEG.reduce(function(a,s){return a+s.q;},0);
+  var sQ = 0;            // current heat supplied (J)
+  var sRate = 62000;     // J per second (fills in ~50 s)
+  var sRunning = true;
+
+  function stateAt(q){
+    var acc=0, temp=SEG[0].t0, lab=SEG[0].label;
+    for(var i=0;i<SEG.length;i++){
+      var s=SEG[i];
+      if(q <= acc+s.q || i===SEG.length-1){
+        var f = s.q>0 ? Math.min(1,(q-acc)/s.q) : 1;
+        temp = s.t0 + (s.t1-s.t0)*f;
+        lab = s.label;
+        return {temp:temp, label:lab};
+      }
+      acc+=s.q;
+    }
+    return {temp:120,label:"Gas (steam)"};
+  }
+
+  function drawState(){
+    var d=fitCanvas(sCanvas), ctx=d.ctx, w=d.w, h=d.h;
+    ctx.clearRect(0,0,w,h);
+    var padL=42, padR=14, padT=16, padB=34;
+    var gw=w-padL-padR, gh=h-padT-padB;
+    var x0=padL, y0=h-padB;
+    // temp axis -20..120
+    var Tmin=-20, Tmax=120;
+    function ty(t){ return y0 - gh*((t-Tmin)/(Tmax-Tmin)); }
+    function qx(q){ return x0 + gw*(q/TOTAL_Q); }
+    // grid + labels
+    ctx.strokeStyle=C("--line"); ctx.fillStyle=C("--muted"); ctx.font="11px system-ui"; ctx.textAlign="right"; ctx.lineWidth=1;
+    [-20,0,25,50,100,120].forEach(function(t){
+      var yy=ty(t);
+      ctx.globalAlpha=(t===0||t===100)?0.55:0.25;
+      ctx.beginPath(); ctx.moveTo(x0,yy); ctx.lineTo(x0+gw,yy); ctx.stroke();
+      ctx.globalAlpha=1;
+      ctx.fillText(t+"°", x0-6, yy+4);
+    });
+    ctx.textAlign="center"; ctx.fillText("Heat supplied →", x0+gw/2, h-6);
+    // build curve polyline over Q
+    ctx.lineWidth=3; ctx.strokeStyle=C("--accent");
+    ctx.beginPath();
+    var acc=0, first=true;
+    for(var i=0;i<SEG.length;i++){
+      var s=SEG[i];
+      var pStart={x:qx(acc), y:ty(s.t0)};
+      var pEnd={x:qx(acc+s.q), y:ty(s.t1)};
+      if(first){ctx.moveTo(pStart.x,pStart.y); first=false;}
+      ctx.lineTo(pEnd.x,pEnd.y);
+      acc+=s.q;
+    }
+    ctx.stroke();
+    // plateau labels
+    ctx.fillStyle=C("--muted"); ctx.font="10px system-ui"; ctx.textAlign="center";
+    ctx.fillText("melting (Lf=334kJ)", qx(42000+334000/2), ty(0)-8);
+    ctx.fillText("boiling (Lv=2260kJ)", qx(796000+2260000/2), ty(100)-8);
+    // progress marker
+    var st=stateAt(sQ);
+    var mx=qx(sQ), my=ty(st.temp);
+    // shade supplied region under curve lightly
+    ctx.fillStyle="rgba(255,138,92,.10)";
+    ctx.fillRect(x0,padT,Math.max(0,mx-x0),gh);
+    // moving dot
+    ctx.beginPath(); ctx.arc(mx,my,6,0,Math.PI*2); ctx.fillStyle=C("--hot"); ctx.fill();
+    ctx.strokeStyle=C("--ink"); ctx.lineWidth=2; ctx.stroke();
+
+    sState.textContent = st.label;
+    sTemp.textContent = st.temp.toFixed(0)+" °C";
+    sHeat.textContent = (sQ/1000).toFixed(0)+" kJ";
+  }
+
+  sPlay.addEventListener("click",function(){
+    sRunning=!sRunning;
+    sPlay.textContent = sRunning ? "Pause" : "Play";
+  });
+  sReset.addEventListener("click",function(){
+    sQ=0; sRunning=true; sPlay.textContent="Pause"; drawState();
+  });
+
+  /* ============================================================
+     MODE 3 — THERMAL EXPANSION + bimetallic strip
+  ============================================================ */
+  var eTemp=document.getElementById("eTemp"), eTempV=document.getElementById("eTempV");
+  var eBrass=document.getElementById("eBrass"), eIron=document.getElementById("eIron"), eBend=document.getElementById("eBend");
+  var eCanvas=document.getElementById("eCanvas");
+  var A_BRASS=19e-6, A_IRON=12e-6, L0=1.0; // 1 m
+  eTemp.addEventListener("input",drawExpand);
+
+  function drawExpand(){
+    var T=parseFloat(eTemp.value), dT=T-20;
+    eTempV.textContent=T+" °C";
+    var dLb = L0*A_BRASS*dT*1000; // mm
+    var dLi = L0*A_IRON*dT*1000;
+    eBrass.textContent=dLb.toFixed(2)+" mm";
+    eIron.textContent=dLi.toFixed(2)+" mm";
+    eBend.textContent = dT<=0 ? "straight" : "bent";
+
+    var d=fitCanvas(eCanvas), ctx=d.ctx, w=d.w, h=d.h;
+    ctx.clearRect(0,0,w,h);
+
+    // ---- Top: single expanding rod (exaggerated) ----
+    var ry=42, rh=22, rx=20;
+    var baseW=w*0.55;
+    var expFactor = 1 + A_BRASS*dT*380; // exaggerate for visibility
+    var rw=baseW*expFactor;
+    ctx.fillStyle=C("--muted"); ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Metal rod heated (length exaggerated):", rx, ry-12);
+    // wall at left
+    ctx.fillStyle=C("--line"); ctx.fillRect(rx-6, ry-6, 6, rh+12);
+    // rod
+    var heatCol = mix(C("--cold"), C("--hot"), Math.max(0,Math.min(1,(T)/200)));
+    ctx.fillStyle=heatCol;
+    roundRect(ctx, rx, ry, rw, rh, 5, true, false);
+    // original end marker
+    ctx.strokeStyle=C("--muted"); ctx.setLineDash([4,4]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(rx+baseW, ry-6); ctx.lineTo(rx+baseW, ry+rh+6); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C("--accent"); ctx.font="11px system-ui";
+    ctx.fillText("ΔL", rx+baseW+4, ry+rh+18);
+    ctx.strokeStyle=C("--accent");
+    ctx.beginPath(); ctx.moveTo(rx+baseW, ry+rh+12); ctx.lineTo(rx+rw, ry+rh+12); ctx.stroke();
+
+    // ---- Bottom: bimetallic strip fixed at left, bends up ----
+    var sx=w*0.5, sy=h-30, len=Math.min(w*0.42, 220);
+    ctx.save();
+    ctx.translate(20, h-70);
+    ctx.fillStyle=C("--muted"); ctx.textAlign="left"; ctx.font="12px system-ui";
+    ctx.fillText("Bimetallic strip (brass over iron):", 0, -66);
+    // fixed clamp
+    ctx.fillStyle=C("--line"); ctx.fillRect(-6,-14,10,40);
+    // curvature: brass expands more -> curls toward iron (downward if iron on bottom)
+    var maxAng = 1.15; // rad at max dT
+    var ang = maxAng * Math.max(0, dT)/180; // curve amount
+    var segN=40, segLen=len/segN, thick=10;
+    var px=0, py=0, dir=0;
+    ctx.lineWidth=1;
+    for(var i=0;i<segN;i++){
+      dir += ang/segN;
+      var nx=px+Math.cos(dir)*segLen, ny=py+Math.sin(dir)*segLen;
+      // brass (top layer) - orange
+      ctx.strokeStyle=C("--accent"); ctx.lineWidth=6;
+      ctx.beginPath(); ctx.moveTo(px,py-3); ctx.lineTo(nx,ny-3); ctx.stroke();
+      // iron (bottom layer) - blue-grey
+      ctx.strokeStyle=C("--cold"); ctx.lineWidth=6;
+      ctx.beginPath(); ctx.moveTo(px,py+3); ctx.lineTo(nx,ny+3); ctx.stroke();
+      px=nx; py=ny;
+    }
+    // labels
+    ctx.fillStyle=C("--accent"); ctx.font="11px system-ui"; ctx.textAlign="left";
+    ctx.fillText("brass (expands more)", 4, -22);
+    ctx.fillStyle=C("--cold");
+    ctx.fillText("iron", 4, 30);
+    ctx.restore();
+  }
+
+  function hex2rgb(hx){
+    hx=hx.replace('#',''); if(hx.length===3) hx=hx.split('').map(function(c){return c+c;}).join('');
+    return [parseInt(hx.substr(0,2),16),parseInt(hx.substr(2,2),16),parseInt(hx.substr(4,2),16)];
+  }
+  function mix(a,b,t){
+    var A=hex2rgb(a),B=hex2rgb(b);
+    return "rgb("+Math.round(A[0]+(B[0]-A[0])*t)+","+Math.round(A[1]+(B[1]-A[1])*t)+","+Math.round(A[2]+(B[2]-A[2])*t)+")";
+  }
+
+  /* ============================================================
+     QUIZ
+  ============================================================ */
+  var QUIZ=[
+    {q:"1. A cup of tea and a bucket of the same warm water are at the same temperature. Which contains more heat energy?",
+     opts:["The cup of tea","The bucket of water","Both contain equal heat","Neither contains heat"],
+     ans:1, ex:"Heat depends on mass too (Q=mcΔT). Same temperature, but the bucket has much more mass, so it stores more heat energy."},
+    {q:"2. While ice is melting at 0°C, the heat supplied is used to:",
+     opts:["Raise the temperature quickly","Break bonds and change state (latent heat) with no temperature change","Cool the surroundings","Increase the mass of the ice"],
+     ans:1, ex:"During melting the temperature stays at 0°C; the latent heat of fusion (334 kJ/kg) goes into breaking the bonds of the solid."},
+    {q:"3. In a bimetallic strip, brass expands more than iron on heating. The strip therefore:",
+     opts:["Stays perfectly straight","Bends, curving toward the iron side","Melts","Shrinks overall"],
+     ans:1, ex:"Unequal expansion makes the strip bend; the metal that expands more (brass) is on the outside of the curve, so it curls toward the iron. This action switches thermostats."}
+  ];
+  var quizEl=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var box=document.createElement("div"); box.className="quiz-q";
+    var p=document.createElement("p"); p.textContent=item.q; box.appendChild(p);
+    var ex=document.createElement("div"); ex.className="explain"; ex.textContent=item.ex;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        var all=box.querySelectorAll(".opt");
+        all.forEach(function(x){x.disabled=true;});
+        if(oi===item.ans){ b.classList.add("correct"); }
+        else{ b.classList.add("wrong"); all[item.ans].classList.add("correct"); }
+        ex.classList.add("show");
+      });
+      box.appendChild(b);
+    });
+    box.appendChild(ex);
+    quizEl.appendChild(box);
+  });
+
+  /* ============================================================
+     ANIMATION LOOP (only mode 2 animates)
+  ============================================================ */
+  var last=performance.now();
+  function loop(now){
+    var dt=(now-last)/1000; last=now;
+    if(!document.hidden && sRunning && !modes.state.classList.contains("hidden")){
+      sQ += sRate*dt;
+      if(sQ>=TOTAL_Q){ sQ=TOTAL_Q; sRunning=false; sPlay.textContent="Play"; }
+      drawState();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  function resizeAll(){
+    updateHeat();
+    drawState();
+    drawExpand();
+  }
+  window.addEventListener("resize", resizeAll);
+  document.addEventListener("visibilitychange", function(){ last=performance.now(); });
+
+  // init
+  resizeAll();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

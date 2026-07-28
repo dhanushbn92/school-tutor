@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Energy Lab — Electrical Energy (NIOS Class 10, Ch 16)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#19202f;
+    --panel2:#212a3d;
+    --ink:#e8ecf6;
+    --muted:#98a3bb;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warm:#ffce54;
+    --line:#2c3650;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 150px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .hide{display:none!important}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 120px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131d;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f131d}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+
+  .readouts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .stat .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .facts{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:640px){.facts{grid-template-columns:1fr 1fr}}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .fact b{color:var(--accent)}
+  .fact .eq{font-family:"Cambria Math",Georgia,serif;color:var(--warm);font-size:1.02rem}
+
+  .q{border-top:1px solid var(--line);padding:14px 0}
+  .q:first-of-type{border-top:none}
+  .q p.stem{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.92rem;
+    touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15)}
+  .explain{font-size:.86rem;color:var(--muted);margin-top:4px;min-height:1px}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid var(--accent);margin-left:6px}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Electrical Energy</span> Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology — Ch 16. Explore Ohm's law, series vs parallel, and your energy bill.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="ohm">Ohm's Law</button>
+    <button class="tab-btn" data-tab="sp">Series / Parallel</button>
+    <button class="tab-btn" data-tab="bill">Power &amp; Bill</button>
+    <button class="tab-btn" data-tab="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ OHM'S LAW ============ -->
+  <section id="tab-ohm">
+    <div class="panel">
+      <h2>Ohm's Law Circuit</h2>
+      <canvas id="ohmCanvas" width="620" height="230"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Voltage V = <output id="vOut">6.0</output> V</label>
+          <input type="range" id="vRange" min="0" max="12" step="0.1" value="6">
+        </div>
+        <div class="ctrl">
+          <label>Resistance R = <output id="rOut">3.0</output> &#8486;</label>
+          <input type="range" id="rRange" min="0.5" max="20" step="0.1" value="3">
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="stat"><div class="k">Current I = V / R</div><div class="v"><span id="iVal">2.00</span> <small>A</small></div></div>
+        <div class="stat"><div class="k">Power P = V &#215; I</div><div class="v"><span id="pVal">12.0</span> <small>W</small></div></div>
+        <div class="stat"><div class="k">Bulb brightness</div><div class="v"><span id="brVal">—</span></div></div>
+      </div>
+      <p class="note">The dots show current flowing from + to &#8722; (conventional current). The bulb glows brighter as power rises. Higher R throttles the current for a fixed V.</p>
+    </div>
+    <div class="panel">
+      <h2>V–I Graph (line slope = 1/R)</h2>
+      <canvas id="viCanvas" width="620" height="260"></canvas>
+      <p class="note">For a fixed resistor, V and I are proportional — a straight line through the origin. The steeper the line, the smaller the resistance.</p>
+    </div>
+  </section>
+
+  <!-- ============ SERIES / PARALLEL ============ -->
+  <section id="tab-sp" class="hide">
+    <div class="panel">
+      <h2>Two Bulbs — Series vs Parallel</h2>
+      <div class="seg" style="margin-bottom:12px">
+        <button id="btnSeries" class="on">Series</button>
+        <button id="btnParallel">Parallel</button>
+      </div>
+      <canvas id="spCanvas" width="620" height="250"></canvas>
+      <div class="controls" style="margin-top:14px">
+        <div class="ctrl">
+          <label>Supply V = <output id="spvOut">6.0</output> V</label>
+          <input type="range" id="spvRange" min="0" max="12" step="0.1" value="6">
+        </div>
+        <div class="ctrl">
+          <label>Each bulb R = <output id="sprOut">4.0</output> &#8486;</label>
+          <input type="range" id="sprRange" min="1" max="12" step="0.1" value="4">
+        </div>
+      </div>
+      <div class="seg" style="margin-bottom:6px">
+        <button id="btnFailA">Bulb 1: working</button>
+        <button id="btnFailB">Bulb 2: working</button>
+      </div>
+      <div class="readouts">
+        <div class="stat"><div class="k">Equivalent R</div><div class="v"><span id="spReq">8.0</span> <small>&#8486;</small></div></div>
+        <div class="stat"><div class="k">Total current</div><div class="v"><span id="spItot">0.75</span> <small>A</small></div></div>
+        <div class="stat"><div class="k">Total power</div><div class="v"><span id="spPtot">4.5</span> <small>W</small></div></div>
+      </div>
+      <p class="note" id="spNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ POWER & BILL ============ -->
+  <section id="tab-bill" class="hide">
+    <div class="panel">
+      <h2>Electric Power &amp; Energy Bill</h2>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Appliance power P = <output id="wOut">100</output> W</label>
+          <input type="range" id="wRange" min="5" max="2000" step="5" value="100">
+        </div>
+        <div class="ctrl">
+          <label>Used per day = <output id="hOut">5.0</output> hours</label>
+          <input type="range" id="hRange" min="0.5" max="24" step="0.5" value="5">
+        </div>
+        <div class="ctrl">
+          <label>Days = <output id="dOut">30</output></label>
+          <input type="range" id="dRange" min="1" max="31" step="1" value="30">
+        </div>
+        <div class="ctrl">
+          <label>Tariff = &#8377; <output id="tOut">6.0</output> / unit</label>
+          <input type="range" id="tRange" min="1" max="12" step="0.5" value="6">
+        </div>
+      </div>
+      <canvas id="billCanvas" width="620" height="200"></canvas>
+      <div class="readouts">
+        <div class="stat"><div class="k">Energy per day</div><div class="v"><span id="ePerDay">0.50</span> <small>kWh (units)</small></div></div>
+        <div class="stat"><div class="k">Energy total</div><div class="v"><span id="eTot">15.0</span> <small>kWh</small></div></div>
+        <div class="stat"><div class="k">Estimated cost</div><div class="v">&#8377; <span id="cost">90</span></div></div>
+      </div>
+      <p class="note">Energy = Power &#215; time. 1 unit on your bill = 1 kilowatt-hour (kWh) = 1000 W running for 1 hour. A 100 W bulb for 10 h uses exactly 1 unit.</p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section id="tab-learn" class="hide">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="facts">
+        <div class="fact"><b>Ohm's law</b><br><span class="eq">V = I &#215; R</span><br>Voltage (V) equals current (A) times resistance (&#8486;), at constant temperature.</div>
+        <div class="fact"><b>Series circuit</b><br>Same current everywhere; resistances add: <span class="eq">R = R&#8321;+R&#8322;</span>. One bulb fails &#8594; both go off.</div>
+        <div class="fact"><b>Parallel circuit</b><br>Same voltage across each; <span class="eq">1/R = 1/R&#8321;+1/R&#8322;</span>. One bulb fails &#8594; other keeps glowing.</div>
+        <div class="fact"><b>Electric power</b><br><span class="eq">P = V&#215;I = I&#178;R = V&#178;/R</span>, measured in watts (W).</div>
+        <div class="fact"><b>Energy &amp; the bill</b><br><span class="eq">E = P &#215; t</span>. Commercial unit = <b>kilowatt-hour (kWh)</b>. 1 kWh = 3.6&#215;10&#8310; J.</div>
+        <div class="fact"><b>Heating effect</b><br>Joule's law: <span class="eq">H = I&#178;Rt</span>. Basis of heaters, geysers and fuses.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Quick Quiz <span class="badge">tap an option</span></h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Physics is exact; values rounded for display. All units labelled in SI.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  function $(id){ return document.getElementById(id); }
+  function clamp(x,a,b){ return x<a?a:(x>b?b:x); }
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  var ACCENT="#4fd1c5", WARM="#ffce54", MUTED="#98a3bb", LINE="#2c3650", PANEL2="#212a3d", INK="#e8ecf6";
+
+  // ---------- tab switching ----------
+  var tabs = document.querySelectorAll(".tab-btn");
+  var sections = { ohm:$("tab-ohm"), sp:$("tab-sp"), bill:$("tab-bill"), learn:$("tab-learn") };
+  tabs.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      var t=b.dataset.tab;
+      for(var k in sections){ sections[k].classList.toggle("hide", k!==t); }
+    });
+  });
+
+  // ================= OHM'S LAW =================
+  var vRange=$("vRange"), rRange=$("rRange");
+  var ohmC=$("ohmCanvas"), octx=ohmC.getContext("2d");
+  var viC=$("viCanvas"), vctx=viC.getContext("2d");
+  var flow=0;
+
+  function ohmVals(){
+    var V=parseFloat(vRange.value), R=parseFloat(rRange.value);
+    var I=V/R, P=V*I;
+    return {V:V,R:R,I:I,P:P};
+  }
+  function drawOhm(){
+    var d=ohmVals();
+    $("vOut").textContent=d.V.toFixed(1);
+    $("rOut").textContent=d.R.toFixed(1);
+    $("iVal").textContent=d.I.toFixed(2);
+    $("pVal").textContent=d.P.toFixed(1);
+    var W=ohmC.width, H=ohmC.height;
+    octx.clearRect(0,0,W,H);
+    // wire rectangle path
+    var L=60,R2=560,T=50,B=185;
+    octx.lineWidth=5; octx.strokeStyle=LINE;
+    octx.beginPath();
+    octx.moveTo(L,T); octx.lineTo(R2,T); octx.lineTo(R2,B); octx.lineTo(L,B); octx.lineTo(L,T);
+    octx.stroke();
+    // battery on left side (vertical)
+    var by=(T+B)/2;
+    octx.strokeStyle=ACCENT; octx.lineWidth=4;
+    octx.beginPath(); octx.moveTo(L,by-26); octx.lineTo(L,by+26); octx.stroke();
+    // battery plates
+    octx.lineWidth=3; octx.strokeStyle=INK;
+    octx.beginPath(); octx.moveTo(L-14,by-16); octx.lineTo(L+14,by-16); octx.stroke(); // long +
+    octx.beginPath(); octx.moveTo(L-8,by-6); octx.lineTo(L+8,by-6); octx.stroke();     // short -
+    octx.beginPath(); octx.moveTo(L-14,by+6); octx.lineTo(L+14,by+6); octx.stroke();
+    octx.beginPath(); octx.moveTo(L-8,by+16); octx.lineTo(L+8,by+16); octx.stroke();
+    octx.fillStyle=MUTED; octx.font="12px system-ui"; octx.textAlign="left";
+    octx.fillText("+", L+18, by-14); octx.fillText("−", L+18, by+20);
+    octx.fillText(d.V.toFixed(1)+" V", L-4, B+22);
+    // resistor (zig-zag) on top wire
+    var rx0=200, rx1=320, ry=T;
+    octx.strokeStyle=WARM; octx.lineWidth=4;
+    octx.beginPath(); octx.moveTo(rx0,ry);
+    var seg=(rx1-rx0)/6;
+    for(var i=0;i<6;i++){ octx.lineTo(rx0+seg*(i+0.5), ry+(i%2?10:-10)); }
+    octx.lineTo(rx1,ry); octx.stroke();
+    octx.fillStyle=MUTED; octx.textAlign="center";
+    octx.fillText("R = "+d.R.toFixed(1)+" Ω", (rx0+rx1)/2, ry-16);
+    // bulb on right side
+    var bx=R2, byb=(T+B)/2;
+    var bright = clamp(d.P/24,0,1); // 0..1 relative to ~24W max
+    var glowR = 16+bright*10;
+    octx.save();
+    var g=octx.createRadialGradient(bx,byb,2,bx,byb,glowR+24);
+    g.addColorStop(0,"rgba(255,206,84,"+(0.15+bright*0.85)+")");
+    g.addColorStop(1,"rgba(255,206,84,0)");
+    octx.fillStyle=g; octx.beginPath(); octx.arc(bx,byb,glowR+24,0,7); octx.fill();
+    octx.restore();
+    octx.beginPath(); octx.arc(bx,byb,glowR,0,7);
+    octx.fillStyle="rgba(255,206,84,"+(0.25+bright*0.75)+")";
+    octx.fill();
+    octx.lineWidth=2; octx.strokeStyle=WARM; octx.stroke();
+    // filament
+    octx.strokeStyle="rgba(255,120,60,"+(0.4+bright*0.6)+")"; octx.lineWidth=2;
+    octx.beginPath(); octx.moveTo(bx-8,byb+6);
+    octx.lineTo(bx-4,byb-6); octx.lineTo(bx,byb+6); octx.lineTo(bx+4,byb-6); octx.lineTo(bx+8,byb+6);
+    octx.stroke();
+    var lvl = bright>0.66?"Bright":(bright>0.3?"Medium":(d.P>0.5?"Dim":"Off"));
+    $("brVal").textContent=lvl;
+
+    // flowing current dots around the loop (perimeter param)
+    var pts=[[L,T],[R2,T],[R2,B],[L,B]];
+    var segLen=[R2-L, B-T, R2-L, B-T];
+    var per=segLen[0]+segLen[1]+segLen[2]+segLen[3];
+    var nDots=18;
+    var speed = clamp(d.I,0,6); // A -> visual speed
+    var dotColor = d.I>0.01?ACCENT:MUTED;
+    octx.fillStyle=dotColor;
+    for(var k=0;k<nDots;k++){
+      var pos=((flow*speed*0.9 + k*(per/nDots))%per+per)%per;
+      var xy=perimeterPoint(pos,pts,segLen);
+      octx.beginPath(); octx.arc(xy[0],xy[1],3.2,0,7); octx.fill();
+    }
+  }
+  function perimeterPoint(pos,pts,segLen){
+    // traverse: top L->R, right T->B, bottom R->L, left B->T
+    var s=pos;
+    if(s<segLen[0]) return [pts[0][0]+s, pts[0][1]];
+    s-=segLen[0];
+    if(s<segLen[1]) return [pts[1][0], pts[1][1]+s];
+    s-=segLen[1];
+    if(s<segLen[2]) return [pts[2][0]-s, pts[2][1]];
+    s-=segLen[2];
+    return [pts[3][0], pts[3][1]-s];
+  }
+  function drawVI(){
+    var d=ohmVals();
+    var W=viC.width,H=viC.height;
+    vctx.clearRect(0,0,W,H);
+    var mL=52,mB=42,mT=16,mR=20;
+    var x0=mL,y0=H-mB,x1=W-mR,y1=mT;
+    var Imax=6, Vmax=12;
+    // axes
+    vctx.strokeStyle=LINE; vctx.lineWidth=1;
+    // grid
+    vctx.strokeStyle="#26304a";
+    for(var gi=1;gi<=6;gi++){
+      var gy=y0-(y0-y1)*(gi/6);
+      vctx.beginPath(); vctx.moveTo(x0,gy); vctx.lineTo(x1,gy); vctx.stroke();
+    }
+    for(var gj=1;gj<=6;gj++){
+      var gx=x0+(x1-x0)*(gj/6);
+      vctx.beginPath(); vctx.moveTo(gx,y0); vctx.lineTo(gx,y1); vctx.stroke();
+    }
+    vctx.strokeStyle=MUTED; vctx.lineWidth=1.5;
+    vctx.beginPath(); vctx.moveTo(x0,y1); vctx.lineTo(x0,y0); vctx.lineTo(x1,y0); vctx.stroke();
+    vctx.fillStyle=MUTED; vctx.font="12px system-ui"; vctx.textAlign="center";
+    vctx.fillText("Voltage V (V)", (x0+x1)/2, H-8);
+    vctx.save(); vctx.translate(14,(y0+y1)/2); vctx.rotate(-Math.PI/2);
+    vctx.fillText("Current I (A)",0,0); vctx.restore();
+    // axis ticks
+    vctx.textAlign="right";
+    for(var ti=0;ti<=6;ti++){ var yy=y0-(y0-y1)*(ti/6); vctx.fillText((Imax*ti/6).toFixed(0), x0-6, yy+4); }
+    vctx.textAlign="center";
+    for(var tj=0;tj<=6;tj++){ var xx=x0+(x1-x0)*(tj/6); vctx.fillText((Vmax*tj/6).toFixed(0), xx, y0+16); }
+    // line I = V/R  -> for V in [0,Vmax]
+    var mapX=function(V){ return x0+(x1-x0)*(V/Vmax); };
+    var mapY=function(I){ return y0-(y0-y1)*(clamp(I,0,Imax)/Imax); };
+    vctx.strokeStyle=ACCENT; vctx.lineWidth=2.5;
+    vctx.beginPath();
+    var started=false;
+    for(var V=0;V<=Vmax+0.001;V+=0.25){
+      var I=V/d.R;
+      if(I>Imax){ // clamp visually, draw to boundary then stop
+        var Vb=Imax*d.R;
+        vctx.lineTo(mapX(Vb),mapY(Imax));
+        break;
+      }
+      if(!started){ vctx.moveTo(mapX(V),mapY(I)); started=true; } else vctx.lineTo(mapX(V),mapY(I));
+    }
+    vctx.stroke();
+    // operating point
+    var px=mapX(clamp(d.V,0,Vmax)), py=mapY(clamp(d.I,0,Imax));
+    vctx.fillStyle=WARM; vctx.beginPath(); vctx.arc(px,py,5,0,7); vctx.fill();
+    vctx.strokeStyle="#0f131d"; vctx.lineWidth=1.5; vctx.stroke();
+    vctx.fillStyle=INK; vctx.textAlign="left"; vctx.font="12px system-ui";
+    vctx.fillText("("+d.V.toFixed(1)+" V, "+d.I.toFixed(2)+" A)", clamp(px+8,x0,x1-110), clamp(py-8,y1+10,y0));
+  }
+  vRange.addEventListener("input", function(){ drawOhm(); drawVI(); });
+  rRange.addEventListener("input", function(){ drawOhm(); drawVI(); });
+
+  // ================= SERIES / PARALLEL =================
+  var mode="series"; var failA=false, failB=false;
+  var spvRange=$("spvRange"), sprRange=$("sprRange");
+  var spC=$("spCanvas"), sctx=spC.getContext("2d");
+  var spFlow=0;
+
+  function spCompute(){
+    var V=parseFloat(spvRange.value), R=parseFloat(sprRange.value);
+    var res={V:V,R:R,mode:mode,failA:failA,failB:failB};
+    if(mode==="series"){
+      // series: if either fails, open circuit -> no current
+      if(failA||failB){
+        res.Req=Infinity; res.Itot=0; res.I1=0; res.I2=0; res.P1=0; res.P2=0; res.Ptot=0; res.open=true;
+      }else{
+        res.Req=2*R; res.Itot=V/res.Req; res.I1=res.Itot; res.I2=res.Itot;
+        res.P1=res.I1*res.I1*R; res.P2=res.I2*res.I2*R; res.Ptot=V*res.Itot; res.open=false;
+      }
+    }else{
+      // parallel: each branch V across it independently
+      var aOn=!failA, bOn=!failB;
+      res.I1= aOn? V/R : 0;
+      res.I2= bOn? V/R : 0;
+      res.Itot=res.I1+res.I2;
+      res.P1=res.I1*res.I1*R;
+      res.P2=res.I2*res.I2*R;
+      res.Ptot=V*res.Itot;
+      var n=(aOn?1:0)+(bOn?1:0);
+      res.Req= n>0 ? R/n : Infinity;
+      res.open=(n===0);
+    }
+    return res;
+  }
+  function bulbBright(P){ return clamp(P/16,0,1); }
+  function drawBulb(ctx,x,y,bright,dead,label){
+    var r=18;
+    if(!dead){
+      var g=ctx.createRadialGradient(x,y,2,x,y,r+22);
+      g.addColorStop(0,"rgba(255,206,84,"+(0.12+bright*0.85)+")");
+      g.addColorStop(1,"rgba(255,206,84,0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r+22,0,7); ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(x,y,r,0,7);
+    ctx.fillStyle= dead? "rgba(120,130,150,.25)" : "rgba(255,206,84,"+(0.2+bright*0.8)+")";
+    ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle= dead? MUTED : WARM; ctx.stroke();
+    // filament or X
+    ctx.lineWidth=2;
+    if(dead){
+      ctx.strokeStyle=MUTED;
+      ctx.beginPath(); ctx.moveTo(x-8,y-8); ctx.lineTo(x+8,y+8);
+      ctx.moveTo(x+8,y-8); ctx.lineTo(x-8,y+8); ctx.stroke();
+    }else{
+      ctx.strokeStyle="rgba(255,120,60,"+(0.4+bright*0.6)+")";
+      ctx.beginPath(); ctx.moveTo(x-7,y+6); ctx.lineTo(x-3,y-6); ctx.lineTo(x+1,y+6); ctx.lineTo(x+5,y-6); ctx.lineTo(x+8,y+6); ctx.stroke();
+    }
+    ctx.fillStyle=MUTED; ctx.font="12px system-ui"; ctx.textAlign="center";
+    ctx.fillText(label, x, y+r+16);
+  }
+  function drawSP(){
+    var d=spCompute();
+    $("spvOut").textContent=d.V.toFixed(1);
+    $("sprOut").textContent=d.R.toFixed(1);
+    $("spReq").textContent = d.Req===Infinity? "∞ (open)" : d.Req.toFixed(1);
+    $("spItot").textContent=d.Itot.toFixed(2);
+    $("spPtot").textContent=d.Ptot.toFixed(1);
+    var W=spC.width,H=spC.height;
+    sctx.clearRect(0,0,W,H);
+    var L=55,R2=565,T=55,B=200;
+    // battery left
+    sctx.strokeStyle=LINE; sctx.lineWidth=5;
+    var by=(T+B)/2;
+    // draw frame differently per mode
+    sctx.strokeStyle=LINE; sctx.lineWidth=5;
+    if(mode==="series"){
+      // single loop with two bulbs on the top wire
+      sctx.beginPath();
+      sctx.moveTo(L,T); sctx.lineTo(R2,T); sctx.lineTo(R2,B); sctx.lineTo(L,B); sctx.lineTo(L,T); sctx.stroke();
+      var b1x=230,b2x=390;
+      drawBulb(sctx,b1x,T, bulbBright(d.P1), d.failA, "Bulb 1");
+      drawBulb(sctx,b2x,T, bulbBright(d.P2), d.failB, "Bulb 2");
+      spDots(d, [[L,T],[R2,T],[R2,B],[L,B]], !d.open);
+    }else{
+      // parallel: two vertical branches between two horizontal rails
+      sctx.beginPath();
+      sctx.moveTo(L,T); sctx.lineTo(R2,T);       // top rail
+      sctx.moveTo(L,B); sctx.lineTo(R2,B);       // bottom rail
+      sctx.moveTo(L,T); sctx.lineTo(L,B);        // left (battery side)
+      sctx.stroke();
+      // two branches
+      var br1=250, br2=420;
+      sctx.beginPath(); sctx.moveTo(br1,T); sctx.lineTo(br1,B); sctx.moveTo(br2,T); sctx.lineTo(br2,B); sctx.stroke();
+      drawBulb(sctx,br1,(T+B)/2, bulbBright(d.P1), d.failA, "Bulb 1");
+      drawBulb(sctx,br2,(T+B)/2, bulbBright(d.P2), d.failB, "Bulb 2");
+      // current on rails
+      spDots(d, [[L,T],[R2,T],[R2,B],[L,B]], d.Itot>0.01);
+    }
+    // battery plates
+    sctx.strokeStyle=ACCENT; sctx.lineWidth=4;
+    sctx.beginPath(); sctx.moveTo(L,by-24); sctx.lineTo(L,by+24); sctx.stroke();
+    sctx.strokeStyle=INK; sctx.lineWidth=3;
+    sctx.beginPath(); sctx.moveTo(L-13,by-10); sctx.lineTo(L+13,by-10); sctx.stroke();
+    sctx.beginPath(); sctx.moveTo(L-7,by+2); sctx.lineTo(L+7,by+2); sctx.stroke();
+    sctx.fillStyle=MUTED; sctx.font="12px system-ui"; sctx.textAlign="left";
+    sctx.fillText(d.V.toFixed(1)+" V", L-8, B-8);
+
+    // note text
+    var note;
+    if(mode==="series"){
+      if(d.open){ note="Series: one bulb has failed, so the circuit is OPEN — no current flows and BOTH bulbs are off. This is why old series fairy-light strings all die together."; }
+      else{ note="Series: the same current ("+d.Itot.toFixed(2)+" A) flows through both bulbs. Resistances add (R = 2×"+d.R.toFixed(1)+" = "+(2*d.R).toFixed(1)+" Ω), so bulbs are dimmer than one bulb alone."; }
+    }else{
+      if(d.open){ note="Parallel: both bulbs have failed — nothing lights."; }
+      else if(d.failA||d.failB){ note="Parallel: one bulb failed but the other still glows at full brightness, because each branch gets the full "+d.V.toFixed(1)+" V. This is how house wiring works."; }
+      else{ note="Parallel: each bulb gets the full "+d.V.toFixed(1)+" V and draws "+ (d.V/d.R).toFixed(2)+" A. Total current is larger and equivalent R is smaller ("+(d.R/2).toFixed(1)+" Ω)."; }
+    }
+    $("spNote").textContent=note;
+  }
+  function spDots(d, pts, flowing){
+    if(!flowing) return;
+    var segLen=[pts[1][0]-pts[0][0], pts[2][1]-pts[1][1], pts[1][0]-pts[0][0], pts[2][1]-pts[1][1]];
+    var per=segLen[0]+segLen[1]+segLen[2]+segLen[3];
+    var speed=clamp(d.Itot,0,6);
+    var n=16;
+    sctx.fillStyle=ACCENT;
+    for(var k=0;k<n;k++){
+      var pos=((spFlow*speed*0.9 + k*(per/n))%per+per)%per;
+      var xy=perimeterPoint(pos,pts,segLen);
+      sctx.beginPath(); sctx.arc(xy[0],xy[1],3,0,7); sctx.fill();
+    }
+  }
+  $("btnSeries").addEventListener("click", function(){ mode="series"; this.classList.add("on"); $("btnParallel").classList.remove("on"); drawSP(); });
+  $("btnParallel").addEventListener("click", function(){ mode="parallel"; this.classList.add("on"); $("btnSeries").classList.remove("on"); drawSP(); });
+  $("btnFailA").addEventListener("click", function(){ failA=!failA; this.textContent="Bulb 1: "+(failA?"FAILED":"working"); this.classList.toggle("on",failA); drawSP(); });
+  $("btnFailB").addEventListener("click", function(){ failB=!failB; this.textContent="Bulb 2: "+(failB?"FAILED":"working"); this.classList.toggle("on",failB); drawSP(); });
+  spvRange.addEventListener("input", drawSP);
+  sprRange.addEventListener("input", drawSP);
+
+  // ================= POWER & BILL =================
+  var wRange=$("wRange"),hRange=$("hRange"),dRange=$("dRange"),tRange=$("tRange");
+  var billC=$("billCanvas"), bctx=billC.getContext("2d");
+  function drawBill(){
+    var P=parseFloat(wRange.value), h=parseFloat(hRange.value), days=parseFloat(dRange.value), tar=parseFloat(tRange.value);
+    $("wOut").textContent=P.toFixed(0);
+    $("hOut").textContent=h.toFixed(1);
+    $("dOut").textContent=days.toFixed(0);
+    $("tOut").textContent=tar.toFixed(1);
+    var ePerDay = P/1000*h;          // kWh
+    var eTot = ePerDay*days;         // kWh
+    var cost = eTot*tar;
+    $("ePerDay").textContent=ePerDay.toFixed(2);
+    $("eTot").textContent=eTot.toFixed(1);
+    $("cost").textContent=cost.toFixed(0);
+    // bar chart: energy per day vs a reference scale
+    var W=billC.width,H=billC.height;
+    bctx.clearRect(0,0,W,H);
+    var mL=52,mB=36,mT=16,mR=16;
+    var x0=mL,y0=H-mB,x1=W-mR,y1=mT;
+    var maxKwh = Math.max(2, Math.ceil(eTot/5)*5); // dynamic
+    bctx.strokeStyle=MUTED; bctx.lineWidth=1.5;
+    bctx.beginPath(); bctx.moveTo(x0,y1); bctx.lineTo(x0,y0); bctx.lineTo(x1,y0); bctx.stroke();
+    bctx.fillStyle=MUTED; bctx.font="12px system-ui"; bctx.textAlign="center";
+    bctx.fillText("Energy consumed (units / kWh)", (x0+x1)/2, H-6);
+    // gridlines + ticks
+    bctx.textAlign="right";
+    for(var g=0;g<=5;g++){
+      var val=maxKwh*g/5;
+      var yy=y0-(y0-y1)*(g/5);
+      bctx.strokeStyle="#26304a"; bctx.beginPath(); bctx.moveTo(x0,yy); bctx.lineTo(x1,yy); bctx.stroke();
+      bctx.fillStyle=MUTED; bctx.fillText(val.toFixed(0), x0-6, yy+4);
+    }
+    // two bars: per day and total
+    function bar(cx,valKwh,color,label){
+      var bw=90;
+      var bh=(y0-y1)*clamp(valKwh/maxKwh,0,1);
+      bctx.fillStyle=color;
+      bctx.fillRect(cx-bw/2, y0-bh, bw, bh);
+      bctx.fillStyle=INK; bctx.textAlign="center"; bctx.font="bold 13px system-ui";
+      bctx.fillText(valKwh.toFixed(2), cx, y0-bh-6);
+      bctx.fillStyle=MUTED; bctx.font="12px system-ui";
+      bctx.fillText(label, cx, y0+16);
+    }
+    bar((x0+x1)/2-90, ePerDay, ACCENT, "per day");
+    bar((x0+x1)/2+90, eTot, WARM, days+" days");
+  }
+  [wRange,hRange,dRange,tRange].forEach(function(r){ r.addEventListener("input", drawBill); });
+
+  // ================= QUIZ =================
+  var quiz=[
+    {q:"A 12 V battery is connected to a 4 Ω resistor. What current flows?",
+     opts:["0.33 A","3 A","48 A","16 A"], a:1,
+     e:"I = V/R = 12 / 4 = 3 A (Ohm's law)."},
+    {q:"Two identical bulbs are in series. If one bulb burns out, the other will:",
+     opts:["Glow brighter","Glow the same","Go off too","Explode"], a:2,
+     e:"A series circuit is a single path — one break opens the whole circuit, so both bulbs go off."},
+    {q:"A 1000 W heater runs for 2 hours. How much energy (in units) is used?",
+     opts:["0.5 unit","2 units","20 units","2000 units"], a:1,
+     e:"E = P×t = 1 kW × 2 h = 2 kWh = 2 units."}
+  ];
+  var qBox=$("quiz");
+  quiz.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var stem=document.createElement("p"); stem.className="stem"; stem.textContent=(qi+1)+". "+item.q;
+    div.appendChild(stem);
+    var ex=document.createElement("div"); ex.className="explain";
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(answered) return; answered=true;
+        if(oi===item.a){ b.classList.add("correct"); }
+        else{ b.classList.add("wrong");
+          var kids=div.querySelectorAll(".opt"); kids[item.a].classList.add("correct");
+        }
+        ex.textContent="✔ "+item.e;
+      });
+      div.appendChild(b);
+    });
+    div.appendChild(ex);
+    qBox.appendChild(div);
+  });
+
+  // ================= ANIMATION LOOP =================
+  function loop(){
+    if(running){
+      flow+=1.6; spFlow+=1.6;
+      drawOhm();
+      drawSP();
+    }
+    requestAnimationFrame(loop);
+  }
+  // initial static draws
+  drawVI(); drawBill();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

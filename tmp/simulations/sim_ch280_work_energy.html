@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work &amp; Energy Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#12161f; --panel:#1b2130; --panel2:#222b3d;
+    --line:#2e3850; --txt:#e6ecf5; --muted:#9aa7bd; --accent:#38d39f;
+    --accent-dim:#1f7a5e; --ke:#38d39f; --pe:#5aa9ff; --tot:#f2c94c;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.45; padding:14px;
+  }
+  h1{font-size:1.35rem; margin:0 0 2px}
+  .sub{color:var(--muted); font-size:.85rem; margin:0 0 14px}
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px}
+  .tab{
+    background:var(--panel); color:var(--muted); border:1px solid var(--line);
+    padding:9px 14px; border-radius:12px; cursor:pointer; font-size:.9rem;
+    font-weight:600; flex:1 1 auto; min-width:120px; text-align:center;
+    transition:.15s;
+  }
+  .tab:hover{color:var(--txt)}
+  .tab.active{background:var(--accent); color:#08120d; border-color:var(--accent)}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:16px; box-shadow:var(--shadow); margin-bottom:14px;
+  }
+  .mode{display:none}
+  .mode.show{display:block}
+  .grid{display:grid; grid-template-columns:1fr; gap:14px}
+  @media(min-width:760px){ .grid{grid-template-columns:1.3fr 1fr} }
+  canvas{width:100%; height:auto; display:block; background:var(--panel2);
+    border-radius:12px; border:1px solid var(--line); touch-action:none}
+  .ctrl{margin:12px 0}
+  .ctrl label{display:flex; justify-content:space-between; font-size:.85rem;
+    color:var(--muted); margin-bottom:5px}
+  .ctrl label b{color:var(--txt)}
+  input[type=range]{width:100%; -webkit-appearance:none; height:26px;
+    background:transparent; cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:6px;
+    background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;
+    height:22px;border-radius:50%;background:var(--accent);margin-top:-8px;
+    border:3px solid #0c1119}
+  input[type=range]::-moz-range-track{height:6px;border-radius:6px;background:var(--line)}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;
+    background:var(--accent);border:3px solid #0c1119}
+  .readout{background:var(--panel2); border:1px solid var(--line);
+    border-radius:12px; padding:12px; margin-top:10px}
+  .readout .big{font-size:1.5rem; font-weight:700; color:var(--accent)}
+  .readout .eq{font-family:ui-monospace,Consolas,monospace; color:var(--muted);
+    font-size:.9rem}
+  .note{font-size:.82rem; color:var(--muted); margin-top:8px}
+  .note.warn{color:var(--tot)}
+  .btn{background:var(--accent-dim); color:var(--txt); border:1px solid var(--accent);
+    padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600;
+    font-size:.85rem}
+  .btn:hover{background:var(--accent); color:#08120d}
+  .btn.sec{background:transparent; border-color:var(--line); color:var(--muted)}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px}
+  .bars{display:flex; gap:14px; align-items:flex-end; height:150px; margin-top:6px}
+  .bar-wrap{flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:flex-end; height:100%}
+  .bar{width:100%; border-radius:8px 8px 0 0; transition:height .08s linear; min-height:2px}
+  .bar-lbl{font-size:.75rem; color:var(--muted); margin-top:6px; text-align:center}
+  .facts{font-size:.86rem}
+  .facts li{margin-bottom:7px}
+  .facts code{background:var(--panel2); padding:2px 6px; border-radius:6px;
+    font-family:ui-monospace,Consolas,monospace; color:var(--accent)}
+  .quiz .q{margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line)}
+  .quiz .q:last-child{border-bottom:none}
+  .quiz .opts{display:flex; flex-direction:column; gap:6px; margin:8px 0}
+  .quiz .opt{background:var(--panel2); border:1px solid var(--line);
+    padding:8px 12px; border-radius:9px; cursor:pointer; font-size:.85rem}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:var(--accent-dim); border-color:var(--accent)}
+  .quiz .opt.wrong{background:#5a2434; border-color:#c0556c}
+  .quiz .ans{font-size:.82rem; color:var(--accent); margin-top:6px; display:none}
+  .quiz .ans.show{display:block}
+  h3{font-size:1rem; margin:0 0 10px}
+  .worker{display:flex; flex-direction:column; gap:6px; margin-bottom:10px}
+  .track{background:var(--panel2); border-radius:8px; height:24px; overflow:hidden;
+    position:relative; border:1px solid var(--line)}
+  .track .fill{height:100%; background:var(--accent); width:0%; border-radius:8px}
+  .wlbl{font-size:.8rem; color:var(--muted); display:flex; justify-content:space-between}
+</style>
+</head>
+<body>
+<h1>Work &amp; Energy Lab</h1>
+<p class="sub">NIOS Class 10 Science &amp; Technology &middot; Ch 13 &mdash; Work, Energy and Power</p>
+
+<div class="tabs">
+  <div class="tab active" data-mode="work">1. Work Done</div>
+  <div class="tab" data-mode="energy">2. KE &amp; PE (Conservation)</div>
+  <div class="tab" data-mode="power">3. Power</div>
+  <div class="tab" data-mode="learn">Facts &amp; Quiz</div>
+</div>
+
+<!-- MODE 1: WORK -->
+<div class="mode show" id="mode-work">
+  <div class="grid">
+    <div class="panel">
+      <h3>Push a box across the floor</h3>
+      <canvas id="cvWork" width="640" height="300"></canvas>
+      <p class="note">The arrow shows the applied force <b>F</b> at angle <b>&theta;</b>. Only the horizontal part (F&middot;cos&theta;) does work along the motion.</p>
+    </div>
+    <div class="panel">
+      <div class="ctrl">
+        <label>Force F <b><span id="wF">40</span> N</b></label>
+        <input type="range" id="sF" min="0" max="100" value="40">
+      </div>
+      <div class="ctrl">
+        <label>Distance d <b><span id="wD">5</span> m</b></label>
+        <input type="range" id="sD" min="0" max="10" step="0.5" value="5">
+      </div>
+      <div class="ctrl">
+        <label>Angle &theta; <b><span id="wA">30</span>&deg;</b></label>
+        <input type="range" id="sA" min="0" max="90" value="30">
+      </div>
+      <div class="readout">
+        <div class="eq">W = F &times; d &times; cos&theta;</div>
+        <div class="eq" id="wCalc">= 40 &times; 5 &times; cos30&deg;</div>
+        <div class="big" id="wOut">173.2 J</div>
+      </div>
+      <p class="note warn" id="wPerp" style="display:none">At &theta; = 90&deg; the force is perpendicular to motion &rarr; <b>zero work done</b> (cos90&deg; = 0).</p>
+      <div class="row"><button class="btn" id="wPush">Push the box</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODE 2: ENERGY -->
+<div class="mode" id="mode-energy">
+  <div class="grid">
+    <div class="panel">
+      <h3>Ball on a ramp &mdash; energy is conserved</h3>
+      <canvas id="cvEn" width="640" height="320"></canvas>
+      <p class="note">Ignoring friction, total mechanical energy (KE + PE) stays constant. Watch PE turn into KE as the ball falls, and back again.</p>
+    </div>
+    <div class="panel">
+      <div class="ctrl">
+        <label>Mass m <b><span id="eM">2.0</span> kg</b></label>
+        <input type="range" id="sM" min="0.5" max="5" step="0.5" value="2">
+      </div>
+      <div class="ctrl">
+        <label>Drop height h <b><span id="eH">4.0</span> m</b></label>
+        <input type="range" id="sH" min="1" max="6" step="0.5" value="4">
+      </div>
+      <div class="readout">
+        <div class="eq">KE = &frac12;mv&sup2; &nbsp; PE = mgh &nbsp; (g = 9.8 m/s&sup2;)</div>
+        <div class="bars">
+          <div class="bar-wrap"><div class="bar" id="barKE" style="background:var(--ke)"></div><div class="bar-lbl">KE<br><span id="valKE">0 J</span></div></div>
+          <div class="bar-wrap"><div class="bar" id="barPE" style="background:var(--pe)"></div><div class="bar-lbl">PE<br><span id="valPE">0 J</span></div></div>
+          <div class="bar-wrap"><div class="bar" id="barTOT" style="background:var(--tot)"></div><div class="bar-lbl">Total<br><span id="valTOT">0 J</span></div></div>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="enRun">Release ball</button>
+        <button class="btn sec" id="enReset">Reset</button>
+      </div>
+      <p class="note">Height at instant: <b id="enH">0.0</b> m &middot; Speed: <b id="enV">0.0</b> m/s</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODE 3: POWER -->
+<div class="mode" id="mode-power">
+  <div class="grid">
+    <div class="panel">
+      <h3>Two workers, same job, different times</h3>
+      <div class="worker">
+        <div class="wlbl"><span>Worker A (fast)</span><span id="pAt">0.0 s</span></div>
+        <div class="track"><div class="fill" id="fillA" style="background:var(--ke)"></div></div>
+      </div>
+      <div class="worker">
+        <div class="wlbl"><span>Worker B (slow)</span><span id="pBt">0.0 s</span></div>
+        <div class="track"><div class="fill" id="fillB" style="background:var(--pe)"></div></div>
+      </div>
+      <p class="note">Both lift the same load, doing the same <b>work W</b>. The one who finishes sooner has more <b>power</b>. Power measures how <em>fast</em> work is done.</p>
+      <div class="row">
+        <button class="btn" id="powRun">Start race</button>
+        <button class="btn sec" id="powReset">Reset</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctrl">
+        <label>Work done W (each) <b><span id="pW">600</span> J</b></label>
+        <input type="range" id="sW" min="100" max="1200" step="50" value="600">
+      </div>
+      <div class="ctrl">
+        <label>Time &mdash; Worker A <b><span id="pTA">3</span> s</b></label>
+        <input type="range" id="sTA" min="1" max="10" value="3">
+      </div>
+      <div class="ctrl">
+        <label>Time &mdash; Worker B <b><span id="pTB">6</span> s</b></label>
+        <input type="range" id="sTB" min="1" max="10" value="6">
+      </div>
+      <div class="readout">
+        <div class="eq">P = W / t</div>
+        <div>Worker A: <b class="big" style="font-size:1.15rem;color:var(--ke)" id="powA">200 W</b></div>
+        <div>Worker B: <b class="big" style="font-size:1.15rem;color:var(--pe)" id="powB">100 W</b></div>
+      </div>
+      <p class="note">1 watt (W) = 1 joule per second. Also <code>P = F&nbsp;v</code> for a force moving at speed v.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODE 4: LEARN -->
+<div class="mode" id="mode-learn">
+  <div class="grid">
+    <div class="panel facts">
+      <h3>Key facts</h3>
+      <ul>
+        <li><b>Work:</b> <code>W = F d cos&theta;</code> &mdash; force &times; distance &times; cosine of angle between them. Unit: <b>joule (J)</b>. 1 J = 1 N&middot;m.</li>
+        <li>Work is <b>zero</b> when the force is perpendicular to motion (&theta; = 90&deg;, cos90&deg; = 0), e.g. carrying a bag horizontally.</li>
+        <li><b>Kinetic energy:</b> <code>KE = &frac12; m v&sup2;</code> &mdash; energy of motion.</li>
+        <li><b>Potential energy (gravitational):</b> <code>PE = m g h</code>, with g = 9.8 m/s&sup2;.</li>
+        <li><b>Conservation of energy:</b> without friction, KE + PE = constant. Energy only changes form.</li>
+        <li><b>Power:</b> <code>P = W / t</code> = rate of doing work. Also <code>P = F v</code>. Unit: <b>watt (W)</b>. 1 W = 1 J/s.</li>
+      </ul>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h3>Quick quiz (tap an option)</h3>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var G = 9.8;
+  var running = true;
+  document.addEventListener("visibilitychange", function(){
+    running = !document.hidden;
+    if(running) requestAnimationFrame(loop);
+  });
+
+  // ---------- tabs ----------
+  var tabs = document.querySelectorAll(".tab");
+  var modes = { work:"mode-work", energy:"mode-energy", power:"mode-power", learn:"mode-learn" };
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      for(var k in modes){ document.getElementById(modes[k]).classList.remove("show"); }
+      document.getElementById(modes[t.dataset.mode]).classList.add("show");
+    });
+  });
+
+  // ---------- helpers ----------
+  function $(id){ return document.getElementById(id); }
+  function DPR(){ return Math.min(window.devicePixelRatio||1, 2); }
+  function setup(cv){
+    var r = cv.getBoundingClientRect();
+    var w = r.width||cv.width, h = w * (cv.height/cv.width);
+    var d = DPR();
+    cv.width = Math.round(w*d); cv.height = Math.round(h*d);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(d,0,0,d,0,0);
+    return {ctx:ctx, w:w, h:h};
+  }
+
+  // ================= MODE 1: WORK =================
+  var wF=$("sF"), wD=$("sD"), wA=$("sA");
+  var boxAnim = 0, boxRun = false;
+  function workCalc(){
+    var F=+wF.value, d=+wD.value, a=+wA.value;
+    $("wF").textContent=F; $("wD").textContent=d.toFixed(1); $("wA").textContent=a;
+    var W = F*d*Math.cos(a*Math.PI/180);
+    $("wCalc").innerHTML = "= "+F+" &times; "+d.toFixed(1)+" &times; cos"+a+"&deg;";
+    $("wOut").textContent = W.toFixed(1)+" J";
+    $("wPerp").style.display = (a===90) ? "block" : "none";
+  }
+  [wF,wD,wA].forEach(function(s){ s.addEventListener("input", workCalc); });
+  $("wPush").addEventListener("click", function(){ boxAnim=0; boxRun=true; });
+
+  function drawWork(ctx,w,h){
+    ctx.clearRect(0,0,w,h);
+    var floorY = h*0.72;
+    // floor
+    ctx.strokeStyle="#3a465c"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(0,floorY); ctx.lineTo(w,floorY); ctx.stroke();
+    // hatch
+    ctx.strokeStyle="rgba(90,110,150,.35)"; ctx.lineWidth=1;
+    for(var x=0;x<w;x+=18){ ctx.beginPath(); ctx.moveTo(x,floorY); ctx.lineTo(x-10,floorY+12); ctx.stroke(); }
+    // box position
+    var d=+wD.value;
+    var travel = (w*0.55) * (d/10);
+    var startX = w*0.12;
+    var bx = startX + travel*boxAnim;
+    var bs = 56;
+    // box
+    ctx.fillStyle="#2f6f57"; ctx.strokeStyle="#38d39f"; ctx.lineWidth=2;
+    roundRect(ctx,bx,floorY-bs,bs,bs,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#cdeee0"; ctx.font="12px system-ui"; ctx.textAlign="center";
+    ctx.fillText("box", bx+bs/2, floorY-bs/2+4);
+    // force arrow from box centre-left corner
+    var a=(+wA.value)*Math.PI/180;
+    var F=+wF.value;
+    var len = 30 + F*0.9;
+    var ox = bx+bs/2, oy = floorY-bs/2;
+    var ex = ox + Math.cos(a)*len, ey = oy - Math.sin(a)*len;
+    ctx.strokeStyle="#f2c94c"; ctx.fillStyle="#f2c94c"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ex,ey); ctx.stroke();
+    // arrowhead
+    var ah=Math.atan2(ey-oy,ex-ox);
+    ctx.beginPath(); ctx.moveTo(ex,ey);
+    ctx.lineTo(ex-10*Math.cos(ah-0.4), ey-10*Math.sin(ah-0.4));
+    ctx.lineTo(ex-10*Math.cos(ah+0.4), ey-10*Math.sin(ah+0.4));
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#f2c94c"; ctx.font="bold 13px system-ui";
+    ctx.fillText("F = "+F+" N", ex+4, ey-8);
+    // horizontal component (dashed)
+    ctx.strokeStyle="rgba(56,211,159,.8)"; ctx.setLineDash([5,4]); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+Math.cos(a)*len,oy); ctx.stroke();
+    ctx.setLineDash([]);
+    // motion label
+    ctx.fillStyle="#9aa7bd"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("motion →", startX, floorY+26);
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  // ================= MODE 2: ENERGY =================
+  var sM=$("sM"), sH=$("sH");
+  var en = { t:0, run:false, y:0, v:0, x0:0, bounces:0 };
+  function enParams(){
+    $("eM").textContent=(+sM.value).toFixed(1);
+    $("eH").textContent=(+sH.value).toFixed(1);
+  }
+  [sM,sH].forEach(function(s){ s.addEventListener("input", function(){ enParams(); enReset(); }); });
+  function enReset(){
+    en.run=false; en.t=0; en.y=+sH.value; en.v=0; en.bounces=0;
+    updateEnergyBars(+sH.value, 0);
+  }
+  $("enRun").addEventListener("click", function(){ en.run=true; en.t=0; en.y=+sH.value; en.v=0; en.bounces=0; });
+  $("enReset").addEventListener("click", enReset);
+
+  function updateEnergyBars(h, v){
+    var m=+sM.value, H=+sH.value;
+    var pe = m*G*h, ke = 0.5*m*v*v;
+    var tot = m*G*H; // reference total = start PE
+    var mx = tot>0?tot:1;
+    $("barKE").style.height = (100*Math.min(ke/mx,1))+"%";
+    $("barPE").style.height = (100*Math.min(pe/mx,1))+"%";
+    $("barTOT").style.height = (100*Math.min((ke+pe)/mx,1))+"%";
+    $("valKE").textContent = ke.toFixed(0)+" J";
+    $("valPE").textContent = pe.toFixed(0)+" J";
+    $("valTOT").textContent = (ke+pe).toFixed(0)+" J";
+    $("enH").textContent = h.toFixed(1);
+    $("enV").textContent = v.toFixed(1);
+  }
+
+  function stepEnergy(dt){
+    if(!en.run) return;
+    // simple falling + bouncing with energy conservation (elastic)
+    en.v += G*dt;              // gravity accelerates downward
+    en.y -= en.v*dt;           // y is height above ground
+    if(en.y <= 0){
+      en.y = 0;
+      en.v = -en.v;            // elastic bounce (energy conserved)
+    }
+    // cap top so it doesn't exceed start height (numerical)
+    if(en.y > +sH.value){ en.y=+sH.value; if(en.v<0) en.v=0; }
+    updateEnergyBars(en.y, Math.abs(en.v));
+  }
+
+  function drawEnergy(ctx,w,h){
+    ctx.clearRect(0,0,w,h);
+    var groundY=h*0.9, topPad=h*0.08;
+    var H=+sH.value;
+    var pxPerM = (groundY-topPad)/6; // 6 m max scale
+    // ground
+    ctx.strokeStyle="#3a465c"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(w,groundY); ctx.stroke();
+    // height ruler
+    ctx.strokeStyle="rgba(90,110,150,.3)"; ctx.fillStyle="#9aa7bd";
+    ctx.font="10px system-ui"; ctx.textAlign="right"; ctx.lineWidth=1;
+    for(var m=1;m<=6;m++){
+      var yy=groundY-m*pxPerM;
+      ctx.setLineDash([3,4]); ctx.beginPath(); ctx.moveTo(40,yy); ctx.lineTo(w,yy); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillText(m+" m", 36, yy+3);
+    }
+    // start line
+    ctx.strokeStyle="rgba(242,201,76,.6)"; ctx.setLineDash([6,4]); ctx.lineWidth=2;
+    var sy=groundY-H*pxPerM;
+    ctx.beginPath(); ctx.moveTo(40,sy); ctx.lineTo(w,sy); ctx.stroke(); ctx.setLineDash([]);
+    // ball
+    var by = groundY - en.y*pxPerM;
+    var bx = w*0.6;
+    var m2=+sM.value;
+    var rad = 10 + m2*3;
+    var grd=ctx.createRadialGradient(bx-4,by-4,2,bx,by,rad);
+    grd.addColorStop(0,"#8ff0cf"); grd.addColorStop(1,"#2f9f77");
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(bx,by,rad,0,7); ctx.fill();
+    ctx.strokeStyle="#38d39f"; ctx.lineWidth=2; ctx.stroke();
+    // velocity arrow
+    if(Math.abs(en.v)>0.2){
+      var dir = en.v>0 ? 1 : -1; // v>0 means moving down (y decreasing)
+      var al = Math.min(Math.abs(en.v)*4,60);
+      ctx.strokeStyle="#5aa9ff"; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.moveTo(bx+rad+8, by); ctx.lineTo(bx+rad+8, by+dir*al); ctx.stroke();
+      var ay=by+dir*al;
+      ctx.fillStyle="#5aa9ff"; ctx.beginPath();
+      ctx.moveTo(bx+rad+8, ay);
+      ctx.lineTo(bx+rad+3, ay-dir*7); ctx.lineTo(bx+rad+13, ay-dir*7);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // ================= MODE 3: POWER =================
+  var sW=$("sW"), sTA=$("sTA"), sTB=$("sTB");
+  var pw = { run:false, t:0 };
+  function powParams(){
+    var W=+sW.value, ta=+sTA.value, tb=+sTB.value;
+    $("pW").textContent=W; $("pTA").textContent=ta; $("pTB").textContent=tb;
+    $("powA").textContent=(W/ta).toFixed(0)+" W";
+    $("powB").textContent=(W/tb).toFixed(0)+" W";
+  }
+  [sW,sTA,sTB].forEach(function(s){ s.addEventListener("input", function(){ powParams(); powReset(); }); });
+  function powReset(){
+    pw.run=false; pw.t=0;
+    $("fillA").style.width="0%"; $("fillB").style.width="0%";
+    $("pAt").textContent="0.0 s"; $("pBt").textContent="0.0 s";
+  }
+  $("powRun").addEventListener("click", function(){ pw.run=true; pw.t=0; });
+  $("powReset").addEventListener("click", powReset);
+  function stepPower(dt){
+    if(!pw.run) return;
+    pw.t += dt;
+    var ta=+sTA.value, tb=+sTB.value;
+    var pa=Math.min(pw.t/ta,1), pb=Math.min(pw.t/tb,1);
+    $("fillA").style.width=(pa*100)+"%";
+    $("fillB").style.width=(pb*100)+"%";
+    $("pAt").textContent=Math.min(pw.t,ta).toFixed(1)+" s";
+    $("pBt").textContent=Math.min(pw.t,tb).toFixed(1)+" s";
+    if(pa>=1 && pb>=1) pw.run=false;
+  }
+
+  // ================= QUIZ =================
+  var quizData=[
+    { q:"A person carries a suitcase horizontally at steady speed for 10 m. How much work is done ON the suitcase by the lifting force?",
+      opts:["Zero, because force is perpendicular to motion","F times 10 J","Depends on the mass only","Cannot be found"],
+      correct:0,
+      exp:"The upward carrying force is perpendicular to the horizontal motion, so cos90° = 0 and W = 0." },
+    { q:"A ball is dropped from rest. Just before hitting the ground (no air resistance), its energy is mostly:",
+      opts:["Potential energy","Kinetic energy","Zero","Equal PE and KE"],
+      correct:1,
+      exp:"As it falls, PE (mgh) converts into KE (½mv²). At the bottom almost all energy is kinetic." },
+    { q:"Worker A does 600 J in 3 s; Worker B does 600 J in 6 s. Who is more powerful?",
+      opts:["Worker B","Both equal","Worker A","Cannot say"],
+      correct:2,
+      exp:"P = W/t. A: 600/3 = 200 W, B: 600/6 = 100 W. Same work, less time → more power (Worker A)." }
+  ];
+  var qc=$("quiz");
+  quizData.forEach(function(item,i){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.innerHTML="<b>Q"+(i+1)+".</b> "+item.q; d.appendChild(p);
+    var od=document.createElement("div"); od.className="opts";
+    var ans=document.createElement("div"); ans.className="ans";
+    item.opts.forEach(function(opt,j){
+      var o=document.createElement("div"); o.className="opt"; o.textContent=opt;
+      o.addEventListener("click", function(){
+        var kids=od.querySelectorAll(".opt");
+        kids.forEach(function(k){k.style.pointerEvents="none";});
+        if(j===item.correct){ o.classList.add("correct"); }
+        else { o.classList.add("wrong"); kids[item.correct].classList.add("correct"); }
+        ans.textContent="✔ "+item.exp; ans.classList.add("show");
+      });
+      od.appendChild(o);
+    });
+    d.appendChild(od); d.appendChild(ans); qc.appendChild(d);
+  });
+
+  // ================= MAIN LOOP =================
+  var cvWork=$("cvWork"), cvEn=$("cvEn");
+  var last=0;
+  function loop(ts){
+    if(!running) return;
+    if(!last) last=ts;
+    var dt=Math.min((ts-last)/1000, 0.05); last=ts;
+
+    // work box animation
+    if(boxRun){ boxAnim += dt*0.6; if(boxAnim>=1){ boxAnim=1; boxRun=false; } }
+    var sw=setup(cvWork); drawWork(sw.ctx,sw.w,sw.h);
+
+    stepEnergy(dt);
+    var se=setup(cvEn); drawEnergy(se.ctx,se.w,se.h);
+
+    stepPower(dt);
+
+    requestAnimationFrame(loop);
+  }
+
+  // init
+  workCalc(); enParams(); enReset(); powParams(); powReset();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

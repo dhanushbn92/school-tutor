@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sources of Energy Lab — NIOS Class 10 Science, Ch 12</title>
+<style>
+  :root{
+    --bg:#0f1620;
+    --panel:#18212e;
+    --panel2:#20293a;
+    --ink:#e9eef6;
+    --muted:#93a1b6;
+    --accent:#3fd6a8;
+    --accent-soft:rgba(63,214,168,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffcc66;
+    --line:#2a3547;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .view{display:none}
+  .view.active{display:block}
+  .muted{color:var(--muted);font-size:.9rem}
+
+  /* Sorter */
+  .pool{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+  .chip{border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:12px;padding:10px 14px;font-size:.95rem;font-weight:600;cursor:grab;
+    touch-action:manipulation;user-select:none;transition:transform .12s,opacity .2s}
+  .chip:active{transform:scale(.96)}
+  .chip.sel{outline:2px solid var(--accent);outline-offset:1px}
+  .chip.placed{opacity:.35;pointer-events:none}
+  .bins{display:flex;gap:10px;flex-wrap:wrap}
+  .bin{flex:1 1 160px;min-height:120px;border:2px dashed var(--line);border-radius:14px;
+    background:var(--panel2);padding:10px;transition:border-color .15s,background .15s}
+  .bin.over{border-color:var(--accent);background:var(--accent-soft)}
+  .bin h3{color:var(--accent);text-align:center;margin-bottom:8px}
+  .bin .drop{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+  .bin .chip{cursor:default;font-size:.85rem;padding:7px 10px}
+  .chip.ok{border-color:var(--good);color:var(--good)}
+  .chip.no{border-color:var(--bad);color:var(--bad)}
+  .scorebar{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+
+  .btn{min-height:46px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;padding:0 16px;
+    touch-action:manipulation}
+  .btn.primary{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.98)}
+  .feedback{margin-top:10px;font-size:.92rem;min-height:1.2em}
+  .feedback.good{color:var(--good)}
+  .feedback.bad{color:var(--bad)}
+
+  /* Explorer */
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .seg button{flex:1 1 90px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.88rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);
+    border:1px solid var(--line);border-radius:14px}
+  .chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:.86rem}
+  .chain .node{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:6px 10px;font-weight:600}
+  .chain .arrow{color:var(--accent);font-weight:700}
+
+  /* Compare */
+  .tablewrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:520px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent);position:sticky;top:0}
+  td.r{font-weight:600}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  .lo{background:var(--good)} .mid{background:var(--warn)} .hi{background:var(--bad)}
+
+  /* Facts + quiz */
+  .facts li{margin:6px 0 6px 18px;font-size:.9rem}
+  .q{margin-bottom:14px}
+  .q p{font-weight:600;margin-bottom:8px}
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opt{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;
+    padding:10px 12px;text-align:left;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .opt.correct{border-color:var(--good);color:var(--good);background:rgba(95,214,139,.12)}
+  .opt.wrong{border-color:var(--bad);color:var(--bad);background:rgba(255,123,123,.12)}
+  .qexp{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .qexp.show{display:block}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Sources of Energy <span>Lab</span></h1>
+    <p>NIOS Class 10 Science &amp; Technology · Chapter 12 — Sources of Energy</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="sort">Sorter</button>
+    <button class="tab-btn" data-view="explore">Power Plant</button>
+    <button class="tab-btn" data-view="compare">Compare</button>
+    <button class="tab-btn" data-view="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ================= SORTER ================= -->
+  <section class="view active" id="view-sort">
+    <div class="panel">
+      <h2>Renewable vs Non-renewable Sorter</h2>
+      <p class="muted">Tap a source to pick it, then tap a bin — or drag it. Renewable sources are naturally replenished; non-renewable ones exist in fixed stores and run out.</p>
+      <div class="pool" id="pool"></div>
+      <div class="bins">
+        <div class="bin" id="bin-renew" data-bin="renew">
+          <h3>Renewable</h3>
+          <div class="drop"></div>
+        </div>
+        <div class="bin" id="bin-nonrenew" data-bin="nonrenew">
+          <h3>Non-renewable</h3>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="feedback" id="sortFb"></div>
+      <div class="scorebar">
+        <div>Score: <strong id="sortScore">0</strong> / 10</div>
+        <button class="btn" id="sortReset">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXPLORER ================= -->
+  <section class="view" id="view-explore">
+    <div class="panel">
+      <h2>Power-plant Explorer</h2>
+      <div class="seg" id="plantSeg">
+        <button class="on" data-plant="solar">Solar cell</button>
+        <button data-plant="wind">Wind turbine</button>
+        <button data-plant="hydro">Hydro dam</button>
+        <button data-plant="thermal">Thermal (coal)</button>
+        <button data-plant="nuclear">Nuclear</button>
+      </div>
+      <canvas id="plantCanvas" width="640" height="300" aria-label="animated energy conversion"></canvas>
+      <div class="chain" id="plantChain"></div>
+      <p class="muted" id="plantDesc" style="margin-top:10px"></p>
+    </div>
+  </section>
+
+  <!-- ================= COMPARE ================= -->
+  <section class="view" id="view-compare">
+    <div class="panel">
+      <h2>Compare Sources</h2>
+      <p class="muted" style="margin-bottom:8px">Pollution &amp; greenhouse-gas level: <span class="dot lo"></span>low <span class="dot mid"></span>medium <span class="dot hi"></span>high</p>
+      <div class="tablewrap">
+        <table id="cmpTable">
+          <thead><tr><th>Source</th><th>Type</th><th>Pollution</th><th>Pros</th><th>Cons</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LEARN ================= -->
+  <section class="view" id="view-learn">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <ul class="facts">
+        <li><strong>Law of conservation of energy:</strong> energy is neither created nor destroyed, only transformed from one form to another. A power plant just converts one energy form into electrical energy.</li>
+        <li><strong>Renewable sources</strong> (solar, wind, hydro, biomass, tidal, geothermal) are replenished by nature and will not run out on a human timescale.</li>
+        <li><strong>Non-renewable sources</strong> (coal, petroleum, natural gas, nuclear fuel like uranium) took millions of years to form and exist in limited amounts.</li>
+        <li><strong>Fossil fuels</strong> (coal, oil, natural gas) release carbon dioxide and other pollutants on burning, adding to the greenhouse effect and global warming.</li>
+        <li>Most conventional plants share one idea: heat or moving water/wind spins a <strong>turbine</strong> that drives a <strong>generator</strong> to make electricity.</li>
+        <li>No source is loss-free — some energy always escapes as heat, so no conversion is 100% efficient.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <div id="quiz"></div>
+      <div class="muted" id="quizScore" style="margin-top:6px"></div>
+    </div>
+  </section>
+
+  <footer>Sources of Energy Lab · self-contained interactive · NIOS Science Ch 12</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Data ---------- */
+  var SOURCES = [
+    {id:"solar",   name:"Solar",       type:"renew"},
+    {id:"wind",    name:"Wind",        type:"renew"},
+    {id:"hydro",   name:"Hydro",       type:"renew"},
+    {id:"biomass", name:"Biomass",     type:"renew"},
+    {id:"tidal",   name:"Tidal",       type:"renew"},
+    {id:"geo",     name:"Geothermal",  type:"renew"},
+    {id:"coal",    name:"Coal",        type:"nonrenew"},
+    {id:"oil",     name:"Petroleum",   type:"nonrenew"},
+    {id:"gas",     name:"Natural gas", type:"nonrenew"},
+    {id:"nuclear", name:"Nuclear",     type:"nonrenew"}
+  ];
+
+  /* ---------- Tab switching ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  var views = document.querySelectorAll(".view");
+  tabBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabBtns.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      var v = b.getAttribute("data-view");
+      views.forEach(function(sec){
+        sec.classList.toggle("active", sec.id === "view-"+v);
+      });
+    });
+  });
+
+  /* ================= SORTER ================= */
+  var pool = document.getElementById("pool");
+  var binRenew = document.getElementById("bin-renew").querySelector(".drop");
+  var binNon   = document.getElementById("bin-nonrenew").querySelector(".drop");
+  var bins = document.querySelectorAll(".bin");
+  var sortScoreEl = document.getElementById("sortScore");
+  var sortFb = document.getElementById("sortFb");
+  var selected = null;
+
+  function buildSorter(){
+    pool.innerHTML = ""; binRenew.innerHTML = ""; binNon.innerHTML = "";
+    selected = null;
+    sortScoreEl.textContent = "0";
+    sortFb.textContent = ""; sortFb.className = "feedback";
+    // shuffle copy
+    var arr = SOURCES.slice();
+    for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;}
+    arr.forEach(function(s){
+      var c = document.createElement("div");
+      c.className = "chip"; c.textContent = s.name; c.setAttribute("draggable","true");
+      c.dataset.id = s.id;
+      c.addEventListener("click", function(){
+        if(c.classList.contains("placed")) return;
+        var was = c.classList.contains("sel");
+        clearSel();
+        if(!was){ c.classList.add("sel"); selected = c; }
+      });
+      c.addEventListener("dragstart", function(e){
+        selected = c; e.dataTransfer.setData("text/plain", s.id);
+      });
+      pool.appendChild(c);
+    });
+  }
+  function clearSel(){
+    pool.querySelectorAll(".chip.sel").forEach(function(x){x.classList.remove("sel");});
+    selected = null;
+  }
+  function updateScore(){
+    var placed = pool.querySelectorAll(".chip.placed").length;
+    var correct = document.querySelectorAll(".bin .chip.ok").length;
+    sortScoreEl.textContent = String(correct);
+    if(placed === SOURCES.length){
+      if(correct === SOURCES.length){
+        sortFb.textContent = "Perfect! All 10 sorted correctly.";
+        sortFb.className = "feedback good";
+      } else {
+        sortFb.textContent = "All placed. " + correct + " correct — red chips are misplaced.";
+        sortFb.className = "feedback bad";
+      }
+    }
+  }
+  function place(chip, binType){
+    if(!chip || chip.classList.contains("placed")) return;
+    var src = SOURCES.filter(function(s){return s.id===chip.dataset.id;})[0];
+    var ok = src.type === binType;
+    var clone = document.createElement("div");
+    clone.className = "chip " + (ok ? "ok" : "no");
+    clone.textContent = src.name + (ok ? " ✓" : " ✗");
+    (binType === "renew" ? binRenew : binNon).appendChild(clone);
+    chip.classList.add("placed"); chip.classList.remove("sel");
+    if(ok){ sortFb.textContent = src.name + " is correct."; sortFb.className="feedback good"; }
+    else { sortFb.textContent = src.name + " belongs in the other bin."; sortFb.className="feedback bad"; }
+    selected = null;
+    updateScore();
+  }
+  bins.forEach(function(bin){
+    var type = bin.getAttribute("data-bin");
+    bin.addEventListener("click", function(){ if(selected) place(selected, type); });
+    bin.addEventListener("dragover", function(e){ e.preventDefault(); bin.classList.add("over"); });
+    bin.addEventListener("dragleave", function(){ bin.classList.remove("over"); });
+    bin.addEventListener("drop", function(e){
+      e.preventDefault(); bin.classList.remove("over");
+      var id = e.dataTransfer.getData("text/plain");
+      var chip = pool.querySelector('.chip[data-id="'+id+'"]');
+      place(chip, type);
+    });
+  });
+  document.getElementById("sortReset").addEventListener("click", buildSorter);
+  buildSorter();
+
+  /* ================= EXPLORER ================= */
+  var canvas = document.getElementById("plantCanvas");
+  var ctx = canvas.getContext("2d");
+  var chainEl = document.getElementById("plantChain");
+  var descEl = document.getElementById("plantDesc");
+  var currentPlant = "solar";
+  var t = 0;
+
+  var PLANTS = {
+    solar: {
+      chain:["Sunlight (light energy)","Solar cell (PV)","Electrical energy"],
+      desc:"A photovoltaic cell converts light energy directly into electrical energy — no moving parts, no turbine. Renewable and pollution-free in use."
+    },
+    wind: {
+      chain:["Wind (kinetic energy)","Turbine blades","Generator","Electrical energy"],
+      desc:"Moving air spins the blades (kinetic → mechanical energy). The turbine turns a generator that produces electricity. Renewable and clean."
+    },
+    hydro: {
+      chain:["Stored water (potential energy)","Falling water (kinetic)","Turbine + generator","Electrical energy"],
+      desc:"Water stored high behind a dam has potential energy. As it falls it gains kinetic energy, spinning a turbine coupled to a generator. Renewable."
+    },
+    thermal: {
+      chain:["Coal (chemical energy)","Burning → heat","Steam spins turbine","Generator → electrical"],
+      desc:"Burning coal releases chemical energy as heat, boiling water into high-pressure steam that spins a turbine and generator. Non-renewable; emits CO2."
+    },
+    nuclear: {
+      chain:["Uranium (nuclear energy)","Fission → heat","Steam spins turbine","Generator → electrical"],
+      desc:"Nuclear fission of uranium releases huge heat, producing steam to drive a turbine and generator. Non-renewable fuel; low CO2 but radioactive waste."
+    }
+  };
+
+  function setChain(p){
+    chainEl.innerHTML = "";
+    PLANTS[p].chain.forEach(function(step,i){
+      if(i>0){ var a=document.createElement("span"); a.className="arrow"; a.textContent="→"; chainEl.appendChild(a); }
+      var n=document.createElement("span"); n.className="node"; n.textContent=step; chainEl.appendChild(n);
+    });
+    descEl.textContent = PLANTS[p].desc;
+  }
+
+  document.getElementById("plantSeg").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    this.querySelectorAll("button").forEach(function(x){x.classList.remove("on");});
+    b.classList.add("on");
+    currentPlant = b.getAttribute("data-plant");
+    setChain(currentPlant);
+  });
+  setChain(currentPlant);
+
+  /* colours */
+  var C = {ink:"#e9eef6", accent:"#3fd6a8", muted:"#93a1b6", line:"#2a3547",
+           sun:"#ffcc66", water:"#5aa9ff", coal:"#8a6f52", spark:"#ffe08a", bolt:"#3fd6a8"};
+
+  function drawGenerator(x,y,spin){
+    // housing
+    ctx.fillStyle="#2f3a4f"; ctx.strokeStyle=C.line; ctx.lineWidth=2;
+    roundRect(x-26,y-22,52,44,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=C.muted; ctx.font="10px system-ui"; ctx.textAlign="center";
+    ctx.fillText("GEN", x, y+3);
+    // spinning marker
+    ctx.strokeStyle=C.accent; ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.arc(x, y-30, 8, spin, spin+Math.PI*1.4); ctx.stroke();
+  }
+  function bolt(x,y,ph){
+    ctx.strokeStyle=C.bolt; ctx.lineWidth=3; ctx.globalAlpha=0.6+0.4*Math.sin(ph);
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+14,y+12); ctx.lineTo(x+6,y+14);
+    ctx.lineTo(x+20,y+30); ctx.stroke(); ctx.globalAlpha=1;
+  }
+  function label(txt,x,y){ ctx.fillStyle=C.muted; ctx.font="12px system-ui"; ctx.textAlign="center"; ctx.fillText(txt,x,y); }
+  function roundRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  function draw(){
+    var W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    var cx=W/2;
+    if(currentPlant==="solar"){
+      // sun
+      ctx.fillStyle=C.sun;
+      ctx.beginPath(); ctx.arc(110,70,30,0,7); ctx.fill();
+      for(var i=0;i<8;i++){var a=i/8*Math.PI*2 + t*0.02;
+        ctx.strokeStyle=C.sun; ctx.lineWidth=3; ctx.beginPath();
+        ctx.moveTo(110+Math.cos(a)*36,70+Math.sin(a)*36);
+        ctx.lineTo(110+Math.cos(a)*48,70+Math.sin(a)*48); ctx.stroke();}
+      // rays travelling to panel
+      for(var r=0;r<4;r++){
+        var prog=((t*2 + r*40)%160)/160;
+        var sx=140, sy=90, ex=300, ey=180;
+        ctx.fillStyle=C.spark; ctx.globalAlpha=1-prog;
+        ctx.beginPath(); ctx.arc(sx+(ex-sx)*prog, sy+(ey-sy)*prog, 4,0,7); ctx.fill(); ctx.globalAlpha=1;
+      }
+      // panel
+      ctx.save(); ctx.translate(320,190); ctx.rotate(-0.35);
+      ctx.fillStyle="#1c3a66"; ctx.strokeStyle=C.water; ctx.lineWidth=2;
+      roundRect(-60,-40,120,80,6); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle="#2b4e82";
+      for(var g=-40;g<60;g+=20){ctx.beginPath();ctx.moveTo(g,-40);ctx.lineTo(g,40);ctx.stroke();}
+      for(var g2=-40;g2<40;g2+=20){ctx.beginPath();ctx.moveTo(-60,g2);ctx.lineTo(60,g2);ctx.stroke();}
+      ctx.restore();
+      label("Sunlight",110,140); label("PV panel",320,250);
+      // electricity out
+      bolt(470,150,t*0.15); bolt(500,150,t*0.15+1);
+      label("Electricity",500,210);
+    } else if(currentPlant==="wind"){
+      // tower
+      ctx.fillStyle="#3a4a63"; ctx.beginPath();
+      ctx.moveTo(cx-8,H-30); ctx.lineTo(cx+8,H-30); ctx.lineTo(cx+4,110); ctx.lineTo(cx-4,110); ctx.fill();
+      // wind lines
+      for(var wl=0;wl<4;wl++){var wy=60+wl*22; var wx=((t*3 + wl*50)%200);
+        ctx.strokeStyle=C.muted; ctx.lineWidth=2; ctx.globalAlpha=.6;
+        ctx.beginPath(); ctx.moveTo(20+wx,wy); ctx.lineTo(70+wx,wy); ctx.stroke(); ctx.globalAlpha=1;}
+      // blades
+      var hubx=cx, huby=100, spin=t*0.06;
+      ctx.strokeStyle=C.accent; ctx.lineWidth=8; ctx.lineCap="round";
+      for(var b=0;b<3;b++){var a=spin + b/3*Math.PI*2;
+        ctx.beginPath(); ctx.moveTo(hubx,huby);
+        ctx.lineTo(hubx+Math.cos(a)*70, huby+Math.sin(a)*70); ctx.stroke();}
+      ctx.lineCap="butt";
+      ctx.fillStyle=C.ink; ctx.beginPath(); ctx.arc(hubx,huby,8,0,7); ctx.fill();
+      label("Wind → blades (kinetic)",cx,H-10);
+      drawGenerator(cx, huby, spin*3);
+      bolt(cx+90,huby-10,t*0.15); label("Electricity",cx+120,huby+30);
+    } else if(currentPlant==="hydro"){
+      // reservoir water
+      ctx.fillStyle="#1c3a66"; roundRect(20,60,180,150,4); ctx.fill();
+      // wavy surface
+      ctx.strokeStyle=C.water; ctx.lineWidth=2; ctx.beginPath();
+      for(var xx=20;xx<=200;xx+=6){ctx.lineTo(xx,68+Math.sin((xx+t*2)*0.08)*4);} ctx.stroke();
+      // dam
+      ctx.fillStyle="#4a5b74"; ctx.beginPath();
+      ctx.moveTo(200,60); ctx.lineTo(230,60); ctx.lineTo(245,230); ctx.lineTo(200,230); ctx.fill();
+      // falling water
+      for(var d=0;d<5;d++){var fp=((t*4 + d*30)%120)/120;
+        ctx.fillStyle=C.water; ctx.globalAlpha=.8;
+        ctx.beginPath(); ctx.arc(255, 120+fp*90, 5,0,7); ctx.fill(); ctx.globalAlpha=1;}
+      label("Stored water (PE)",110,130);
+      // turbine wheel
+      var tx=300, ty=215, sp=t*0.08;
+      ctx.strokeStyle=C.accent; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(tx,ty,26,0,7); ctx.stroke();
+      for(var s=0;s<6;s++){var a2=sp+s/6*Math.PI*2;
+        ctx.beginPath(); ctx.moveTo(tx,ty); ctx.lineTo(tx+Math.cos(a2)*24,ty+Math.sin(a2)*24); ctx.stroke();}
+      label("Turbine",tx,ty+45);
+      drawGenerator(390,ty, sp*3);
+      bolt(470,ty-10,t*0.15); label("Electricity",500,ty+30);
+    } else {
+      // thermal / nuclear share layout
+      var isNuc = currentPlant==="nuclear";
+      // fuel source
+      if(isNuc){
+        ctx.fillStyle="#2f3a4f"; roundRect(30,120,90,110,8); ctx.fill();
+        ctx.strokeStyle=C.accent; ctx.lineWidth=2; ctx.stroke();
+        // fission sparks
+        for(var f=0;f<6;f++){var fa=t*0.1+f;
+          ctx.fillStyle=C.spark; ctx.globalAlpha=.5+.5*Math.sin(fa);
+          ctx.beginPath(); ctx.arc(75+Math.cos(fa)*20,175+Math.sin(fa*1.3)*30,3,0,7); ctx.fill(); ctx.globalAlpha=1;}
+        label("Uranium (fission)",75,250);
+      } else {
+        ctx.fillStyle=C.coal; roundRect(30,150,90,80,8); ctx.fill();
+        // flames
+        for(var fl=0;fl<5;fl++){var fx=45+fl*15, h=18+Math.abs(Math.sin(t*0.15+fl))*16;
+          ctx.fillStyle= fl%2? "#ff8a3d":"#ffb454";
+          ctx.beginPath(); ctx.moveTo(fx-6,150); ctx.quadraticCurveTo(fx,150-h,fx+6,150); ctx.fill();}
+        label("Coal (burning)",75,250);
+      }
+      // heat arrows to boiler
+      for(var ha=0;ha<3;ha++){var hp=((t*3 + ha*40)%120)/120;
+        ctx.fillStyle="#ff8a3d"; ctx.globalAlpha=1-hp;
+        ctx.beginPath(); ctx.arc(140+hp*40,180,4,0,7); ctx.fill(); ctx.globalAlpha=1;}
+      // boiler -> steam
+      ctx.fillStyle="#33405a"; roundRect(190,120,70,110,8); ctx.fill();
+      ctx.strokeStyle=C.line; ctx.stroke();
+      label("Boiler",225,250);
+      for(var st=0;st<5;st++){var stp=((t*4+st*24)%120)/120;
+        ctx.fillStyle="#cfe3ff"; ctx.globalAlpha=1-stp;
+        ctx.beginPath(); ctx.arc(280+st*8*0, 120 - stp*70 + 0, 6-stp*3,0,7); ctx.fill();}
+      ctx.globalAlpha=1;
+      // steam stream to turbine
+      for(var sc=0;sc<4;sc++){var scp=((t*4+sc*30)%120)/120;
+        ctx.fillStyle="#cfe3ff"; ctx.globalAlpha=.8;
+        ctx.beginPath(); ctx.arc(280+scp*40, 150, 5,0,7); ctx.fill(); ctx.globalAlpha=1;}
+      label("Steam",300,110);
+      // turbine
+      var Tx=360, Ty=175, Sp=t*0.09;
+      ctx.strokeStyle=C.accent; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(Tx,Ty,26,0,7); ctx.stroke();
+      for(var s2=0;s2<8;s2++){var a3=Sp+s2/8*Math.PI*2;
+        ctx.beginPath(); ctx.moveTo(Tx,Ty); ctx.lineTo(Tx+Math.cos(a3)*24,Ty+Math.sin(a3)*24); ctx.stroke();}
+      label("Turbine",Tx,Ty+45);
+      drawGenerator(450,Ty,Sp*3);
+      bolt(530,Ty-10,t*0.15); label("Electricity",560,Ty+30);
+    }
+  }
+
+  var raf=null;
+  function loop(){
+    if(!document.hidden){ t++; draw(); }
+    raf = requestAnimationFrame(loop);
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden){ /* resume smoothly */ }
+  });
+  loop();
+
+  /* ================= COMPARE ================= */
+  var CMP = [
+    {n:"Solar",       t:"Renewable",    p:"lo",  pro:"Free, abundant, no fuel, no emissions in use", con:"Only in daylight/clear weather; needs storage; high setup cost"},
+    {n:"Wind",        t:"Renewable",    p:"lo",  pro:"Clean, no fuel cost, good for windy coasts", con:"Intermittent; noise; needs large open sites"},
+    {n:"Hydro",       t:"Renewable",    p:"lo",  pro:"Reliable, long-lasting, also controls floods", con:"Dams displace people; disturb river ecology"},
+    {n:"Biomass",     t:"Renewable",    p:"mid", pro:"Uses waste/crops; can be stored", con:"Releases some smoke/CO2; needs land"},
+    {n:"Geothermal",  t:"Renewable",    p:"lo",  pro:"Steady 24×7 heat; small footprint", con:"Limited to volcanic/hot regions"},
+    {n:"Coal",        t:"Non-renewable",p:"hi",  pro:"Cheap, easy to store, reliable base load", con:"Heavy CO2 &amp; smoke; will run out; mining damage"},
+    {n:"Petroleum",   t:"Non-renewable",p:"hi",  pro:"Energy-dense; powers most transport", con:"CO2 emissions; finite; price swings"},
+    {n:"Natural gas", t:"Non-renewable",p:"mid", pro:"Burns cleaner than coal; flexible", con:"Still emits CO2; finite; leak risk"},
+    {n:"Nuclear",     t:"Non-renewable",p:"lo",  pro:"Huge output; very low CO2; small fuel amount", con:"Radioactive waste; accident risk; costly plants"}
+  ];
+  (function buildCmp(){
+    var tb = document.querySelector("#cmpTable tbody");
+    CMP.forEach(function(r){
+      var tr=document.createElement("tr");
+      tr.innerHTML = '<td class="r">'+r.n+'</td><td>'+r.t+'</td>'+
+        '<td><span class="dot '+r.p+'"></span></td>'+
+        '<td>'+r.pro+'</td><td>'+r.con+'</td>';
+      tb.appendChild(tr);
+    });
+  })();
+
+  /* ================= QUIZ ================= */
+  var QUIZ = [
+    {q:"Which of these is a renewable source of energy?",
+     opts:["Coal","Natural gas","Tidal energy","Petroleum"], a:2,
+     e:"Tidal energy comes from the sea tides driven by the Moon — it is naturally replenished, so it is renewable."},
+    {q:"In a thermal (coal) power plant, what spins the turbine?",
+     opts:["Falling water","High-pressure steam","Sunlight","Wind"], a:1,
+     e:"Coal is burnt to boil water into high-pressure steam, and it is this steam that spins the turbine-generator."},
+    {q:"The law of conservation of energy states that energy is:",
+     opts:["Created in a power plant","Destroyed when used","Only transformed, never created or destroyed","Made only by the Sun"], a:2,
+     e:"Energy cannot be created or destroyed; a power plant only converts one form of energy into electrical energy."}
+  ];
+  var quizWrap = document.getElementById("quiz");
+  var quizScoreEl = document.getElementById("quizScore");
+  var answered = 0, correctCount = 0;
+  QUIZ.forEach(function(item, qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    var opts=document.createElement("div"); opts.className="opts";
+    item.opts.forEach(function(o, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=o;
+      b.addEventListener("click", function(){
+        if(d.dataset.done) return;
+        d.dataset.done="1"; answered++;
+        var btns=opts.querySelectorAll(".opt");
+        btns.forEach(function(x){x.style.cursor="default";});
+        if(oi===item.a){ b.classList.add("correct"); correctCount++; }
+        else { b.classList.add("wrong"); btns[item.a].classList.add("correct"); }
+        exp.classList.add("show");
+        quizScoreEl.textContent = "Answered "+answered+"/"+QUIZ.length+" · correct: "+correctCount;
+      });
+      opts.appendChild(b);
+    });
+    d.appendChild(opts);
+    var exp=document.createElement("div"); exp.className="qexp"; exp.textContent="Explanation: "+item.e;
+    d.appendChild(exp);
+    quizWrap.appendChild(d);
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Light Energy Lab — Light (NIOS Class 10, Ch 15)</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --panel:#19202f;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#9aa5bd;
+    --accent:#54c7ff;
+    --accent-soft:rgba(84,199,255,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2c3650;
+    --ray:#ffd166;
+    --normal:#7f8db0;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 200px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 auto;min-height:46px;min-width:80px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    padding:0 10px;touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1420;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1420}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;touch-action:manipulation}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;
+    font-size:.86rem;min-width:120px}
+  .chip b{display:block;color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .chip.state b{color:var(--good)}
+
+  .mode{display:none}
+  .mode.show{display:block}
+
+  ul.facts{list-style:none;font-size:.9rem}
+  ul.facts li{padding:7px 0;border-bottom:1px dashed var(--line);color:var(--muted)}
+  ul.facts li:last-child{border-bottom:none}
+  ul.facts li b{color:var(--ink)}
+  .formula{font-family:"Cambria Math",Georgia,serif;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:2px 8px;color:var(--accent);display:inline-block}
+
+  .q{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+  .q p.qs{font-weight:600;margin-bottom:8px}
+  .opts{display:flex;flex-direction:column;gap:6px}
+  .opts button{text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:10px;padding:10px 12px;font-size:.9rem;cursor:pointer;min-height:44px;touch-action:manipulation}
+  .opts button.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .opts button.wrong{background:rgba(255,123,123,.15);border-color:var(--bad);color:var(--bad)}
+  .expl{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .expl.show{display:block}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Light</span> Energy Lab</h1>
+    <p>Ray optics — reflection, refraction &amp; the eye. NIOS Class 10 Science &amp; Technology, Ch 15.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="reflect">Reflection &amp; Mirrors</button>
+    <button class="tab-btn" data-mode="refract">Refraction &amp; Lenses</button>
+    <button class="tab-btn" data-mode="eye">Prism &amp; Eye</button>
+  </div>
+
+  <!-- ============ REFLECTION MODE ============ -->
+  <section class="mode show" id="mode-reflect">
+    <div class="panel">
+      <h2>Reflection</h2>
+      <div class="seg" id="reflectType">
+        <button class="on" data-t="plane">Plane mirror</button>
+        <button data-t="concave">Concave mirror</button>
+        <button data-t="convex">Convex mirror</button>
+      </div>
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl" id="planeCtrl">
+          <label>Angle of incidence: <output id="aiOut">40&deg;</output></label>
+          <input type="range" id="ai" min="5" max="85" value="40" step="1">
+        </div>
+        <div class="ctrl" id="mirrorCtrl" style="display:none">
+          <label>Object distance u: <output id="uOut">30 cm</output></label>
+          <input type="range" id="uMir" min="6" max="60" value="30" step="1">
+        </div>
+      </div>
+      <canvas id="cvR" width="900" height="440" aria-label="Reflection ray diagram"></canvas>
+      <div class="readout" id="roR"></div>
+    </div>
+  </section>
+
+  <!-- ============ REFRACTION MODE ============ -->
+  <section class="mode" id="mode-refract">
+    <div class="panel">
+      <h2>Refraction</h2>
+      <div class="seg" id="refractType">
+        <button class="on" data-t="boundary">Boundary (Snell)</button>
+        <button data-t="convex">Convex lens</button>
+        <button data-t="concave">Concave lens</button>
+      </div>
+      <div class="controls" style="margin-top:12px">
+        <div class="ctrl" id="snellCtrl">
+          <label>Angle of incidence: <output id="siOut">40&deg;</output></label>
+          <input type="range" id="si" min="0" max="85" value="40" step="1">
+          <label style="margin-top:10px">Medium 2 (n&#8322;): <output id="n2Out">1.50 glass</output></label>
+          <input type="range" id="n2" min="100" max="240" value="150" step="1">
+        </div>
+        <div class="ctrl" id="lensCtrl" style="display:none">
+          <label>Object distance u: <output id="uLOut">30 cm</output></label>
+          <input type="range" id="uLens" min="6" max="60" value="30" step="1">
+        </div>
+      </div>
+      <canvas id="cvF" width="900" height="440" aria-label="Refraction ray diagram"></canvas>
+      <div class="readout" id="roF"></div>
+    </div>
+  </section>
+
+  <!-- ============ EYE / PRISM MODE ============ -->
+  <section class="mode" id="mode-eye">
+    <div class="panel">
+      <h2>Prism &amp; Human Eye</h2>
+      <div class="seg" id="eyeType">
+        <button class="on" data-t="prism">Prism (dispersion)</button>
+        <button data-t="normal">Normal eye</button>
+        <button data-t="myopia">Myopia + fix</button>
+        <button data-t="hyper">Hypermetropia + fix</button>
+      </div>
+      <canvas id="cvE" width="900" height="440" aria-label="Prism and eye diagram"></canvas>
+      <div class="readout" id="roE"></div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <div class="panel">
+    <h2>Key facts &amp; formulae</h2>
+    <ul class="facts">
+      <li><b>Laws of reflection:</b> (1) angle of incidence = angle of reflection (&ang;i = &ang;r). (2) The incident ray, reflected ray and the normal all lie in one plane.</li>
+      <li><b>Mirror formula:</b> <span class="formula">1/f = 1/v + 1/u</span> &nbsp; Magnification <span class="formula">m = -v/u = h&#39;/h</span>. Focal length <span class="formula">f = R/2</span>.</li>
+      <li><b>Lens formula:</b> <span class="formula">1/f = 1/v - 1/u</span> &nbsp; Magnification <span class="formula">m = v/u = h&#39;/h</span>. Power <span class="formula">P = 1/f (m) dioptre</span>.</li>
+      <li><b>Laws of refraction (Snell):</b> <span class="formula">n&#8321; sin i = n&#8322; sin r</span>. Light bends <b>toward</b> the normal entering a denser medium, <b>away</b> when entering a rarer one.</li>
+      <li><b>Sign convention (Cartesian):</b> distances measured from the pole/optical centre; those in the direction of incident light are +, opposite are &minus;. Real image distance v is + for lens (behind), &minus;-side for mirror (in front).</li>
+      <li><b>Concave mirror / convex lens</b> can form <b>real, inverted</b> images. <b>Convex mirror / concave lens</b> always give <b>virtual, erect, diminished</b> images.</li>
+    </ul>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel">
+    <h2>Quick quiz (tap an option)</h2>
+    <div id="quiz"></div>
+  </div>
+
+  <footer>All optics computed live using ray-optics formulae. Distances in cm unless noted.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id);}
+function ro(host, items){
+  host.innerHTML = items.map(function(it){
+    return '<div class="chip'+(it.state?' state':'')+'"><b>'+it.k+'</b>'+it.v+'</div>';
+  }).join('');
+}
+function dpr(cv){
+  var d = window.devicePixelRatio||1;
+  var cssW = cv.clientWidth||cv.width;
+  var ratio = cv.height/cv.width;
+  var w = Math.round(cssW*d), h = Math.round(cssW*ratio*d);
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}
+  var ctx = cv.getContext('2d');
+  ctx.setTransform(d*cssW/900,0,0,d*cssW/900,0,0); // logical 900 x (900*ratio)
+  return ctx;
+}
+var H = 440; // logical height
+function clr(ctx){ctx.clearRect(0,0,900,H);}
+function line(ctx,x1,y1,x2,y2,col,w){ctx.strokeStyle=col;ctx.lineWidth=w||2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function dash(ctx,x1,y1,x2,y2,col,w){ctx.setLineDash([6,6]);line(ctx,x1,y1,x2,y2,col,w||1.5);ctx.setLineDash([]);}
+function arrow(ctx,x1,y1,x2,y2,col,w){
+  line(ctx,x1,y1,x2,y2,col,w||2.5);
+  var a=Math.atan2(y2-y1,x2-x1),s=9;
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(x2,y2);ctx.lineTo(x2-s*Math.cos(a-.4),y2-s*Math.sin(a-.4));
+  ctx.lineTo(x2-s*Math.cos(a+.4),y2-s*Math.sin(a+.4));ctx.closePath();ctx.fill();
+}
+function label(ctx,t,x,y,col,size,align){
+  ctx.fillStyle=col||'#e9edf7';ctx.font=(size||13)+'px system-ui, sans-serif';
+  ctx.textAlign=align||'left';ctx.textBaseline='middle';ctx.fillText(t,x,y);ctx.textAlign='left';
+}
+function dot(ctx,x,y,col,r){ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r||4,0,7);ctx.fill();}
+var CINK='#e9edf7',CMUT='#9aa5bd',CACC='#54c7ff',CRAY='#ffd166',CNRM='#7f8db0',CGOOD='#5fd68b',CBAD='#ff7b7b';
+
+/* =========================================================
+   REFLECTION
+========================================================= */
+var reflectType='plane';
+function drawReflect(){
+  var ctx=dpr($('cvR'));clr(ctx);
+  if(reflectType==='plane') drawPlane(ctx); else drawSpherical(ctx, reflectType);
+}
+function drawPlane(ctx){
+  var ang=+$('ai').value; $('aiOut').textContent=ang+'°';
+  var px=450, py=300;           // point of incidence
+  var mirTop=110, mirBot=380;
+  // mirror surface (vertical) with hatching behind
+  line(ctx,px,mirTop,px,mirBot,CACC,4);
+  ctx.strokeStyle=CMUT;ctx.lineWidth=1;
+  for(var y=mirTop;y<mirBot;y+=14){ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px+12,y+12);ctx.stroke();}
+  // normal (horizontal, pointing left into medium)
+  dash(ctx,px,py,px-260,py,CNRM,1.5);
+  label(ctx,'normal',px-250,py-14,CNRM,12);
+  var rad=ang*Math.PI/180, L=230;
+  // incident ray from upper-left to px,py
+  var ix=px-L*Math.sin(rad), iy=py-L*Math.cos(rad);
+  arrow(ctx,ix,iy,px,py,CRAY,2.5);
+  // reflected ray to lower-left (mirror image about normal -> below)
+  var rx=px-L*Math.sin(rad), ry=py+L*Math.cos(rad);
+  arrow(ctx,px,py,rx,ry,CGOOD,2.5);
+  // angle arcs
+  ctx.strokeStyle=CRAY;ctx.lineWidth=1.5;ctx.beginPath();
+  ctx.arc(px,py,44,Math.PI+ (Math.PI/2-rad),Math.PI,false);ctx.stroke();
+  ctx.strokeStyle=CGOOD;ctx.beginPath();
+  ctx.arc(px,py,44,Math.PI,Math.PI+rad,false);ctx.stroke();
+  label(ctx,'i='+ang+'°',px-92,py-40,CRAY,13);
+  label(ctx,'r='+ang+'°',px-92,py+40,CGOOD,13);
+  label(ctx,'incident ray',ix+6,iy-4,CRAY,12);
+  label(ctx,'reflected ray',rx+6,ry+6,CGOOD,12);
+  dot(ctx,px,py,CINK,3);
+  ro($('roR'),[
+    {k:'Angle of incidence',v:ang+'°'},
+    {k:'Angle of reflection',v:ang+'°'},
+    {k:'Law',v:'&ang;i = &ang;r',state:true}
+  ]);
+}
+function drawSpherical(ctx, type){
+  $('uOut').textContent=$('uMir').value+' cm';
+  var concave = (type==='concave');
+  var axisY=245, pole=560;                 // pole on right
+  var f = 90;                              // focal length (px) magnitude
+  var scale = 4.0;                        // cm -> px
+  var u_cm = +$('uMir').value;
+  var u_px = u_cm*scale;
+  // principal axis
+  line(ctx,40,axisY,860,axisY,CMUT,1.5);
+  // mirror arc
+  var R=f*2;
+  var cx = concave ? pole - R : pole + R;  // centre of curvature
+  ctx.strokeStyle=CACC;ctx.lineWidth=4;ctx.beginPath();
+  var sweep=Math.asin(120/R);
+  if(concave) ctx.arc(cx,axisY,R,-sweep,sweep,false);
+  else ctx.arc(cx,axisY,R,Math.PI-sweep,Math.PI+sweep,false);
+  ctx.stroke();
+  // F and C
+  var Fx = concave ? pole - f : pole + f;
+  var Cx = concave ? pole - R : pole + R;
+  dot(ctx,Fx,axisY,CMUT,3);label(ctx,'F',Fx-4,axisY+16,CMUT,12);
+  dot(ctx,Cx,axisY,CMUT,3);label(ctx,'C',Cx-4,axisY+16,CMUT,12);
+  dot(ctx,pole,axisY,CINK,3);label(ctx,'P',pole+8,axisY+16,CMUT,12);
+  // object (left of pole), erect
+  var ox = pole - u_px;
+  var oh = 70;
+  arrow(ctx,ox,axisY,ox,axisY-oh,CINK,2.5);
+  label(ctx,'object',ox-6,axisY-oh-10,CINK,12,'end');
+  // compute with sign convention: mirror, distances left of pole negative
+  var f_s = -f;            // concave f negative (in front)
+  if(!concave) f_s = f;    // convex f positive (behind)
+  var u_s = -u_px;         // object always in front -> negative
+  // 1/f = 1/v + 1/u  => 1/v = 1/f - 1/u
+  var inv = 1/f_s - 1/u_s;
+  var v_s = 1/inv;         // px, sign per convention
+  var m = -v_s/u_s;
+  var vx = pole + v_s;     // convention: negative v -> left(front); positive -> right(behind)
+  var ih = oh*m;           // image height (px), sign: + up... m negative => inverted
+  var iy = axisY - ih;
+  // Ray 1: parallel to axis -> reflects through F (concave) / appears from F (convex)
+  var top={x:ox,y:axisY-oh};
+  arrow(ctx,top.x,top.y,pole,top.y,CRAY,2);   // parallel hits mirror at pole-level height
+  // reflect: line through F
+  if(concave){
+    // from mirror point (pole,top.y) toward F then extend
+    extendThrough(ctx,pole,top.y,Fx,axisY,CRAY);
+  } else {
+    dash(ctx,pole,top.y,Fx,axisY,CRAY);       // virtual back-extension to F
+    // real reflected ray goes up-left, along line away from F
+    var dir=dirFrom(Fx,axisY,pole,top.y);
+    arrow(ctx,pole,top.y,pole-200*dir.x,top.y-200*dir.y,CRAY,2);
+  }
+  // Ray 2: through/toward centre C -> reflects back on itself
+  arrow(ctx,top.x,top.y,Cx< pole?Cx:pole, axisY - (top.y-axisY)*0 ,CGOOD,2); // aim toward C
+  // simpler ray2: line from object top through C, hitting mirror, back on itself
+  ctx.strokeStyle=CGOOD;ctx.lineWidth=2;
+  // recompute ray2 properly: from top toward C
+  clrRay2(ctx, top, Cx, axisY, pole, concave);
+  // image
+  if(v_s!==Infinity && isFinite(v_s)){
+    if((concave && vx<pole) || (m<0)){
+      arrow(ctx,vx,axisY,vx,iy,CGOOD,2.5);
+    } else {
+      dash(ctx,vx,axisY,vx,iy,CACC,2);
+      label(ctx,'virtual',vx+6,(axisY+iy)/2,CACC,11);
+    }
+    label(ctx,'image',vx+6,iy - (ih>0?10:-10),CGOOD,12);
+  }
+  // readout
+  var v_cm = (v_s/scale);
+  var nature;
+  if(m<0) nature='real, inverted';
+  else nature='virtual, erect';
+  var size = Math.abs(m)>1?'enlarged':(Math.abs(m)<1?'diminished':'same size');
+  ro($('roR'),[
+    {k:'Type',v:concave?'Concave (f = -15 cm)':'Convex (f = +15 cm)'},
+    {k:'u',v:'-'+u_cm+' cm'},
+    {k:'v',v:(v_cm>=0?'+':'')+v_cm.toFixed(1)+' cm'},
+    {k:'m',v:m.toFixed(2)},
+    {k:'Image',v:nature+', '+size,state:true}
+  ]);
+}
+function extendThrough(ctx,x1,y1,fx,fy,col){
+  var dx=fx-x1, dy=fy-y1, k=1.7;
+  arrow(ctx,x1,y1,x1+dx*k,y1+dy*k,col,2);
+}
+function dirFrom(ax,ay,bx,by){var dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy);return{x:dx/L,y:dy/L};}
+function clrRay2(ctx, top, Cx, axisY, pole, concave){
+  // ray from object top through C; where it meets mirror it returns along same line
+  var col=CGOOD;
+  arrow(ctx,top.x,top.y,Cx,axisY,col,2);
+}
+
+/* =========================================================
+   REFRACTION
+========================================================= */
+var refractType='boundary';
+function drawRefract(){
+  var ctx=dpr($('cvF'));clr(ctx);
+  if(refractType==='boundary') drawSnell(ctx); else drawLens(ctx, refractType);
+}
+function drawSnell(ctx){
+  var i=+$('si').value; $('siOut').textContent=i+'°';
+  var n2=(+$('n2').value)/100;
+  var name = n2<1.4?'water':(n2<1.7?'glass':'diamond');
+  $('n2Out').textContent=n2.toFixed(2)+' '+name;
+  var n1=1.00;
+  var bx=450, by=220;                  // boundary point
+  // horizontal boundary
+  line(ctx,60,by,840,by,CACC,3);
+  // shade denser medium below
+  ctx.fillStyle='rgba(84,199,255,.07)';ctx.fillRect(60,by,780,H-by-30);
+  label(ctx,'medium 1  (n₁ = 1.00, air)',70,by-16,CMUT,12);
+  label(ctx,'medium 2  (n₂ = '+n2.toFixed(2)+', '+name+')',70,by+18,CMUT,12);
+  // normal vertical
+  dash(ctx,bx,60,bx,by+150,CNRM,1.5);label(ctx,'normal',bx+6,80,CNRM,12);
+  var ir=i*Math.PI/180, L=180;
+  // incident ray from top-left down to boundary
+  var ix=bx - L*Math.sin(ir), iy=by - L*Math.cos(ir);
+  arrow(ctx,ix,iy,bx,by,CRAY,2.5);
+  label(ctx,'incident',ix-4,iy-8,CRAY,12,'end');
+  // Snell: n1 sin i = n2 sin r
+  var sinr = n1*Math.sin(ir)/n2;
+  if(sinr<=1){
+    var r=Math.asin(sinr);
+    var rx=bx + L*Math.sin(r), ry=by + L*Math.cos(r);
+    arrow(ctx,bx,by,rx,ry,CGOOD,2.5);
+    label(ctx,'refracted (bends toward normal)',rx+6,ry,CGOOD,12);
+    label(ctx,'r = '+(r*180/Math.PI).toFixed(1)+'°',bx+16,by+70,CGOOD,13);
+    ro($('roF'),[
+      {k:'Angle i',v:i+'°'},
+      {k:'Angle r',v:(r*180/Math.PI).toFixed(1)+'°'},
+      {k:'n₂',v:n2.toFixed(2)},
+      {k:'Rule',v:'denser → bends toward normal',state:true}
+    ]);
+  } else {
+    // total internal reflection not typical air->dense; show reflection
+    var rrx=bx + L*Math.sin(ir), rry=by - L*Math.cos(ir);
+    arrow(ctx,bx,by,rrx,rry,CBAD,2.5);
+    ro($('roF'),[{k:'Note',v:'no refraction (limit)',state:true}]);
+  }
+  // partial reflected ray (faint)
+  var fx=bx + L*0.6*Math.sin(ir), fy=by - L*0.6*Math.cos(ir);
+  dash(ctx,bx,by,fx,fy,CMUT,1.2);
+  label(ctx,'i = '+i+'°',bx-70,by-60,CRAY,13);
+  dot(ctx,bx,by,CINK,3);
+}
+function drawLens(ctx, type){
+  $('uLOut').textContent=$('uLens').value+' cm';
+  var convex=(type==='convex');
+  var axisY=245, oc=450;      // optical centre x
+  var f=100, scale=4.0;
+  var u_cm=+$('uLens').value, u_px=u_cm*scale;
+  line(ctx,40,axisY,860,axisY,CMUT,1.5);
+  // lens shape
+  ctx.strokeStyle=CACC;ctx.lineWidth=3;
+  if(convex){
+    ctx.beginPath();ctx.moveTo(oc,axisY-120);
+    ctx.quadraticCurveTo(oc+26,axisY,oc,axisY+120);
+    ctx.moveTo(oc,axisY-120);ctx.quadraticCurveTo(oc-26,axisY,oc,axisY+120);
+    ctx.stroke();
+    // arrow heads top/bottom
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(oc-14,axisY-120);ctx.quadraticCurveTo(oc+8,axisY,oc-14,axisY+120);
+    ctx.moveTo(oc+14,axisY-120);ctx.quadraticCurveTo(oc-8,axisY,oc+14,axisY+120);
+    ctx.stroke();
+  }
+  // F and 2F both sides
+  var F1=oc-f, F2=oc+f, twoF1=oc-2*f, twoF2=oc+2*f;
+  [[F1,'F'],[F2,'F'],[twoF1,'2F'],[twoF2,'2F']].forEach(function(p){
+    dot(ctx,p[0],axisY,CMUT,3);label(ctx,p[1],p[0]-5,axisY+16,CMUT,11);
+  });
+  label(ctx,'O',oc+6,axisY-128,CMUT,11);
+  // object left
+  var ox=oc-u_px, oh=70;
+  arrow(ctx,ox,axisY,ox,axisY-oh,CINK,2.5);
+  label(ctx,'object',ox-6,axisY-oh-10,CINK,12,'end');
+  var top={x:ox,y:axisY-oh};
+  // sign convention lens: u negative (left)
+  var f_s = convex? f : -f;
+  var u_s = -u_px;
+  // 1/f = 1/v - 1/u => 1/v = 1/f + 1/u
+  var inv=1/f_s + 1/u_s;
+  var v_s=1/inv;
+  var m=v_s/u_s;
+  var vx=oc+v_s;
+  var ih=oh*m, iy=axisY-ih;   // m<0 => inverted (real convex)
+  // Ray 1: parallel -> through F2 (convex) / appears from F1 (concave)
+  arrow(ctx,top.x,top.y,oc,top.y,CRAY,2);
+  if(convex){
+    extendThrough(ctx,oc,top.y,F2,axisY,CRAY);
+  } else {
+    var d=dirFrom(F1,axisY,oc,top.y);
+    arrow(ctx,oc,top.y,oc+200*d.x,top.y+200*d.y,CRAY,2);
+    dash(ctx,oc,top.y,F1,axisY,CRAY);
+  }
+  // Ray 2: through optical centre -> straight
+  extendThrough(ctx,top.x,top.y,oc,axisY,CGOOD);
+  // image
+  if(isFinite(v_s)){
+    if(m<0){
+      arrow(ctx,vx,axisY,vx,iy,CGOOD,2.5);
+      label(ctx,'real image',vx+6,iy+ (ih<0? -12:12),CGOOD,12);
+    } else {
+      dash(ctx,vx,axisY,vx,iy,CACC,2);
+      label(ctx,'virtual image',vx+6,iy-12,CACC,11);
+      // for concave/virtual, dashed back-extension of ray1
+    }
+  }
+  var v_cm=v_s/scale;
+  var nature = m<0?'real, inverted':'virtual, erect';
+  var size = Math.abs(m)>1?'enlarged':(Math.abs(m)<1?'diminished':'same size');
+  ro($('roF'),[
+    {k:'Type',v:convex?'Convex (f = +25 cm)':'Concave (f = -25 cm)'},
+    {k:'u',v:'-'+u_cm+' cm'},
+    {k:'v',v:(v_cm>=0?'+':'')+v_cm.toFixed(1)+' cm'},
+    {k:'m',v:m.toFixed(2)},
+    {k:'Image',v:nature+', '+size,state:true}
+  ]);
+}
+
+/* =========================================================
+   PRISM & EYE
+========================================================= */
+var eyeType='prism';
+function drawEye(){
+  var ctx=dpr($('cvE'));clr(ctx);
+  if(eyeType==='prism') drawPrism(ctx); else drawHumanEye(ctx, eyeType);
+}
+function drawPrism(ctx){
+  // triangular prism
+  var ax=430,ay=110,bx=340,by=330,cx=560,cy=330;
+  ctx.strokeStyle=CACC;ctx.lineWidth=3;ctx.fillStyle='rgba(84,199,255,.08)';
+  ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx,cy);ctx.closePath();ctx.fill();ctx.stroke();
+  // white incident ray
+  var enter={x:385,y:200};
+  arrow(ctx,150,175,enter.x,enter.y,'#ffffff',3);
+  label(ctx,'white light',150,160,CINK,13);
+  // spectrum out of right face
+  var exit={x:505,y:255};
+  line(ctx,enter.x,enter.y,exit.x,exit.y,'#dfe6ff',3); // inside prism
+  var cols=['#ff4d4d','#ff9a3c','#ffe14d','#5fd68b','#4db8ff','#7d6bff','#b45cff'];
+  var names=['red','orange','yellow','green','blue','indigo','violet'];
+  for(var k=0;k<cols.length;k++){
+    var spread=(k-3)*4;                 // violet bends most (down)
+    var ang=(6+ k*2.1)*Math.PI/180;
+    var ex=exit.x+300*Math.cos(ang), ey=exit.y+300*Math.sin(ang);
+    line(ctx,exit.x,exit.y,ex,ey,cols[k],3);
+  }
+  label(ctx,'VIBGYOR spectrum',720,250,CINK,12,'end');
+  label(ctx,'red (bends least)',770,275,'#ff9a3c',11,'end');
+  label(ctx,'violet (bends most)',770,360,'#b45cff',11,'end');
+  ro($('roE'),[
+    {k:'Effect',v:'Dispersion of white light'},
+    {k:'Cause',v:'n depends on colour (λ)'},
+    {k:'Order',v:'VIBGYOR',state:true}
+  ]);
+}
+function drawHumanEye(ctx, mode){
+  var cx=560, cy=245, R=115;   // eyeball
+  // eyeball
+  ctx.strokeStyle=CMUT;ctx.lineWidth=2.5;ctx.fillStyle='rgba(255,255,255,.03)';
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();ctx.stroke();
+  // retina (back)
+  ctx.strokeStyle=CGOOD;ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,R,Math.PI*0.62,Math.PI*1.38,false);ctx.stroke();
+  label(ctx,'retina',cx+R-6,cy,CGOOD,12,'end');
+  // eye lens (front)
+  var lensX=cx-R+18;
+  ctx.strokeStyle=CACC;ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(lensX,cy-46);ctx.quadraticCurveTo(lensX+16,cy,lensX,cy+46);
+  ctx.moveTo(lensX,cy-46);ctx.quadraticCurveTo(lensX-16,cy,lensX,cy+46);ctx.stroke();
+  label(ctx,'eye lens',lensX,cy-58,CACC,12,'end');
+  // incoming parallel rays from far object
+  var y1=cy-40, y2=cy+40, startX=90;
+  arrow(ctx,startX,y1,lensX,y1,CRAY,2);
+  arrow(ctx,startX,y2,lensX,y2,CRAY,2);
+  var retinaX=cx+R-4;
+  var info;
+  if(mode==='normal'){
+    // focus exactly on retina
+    arrow(ctx,lensX,y1,retinaX,cy,CRAY,2);
+    arrow(ctx,lensX,y2,retinaX,cy,CRAY,2);
+    dot(ctx,retinaX,cy,CGOOD,5);
+    label(ctx,'sharp focus on retina',cx,cy+R+20,CGOOD,13,'center');
+    info=[{k:'Eye',v:'Normal (emmetropic)'},{k:'Image',v:'on the retina',state:true}];
+  } else if(mode==='myopia'){
+    // focus in front of retina
+    var fX=cx-10;
+    arrow(ctx,lensX,y1,fX,cy,CRAY,2);
+    arrow(ctx,lensX,y2,fX,cy,CRAY,2);
+    dot(ctx,fX,cy,CBAD,5);
+    // diverge after
+    line(ctx,fX,cy,retinaX,cy-26,CBAD,1.5);line(ctx,fX,cy,retinaX,cy+26,CBAD,1.5);
+    label(ctx,'focus BEFORE retina',fX-6,cy-22,CBAD,12,'end');
+    // corrective concave lens in front
+    var clx=200;
+    ctx.strokeStyle='#b45cff';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(clx-10,cy-52);ctx.quadraticCurveTo(clx+6,cy,clx-10,cy+52);
+    ctx.moveTo(clx+10,cy-52);ctx.quadraticCurveTo(clx-6,cy,clx+10,cy+52);ctx.stroke();
+    label(ctx,'concave lens (fix)',clx,cy-64,'#b45cff',12,'center');
+    label(ctx,'corrected → focus on retina',cx,cy+R+20,CGOOD,13,'center');
+    dot(ctx,retinaX,cy,CGOOD,5);
+    info=[{k:'Defect',v:'Myopia (near-sighted)'},{k:'Cause',v:'image before retina'},{k:'Fix',v:'concave lens (−P)',state:true}];
+  } else {
+    // hypermetropia: focus behind retina
+    var fbX=cx+R+40;
+    line(ctx,lensX,y1,fbX,cy,CBAD,1.5);
+    line(ctx,lensX,y2,fbX,cy,CBAD,1.5);
+    dot(ctx,fbX,cy,CBAD,5);
+    label(ctx,'focus BEHIND retina',fbX-6,cy-14,CBAD,12,'end');
+    // corrective convex lens
+    var clx2=200;
+    ctx.strokeStyle='#b45cff';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(clx2,cy-52);ctx.quadraticCurveTo(clx2+14,cy,clx2,cy+52);
+    ctx.moveTo(clx2,cy-52);ctx.quadraticCurveTo(clx2-14,cy,clx2,cy+52);ctx.stroke();
+    label(ctx,'convex lens (fix)',clx2,cy-64,'#b45cff',12,'center');
+    label(ctx,'corrected → focus on retina',cx,cy+R+20,CGOOD,13,'center');
+    dot(ctx,retinaX,cy,CGOOD,5);
+    info=[{k:'Defect',v:'Hypermetropia (far-sighted)'},{k:'Cause',v:'image behind retina'},{k:'Fix',v:'convex lens (+P)',state:true}];
+  }
+  ctx.textAlign='left';
+  ro($('roE'),info);
+}
+// centre align helper for label
+var _lab=label;
+label=function(ctx,t,x,y,col,size,align){
+  if(align==='center'){ctx.textAlign='center';ctx.fillStyle=col||CINK;ctx.font=(size||13)+'px system-ui,sans-serif';ctx.textBaseline='middle';ctx.fillText(t,x,y);ctx.textAlign='left';return;}
+  _lab(ctx,t,x,y,col,size,align);
+};
+
+/* =========================================================
+   QUIZ
+========================================================= */
+var QUIZ=[
+  {q:'A concave mirror has focal length 15 cm. For an object at 30 cm (at 2F), the image is:',
+   o:['virtual, erect, enlarged','real, inverted, same size','real, erect, diminished','virtual, inverted'],
+   a:1,e:'At u = 2F, a concave mirror forms a real, inverted image of the same size at 2F.'},
+  {q:'Light travels from air into glass. At the boundary it bends:',
+   o:['away from the normal','toward the normal','along the surface','it does not bend'],
+   a:1,e:'Entering a denser medium (higher n) the ray slows and bends TOWARD the normal.'},
+  {q:'Myopia (short-sightedness) is corrected using a:',
+   o:['convex lens','concave lens','plane mirror','prism'],
+   a:1,e:'A concave (diverging) lens moves the image back onto the retina, correcting myopia.'}
+];
+function buildQuiz(){
+  var host=$('quiz');
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='q';
+    var opts='<div class="opts">'+item.o.map(function(t,oi){
+      return '<button data-q="'+qi+'" data-o="'+oi+'">'+String.fromCharCode(65+oi)+'. '+t+'</button>';
+    }).join('')+'</div>';
+    d.innerHTML='<p class="qs">'+(qi+1)+'. '+item.q+'</p>'+opts+'<div class="expl" id="ex'+qi+'"></div>';
+    host.appendChild(d);
+  });
+  host.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-q]');if(!b)return;
+    var qi=+b.dataset.q, oi=+b.dataset.o, item=QUIZ[qi];
+    var group=b.closest('.opts');
+    if(group.dataset.done) return;
+    group.dataset.done='1';
+    group.querySelectorAll('button').forEach(function(btn){
+      var i=+btn.dataset.o;
+      if(i===item.a) btn.classList.add('correct');
+      else if(i===oi) btn.classList.add('wrong');
+      btn.style.cursor='default';
+    });
+    var ex=$('ex'+qi);ex.textContent=(oi===item.a?'✓ Correct. ':'✗ ')+item.e;ex.classList.add('show');
+  });
+}
+
+/* =========================================================
+   TABS + WIRING
+========================================================= */
+function showMode(m){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.mode===m);});
+  document.querySelectorAll('.mode').forEach(function(s){s.classList.remove('show');});
+  $('mode-'+m).classList.add('show');
+  if(m==='reflect') drawReflect(); else if(m==='refract') drawRefract(); else drawEye();
+}
+document.querySelectorAll('.tab-btn').forEach(function(b){
+  b.addEventListener('click',function(){showMode(b.dataset.mode);});
+});
+// reflection sub-type
+$('reflectType').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  reflectType=b.dataset.t;
+  this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('planeCtrl').style.display = reflectType==='plane'?'':'none';
+  $('mirrorCtrl').style.display = reflectType==='plane'?'none':'';
+  drawReflect();
+});
+$('ai').addEventListener('input',drawReflect);
+$('uMir').addEventListener('input',drawReflect);
+// refraction sub-type
+$('refractType').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  refractType=b.dataset.t;
+  this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+  $('snellCtrl').style.display = refractType==='boundary'?'':'none';
+  $('lensCtrl').style.display = refractType==='boundary'?'none':'';
+  drawRefract();
+});
+$('si').addEventListener('input',drawRefract);
+$('n2').addEventListener('input',drawRefract);
+$('uLens').addEventListener('input',drawRefract);
+// eye sub-type
+$('eyeType').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  eyeType=b.dataset.t;
+  this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+  drawEye();
+});
+window.addEventListener('resize',function(){
+  var m=document.querySelector('.tab-btn.active').dataset.mode;
+  if(m==='reflect') drawReflect(); else if(m==='refract') drawRefract(); else drawEye();
+});
+buildQuiz();
+showMode('reflect');
+</script>
+</body>
+</html>
