@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homeostasis Lab - NIOS Class 12 Biology (Ch18)</title>
+<style>
+  :root{
+    --accent:#4fd1a8;
+    --accent-dark:#2fa885;
+    --bg:#0f1720;
+    --panel:#18222e;
+    --panel-2:#1f2c3a;
+    --ink:#e7edf3;
+    --muted:#93a4b8;
+    --line:#2b3a4c;
+    --cold:#5aa9ff;
+    --hot:#ff7b6b;
+    --warn:#f5c451;
+    --good:#4fd1a8;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2836,#0f1720 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:2px solid transparent;padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#08131b;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:0 0 6px;}
+  .sub{color:var(--muted);font-size:.86rem;margin:0 0 12px;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 300px;min-width:270px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .btn{background:var(--accent);color:#08131b;border:none;padding:10px 16px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.9rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost:hover{border-color:var(--accent);}
+  .btn.cold{background:var(--cold);color:#04121f;}
+  .btn.hot{background:var(--hot);color:#2a0b06;}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px;}
+  .readout{font-variant-numeric:tabular-nums;font-weight:700;}
+  .pill{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.78rem;
+    font-weight:700;background:var(--panel-2);border:1px solid var(--line);}
+  .pill.on{background:var(--accent);color:#08131b;border-color:var(--accent-dark);}
+  .resp{list-style:none;padding:0;margin:8px 0 0;}
+  .resp li{padding:7px 10px;margin:6px 0;border-radius:10px;background:var(--panel-2);
+    border:1px solid var(--line);font-size:.86rem;color:var(--muted);transition:.2s;}
+  .resp li.active{color:var(--ink);border-color:var(--accent);background:#1c3a33;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:6px;}
+  .fact{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;}
+  .fact b{color:var(--accent);}
+  .fact p{margin:5px 0 0;font-size:.83rem;color:var(--muted);}
+  .status{font-size:.86rem;font-weight:700;padding:6px 10px;border-radius:10px;display:inline-block;}
+  .status.ok{background:#123528;color:var(--good);}
+  .status.warnc{background:#12293f;color:var(--cold);}
+  .status.warnh{background:#3a1a15;color:var(--hot);}
+  .q{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);}
+  .q p{margin:0 0 8px;font-weight:600;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:6px 0;cursor:pointer;font-size:.86rem;transition:.15s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:#123528;border-color:var(--good);color:#c9f5e4;}
+  .opt.wrong{background:#3a1a15;border-color:var(--hot);color:#ffd6cf;}
+  .explain{margin-top:8px;font-size:.83rem;color:var(--muted);display:none;}
+  .explain.show{display:block;}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:6px;}
+  .kv{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 0;border-bottom:1px dashed var(--line);}
+  .kv:last-child{border-bottom:none;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin:8px 0 20px;}
+  .flowlbl{font:600 12px -apple-system,Segoe UI,sans-serif;}
+  @media(max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Homeostasis Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Chapter 18 &mdash; Homeostasis: The Steady State</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="loop" role="tab">Feedback Loop</div>
+    <div class="tab" data-tab="thermo" role="tab">Thermoregulation</div>
+    <div class="tab" data-tab="gluc" role="tab">Blood Glucose</div>
+    <div class="tab" data-tab="facts" role="tab">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ===== FEEDBACK LOOP ===== -->
+  <section class="panel" id="loop">
+    <h2>Negative Feedback Loop</h2>
+    <p class="sub">Push a variable away from its <b>set point</b> and watch the body's control system pull it back. This is the core logic behind every homeostatic response.</p>
+    <div class="stage">
+      <div class="col">
+        <svg viewBox="0 0 360 300" id="loopSvg" aria-label="Negative feedback loop diagram">
+          <defs>
+            <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+              <path d="M0,0 L9,4.5 L0,9 Z" fill="#4fd1a8"></path>
+            </marker>
+          </defs>
+          <!-- ring path arrows -->
+          <path d="M180,52 A100,100 0 0 1 280,150" fill="none" stroke="#4fd1a8" stroke-width="2.5" marker-end="url(#arw)"></path>
+          <path d="M280,150 A100,100 0 0 1 180,250" fill="none" stroke="#4fd1a8" stroke-width="2.5" marker-end="url(#arw)"></path>
+          <path d="M180,250 A100,100 0 0 1 80,150" fill="none" stroke="#4fd1a8" stroke-width="2.5" marker-end="url(#arw)"></path>
+          <path d="M80,150 A100,100 0 0 1 180,52" fill="none" stroke="#4fd1a8" stroke-width="2.5" marker-end="url(#arw)"></path>
+          <!-- nodes -->
+          <g id="nStim"><circle cx="180" cy="40" r="30" fill="#1f2c3a" stroke="#5aa9ff" stroke-width="2"/><text x="180" y="37" text-anchor="middle" class="flowlbl" fill="#e7edf3" font-size="11" font-weight="700">Stimulus</text><text x="180" y="50" text-anchor="middle" fill="#93a4b8" font-size="9">variable shifts</text></g>
+          <g id="nRec"><circle cx="292" cy="150" r="30" fill="#1f2c3a" stroke="#4fd1a8" stroke-width="2"/><text x="292" y="147" text-anchor="middle" fill="#e7edf3" font-size="11" font-weight="700">Receptor</text><text x="292" y="160" text-anchor="middle" fill="#93a4b8" font-size="9">detects</text></g>
+          <g id="nCtrl"><circle cx="180" cy="260" r="32" fill="#1f2c3a" stroke="#f5c451" stroke-width="2"/><text x="180" y="256" text-anchor="middle" fill="#e7edf3" font-size="10" font-weight="700">Control</text><text x="180" y="268" text-anchor="middle" fill="#e7edf3" font-size="10" font-weight="700">centre</text></g>
+          <g id="nEff"><circle cx="68" cy="150" r="30" fill="#1f2c3a" stroke="#ff7b6b" stroke-width="2"/><text x="68" y="147" text-anchor="middle" fill="#e7edf3" font-size="11" font-weight="700">Effector</text><text x="68" y="160" text-anchor="middle" fill="#93a4b8" font-size="9">responds</text></g>
+          <text x="180" y="152" text-anchor="middle" fill="#93a4b8" font-size="10">Response</text>
+          <text x="180" y="166" text-anchor="middle" fill="#4fd1a8" font-size="11" font-weight="700">restores set point</text>
+        </svg>
+        <div class="legend">Arrows show information flowing around the loop. The active stage glows as the correction runs.</div>
+      </div>
+      <div class="col">
+        <div class="row"><span class="pill">Set point: <span class="readout">50</span></span>
+          <span class="status ok" id="loopStatus">At set point</span></div>
+        <svg viewBox="0 0 320 120" id="barSvg" aria-label="Variable level bar">
+          <rect x="10" y="20" width="300" height="34" rx="8" fill="#1f2c3a" stroke="#2b3a4c"/>
+          <line x1="160" y1="12" x2="160" y2="62" stroke="#4fd1a8" stroke-width="2" stroke-dasharray="4 3"/>
+          <text x="160" y="76" text-anchor="middle" fill="#4fd1a8" font-size="10">set point</text>
+          <rect id="varBar" x="160" y="22" width="0" height="30" rx="6" fill="#5aa9ff"/>
+          <circle id="varDot" cx="160" cy="37" r="9" fill="#e7edf3"/>
+          <text id="varTxt" x="160" y="105" text-anchor="middle" fill="#e7edf3" font-size="13" font-weight="700">50</text>
+        </svg>
+        <div class="row">
+          <label style="flex:1 1 100%;font-size:.85rem;color:var(--muted)">Disturb the variable (then release):</label>
+          <input type="range" id="loopSlider" min="0" max="100" value="50">
+        </div>
+        <div class="row">
+          <button class="btn ghost" id="loopDisturb">Nudge up</button>
+          <button class="btn ghost" id="loopDown">Nudge down</button>
+          <button class="btn" id="loopReset">Let body correct</button>
+        </div>
+        <p class="sub" style="margin-top:6px">The effector always pushes the variable in the <b>opposite</b> direction to the change &mdash; that is why it is called <b>negative</b> feedback.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== THERMOREGULATION ===== -->
+  <section class="panel hidden" id="thermo">
+    <h2>Thermoregulation (core &asymp; 37&deg;C)</h2>
+    <p class="sub">The hypothalamus is the thermostat. Move the environment slider; the body triggers responses that push core temperature back toward 37&deg;C.</p>
+    <div class="stage">
+      <div class="col">
+        <svg viewBox="0 0 220 300" id="bodySvg" aria-label="Human body thermoregulation">
+          <!-- body -->
+          <ellipse cx="110" cy="46" rx="26" ry="30" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <rect x="82" y="72" width="56" height="120" rx="24" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <rect x="60" y="86" width="18" height="86" rx="9" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <rect x="142" y="86" width="18" height="86" rx="9" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <rect x="88" y="188" width="20" height="96" rx="10" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <rect x="112" y="188" width="20" height="96" rx="10" fill="#26384a" stroke="#3a5066" stroke-width="2"/>
+          <!-- core temp glow -->
+          <circle id="coreGlow" cx="110" cy="130" r="30" fill="#4fd1a8" opacity=".28"/>
+          <text x="110" y="128" text-anchor="middle" fill="#e7edf3" font-size="11" font-weight="700">core</text>
+          <text id="coreTemp" x="110" y="144" text-anchor="middle" fill="#e7edf3" font-size="14" font-weight="800">37.0&deg;</text>
+          <!-- skin cues -->
+          <g id="sweatG" opacity="0">
+            <circle cx="86" cy="60" r="3" fill="#5aa9ff"/><circle cx="134" cy="66" r="3" fill="#5aa9ff"/>
+            <circle cx="92" cy="100" r="3" fill="#5aa9ff"/><circle cx="130" cy="110" r="3" fill="#5aa9ff"/>
+          </g>
+          <g id="shiverG" opacity="0">
+            <text x="150" y="52" fill="#5aa9ff" font-size="14">~</text>
+            <text x="56" y="70" fill="#5aa9ff" font-size="14">~</text>
+            <text x="150" y="120" fill="#5aa9ff" font-size="14">~</text>
+          </g>
+        </svg>
+        <div class="row" style="justify-content:center">
+          <span class="status ok" id="thermoStatus">Comfortable</span>
+        </div>
+      </div>
+      <div class="col">
+        <div class="row"><span class="pill">Environment: <span class="readout" id="envTxt">Mild 22&deg;C</span></span></div>
+        <div class="row">
+          <span style="color:var(--cold);font-size:.8rem">Cold</span>
+          <input type="range" id="envSlider" min="-10" max="45" value="22" style="flex:1">
+          <span style="color:var(--hot);font-size:.8rem">Hot</span>
+        </div>
+        <div class="row">
+          <button class="btn cold" id="setCold">Freezing</button>
+          <button class="btn ghost" id="setMild">Mild</button>
+          <button class="btn hot" id="setHot">Scorching</button>
+        </div>
+        <b style="font-size:.85rem">Body's responses</b>
+        <ul class="resp" id="thermoResp">
+          <li data-r="shiver">Shivering &mdash; muscles contract to generate heat</li>
+          <li data-r="vasoc">Vasoconstriction &mdash; skin vessels narrow, conserve heat</li>
+          <li data-r="goose">Goosebumps (piloerection) &mdash; traps warm air</li>
+          <li data-r="sweat">Sweating &mdash; evaporation cools the skin</li>
+          <li data-r="vasod">Vasodilation &mdash; skin vessels widen, lose heat</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOOD GLUCOSE ===== -->
+  <section class="panel hidden" id="gluc">
+    <h2>Blood Glucose Regulation</h2>
+    <p class="sub">Normal fasting range &asymp; 70&ndash;110 mg/dL. The pancreas balances two antagonistic hormones to hold glucose steady.</p>
+    <div class="stage">
+      <div class="col">
+        <svg viewBox="0 0 340 170" id="glucGraph" aria-label="Blood glucose over time graph">
+          <rect x="0" y="0" width="340" height="170" fill="transparent"/>
+          <!-- range band 70-110 mapped -->
+          <rect x="34" y="60" width="300" height="36" fill="#123528" opacity=".6"/>
+          <line x1="34" y1="60" x2="334" y2="60" stroke="#4fd1a8" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="34" y1="96" x2="334" y2="96" stroke="#4fd1a8" stroke-width="1" stroke-dasharray="4 3"/>
+          <text x="4" y="42" fill="#93a4b8" font-size="9">160</text>
+          <text x="4" y="82" fill="#4fd1a8" font-size="9">110</text>
+          <text x="4" y="100" fill="#4fd1a8" font-size="9">70</text>
+          <text x="6" y="130" fill="#93a4b8" font-size="9">40</text>
+          <line x1="34" y1="18" x2="34" y2="140" stroke="#2b3a4c"/>
+          <line x1="34" y1="140" x2="334" y2="140" stroke="#2b3a4c"/>
+          <polyline id="glucLine" points="" fill="none" stroke="#f5c451" stroke-width="2.5"/>
+          <circle id="glucHead" cx="34" cy="90" r="4" fill="#f5c451"/>
+        </svg>
+        <div class="legend">Yellow line = blood glucose. Green band = healthy range (70&ndash;110 mg/dL).</div>
+        <div class="row" style="margin-top:6px">
+          <span class="pill">Glucose: <span class="readout" id="glucVal">90</span> mg/dL</span>
+          <span class="status ok" id="glucStatus">In range</span>
+        </div>
+      </div>
+      <div class="col">
+        <div class="row">
+          <button class="btn hot" id="eatBtn">Eat a meal</button>
+          <button class="btn cold" id="fastBtn">Fast / exercise</button>
+          <button class="btn ghost" id="glucReset">Reset</button>
+        </div>
+        <div class="fact" style="margin:6px 0">
+          <span class="pill on" id="hormoneTag">Balanced</span>
+          <p id="hormoneMsg">Glucose is steady. Both hormones idle.</p>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px">
+          <div class="kv"><span>Insulin (beta cells)</span><b id="insLvl" style="color:var(--cold)">low</b></div>
+          <div class="kv"><span>&rarr; liver stores glycogen</span><b id="glyStore">&mdash;</b></div>
+          <div class="kv"><span>Glucagon (alpha cells)</span><b id="glgLvl" style="color:var(--hot)">low</b></div>
+          <div class="kv"><span>&rarr; liver releases glucose</span><b id="glyRel">&mdash;</b></div>
+        </div>
+        <div class="fact" style="margin-top:10px;border-color:var(--cold)">
+          <b>Osmoregulation (ADH)</b>
+          <p>When blood is too concentrated, the hypothalamus signals the pituitary to release <b>ADH (vasopressin)</b>. The kidneys reabsorb more water, urine becomes concentrated, and blood water returns to normal &mdash; the same negative-feedback logic.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FACTS & QUIZ ===== -->
+  <section class="panel hidden" id="facts">
+    <h2>Key Facts</h2>
+    <div class="facts">
+      <div class="fact"><b>Homeostasis</b><p>Maintenance of a stable internal environment (temperature, pH, glucose, water, ions) despite external change &mdash; essential for enzymes and cells to function.</p></div>
+      <div class="fact"><b>Negative feedback</b><p>The dominant control mode: a change triggers a response that opposes and reverses it, returning the variable to normal.</p></div>
+      <div class="fact"><b>Set point</b><p>The target value the control system defends (e.g. core temp &asymp; 37&deg;C, glucose &asymp; 90 mg/dL). Receptors detect deviations from it.</p></div>
+      <div class="fact"><b>Insulin vs glucagon</b><p>Antagonistic pancreatic hormones. Insulin <b>lowers</b> glucose (uptake + glycogen storage); glucagon <b>raises</b> it (glycogen breakdown).</p></div>
+      <div class="fact"><b>Hypothalamus</b><p>Master coordinator: thermostat for temperature, osmoreceptor centre for water balance, and driver of many endocrine responses.</p></div>
+      <div class="fact"><b>Positive feedback</b><p>Rarer &mdash; amplifies a change (e.g. childbirth, blood clotting). Not used to keep variables steady.</p></div>
+    </div>
+
+    <h2 style="margin-top:18px">Quick Quiz</h2>
+    <p class="sub">Tap an option to check your answer.</p>
+    <div id="quiz"></div>
+  </section>
+
+  <footer>Homeostasis Lab &middot; self-contained interactive &middot; NIOS Biology Ch18</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var raf=null;
+
+  /* ---------- tabs ---------- */
+  var tabs=document.querySelectorAll('.tab');
+  var sections={loop:byId('loop'),thermo:byId('thermo'),gluc:byId('gluc'),facts:byId('facts')};
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var k=t.getAttribute('data-tab');
+      for(var s in sections){sections[s].classList.toggle('hidden',s!==k);}
+    });
+  });
+  function byId(i){return document.getElementById(i);}
+
+  /* ---------- FEEDBACK LOOP ---------- */
+  var SET=50, cur=50, target=50, correcting=false, phase=0, phaseT=0;
+  var loopSlider=byId('loopSlider');
+  var stages=['nStim','nRec','nCtrl','nEff'];
+  function setVar(v){ cur=Math.max(0,Math.min(100,v)); drawVar(); }
+  function drawVar(){
+    var barX=160, w=(cur-50)*3; // 300px span /100
+    var bar=byId('varBar'), dot=byId('varDot'), txt=byId('varTxt');
+    if(w>=0){bar.setAttribute('x',160);bar.setAttribute('width',w);}
+    else{bar.setAttribute('x',160+w);bar.setAttribute('width',-w);}
+    var col=Math.abs(cur-50)<3?'#4fd1a8':(cur>50?'#ff7b6b':'#5aa9ff');
+    bar.setAttribute('fill',col);
+    dot.setAttribute('cx',160+(cur-50)*3);
+    dot.setAttribute('fill',col);
+    txt.textContent=Math.round(cur);
+    var st=byId('loopStatus');
+    if(Math.abs(cur-50)<3){st.textContent='At set point';st.className='status ok';}
+    else if(cur>50){st.textContent='Above set point';st.className='status warnh';}
+    else{st.textContent='Below set point';st.className='status warnc';}
+  }
+  function highlight(idx){
+    stages.forEach(function(id,i){
+      var g=byId(id).querySelector('circle');
+      g.setAttribute('stroke-width', i===idx&&correcting?'4':'2');
+    });
+  }
+  loopSlider.addEventListener('input',function(){correcting=false;setVar(+loopSlider.value);});
+  byId('loopDisturb').addEventListener('click',function(){correcting=false;setVar(cur+22);loopSlider.value=cur;});
+  byId('loopDown').addEventListener('click',function(){correcting=false;setVar(cur-22);loopSlider.value=cur;});
+  byId('loopReset').addEventListener('click',function(){correcting=true;phase=0;phaseT=0;});
+
+  /* ---------- THERMOREGULATION ---------- */
+  var envSlider=byId('envSlider'), core=37.0;
+  function applyEnv(){
+    var e=+envSlider.value;
+    byId('envTxt').textContent=(e<10?'Cold ':e>30?'Hot ':'Mild ')+e+'°C';
+    // stress on core proportional to deviation from ~24C neutral, damped by regulation
+    var drive=(e-24)/60; // -0.57..0.35
+    var tcore=37.0+drive; // pre-regulation drift, then regulation pulls it back
+    core=37.0+drive*0.28; // regulation limits deviation
+    byId('coreTemp').textContent=core.toFixed(1)+'°';
+    var g=byId('coreGlow');
+    var st=byId('thermoStatus');
+    var resp=byId('thermoResp').children;
+    for(var i=0;i<resp.length;i++)resp[i].classList.remove('active');
+    var sweat=byId('sweatG'), shiver=byId('shiverG');
+    sweat.style.opacity=0; shiver.style.opacity=0;
+    function act(r){var el=document.querySelector('#thermoResp li[data-r="'+r+'"]');if(el)el.classList.add('active');}
+    if(e<=15){
+      g.setAttribute('fill','#5aa9ff');
+      act('shiver');act('vasoc');act('goose');
+      shiver.style.opacity=1;
+      st.textContent='COLD → generating & conserving heat';st.className='status warnc';
+    }else if(e>=30){
+      g.setAttribute('fill','#ff7b6b');
+      act('sweat');act('vasod');
+      sweat.style.opacity=1;
+      st.textContent='HOT → losing heat by sweat & dilation';st.className='status warnh';
+    }else{
+      g.setAttribute('fill','#4fd1a8');
+      st.textContent='Comfortable — core held near 37°C';st.className='status ok';
+    }
+  }
+  envSlider.addEventListener('input',applyEnv);
+  byId('setCold').addEventListener('click',function(){envSlider.value=-5;applyEnv();});
+  byId('setMild').addEventListener('click',function(){envSlider.value=22;applyEnv();});
+  byId('setHot').addEventListener('click',function(){envSlider.value=40;applyEnv();});
+
+  /* ---------- BLOOD GLUCOSE ---------- */
+  var glc=90, gTarget=90, hist=[];
+  for(var i=0;i<50;i++)hist.push(90);
+  function mapY(v){ // 40->140, 160->18
+    var y=140-((v-40)/(160-40))*(140-18);
+    return Math.max(14,Math.min(146,y));
+  }
+  function drawGluc(){
+    var pts=[];
+    var n=hist.length, x0=34, xw=300;
+    for(var i=0;i<n;i++){
+      var x=x0+(i/(n-1))*xw;
+      pts.push(x.toFixed(1)+','+mapY(hist[i]).toFixed(1));
+    }
+    byId('glucLine').setAttribute('points',pts.join(' '));
+    var last=hist[n-1];
+    byId('glucHead').setAttribute('cx',x0+xw);
+    byId('glucHead').setAttribute('cy',mapY(last));
+    byId('glucVal').textContent=Math.round(last);
+    var st=byId('glucStatus');
+    if(last>115){st.textContent='High → insulin released';st.className='status warnh';}
+    else if(last<65){st.textContent='Low → glucagon released';st.className='status warnc';}
+    else{st.textContent='In range';st.className='status ok';}
+    // hormone panel
+    var ins=byId('insLvl'), glg=byId('glgLvl'), tag=byId('hormoneTag'), msg=byId('hormoneMsg');
+    if(last>115){
+      ins.textContent='HIGH';glg.textContent='low';
+      byId('glyStore').textContent='storing';byId('glyRel').textContent='—';
+      tag.textContent='Insulin';tag.className='pill on';
+      msg.textContent='High glucose → beta cells release insulin. Cells take up glucose and the liver stores it as glycogen, lowering blood sugar.';
+    }else if(last<65){
+      ins.textContent='low';glg.textContent='HIGH';
+      byId('glyStore').textContent='—';byId('glyRel').textContent='releasing';
+      tag.textContent='Glucagon';tag.className='pill on';
+      msg.textContent='Low glucose → alpha cells release glucagon. The liver breaks down glycogen and releases glucose, raising blood sugar.';
+    }else{
+      ins.textContent='low';glg.textContent='low';
+      byId('glyStore').textContent='—';byId('glyRel').textContent='—';
+      tag.textContent='Balanced';tag.className='pill on';
+      msg.textContent='Glucose is steady in range. Both hormones idle at baseline.';
+    }
+  }
+  byId('eatBtn').addEventListener('click',function(){gTarget=Math.min(180,glc+70);});
+  byId('fastBtn').addEventListener('click',function(){gTarget=Math.max(55,glc-40);});
+  byId('glucReset').addEventListener('click',function(){gTarget=90;glc=90;for(var i=0;i<hist.length;i++)hist[i]=90;drawGluc();});
+
+  /* ---------- animation loop ---------- */
+  var acc=0, glucTick=0;
+  function tick(){
+    // feedback loop correction stepping
+    if(correcting){
+      phaseT+=1;
+      var stp=phaseT%20;
+      var idx=Math.floor((phaseT/20))%4;
+      highlight(idx);
+      // ease cur toward SET
+      cur+=(SET-cur)*0.05;
+      loopSlider.value=cur;
+      drawVar();
+      if(Math.abs(cur-SET)<0.4){cur=SET;correcting=false;highlight(-1);drawVar();}
+    }
+    // glucose homeostasis: body always pulls gTarget toward 90 slowly; glc eases to gTarget
+    gTarget+=(90-gTarget)*0.01;
+    glc+=(gTarget-glc)*0.08;
+    glucTick++;
+    if(glucTick%3===0){ hist.push(glc); if(hist.length>60)hist.shift(); drawGluc(); }
+    // shiver jitter
+    var sh=byId('shiverG');
+    if(sh && sh.style.opacity==='1'){ sh.setAttribute('transform','translate('+((Math.random()-0.5)*3).toFixed(1)+',0)'); }
+    raf=requestAnimationFrame(tick);
+  }
+  function start(){ if(!raf)raf=requestAnimationFrame(tick); }
+  function stop(){ if(raf){cancelAnimationFrame(raf);raf=null;} }
+  document.addEventListener('visibilitychange',function(){ if(document.hidden)stop(); else start(); });
+
+  /* ---------- QUIZ ---------- */
+  var QZ=[
+    {q:"A rise in blood glucose after a meal is corrected mainly by:",
+     o:["Glucagon from alpha cells","Insulin from beta cells","ADH from the pituitary","Adrenaline from the adrenal medulla"],a:1,
+     e:"Insulin (beta cells) promotes glucose uptake and glycogen storage in the liver, lowering blood sugar."},
+    {q:"In a cold environment, which response does NOT help conserve or generate heat?",
+     o:["Shivering","Vasoconstriction of skin vessels","Sweating","Piloerection (goosebumps)"],a:2,
+     e:"Sweating cools the body and is a heat-loss response for hot conditions, not cold."},
+    {q:"'Negative feedback' means the correcting response:",
+     o:["Amplifies the original change","Opposes and reverses the change","Has no effect on the variable","Only works for temperature"],a:1,
+     e:"Negative feedback counteracts the deviation, returning the variable toward its set point — the basis of homeostasis."}
+  ];
+  var quiz=byId('quiz');
+  QZ.forEach(function(item,qi){
+    var d=document.createElement('div');d.className='q';
+    var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;d.appendChild(p);
+    var ex=document.createElement('div');ex.className='explain';ex.textContent=item.e;
+    item.o.forEach(function(txt,oi){
+      var b=document.createElement('button');b.className='opt';b.textContent=txt;
+      b.addEventListener('click',function(){
+        if(d.getAttribute('data-done'))return;
+        d.setAttribute('data-done','1');
+        var opts=d.querySelectorAll('.opt');
+        opts[item.a].classList.add('correct');
+        if(oi!==item.a)b.classList.add('wrong');
+        ex.classList.add('show');
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(ex);quiz.appendChild(d);
+  });
+
+  /* ---------- init ---------- */
+  drawVar(); applyEnv(); drawGluc(); start();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Growth &amp; Development Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#4fae7a;
+    --accent-dark:#37945f;
+    --bg:#111a17;
+    --panel:#182521;
+    --panel2:#1f312b;
+    --ink:#e6f0ea;
+    --muted:#9db4a8;
+    --line:#2c443c;
+    --good:#57c98a;
+    --bad:#e08a6b;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2a24,#0e1613);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.4rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08130e;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.12rem;margin:0 0 10px;}
+  h3{font-size:1rem;margin:14px 0 6px;color:var(--accent);}
+  p.lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .col{flex:1 1 320px;min-width:260px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  .btn{background:var(--accent);color:#08130e;border:none;padding:9px 15px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#08130e;}
+  label.sl{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:4px;flex:1 1 140px;}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .readout{font-size:.82rem;color:var(--muted);background:var(--panel2);border:1px solid var(--line);
+    border-radius:10px;padding:8px 10px;margin-top:8px;}
+  .readout b{color:var(--ink);}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+  .hcard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;
+    cursor:pointer;transition:.15s;}
+  .hcard:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .hcard.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(79,174,122,.35) inset;}
+  .hcard .dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle;}
+  .hcard h4{margin:0 0 4px;font-size:.95rem;}
+  .hcard .sub{font-size:.74rem;color:var(--muted);}
+  .detail{margin-top:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .detail ul{margin:6px 0 0;padding-left:18px;font-size:.86rem;}
+  .detail li{margin-bottom:4px;}
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.85rem;}
+  .facts h3{margin-top:0;}
+  .facts ul{margin:0;padding-left:18px;} .facts li{margin-bottom:6px;}
+  .quiz .q{margin-bottom:14px;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:8px 10px;border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:.85rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(87,201,138,.22);border-color:var(--good);}
+  .opt.wrong{background:rgba(224,138,107,.18);border-color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none;}
+  .expl.show{display:block;}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:8px;
+    padding:6px 11px;font-size:.82rem;cursor:pointer;font-weight:600;}
+  .seg button.on{background:var(--accent);color:#08130e;border-color:var(--accent-dark);}
+  .legend{font-size:.78rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .legend i{width:14px;height:3px;border-radius:2px;display:inline-block;}
+  .tag{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:20px;
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);}
+  footer{color:var(--muted);font-size:.76rem;text-align:center;margin:8px 0 24px;}
+  @media(max-width:420px){header h1{font-size:1.2rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Plant Growth &amp; Development Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch.20 Growth and Development in Plants &mdash; explore, animate, quiz.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-mode="growth">1 &middot; Growth Curve &amp; Regions</div>
+    <div class="tab" data-mode="hormones">2 &middot; Plant Hormones (PGRs)</div>
+    <div class="tab" data-mode="tropism">3 &middot; Tropisms &amp; Photoperiod</div>
+  </div>
+
+  <!-- ============ MODE 1: GROWTH ============ -->
+  <section class="panel" id="m-growth">
+    <h2>The Sigmoid Growth Curve &amp; Regions of Growth</h2>
+    <p class="lead">Growth = irreversible increase in dry mass/size. Plotted over time it gives an S-shaped (sigmoid) curve with three phases. Meristems at root &amp; shoot tips drive it.</p>
+    <div class="stage">
+      <div class="col">
+        <div class="controls">
+          <button class="btn" id="growPlay">Play growth</button>
+          <button class="btn ghost" id="growReset">Reset</button>
+        </div>
+        <svg id="growSvg" viewBox="0 0 460 300" role="img" aria-label="Sigmoid growth curve"></svg>
+        <div class="legend">
+          <span><i style="background:#8aa0ff"></i>Lag phase</span>
+          <span><i style="background:#4fae7a"></i>Log / exponential</span>
+          <span><i style="background:#e0b45a"></i>Stationary</span>
+        </div>
+        <div class="readout" id="growRead">Press <b>Play growth</b> to trace the curve. Time: <b>0</b> &middot; Size: <b>0%</b> &middot; Phase: <b>&mdash;</b></div>
+      </div>
+      <div class="col">
+        <h3>Regions of growth (root &amp; shoot tip)</h3>
+        <svg id="regionSvg" viewBox="0 0 260 320" role="img" aria-label="Regions of growth in a root"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: HORMONES ============ -->
+  <section class="panel hidden" id="m-hormones">
+    <h2>Plant Growth Regulators (Phytohormones)</h2>
+    <p class="lead">Tap a hormone card to see its main effects. Then try the apical-dominance demo below.</p>
+    <div class="cards" id="hCards"></div>
+    <div class="detail" id="hDetail"></div>
+
+    <h3>Apical dominance interactive</h3>
+    <p class="lead">Auxin made at the shoot tip suppresses lateral (axillary) buds. Remove the tip &rarr; auxin drops &rarr; laterals grow (bushy plant). This is why gardeners prune/pinch tips.</p>
+    <div class="stage">
+      <div class="col" style="flex:1 1 240px;max-width:300px;">
+        <svg id="apexSvg" viewBox="0 0 220 300" role="img" aria-label="Apical dominance plant"></svg>
+      </div>
+      <div class="col">
+        <div class="controls">
+          <button class="btn" id="cutTip">Remove apical tip &#9986;</button>
+          <button class="btn ghost" id="regrow">Restore tip</button>
+        </div>
+        <div class="readout" id="apexRead">Tip <b>intact</b>: high apical auxin suppresses side buds &rarr; single dominant stem.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: TROPISM ============ -->
+  <section class="panel hidden" id="m-tropism">
+    <h2>Tropisms &amp; Photoperiodism</h2>
+    <div class="seg" id="tropSeg">
+      <button class="on" data-t="photo">Phototropism</button>
+      <button data-t="geo">Geotropism</button>
+      <button data-t="period">Photoperiodism</button>
+    </div>
+    <div class="stage">
+      <div class="col" style="flex:1 1 260px;max-width:320px;">
+        <svg id="tropSvg" viewBox="0 0 240 300" role="img" aria-label="Tropism demonstration"></svg>
+        <div class="controls" id="tropControls"></div>
+      </div>
+      <div class="col">
+        <div class="detail" id="tropInfo"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS + QUIZ ============ -->
+  <section class="panel">
+    <div class="stage">
+      <div class="col facts">
+        <h3>Quick facts</h3>
+        <ul>
+          <li><b>Growth</b> is measured as increase in fresh/dry weight, length, area or cell number &mdash; it is irreversible.</li>
+          <li><b>Meristems</b> (apical, lateral/cambium, intercalary) have cells that keep dividing.</li>
+          <li><b>Differentiation</b>, <b>dedifferentiation</b> &amp; <b>redifferentiation</b> shape cells and tissues; <b>development</b> = growth + differentiation.</li>
+          <li>The <b>plumule</b> shows negative geotropism (grows up); the <b>radicle</b> shows positive geotropism (grows down).</li>
+          <li><b>Vernalization</b> = cold treatment that promotes flowering (e.g. winter wheat).</li>
+        </ul>
+      </div>
+      <div class="col quiz" id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Self-contained interactive &middot; NIOS Biology Ch.20 &middot; no external resources.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabs=document.querySelectorAll('.tab');
+  var panels={growth:document.getElementById('m-growth'),hormones:document.getElementById('m-hormones'),tropism:document.getElementById('m-tropism')};
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    for(var k in panels){panels[k].classList.add('hidden');}
+    panels[t.dataset.mode].classList.remove('hidden');
+  });});
+
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs,parent){var e=document.createElementNS(SVGNS,tag);for(var k in attrs){e.setAttribute(k,attrs[k]);}if(parent)parent.appendChild(e);return e;}
+
+  // ================= MODE 1: GROWTH CURVE =================
+  var gSvg=document.getElementById('growSvg');
+  var gRead=document.getElementById('growRead');
+  // axes geometry
+  var GX0=48,GY0=260,GX1=430,GY1=30;
+  function sigmoid(t){ // t 0..1 -> size 0..1
+    var k=11, mid=0.5;
+    var y=1/(1+Math.exp(-k*(t-mid)));
+    var y0=1/(1+Math.exp(-k*(0-mid))), y1=1/(1+Math.exp(-k*(1-mid)));
+    return (y-y0)/(y1-y0);
+  }
+  function tx(t){return GX0+t*(GX1-GX0);}
+  function ty(v){return GY0-v*(GY0-GY1);}
+  function drawGrowBase(){
+    gSvg.innerHTML="";
+    // phase bands
+    var bands=[[0,0.32,'#8aa0ff'],[0.32,0.7,'#4fae7a'],[0.7,1,'#e0b45a']];
+    bands.forEach(function(b){el('rect',{x:tx(b[0]),y:GY1,width:tx(b[1])-tx(b[0]),height:GY0-GY1,fill:b[2],opacity:0.10},gSvg);});
+    // grid
+    for(var i=0;i<=4;i++){var yy=GY0-(i/4)*(GY0-GY1);el('line',{x1:GX0,y1:yy,x2:GX1,y2:yy,stroke:'#2c443c','stroke-width':1},gSvg);}
+    el('line',{x1:GX0,y1:GY0,x2:GX1,y2:GY0,stroke:'#9db4a8','stroke-width':1.5},gSvg);
+    el('line',{x1:GX0,y1:GY0,x2:GX0,y2:GY1,stroke:'#9db4a8','stroke-width':1.5},gSvg);
+    var yl=el('text',{x:14,y:150,fill:'#9db4a8','font-size':11,transform:'rotate(-90 14 150)'},gSvg);yl.textContent='Size / mass (%)';
+    var xl=el('text',{x:200,y:288,fill:'#9db4a8','font-size':11},gSvg);xl.textContent='Time →';
+    // faint full curve
+    var d="M";for(var t=0;t<=1.0001;t+=0.02){d+=(t===0?"":"L")+tx(t).toFixed(1)+" "+ty(sigmoid(t)).toFixed(1);}
+    el('path',{d:d,fill:'none',stroke:'#3a5a4f','stroke-width':1.5,'stroke-dasharray':'3 4'},gSvg);
+    // phase labels
+    var lbl=[[0.15,'Lag'],[0.5,'Log'],[0.85,'Stationary']];
+    lbl.forEach(function(l){var tt=el('text',{x:tx(l[0]),y:44,fill:'#9db4a8','font-size':10,'text-anchor':'middle'},gSvg);tt.textContent=l[1];});
+    // animated path + marker
+    growPath=el('path',{d:"M"+tx(0)+" "+ty(0),fill:'none',stroke:'#4fae7a','stroke-width':3,'stroke-linecap':'round'},gSvg);
+    growMarker=el('circle',{cx:tx(0),cy:ty(0),r:5,fill:'#e6f0ea',stroke:'#4fae7a','stroke-width':2},gSvg);
+  }
+  var growPath,growMarker,growT=0,growAnim=null,growPts="";
+  function phaseName(t){return t<0.32?'Lag (cell prep, slow)':t<0.7?'Log / exponential (rapid)':'Stationary (plateau, maturity)';}
+  function growStep(){
+    if(document.hidden){growAnim=requestAnimationFrame(growStep);return;}
+    growT+=0.006;
+    if(growT>1){growT=1;}
+    var v=sigmoid(growT);
+    growPts+=(growPts===""?"M":"L")+tx(growT).toFixed(1)+" "+ty(v).toFixed(1);
+    growPath.setAttribute('d',growPts);
+    growMarker.setAttribute('cx',tx(growT));growMarker.setAttribute('cy',ty(v));
+    gRead.innerHTML='Time: <b>'+(growT*100).toFixed(0)+'</b> &middot; Size: <b>'+(v*100).toFixed(0)+'%</b> &middot; Phase: <b>'+phaseName(growT)+'</b>';
+    if(growT<1){growAnim=requestAnimationFrame(growStep);}else{growAnim=null;}
+  }
+  document.getElementById('growPlay').addEventListener('click',function(){
+    if(growAnim)return;
+    if(growT>=1){growT=0;growPts="";growPath.setAttribute('d',"M"+tx(0)+" "+ty(0));}
+    growAnim=requestAnimationFrame(growStep);
+  });
+  document.getElementById('growReset').addEventListener('click',function(){
+    if(growAnim){cancelAnimationFrame(growAnim);growAnim=null;}
+    growT=0;growPts="";drawGrowBase();
+    gRead.innerHTML='Press <b>Play growth</b> to trace the curve. Time: <b>0</b> &middot; Size: <b>0%</b> &middot; Phase: <b>&mdash;</b>';
+  });
+  drawGrowBase();
+
+  // ---- regions of growth (root) ----
+  var rSvg=document.getElementById('regionSvg');
+  (function(){
+    var zones=[
+      {y:40,h:44,c:'#e0b45a',t:'Maturation / differentiation',s:'root hairs; cells mature'},
+      {y:88,h:60,c:'#4fae7a',t:'Elongation zone',s:'cells enlarge / vacuolate'},
+      {y:150,h:56,c:'#8aa0ff',t:'Meristematic zone',s:'active cell division'},
+      {y:210,h:34,c:'#c98acf',t:'Root cap',s:'protects tip'}
+    ];
+    // root outline
+    el('path',{d:'M95 30 L165 30 L165 205 Q130 260 95 205 Z',fill:'#20342d',stroke:'#2c443c','stroke-width':2},rSvg);
+    zones.forEach(function(z){
+      el('rect',{x:97,y:z.y,width:66,height:z.h,fill:z.c,opacity:0.5},rSvg);
+      var t=el('text',{x:172,y:z.y+z.h/2-2,fill:'#e6f0ea','font-size':10,'font-weight':600},rSvg);t.textContent=z.t;
+      var s=el('text',{x:172,y:z.y+z.h/2+11,fill:'#9db4a8','font-size':8.5},rSvg);s.textContent=z.s;
+    });
+    // root hairs
+    for(var i=0;i<5;i++){var yy=48+i*7;el('line',{x1:97,y1:yy,x2:88,y2:yy-3,stroke:'#e0b45a','stroke-width':1.4},rSvg);el('line',{x1:163,y1:yy,x2:172,y2:yy-3,stroke:'#e0b45a','stroke-width':1.4},rSvg);}
+    var cap=el('text',{x:130,y:22,fill:'#9db4a8','font-size':9,'text-anchor':'middle'},rSvg);cap.textContent='Direction of growth ↑';
+  })();
+
+  // ================= MODE 2: HORMONES =================
+  var hormones=[
+    {id:'auxin',name:'Auxin (IAA)',color:'#4fae7a',sub:'apical dominance',
+     eff:['Promotes cell elongation (esp. in shoots)','Controls apical dominance (suppresses lateral buds)','Basis of phototropism & geotropism (lateral redistribution)','Promotes rooting of cuttings; used in rooting powders','Prevents early leaf/fruit drop (abscission)','Synthetic: 2,4-D used as a selective weedicide'],
+     more:'Made at shoot tips & young leaves; moves basipetally (tip to base).'},
+    {id:'ga',name:'Gibberellin (GA)',color:'#8aa0ff',sub:'stem elongation',
+     eff:['Causes internode/stem elongation ("bolting")','Breaks seed & bud dormancy; promotes germination','Reverses dwarfism in some plants','Delays senescence; increases fruit size (e.g. grapes)','Induces α-amylase in germinating cereal seeds'],
+     more:'Discovered from the fungus Gibberella fujikuroi (foolish-seedling disease of rice).'},
+    {id:'cyto',name:'Cytokinin',color:'#e0b45a',sub:'cell division',
+     eff:['Promotes cell division (cytokinesis)','With auxin, controls differentiation of shoots/roots in culture','Delays leaf senescence (Richmond–Lang effect)','Overcomes apical dominance (promotes lateral bud growth)','Helps nutrient mobilization'],
+     more:'Abundant in regions of active division: root tips, developing fruits, endosperm.'},
+    {id:'aba',name:'Abscisic acid (ABA)',color:'#e08a6b',sub:'stress / dormancy',
+     eff:['Induces & maintains seed and bud dormancy','Closes stomata under water stress (guard cells)','"Stress hormone" — tolerance to drought/cold','Inhibits growth; antagonist of GA','Promotes abscission and senescence'],
+     more:'Rises sharply under water stress to conserve water by shutting stomata.'},
+    {id:'eth',name:'Ethylene',color:'#c98acf',sub:'ripening (gas)',
+     eff:['Promotes fruit ripening (a gaseous hormone)','Triggers senescence & abscission of leaves/flowers','Breaks dormancy; promotes germination','Triple response in seedlings; epinasty','Ripens tomatoes/apples; used commercially as ethephon'],
+     more:'The only gaseous phytohormone; one ripe fruit hastens ripening of neighbours.'}
+  ];
+  var hCards=document.getElementById('hCards'),hDetail=document.getElementById('hDetail');
+  hormones.forEach(function(h,i){
+    var c=document.createElement('div');c.className='hcard'+(i===0?' sel':'');c.dataset.id=h.id;
+    c.innerHTML='<h4><span class="dot" style="background:'+h.color+'"></span>'+h.name+'</h4><div class="sub">'+h.sub+'</div>';
+    c.addEventListener('click',function(){
+      hCards.querySelectorAll('.hcard').forEach(function(x){x.classList.remove('sel');});
+      c.classList.add('sel');showHormone(h);
+    });
+    hCards.appendChild(c);
+  });
+  function showHormone(h){
+    var li=h.eff.map(function(e){return '<li>'+e+'</li>';}).join('');
+    hDetail.innerHTML='<h4 style="margin:0 0 6px;"><span class="dot" style="background:'+h.color+';width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:6px;"></span>'+h.name+' <span class="tag">'+h.sub+'</span></h4><ul>'+li+'</ul><p class="sub" style="margin:8px 0 0;color:#9db4a8;font-size:.8rem;">'+h.more+'</p>';
+  }
+  showHormone(hormones[0]);
+
+  // ---- apical dominance ----
+  var apexSvg=document.getElementById('apexSvg'),apexRead=document.getElementById('apexRead');
+  var tipIntact=true,lateralH=0,apexAnim=null;
+  function drawApex(){
+    apexSvg.innerHTML="";
+    el('rect',{x:0,y:270,width:220,height:30,fill:'#20342d'},apexSvg); // soil
+    el('line',{x1:110,y1:270,x2:110,y2:60,stroke:'#4fae7a','stroke-width':7,'stroke-linecap':'round'},apexSvg); // main stem
+    // roots
+    el('path',{d:'M110 270 q-16 18 -30 26 M110 270 q16 18 30 26 M110 270 v26',stroke:'#8a6b4f','stroke-width':3,fill:'none'},apexSvg);
+    // apical tip
+    if(tipIntact){
+      el('path',{d:'M110 60 q-14 -12 0 -34 q14 22 0 34',fill:'#57c98a',stroke:'#37945f','stroke-width':1.5},apexSvg);
+      var t=el('text',{x:132,y:40,fill:'#9db4a8','font-size':10},apexSvg);t.textContent='tip (auxin↑)';
+    }else{
+      el('line',{x1:100,y1:66,x2:120,y2:56,stroke:'#e08a6b','stroke-width':2.5},apexSvg);
+      el('line',{x1:100,y1:56,x2:120,y2:66,stroke:'#e08a6b','stroke-width':2.5},apexSvg);
+      var c=el('text',{x:132,y:52,fill:'#e08a6b','font-size':10},apexSvg);c.textContent='removed';
+    }
+    // lateral buds at 3 nodes
+    var nodes=[110,160,210];
+    nodes.forEach(function(ny,idx){
+      el('circle',{cx:110,cy:ny,r:3,fill:'#37945f'},apexSvg);
+      var len=lateralH*(idx===0?1:idx===1?0.85:0.7);
+      var dir=idx%2===0?-1:1;
+      if(len>1){
+        el('path',{d:'M110 '+ny+' q '+(dir*22)+' -6 '+(dir*40)+' -'+len,stroke:'#4fae7a','stroke-width':4,fill:'none','stroke-linecap':'round'},apexSvg);
+        if(len>20){el('circle',{cx:110+dir*40,cy:ny-len,r:4,fill:'#57c98a'},apexSvg);}
+      }
+    });
+  }
+  function apexGrow(){
+    if(document.hidden){apexAnim=requestAnimationFrame(apexGrow);return;}
+    if(lateralH<48){lateralH+=1.1;drawApex();apexAnim=requestAnimationFrame(apexGrow);}
+    else{apexAnim=null;apexRead.innerHTML='Tip <b>removed</b>: apical auxin falls → lateral (axillary) buds released → plant becomes <b>bushy</b>. (Cytokinin promotes these buds.)';}
+  }
+  document.getElementById('cutTip').addEventListener('click',function(){
+    tipIntact=false;if(!apexAnim)apexAnim=requestAnimationFrame(apexGrow);drawApex();
+    apexRead.innerHTML='Tip removed — watch lateral buds sprout...';
+  });
+  document.getElementById('regrow').addEventListener('click',function(){
+    if(apexAnim){cancelAnimationFrame(apexAnim);apexAnim=null;}
+    tipIntact=true;lateralH=0;drawApex();
+    apexRead.innerHTML='Tip <b>intact</b>: high apical auxin suppresses side buds → single dominant stem.';
+  });
+  drawApex();
+
+  // ================= MODE 3: TROPISM =================
+  var tropSvg=document.getElementById('tropSvg'),tropInfo=document.getElementById('tropInfo'),tropCtrl=document.getElementById('tropControls');
+  var tropSeg=document.getElementById('tropSeg');
+  var currentT='photo',lightSide='right',bend=0,tAnim=null,plantType='long',daylen=14;
+
+  tropSeg.querySelectorAll('button').forEach(function(b){b.addEventListener('click',function(){
+    tropSeg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');currentT=b.dataset.t;bend=0;if(tAnim){cancelAnimationFrame(tAnim);tAnim=null;}buildTrop();
+  });});
+
+  function buildTrop(){
+    tropCtrl.innerHTML="";
+    if(currentT==='photo'){
+      var b1=mkBtn('Light from left',function(){lightSide='left';animateBend();});
+      var b2=mkBtn('Light from right',function(){lightSide='right';animateBend();});
+      tropCtrl.appendChild(b1);tropCtrl.appendChild(b2);
+      tropInfo.innerHTML='<h4 style="margin:0 0 6px;">Phototropism</h4><p class="sub" style="color:#9db4a8;font-size:.85rem;margin:0;">Shoots bend <b>toward light (positive)</b>. Auxin moves to the <b>shaded side</b>, where cells elongate more, so the tip curves toward the light. Roots are negatively phototropic. Classic Darwin/coleoptile experiments showed the tip perceives light.</p>';
+    }else if(currentT==='geo'){
+      var g1=mkBtn('Lay pot on side',function(){lightSide='geo';animateBend();});
+      var g2=mkBtn('Stand upright',function(){bend=0;if(tAnim){cancelAnimationFrame(tAnim);tAnim=null;}drawTrop();});
+      tropCtrl.appendChild(g1);tropCtrl.appendChild(g2);
+      tropInfo.innerHTML='<h4 style="margin:0 0 6px;">Geotropism (gravitropism)</h4><p class="sub" style="color:#9db4a8;font-size:.85rem;margin:0;">Response to gravity, sensed by <b>statoliths</b> (starch grains) in root-cap cells. <b>Roots</b> grow toward gravity (positive), the <b>shoot</b> grows against it (negative). If a plant is tipped over, auxin gathers on the lower side; in the shoot the lower side elongates so it bends back upward.</p>';
+    }else{
+      // photoperiod controls
+      var wrap=document.createElement('div');wrap.style.width='100%';
+      wrap.innerHTML='<label class="sl">Day length: <b id="dlv">'+daylen+' h</b><input id="dlr" type="range" min="8" max="18" step="0.5" value="'+daylen+'"></label>';
+      tropCtrl.appendChild(wrap);
+      var pt=document.createElement('div');pt.className='seg';pt.style.marginTop='8px';
+      pt.innerHTML='<button data-p="long" class="'+(plantType==='long'?'on':'')+'">Long-day plant</button><button data-p="short" class="'+(plantType==='short'?'on':'')+'">Short-day plant</button><button data-p="neutral" class="'+(plantType==='neutral'?'on':'')+'">Day-neutral</button>';
+      tropCtrl.appendChild(pt);
+      pt.querySelectorAll('button').forEach(function(x){x.addEventListener('click',function(){plantType=x.dataset.p;pt.querySelectorAll('button').forEach(function(y){y.classList.remove('on');});x.classList.add('on');drawPeriod();});});
+      document.getElementById('dlr').addEventListener('input',function(){daylen=parseFloat(this.value);document.getElementById('dlv').textContent=daylen+' h';drawPeriod();});
+      drawPeriod();return;
+    }
+    drawTrop();
+  }
+  function mkBtn(txt,fn){var b=document.createElement('button');b.className='btn ghost';b.textContent=txt;b.addEventListener('click',fn);return b;}
+
+  function animateBend(){
+    if(tAnim){cancelAnimationFrame(tAnim);}
+    var target=(lightSide==='left'||lightSide==='geo')?-1:1;
+    if(currentT==='geo')target=1; // bend upward from horizontal
+    var step=function(){
+      if(document.hidden){tAnim=requestAnimationFrame(step);return;}
+      var goal=target*32;
+      bend+=(goal-bend)*0.12;
+      drawTrop();
+      if(Math.abs(goal-bend)>0.4){tAnim=requestAnimationFrame(step);}else{bend=goal;drawTrop();tAnim=null;}
+    };
+    tAnim=requestAnimationFrame(step);
+  }
+
+  function drawTrop(){
+    tropSvg.innerHTML="";
+    // pot
+    el('path',{d:'M80 275 L160 275 L152 300 L88 300 Z',fill:'#8a6b4f'},tropSvg);
+    el('rect',{x:78,y:268,width:84,height:9,rx:2,fill:'#a37b5a'},tropSvg);
+    if(currentT==='photo'){
+      // sun
+      var sx=lightSide==='left'?30:210;
+      el('circle',{cx:sx,cy:60,r:16,fill:'#e0b45a'},tropSvg);
+      for(var i=0;i<8;i++){var a=i*Math.PI/4;el('line',{x1:sx+Math.cos(a)*20,y1:60+Math.sin(a)*20,x2:sx+Math.cos(a)*28,y2:60+Math.sin(a)*28,stroke:'#e0b45a','stroke-width':2},tropSvg);}
+      var lt=el('text',{x:sx,y:98,fill:'#9db4a8','font-size':9,'text-anchor':'middle'},tropSvg);lt.textContent='light';
+    }
+    // stem: curved by bend. base at (120,268) going up ~150
+    var base={x:120,y:268};
+    var midx=base.x+bend*0.6, topx=base.x+bend*2;
+    var d='M'+base.x+' '+base.y+' Q'+midx+' '+(base.y-100)+' '+topx+' '+(base.y-150);
+    el('path',{d:d,fill:'none',stroke:'#4fae7a','stroke-width':7,'stroke-linecap':'round'},tropSvg);
+    // leaves
+    el('ellipse',{cx:topx,cy:base.y-150,rx:14,ry:7,fill:'#57c98a',transform:'rotate('+(bend*1.2)+' '+topx+' '+(base.y-150)+')'},tropSvg);
+    el('ellipse',{cx:midx,cy:base.y-90,rx:11,ry:6,fill:'#4fae7a',transform:'rotate(30 '+midx+' '+(base.y-90)+')'},tropSvg);
+    // roots for geo
+    if(currentT==='geo'){
+      el('path',{d:'M120 268 q-10 16 -22 22 M120 268 q10 16 22 22 M120 268 v22',stroke:'#8a6b4f','stroke-width':2.5,fill:'none'},tropSvg);
+      var gt=el('text',{x:120,y:20,fill:'#9db4a8','font-size':10,'text-anchor':'middle'},tropSvg);gt.textContent=bend>2?'shoot bends up ↑':'gravity ↓';
+    }
+    // auxin shaded-side marker for photo
+    if(currentT==='photo'&&Math.abs(bend)>2){
+      var shadeX=lightSide==='left'?topx+9:topx-9;
+      el('text',{x:shadeX,y:base.y-158,fill:'#e0b45a','font-size':9,'text-anchor':'middle'},tropSvg).textContent='auxin●';
+    }
+  }
+
+  function drawPeriod(){
+    tropSvg.innerHTML="";
+    // critical day length ~12h. long-day flowers when day>critical; short-day when day<critical.
+    var crit=12;
+    var flowers=false;
+    if(plantType==='long')flowers=daylen>=crit+0.5;
+    else if(plantType==='short')flowers=daylen<=crit-0.5;
+    else flowers=true;
+    // day/night bar
+    var barY=30, barW=200, x0=20;
+    var dayFrac=daylen/24;
+    el('rect',{x:x0,y:barY,width:barW*dayFrac,height:16,fill:'#e0b45a',rx:3},tropSvg);
+    el('rect',{x:x0+barW*dayFrac,y:barY,width:barW*(1-dayFrac),height:16,fill:'#2c443c',rx:3},tropSvg);
+    el('text',{x:x0,y:barY-5,fill:'#9db4a8','font-size':9}).textContent='';
+    var dl=el('text',{x:x0+barW*dayFrac/2,y:barY+42,fill:'#e0b45a','font-size':9,'text-anchor':'middle'},tropSvg);dl.textContent=daylen+'h light';
+    var nl=el('text',{x:x0+barW*dayFrac+barW*(1-dayFrac)/2,y:barY+42,fill:'#9db4a8','font-size':9,'text-anchor':'middle'},tropSvg);nl.textContent=(24-daylen)+'h dark';
+    // critical line
+    el('line',{x1:x0+barW*(crit/24),y1:barY-6,x2:x0+barW*(crit/24),y2:barY+22,stroke:'#e08a6b','stroke-width':2,'stroke-dasharray':'3 2'},tropSvg);
+    el('text',{x:x0+barW*(crit/24),y:barY-9,fill:'#e08a6b','font-size':8,'text-anchor':'middle'},tropSvg).textContent='critical';
+    // plant
+    var base={x:120,y:270};
+    el('path',{d:'M80 270 L160 270 L152 296 L88 296 Z',fill:'#8a6b4f'},tropSvg);
+    el('line',{x1:base.x,y1:base.y,x2:base.x,y2:base.y-90,stroke:'#4fae7a','stroke-width':7,'stroke-linecap':'round'},tropSvg);
+    el('ellipse',{cx:base.x-15,cy:base.y-55,rx:12,ry:6,fill:'#4fae7a',transform:'rotate(-30 '+(base.x-15)+' '+(base.y-55)+')'},tropSvg);
+    el('ellipse',{cx:base.x+15,cy:base.y-70,rx:12,ry:6,fill:'#4fae7a',transform:'rotate(30 '+(base.x+15)+' '+(base.y-70)+')'},tropSvg);
+    if(flowers){
+      // bloom
+      var fy=base.y-96;
+      for(var i=0;i<6;i++){var a=i*Math.PI/3;el('ellipse',{cx:base.x+Math.cos(a)*9,cy:fy+Math.sin(a)*9,rx:6,ry:4,fill:'#e08a6b',transform:'rotate('+(a*57)+' '+(base.x+Math.cos(a)*9)+' '+(fy+Math.sin(a)*9)+')'},tropSvg);}
+      el('circle',{cx:base.x,cy:fy,r:6,fill:'#e0b45a'},tropSvg);
+      el('text',{x:base.x,y:base.y-118,fill:'#57c98a','font-size':11,'text-anchor':'middle','font-weight':700},tropSvg).textContent='Flowering!';
+    }else{
+      el('circle',{cx:base.x,cy:base.y-94,r:5,fill:'#37945f'},tropSvg);
+      el('text',{x:base.x,y:base.y-116,fill:'#9db4a8','font-size':10,'text-anchor':'middle'},tropSvg).textContent='vegetative';
+    }
+    var names={long:'Long-day plant',short:'Short-day plant',neutral:'Day-neutral plant'};
+    var rule={long:'flowers when day length exceeds a critical value (spring/summer, e.g. spinach, wheat).',short:'flowers when day length is shorter than a critical value — really needs a long <b>continuous dark</b> period (autumn, e.g. rice, chrysanthemum, dahlia).',neutral:'flowers regardless of day length (e.g. tomato, cucumber).'};
+    tropInfo.innerHTML='<h4 style="margin:0 0 6px;">Photoperiodism &amp; vernalization</h4><p class="sub" style="color:#9db4a8;font-size:.85rem;margin:0 0 8px;"><b>'+names[plantType]+'</b> '+rule[plantType]+' The <b>leaf</b> perceives photoperiod; the hormone <b>florigen</b> is thought to move to the shoot apex to induce flowering.</p><p class="sub" style="color:#9db4a8;font-size:.85rem;margin:0;"><b>Vernalization</b>: some plants (e.g. winter wheat, biennials) need a prolonged cold spell before they will flower.</p>';
+  }
+
+  buildTrop();
+
+  // ================= QUIZ =================
+  var quizData=[
+    {q:'Which phase of the sigmoid growth curve shows the most rapid, exponential increase in size?',
+     opts:['Lag phase','Log (exponential) phase','Stationary phase','Senescent phase'],a:1,
+     e:'The log/exponential phase shows maximum growth rate before resources become limiting and growth plateaus (stationary phase).'},
+    {q:'Removing the apical bud of a plant usually causes the plant to become bushy because:',
+     opts:['Gibberellin makes the stem taller','Auxin from the tip no longer suppresses lateral buds','Abscisic acid closes the stomata','Ethylene ripens the fruits'],a:1,
+     e:'Apical dominance is due to auxin made at the shoot tip. Remove the tip and auxin falls, so axillary (lateral) buds are released and grow.'},
+    {q:'A shoot bends toward light in phototropism because auxin:',
+     opts:['Accumulates on the lit side and inhibits it','Accumulates on the shaded side, causing more elongation there','Is destroyed by light on both sides','Has no role in bending'],a:1,
+     e:'Auxin redistributes to the shaded side; cells there elongate more, so the shoot curves toward the light (positive phototropism).'}
+  ];
+  var quizEl=document.getElementById('quiz');
+  quizEl.innerHTML='<h3 style="margin-top:0;">Check yourself (3 questions)</h3>';
+  quizData.forEach(function(item,qi){
+    var q=document.createElement('div');q.className='q';
+    var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;q.appendChild(p);
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement('button');b.className='opt';b.textContent=o;
+      b.addEventListener('click',function(){
+        if(q.dataset.done)return;q.dataset.done='1';
+        q.querySelectorAll('.opt').forEach(function(x,xi){
+          if(xi===item.a)x.classList.add('correct');
+          if(xi===oi&&oi!==item.a)x.classList.add('wrong');
+          x.style.cursor='default';
+        });
+        q.querySelector('.expl').classList.add('show');
+      });
+      q.appendChild(b);
+    });
+    var ex=document.createElement('div');ex.className='expl';ex.innerHTML='<b>'+(item.a===0?'':'')+'Answer:</b> '+item.opts[item.a]+'. '+item.e;q.appendChild(ex);
+    quizEl.appendChild(q);
+  });
+
+  // pause animations when tab hidden (handled inside each rAF loop via document.hidden guard)
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden){
+      if(growAnim===null&&growT>0&&growT<1){growAnim=requestAnimationFrame(growStep);}
+    }
+  });
+})();
+</script>
+</body>
+</html>

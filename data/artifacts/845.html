@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plant Reproduction Lab — NIOS Biology Ch.19</title>
+<style>
+  :root{
+    --bg:#141a1f; --panel:#1c252c; --panel2:#232f38; --ink:#e7eef2;
+    --muted:#9fb1bd; --line:#31414d; --accent:#4dd6a0; --accent-d:#2fa87c;
+    --warn:#f0a860;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; font-size:15px; padding:14px;
+  }
+  h1{font-size:1.35rem; margin:0 0 2px}
+  .sub{color:var(--muted); font-size:.85rem; margin-bottom:12px}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+  .tab{
+    background:var(--panel); color:var(--ink); border:1px solid var(--line);
+    padding:9px 14px; border-radius:12px; cursor:pointer; font-size:.9rem;
+    flex:1 1 auto; min-width:120px; text-align:center;
+  }
+  .tab.active{background:var(--accent); color:#062018; border-color:var(--accent); font-weight:600}
+  .wrap{display:grid; grid-template-columns:1fr; gap:14px}
+  @media(min-width:820px){.wrap{grid-template-columns:1.4fr 1fr}}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px}
+  .stage{background:var(--panel2); border-radius:14px; padding:6px; overflow:hidden}
+  svg{width:100%; height:auto; display:block; touch-action:manipulation}
+  .mode{display:none}
+  .mode.active{display:block}
+  .facts{min-height:60px}
+  .facts h3{margin:0 0 6px; font-size:1rem; color:var(--accent)}
+  .facts p{margin:6px 0; font-size:.9rem; color:var(--ink)}
+  .facts .tag{color:var(--muted); font-size:.8rem}
+  .controls{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0}
+  button.ctl{
+    background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-size:.85rem;
+  }
+  button.ctl:hover{border-color:var(--accent)}
+  button.ctl.on{background:var(--accent-d); border-color:var(--accent); color:#eafff6}
+  .legend{font-size:.78rem; color:var(--muted); margin-top:8px}
+  .chip{display:inline-block; padding:2px 8px; border-radius:20px; background:var(--panel2);
+    border:1px solid var(--line); margin:3px 4px 0 0; font-size:.78rem}
+  .hint{font-size:.8rem; color:var(--muted); margin-top:6px}
+  .clk{cursor:pointer}
+  .clk:hover{filter:brightness(1.25)}
+  .quiz{margin-top:16px}
+  .q{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px}
+  .q .stem{font-weight:600; margin-bottom:8px; font-size:.9rem}
+  .opt{display:block; width:100%; text-align:left; background:var(--panel); color:var(--ink);
+    border:1px solid var(--line); border-radius:9px; padding:8px 10px; margin:5px 0; cursor:pointer; font-size:.85rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#173d30; border-color:var(--accent); color:#c9ffe9}
+  .opt.wrong{background:#3d1f1f; border-color:#c96b6b; color:#ffd6d6}
+  .expl{font-size:.82rem; color:var(--muted); margin-top:6px; display:none}
+  .expl.show{display:block}
+  .ploidy{font-weight:700}
+  .n2{color:#7fd0ff}
+  .n3{color:var(--warn)}
+  select{background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    border-radius:9px; padding:7px 9px; font-size:.85rem}
+  label.lbl{font-size:.82rem; color:var(--muted); margin-right:4px}
+</style>
+</head>
+<body>
+<h1>Plant Reproduction Lab</h1>
+<div class="sub">NIOS Class 12 Biology · Chapter 19 — Reproduction in Plants (Angiosperms)</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-m="flower">1 · Flower Structure</button>
+  <button class="tab" data-m="fert">2 · Pollination &amp; Fertilization</button>
+  <button class="tab" data-m="seed">3 · Seed, Fruit &amp; Asexual</button>
+</div>
+
+<div class="wrap">
+  <div class="panel stage">
+    <!-- MODE 1 : FLOWER -->
+    <div class="mode active" id="mode-flower">
+      <svg viewBox="0 0 400 380" role="img" aria-label="Labelled flower">
+        <defs>
+          <radialGradient id="petg" cx="50%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="#ffd6ea"/><stop offset="100%" stop-color="#e878ac"/>
+          </radialGradient>
+        </defs>
+        <!-- receptacle / stalk -->
+        <rect x="192" y="300" width="16" height="70" rx="6" fill="#5a8a4a"/>
+        <!-- sepals (calyx) -->
+        <g class="clk" data-p="sepal">
+          <path d="M170 300 Q150 320 140 348 Q168 336 196 306 Z" fill="#4f9a54"/>
+          <path d="M230 300 Q250 320 260 348 Q232 336 204 306 Z" fill="#4f9a54"/>
+        </g>
+        <!-- petals (corolla) -->
+        <g class="clk" data-p="petal">
+          <ellipse cx="200" cy="150" rx="46" ry="70" fill="url(#petg)"/>
+          <ellipse cx="130" cy="200" rx="66" ry="40" fill="url(#petg)" transform="rotate(-25 130 200)"/>
+          <ellipse cx="270" cy="200" rx="66" ry="40" fill="url(#petg)" transform="rotate(25 270 200)"/>
+          <ellipse cx="150" cy="260" rx="58" ry="38" fill="url(#petg)" transform="rotate(30 150 260)"/>
+          <ellipse cx="250" cy="260" rx="58" ry="38" fill="url(#petg)" transform="rotate(-30 250 260)"/>
+        </g>
+        <!-- stamens (androecium) -->
+        <g class="clk" data-p="stamen">
+          <line x1="165" y1="255" x2="150" y2="150" stroke="#d9c24a" stroke-width="4"/>
+          <ellipse cx="148" cy="142" rx="12" ry="8" fill="#e8b93a"/>
+          <line x1="235" y1="255" x2="250" y2="150" stroke="#d9c24a" stroke-width="4"/>
+          <ellipse cx="252" cy="142" rx="12" ry="8" fill="#e8b93a"/>
+          <line x1="180" y1="258" x2="172" y2="135" stroke="#d9c24a" stroke-width="4"/>
+          <ellipse cx="171" cy="128" rx="12" ry="8" fill="#e8b93a"/>
+          <line x1="220" y1="258" x2="228" y2="135" stroke="#d9c24a" stroke-width="4"/>
+          <ellipse cx="229" cy="128" rx="12" ry="8" fill="#e8b93a"/>
+        </g>
+        <!-- carpel (gynoecium) -->
+        <g class="clk" data-p="carpel">
+          <ellipse cx="200" cy="128" rx="15" ry="9" fill="#c85a9a"/><!-- stigma -->
+          <rect x="196" y="132" width="8" height="115" rx="4" fill="#9a4c76"/><!-- style -->
+          <ellipse cx="200" cy="270" rx="30" ry="42" fill="#b06a3a"/><!-- ovary -->
+          <circle cx="190" cy="268" r="6" fill="#f2d9a0"/><!-- ovule -->
+          <circle cx="210" cy="268" r="6" fill="#f2d9a0"/>
+          <circle cx="200" cy="285" r="6" fill="#f2d9a0"/>
+        </g>
+      </svg>
+      <div class="legend">Tap any structure to identify it. This is a <b>complete, bisexual</b> flower — it has all 4 whorls and both stamens (male) &amp; carpel (female).</div>
+    </div>
+
+    <!-- MODE 2 : POLLINATION + FERTILIZATION -->
+    <div class="mode" id="mode-fert">
+      <svg viewBox="0 0 400 380" id="fsvg" role="img" aria-label="Pollination and double fertilization">
+        <!-- style / pistil -->
+        <ellipse cx="200" cy="52" rx="26" ry="12" fill="#c85a9a"/><!-- stigma -->
+        <text x="200" y="30" text-anchor="middle" font-size="11" fill="#e7eef2">Stigma</text>
+        <path d="M186 60 Q186 170 176 250 L224 250 Q214 170 214 60 Z" fill="#7d3e60" opacity="0.85"/>
+        <text x="286" y="150" text-anchor="middle" font-size="11" fill="#9fb1bd">Style</text>
+        <!-- ovary -->
+        <ellipse cx="200" cy="300" rx="70" ry="60" fill="#8a4e2e"/>
+        <!-- embryo sac -->
+        <ellipse cx="200" cy="300" rx="46" ry="40" fill="#f2e2c0"/>
+        <circle id="egg" cx="200" cy="322" r="11" fill="#7fd0ff"/><!-- egg 2 gametes: egg + synergids simplified -->
+        <text x="200" y="326" text-anchor="middle" font-size="9" fill="#08303f">egg</text>
+        <circle id="polar" cx="200" cy="290" r="13" fill="#f0a860"/><!-- central cell / 2 polar nuclei -->
+        <text x="200" y="294" text-anchor="middle" font-size="8" fill="#3a2200">2 polar</text>
+        <!-- pollen grain on stigma -->
+        <circle id="pollen" cx="200" cy="50" r="8" fill="#e8b93a"/>
+        <!-- pollen tube (drawn dynamically) -->
+        <path id="tube" d="" fill="none" stroke="#e8b93a" stroke-width="4" stroke-linecap="round"/>
+        <!-- two sperm nuclei -->
+        <circle id="sperm1" cx="200" cy="50" r="5" fill="#ff6b9a" opacity="0"/>
+        <circle id="sperm2" cx="200" cy="50" r="5" fill="#c060ff" opacity="0"/>
+        <!-- results -->
+        <circle id="zygote" cx="200" cy="322" r="0" fill="#4dd6a0"/>
+        <circle id="endo" cx="200" cy="290" r="0" fill="#ffd24d"/>
+        <text id="tzy" x="200" y="352" text-anchor="middle" font-size="0" fill="#4dd6a0"></text>
+      </svg>
+      <div class="controls">
+        <span><label class="lbl">Pollination</label>
+        <select id="polType">
+          <option value="self">Self-pollination</option>
+          <option value="cross">Cross-pollination</option>
+        </select></span>
+        <span><label class="lbl">Agent</label>
+        <select id="agent">
+          <option value="insect">Insects</option>
+          <option value="wind">Wind</option>
+          <option value="water">Water</option>
+        </select></span>
+        <button class="ctl on" id="play">▶ Grow pollen tube</button>
+      </div>
+      <div class="legend" id="stepText">Choose settings, then grow the pollen tube to watch double fertilization.</div>
+    </div>
+
+    <!-- MODE 3 : SEED / FRUIT / ASEXUAL -->
+    <div class="mode" id="mode-seed">
+      <svg viewBox="0 0 400 300" id="ssvg" role="img" aria-label="Seed fruit and vegetative propagation">
+        <g id="seedView">
+          <ellipse cx="120" cy="150" rx="80" ry="95" fill="#c04a2a"/><!-- fruit (pericarp) -->
+          <text x="120" y="45" text-anchor="middle" font-size="11" fill="#e7eef2">Fruit (from ovary wall)</text>
+          <ellipse cx="120" cy="160" rx="46" ry="58" fill="#f0d59a"/><!-- seed -->
+          <ellipse cx="120" cy="160" rx="30" ry="42" fill="#c9e2b0"/><!-- endosperm -->
+          <path d="M120 130 q-16 20 -4 50 q10 -8 4 -50" fill="#5a8a4a"/><!-- embryo -->
+          <text x="300" y="120" text-anchor="middle" font-size="11" fill="#9fb1bd">Seed = ovule</text>
+          <text x="300" y="150" text-anchor="middle" font-size="10" fill="#c9e2b0">Endosperm 3n</text>
+          <text x="300" y="175" text-anchor="middle" font-size="10" fill="#5a8a4a">Embryo (from zygote 2n)</text>
+        </g>
+      </svg>
+      <div class="controls">
+        <button class="ctl on" data-veg="seed">Seed &amp; Fruit</button>
+        <button class="ctl" data-veg="runner">Runner</button>
+        <button class="ctl" data-veg="tuber">Tuber</button>
+        <button class="ctl" data-veg="bulb">Bulb</button>
+        <button class="ctl" data-veg="cutting">Cutting</button>
+        <button class="ctl" data-veg="grafting">Grafting</button>
+        <button class="ctl" data-veg="layering">Layering</button>
+        <button class="ctl" data-veg="tissue">Tissue culture</button>
+      </div>
+      <div class="legend" id="vegLegend">After fertilization: ovule → seed, ovary → fruit.</div>
+    </div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="panel">
+    <div class="facts" id="facts">
+      <h3>Facts</h3>
+      <p>Select a mode and tap the diagram to explore.</p>
+    </div>
+    <div class="quiz" id="quiz">
+      <h3 style="color:var(--accent);font-size:1rem;margin:8px 0">Quick Quiz</h3>
+      <div class="q" data-a="1">
+        <div class="stem">1. In angiosperm double fertilization, the endosperm is:</div>
+        <button class="opt">Diploid (2n) from zygote</button>
+        <button class="opt">Triploid (3n) from one sperm + two polar nuclei</button>
+        <button class="opt">Haploid (n) from a single polar nucleus</button>
+        <div class="expl">One male gamete fuses with the egg → zygote (2n); the other fuses with the two polar nuclei of the central cell → primary endosperm nucleus (3n). This triple fusion is unique to angiosperms.</div>
+      </div>
+      <div class="q" data-a="2">
+        <div class="stem">2. A runner, tuber and bulb are examples of:</div>
+        <button class="opt">Artificial vegetative propagation</button>
+        <button class="opt">Sexual reproduction by seeds</button>
+        <button class="opt">Natural vegetative (asexual) propagation</button>
+        <div class="expl">Runner (strawberry), tuber (potato) and bulb (onion) are natural vegetative organs that give rise to new plants without seeds — offspring are genetically identical clones.</div>
+      </div>
+      <div class="q" data-a="1">
+        <div class="stem">3. Wind-pollinated flowers typically have:</div>
+        <button class="opt">Large amounts of light, dry pollen &amp; feathery stigmas</button>
+        <button class="opt">Bright petals, nectar and scent</button>
+        <button class="opt">Sticky pollen carried underwater</button>
+        <div class="expl">Anemophilous (wind) flowers produce abundant light dry pollen, have exposed anthers and large feathery stigmas, and usually lack showy petals, scent or nectar.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- tab switching ---------- */
+  var tabs=document.querySelectorAll('.tab');
+  var modes={flower:document.getElementById('mode-flower'),
+             fert:document.getElementById('mode-fert'),
+             seed:document.getElementById('mode-seed')};
+  var current='flower';
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      for(var k in modes){modes[k].classList.remove('active');}
+      current=t.dataset.m;
+      modes[current].classList.add('active');
+      resetFacts(current);
+    });
+  });
+
+  var facts=document.getElementById('facts');
+  function setFacts(title,html,tag){
+    facts.innerHTML='<h3>'+title+'</h3>'+html+(tag?'<p class="tag">'+tag+'</p>':'');
+  }
+  function resetFacts(mode){
+    if(mode==='flower') setFacts('Flower structure','<p>Tap sepals, petals, stamen or carpel to learn its role.</p><p><span class="chip">complete flower</span><span class="chip">bisexual</span></p>','A flower with all four whorls is <b>complete</b>; with both androecium &amp; gynoecium it is <b>bisexual</b> (perfect). Missing a whorl → incomplete; only one sex → unisexual.');
+    else if(mode==='fert') setFacts('Pollination &amp; fertilization','<p>Pollen lands on the stigma, germinates and a <b>pollen tube</b> grows down the style carrying two male gametes to the embryo sac.</p>','Double fertilization: sperm + egg → <span class="ploidy n2">zygote (2n)</span>; sperm + 2 polar nuclei → <span class="ploidy n3">endosperm (3n)</span>.');
+    else setFacts('Seed, fruit &amp; asexual','<p>After fertilization the ovule becomes the <b>seed</b> and the ovary becomes the <b>fruit</b>. Plants also reproduce asexually by vegetative propagation.</p>','Vegetative propagation gives genetically identical clones — useful in agriculture &amp; horticulture.');
+  }
+  resetFacts('flower');
+
+  /* ---------- MODE 1: flower parts ---------- */
+  var partInfo={
+    sepal:['Sepals — Calyx','<p>The outermost green whorl. Sepals protect the developing bud and support the open flower.</p>','Collectively called the <b>calyx</b> (accessory whorl).'],
+    petal:['Petals — Corolla','<p>Brightly coloured whorl that attracts pollinators with colour, scent and nectar.</p>','Collectively the <b>corolla</b>. Calyx + corolla = perianth (accessory whorls).'],
+    stamen:['Stamen — Androecium (male)','<p>Each stamen = <b>anther</b> (produces pollen/microspores) + <b>filament</b> (stalk). All stamens form the androecium.</p>','Pollen grains carry the male gametes.'],
+    carpel:['Carpel — Gynoecium (female)','<p>Carpel = <b>stigma</b> (receives pollen) + <b>style</b> (tube) + <b>ovary</b> (holds <b>ovules</b>). Ovules contain the egg &amp; embryo sac.</p>','After fertilization ovule→seed, ovary→fruit.']
+  };
+  document.querySelectorAll('#mode-flower .clk').forEach(function(g){
+    g.addEventListener('click',function(){
+      var info=partInfo[g.dataset.p];
+      if(info) setFacts(info[0],info[1],info[2]);
+    });
+  });
+
+  /* ---------- MODE 2: pollen tube + double fertilization ---------- */
+  var fsvg=document.getElementById('fsvg');
+  var pollen=document.getElementById('pollen');
+  var tube=document.getElementById('tube');
+  var sperm1=document.getElementById('sperm1'), sperm2=document.getElementById('sperm2');
+  var eggEl=document.getElementById('egg'), polarEl=document.getElementById('polar');
+  var zyg=document.getElementById('zygote'), endo=document.getElementById('endo');
+  var tzy=document.getElementById('tzy');
+  var stepText=document.getElementById('stepText');
+  var playBtn=document.getElementById('play');
+  var polType=document.getElementById('polType'), agent=document.getElementById('agent');
+
+  // path of the pollen tube from stigma (200,50) down style to embryo sac (~200,300)
+  var tubePts=[[200,55],[197,110],[203,170],[199,225],[200,270],[200,296]];
+  var animId=null, t=0, running=false, phase='idle';
+
+  function buildTubePath(frac){
+    // number of segments to reveal
+    var total=tubePts.length-1;
+    var pos=frac*total;
+    var seg=Math.floor(pos);
+    var d='M'+tubePts[0][0]+' '+tubePts[0][1];
+    for(var i=1;i<=seg && i<tubePts.length;i++){ d+=' L'+tubePts[i][0]+' '+tubePts[i][1]; }
+    if(seg<total){
+      var f=pos-seg;
+      var a=tubePts[seg], b=tubePts[seg+1];
+      var x=a[0]+(b[0]-a[0])*f, y=a[1]+(b[1]-a[1])*f;
+      d+=' L'+x.toFixed(1)+' '+y.toFixed(1);
+      return {d:d,x:x,y:y};
+    }
+    var last=tubePts[total];
+    return {d:d,x:last[0],y:last[1]};
+  }
+
+  function resetFert(){
+    if(animId){cancelAnimationFrame(animId);animId=null;}
+    running=false; t=0; phase='idle';
+    tube.setAttribute('d','');
+    pollen.setAttribute('cx',200); pollen.setAttribute('cy',50);
+    pollen.style.opacity=1;
+    sperm1.setAttribute('opacity',0); sperm2.setAttribute('opacity',0);
+    eggEl.style.opacity=1; polarEl.style.opacity=1;
+    zyg.setAttribute('r',0); endo.setAttribute('r',0);
+    tzy.setAttribute('font-size',0); tzy.textContent='';
+    playBtn.textContent='▶ Grow pollen tube';
+    playBtn.classList.add('on');
+    var kind=polType.value, ag=agent.value;
+    var agTxt={insect:'Insects (entomophily): showy petals, nectar, sticky pollen.',
+               wind:'Wind (anemophily): light dry pollen, feathery stigmas, no petals/scent.',
+               water:'Water (hydrophily): pollen carried by water currents.'}[ag];
+    var kTxt=kind==='self'?'Self-pollination: pollen from the same flower/plant → less variation.'
+                          :'Cross-pollination: pollen from another plant of same species → genetic variation.';
+    stepText.innerHTML=kTxt+' '+agTxt+' Press play to fertilize.';
+  }
+
+  function step(){
+    if(document.hidden){ animId=requestAnimationFrame(step); return; }
+    if(!running){ return; }
+    t+=0.010;
+    if(phase==='grow'){
+      var g=buildTubePath(Math.min(t,1));
+      tube.setAttribute('d',g.d);
+      pollen.style.opacity = t<0.15?1:Math.max(0,1-(t-0.15)*4);
+      // sperm nuclei ride the tip
+      sperm1.setAttribute('opacity',1); sperm2.setAttribute('opacity',1);
+      sperm1.setAttribute('cx',g.x-4); sperm1.setAttribute('cy',g.y);
+      sperm2.setAttribute('cx',g.x+4); sperm2.setAttribute('cy',g.y);
+      stepText.innerHTML='<b>Pollen tube</b> growing down the style, carrying <span style="color:#ff6b9a">two male gametes</span> to the embryo sac...';
+      if(t>=1){ phase='fuse'; t=0; }
+    } else if(phase==='fuse'){
+      // sperm1 -> egg (322), sperm2 -> polar (290)
+      var f=Math.min(t*1.4,1);
+      sperm1.setAttribute('cx',196+ (200-196)*f);
+      sperm1.setAttribute('cy',296+(322-296)*f);
+      sperm2.setAttribute('cx',204+(200-204)*f);
+      sperm2.setAttribute('cy',296+(290-296)*f);
+      stepText.innerHTML='<b>Double fertilization:</b> one gamete moves to the egg, the other to the central cell (2 polar nuclei).';
+      if(f>=1){ phase='result'; t=0; sperm1.setAttribute('opacity',0); sperm2.setAttribute('opacity',0);
+                eggEl.style.opacity=0; polarEl.style.opacity=0; }
+    } else if(phase==='result'){
+      var r=Math.min(t*2.5,1);
+      zyg.setAttribute('r',(11*r).toFixed(1));
+      endo.setAttribute('r',(14*r).toFixed(1));
+      if(r>=1){
+        tzy.setAttribute('font-size',11);
+        tzy.innerHTML='';
+        running=false; phase='done';
+        stepText.innerHTML='Result → <span class="ploidy n2">zygote (2n)</span> forms the embryo, and <span class="ploidy n3">endosperm (3n)</span> nourishes it. Triple fusion is the <b>hallmark of angiosperms</b>.';
+        playBtn.textContent='↻ Replay';
+        playBtn.classList.remove('on');
+      }
+    }
+    animId=requestAnimationFrame(step);
+  }
+
+  // draw labels for zygote/endosperm using SVG text after result
+  function labelResults(){
+    tzy.setAttribute('font-size',10);
+    tzy.textContent='zygote 2n  +  endosperm 3n';
+  }
+
+  playBtn.addEventListener('click',function(){
+    if(phase==='idle' || phase==='done'){
+      resetFert();
+      running=true; phase='grow'; t=0;
+      playBtn.textContent='● fertilizing...';
+      playBtn.classList.remove('on');
+      if(animId)cancelAnimationFrame(animId);
+      animId=requestAnimationFrame(step);
+      // schedule final label
+    }
+  });
+  polType.addEventListener('change',resetFert);
+  agent.addEventListener('change',resetFert);
+  // observe result label
+  var _origStep=step;
+  resetFert();
+
+  // pause handling: when tab hidden, step() self-yields; ensure resume
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden && running && animId==null){ animId=requestAnimationFrame(step); }
+  });
+
+  /* patch: add label when done */
+  var checkDone=setInterval(function(){
+    if(phase==='done' && tzy.getAttribute('font-size')!=='10'){ labelResults(); }
+  },400);
+
+  /* ---------- MODE 3: seed / fruit / vegetative ---------- */
+  var ssvg=document.getElementById('ssvg');
+  var vegLegend=document.getElementById('vegLegend');
+  var vegBtns=document.querySelectorAll('[data-veg]');
+  var seedView=document.getElementById('seedView');
+
+  var vegData={
+    seed:{
+      cat:'Sexual — after fertilization',
+      txt:'Ovule → <b>seed</b> (seed coat from integuments, embryo from zygote 2n, food store = endosperm 3n). Ovary wall → <b>fruit</b> (pericarp) protecting the seeds.',
+      draw:function(){return seedView.outerHTML;}
+    },
+    runner:{cat:'Natural vegetative', txt:'<b>Runner (stolon):</b> a horizontal stem creeping above soil (e.g. strawberry, grass); nodes touch the ground and grow roots &amp; new plantlets.',
+      draw:runnerSVG},
+    tuber:{cat:'Natural vegetative', txt:'<b>Tuber:</b> a swollen underground stem storing food, bearing "eyes" (axillary buds) that sprout new plants (e.g. potato).',
+      draw:tuberSVG},
+    bulb:{cat:'Natural vegetative', txt:'<b>Bulb:</b> a condensed shoot with fleshy leaf-scales storing food; lateral buds form daughter bulbs (e.g. onion, garlic).',
+      draw:bulbSVG},
+    cutting:{cat:'Artificial vegetative', txt:'<b>Cutting:</b> a piece of stem/root with a node is planted; it develops adventitious roots (e.g. rose, sugarcane, Bougainvillea).',
+      draw:cuttingSVG},
+    grafting:{cat:'Artificial vegetative', txt:'<b>Grafting:</b> a <b>scion</b> (shoot) is joined to a rooted <b>stock</b> so their cambia unite (e.g. mango, apple). Combines desired shoot with hardy roots.',
+      draw:graftingSVG},
+    layering:{cat:'Artificial vegetative', txt:'<b>Layering:</b> a low branch is bent and buried; it roots while still attached to the parent, then is cut off (e.g. jasmine, guava).',
+      draw:layeringSVG},
+    tissue:{cat:'Artificial vegetative', txt:'<b>Tissue culture (micropropagation):</b> small explants grown on nutrient medium in vitro form a callus → many identical plantlets. Rapid, disease-free clones.',
+      draw:tissueSVG}
+  };
+
+  function svgWrap(inner){ return inner; }
+
+  function runnerSVG(){
+    return '<rect x="20" y="200" width="360" height="30" fill="#6b4a2a"/>'+
+    '<path d="M60 190 Q200 150 340 190" stroke="#5a8a4a" stroke-width="8" fill="none"/>'+
+    '<ellipse cx="60" cy="180" rx="22" ry="30" fill="#4f9a54"/>'+
+    '<ellipse cx="340" cy="180" rx="18" ry="26" fill="#7ac07f"/>'+
+    '<line x1="60" y1="200" x2="60" y2="225" stroke="#6b4a2a" stroke-width="4"/>'+
+    '<line x1="340" y1="200" x2="340" y2="225" stroke="#6b4a2a" stroke-width="4"/>'+
+    '<text x="60" y="130" text-anchor="middle" font-size="11" fill="#e7eef2">parent</text>'+
+    '<text x="340" y="130" text-anchor="middle" font-size="11" fill="#7ac07f">new plant</text>';
+  }
+  function tuberSVG(){
+    return '<rect x="20" y="120" width="360" height="20" fill="#6b4a2a" opacity="0.5"/>'+
+    '<ellipse cx="200" cy="210" rx="90" ry="60" fill="#d9b06a"/>'+
+    '<circle cx="150" cy="185" r="7" fill="#5a8a4a"/><circle cx="230" cy="180" r="7" fill="#5a8a4a"/>'+
+    '<circle cx="250" cy="230" r="7" fill="#5a8a4a"/>'+
+    '<path d="M150 178 q-4 -30 -10 -50" stroke="#5a8a4a" stroke-width="5" fill="none"/>'+
+    '<text x="200" y="290" text-anchor="middle" font-size="11" fill="#e7eef2">Potato tuber — "eyes" = buds</text>';
+  }
+  function bulbSVG(){
+    return '<path d="M200 90 L200 150" stroke="#5a8a4a" stroke-width="4"/>'+
+    '<ellipse cx="200" cy="200" rx="70" ry="80" fill="#e8d0e0"/>'+
+    '<ellipse cx="200" cy="200" rx="52" ry="62" fill="#dcb8cf"/>'+
+    '<ellipse cx="200" cy="200" rx="32" ry="42" fill="#c99cbb"/>'+
+    '<line x1="180" y1="278" x2="175" y2="300" stroke="#d9c24a" stroke-width="2"/>'+
+    '<line x1="200" y1="282" x2="200" y2="304" stroke="#d9c24a" stroke-width="2"/>'+
+    '<line x1="220" y1="278" x2="225" y2="300" stroke="#d9c24a" stroke-width="2"/>'+
+    '<text x="200" y="70" text-anchor="middle" font-size="11" fill="#7ac07f">shoot</text>'+
+    '<text x="300" y="200" text-anchor="middle" font-size="11" fill="#e7eef2">fleshy scales</text>';
+  }
+  function cuttingSVG(){
+    return '<rect x="20" y="210" width="360" height="30" fill="#6b4a2a"/>'+
+    '<rect x="190" y="90" width="14" height="140" rx="6" fill="#5a8a4a"/>'+
+    '<ellipse cx="180" cy="110" rx="20" ry="12" fill="#4f9a54" transform="rotate(-30 180 110)"/>'+
+    '<ellipse cx="215" cy="130" rx="20" ry="12" fill="#4f9a54" transform="rotate(30 215 130)"/>'+
+    '<circle cx="197" cy="180" r="5" fill="#3a5a2a"/>'+
+    '<path d="M197 228 q-20 20 -35 40 M197 228 q0 25 0 45 M197 228 q20 20 35 40" stroke="#c9a060" stroke-width="3" fill="none"/>'+
+    '<text x="197" y="70" text-anchor="middle" font-size="11" fill="#e7eef2">stem cutting → new roots</text>';
+  }
+  function graftingSVG(){
+    return '<rect x="20" y="230" width="360" height="30" fill="#6b4a2a"/>'+
+    '<rect x="188" y="150" width="20" height="85" fill="#7a5230"/>'+
+    '<path d="M188 235 q-18 20 -34 34 M208 235 q18 20 34 34 M198 235 v40" stroke="#c9a060" stroke-width="3" fill="none"/>'+
+    '<rect x="188" y="70" width="20" height="82" fill="#5a8a4a"/>'+
+    '<ellipse cx="176" cy="90" rx="20" ry="12" fill="#4f9a54" transform="rotate(-30 176 90)"/>'+
+    '<ellipse cx="220" cy="100" rx="20" ry="12" fill="#4f9a54" transform="rotate(30 220 100)"/>'+
+    '<line x1="180" y1="152" x2="216" y2="152" stroke="#f0a860" stroke-width="4"/>'+
+    '<text x="300" y="100" text-anchor="middle" font-size="11" fill="#7ac07f">scion</text>'+
+    '<text x="300" y="200" text-anchor="middle" font-size="11" fill="#e7eef2">stock</text>'+
+    '<text x="300" y="152" text-anchor="middle" font-size="10" fill="#f0a860">graft union</text>';
+  }
+  function layeringSVG(){
+    return '<rect x="20" y="200" width="360" height="40" fill="#6b4a2a"/>'+
+    '<rect x="60" y="120" width="16" height="90" fill="#5a8a4a"/>'+
+    '<path d="M68 130 Q150 90 230 150 Q280 185 250 210" stroke="#5a8a4a" stroke-width="10" fill="none"/>'+
+    '<ellipse cx="250" cy="205" rx="16" ry="20" fill="#7ac07f"/>'+
+    '<path d="M250 218 q-15 18 -25 34 M250 218 q0 22 0 40 M250 218 q15 18 25 34" stroke="#c9a060" stroke-width="3" fill="none"/>'+
+    '<text x="68" y="105" text-anchor="middle" font-size="11" fill="#e7eef2">parent</text>'+
+    '<text x="250" y="175" text-anchor="middle" font-size="11" fill="#7ac07f">buried branch roots</text>';
+  }
+  function tissueSVG(){
+    return '<rect x="60" y="120" width="120" height="140" rx="10" fill="#233b45" stroke="#4dd6a0"/>'+
+    '<ellipse cx="120" cy="230" rx="40" ry="18" fill="#c9e2b0"/>'+
+    '<circle cx="110" cy="200" r="10" fill="#7ac07f"/><circle cx="130" cy="190" r="8" fill="#7ac07f"/>'+
+    '<text x="120" y="150" text-anchor="middle" font-size="10" fill="#9fb1bd">callus in vitro</text>'+
+    '<path d="M200 190 L250 190" stroke="#4dd6a0" stroke-width="3" marker-end=""/>'+
+    '<polygon points="250,185 260,190 250,195" fill="#4dd6a0"/>'+
+    '<g>'+
+    '<ellipse cx="290" cy="230" rx="10" ry="26" fill="#4f9a54"/>'+
+    '<ellipse cx="320" cy="230" rx="10" ry="26" fill="#4f9a54"/>'+
+    '<ellipse cx="350" cy="230" rx="10" ry="26" fill="#4f9a54"/>'+
+    '</g>'+
+    '<text x="320" y="180" text-anchor="middle" font-size="10" fill="#7ac07f">identical plantlets</text>';
+  }
+
+  var seedOuterHTML=seedView.outerHTML;
+  function renderVeg(key){
+    var d=vegData[key];
+    if(key==='seed'){ ssvg.innerHTML=seedOuterHTML; }
+    else { ssvg.innerHTML=d.draw(); }
+    vegLegend.innerHTML='<b>'+d.cat+'</b> — '+d.txt;
+    setFacts(key==='seed'?'Seed &amp; Fruit':d.cat, '<p>'+d.txt+'</p>',
+      key==='seed'?'Fruit protects seeds and aids dispersal (wind, water, animals).':'Offspring are genetically identical clones of the parent.');
+  }
+  vegBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      vegBtns.forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      renderVeg(b.dataset.veg);
+    });
+  });
+
+  /* ---------- QUIZ ---------- */
+  document.querySelectorAll('.q').forEach(function(q){
+    var ans=parseInt(q.dataset.a,10);
+    var opts=q.querySelectorAll('.opt');
+    var expl=q.querySelector('.expl');
+    var done=false;
+    opts.forEach(function(o,i){
+      o.addEventListener('click',function(){
+        if(done) return; done=true;
+        opts.forEach(function(x){x.disabled=true;});
+        if(i===ans){ o.classList.add('correct'); }
+        else { o.classList.add('wrong'); opts[ans].classList.add('correct'); }
+        expl.classList.add('show');
+      });
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

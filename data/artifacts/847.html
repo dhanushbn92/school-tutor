@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Reproduction &amp; Population Lab — NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --bg:#0f141b;
+    --panel:#18202b;
+    --panel2:#1e2836;
+    --line:#2c3a4d;
+    --ink:#e8eef6;
+    --muted:#9db0c6;
+    --accent:#4db6ac;
+    --accent-dim:#2f6d67;
+    --good:#7bd88f;
+    --bad:#e57373;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  header{
+    padding:18px 16px 10px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#141b24,#0f141b);
+  }
+  header h1{margin:0;font-size:clamp(18px,4.5vw,26px);letter-spacing:.3px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .wrap{max-width:1000px;margin:0 auto;padding:14px}
+  .tabs{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;
+  }
+  .tabs button{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;font-size:13px;cursor:pointer;
+    transition:.15s;min-height:40px;
+  }
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.active{background:var(--accent);color:#04231f;border-color:var(--accent);font-weight:600}
+  .mode{display:none;animation:fade .25s ease}
+  .mode.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin:12px 0;box-shadow:var(--shadow);
+  }
+  .panel h2{margin:0 0 10px;font-size:17px;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:14px;color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .diagram{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px;text-align:center;
+  }
+  svg{max-width:100%;height:auto;display:block;margin:0 auto;touch-action:manipulation}
+  .hot{cursor:pointer;transition:.15s}
+  .hot:hover{opacity:.85}
+  .info-box{
+    background:var(--panel2);border:1px dashed var(--accent-dim);border-radius:12px;
+    padding:12px;margin-top:12px;min-height:64px;font-size:13.5px;
+  }
+  .info-box strong{color:var(--accent)}
+  .segbtns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .segbtns button{
+    background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    padding:7px 12px;border-radius:10px;font-size:12.5px;cursor:pointer;min-height:38px;
+  }
+  .segbtns button.active{background:var(--accent-dim);color:var(--ink);border-color:var(--accent)}
+  .facts{list-style:none;padding:0;margin:0}
+  .facts li{
+    padding:9px 12px;border-left:3px solid var(--accent);background:var(--panel2);
+    border-radius:8px;margin-bottom:8px;font-size:13.5px;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;font-size:11.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .slider-row{display:flex;align-items:center;gap:10px;margin:12px 0}
+  .slider-row input[type=range]{flex:1;accent-color:var(--accent)}
+  .daybadge{
+    background:var(--accent);color:#04231f;font-weight:700;border-radius:8px;
+    padding:4px 10px;font-size:13px;min-width:66px;text-align:center;
+  }
+  .phase-tag{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--accent)}
+  .quiz .q{margin-bottom:16px;padding:12px;background:var(--panel2);border-radius:12px;border:1px solid var(--line)}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:14px}
+  .quiz .opt{
+    display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:6px 0;
+    cursor:pointer;font-size:13px;min-height:40px;transition:.12s;
+  }
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:#183a26;border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:#3a1c1c;border-color:#e57373;color:#f0a9a9}
+  .quiz .explain{margin-top:8px;font-size:12.5px;color:var(--muted);display:none}
+  .quiz .explain.show{display:block}
+  .note{font-size:11.5px;color:var(--muted);margin-top:10px;font-style:italic}
+  .disclaimer{
+    background:#14232b;border:1px solid var(--accent-dim);border-radius:12px;
+    padding:12px;font-size:12.5px;color:var(--muted);margin-top:12px;
+  }
+  .stage-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:10px}
+  .stage-cards .c{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .stage-cards .c b{display:block;color:var(--accent);font-size:13px;margin-bottom:4px}
+  .stage-cards .c span{font-size:11.5px;color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:18px}
+  .pill{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Human Reproduction &amp; Population Lab</h1>
+  <p>NIOS Class 12 Biology · Chapter 21 — Reproduction and Population Control</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="systems">1 · Reproductive Systems</button>
+    <button class="tab-btn" data-mode="cycle">2 · Cycle &amp; Fertilization</button>
+    <button class="tab-btn" data-mode="population">3 · Population Control</button>
+    <button class="tab-btn" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- ================= MODE 1: SYSTEMS ================= -->
+  <section class="mode active" id="mode-systems">
+    <div class="panel">
+      <h2>Human Reproductive Systems</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Select the male or female system, then tap any labelled structure to read its function. Diagrams are schematic, not to scale.</p>
+      <div class="segbtns" id="sysToggle">
+        <button class="active" data-sys="male">Male system</button>
+        <button data-sys="female">Female system</button>
+        <button data-sys="gamete">Gamete formation</button>
+      </div>
+
+      <div class="grid2">
+        <div class="diagram" id="sysDiagram"><!-- svg injected --></div>
+        <div>
+          <div class="info-box" id="sysInfo"><strong>Tip:</strong> tap a labelled part to see its function.</div>
+          <h3>Facts</h3>
+          <ul class="facts" id="sysFacts"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 2: CYCLE ================= -->
+  <section class="mode" id="mode-cycle">
+    <div class="panel">
+      <h2>Menstrual Cycle &amp; Hormones (~28 days)</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Drag the slider to move through an idealised 28-day cycle. Watch hormone levels, the ovary and the uterine lining change together.</p>
+      <div class="slider-row">
+        <span class="daybadge" id="dayBadge">Day 1</span>
+        <input type="range" id="daySlider" min="1" max="28" value="1" step="1" aria-label="Cycle day">
+      </div>
+      <div id="phaseLine"></div>
+      <div class="diagram"><div id="cycleChart"></div></div>
+      <div class="legend">
+        <span><span class="dot" style="background:#4db6ac"></span>FSH</span>
+        <span><span class="dot" style="background:#ffb74d"></span>LH</span>
+        <span><span class="dot" style="background:#ba68c8"></span>Estrogen</span>
+        <span><span class="dot" style="background:#64b5f6"></span>Progesterone</span>
+      </div>
+      <div class="info-box" id="cycleInfo"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Fertilization &amp; Early Development</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Step through the journey from ovulation to a growing foetus.</p>
+      <div class="segbtns" id="fertSteps"></div>
+      <div class="diagram"><div id="fertDiagram"></div></div>
+      <div class="info-box" id="fertInfo"></div>
+      <h3>Development overview</h3>
+      <div class="stage-cards">
+        <div class="c"><b>Zygote</b><span>Day 0 — single fertilised cell (diploid)</span></div>
+        <div class="c"><b>Cleavage</b><span>Days 1–4 — mitotic divisions, morula</span></div>
+        <div class="c"><b>Blastocyst</b><span>Days 5–6 — hollow ball of cells</span></div>
+        <div class="c"><b>Implantation</b><span>Days 6–10 — embeds in uterine wall</span></div>
+        <div class="c"><b>Embryo</b><span>Weeks 3–8 — organs form (organogenesis)</span></div>
+        <div class="c"><b>Foetus</b><span>Week 9–birth — growth &amp; maturation</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 3: POPULATION ================= -->
+  <section class="mode" id="mode-population">
+    <div class="panel">
+      <h2>Contraception &amp; Reproductive Health</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Educational overview of the main categories of contraceptive methods. Tap a category for how it works.</p>
+      <div class="segbtns" id="contraToggle"></div>
+      <div class="grid2">
+        <div class="info-box" id="contraInfo" style="min-height:120px"></div>
+        <div>
+          <table>
+            <thead><tr><th>Category</th><th>Principle</th></tr></thead>
+            <tbody>
+              <tr><td>Barrier</td><td>Physically blocks sperm from reaching the egg (condom, diaphragm)</td></tr>
+              <tr><td>Hormonal</td><td>Alters hormones to prevent ovulation (oral pills, injectables)</td></tr>
+              <tr><td>Intra-uterine (IUD)</td><td>Device in the uterus prevents implantation/fertilisation</td></tr>
+              <tr><td>Surgical</td><td>Permanent — vasectomy (male), tubectomy (female)</td></tr>
+              <tr><td>Natural</td><td>Rhythm/periodic abstinence based on the fertile window</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="disclaimer">Clinical note: This is general educational information for the NIOS syllabus, not personalised medical advice. Decisions about contraception and reproductive health should be made with a qualified healthcare professional.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Population Growth Concepts</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Compare unchecked (exponential) growth with limited (logistic) growth toward a carrying capacity. Adjust the growth rate.</p>
+      <div class="slider-row">
+        <span class="pill">Growth rate r</span>
+        <input type="range" id="rSlider" min="1" max="10" value="5" step="1" aria-label="Growth rate">
+        <span class="daybadge" id="rBadge">0.5</span>
+      </div>
+      <div class="diagram"><div id="popChart"></div></div>
+      <div class="legend">
+        <span><span class="dot" style="background:#e57373"></span>Exponential (J-curve)</span>
+        <span><span class="dot" style="background:#4db6ac"></span>Logistic (S-curve)</span>
+        <span><span class="dot" style="background:#9db0c6"></span>Carrying capacity K</span>
+      </div>
+      <h3>Key terms &amp; measures</h3>
+      <ul class="facts" id="popFacts"></ul>
+    </div>
+  </section>
+
+  <!-- ================= MODE 4: QUIZ ================= -->
+  <section class="mode" id="mode-quiz">
+    <div class="panel quiz" id="quizPanel">
+      <h2>Check Your Understanding</h2>
+      <p style="color:var(--muted);font-size:13px;margin-top:0">Three questions. Tap an option to reveal the answer and an explanation.</p>
+      <div id="quizHost"></div>
+      <div class="note">Score updates as you answer. Refresh the page to retry.</div>
+      <div class="info-box" id="quizScore" style="text-align:center;font-weight:600">Score: 0 / 3</div>
+    </div>
+  </section>
+
+  <footer>Schematic educational simulation · Tone: clinical &amp; scientific · No external resources.</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s);}
+function el(html){var d=document.createElement('div');d.innerHTML=html.trim();return d.firstChild;}
+
+/* ---------- tab switching ---------- */
+var tabButtons=document.querySelectorAll('.tab-btn');
+tabButtons.forEach(function(b){
+  b.addEventListener('click',function(){
+    tabButtons.forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    document.querySelectorAll('.mode').forEach(function(m){m.classList.remove('active');});
+    $('#mode-'+b.dataset.mode).classList.add('active');
+  });
+});
+
+/* =====================================================
+   MODE 1 — REPRODUCTIVE SYSTEMS
+===================================================== */
+var SYS={
+  male:{
+    svg:'<svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Male reproductive system schematic">'
+      +'<rect width="320" height="260" fill="#1a2330"/>'
+      +'<path d="M60,80 C60,50 120,50 140,70" fill="none" stroke="#5b7086" stroke-width="3"/>'
+      // bladder
+      +'<ellipse cx="120" cy="120" rx="34" ry="26" fill="#334255" stroke="#5b7086"/>'
+      +'<text x="120" y="123" fill="#9db0c6" font-size="9" text-anchor="middle">bladder</text>'
+      // seminal vesicle
+      +'<g class="hot" data-id="seminal"><ellipse cx="176" cy="126" rx="20" ry="12" fill="#4db6ac"/><text x="176" y="129" fill="#04231f" font-size="8" text-anchor="middle">seminal ves.</text></g>'
+      // prostate
+      +'<g class="hot" data-id="prostate"><circle cx="150" cy="160" r="18" fill="#ba68c8"/><text x="150" y="163" fill="#1a1020" font-size="8" text-anchor="middle">prostate</text></g>'
+      // vas deferens
+      +'<g class="hot" data-id="vas"><path d="M92,200 C110,178 140,175 150,150" fill="none" stroke="#ffb74d" stroke-width="6" stroke-linecap="round"/><text x="86" y="185" fill="#ffb74d" font-size="8">vas def.</text></g>'
+      // epididymis
+      +'<g class="hot" data-id="epididymis"><path d="M78,214 C64,208 62,232 78,232" fill="none" stroke="#64b5f6" stroke-width="5"/><text x="40" y="221" fill="#64b5f6" font-size="8">epididymis</text></g>'
+      // testis
+      +'<g class="hot" data-id="testes"><ellipse cx="90" cy="224" rx="17" ry="20" fill="#7bd88f"/><text x="90" y="227" fill="#04231f" font-size="8" text-anchor="middle">testis</text></g>'
+      // penis / urethra
+      +'<g class="hot" data-id="penis"><rect x="196" y="150" width="90" height="20" rx="10" fill="#e0a082"/><text x="241" y="164" fill="#3a1e10" font-size="8" text-anchor="middle">penis / urethra</text></g>'
+      +'<path d="M168,160 L200,160" stroke="#e0a082" stroke-width="6"/>'
+      +'</svg>',
+    facts:[
+      'The testes produce sperm (spermatogenesis) and the hormone testosterone.',
+      'Sperm mature and are stored in the epididymis before ejaculation.',
+      'The vas deferens carries sperm from epididymis toward the urethra.',
+      'Seminal vesicle + prostate secretions form semen, nourishing and activating sperm.'
+    ]
+  },
+  female:{
+    svg:'<svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Female reproductive system schematic">'
+      +'<rect width="320" height="260" fill="#1a2330"/>'
+      // uterus body
+      +'<g class="hot" data-id="uterus"><path d="M120,90 C120,60 200,60 200,90 L192,170 C185,200 135,200 128,170 Z" fill="#ba68c8"/><text x="160" y="140" fill="#1a1020" font-size="10" text-anchor="middle">uterus</text></g>'
+      // fallopian tubes
+      +'<g class="hot" data-id="oviduct"><path d="M120,92 C80,70 66,96 84,112" fill="none" stroke="#ffb74d" stroke-width="6" stroke-linecap="round"/><path d="M200,92 C240,70 254,96 236,112" fill="none" stroke="#ffb74d" stroke-width="6" stroke-linecap="round"/><text x="160" y="78" fill="#ffb74d" font-size="8" text-anchor="middle">fallopian tube (oviduct)</text></g>'
+      // ovaries
+      +'<g class="hot" data-id="ovaries"><ellipse cx="80" cy="118" rx="15" ry="11" fill="#7bd88f"/><ellipse cx="240" cy="118" rx="15" ry="11" fill="#7bd88f"/><text x="80" y="145" fill="#7bd88f" font-size="8" text-anchor="middle">ovary</text><text x="240" y="145" fill="#7bd88f" font-size="8" text-anchor="middle">ovary</text></g>'
+      // cervix
+      +'<g class="hot" data-id="cervix"><rect x="146" y="185" width="28" height="18" rx="5" fill="#4db6ac"/><text x="160" y="197" fill="#04231f" font-size="8" text-anchor="middle">cervix</text></g>'
+      // vagina
+      +'<g class="hot" data-id="vagina"><path d="M148,203 L146,238 L174,238 L172,203 Z" fill="#e0a082"/><text x="160" y="228" fill="#3a1e10" font-size="8" text-anchor="middle">vagina</text></g>'
+      +'</svg>',
+    facts:[
+      'Ovaries store follicles, release one egg (ovum) each cycle, and secrete estrogen & progesterone.',
+      'The fallopian tube (oviduct) is the usual site of fertilisation; cilia move the egg toward the uterus.',
+      'The uterus (womb) has a thick lining (endometrium) where the embryo implants and develops.',
+      'The cervix is the narrow neck of the uterus; the vagina is the muscular canal to the exterior.'
+    ]
+  },
+  gamete:{
+    svg:'<svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sperm and egg schematic">'
+      +'<rect width="320" height="260" fill="#1a2330"/>'
+      // sperm
+      +'<g class="hot" data-id="sperm"><ellipse cx="70" cy="90" rx="22" ry="16" fill="#4db6ac"/>'
+      +'<path d="M92,90 q20,-16 40,0 q-20,16 -40,0" fill="none" stroke="#4db6ac" stroke-width="3"/>'
+      +'<path d="M132,90 q18,16 40,0 q-18,-16 -40,0" fill="none" stroke="#4db6ac" stroke-width="3"/>'
+      +'<text x="70" y="94" fill="#04231f" font-size="8" text-anchor="middle">head</text>'
+      +'<text x="120" y="120" fill="#4db6ac" font-size="9" text-anchor="middle">sperm (male gamete)</text></g>'
+      // egg
+      +'<g class="hot" data-id="egg"><circle cx="220" cy="180" r="46" fill="#ba68c8" opacity="0.35" stroke="#ba68c8"/>'
+      +'<circle cx="220" cy="180" r="30" fill="#ba68c8"/>'
+      +'<circle cx="220" cy="180" r="12" fill="#1a1020"/>'
+      +'<text x="220" y="240" fill="#ba68c8" font-size="9" text-anchor="middle">egg / ovum (female gamete)</text></g>'
+      +'</svg>',
+    facts:[
+      'Spermatogenesis makes millions of small, motile sperm continuously from puberty.',
+      'Oogenesis produces one large, non-motile ovum per cycle, rich in cytoplasm and nutrients.',
+      'Both gametes are haploid (n=23); fertilisation restores the diploid number (2n=46).',
+      'Meiosis halves the chromosome number, ensuring genetic variation and a constant species number.'
+    ]
+  }
+};
+var SYS_INFO={
+  testes:'<strong>Testes:</strong> paired organs in the scrotum; site of sperm production (spermatogenesis) and secretion of testosterone. The scrotum keeps them slightly below body temperature.',
+  epididymis:'<strong>Epididymis:</strong> a coiled tube on each testis where sperm mature and are stored until ejaculation.',
+  vas:'<strong>Vas deferens:</strong> a muscular duct that transports mature sperm from the epididymis toward the urethra during ejaculation.',
+  seminal:'<strong>Seminal vesicle:</strong> secretes a fructose-rich fluid that nourishes sperm and forms much of the semen volume.',
+  prostate:'<strong>Prostate gland:</strong> adds an alkaline secretion that neutralises acidity and helps sperm motility.',
+  penis:'<strong>Penis / urethra:</strong> the urethra carries both urine and semen; the penis is the copulatory organ that deposits semen.',
+  ovaries:'<strong>Ovaries:</strong> paired glands that hold follicles, release one mature ovum per cycle (ovulation), and produce estrogen and progesterone.',
+  oviduct:'<strong>Fallopian tube (oviduct):</strong> funnel-shaped tube that receives the ovum; its inner cilia and site is where fertilisation usually occurs.',
+  uterus:'<strong>Uterus (womb):</strong> muscular organ whose lining (endometrium) thickens each cycle; supports implantation and foetal development.',
+  cervix:'<strong>Cervix:</strong> the narrow lower neck of the uterus that opens into the vagina; produces mucus that changes across the cycle.',
+  vagina:'<strong>Vagina:</strong> a muscular canal that receives semen and serves as the birth canal.',
+  sperm:'<strong>Sperm:</strong> the male gamete — a small, motile, haploid cell with a head (nucleus + acrosome), midpiece (mitochondria) and tail (flagellum).',
+  egg:'<strong>Ovum (egg):</strong> the female gamete — a large, non-motile, haploid cell rich in cytoplasm, surrounded by protective layers.'
+};
+var currentSys='male';
+function renderSys(){
+  var d=SYS[currentSys];
+  $('#sysDiagram').innerHTML=d.svg;
+  var fl=$('#sysFacts');fl.innerHTML='';
+  d.facts.forEach(function(f){var li=document.createElement('li');li.textContent=f;fl.appendChild(li);});
+  $('#sysInfo').innerHTML='<strong>Tip:</strong> tap a labelled part to see its function.';
+  $('#sysDiagram').querySelectorAll('.hot').forEach(function(g){
+    g.addEventListener('click',function(){
+      var id=g.dataset.id;
+      $('#sysInfo').innerHTML=SYS_INFO[id]||'';
+    });
+  });
+}
+$('#sysToggle').querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click',function(){
+    $('#sysToggle').querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');currentSys=b.dataset.sys;renderSys();
+  });
+});
+renderSys();
+
+/* =====================================================
+   MODE 2 — CYCLE, HORMONES, FERTILIZATION
+===================================================== */
+// hormone level models across 28 days (schematic 0..1)
+function fsh(d){ // rises early, small ovulatory bump
+  return 0.25+0.35*Math.exp(-Math.pow((d-4)/3,2))+0.4*Math.exp(-Math.pow((d-13)/1.4,2));
+}
+function lh(d){ // sharp ovulation surge day 13-14
+  return 0.15+0.85*Math.exp(-Math.pow((d-13.5)/1.1,2));
+}
+function estrogen(d){ // peaks just before ovulation, second smaller luteal rise
+  return 0.15+0.6*Math.exp(-Math.pow((d-12)/3,2))+0.3*Math.exp(-Math.pow((d-21)/4,2));
+}
+function progesterone(d){ // low until after ovulation, luteal peak ~day21
+  return 0.1+0.7*Math.exp(-Math.pow((d-21)/4.5,2))*(d>13?1:0.25);
+}
+function phaseOf(d){
+  if(d<=5) return {name:'Menstrual phase',color:'#e57373',text:'Days 1–5: the thickened uterine lining is shed as menstrual flow. Hormone levels are low.'};
+  if(d<=13) return {name:'Follicular phase',color:'#4db6ac',text:'Days 6–13: FSH stimulates a follicle to grow; rising estrogen rebuilds the uterine lining.'};
+  if(d<=15) return {name:'Ovulation (~day 14)',color:'#ffb74d',text:'Around day 14: an LH surge triggers release of the mature egg from the ovary — the fertile window.'};
+  return {name:'Luteal phase',color:'#64b5f6',text:'Days 15–28: the corpus luteum secretes progesterone to maintain the lining. If no pregnancy, it declines and menstruation begins.'};
+}
+function cycleChartSVG(day){
+  var W=320,H=170,padL=26,padB=22,padT=10,padR=8;
+  var pw=W-padL-padR, ph=H-padB-padT;
+  function X(d){return padL+(d-1)/27*pw;}
+  function Y(v){return padT+(1-v)*ph;}
+  function path(fn,col){
+    var p='';for(var d=1;d<=28;d+=0.5){var x=X(d),y=Y(Math.min(1,fn(d)));p+=(d===1?'M':'L')+x.toFixed(1)+','+y.toFixed(1);}
+    return '<path d="'+p+'" fill="none" stroke="'+col+'" stroke-width="2"/>';
+  }
+  var s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hormone level chart across the cycle">';
+  s+='<rect width="'+W+'" height="'+H+'" fill="#1a2330"/>';
+  // phase bands
+  s+='<rect x="'+X(1)+'" y="'+padT+'" width="'+(X(5)-X(1))+'" height="'+ph+'" fill="#e57373" opacity="0.10"/>';
+  s+='<rect x="'+X(5)+'" y="'+padT+'" width="'+(X(13)-X(5))+'" height="'+ph+'" fill="#4db6ac" opacity="0.10"/>';
+  s+='<rect x="'+X(13)+'" y="'+padT+'" width="'+(X(15)-X(13))+'" height="'+ph+'" fill="#ffb74d" opacity="0.16"/>';
+  s+='<rect x="'+X(15)+'" y="'+padT+'" width="'+(X(28)-X(15))+'" height="'+ph+'" fill="#64b5f6" opacity="0.10"/>';
+  // axes
+  s+='<line x1="'+padL+'" y1="'+(padT+ph)+'" x2="'+(W-padR)+'" y2="'+(padT+ph)+'" stroke="#5b7086"/>';
+  s+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+ph)+'" stroke="#5b7086"/>';
+  [1,7,14,21,28].forEach(function(d){s+='<text x="'+X(d)+'" y="'+(H-6)+'" fill="#9db0c6" font-size="8" text-anchor="middle">'+d+'</text>';});
+  s+='<text x="'+(padL+pw/2)+'" y="'+(H-0)+'" fill="#9db0c6" font-size="8" text-anchor="middle"></text>';
+  s+=path(fsh,'#4db6ac');
+  s+=path(lh,'#ffb74d');
+  s+=path(estrogen,'#ba68c8');
+  s+=path(progesterone,'#64b5f6');
+  // day marker
+  s+='<line x1="'+X(day)+'" y1="'+padT+'" x2="'+X(day)+'" y2="'+(padT+ph)+'" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="3,3"/>';
+  s+='<circle cx="'+X(day)+'" cy="'+padT+'" r="3" fill="#fff"/>';
+  return s+'</svg>';
+}
+// mini ovary + lining next to it
+function ovaryUterusSVG(day){
+  var follicle=Math.min(1,(day<=14?day/14:Math.max(0,(28-day)/14)));
+  var lining=Math.max(4, day<=5? (5-day)*2+6 : (day-5)*1.6+6);
+  if(day>27)lining=6;
+  var s='<svg viewBox="0 0 320 70" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ovary and uterine lining state">';
+  s+='<rect width="320" height="70" fill="#1a2330"/>';
+  // ovary
+  s+='<ellipse cx="60" cy="35" rx="40" ry="26" fill="#334255" stroke="#5b7086"/>';
+  var fr=4+follicle*10;
+  var fill=(day>=13&&day<=15)?'#ffb74d':(day>15?'#64b5f6':'#7bd88f');
+  s+='<circle cx="60" cy="35" r="'+fr.toFixed(1)+'" fill="'+fill+'"/>';
+  s+='<text x="60" y="66" fill="#9db0c6" font-size="8" text-anchor="middle">ovary / follicle</text>';
+  // uterus lining bar
+  s+='<rect x="150" y="14" width="150" height="42" rx="6" fill="#2a3444" stroke="#5b7086"/>';
+  s+='<rect x="152" y="'+(54-lining)+'" width="146" height="'+lining+'" fill="#ba68c8" opacity="0.8"/>';
+  s+='<text x="225" y="66" fill="#9db0c6" font-size="8" text-anchor="middle">uterine lining thickness</text>';
+  return s+'</svg>';
+}
+var daySlider=$('#daySlider');
+function renderCycle(){
+  var d=+daySlider.value;
+  $('#dayBadge').textContent='Day '+d;
+  var ph=phaseOf(d);
+  $('#phaseLine').innerHTML='<span class="phase-tag" style="background:'+ph.color+'22;color:'+ph.color+';border:1px solid '+ph.color+'">'+ph.name+'</span>';
+  $('#cycleChart').innerHTML=cycleChartSVG(d)+ovaryUterusSVG(d);
+  var levels='FSH '+pct(fsh(d))+' · LH '+pct(lh(d))+' · Estrogen '+pct(estrogen(d))+' · Progesterone '+pct(progesterone(d));
+  $('#cycleInfo').innerHTML='<strong>'+ph.name+'.</strong> '+ph.text+'<br><span class="note" style="font-style:normal">Relative hormone levels — '+levels+'</span>';
+}
+function pct(v){return Math.round(Math.min(1,v)*100)+'%';}
+daySlider.addEventListener('input',renderCycle);
+renderCycle();
+
+// fertilization steps
+var FERT=[
+  {t:'Ovulation',svg:fertSVG(0),info:'A mature egg is released from the ovary into the fallopian tube around day 14.'},
+  {t:'Sperm meet egg',svg:fertSVG(1),info:'Many sperm travel through the uterus into the oviduct; only one penetrates the egg\'s outer layer.'},
+  {t:'Fertilisation',svg:fertSVG(2),info:'The sperm and egg nuclei fuse (syngamy). The diploid single cell formed is the zygote (2n=46).'},
+  {t:'Cleavage',svg:fertSVG(3),info:'The zygote divides repeatedly by mitosis as it moves toward the uterus, forming a morula then a blastocyst.'},
+  {t:'Implantation',svg:fertSVG(4),info:'Around days 6–10 the blastocyst embeds into the thick uterine lining and begins to draw nourishment.'},
+  {t:'Embryo → foetus',svg:fertSVG(5),info:'The embryo forms organs (weeks 3–8); from week 9 it is a foetus, growing and maturing until birth (~38–40 weeks).'}
+];
+function fertSVG(step){
+  var s='<svg viewBox="0 0 320 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fertilisation and development step">';
+  s+='<rect width="320" height="140" fill="#1a2330"/>';
+  // schematic oviduct + uterus outline
+  s+='<path d="M40,40 C120,10 220,10 280,50 L275,120 C210,145 120,145 60,120 Z" fill="none" stroke="#3a4a5e" stroke-width="2"/>';
+  s+='<ellipse cx="46" cy="46" rx="14" ry="10" fill="#334255" stroke="#5b7086"/>';
+  s+='<text x="46" y="30" fill="#9db0c6" font-size="8" text-anchor="middle">ovary</text>';
+  if(step===0){
+    s+='<circle cx="80" cy="55" r="14" fill="#ba68c8"/><circle cx="80" cy="55" r="5" fill="#1a1020"/>';
+    s+='<text x="120" y="60" fill="#e8eef6" font-size="9">egg released</text>';
+  }else if(step===1){
+    s+='<circle cx="150" cy="70" r="16" fill="#ba68c8"/><circle cx="150" cy="70" r="6" fill="#1a1020"/>';
+    for(var i=0;i<6;i++){var a=i*0.5;s+='<ellipse cx="'+(180+i*8)+'" cy="'+(70+Math.sin(a)*12)+'" rx="5" ry="3" fill="#4db6ac"/>';}
+    s+='<text x="150" y="40" fill="#e8eef6" font-size="9" text-anchor="middle">sperm approach egg</text>';
+  }else if(step===2){
+    s+='<circle cx="160" cy="72" r="18" fill="#ba68c8"/><circle cx="153" cy="72" r="7" fill="#7bd88f"/><circle cx="168" cy="72" r="7" fill="#4db6ac"/>';
+    s+='<text x="160" y="40" fill="#e8eef6" font-size="9" text-anchor="middle">zygote forms (2n)</text>';
+  }else if(step===3){
+    var cx=200,cy=80;
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="20" fill="#3a2a44" stroke="#ba68c8"/>';
+    [[ -6,-6],[6,-6],[-6,6],[6,6],[0,0]].forEach(function(o){s+='<circle cx="'+(cx+o[0])+'" cy="'+(cy+o[1])+'" r="6" fill="#ba68c8"/>';});
+    s+='<text x="'+cx+'" y="48" fill="#e8eef6" font-size="9" text-anchor="middle">cleavage / morula</text>';
+  }else if(step===4){
+    s+='<rect x="150" y="95" width="120" height="30" rx="6" fill="#ba68c8" opacity="0.35"/>';
+    s+='<circle cx="210" cy="105" r="9" fill="#7bd88f"/>';
+    s+='<text x="210" y="80" fill="#e8eef6" font-size="9" text-anchor="middle">blastocyst implants</text>';
+  }else{
+    s+='<rect x="150" y="90" width="130" height="40" rx="8" fill="#ba68c8" opacity="0.30"/>';
+    s+='<path d="M215,100 c-10,0 -14,10 -6,16 c-6,8 4,16 12,10 c8,4 14,-6 8,-14 c4,-8 -6,-16 -14,-12 z" fill="#7bd88f"/>';
+    s+='<text x="215" y="82" fill="#e8eef6" font-size="9" text-anchor="middle">embryo → foetus</text>';
+  }
+  return s+'</svg>';
+}
+var fertHost=$('#fertSteps');
+FERT.forEach(function(f,i){
+  var b=document.createElement('button');b.textContent=(i+1)+'. '+f.t;
+  if(i===0)b.classList.add('active');
+  b.addEventListener('click',function(){
+    fertHost.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    $('#fertDiagram').innerHTML=f.svg;
+    $('#fertInfo').innerHTML='<strong>'+f.t+':</strong> '+f.info;
+  });
+  fertHost.appendChild(b);
+});
+$('#fertDiagram').innerHTML=FERT[0].svg;
+$('#fertInfo').innerHTML='<strong>'+FERT[0].t+':</strong> '+FERT[0].info;
+
+/* =====================================================
+   MODE 3 — POPULATION CONTROL
+===================================================== */
+var CONTRA=[
+  {k:'barrier',label:'Barrier',info:'<strong>Barrier methods</strong> physically prevent sperm from reaching the egg. Examples: male &amp; female condoms, diaphragm, cervical cap. Condoms also reduce the risk of sexually transmitted infections. Reversible and non-hormonal.'},
+  {k:'hormonal',label:'Hormonal',info:'<strong>Hormonal methods</strong> use synthetic estrogen and/or progesterone to prevent ovulation and thicken cervical mucus. Examples: oral contraceptive pills, injectables, implants. Reversible; used under medical guidance.'},
+  {k:'iud',label:'IUD',info:'<strong>Intra-uterine devices</strong> are small copper or hormonal devices placed in the uterus by a clinician. They prevent fertilisation/implantation and provide long-acting, reversible contraception.'},
+  {k:'surgical',label:'Surgical',info:'<strong>Surgical (permanent) methods</strong>: vasectomy cuts/ties the vas deferens in males; tubectomy (ligation) blocks the fallopian tubes in females. Highly effective and intended to be permanent.'},
+  {k:'natural',label:'Natural',info:'<strong>Natural methods</strong> (rhythm / periodic abstinence) avoid intercourse during the fertile window around ovulation. No devices or drugs, but less reliable than other methods.'}
+];
+var ct=$('#contraToggle');
+CONTRA.forEach(function(c,i){
+  var b=document.createElement('button');b.textContent=c.label;if(i===0)b.classList.add('active');
+  b.addEventListener('click',function(){
+    ct.querySelectorAll('button').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');$('#contraInfo').innerHTML=c.info;
+  });
+  ct.appendChild(b);
+});
+$('#contraInfo').innerHTML=CONTRA[0].info;
+
+var popFacts=[
+  'Exponential (J-shaped) growth: population rises unchecked when resources are unlimited — rare for long in nature.',
+  'Logistic (S-shaped) growth: growth slows as the population nears the carrying capacity (K), the maximum an environment can sustain.',
+  'Birth rate, death rate and migration together determine how a population changes over time.',
+  'Family planning, education, healthcare and awareness are key to stabilising human population growth.'
+];
+(function(){var f=$('#popFacts');popFacts.forEach(function(t){var li=document.createElement('li');li.textContent=t;f.appendChild(li);});})();
+
+var rSlider=$('#rSlider');
+function popChartSVG(r){
+  var W=320,H=180,padL=28,padB=22,padT=10,padR=8;
+  var pw=W-padL-padR, ph=H-padB-padT;
+  var K=1.0; // normalised carrying capacity
+  function X(t){return padL+t/20*pw;}
+  function Y(v){return padT+(1-v/1.15)*ph;}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Population growth curves">';
+  s+='<rect width="'+W+'" height="'+H+'" fill="#1a2330"/>';
+  // K line
+  s+='<line x1="'+padL+'" y1="'+Y(K)+'" x2="'+(W-padR)+'" y2="'+Y(K)+'" stroke="#9db0c6" stroke-dasharray="4,4"/>';
+  s+='<text x="'+(W-padR)+'" y="'+(Y(K)-3)+'" fill="#9db0c6" font-size="8" text-anchor="end">K</text>';
+  // logistic
+  var N0=0.02;
+  var pl='';for(var t=0;t<=20;t+=0.25){var n=K/(1+((K-N0)/N0)*Math.exp(-r*t));var y=Y(n);pl+=(t===0?'M':'L')+X(t).toFixed(1)+','+y.toFixed(1);}
+  // exponential (clipped at 1.15)
+  var pe='';for(var t2=0;t2<=20;t2+=0.25){var ne=Math.min(1.15,N0*Math.exp(r*t2));var y2=Y(ne);pe+=(t2===0?'M':'L')+X(t2).toFixed(1)+','+y2.toFixed(1);if(ne>=1.15)break;}
+  s+='<path d="'+pe+'" fill="none" stroke="#e57373" stroke-width="2"/>';
+  s+='<path d="'+pl+'" fill="none" stroke="#4db6ac" stroke-width="2.4"/>';
+  // axes
+  s+='<line x1="'+padL+'" y1="'+(padT+ph)+'" x2="'+(W-padR)+'" y2="'+(padT+ph)+'" stroke="#5b7086"/>';
+  s+='<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(padT+ph)+'" stroke="#5b7086"/>';
+  s+='<text x="'+(padL+pw/2)+'" y="'+(H-4)+'" fill="#9db0c6" font-size="8" text-anchor="middle">time →</text>';
+  s+='<text x="10" y="'+(padT+ph/2)+'" fill="#9db0c6" font-size="8" transform="rotate(-90 10 '+(padT+ph/2)+')">population size →</text>';
+  return s+'</svg>';
+}
+function renderPop(){
+  var r=(+rSlider.value)/10;
+  $('#rBadge').textContent=r.toFixed(1);
+  $('#popChart').innerHTML=popChartSVG(r);
+}
+rSlider.addEventListener('input',renderPop);
+renderPop();
+
+/* =====================================================
+   MODE 4 — QUIZ
+===================================================== */
+var QUIZ=[
+  {q:'Around which day of an idealised 28-day menstrual cycle does ovulation typically occur?',
+   opts:['Day 1','Day 7','Day 14','Day 28'],correct:2,
+   ex:'Ovulation usually occurs around day 14, triggered by a surge in luteinising hormone (LH).'},
+  {q:'Fertilisation of the egg by a sperm most commonly takes place in the:',
+   opts:['Uterus','Fallopian tube (oviduct)','Cervix','Ovary'],correct:1,
+   ex:'The egg is usually fertilised in the fallopian tube (oviduct) as it travels toward the uterus.'},
+  {q:'A vasectomy is a contraceptive method that works by:',
+   opts:['Preventing ovulation with hormones','Blocking sperm transport in the vas deferens','Placing a device in the uterus','Forming a barrier over the cervix'],correct:1,
+   ex:'Vasectomy is a surgical method: the vas deferens is cut or tied so sperm cannot travel into the semen.'}
+];
+var score=0,answered=0;
+var host=$('#quizHost');
+QUIZ.forEach(function(item,qi){
+  var box=document.createElement('div');box.className='q';
+  var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;box.appendChild(p);
+  var done=false;
+  item.opts.forEach(function(opt,oi){
+    var b=document.createElement('button');b.className='opt';b.textContent=opt;
+    b.addEventListener('click',function(){
+      if(done)return;done=true;answered++;
+      var btns=box.querySelectorAll('.opt');
+      btns.forEach(function(x){x.style.pointerEvents='none';});
+      if(oi===item.correct){b.classList.add('correct');score++;}
+      else{b.classList.add('wrong');btns[item.correct].classList.add('correct');}
+      $('#quizScore').textContent='Score: '+score+' / '+QUIZ.length;
+      box.querySelector('.explain').classList.add('show');
+    });
+    box.appendChild(b);
+  });
+  var ex=document.createElement('div');ex.className='explain';ex.innerHTML='<strong>Explanation:</strong> '+item.ex;
+  box.appendChild(ex);
+  host.appendChild(box);
+});
+</script>
+</body>
+</html>

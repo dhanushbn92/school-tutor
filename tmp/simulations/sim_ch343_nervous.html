@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordination &amp; Control Lab - NIOS Class 12 Biology Ch17</title>
+<style>
+  :root{
+    --accent:#4fd1c5;
+    --accent-2:#38b2ac;
+    --bg0:#0f1720;
+    --bg1:#131d29;
+    --panel:#18242f;
+    --panel-2:#1f2e3b;
+    --ink:#e7eef5;
+    --muted:#93a7b8;
+    --line:#26384a;
+    --good:#4ade80;
+    --bad:#f87171;
+    --warn:#fbbf24;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#182634,var(--bg0));
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:120px;background:var(--panel);
+    border:2px solid transparent;padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#08131a;background:var(--accent);border-color:var(--accent-2);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  .toggle-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .btn{background:var(--accent);color:#08131a;border:none;padding:9px 15px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-2);}
+  .btn.ghost{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#08131a;border-color:var(--accent-2);}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .canvas-box{flex:2 1 380px;min-width:300px;background:var(--bg1);border-radius:12px;
+    padding:10px;border:1px solid var(--line);}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{opacity:.82;}
+  .hot.sel{stroke:var(--accent);stroke-width:3;}
+  .lbl{font-size:11px;fill:var(--ink);pointer-events:none;}
+  .lbl.sm{font-size:9.5px;fill:var(--muted);}
+  .info{flex:1 1 240px;min-width:230px;background:var(--panel-2);border-radius:12px;
+    padding:14px;border:1px solid var(--line);}
+  .info h3{margin:0 0 6px;font-size:1.05rem;color:var(--accent);}
+  .info p{margin:0 0 6px;font-size:.9rem;color:var(--ink);}
+  .info .hint{color:var(--muted);font-style:italic;}
+  .facts{margin-top:12px;background:var(--bg1);border:1px solid var(--line);
+    border-radius:10px;padding:12px;}
+  .facts h4{margin:0 0 6px;font-size:.85rem;color:var(--accent);letter-spacing:.03em;text-transform:uppercase;}
+  .facts ul{margin:0;padding-left:18px;font-size:.86rem;color:var(--muted);}
+  .facts li{margin-bottom:4px;}
+  .facts li b{color:var(--ink);}
+  .swatch{display:inline-block;width:13px;height:13px;border-radius:4px;margin-right:6px;
+    vertical-align:middle;border:1px solid rgba(255,255,255,.15);}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th,td{padding:8px 9px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{color:var(--muted);font-weight:600;}
+  td.tag{font-weight:700;color:var(--accent);}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700;}
+  .pill.symp{background:#3a1f2b;color:#f9a8b4;}
+  .pill.para{background:#153026;color:#7ee2b0;}
+  .quiz-q{font-size:1rem;font-weight:600;margin-bottom:10px;}
+  .qnum{color:var(--accent);}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+  @media(max-width:520px){.options{grid-template-columns:1fr;}}
+  .opt{background:var(--panel-2);border:2px solid var(--line);border-radius:10px;padding:11px;
+    cursor:pointer;font-size:.88rem;font-weight:600;text-align:left;transition:.12s;color:var(--ink);}
+  .opt:hover:not(:disabled){border-color:var(--accent);}
+  .opt.correct{background:#12301f;border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:#331616;border-color:var(--bad);color:var(--bad);}
+  .opt:disabled{cursor:default;}
+  .feedback{font-size:.86rem;margin:4px 0 16px;min-height:1.2em;}
+  .feedback.ok{color:var(--good);}
+  .feedback.no{color:var(--bad);}
+  .score{font-weight:700;color:var(--accent);}
+  .bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:10px 0;}
+  .bar > i{display:block;height:100%;width:0;background:var(--accent);transition:.3s;}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:.76rem;color:var(--muted);}
+  .ctrl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+  .ctrl label{font-size:.82rem;color:var(--muted);}
+  input[type=range]{accent-color:var(--accent);}
+  footer{text-align:center;color:var(--muted);font-size:.76rem;padding:8px 0 20px;}
+  .cmp{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
+  .cmp .card{flex:1 1 220px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:12px;padding:12px;}
+  .cmp .card h4{margin:0 0 6px;font-size:.95rem;}
+  .cmp .fast h4{color:var(--warn);}
+  .cmp .slow h4{color:var(--accent);}
+  .cmp .card p{margin:0;font-size:.84rem;color:var(--muted);}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .subtab{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;
+    padding:6px 13px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;}
+  .subtab.active{background:var(--accent);color:#08131a;border-color:var(--accent-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Coordination &amp; Control Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 17: Coordination and Control &mdash; The Nervous &amp; Endocrine Systems</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="neuron">1 &middot; Neuron &amp; Impulse</button>
+    <button class="tab" data-mode="brain">2 &middot; Brain &amp; Nervous System</button>
+    <button class="tab" data-mode="endo">3 &middot; Glands &amp; Hormones</button>
+    <button class="tab" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: NEURON ============ -->
+  <section id="mode-neuron" class="panel">
+    <div class="subtabs" id="neuronSubs">
+      <button class="subtab active" data-view="neuron">Neuron &amp; action potential</button>
+      <button class="subtab" data-view="synapse">Synapse</button>
+      <button class="subtab" data-view="reflex">Reflex arc</button>
+    </div>
+    <div class="ctrl">
+      <button class="btn" id="npPlay">Pause</button>
+      <button class="btn ghost" id="npFire">Fire impulse</button>
+      <label>Speed <input type="range" id="npSpeed" min="0.4" max="2.2" step="0.1" value="1"></label>
+    </div>
+    <div class="stage">
+      <div class="canvas-box">
+        <!-- NEURON VIEW -->
+        <svg id="svgNeuron" viewBox="0 0 640 300" role="img" aria-label="Labelled neuron">
+          <defs>
+            <radialGradient id="somaG" cx="50%" cy="45%" r="60%">
+              <stop offset="0%" stop-color="#63b3c9"/><stop offset="100%" stop-color="#2c6b7d"/>
+            </radialGradient>
+          </defs>
+          <!-- dendrites -->
+          <g stroke="#7bb5c4" stroke-width="3" fill="none" class="hot" data-part="dendrite">
+            <path d="M70 150 L20 110"/><path d="M70 150 L18 150"/><path d="M70 150 L22 195"/>
+            <path d="M75 128 L30 90"/><path d="M75 172 L30 210"/>
+          </g>
+          <!-- cell body -->
+          <ellipse class="hot" data-part="soma" cx="100" cy="150" rx="38" ry="34" fill="url(#somaG)" stroke="#2c6b7d" stroke-width="2"/>
+          <circle cx="100" cy="150" r="12" fill="#173540"/>
+          <!-- axon -->
+          <rect class="hot" data-part="axon" x="138" y="141" width="360" height="18" rx="9" fill="#3b5566"/>
+          <!-- myelin sheaths -->
+          <g class="hot" data-part="myelin">
+            <rect x="175" y="132" width="60" height="36" rx="14" fill="#8a7bd8"/>
+            <rect x="255" y="132" width="60" height="36" rx="14" fill="#8a7bd8"/>
+            <rect x="335" y="132" width="60" height="36" rx="14" fill="#8a7bd8"/>
+            <rect x="415" y="132" width="60" height="36" rx="14" fill="#8a7bd8"/>
+          </g>
+          <!-- nodes of Ranvier gaps highlighted -->
+          <g class="hot" data-part="node">
+            <rect x="238" y="145" width="14" height="10" rx="4" fill="#f6c453"/>
+            <rect x="318" y="145" width="14" height="10" rx="4" fill="#f6c453"/>
+            <rect x="398" y="145" width="14" height="10" rx="4" fill="#f6c453"/>
+          </g>
+          <!-- axon terminals + synapse -->
+          <g class="hot" data-part="terminal" stroke="#3b5566" stroke-width="3" fill="none">
+            <path d="M498 150 L560 118"/><path d="M498 150 L565 150"/><path d="M498 150 L560 182"/>
+          </g>
+          <circle class="hot" data-part="synapse" cx="566" cy="118" r="8" fill="#4fd1c5"/>
+          <circle class="hot" data-part="synapse" cx="571" cy="150" r="8" fill="#4fd1c5"/>
+          <circle class="hot" data-part="synapse" cx="566" cy="182" r="8" fill="#4fd1c5"/>
+          <!-- travelling action potential -->
+          <circle id="apDot" cx="140" cy="150" r="11" fill="#fbbf24" opacity="0.95"/>
+          <!-- labels -->
+          <text class="lbl sm" x="10" y="80">Dendrites</text>
+          <text class="lbl sm" x="78" y="205">Cell body (soma)</text>
+          <text class="lbl sm" x="300" y="188">Axon</text>
+          <text class="lbl sm" x="330" y="122">Myelin sheath</text>
+          <text class="lbl sm" x="300" y="220">Nodes of Ranvier</text>
+          <text class="lbl sm" x="520" y="205">Synaptic terminals</text>
+        </svg>
+
+        <!-- SYNAPSE VIEW -->
+        <svg id="svgSynapse" viewBox="0 0 640 300" class="hidden" role="img" aria-label="Synaptic transmission">
+          <rect x="40" y="60" width="230" height="180" rx="18" fill="#3b5566"/>
+          <rect x="370" y="60" width="230" height="180" rx="18" fill="#2c6b7d"/>
+          <text class="lbl" x="70" y="50">Presynaptic terminal</text>
+          <text class="lbl" x="400" y="50">Postsynaptic neuron</text>
+          <text class="lbl sm" x="285" y="30">Synaptic cleft</text>
+          <!-- vesicles -->
+          <g id="vesicles">
+            <circle cx="210" cy="110" r="14" fill="#8a7bd8"/>
+            <circle cx="230" cy="160" r="14" fill="#8a7bd8"/>
+            <circle cx="205" cy="200" r="14" fill="#8a7bd8"/>
+          </g>
+          <text class="lbl sm" x="150" y="115" id="vesLbl">Vesicles</text>
+          <!-- receptors -->
+          <g fill="#f6c453">
+            <rect x="372" y="100" width="10" height="22" rx="3"/>
+            <rect x="372" y="150" width="10" height="22" rx="3"/>
+            <rect x="372" y="195" width="10" height="22" rx="3"/>
+          </g>
+          <text class="lbl sm" x="392" y="235">Receptors</text>
+          <!-- neurotransmitter dots animated -->
+          <g id="ntDots"></g>
+        </svg>
+
+        <!-- REFLEX VIEW -->
+        <svg id="svgReflex" viewBox="0 0 640 300" class="hidden" role="img" aria-label="Reflex arc">
+          <!-- spinal cord -->
+          <ellipse cx="480" cy="150" rx="70" ry="95" fill="#233544" stroke="#3b5566" stroke-width="2"/>
+          <path d="M480 90 C455 120 455 180 480 210 C505 180 505 120 480 90 Z" fill="#3b5566"/>
+          <text class="lbl sm" x="440" y="270">Spinal cord</text>
+          <!-- receptor (skin/hand) -->
+          <circle cx="70" cy="80" r="18" fill="#f6c453"/>
+          <text class="lbl sm" x="45" y="120">Receptor (skin)</text>
+          <!-- sensory neuron -->
+          <path id="rfSensory" d="M88 80 Q280 60 430 130" stroke="#4fd1c5" stroke-width="4" fill="none"/>
+          <text class="lbl sm" x="200" y="55">Sensory (afferent) neuron</text>
+          <!-- interneuron -->
+          <path id="rfInter" d="M455 135 Q490 150 455 190" stroke="#8a7bd8" stroke-width="4" fill="none"/>
+          <text class="lbl sm" x="500" y="150">Interneuron</text>
+          <!-- motor neuron -->
+          <path id="rfMotor" d="M430 190 Q280 250 95 220" stroke="#fbbf24" stroke-width="4" fill="none"/>
+          <text class="lbl sm" x="200" y="270">Motor (efferent) neuron</text>
+          <!-- effector (muscle) -->
+          <rect x="45" y="200" width="40" height="40" rx="8" fill="#f87171"/>
+          <text class="lbl sm" x="20" y="195">Effector (muscle)</text>
+          <!-- signal dot -->
+          <circle id="rfDot" r="9" fill="#ffffff" opacity="0"/>
+        </svg>
+      </div>
+      <div class="info">
+        <h3 id="nInfoT">Tap a neuron part</h3>
+        <p id="nInfoP" class="hint">The yellow pulse is an action potential travelling along the axon. In myelinated axons it jumps node to node (saltatory conduction). Use the sub-tabs to see the synapse and a reflex arc.</p>
+        <div class="facts">
+          <h4>Key facts</h4>
+          <ul>
+            <li><b>Resting potential</b> approx -70 mV; maintained by the Na+/K+ pump.</li>
+            <li><b>Depolarisation:</b> Na+ rushes in; <b>repolarisation:</b> K+ moves out.</li>
+            <li>Impulse is <b>one-way</b> across a synapse (transmitter only on presynaptic side).</li>
+            <li>A <b>reflex</b> bypasses the brain, giving a fast automatic response.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: BRAIN ============ -->
+  <section id="mode-brain" class="panel hidden">
+    <div class="toggle-row">
+      <span style="color:var(--muted);font-size:.85rem;">Tap a brain region or an organisation box to learn its role.</span>
+    </div>
+    <div class="stage">
+      <div class="canvas-box">
+        <svg id="svgBrain" viewBox="0 0 640 340" role="img" aria-label="Human brain and spinal cord">
+          <defs>
+            <radialGradient id="cbG" cx="45%" cy="40%" r="70%">
+              <stop offset="0%" stop-color="#6fb7c8"/><stop offset="100%" stop-color="#367283"/>
+            </radialGradient>
+          </defs>
+          <!-- cerebrum -->
+          <path class="hot" data-part="cerebrum" d="M120 130 C120 60 240 40 330 55 C430 40 520 80 500 140 C520 150 505 195 445 200 C430 215 200 218 160 200 C110 195 100 155 120 130 Z" fill="url(#cbG)" stroke="#2c6b7d" stroke-width="2"/>
+          <!-- gyri lines -->
+          <g stroke="#2c6b7d" stroke-width="1.4" fill="none" opacity=".55" pointer-events="none">
+            <path d="M160 100 q30 20 10 50"/><path d="M220 80 q20 30 0 70"/>
+            <path d="M300 70 q10 40 -10 80"/><path d="M380 78 q20 30 5 75"/>
+            <path d="M440 95 q25 25 5 55"/>
+          </g>
+          <!-- cerebellum -->
+          <path class="hot" data-part="cerebellum" d="M455 200 C520 190 560 220 545 260 C530 285 470 280 448 255 C438 235 440 210 455 200 Z" fill="#c98a5b" stroke="#a56e40" stroke-width="2"/>
+          <g stroke="#a56e40" stroke-width="1" opacity=".6" pointer-events="none" fill="none">
+            <path d="M470 210 l60 8"/><path d="M465 225 l70 8"/><path d="M468 242 l60 10"/>
+          </g>
+          <!-- hypothalamus / pituitary -->
+          <circle class="hot" data-part="hypothalamus" cx="300" cy="205" r="16" fill="#8a7bd8" stroke="#6c5cc0" stroke-width="2"/>
+          <circle class="hot" data-part="hypothalamus" cx="300" cy="232" r="9" fill="#b3a7ef" stroke="#6c5cc0" stroke-width="1.5"/>
+          <!-- medulla -->
+          <path class="hot" data-part="medulla" d="M420 250 C440 260 435 290 415 300 C400 292 402 268 420 250 Z" fill="#e08d6f" stroke="#b96a4c" stroke-width="2"/>
+          <!-- spinal cord -->
+          <rect class="hot" data-part="spinal" x="392" y="292" width="26" height="42" rx="10" fill="#3b5566"/>
+          <!-- labels -->
+          <text class="lbl sm" x="230" y="110">Cerebrum</text>
+          <text class="lbl sm" x="480" y="300">Cerebellum</text>
+          <text class="lbl sm" x="200" y="212">Hypothalamus</text>
+          <text class="lbl sm" x="205" y="238">+ Pituitary</text>
+          <text class="lbl sm" x="330" y="285">Medulla oblongata</text>
+          <text class="lbl sm" x="330" y="325">Spinal cord</text>
+        </svg>
+        <div class="cmp" style="margin-top:12px;">
+          <div class="card hot" data-part="cns" style="cursor:pointer;"><h4 style="color:var(--accent);">CNS</h4><p>Brain + spinal cord. Tap to learn.</p></div>
+          <div class="card hot" data-part="somatic" style="cursor:pointer;"><h4 style="color:var(--warn);">PNS &middot; Somatic</h4><p>Voluntary. Tap to learn.</p></div>
+          <div class="card hot" data-part="symp" style="cursor:pointer;"><h4 style="color:#f9a8b4;">Autonomic &middot; Sympathetic</h4><p>"Fight or flight". Tap.</p></div>
+          <div class="card hot" data-part="para" style="cursor:pointer;"><h4 style="color:#7ee2b0;">Autonomic &middot; Parasympathetic</h4><p>"Rest and digest". Tap.</p></div>
+        </div>
+      </div>
+      <div class="info">
+        <h3 id="bInfoT">Tap a region</h3>
+        <p id="bInfoP" class="hint">The nervous system splits into the CNS (brain + spinal cord) and the PNS. The PNS has a somatic (voluntary) part and an autonomic part, which is further divided into sympathetic and parasympathetic branches that oppose each other.</p>
+        <div class="facts">
+          <h4>Quick reference</h4>
+          <ul>
+            <li><b>Cerebrum</b> - thinking, memory, voluntary action.</li>
+            <li><b>Cerebellum</b> - balance, posture, coordination.</li>
+            <li><b>Medulla</b> - heartbeat, breathing, reflexes.</li>
+            <li><b>Hypothalamus</b> - links nervous &amp; endocrine systems; controls the pituitary.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: ENDOCRINE ============ -->
+  <section id="mode-endo" class="panel hidden">
+    <div class="toggle-row">
+      <span style="color:var(--muted);font-size:.85rem;">Tap a gland on the body map for its hormone(s) and effect.</span>
+    </div>
+    <div class="cmp">
+      <div class="card fast"><h4>Nervous control &mdash; FAST</h4><p>Electrical impulses; acts in milliseconds; short-lived; targets specific muscles/glands via nerves.</p></div>
+      <div class="card slow"><h4>Endocrine control &mdash; SLOW</h4><p>Chemical hormones in blood; seconds to hours; longer-lasting; can affect many organs at once.</p></div>
+    </div>
+    <div class="stage">
+      <div class="canvas-box">
+        <svg id="svgBody" viewBox="0 0 300 400" role="img" aria-label="Endocrine glands body map">
+          <!-- body silhouette -->
+          <path d="M150 20 a26 26 0 1 0 0.1 0 Z" fill="#233544" stroke="#3b5566" stroke-width="2"/>
+          <path d="M110 78 C120 66 180 66 190 78 L205 175 L185 300 L170 385 L130 385 L115 300 L95 175 Z" fill="#233544" stroke="#3b5566" stroke-width="2"/>
+          <!-- pituitary (in head) -->
+          <circle class="hot" data-g="pituitary" cx="150" cy="40" r="9" fill="#8a7bd8"/>
+          <!-- thyroid -->
+          <ellipse class="hot" data-g="thyroid" cx="150" cy="92" rx="17" ry="9" fill="#4fd1c5"/>
+          <!-- parathyroid (dots on thyroid) -->
+          <circle class="hot" data-g="parathyroid" cx="138" cy="88" r="3.2" fill="#f6c453"/>
+          <circle class="hot" data-g="parathyroid" cx="162" cy="88" r="3.2" fill="#f6c453"/>
+          <circle class="hot" data-g="parathyroid" cx="138" cy="96" r="3.2" fill="#f6c453"/>
+          <circle class="hot" data-g="parathyroid" cx="162" cy="96" r="3.2" fill="#f6c453"/>
+          <!-- adrenal glands (on kidneys) -->
+          <path class="hot" data-g="adrenal" d="M120 168 q8 -12 18 -2 q-4 8 -18 6 Z" fill="#f87171"/>
+          <path class="hot" data-g="adrenal" d="M180 168 q-8 -12 -18 -2 q4 8 18 6 Z" fill="#f87171"/>
+          <!-- pancreas -->
+          <path class="hot" data-g="pancreas" d="M132 200 q30 -6 44 8 q-24 4 -44 -8 Z" fill="#fbbf24"/>
+          <!-- gonads -->
+          <circle class="hot" data-g="gonads" cx="150" cy="300" r="11" fill="#e08d6f"/>
+          <!-- labels -->
+          <text class="lbl sm" x="165" y="42">Pituitary</text>
+          <text class="lbl sm" x="175" y="90">Thyroid</text>
+          <text class="lbl sm" x="8" y="90">Parathyroids</text>
+          <text class="lbl sm" x="200" y="168">Adrenals</text>
+          <text class="lbl sm" x="200" y="205">Pancreas</text>
+          <text class="lbl sm" x="170" y="304">Gonads</text>
+        </svg>
+      </div>
+      <div class="info">
+        <h3 id="eInfoT">Tap a gland</h3>
+        <p id="eInfoP" class="hint">Each gland is ductless and releases hormone(s) straight into the blood.</p>
+        <div class="facts" id="feedbackBox">
+          <h4>Feedback loop &mdash; blood sugar</h4>
+          <ul>
+            <li>Sugar HIGH &rarr; pancreas releases <b>insulin</b> &rarr; cells take up glucose &rarr; sugar falls.</li>
+            <li>Sugar LOW &rarr; pancreas releases <b>glucagon</b> &rarr; liver frees glucose &rarr; sugar rises.</li>
+            <li>This <b>negative feedback</b> keeps blood glucose near a set point.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Gland</th><th>Hormone(s)</th><th>Main effect</th></tr></thead>
+      <tbody id="endoTable"></tbody>
+    </table>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="mode-quiz" class="panel hidden">
+    <div id="quizArea"></div>
+    <div class="bar"><i id="quizBar"></i></div>
+    <p class="score" id="quizScore">Score: 0 / 3</p>
+  </section>
+
+  <footer>Coordination &amp; Control Lab &middot; self-contained interactive &middot; NIOS Biology</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- tab switching ---------- */
+  var modes=["neuron","brain","endo","quiz"];
+  var tabs=document.getElementById("tabs");
+  tabs.addEventListener("click",function(e){
+    var b=e.target.closest(".tab"); if(!b) return;
+    var m=b.getAttribute("data-mode");
+    Array.prototype.forEach.call(tabs.children,function(t){t.classList.toggle("active",t===b);});
+    modes.forEach(function(x){document.getElementById("mode-"+x).classList.toggle("hidden",x!==m);});
+    running = (m==="neuron");
+  });
+
+  /* ---------- MODE 1 neuron data ---------- */
+  var neuronInfo={
+    dendrite:["Dendrites","Branched extensions that receive signals from other neurons and carry the impulse toward the cell body."],
+    soma:["Cell body (soma)","Contains the nucleus and cytoplasm; integrates incoming signals and keeps the neuron alive."],
+    axon:["Axon","A long fibre that carries the action potential away from the cell body toward the terminals."],
+    myelin:["Myelin sheath","A fatty insulating layer (made by Schwann cells) that speeds conduction and saves energy."],
+    node:["Nodes of Ranvier","Gaps in the myelin where the impulse regenerates; it 'jumps' node to node (saltatory conduction)."],
+    terminal:["Axon terminals","Fine endings that pass the signal to the next cell at a synapse."],
+    synapse:["Synapse","Tiny gap between neurons. The impulse crosses chemically using neurotransmitters - it is one-directional."]
+  };
+  var nInfoT=document.getElementById("nInfoT"),nInfoP=document.getElementById("nInfoP");
+  document.getElementById("svgNeuron").addEventListener("click",function(e){
+    var g=e.target.closest("[data-part]"); if(!g) return;
+    document.querySelectorAll("#svgNeuron .sel").forEach(function(x){x.classList.remove("sel");});
+    g.classList.add("sel");
+    var d=neuronInfo[g.getAttribute("data-part")];
+    if(d){nInfoT.textContent=d[0];nInfoP.className="";nInfoP.textContent=d[1];}
+  });
+
+  /* neuron sub-views */
+  var view="neuron";
+  var subs=document.getElementById("neuronSubs");
+  subs.addEventListener("click",function(e){
+    var b=e.target.closest(".subtab"); if(!b) return;
+    view=b.getAttribute("data-view");
+    Array.prototype.forEach.call(subs.children,function(t){t.classList.toggle("active",t===b);});
+    document.getElementById("svgNeuron").classList.toggle("hidden",view!=="neuron");
+    document.getElementById("svgSynapse").classList.toggle("hidden",view!=="synapse");
+    document.getElementById("svgReflex").classList.toggle("hidden",view!=="reflex");
+  });
+
+  /* ---------- animation engine ---------- */
+  var running=true, speed=1, t=0;
+  var apDot=document.getElementById("apDot");
+  var ntDots=document.getElementById("ntDots");
+  var rfDot=document.getElementById("rfDot");
+  var vesLbl=document.getElementById("vesLbl");
+  var playBtn=document.getElementById("npPlay");
+  playBtn.addEventListener("click",function(){running=!running;playBtn.textContent=running?"Pause":"Play";});
+  document.getElementById("npSpeed").addEventListener("input",function(e){speed=parseFloat(e.target.value);});
+  document.getElementById("npFire").addEventListener("click",function(){t=0;});
+
+  // build neurotransmitter dot pool
+  var nt=[];
+  for(var i=0;i<7;i++){
+    var c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("r","5");c.setAttribute("fill","#f6c453");c.setAttribute("opacity","0");
+    ntDots.appendChild(c);nt.push(c);
+  }
+
+  // axon path for action potential (x from 140 to 500), reflect node jumps
+  function updateNeuron(p){
+    // p 0..1 across axon
+    var x=140+p*360;
+    apDot.setAttribute("cx",x);
+    apDot.setAttribute("cy",150);
+    // pulse size to suggest depolarisation
+    apDot.setAttribute("r", (9+2*Math.sin(p*Math.PI)).toFixed(1));
+    apDot.setAttribute("opacity", p<0.02?0.2:0.95);
+  }
+  function updateSynapse(p){
+    // vesicles fuse then transmitter crosses cleft (x 270 -> 372)
+    for(var i=0;i<nt.length;i++){
+      var ph=(p+ i/nt.length)%1;
+      var x=270+ph*100;
+      var y=100+ (i%3)*48 + Math.sin(ph*6+i)*4;
+      nt[i].setAttribute("cx",x);nt[i].setAttribute("cy",y);
+      nt[i].setAttribute("opacity", (ph<0.9?0.9:0).toString());
+    }
+    vesLbl.textContent = p<0.5? "Vesicles release" : "Neurotransmitter";
+  }
+  var rfSeg=[
+    ["rfSensory","M88 80 Q280 60 430 130",false],
+    ["rfInter","M455 135 Q490 150 455 190",false],
+    ["rfMotor","M430 190 Q280 250 95 220",false]
+  ];
+  function pointOnQuad(p0,c,p1,t){
+    var mt=1-t;
+    return [mt*mt*p0[0]+2*mt*t*c[0]+t*t*p1[0], mt*mt*p0[1]+2*mt*t*c[1]+t*t*p1[1]];
+  }
+  var rfPts=[
+    [[88,80],[280,60],[430,130]],
+    [[455,135],[490,150],[455,190]],
+    [[430,190],[280,250],[95,220]]
+  ];
+  function updateReflex(p){
+    // three segments in sequence
+    var seg=Math.floor(p*3); if(seg>2) seg=2;
+    var local=(p*3)-seg;
+    var q=rfPts[seg];
+    var xy=pointOnQuad(q[0],q[1],q[2],local);
+    rfDot.setAttribute("cx",xy[0]);rfDot.setAttribute("cy",xy[1]);
+    rfDot.setAttribute("opacity","1");
+    rfDot.setAttribute("fill", seg===0?"#4fd1c5":seg===1?"#8a7bd8":"#fbbf24");
+  }
+
+  var last=performance.now();
+  function loop(now){
+    var dt=(now-last)/1000; last=now;
+    if(running && !document.hidden){
+      t += dt*0.35*speed;
+      if(t>1) t=0;
+      if(view==="neuron") updateNeuron(t);
+      else if(view==="synapse") updateSynapse(t);
+      else if(view==="reflex") updateReflex(t);
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  document.addEventListener("visibilitychange",function(){last=performance.now();});
+
+  /* ---------- MODE 2 brain ---------- */
+  var brainInfo={
+    cerebrum:["Cerebrum","Largest part; grey matter cortex. Seat of intelligence, memory, reasoning, senses and voluntary movement."],
+    cerebellum:["Cerebellum","Coordinates muscle activity, maintains balance, posture and smooth movement."],
+    medulla:["Medulla oblongata","Part of the brain stem. Controls involuntary vital actions: heartbeat, breathing, blood pressure, coughing, vomiting."],
+    hypothalamus:["Hypothalamus + Pituitary","Hypothalamus controls hunger, thirst, temperature and links the nervous & endocrine systems by directing the pituitary ('master gland')."],
+    spinal:["Spinal cord","Relays impulses between body and brain and is the centre for spinal reflexes."],
+    cns:["Central Nervous System","Brain + spinal cord. Processes information and issues commands; protected by skull, vertebrae and meninges."],
+    somatic:["Somatic nervous system","Part of the PNS controlling voluntary skeletal muscle and carrying sensory information consciously."],
+    symp:["Sympathetic division","'Fight or flight'. Speeds heartbeat, widens pupils, releases glucose - prepares the body for emergencies."],
+    para:["Parasympathetic division","'Rest and digest'. Slows heartbeat, stimulates digestion - conserves energy and restores calm."]
+  };
+  var bInfoT=document.getElementById("bInfoT"),bInfoP=document.getElementById("bInfoP");
+  document.getElementById("mode-brain").addEventListener("click",function(e){
+    var g=e.target.closest("[data-part]"); if(!g) return;
+    document.querySelectorAll("#mode-brain .sel").forEach(function(x){x.classList.remove("sel");});
+    if(g.classList.contains("hot")&&g.tagName!=="DIV") g.classList.add("sel");
+    var d=brainInfo[g.getAttribute("data-part")];
+    if(d){bInfoT.textContent=d[0];bInfoP.className="";bInfoP.textContent=d[1];}
+  });
+
+  /* ---------- MODE 3 endocrine ---------- */
+  var glands={
+    pituitary:["Pituitary (master gland)","Growth hormone (GH), TSH, FSH/LH, ACTH, prolactin, ADH","Controls other endocrine glands, growth, water balance and reproduction; directed by the hypothalamus."],
+    thyroid:["Thyroid","Thyroxine (T4/T3)","Raises basal metabolic rate; needs iodine. Deficiency causes goitre/hypothyroidism."],
+    parathyroid:["Parathyroid","Parathormone (PTH)","Raises blood calcium level by acting on bone, kidney and gut."],
+    adrenal:["Adrenal","Adrenaline & noradrenaline; cortisol; aldosterone","Adrenaline drives 'fight or flight' - fast heart, more blood sugar; cortisol manages stress."],
+    pancreas:["Pancreas (islets)","Insulin & glucagon","Insulin lowers blood glucose; glucagon raises it. Together they regulate blood sugar."],
+    gonads:["Gonads (testes/ovaries)","Testosterone / oestrogen & progesterone","Develop secondary sexual characters and control reproduction & the menstrual cycle."]
+  };
+  var eInfoT=document.getElementById("eInfoT"),eInfoP=document.getElementById("eInfoP");
+  document.getElementById("svgBody").addEventListener("click",function(e){
+    var g=e.target.closest("[data-g]"); if(!g) return;
+    document.querySelectorAll("#svgBody .sel").forEach(function(x){x.classList.remove("sel");});
+    g.classList.add("sel");
+    var d=glands[g.getAttribute("data-g")];
+    if(d){eInfoT.textContent=d[0];eInfoP.className="";eInfoP.innerHTML="<b>"+d[1]+"</b><br>"+d[2];}
+  });
+  // build table
+  var tb=document.getElementById("endoTable");
+  Object.keys(glands).forEach(function(k){
+    var d=glands[k];
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td class='tag'>"+d[0]+"</td><td>"+d[1]+"</td><td>"+d[2]+"</td>";
+    tb.appendChild(tr);
+  });
+
+  /* ---------- QUIZ ---------- */
+  var quiz=[
+    {q:"Which part of a myelinated axon regenerates the impulse, allowing it to 'jump'?",
+     o:["Cell body","Nodes of Ranvier","Dendrites","Synaptic cleft"],a:1,
+     e:"At the nodes of Ranvier the impulse is regenerated, giving fast saltatory conduction."},
+    {q:"The centre that controls involuntary heartbeat and breathing is the:",
+     o:["Cerebrum","Cerebellum","Medulla oblongata","Hypothalamus"],a:2,
+     e:"The medulla oblongata in the brain stem controls vital involuntary functions."},
+    {q:"Which hormone LOWERS blood glucose, and from which gland?",
+     o:["Glucagon - pancreas","Adrenaline - adrenal","Insulin - pancreas","Thyroxine - thyroid"],a:2,
+     e:"Insulin from the pancreatic islets lowers blood glucose; glucagon raises it."}
+  ];
+  var score=0, answered=0;
+  var qa=document.getElementById("quizArea");
+  quiz.forEach(function(item,qi){
+    var wrap=document.createElement("div");wrap.style.marginBottom="18px";
+    var q=document.createElement("div");q.className="quiz-q";
+    q.innerHTML="<span class='qnum'>Q"+(qi+1)+".</span> "+item.q;
+    var opts=document.createElement("div");opts.className="options";
+    var fb=document.createElement("div");fb.className="feedback";
+    item.o.forEach(function(txt,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=txt;
+      b.addEventListener("click",function(){
+        if(b.disabled||wrap.dataset.done) return;
+        wrap.dataset.done="1";answered++;
+        Array.prototype.forEach.call(opts.children,function(x){x.disabled=true;});
+        if(oi===item.a){b.classList.add("correct");score++;fb.className="feedback ok";fb.textContent="Correct! "+item.e;}
+        else{b.classList.add("wrong");opts.children[item.a].classList.add("correct");
+          fb.className="feedback no";fb.textContent="Not quite. "+item.e;}
+        document.getElementById("quizScore").textContent="Score: "+score+" / 3";
+        document.getElementById("quizBar").style.width=(answered/3*100)+"%";
+      });
+      opts.appendChild(b);
+    });
+    wrap.appendChild(q);wrap.appendChild(opts);wrap.appendChild(fb);
+    qa.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
