@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Line in Space Lab — Straight Line in 3-D (NIOS Class 12 Maths, Ch 36)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#98a3ba;
+    --accent:#6fd0c0;
+    --accent-soft:rgba(111,208,192,.16);
+    --accent2:#ff9d5c;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:16px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.92rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:4px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.02rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.92rem;margin-bottom:6px}
+
+  .grid2{display:flex;flex-wrap:wrap;gap:16px}
+  .grid2 .col{flex:1 1 300px;min-width:0}
+
+  canvas{width:100%;height:auto;display:block;background:#0c1019;border:1px solid var(--line);
+    border-radius:12px;touch-action:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:12px}
+  .ctrl{flex:1 1 130px;min-width:120px}
+  .ctrl label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+  .ctrl label b{color:var(--ink)}
+
+  input[type=range]{width:100%;height:32px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131d;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid #0f131d}
+
+  .out{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:12px;
+    font-size:.95rem;line-height:1.7}
+  .out .eq{font-size:1.02rem;color:var(--accent);font-weight:600;word-break:break-word}
+  .out .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .k{color:var(--muted)}
+  .v{color:var(--ink);font-weight:600}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.85rem;font-weight:700}
+  .pill.p-int{background:rgba(125,180,255,.18);color:#7db4ff}
+  .pill.p-par{background:rgba(255,157,92,.18);color:var(--accent2)}
+  .pill.p-skew{background:rgba(255,123,123,.16);color:var(--bad)}
+  .pill.p-perp{background:rgba(95,214,139,.16);color:var(--good)}
+  code{background:#0c1019;border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+    font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:.9em;color:var(--accent)}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .seg button{flex:1 1 auto;min-height:42px;min-width:110px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.85rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .hint{color:var(--muted);font-size:.82rem;margin-top:8px}
+  .facts ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .facts li{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.9rem}
+  .facts li b{color:var(--accent)}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px}
+  .quiz .opts button{text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+    border-radius:10px;padding:9px 12px;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .quiz .opts button.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .quiz .opts button.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .quiz .exp{margin-top:8px;font-size:.85rem;color:var(--muted);display:none}
+  .quiz .exp.show{display:block}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Line in <span>Space</span> Lab</h1>
+    <p>NIOS Class 12 Mathematics · Ch 36 — Straight line in 3-D. Drag the view to rotate.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="eq">Equation of a line</button>
+    <button class="tab-btn" data-tab="angle">Angle between lines</button>
+    <button class="tab-btn" data-tab="rel">Relationship &amp; distance</button>
+    <button class="tab-btn" data-tab="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===================== TAB 1: EQUATION ===================== -->
+  <section id="tab-eq">
+    <div class="grid2">
+      <div class="col panel">
+        <h2>r = A + t·d</h2>
+        <canvas id="cv1" width="440" height="380"></canvas>
+        <p class="hint">Drag the view to rotate. The line passes through <b>A</b> (blue) with direction <b>d</b> (orange arrow). Move the <b>t</b>-slider to slide point <b>P</b> along the line.</p>
+      </div>
+      <div class="col panel">
+        <h3>Point A (x₁, y₁, z₁)</h3>
+        <div class="controls">
+          <div class="ctrl"><label>x₁ = <b id="v_x1">1</b></label><input type="range" id="s_x1" min="-5" max="5" step="1" value="1"></div>
+          <div class="ctrl"><label>y₁ = <b id="v_y1">1</b></label><input type="range" id="s_y1" min="-5" max="5" step="1" value="1"></div>
+          <div class="ctrl"><label>z₁ = <b id="v_z1">0</b></label><input type="range" id="s_z1" min="-5" max="5" step="1" value="0"></div>
+        </div>
+        <h3 style="margin-top:12px">Direction ratios d = (a, b, c)</h3>
+        <div class="controls">
+          <div class="ctrl"><label>a = <b id="v_a">2</b></label><input type="range" id="s_a" min="-4" max="4" step="1" value="2"></div>
+          <div class="ctrl"><label>b = <b id="v_b">1</b></label><input type="range" id="s_b" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>c = <b id="v_c">2</b></label><input type="range" id="s_c" min="-4" max="4" step="1" value="2"></div>
+        </div>
+        <h3 style="margin-top:12px">Parameter t = <b id="v_t">0</b></h3>
+        <input type="range" id="s_t" min="-2" max="2" step="0.1" value="0">
+        <div class="out">
+          <div class="eq" id="eq_vec">r = (1, 1, 0) + t(2, 1, 2)</div>
+          <div class="eq" id="eq_sym" style="margin-top:6px;color:var(--accent2)">(x−1)/2 = (y−1)/1 = (z−0)/2</div>
+          <div class="row"><span class="k">Point P = A + t·d</span><span class="v" id="pt_P">(1, 1, 0)</span></div>
+          <div class="row"><span class="k">Unit direction d̂</span><span class="v" id="pt_u"></span></div>
+        </div>
+        <p class="hint">Vector form: <code>r = A + t·d</code>. Symmetric (Cartesian) form: <code>(x−x₁)/a = (y−y₁)/b = (z−z₁)/c = t</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 2: ANGLE ===================== -->
+  <section id="tab-angle" class="hidden">
+    <div class="grid2">
+      <div class="col panel">
+        <h2>Angle between two lines</h2>
+        <canvas id="cv2" width="440" height="380"></canvas>
+        <p class="hint">Both lines are drawn through the origin so the angle is easy to see. Line 1 direction <b>d₁</b> (green), line 2 direction <b>d₂</b> (orange). Drag to rotate.</p>
+      </div>
+      <div class="col panel">
+        <h3>Line 1 direction d₁ = (a₁, b₁, c₁)</h3>
+        <div class="controls">
+          <div class="ctrl"><label>a₁ = <b id="g_a1">1</b></label><input type="range" id="g_sa1" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>b₁ = <b id="g_b1">0</b></label><input type="range" id="g_sb1" min="-4" max="4" step="1" value="0"></div>
+          <div class="ctrl"><label>c₁ = <b id="g_c1">0</b></label><input type="range" id="g_sc1" min="-4" max="4" step="1" value="0"></div>
+        </div>
+        <h3 style="margin-top:12px">Line 2 direction d₂ = (a₂, b₂, c₂)</h3>
+        <div class="controls">
+          <div class="ctrl"><label>a₂ = <b id="g_a2">1</b></label><input type="range" id="g_sa2" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>b₂ = <b id="g_b2">1</b></label><input type="range" id="g_sb2" min="-4" max="4" step="1" value="1"></div>
+          <div class="ctrl"><label>c₂ = <b id="g_c2">0</b></label><input type="range" id="g_sc2" min="-4" max="4" step="1" value="0"></div>
+        </div>
+        <div class="out">
+          <div class="row"><span class="k">d₁ · d₂</span><span class="v" id="g_dot"></span></div>
+          <div class="row"><span class="k">|d₁| · |d₂|</span><span class="v" id="g_mag"></span></div>
+          <div class="row"><span class="k">cos θ</span><span class="v" id="g_cos"></span></div>
+          <div class="eq" id="g_ang">θ = 45°</div>
+          <div class="row"><span class="k">Relationship</span><span class="v" id="g_rel"></span></div>
+        </div>
+        <p class="hint">cos θ = <code>(d₁·d₂)/(|d₁||d₂|)</code>. Lines are <b>parallel</b> when d₁∥d₂ (d₁×d₂ = 0), <b>perpendicular</b> when d₁·d₂ = 0.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 3: RELATIONSHIP & DISTANCE ===================== -->
+  <section id="tab-rel" class="hidden">
+    <div class="seg" id="relmode">
+      <button class="on" data-m="two">Two lines: relationship &amp; distance</button>
+      <button data-m="pts">Line through two points</button>
+    </div>
+
+    <div id="relTwo">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Intersecting, parallel or skew?</h2>
+          <canvas id="cv3" width="440" height="380"></canvas>
+          <p class="hint">Line 1 (green): through A₁ with direction d₁. Line 2 (orange): through A₂ with direction d₂. The dashed magenta segment is the shortest (common perpendicular) distance. Drag to rotate.</p>
+        </div>
+        <div class="col panel">
+          <h3>Line 1 — point A₁ &amp; direction d₁</h3>
+          <div class="controls">
+            <div class="ctrl"><label>A₁·x = <b id="r_p1x">0</b></label><input type="range" id="r_sp1x" min="-5" max="5" step="1" value="0"></div>
+            <div class="ctrl"><label>A₁·y = <b id="r_p1y">0</b></label><input type="range" id="r_sp1y" min="-5" max="5" step="1" value="0"></div>
+            <div class="ctrl"><label>A₁·z = <b id="r_p1z">0</b></label><input type="range" id="r_sp1z" min="-5" max="5" step="1" value="0"></div>
+          </div>
+          <div class="controls">
+            <div class="ctrl"><label>d₁·a = <b id="r_d1a">1</b></label><input type="range" id="r_sd1a" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>d₁·b = <b id="r_d1b">0</b></label><input type="range" id="r_sd1b" min="-4" max="4" step="1" value="0"></div>
+            <div class="ctrl"><label>d₁·c = <b id="r_d1c">0</b></label><input type="range" id="r_sd1c" min="-4" max="4" step="1" value="0"></div>
+          </div>
+          <h3 style="margin-top:12px">Line 2 — point A₂ &amp; direction d₂</h3>
+          <div class="controls">
+            <div class="ctrl"><label>A₂·x = <b id="r_p2x">0</b></label><input type="range" id="r_sp2x" min="-5" max="5" step="1" value="0"></div>
+            <div class="ctrl"><label>A₂·y = <b id="r_p2y">2</b></label><input type="range" id="r_sp2y" min="-5" max="5" step="1" value="2"></div>
+            <div class="ctrl"><label>A₂·z = <b id="r_p2z">1</b></label><input type="range" id="r_sp2z" min="-5" max="5" step="1" value="1"></div>
+          </div>
+          <div class="controls">
+            <div class="ctrl"><label>d₂·a = <b id="r_d2a">0</b></label><input type="range" id="r_sd2a" min="-4" max="4" step="1" value="0"></div>
+            <div class="ctrl"><label>d₂·b = <b id="r_d2b">1</b></label><input type="range" id="r_sd2b" min="-4" max="4" step="1" value="1"></div>
+            <div class="ctrl"><label>d₂·c = <b id="r_d2c">0</b></label><input type="range" id="r_sd2c" min="-4" max="4" step="1" value="0"></div>
+          </div>
+          <div class="out">
+            <div class="row"><span class="k">d₁ × d₂</span><span class="v" id="r_cross"></span></div>
+            <div class="row"><span class="k">(A₂−A₁)·(d₁×d₂)</span><span class="v" id="r_triple"></span></div>
+            <div class="row"><span class="k">|d₁×d₂|</span><span class="v" id="r_den"></span></div>
+            <div class="eq" id="r_dist">Shortest distance = 1</div>
+            <div class="row"><span class="k">Configuration</span><span class="v"><span class="pill" id="r_cfg">skew</span></span></div>
+          </div>
+          <p class="hint">Skew lines: SD = <code>|(A₂−A₁)·(d₁×d₂)| / |d₁×d₂|</code>. If d₁×d₂ = 0 the lines are parallel and SD = <code>|(A₂−A₁)×d₁| / |d₁|</code>. If SD = 0 (and not parallel) the lines intersect.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="relPts" class="hidden">
+      <div class="grid2">
+        <div class="col panel">
+          <h2>Line through two points</h2>
+          <canvas id="cv4" width="440" height="380"></canvas>
+          <p class="hint">Points P (blue) and Q (blue) determine one line with direction <b>d = Q − P</b> (orange). Drag to rotate.</p>
+        </div>
+        <div class="col panel">
+          <h3>Point P (x₁, y₁, z₁)</h3>
+          <div class="controls">
+            <div class="ctrl"><label>x₁ = <b id="t_px">1</b></label><input type="range" id="t_spx" min="-5" max="5" step="1" value="1"></div>
+            <div class="ctrl"><label>y₁ = <b id="t_py">2</b></label><input type="range" id="t_spy" min="-5" max="5" step="1" value="2"></div>
+            <div class="ctrl"><label>z₁ = <b id="t_pz">3</b></label><input type="range" id="t_spz" min="-5" max="5" step="1" value="3"></div>
+          </div>
+          <h3 style="margin-top:12px">Point Q (x₂, y₂, z₂)</h3>
+          <div class="controls">
+            <div class="ctrl"><label>x₂ = <b id="t_qx">3</b></label><input type="range" id="t_sqx" min="-5" max="5" step="1" value="3"></div>
+            <div class="ctrl"><label>y₂ = <b id="t_qy">-1</b></label><input type="range" id="t_sqy" min="-5" max="5" step="1" value="-1"></div>
+            <div class="ctrl"><label>z₂ = <b id="t_qz">2</b></label><input type="range" id="t_sqz" min="-5" max="5" step="1" value="2"></div>
+          </div>
+          <div class="out">
+            <div class="row"><span class="k">Direction d = Q − P</span><span class="v" id="t_dir"></span></div>
+            <div class="eq" id="t_vec">r = (1, 2, 3) + t(2, −3, −1)</div>
+            <div class="eq" id="t_sym" style="margin-top:6px;color:var(--accent2)"></div>
+          </div>
+          <p class="hint">Line through P, Q: <code>r = P + t(Q − P)</code>, i.e. <code>(x−x₁)/(x₂−x₁) = (y−y₁)/(y₂−y₁) = (z−z₁)/(z₂−z₁)</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 4: FACTS & QUIZ ===================== -->
+  <section id="tab-facts" class="hidden">
+    <div class="panel facts">
+      <h2>Key facts — line in space</h2>
+      <ul>
+        <li><b>Vector form:</b> a line through point A with direction d is <b>r = A + t·d</b>, where t is a real parameter.</li>
+        <li><b>Symmetric / Cartesian form:</b> (x−x₁)/a = (y−y₁)/b = (z−z₁)/c, where (a, b, c) are the direction ratios. Direction cosines are (a, b, c)/√(a²+b²+c²).</li>
+        <li><b>Through two points P, Q:</b> direction d = Q − P, so (x−x₁)/(x₂−x₁) = (y−y₁)/(y₂−y₁) = (z−z₁)/(z₂−z₁).</li>
+        <li><b>Angle between lines:</b> cos θ = (d₁·d₂)/(|d₁||d₂|) = |a₁a₂+b₁b₂+c₁c₂| / (√Σa₁²·√Σa₂²).</li>
+        <li><b>Parallel:</b> a₁/a₂ = b₁/b₂ = c₁/c₂ (d₁×d₂ = 0). <b>Perpendicular:</b> a₁a₂+b₁b₂+c₁c₂ = 0.</li>
+        <li><b>Skew lines</b> are non-parallel lines that do not intersect. Shortest distance = |(A₂−A₁)·(d₁×d₂)| / |d₁×d₂|, using the scalar triple product.</li>
+        <li><b>Intersecting</b> lines have shortest distance 0, i.e. (A₂−A₁)·(d₁×d₂) = 0 while d₁×d₂ ≠ 0.</li>
+      </ul>
+    </div>
+
+    <div class="panel quiz" id="quiz">
+      <h2>Quick check (3 questions)</h2>
+
+      <div class="q" data-a="1">
+        <p>1. The line (x−2)/3 = (y+1)/(−4) = (z)/5 has direction ratios:</p>
+        <div class="opts">
+          <button>(2, −1, 0)</button>
+          <button>(3, −4, 5)</button>
+          <button>(−3, 4, −5) only</button>
+          <button>(1/3, −1/4, 1/5)</button>
+        </div>
+        <div class="exp">In (x−x₁)/a = (y−y₁)/b = (z−z₁)/c the denominators (3, −4, 5) are the direction ratios; the point on the line is (2, −1, 0).</div>
+      </div>
+
+      <div class="q" data-a="0">
+        <p>2. Two lines with directions (1, 2, 2) and (2, −2, 1) are:</p>
+        <div class="opts">
+          <button>Perpendicular</button>
+          <button>Parallel</button>
+          <button>The same line</button>
+          <button>At 45°</button>
+        </div>
+        <div class="exp">d₁·d₂ = 1·2 + 2·(−2) + 2·1 = 2 − 4 + 2 = 0, so the lines are perpendicular.</div>
+      </div>
+
+      <div class="q" data-a="2">
+        <p>3. Shortest distance between skew lines r = A₁ + t·d₁ and r = A₂ + s·d₂ is:</p>
+        <div class="opts">
+          <button>|(A₂−A₁)·(d₁+d₂)| / |d₁+d₂|</button>
+          <button>|d₁×d₂| / |A₂−A₁|</button>
+          <button>|(A₂−A₁)·(d₁×d₂)| / |d₁×d₂|</button>
+          <button>|A₂−A₁| always</button>
+        </div>
+        <div class="exp">The common perpendicular is along d₁×d₂; projecting A₂−A₁ onto its unit vector gives SD = |(A₂−A₁)·(d₁×d₂)| / |d₁×d₂|.</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- vector helpers ----------
+  function cross(a,b){return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];}
+  function add(a,b){return [a[0]+b[0],a[1]+b[1],a[2]+b[2]];}
+  function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+  function scale(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+  function dotp(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+  function mag(a){return Math.sqrt(dotp(a,a));}
+  function norm(a){var m=mag(a); return m<1e-9?[0,0,0]:[a[0]/m,a[1]/m,a[2]/m];}
+
+  function fmt(x){
+    if(Math.abs(x)<1e-9) x=0;
+    var r=Math.round(x*1000)/1000;
+    return (Number.isInteger(r)? r.toString() : r.toFixed(3).replace(/0+$/,'').replace(/\.$/,''));
+  }
+  function vecStr(v){ return "("+fmt(v[0])+", "+fmt(v[1])+", "+fmt(v[2])+")"; }
+
+  // ---------- 3D -> 2D projection ----------
+  function makeView(canvas){
+    return { az:-0.6, el:0.5, cx:canvas.width/2, cy:canvas.height/2, scale:30, canvas:canvas };
+  }
+  function project(v, view){
+    var x=v[0], y=v[1], z=v[2];
+    var ca=Math.cos(view.az), sa=Math.sin(view.az);
+    var x1=x*ca - y*sa, y1=x*sa + y*ca, z1=z;
+    var ce=Math.cos(view.el), se=Math.sin(view.el);
+    var y2=y1*ce - z1*se, z2=y1*se + z1*ce;
+    return [view.cx + x1*view.scale, view.cy - z2*view.scale, y2];
+  }
+  function line(ctx,a,b,view,color,w){
+    var pa=project(a,view), pb=project(b,view);
+    ctx.strokeStyle=color; ctx.lineWidth=w||1.5;
+    ctx.beginPath(); ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pb[0],pb[1]); ctx.stroke();
+  }
+  function dot(ctx,a,view,color,r){
+    var p=project(a,view);
+    ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p[0],p[1],r||4,0,7); ctx.fill();
+  }
+  function label(ctx,a,view,text,color){
+    var p=project(a,view);
+    ctx.fillStyle=color; ctx.font="12px system-ui,sans-serif";
+    ctx.fillText(text,p[0]+6,p[1]-6);
+  }
+  function axes(ctx,view){
+    var L=4.6;
+    line(ctx,[-L,0,0],[L,0,0],view,"#39435f",1);
+    line(ctx,[0,-L,0],[0,L,0],view,"#39435f",1);
+    line(ctx,[0,0,-L],[0,0,L],view,"#39435f",1);
+    label(ctx,[L,0,0],view,"x","#5b6785");
+    label(ctx,[0,L,0],view,"y","#5b6785");
+    label(ctx,[0,0,L],view,"z","#5b6785");
+  }
+  function clear(ctx,cv){ ctx.clearRect(0,0,cv.width,cv.height); }
+  function drawVector(ctx,view,from,to,color){
+    line(ctx,from,to,view,color,2.5);
+    // arrowhead
+    var pf=project(from,view), pt=project(to,view);
+    var dx=pt[0]-pf[0], dy=pt[1]-pf[1], L=Math.sqrt(dx*dx+dy*dy);
+    if(L>1){
+      var ux=dx/L, uy=dy/L, s=8;
+      ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath();
+      ctx.moveTo(pt[0],pt[1]); ctx.lineTo(pt[0]-s*ux-s*0.6*uy, pt[1]-s*uy+s*0.6*ux);
+      ctx.moveTo(pt[0],pt[1]); ctx.lineTo(pt[0]-s*ux+s*0.6*uy, pt[1]-s*uy-s*0.6*ux);
+      ctx.stroke();
+    }
+  }
+  // draw an infinite-looking line: A + t*u for t in [-ext, ext]
+  function drawInfLine(ctx,view,A,d,color,ext){
+    var u=norm(d); if(mag(u)<1e-9) return;
+    var e=ext||4.6;
+    line(ctx, sub(A,scale(u,e)), add(A,scale(u,e)), view, color, 2);
+  }
+
+  // ---------- drag-to-rotate ----------
+  var views={};
+  function attachDrag(canvas,key,redraw){
+    var view=makeView(canvas); views[key]=view;
+    var dragging=false, lx=0, ly=0;
+    function pt(e){ var r=canvas.getBoundingClientRect(); var t=e.touches?e.touches[0]:e;
+      return {x:(t.clientX-r.left)*(canvas.width/r.width), y:(t.clientY-r.top)*(canvas.height/r.height)}; }
+    function down(e){ dragging=true; var p=pt(e); lx=p.x; ly=p.y; e.preventDefault(); }
+    function move(e){ if(!dragging) return; var p=pt(e);
+      view.az += (p.x-lx)*0.01; view.el += (p.y-ly)*0.01;
+      if(view.el>1.5) view.el=1.5; if(view.el<-1.5) view.el=-1.5;
+      lx=p.x; ly=p.y; redraw(); e.preventDefault(); }
+    function up(){ dragging=false; }
+    canvas.addEventListener("mousedown",down); window.addEventListener("mousemove",move); window.addEventListener("mouseup",up);
+    canvas.addEventListener("touchstart",down,{passive:false}); canvas.addEventListener("touchmove",move,{passive:false}); canvas.addEventListener("touchend",up);
+    return view;
+  }
+
+  function symStr(x1,y1,z1,a,b,c){
+    function part(v,den){
+      var num = (v===0)? v : (v<0? "(x+"+(-v)+")" : "(x−"+v+")");
+      return num;
+    }
+    function seg(name,val,den){
+      var top = (val===0)? name : (val<0? "("+name+"+"+(-val)+")" : "("+name+"−"+val+")");
+      return top+"/"+den;
+    }
+    return seg("x",x1,fmt(a))+" = "+seg("y",y1,fmt(b))+" = "+seg("z",z1,fmt(c));
+  }
+
+  // ==================== TAB 1: EQUATION ====================
+  var cv1=document.getElementById("cv1"), ctx1=cv1.getContext("2d");
+  var s_x1=document.getElementById("s_x1"),s_y1=document.getElementById("s_y1"),s_z1=document.getElementById("s_z1");
+  var s_a=document.getElementById("s_a"),s_b=document.getElementById("s_b"),s_c=document.getElementById("s_c"),s_t=document.getElementById("s_t");
+  function draw1(){
+    clear(ctx1,cv1); axes(ctx1,views.v1);
+    var A=[+s_x1.value,+s_y1.value,+s_z1.value];
+    var d=[+s_a.value,+s_b.value,+s_c.value];
+    var t=+s_t.value;
+    document.getElementById("v_x1").textContent=A[0];document.getElementById("v_y1").textContent=A[1];document.getElementById("v_z1").textContent=A[2];
+    document.getElementById("v_a").textContent=d[0];document.getElementById("v_b").textContent=d[1];document.getElementById("v_c").textContent=d[2];
+    document.getElementById("v_t").textContent=fmt(t);
+    if(mag(d)>1e-9){
+      drawInfLine(ctx1,views.v1,A,d,"#6fd0c0",4.6);
+      drawVector(ctx1,views.v1,A,add(A,norm(d).map(function(x){return x*2.4;})),"#ff9d5c");
+      label(ctx1,add(A,scale(norm(d),2.6)),views.v1,"d","#ff9d5c");
+    }
+    dot(ctx1,A,views.v1,"#7db4ff",5); label(ctx1,A,views.v1,"A","#7db4ff");
+    var P=add(A,scale(d,t));
+    dot(ctx1,P,views.v1,"#ffd27a",5); label(ctx1,P,views.v1,"P","#ffd27a");
+    dot(ctx1,[0,0,0],views.v1,"#e8ecf6",3);
+    // readouts
+    document.getElementById("eq_vec").textContent="r = "+vecStr(A)+" + t"+vecStr(d);
+    if(mag(d)>1e-9){
+      document.getElementById("eq_sym").textContent=symStr(A[0],A[1],A[2],d[0],d[1],d[2]);
+      document.getElementById("pt_u").textContent=vecStr(norm(d));
+    } else {
+      document.getElementById("eq_sym").textContent="direction is zero — not a line";
+      document.getElementById("pt_u").textContent="—";
+    }
+    document.getElementById("pt_P").textContent=vecStr(P);
+  }
+
+  // ==================== TAB 2: ANGLE ====================
+  var cv2=document.getElementById("cv2"), ctx2=cv2.getContext("2d");
+  var g_sa1=document.getElementById("g_sa1"),g_sb1=document.getElementById("g_sb1"),g_sc1=document.getElementById("g_sc1");
+  var g_sa2=document.getElementById("g_sa2"),g_sb2=document.getElementById("g_sb2"),g_sc2=document.getElementById("g_sc2");
+  function draw2(){
+    clear(ctx2,cv2); axes(ctx2,views.v2);
+    var d1=[+g_sa1.value,+g_sb1.value,+g_sc1.value];
+    var d2=[+g_sa2.value,+g_sb2.value,+g_sc2.value];
+    document.getElementById("g_a1").textContent=d1[0];document.getElementById("g_b1").textContent=d1[1];document.getElementById("g_c1").textContent=d1[2];
+    document.getElementById("g_a2").textContent=d2[0];document.getElementById("g_b2").textContent=d2[1];document.getElementById("g_c2").textContent=d2[2];
+    if(mag(d1)>1e-9){ drawInfLine(ctx2,views.v2,[0,0,0],d1,"rgba(111,208,192,.55)",4.6);
+      drawVector(ctx2,views.v2,[0,0,0],scale(norm(d1),2.6),"#6fd0c0"); label(ctx2,scale(norm(d1),2.7),views.v2,"d₁","#6fd0c0"); }
+    if(mag(d2)>1e-9){ drawInfLine(ctx2,views.v2,[0,0,0],d2,"rgba(255,157,92,.55)",4.6);
+      drawVector(ctx2,views.v2,[0,0,0],scale(norm(d2),2.6),"#ff9d5c"); label(ctx2,scale(norm(d2),2.7),views.v2,"d₂","#ff9d5c"); }
+    dot(ctx2,[0,0,0],views.v2,"#e8ecf6",3);
+    var dp=dotp(d1,d2), m1=mag(d1), m2=mag(d2);
+    document.getElementById("g_dot").textContent=fmt(dp);
+    document.getElementById("g_mag").textContent=fmt(m1)+" · "+fmt(m2)+" = "+fmt(m1*m2);
+    if(m1>1e-9 && m2>1e-9){
+      var cosFull=dp/(m1*m2);
+      var cosAcute=Math.min(1,Math.max(-1,Math.abs(cosFull)));
+      var deg=Math.acos(cosAcute)*180/Math.PI;
+      document.getElementById("g_cos").textContent=fmt(cosAcute)+"  (= |d₁·d₂|/|d₁||d₂|)";
+      document.getElementById("g_ang").textContent="θ = "+fmt(deg)+"°";
+      var rel, cls;
+      if(Math.abs(dp)<1e-9){ rel="Perpendicular (d₁·d₂ = 0)"; cls="p-perp"; }
+      else if(mag(cross(d1,d2))<1e-9){ rel="Parallel (d₁ ∥ d₂)"; cls="p-par"; }
+      else { rel="θ = "+fmt(deg)+"° (oblique)"; cls="p-int"; }
+      document.getElementById("g_rel").innerHTML='<span class="pill '+cls+'">'+rel+'</span>';
+    } else {
+      document.getElementById("g_cos").textContent="—";
+      document.getElementById("g_ang").textContent="θ = —";
+      document.getElementById("g_rel").textContent="need non-zero directions";
+    }
+  }
+
+  // ==================== TAB 3a: TWO LINES ====================
+  var cv3=document.getElementById("cv3"), ctx3=cv3.getContext("2d");
+  var R={
+    p1x:id("r_sp1x"),p1y:id("r_sp1y"),p1z:id("r_sp1z"),
+    d1a:id("r_sd1a"),d1b:id("r_sd1b"),d1c:id("r_sd1c"),
+    p2x:id("r_sp2x"),p2y:id("r_sp2y"),p2z:id("r_sp2z"),
+    d2a:id("r_sd2a"),d2b:id("r_sd2b"),d2c:id("r_sd2c")
+  };
+  function id(x){ return document.getElementById(x); }
+  function setTxt(x,v){ document.getElementById(x).textContent=v; }
+  function draw3(){
+    clear(ctx3,cv3); axes(ctx3,views.v3);
+    var A1=[+R.p1x.value,+R.p1y.value,+R.p1z.value];
+    var d1=[+R.d1a.value,+R.d1b.value,+R.d1c.value];
+    var A2=[+R.p2x.value,+R.p2y.value,+R.p2z.value];
+    var d2=[+R.d2a.value,+R.d2b.value,+R.d2c.value];
+    setTxt("r_p1x",A1[0]);setTxt("r_p1y",A1[1]);setTxt("r_p1z",A1[2]);
+    setTxt("r_d1a",d1[0]);setTxt("r_d1b",d1[1]);setTxt("r_d1c",d1[2]);
+    setTxt("r_p2x",A2[0]);setTxt("r_p2y",A2[1]);setTxt("r_p2z",A2[2]);
+    setTxt("r_d2a",d2[0]);setTxt("r_d2b",d2[1]);setTxt("r_d2c",d2[2]);
+    if(mag(d1)>1e-9){ drawInfLine(ctx3,views.v3,A1,d1,"#6fd0c0",4.6); dot(ctx3,A1,views.v3,"#6fd0c0",5); label(ctx3,A1,views.v3,"A₁","#6fd0c0"); }
+    if(mag(d2)>1e-9){ drawInfLine(ctx3,views.v3,A2,d2,"#ff9d5c",4.6); dot(ctx3,A2,views.v3,"#ff9d5c",5); label(ctx3,A2,views.v3,"A₂","#ff9d5c"); }
+    dot(ctx3,[0,0,0],views.v3,"#e8ecf6",3);
+
+    var cr=cross(d1,d2), crm=mag(cr);
+    var w=sub(A2,A1);
+    var triple=dotp(w,cr);
+    setTxt("r_cross",vecStr(cr));
+    setTxt("r_triple",fmt(triple));
+    setTxt("r_den",fmt(crm));
+
+    var cfgEl=document.getElementById("r_cfg");
+    if(mag(d1)<1e-9 || mag(d2)<1e-9){
+      document.getElementById("r_dist").textContent="Shortest distance = —";
+      cfgEl.textContent="need directions"; cfgEl.className="pill";
+      return;
+    }
+    if(crm<1e-9){
+      // parallel (or coincident): SD = |w x d1| / |d1|
+      var sd = mag(cross(w,d1))/mag(d1);
+      if(sd<1e-9){
+        document.getElementById("r_dist").textContent="Shortest distance = 0 (coincident lines)";
+        cfgEl.textContent="Coincident"; cfgEl.className="pill p-par";
+      } else {
+        document.getElementById("r_dist").textContent="Shortest distance = "+fmt(sd)+"  (parallel)";
+        cfgEl.textContent="Parallel"; cfgEl.className="pill p-par";
+        drawSDParallel(A1,d1,A2);
+      }
+    } else {
+      var sd = Math.abs(triple)/crm;
+      if(Math.abs(triple)<1e-9){
+        document.getElementById("r_dist").textContent="Shortest distance = 0 (lines intersect)";
+        cfgEl.textContent="Intersecting"; cfgEl.className="pill p-int";
+      } else {
+        document.getElementById("r_dist").textContent="Shortest distance = "+fmt(sd);
+        cfgEl.textContent="Skew"; cfgEl.className="pill p-skew";
+        drawSDSkew(A1,d1,A2,d2);
+      }
+    }
+  }
+  // common perpendicular feet between skew lines
+  function drawSDSkew(A1,d1,A2,d2){
+    var r=sub(A1,A2);
+    var a=dotp(d1,d1), b=dotp(d1,d2), c=dotp(d2,d2), dd=dotp(d1,r), e=dotp(d2,r);
+    var den=a*c-b*b; if(Math.abs(den)<1e-12) return;
+    var t=(b*e - c*dd)/den;
+    var s=(a*e - b*dd)/den;
+    var P1=add(A1,scale(d1,t));
+    var P2=add(A2,scale(d2,s));
+    ctx3.setLineDash([5,4]);
+    line(ctx3,P1,P2,views.v3,"#e879f9",2.5);
+    ctx3.setLineDash([]);
+    dot(ctx3,P1,views.v3,"#e879f9",4); dot(ctx3,P2,views.v3,"#e879f9",4);
+  }
+  function drawSDParallel(A1,d1,A2){
+    // foot of A2 onto line1
+    var u=norm(d1);
+    var F=add(A1,scale(u, dotp(sub(A2,A1),u)));
+    ctx3.setLineDash([5,4]);
+    line(ctx3,A2,F,views.v3,"#e879f9",2.5);
+    ctx3.setLineDash([]);
+    dot(ctx3,F,views.v3,"#e879f9",4);
+  }
+
+  // ==================== TAB 3b: LINE THROUGH TWO POINTS ====================
+  var cv4=document.getElementById("cv4"), ctx4=cv4.getContext("2d");
+  var T={ px:id("t_spx"),py:id("t_spy"),pz:id("t_spz"),qx:id("t_sqx"),qy:id("t_sqy"),qz:id("t_sqz") };
+  function draw4(){
+    clear(ctx4,cv4); axes(ctx4,views.v4);
+    var P=[+T.px.value,+T.py.value,+T.pz.value];
+    var Q=[+T.qx.value,+T.qy.value,+T.qz.value];
+    setTxt("t_px",P[0]);setTxt("t_py",P[1]);setTxt("t_pz",P[2]);
+    setTxt("t_qx",Q[0]);setTxt("t_qy",Q[1]);setTxt("t_qz",Q[2]);
+    var d=sub(Q,P);
+    if(mag(d)>1e-9) drawInfLine(ctx4,views.v4,P,d,"#6fd0c0",4.6);
+    // segment PQ highlighted + direction arrow
+    if(mag(d)>1e-9){
+      drawVector(ctx4,views.v4,P,Q,"#ff9d5c");
+    }
+    dot(ctx4,P,views.v4,"#7db4ff",5); label(ctx4,P,views.v4,"P","#7db4ff");
+    dot(ctx4,Q,views.v4,"#7db4ff",5); label(ctx4,Q,views.v4,"Q","#7db4ff");
+    dot(ctx4,[0,0,0],views.v4,"#e8ecf6",3);
+    setTxt("t_dir",vecStr(d));
+    document.getElementById("t_vec").textContent="r = "+vecStr(P)+" + t"+vecStr(d);
+    if(mag(d)>1e-9) document.getElementById("t_sym").textContent=symStr(P[0],P[1],P[2],d[0],d[1],d[2]);
+    else document.getElementById("t_sym").textContent="P = Q — no unique line";
+  }
+
+  // ---------- attach drags ----------
+  attachDrag(cv1,"v1",draw1);
+  attachDrag(cv2,"v2",draw2);
+  attachDrag(cv3,"v3",draw3);
+  attachDrag(cv4,"v4",draw4);
+
+  // ---------- slider events ----------
+  [s_x1,s_y1,s_z1,s_a,s_b,s_c,s_t].forEach(function(s){ s.addEventListener("input",draw1); });
+  [g_sa1,g_sb1,g_sc1,g_sa2,g_sb2,g_sc2].forEach(function(s){ s.addEventListener("input",draw2); });
+  Object.keys(R).forEach(function(k){ R[k].addEventListener("input",draw3); });
+  Object.keys(T).forEach(function(k){ T[k].addEventListener("input",draw4); });
+
+  // ---------- tabs ----------
+  var tabs=document.querySelectorAll(".tab-btn");
+  var sections={eq:document.getElementById("tab-eq"),angle:document.getElementById("tab-angle"),
+    rel:document.getElementById("tab-rel"),facts:document.getElementById("tab-facts")};
+  tabs.forEach(function(t){ t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");}); t.classList.add("active");
+    for(var k in sections) sections[k].classList.add("hidden");
+    sections[t.dataset.tab].classList.remove("hidden");
+    if(t.dataset.tab==="eq") draw1();
+    if(t.dataset.tab==="angle") draw2();
+    if(t.dataset.tab==="rel"){ draw3(); draw4(); }
+  }); });
+
+  // ---------- sub-mode toggle ----------
+  var relmode=document.getElementById("relmode");
+  relmode.querySelectorAll("button").forEach(function(b){ b.addEventListener("click",function(){
+    relmode.querySelectorAll("button").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    document.getElementById("relTwo").classList.toggle("hidden", b.dataset.m!=="two");
+    document.getElementById("relPts").classList.toggle("hidden", b.dataset.m!=="pts");
+    if(b.dataset.m==="two") draw3(); else draw4();
+  }); });
+
+  // ---------- quiz ----------
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var ans=+q.dataset.a, opts=q.querySelectorAll(".opts button"), exp=q.querySelector(".exp");
+    opts.forEach(function(o,i){ o.addEventListener("click",function(){
+      opts.forEach(function(x){x.disabled=true;});
+      if(i===ans) o.classList.add("correct");
+      else { o.classList.add("wrong"); opts[ans].classList.add("correct"); }
+      exp.classList.add("show");
+    }); });
+  });
+
+  // ---------- init ----------
+  draw1(); draw2(); draw3(); draw4();
+})();
+</script>
+</body>
+</html>

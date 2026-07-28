@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Programming Lab — NIOS Class 12 Maths (Ch 37)</title>
+<style>
+  :root{
+    --bg:#12151c; --panel:#1a1f2b; --panel2:#212736; --ink:#e7ecf5;
+    --muted:#9aa6bd; --accent:#4fd1c5; --accent2:#2b6a63;
+    --line:#2c3446; --good:#63d67a; --bad:#ff7a7a; --warn:#ffd166;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:14px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.3rem; margin:0 0 4px}
+  .sub{color:var(--muted); font-size:.85rem; margin-bottom:12px}
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px}
+  .tab{
+    background:var(--panel2); color:var(--ink); border:1px solid var(--line);
+    padding:8px 14px; border-radius:999px; cursor:pointer; font-size:.9rem;
+    min-height:40px;
+  }
+  .tab.active{background:var(--accent); color:#0b0e13; border-color:var(--accent); font-weight:600}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px; margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  .row{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-start}
+  .col{flex:1 1 300px; min-width:0}
+  canvas{
+    width:100%; height:auto; display:block; background:var(--panel2);
+    border:1px solid var(--line); border-radius:12px; touch-action:manipulation;
+  }
+  label{font-size:.82rem; color:var(--muted); display:block; margin:6px 0 2px}
+  input[type=text],input[type=number],select,textarea{
+    width:100%; background:var(--panel2); color:var(--ink);
+    border:1px solid var(--line); border-radius:10px; padding:9px 10px;
+    font-size:.95rem; font-family:inherit;
+  }
+  textarea{resize:vertical; min-height:96px; white-space:pre; overflow-x:auto}
+  button.act{
+    background:var(--accent); color:#0b0e13; border:none; border-radius:10px;
+    padding:10px 14px; font-size:.92rem; font-weight:600; cursor:pointer;
+    min-height:42px; margin-top:8px;
+  }
+  button.ghost{
+    background:transparent; color:var(--accent); border:1px solid var(--accent);
+    border-radius:10px; padding:9px 12px; font-size:.88rem; cursor:pointer;
+    min-height:40px; margin-top:8px;
+  }
+  .inline{display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end}
+  .inline > div{flex:1 1 90px}
+  table{width:100%; border-collapse:collapse; font-size:.85rem; margin-top:6px}
+  th,td{border:1px solid var(--line); padding:6px 8px; text-align:center}
+  th{background:var(--panel2); color:var(--muted); font-weight:600}
+  tr.opt td{background:rgba(79,209,197,.16); font-weight:700; color:var(--accent)}
+  .status{
+    margin-top:10px; padding:9px 11px; border-radius:10px; font-size:.88rem;
+    background:var(--panel2); border:1px solid var(--line);
+  }
+  .status.good{border-color:var(--good)}
+  .status.bad{border-color:var(--bad); color:#ffd7d7}
+  .status.warn{border-color:var(--warn)}
+  details{background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:10px}
+  summary{cursor:pointer; font-weight:600; font-size:.92rem}
+  .facts h3{margin:.4rem 0 .2rem; font-size:.98rem; color:var(--accent)}
+  .facts p, .facts li{font-size:.86rem; color:var(--ink)}
+  .facts .muted{color:var(--muted)}
+  .quiz .q{font-weight:600; margin:10px 0 6px; font-size:.92rem}
+  .quiz button.opt{
+    display:block; width:100%; text-align:left; background:var(--panel2);
+    color:var(--ink); border:1px solid var(--line); border-radius:10px;
+    padding:9px 11px; margin:5px 0; cursor:pointer; font-size:.88rem; min-height:40px;
+  }
+  .quiz button.opt.correct{border-color:var(--good); background:rgba(99,214,122,.14)}
+  .quiz button.opt.wrong{border-color:var(--bad); background:rgba(255,122,122,.14)}
+  .expl{font-size:.82rem; color:var(--muted); margin:4px 0 10px; display:none}
+  .expl.show{display:block}
+  .pill{display:inline-block; padding:2px 8px; border-radius:999px; font-size:.75rem; background:var(--panel2); border:1px solid var(--line); color:var(--muted); margin:2px 4px 2px 0}
+  code{background:var(--panel2); padding:1px 5px; border-radius:6px; font-size:.85em}
+  .legend{font-size:.78rem; color:var(--muted); margin-top:6px}
+  .legend span{display:inline-flex; align-items:center; gap:5px; margin-right:12px}
+  .sw{width:14px; height:14px; border-radius:3px; display:inline-block}
+  @media (max-width:420px){ h1{font-size:1.12rem} }
+</style>
+</head>
+<body>
+<h1>Linear Programming Lab</h1>
+<div class="sub">NIOS Class 12 Mathematics · Chapter 37 · corner-point method, feasible regions &amp; optimisation</div>
+
+<div class="tabs">
+  <button class="tab active" data-view="grapher">1 · Feasible Region</button>
+  <button class="tab" data-view="optimize">2 · Optimise Z</button>
+  <button class="tab" data-view="example">3 · Worked Example</button>
+  <button class="tab" data-view="facts">Facts</button>
+  <button class="tab" data-view="quiz">Quiz</button>
+</div>
+
+<!-- ===================== VIEW 1 + 2 share the same graph/constraints ===================== -->
+<div class="view active" id="grapher">
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <label>Constraints — one per line. Use <code>&lt;=</code>, <code>&gt;=</code>, <code>=</code>. Vars <code>x</code>, <code>y</code>.</label>
+        <textarea id="cons">x >= 0
+y >= 0
+2x + y <= 10
+x + 3y <= 15</textarea>
+        <div class="inline">
+          <button class="act" id="plotBtn">Plot &amp; shade</button>
+          <button class="ghost" id="resetView">Reset view</button>
+        </div>
+        <div class="status" id="gStatus">Ready.</div>
+        <div class="legend">
+          <span><span class="sw" style="background:#4fd1c5"></span>feasible region</span>
+          <span><span class="sw" style="background:#ffd166"></span>vertex</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <canvas id="cv1" width="560" height="560" aria-label="Feasible region plot"></canvas>
+        <div id="vtxList" style="font-size:.82rem;color:var(--muted);margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== VIEW 2 OPTIMISE ===================== -->
+<div class="view" id="optimize">
+  <div class="row">
+    <div class="col">
+      <div class="panel">
+        <div class="sub" style="margin:0 0 8px">Uses the constraints entered in tab 1. Objective <code>Z = a·x + b·y</code>.</div>
+        <div class="inline">
+          <div><label>a (coeff of x)</label><input type="number" id="objA" value="3" step="any"></div>
+          <div><label>b (coeff of y)</label><input type="number" id="objB" value="4" step="any"></div>
+          <div><label>Goal</label>
+            <select id="goal"><option value="max">Maximise</option><option value="min">Minimise</option></select>
+          </div>
+        </div>
+        <button class="act" id="optBtn">Evaluate corners</button>
+        <div class="status" id="oStatus">Enter Z and evaluate.</div>
+        <div id="objTable"></div>
+        <label style="margin-top:10px">Slide the iso-profit line (Z value)</label>
+        <input type="range" id="isoSlide" min="0" max="100" value="0" step="1" style="width:100%">
+        <div id="isoLbl" style="font-size:.82rem;color:var(--muted)"></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="panel">
+        <canvas id="cv2" width="560" height="560" aria-label="Optimisation plot"></canvas>
+        <div class="legend">
+          <span><span class="sw" style="background:#4fd1c5"></span>feasible</span>
+          <span><span class="sw" style="background:#ff8fb0"></span>iso-profit Z line</span>
+          <span><span class="sw" style="background:#63d67a"></span>optimum vertex</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== VIEW 3 EXAMPLE ===================== -->
+<div class="view" id="example">
+  <div class="panel">
+    <label>Load a classic preset, then explore it in tabs 1 &amp; 2.</label>
+    <div class="inline">
+      <select id="preset">
+        <option value="furniture">Furniture factory — maximise profit (bounded)</option>
+        <option value="diet">Diet problem — minimise cost (unbounded region)</option>
+        <option value="nofeas">No feasible solution (empty region)</option>
+        <option value="unbounded">Unbounded maximum</option>
+      </select>
+      <button class="act" id="loadPreset">Load preset</button>
+    </div>
+    <div class="status" id="exStatus"></div>
+    <div id="exBody" class="facts" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ===================== FACTS ===================== -->
+<div class="view" id="facts">
+  <div class="panel facts">
+    <details open><summary>Constraints &amp; the feasible region</summary>
+      <p>A <b>linear constraint</b> is an inequality such as <code>2x + y &le; 10</code>. Each one divides the plane into two <b>half-planes</b>; the constraint keeps the side that satisfies it.</p>
+      <p>The <b>feasible region</b> is the intersection of all half-planes — the set of every point satisfying <i>all</i> constraints simultaneously. With <code>x&ge;0, y&ge;0</code> it sits in the first quadrant.</p>
+    </details>
+    <details><summary>Corner-point (vertex) theorem</summary>
+      <p>For a linear objective on a <b>convex polygon</b> feasible region, the optimum (max or min) always occurs at a <b>corner point</b> (vertex). So we:</p>
+      <ul>
+        <li>find every vertex (intersection of boundary lines that lies in the region),</li>
+        <li>evaluate <code>Z = ax + by</code> at each vertex,</li>
+        <li>pick the largest value (maximise) or smallest (minimise).</li>
+      </ul>
+    </details>
+    <details><summary>Objective function</summary>
+      <p>The quantity being optimised, e.g. profit <code>Z = 3x + 4y</code>. Lines <code>Z = k</code> are parallel; sliding them (the <b>iso-profit line</b>) until they last touch the region locates the optimum vertex.</p>
+    </details>
+    <details><summary>Bounded / unbounded / infeasible</summary>
+      <ul>
+        <li><b>Bounded:</b> region enclosed — both max &amp; min exist.</li>
+        <li><b>Unbounded:</b> region extends to infinity — a max (or min) may not exist. If it does, still at a vertex.</li>
+        <li><b>No feasible solution:</b> constraints contradict — the region is empty.</li>
+      </ul>
+    </details>
+    <div style="margin-top:8px">
+      <span class="pill">half-plane</span><span class="pill">convex region</span>
+      <span class="pill">vertex</span><span class="pill">iso-profit line</span><span class="pill">optimum</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== QUIZ ===================== -->
+<div class="view" id="quiz">
+  <div class="panel quiz" id="quizBox"></div>
+</div>
+
+<script>
+"use strict";
+/* ---------------- constraint parsing ---------------- */
+// returns {A,B,C,op,raw}  meaning A*x + B*y (op) C   ; op in '<=','>=','='
+function parseConstraint(line){
+  const raw = line.trim();
+  if(!raw) return null;
+  const m = raw.match(/(<=|>=|=<|=>|<|>|=)/);
+  if(!m) throw new Error("no comparator in: "+raw);
+  let op = m[0];
+  if(op==='=<') op='<='; if(op==='=>') op='>=';
+  if(op==='<') op='<='; if(op==='>') op='>=';
+  const idx = raw.indexOf(m[0]);
+  const lhs = raw.slice(0, idx);
+  const rhs = raw.slice(idx + m[0].length);
+  const L = linExpr(lhs), R = linExpr(rhs);
+  // (Lx-Rx) x + (Ly-Ry) y  op  (Rc - Lc)
+  const A = L.x - R.x, B = L.y - R.y, C = R.c - L.c;
+  if(A===0 && B===0) throw new Error("not a real constraint: "+raw);
+  return {A,B,C,op,raw};
+}
+// parse "2x + 3y - 4" -> {x,y,c}
+function linExpr(s){
+  s = s.replace(/\s+/g,'');
+  if(s==='') return {x:0,y:0,c:0};
+  // tokenise signed terms
+  const terms = s.match(/[+\-]?[^+\-]+/g) || [];
+  let x=0,y=0,c=0;
+  for(let t of terms){
+    let sign=1;
+    if(t[0]==='+'){t=t.slice(1);} else if(t[0]==='-'){sign=-1;t=t.slice(1);}
+    if(/x$/.test(t)){
+      let co=t.slice(0,-1); if(co===''||co==='.') co='1';
+      x += sign*parseFloat(co);
+    } else if(/y$/.test(t)){
+      let co=t.slice(0,-1); if(co===''||co==='.') co='1';
+      y += sign*parseFloat(co);
+    } else {
+      c += sign*parseFloat(t);
+    }
+  }
+  if([x,y,c].some(v=>isNaN(v))) throw new Error("bad term in: "+s);
+  return {x,y,c};
+}
+
+/* ---------------- geometry ---------------- */
+function satisfies(cst, px, py, eps=1e-7){
+  const v = cst.A*px + cst.B*py;
+  if(cst.op==='<=') return v <= cst.C + eps;
+  if(cst.op==='>=') return v >= cst.C - eps;
+  return Math.abs(v - cst.C) <= eps*Math.max(1,Math.abs(cst.C));
+}
+function feasiblePoint(cons, px, py){
+  return cons.every(c=>satisfies(c,px,py));
+}
+// intersection of two lines A1x+B1y=C1 etc
+function intersect(a,b){
+  const det = a.A*b.B - b.A*a.B;
+  if(Math.abs(det) < 1e-12) return null;
+  const x = (a.C*b.B - b.C*a.B)/det;
+  const y = (a.A*b.C - b.A*a.C)/det;
+  return {x,y};
+}
+// compute feasible vertices: pairwise intersections + also intersections satisfying all
+function computeVertices(cons){
+  const pts=[];
+  for(let i=0;i<cons.length;i++)
+    for(let j=i+1;j<cons.length;j++){
+      const p = intersect(cons[i],cons[j]);
+      if(p && isFinite(p.x) && isFinite(p.y) && feasiblePoint(cons,p.x,p.y)) pts.push(p);
+    }
+  // dedupe
+  const out=[];
+  for(const p of pts){
+    if(!out.some(q=>Math.abs(q.x-p.x)<1e-6 && Math.abs(q.y-p.y)<1e-6)) out.push(p);
+  }
+  // order by angle around centroid (convex polygon)
+  if(out.length>=3){
+    const cx=out.reduce((s,p)=>s+p.x,0)/out.length;
+    const cy=out.reduce((s,p)=>s+p.y,0)/out.length;
+    out.sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
+  }
+  return out;
+}
+// is region bounded? test if feasible far out in several directions
+function isBounded(cons){
+  const R=1e6;
+  for(let k=0;k<16;k++){
+    const th = k*Math.PI/8;
+    // find a feasible interior point first
+    if(feasiblePoint(cons, R*Math.cos(th), R*Math.sin(th))) return false;
+  }
+  return true;
+}
+
+/* ---------------- view/coordinate mapping ---------------- */
+let VIEW = {xmin:-1, xmax:12, ymin:-1, ymax:12};
+function autoView(vtx){
+  let xs=[0], ys=[0];
+  vtx.forEach(p=>{xs.push(p.x);ys.push(p.y);});
+  let xmax=Math.max(...xs), ymax=Math.max(...ys);
+  if(!isFinite(xmax)||xmax<=0) xmax=10;
+  if(!isFinite(ymax)||ymax<=0) ymax=10;
+  const pad = 0.15;
+  VIEW={xmin:-1, xmax:Math.ceil(xmax*(1+pad))+1, ymin:-1, ymax:Math.ceil(ymax*(1+pad))+1};
+}
+function mapper(cv){
+  const W=cv.width, H=cv.height, m=40;
+  const sx = (W-2*m)/(VIEW.xmax-VIEW.xmin);
+  const sy = (H-2*m)/(VIEW.ymax-VIEW.ymin);
+  return {
+    X:x=> m + (x-VIEW.xmin)*sx,
+    Y:y=> H-m - (y-VIEW.ymin)*sy,
+    m,W,H
+  };
+}
+
+/* ---------------- drawing ---------------- */
+const ACCENT='#4fd1c5';
+function drawBase(cv, cons, vtx){
+  const ctx=cv.getContext('2d'); const M=mapper(cv);
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // grid
+  ctx.strokeStyle='#242b3b'; ctx.lineWidth=1; ctx.fillStyle='#6a748c';
+  ctx.font='11px system-ui'; ctx.textAlign='center'; ctx.textBaseline='top';
+  for(let gx=Math.ceil(VIEW.xmin); gx<=VIEW.xmax; gx++){
+    ctx.beginPath(); ctx.moveTo(M.X(gx),M.m); ctx.lineTo(M.X(gx),M.H-M.m); ctx.stroke();
+    if(gx!==0) ctx.fillText(gx, M.X(gx), M.Y(0)+4);
+  }
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let gy=Math.ceil(VIEW.ymin); gy<=VIEW.ymax; gy++){
+    ctx.beginPath(); ctx.moveTo(M.m,M.Y(gy)); ctx.lineTo(M.W-M.m,M.Y(gy)); ctx.stroke();
+    if(gy!==0) ctx.fillText(gy, M.X(0)-5, M.Y(gy));
+  }
+  // axes
+  ctx.strokeStyle='#5b647a'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(M.X(VIEW.xmin),M.Y(0)); ctx.lineTo(M.X(VIEW.xmax),M.Y(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(M.X(0),M.Y(VIEW.ymin)); ctx.lineTo(M.X(0),M.Y(VIEW.ymax)); ctx.stroke();
+  ctx.fillStyle='#9aa6bd'; ctx.font='12px system-ui';
+  ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('x', M.W-M.m+4, M.Y(0)+4);
+  ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText('y', M.X(0)-6, M.m-2);
+
+  // shade feasible region via pixel sampling (accurate intersection of half-planes)
+  shadeFeasible(ctx, cv, cons, M);
+
+  // constraint lines
+  const pal=['#ff8fb0','#8fb4ff','#c9a6ff','#ffd166','#7de0c8','#ffa879'];
+  cons.forEach((c,i)=>{
+    drawLine(ctx,c,M,pal[i%pal.length]);
+  });
+  return M;
+}
+function shadeFeasible(ctx,cv,cons,M){
+  if(!cons.length) return;
+  const step=3;
+  ctx.fillStyle='rgba(79,209,197,0.20)';
+  for(let px=M.m; px<=M.W-M.m; px+=step){
+    // for each column, walk rows — cheap fill of small rects
+    for(let py=M.m; py<=M.H-M.m; py+=step){
+      const wx = VIEW.xmin + (px-M.m)/((M.W-2*M.m))*(VIEW.xmax-VIEW.xmin);
+      const wy = VIEW.ymin + (M.H-M.m-py)/((M.H-2*M.m))*(VIEW.ymax-VIEW.ymin);
+      if(feasiblePoint(cons,wx,wy)) ctx.fillRect(px,py,step,step);
+    }
+  }
+}
+function drawLine(ctx,c,M,color){
+  // A x + B y = C ; find two on-screen endpoints
+  ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+  let pts=[];
+  if(Math.abs(c.B)>1e-9){
+    pts.push({x:VIEW.xmin, y:(c.C-c.A*VIEW.xmin)/c.B});
+    pts.push({x:VIEW.xmax, y:(c.C-c.A*VIEW.xmax)/c.B});
+  } else {
+    const xv=c.C/c.A;
+    pts.push({x:xv,y:VIEW.ymin}); pts.push({x:xv,y:VIEW.ymax});
+  }
+  ctx.moveTo(M.X(pts[0].x),M.Y(pts[0].y));
+  ctx.lineTo(M.X(pts[1].x),M.Y(pts[1].y));
+  ctx.stroke();
+}
+function drawVertices(ctx,M,vtx,optIdx){
+  vtx.forEach((p,i)=>{
+    ctx.beginPath();
+    ctx.fillStyle = (i===optIdx)? '#63d67a' : '#ffd166';
+    ctx.arc(M.X(p.x),M.Y(p.y), (i===optIdx?7:5), 0, 2*Math.PI); ctx.fill();
+    ctx.strokeStyle='#0b0e13'; ctx.lineWidth=1.4; ctx.stroke();
+    ctx.fillStyle='#e7ecf5'; ctx.font='11px system-ui'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    ctx.fillText('('+fmt(p.x)+', '+fmt(p.y)+')', M.X(p.x)+8, M.Y(p.y)-6);
+  });
+}
+function fmt(v){ return (Math.round(v*100)/100).toString(); }
+
+/* ---------------- state ---------------- */
+let CONS=[], VTX=[], BOUNDED=true, ERR=null;
+
+function buildFromText(){
+  ERR=null;
+  const lines=document.getElementById('cons').value.split('\n');
+  const cons=[];
+  try{
+    for(const ln of lines){ const c=parseConstraint(ln); if(c) cons.push(c); }
+  }catch(e){ ERR=e.message; return; }
+  CONS=cons;
+  VTX=computeVertices(cons);
+  BOUNDED=isBounded(cons);
+}
+
+function renderGrapher(){
+  const st=document.getElementById('gStatus');
+  buildFromText();
+  if(ERR){ st.className='status bad'; st.textContent='Parse error: '+ERR; return; }
+  autoView(VTX);
+  const cv=document.getElementById('cv1');
+  const M=drawBase(cv,CONS,VTX);
+  drawVertices(cv.getContext('2d'),M,VTX,-1);
+  const vl=document.getElementById('vtxList');
+  if(VTX.length===0){
+    if(!feasibleExists(CONS)){ st.className='status bad'; st.textContent='No feasible solution — the constraints have no common region.'; }
+    else { st.className='status warn'; st.textContent='Feasible region has no bounded vertices (open/unbounded).'; }
+    vl.textContent='';
+  } else {
+    st.className='status good';
+    st.textContent = (BOUNDED?'Bounded':'Unbounded')+' region · '+VTX.length+' vertices.';
+    vl.innerHTML='<b>Vertices:</b> '+VTX.map(p=>'('+fmt(p.x)+', '+fmt(p.y)+')').join('  ');
+  }
+}
+function feasibleExists(cons){
+  // sample a grid for any feasible point
+  for(let gx=0; gx<=VIEW.xmax; gx+=0.5)
+    for(let gy=0; gy<=VIEW.ymax; gy+=0.5)
+      if(feasiblePoint(cons,gx,gy)) return true;
+  // also test some negative in case constraints allow
+  return VTX.length>0;
+}
+
+/* ---------------- optimise ---------------- */
+let OPT=null; // {idx, val, all:[{p,z}], goal}
+function renderOptimize(redrawOnly){
+  const st=document.getElementById('oStatus');
+  buildFromText();
+  if(ERR){ st.className='status bad'; st.textContent='Fix constraints in tab 1: '+ERR; return; }
+  autoView(VTX);
+  const a=parseFloat(document.getElementById('objA').value)||0;
+  const b=parseFloat(document.getElementById('objB').value)||0;
+  const goal=document.getElementById('goal').value;
+  const cv=document.getElementById('cv2');
+  const ctx=cv.getContext('2d');
+
+  if(VTX.length===0){
+    drawBase(cv,CONS,VTX);
+    st.className='status bad';
+    st.textContent = feasibleExists(CONS)? 'Region unbounded/open — no vertex to optimise.' : 'No feasible solution.';
+    document.getElementById('objTable').innerHTML='';
+    OPT=null; return;
+  }
+  const evals=VTX.map(p=>({p, z:a*p.x + b*p.y}));
+  let bestIdx=0;
+  for(let i=1;i<evals.length;i++){
+    if(goal==='max' ? evals[i].z>evals[bestIdx].z : evals[i].z<evals[bestIdx].z) bestIdx=i;
+  }
+  OPT={idx:bestIdx, val:evals[bestIdx].z, all:evals, goal, a, b};
+
+  const M=drawBase(cv,CONS,VTX);
+  // iso-profit slider range
+  const zs=evals.map(e=>e.z);
+  const zmin=Math.min(...zs,0), zmax=Math.max(...zs,0);
+  const sl=document.getElementById('isoSlide');
+  if(!redrawOnly){ sl.min=Math.floor(zmin); sl.max=Math.ceil(zmax); sl.value=OPT.val; }
+  const zLine=parseFloat(sl.value);
+  drawIso(ctx,M,a,b,zLine);
+  drawVertices(ctx,M,VTX,bestIdx);
+  document.getElementById('isoLbl').textContent='Iso-profit line: '+a+'x + '+b+'y = '+fmt(zLine)+(Math.abs(zLine-OPT.val)<1e-6?'  ← touches optimum':'');
+
+  // table
+  let rows='<table><tr><th>Vertex (x, y)</th><th>Z = '+a+'x + '+b+'y</th></tr>';
+  evals.forEach((e,i)=>{
+    rows+='<tr class="'+(i===bestIdx?'opt':'')+'"><td>('+fmt(e.p.x)+', '+fmt(e.p.y)+')</td><td>'+fmt(e.z)+'</td></tr>';
+  });
+  rows+='</table>';
+  document.getElementById('objTable').innerHTML=rows;
+  st.className='status good';
+  const warn = (goal==='max' && !BOUNDED) ? ' (region unbounded — a true max may not exist; shown value is the best vertex)' : '';
+  st.textContent = (goal==='max'?'Maximum':'Minimum')+' Z = '+fmt(OPT.val)+' at ('+fmt(VTX[bestIdx].x)+', '+fmt(VTX[bestIdx].y)+')'+warn;
+}
+function drawIso(ctx,M,a,b,z){
+  const c={A:a,B:b,C:z,op:'='};
+  ctx.setLineDash([6,5]);
+  drawLine(ctx,c,M,'#ff8fb0');
+  ctx.setLineDash([]);
+}
+
+/* ---------------- presets ---------------- */
+const PRESETS={
+  furniture:{
+    cons:"x >= 0\ny >= 0\n4x + 3y <= 240\n2x + y <= 100",
+    a:70, b:50, goal:'max',
+    note:"A factory makes x tables and y chairs. Wood: 4x+3y≤240 units; labour: 2x+y≤100 hrs. Profit Z=70x+50y. Bounded region — corner-point method gives a unique maximum.",
+    heading:"Furniture factory (bounded, maximise profit)"
+  },
+  diet:{
+    cons:"x >= 0\ny >= 0\nx + 2y >= 10\n3x + y >= 12",
+    a:6, b:5, goal:'min',
+    note:"Buy x kg of food A and y kg of food B to meet nutrient minimums (x+2y≥10, 3x+y≥12) at least cost Z=6x+5y. The region is UNBOUNDED above, but a minimum still exists at a vertex.",
+    heading:"Diet problem (unbounded region, minimise cost)"
+  },
+  nofeas:{
+    cons:"x >= 0\ny >= 0\nx + y <= 2\nx + y >= 6",
+    a:1, b:1, goal:'max',
+    note:"x+y can't be both ≤2 and ≥6. The half-planes never overlap → NO FEASIBLE SOLUTION (empty region).",
+    heading:"No feasible solution (empty region)"
+  },
+  unbounded:{
+    cons:"x >= 0\ny >= 0\nx + y >= 3",
+    a:2, b:3, goal:'max',
+    note:"Feasible region stretches to infinity. Maximising Z=2x+3y has NO finite maximum (unbounded). Minimising would have a solution on the boundary.",
+    heading:"Unbounded maximum"
+  }
+};
+function loadPreset(){
+  const key=document.getElementById('preset').value;
+  const p=PRESETS[key];
+  document.getElementById('cons').value=p.cons;
+  document.getElementById('objA').value=p.a;
+  document.getElementById('objB').value=p.b;
+  document.getElementById('goal').value=p.goal;
+  document.getElementById('exStatus').className='status good';
+  document.getElementById('exStatus').textContent='Loaded: '+p.heading;
+  document.getElementById('exBody').innerHTML='<p>'+p.note+'</p><p class="muted">Now open tab 1 to see the region and tab 2 to optimise.</p>';
+  renderGrapher();
+  renderOptimize(false);
+}
+
+/* ---------------- quiz ---------------- */
+const QUIZ=[
+ {q:"1. The feasible region of a linear programming problem is:",
+  opts:["The set of all points satisfying every constraint","The single optimal point","Only the corner points","The graph of the objective function"],
+  ans:0, ex:"It is the intersection of all half-planes — every point meeting all constraints at once."},
+ {q:"2. By the corner-point theorem, the optimum of a linear objective on a bounded region occurs:",
+  opts:["At the centre of the region","At a vertex (corner point)","Only where x=y","Never inside the first quadrant"],
+  ans:1, ex:"For a linear Z on a convex polygon, the max/min is always attained at a vertex."},
+ {q:"3. If a maximisation problem has an unbounded feasible region, then:",
+  opts:["It always has a maximum","A maximum may fail to exist","The minimum is always 0","There are no vertices"],
+  ans:1, ex:"Z can increase without limit, so a finite maximum need not exist for an unbounded region."}
+];
+function buildQuiz(){
+  const box=document.getElementById('quizBox'); box.innerHTML='';
+  QUIZ.forEach((item,qi)=>{
+    const qd=document.createElement('div');
+    qd.innerHTML='<div class="q">'+item.q+'</div>';
+    item.opts.forEach((o,oi)=>{
+      const btn=document.createElement('button');
+      btn.className='opt'; btn.textContent=o;
+      btn.onclick=()=>{
+        if(qd.dataset.done) return;
+        qd.dataset.done='1';
+        const kids=qd.querySelectorAll('.opt');
+        kids[item.ans].classList.add('correct');
+        if(oi!==item.ans) btn.classList.add('wrong');
+        qd.querySelector('.expl').classList.add('show');
+      };
+      qd.appendChild(btn);
+    });
+    const ex=document.createElement('div'); ex.className='expl'; ex.textContent='✔ '+item.ex;
+    qd.appendChild(ex);
+    box.appendChild(qd);
+  });
+}
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const v=t.dataset.view;
+    document.getElementById(v).classList.add('active');
+    if(v==='grapher') renderGrapher();
+    if(v==='optimize') renderOptimize(false);
+  };
+});
+document.getElementById('plotBtn').onclick=renderGrapher;
+document.getElementById('resetView').onclick=()=>{ VIEW={xmin:-1,xmax:12,ymin:-1,ymax:12}; renderGrapher(); };
+document.getElementById('optBtn').onclick=()=>renderOptimize(false);
+['objA','objB','goal'].forEach(id=>document.getElementById(id).addEventListener('change',()=>renderOptimize(false)));
+document.getElementById('cons').addEventListener('input',()=>{ if(document.getElementById('grapher').classList.contains('active')) renderGrapher(); });
+document.getElementById('isoSlide').addEventListener('input',()=>renderOptimize(true));
+document.getElementById('loadPreset').onclick=loadPreset;
+
+/* init */
+buildQuiz();
+renderGrapher();
+renderOptimize(false);
+</script>
+</body>
+</html>

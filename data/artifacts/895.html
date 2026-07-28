@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematical Reasoning Lab - NIOS Class 12 Maths</title>
+<style>
+  :root{
+    --bg:#12161f;
+    --panel:#1b2130;
+    --panel2:#232b3d;
+    --ink:#e8ecf4;
+    --muted:#9aa6bd;
+    --accent:#5ad1c9;
+    --accent-dim:#2c6f6b;
+    --true:#3fb98a;
+    --false:#d9736a;
+    --line:#313a50;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Segoe UI",Roboto,system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+    padding:14px;
+  }
+  h1{font-size:1.5rem;margin:0 0 4px;}
+  h2{font-size:1.15rem;margin:0 0 10px;color:var(--accent);}
+  h3{font-size:1rem;margin:14px 0 6px;}
+  p{margin:6px 0;}
+  .sub{color:var(--muted);margin:0 0 16px;font-size:.95rem;}
+  .wrap{max-width:900px;margin:0 auto;}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;
+    min-width:120px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:.92rem;
+    text-align:center;
+    transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent-dim);}
+  .tab.active{background:var(--accent-dim);color:#fff;border-color:var(--accent);}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:16px;
+  }
+  .card{
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    margin:10px 0;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  label{font-size:.92rem;color:var(--muted);}
+  select,button{font-family:inherit;}
+  select{
+    background:var(--panel2);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:.95rem;
+    width:100%;
+    margin-top:4px;
+  }
+  .toggle-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;}
+  .toggle{
+    flex:1 1 140px;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px;
+    text-align:center;
+  }
+  .tbtn{
+    display:inline-block;
+    margin-top:8px;
+    padding:8px 16px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    cursor:pointer;
+    font-weight:600;
+    font-size:1rem;
+    min-width:48px;
+    color:#fff;
+    transition:.15s;
+  }
+  .tbtn.T{background:var(--true);border-color:var(--true);}
+  .tbtn.F{background:var(--false);border-color:var(--false);}
+  .conn-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+  .conn{
+    flex:1 1 auto;
+    background:var(--panel2);
+    border:1px solid var(--line);
+    color:var(--muted);
+    border-radius:10px;
+    padding:8px 6px;
+    cursor:pointer;
+    font-size:.85rem;
+    text-align:center;
+    transition:.15s;
+  }
+  .conn.active{background:var(--accent-dim);color:#fff;border-color:var(--accent);}
+  .expr{
+    font-size:1.2rem;
+    text-align:center;
+    padding:12px;
+    background:var(--panel2);
+    border-radius:12px;
+    margin:12px 0;
+    border:1px solid var(--accent-dim);
+  }
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.92rem;}
+  th,td{border:1px solid var(--line);padding:7px 6px;text-align:center;}
+  th{background:var(--panel2);color:var(--accent);font-weight:600;}
+  td.res{font-weight:700;}
+  .cT{color:var(--true);}
+  .cF{color:var(--false);}
+  tr.hl{background:rgba(90,209,201,.10);}
+  .val{font-weight:700;}
+  .tag{
+    display:inline-block;
+    font-size:.75rem;
+    padding:2px 8px;
+    border-radius:20px;
+    background:var(--accent-dim);
+    color:#fff;
+    margin-left:6px;
+  }
+  .eq{color:var(--true);font-weight:600;}
+  .neq{color:var(--false);font-weight:600;}
+  .mono{font-family:"Consolas",monospace;}
+  .quiz-q{font-weight:600;margin-bottom:8px;}
+  .opt{
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 12px;
+    margin:6px 0;
+    cursor:pointer;
+    font-size:.92rem;
+    transition:.15s;
+  }
+  .opt:hover{border-color:var(--accent-dim);}
+  .opt.correct{background:rgba(63,185,138,.18);border-color:var(--true);}
+  .opt.wrong{background:rgba(217,115,106,.18);border-color:var(--false);}
+  .explain{
+    display:none;
+    margin-top:8px;
+    font-size:.88rem;
+    color:var(--muted);
+    border-left:3px solid var(--accent);
+    padding-left:10px;
+  }
+  .explain.show{display:block;}
+  .fact-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  ul{margin:6px 0;padding-left:20px;}
+  li{margin:3px 0;}
+  .btn{
+    background:var(--accent-dim);
+    color:#fff;
+    border:1px solid var(--accent);
+    border-radius:10px;
+    padding:9px 14px;
+    cursor:pointer;
+    font-size:.9rem;
+    margin-top:8px;
+  }
+  .btn:hover{background:var(--accent);color:#0c1018;}
+  .quant-box{display:flex;flex-wrap:wrap;gap:10px;}
+  .quant-box>div{flex:1 1 240px;}
+  .verdict{font-size:1.05rem;font-weight:700;text-align:center;padding:10px;border-radius:10px;margin-top:10px;}
+  .verdict.taut{background:rgba(63,185,138,.18);color:var(--true);}
+  .verdict.contra{background:rgba(217,115,106,.18);color:var(--false);}
+  .verdict.cont{background:var(--panel2);color:var(--muted);}
+  small.hint{color:var(--muted);font-size:.8rem;}
+  @media(max-width:420px){
+    body{padding:10px;}
+    h1{font-size:1.25rem;}
+    th,td{padding:5px 3px;font-size:.82rem;}
+    .tab{min-width:100px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mathematical Reasoning Lab</h1>
+  <p class="sub">NIOS Class 12 Mathematics &middot; Ch. 38 &mdash; explore statements, connectives, truth tables, converse/inverse/contrapositive, and quantifiers.</p>
+
+  <div class="tabs">
+    <div class="tab active" data-view="v1">1. Connectives &amp; Truth Tables</div>
+    <div class="tab" data-view="v2">2. Converse / Inverse / Contrapositive</div>
+    <div class="tab" data-view="v3">3. Quantifiers &amp; Validity</div>
+    <div class="tab" data-view="v4">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ============ VIEW 1 ============ -->
+  <section class="view active" id="v1">
+    <div class="panel">
+      <h2>Statements &amp; Connectives</h2>
+      <p class="sub">Two simple statements. Toggle their truth values and pick a connective to build a compound statement.</p>
+      <div class="card">
+        <p><span class="mono">p</span>: "It is raining."&nbsp;&nbsp;<span class="mono">q</span>: "The ground is wet."</p>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle">
+          <label>Truth value of <b>p</b></label><br>
+          <span class="tbtn T" id="btnP" onclick="togglePQ('p')">TRUE</span>
+        </div>
+        <div class="toggle">
+          <label>Truth value of <b>q</b></label><br>
+          <span class="tbtn T" id="btnQ" onclick="togglePQ('q')">TRUE</span>
+        </div>
+      </div>
+
+      <h3>Choose a connective</h3>
+      <div class="conn-grid" id="connGrid"></div>
+
+      <div class="expr" id="exprLine"></div>
+      <p style="text-align:center">Current result for your chosen p, q:
+        <span class="val" id="curResult"></span></p>
+
+      <h3>Live Truth Table</h3>
+      <div id="ttWrap"></div>
+      <small class="hint">The highlighted row matches your current toggles.</small>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 2 ============ -->
+  <section class="view" id="v2">
+    <div class="panel">
+      <h2>Negation, Converse, Inverse, Contrapositive</h2>
+      <p class="sub">Start from a conditional <span class="mono">p &rArr; q</span> and see its related forms.</p>
+
+      <div class="card">
+        <label>Worked example (conditional p &rArr; q):</label>
+        <select id="exSel" onchange="renderForms()">
+          <option value="0">If a number is divisible by 4, then it is even.</option>
+          <option value="1">If it rains, then the match is cancelled.</option>
+          <option value="2">If two angles are vertically opposite, then they are equal.</option>
+        </select>
+      </div>
+
+      <table>
+        <tr><th>Form</th><th>Symbolic</th><th>Statement</th></tr>
+        <tr><td>Conditional</td><td class="mono">p &rArr; q</td><td id="fCond"></td></tr>
+        <tr><td>Converse</td><td class="mono">q &rArr; p</td><td id="fConv"></td></tr>
+        <tr><td>Inverse</td><td class="mono">&not;p &rArr; &not;q</td><td id="fInv"></td></tr>
+        <tr class="hl"><td>Contrapositive <span class="tag">&equiv; original</span></td><td class="mono">&not;q &rArr; &not;p</td><td id="fContra"></td></tr>
+        <tr><td>Negation</td><td class="mono">p &and; &not;q</td><td id="fNeg"></td></tr>
+      </table>
+
+      <h3>Why contrapositive &equiv; conditional</h3>
+      <p class="sub">Compare the truth-table columns for <span class="mono">p&rArr;q</span> and <span class="mono">&not;q&rArr;&not;p</span> &mdash; they are identical in every row. The converse and inverse are also equivalent to each other, but <b>not</b> to the original.</p>
+      <table id="equivTable"></table>
+      <div class="card">
+        <span class="eq">p&rArr;q &nbsp;&equiv;&nbsp; &not;q&rArr;&not;p</span> (contrapositive)<br>
+        <span class="eq">q&rArr;p &nbsp;&equiv;&nbsp; &not;p&rArr;&not;q</span> (converse &equiv; inverse)<br>
+        <span class="neq">p&rArr;q &nbsp;&ne;&nbsp; q&rArr;p</span> (a conditional is not equivalent to its converse)
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 3 ============ -->
+  <section class="view" id="v3">
+    <div class="panel">
+      <h2>Quantifiers</h2>
+      <p class="sub">"For all" (&forall;) and "there exists" (&exist;), and how to negate them.</p>
+      <div class="quant-box">
+        <div class="card">
+          <b>Universal &forall;</b><br>
+          &forall;x, P(x): "For all x, P(x) holds."<br>
+          <small class="hint">Example: &forall;x&isin;&#8469;, x+1 &gt; x.</small>
+          <hr style="border-color:var(--line)">
+          Negation:<br>
+          <span class="mono">&not;(&forall;x, P(x)) &equiv; &exist;x, &not;P(x)</span>
+        </div>
+        <div class="card">
+          <b>Existential &exist;</b><br>
+          &exist;x, P(x): "There exists an x with P(x)."<br>
+          <small class="hint">Example: &exist;x&isin;&#8469;, x is even.</small>
+          <hr style="border-color:var(--line)">
+          Negation:<br>
+          <span class="mono">&not;(&exist;x, P(x)) &equiv; &forall;x, &not;P(x)</span>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:8px">Negating a quantifier flips it (&forall;&harr;&exist;) and negates the inside.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Tautology / Contradiction Checker</h2>
+      <p class="sub">Pick a compound statement. The lab evaluates it for all combinations of p, q and reports whether it is a tautology (always true), a contradiction (always false), or a contingency.</p>
+      <select id="tautSel" onchange="checkTaut()">
+        <option value="0">p &or; &not;p</option>
+        <option value="1">p &and; &not;p</option>
+        <option value="2">(p &rArr; q) &hArr; (&not;q &rArr; &not;p)</option>
+        <option value="3">(p &and; q) &rArr; p</option>
+        <option value="4">p &rArr; (p &or; q)</option>
+        <option value="5">(p &or; q) &and; &not;p &and; &not;q</option>
+        <option value="6">p &hArr; q</option>
+      </select>
+      <table id="tautTable"></table>
+      <div class="verdict" id="tautVerdict"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Valid or Invalid Argument?</h2>
+      <p class="sub">An argument is valid when the conclusion is true in every row where all premises are true.</p>
+      <select id="argSel" onchange="checkArg()">
+        <option value="0">Modus Ponens: p&rArr;q, p &there4; q</option>
+        <option value="1">Modus Tollens: p&rArr;q, &not;q &there4; &not;p</option>
+        <option value="2">Affirming the Consequent: p&rArr;q, q &there4; p</option>
+        <option value="3">Denying the Antecedent: p&rArr;q, &not;p &there4; &not;q</option>
+      </select>
+      <table id="argTable"></table>
+      <div class="verdict" id="argVerdict"></div>
+    </div>
+  </section>
+
+  <!-- ============ VIEW 4 ============ -->
+  <section class="view" id="v4">
+    <div class="panel">
+      <h2>Facts Panel</h2>
+      <div class="fact-grid">
+        <div class="card">
+          <h3 style="margin-top:0">Connectives</h3>
+          <ul>
+            <li><b>NOT</b> &not;p &mdash; negation: true when p is false.</li>
+            <li><b>AND</b> p&and;q &mdash; conjunction: true only when both true.</li>
+            <li><b>OR</b> p&or;q &mdash; disjunction: false only when both false (inclusive OR).</li>
+            <li><b>IF-THEN</b> p&rArr;q &mdash; conditional: false <i>only</i> when p is true and q is false.</li>
+            <li><b>IFF</b> p&hArr;q &mdash; biconditional: true when p and q have the same truth value.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Reference Truth Table</h3>
+          <table>
+            <tr><th>p</th><th>q</th><th>&not;p</th><th>p&and;q</th><th>p&or;q</th><th>p&rArr;q</th><th>p&hArr;q</th></tr>
+            <tr><td class="cT">T</td><td class="cT">T</td><td class="cF">F</td><td class="cT">T</td><td class="cT">T</td><td class="cT">T</td><td class="cT">T</td></tr>
+            <tr><td class="cT">T</td><td class="cF">F</td><td class="cF">F</td><td class="cF">F</td><td class="cT">T</td><td class="cF">F</td><td class="cF">F</td></tr>
+            <tr><td class="cF">F</td><td class="cT">T</td><td class="cT">T</td><td class="cF">F</td><td class="cT">T</td><td class="cT">T</td><td class="cF">F</td></tr>
+            <tr><td class="cF">F</td><td class="cF">F</td><td class="cT">T</td><td class="cF">F</td><td class="cF">F</td><td class="cT">T</td><td class="cT">T</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Converse / Inverse / Contrapositive</h3>
+          <ul>
+            <li>Conditional: <span class="mono">p&rArr;q</span></li>
+            <li>Converse: <span class="mono">q&rArr;p</span></li>
+            <li>Inverse: <span class="mono">&not;p&rArr;&not;q</span></li>
+            <li>Contrapositive: <span class="mono">&not;q&rArr;&not;p</span> &mdash; <span class="eq">equivalent to the original</span>.</li>
+            <li>Converse &equiv; Inverse (both differ from original).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Quantifiers</h3>
+          <ul>
+            <li>&forall; "for all" &mdash; universal quantifier.</li>
+            <li>&exist; "there exists" &mdash; existential quantifier.</li>
+            <li>&not;(&forall;x,P) &equiv; &exist;x,&not;P</li>
+            <li>&not;(&exist;x,P) &equiv; &forall;x,&not;P</li>
+            <li><b>Tautology</b>: true in every row. <b>Contradiction</b>: false in every row. <b>Contingency</b>: sometimes true, sometimes false.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p class="sub">Tap an option; the correct answer and explanation reveal.</p>
+      <div id="quizWrap"></div>
+    </div>
+  </section>
+
+  <p class="sub" style="text-align:center;margin-top:20px">Mathematical Reasoning Lab &middot; self-contained interactive &middot; NIOS Class 12 Maths</p>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- Boolean logic primitives (all exact) ---------- */
+function NOT(a){return !a;}
+function AND(a,b){return a&&b;}
+function OR(a,b){return a||b;}
+function IMP(a,b){return (!a)||b;}   // p=>q false only when p true, q false
+function IFF(a,b){return a===b;}
+
+/* ---------- Tab switching ---------- */
+var tabs=document.querySelectorAll('.tab');
+tabs.forEach(function(t){
+  t.addEventListener('click',function(){
+    tabs.forEach(function(x){x.classList.remove('active');});
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+    t.classList.add('active');
+    document.getElementById(t.dataset.view).classList.add('active');
+  });
+});
+
+/* ================= VIEW 1: Connectives & truth table ================= */
+var state={p:true,q:true,conn:'AND'};
+var connectives=[
+  {key:'NOT', label:'NOT ¬p', fn:function(p,q){return NOT(p);}, sym:'¬p', unary:true},
+  {key:'AND', label:'AND p∧q', fn:function(p,q){return AND(p,q);}, sym:'p ∧ q'},
+  {key:'OR',  label:'OR p∨q',  fn:function(p,q){return OR(p,q);},  sym:'p ∨ q'},
+  {key:'IMP', label:'IF-THEN p⇒q', fn:function(p,q){return IMP(p,q);}, sym:'p ⇒ q'},
+  {key:'IFF', label:'IFF p⇔q', fn:function(p,q){return IFF(p,q);}, sym:'p ⇔ q'}
+];
+
+function curConn(){return connectives.filter(function(c){return c.key===state.conn;})[0];}
+
+function buildConnButtons(){
+  var g=document.getElementById('connGrid');
+  g.innerHTML='';
+  connectives.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='conn'+(c.key===state.conn?' active':'');
+    d.textContent=c.label;
+    d.onclick=function(){state.conn=c.key;buildConnButtons();renderV1();};
+    g.appendChild(d);
+  });
+}
+
+function togglePQ(which){
+  state[which]=!state[which];
+  var btn=document.getElementById(which==='p'?'btnP':'btnQ');
+  btn.className='tbtn '+(state[which]?'T':'F');
+  btn.textContent=state[which]?'TRUE':'FALSE';
+  renderV1();
+}
+
+function tf(b){return b?'T':'F';}
+function cls(b){return b?'cT':'cF';}
+
+function renderV1(){
+  var c=curConn();
+  document.getElementById('exprLine').innerHTML='Compound statement: <b>'+c.sym+'</b>';
+  var res=c.fn(state.p,state.q);
+  var rEl=document.getElementById('curResult');
+  rEl.textContent=res?'TRUE':'FALSE';
+  rEl.className='val '+(res?'cT':'cF');
+
+  // truth table
+  var rows=[[true,true],[true,false],[false,true],[false,false]];
+  var h='<table><tr><th>p</th><th>q</th><th>'+c.sym+'</th></tr>';
+  rows.forEach(function(r){
+    var p=r[0],q=r[1];
+    var out=c.fn(p,q);
+    var isCur=(p===state.p&&q===state.q);
+    h+='<tr class="'+(isCur?'hl':'')+'">'+
+       '<td class="'+cls(p)+'">'+tf(p)+'</td>'+
+       '<td class="'+cls(q)+'">'+tf(q)+'</td>'+
+       '<td class="res '+cls(out)+'">'+tf(out)+'</td></tr>';
+  });
+  h+='</table>';
+  document.getElementById('ttWrap').innerHTML=h;
+}
+
+/* ================= VIEW 2: forms ================= */
+var examples=[
+  {p:'a number is divisible by 4', q:'it is even',
+   np:'a number is not divisible by 4', nq:'it is not even'},
+  {p:'it rains', q:'the match is cancelled',
+   np:'it does not rain', nq:'the match is not cancelled'},
+  {p:'two angles are vertically opposite', q:'they are equal',
+   np:'two angles are not vertically opposite', nq:'they are not equal'}
+];
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function renderForms(){
+  var e=examples[+document.getElementById('exSel').value];
+  document.getElementById('fCond').textContent='If '+e.p+', then '+e.q+'.';
+  document.getElementById('fConv').textContent='If '+e.q+', then '+e.p+'.';
+  document.getElementById('fInv').textContent='If '+e.np+', then '+e.nq+'.';
+  document.getElementById('fContra').textContent='If '+e.nq+', then '+e.np+'.';
+  document.getElementById('fNeg').textContent=cap(e.p)+' and '+e.nq+'.';
+}
+
+function buildEquivTable(){
+  var rows=[[true,true],[true,false],[false,true],[false,false]];
+  var h='<tr><th>p</th><th>q</th><th>p&rArr;q</th><th>&not;q&rArr;&not;p<br>(contra)</th><th>q&rArr;p<br>(conv)</th><th>&not;p&rArr;&not;q<br>(inv)</th></tr>';
+  rows.forEach(function(r){
+    var p=r[0],q=r[1];
+    var cond=IMP(p,q);
+    var contra=IMP(NOT(q),NOT(p));
+    var conv=IMP(q,p);
+    var inv=IMP(NOT(p),NOT(q));
+    h+='<tr><td class="'+cls(p)+'">'+tf(p)+'</td><td class="'+cls(q)+'">'+tf(q)+'</td>'+
+       '<td class="res '+cls(cond)+'">'+tf(cond)+'</td>'+
+       '<td class="res '+cls(contra)+'">'+tf(contra)+'</td>'+
+       '<td class="res '+cls(conv)+'">'+tf(conv)+'</td>'+
+       '<td class="res '+cls(inv)+'">'+tf(inv)+'</td></tr>';
+  });
+  document.getElementById('equivTable').innerHTML=h;
+}
+
+/* ================= VIEW 3: tautology & arguments ================= */
+var tautExprs=[
+  {sym:'p ∨ ¬p', fn:function(p,q){return OR(p,NOT(p));}, useQ:false},
+  {sym:'p ∧ ¬p', fn:function(p,q){return AND(p,NOT(p));}, useQ:false},
+  {sym:'(p⇒q) ⇔ (¬q⇒¬p)', fn:function(p,q){return IFF(IMP(p,q),IMP(NOT(q),NOT(p)));}, useQ:true},
+  {sym:'(p∧q) ⇒ p', fn:function(p,q){return IMP(AND(p,q),p);}, useQ:true},
+  {sym:'p ⇒ (p∨q)', fn:function(p,q){return IMP(p,OR(p,q));}, useQ:true},
+  {sym:'(p∨q) ∧ ¬p ∧ ¬q', fn:function(p,q){return AND(AND(OR(p,q),NOT(p)),NOT(q));}, useQ:true},
+  {sym:'p ⇔ q', fn:function(p,q){return IFF(p,q);}, useQ:true}
+];
+function checkTaut(){
+  var ex=tautExprs[+document.getElementById('tautSel').value];
+  var rows=ex.useQ?[[true,true],[true,false],[false,true],[false,false]]:[[true,false],[false,false]];
+  var allTrue=true,allFalse=true;
+  var h='<tr><th>p</th>'+(ex.useQ?'<th>q</th>':'')+'<th>'+ex.sym+'</th></tr>';
+  rows.forEach(function(r){
+    var p=r[0],q=r[1];
+    var out=ex.fn(p,q);
+    if(out)allFalse=false;else allTrue=false;
+    h+='<tr><td class="'+cls(p)+'">'+tf(p)+'</td>'+
+       (ex.useQ?'<td class="'+cls(q)+'">'+tf(q)+'</td>':'')+
+       '<td class="res '+cls(out)+'">'+tf(out)+'</td></tr>';
+  });
+  document.getElementById('tautTable').innerHTML=h;
+  var v=document.getElementById('tautVerdict');
+  if(allTrue){v.className='verdict taut';v.textContent='TAUTOLOGY — true in every row.';}
+  else if(allFalse){v.className='verdict contra';v.textContent='CONTRADICTION — false in every row.';}
+  else{v.className='verdict cont';v.textContent='CONTINGENCY — sometimes true, sometimes false.';}
+}
+
+var args=[
+  {name:'Modus Ponens', premises:[function(p,q){return IMP(p,q);},function(p,q){return p;}],
+   concl:function(p,q){return q;}, plabels:['p⇒q','p'], clabel:'q'},
+  {name:'Modus Tollens', premises:[function(p,q){return IMP(p,q);},function(p,q){return NOT(q);}],
+   concl:function(p,q){return NOT(p);}, plabels:['p⇒q','¬q'], clabel:'¬p'},
+  {name:'Affirming the Consequent', premises:[function(p,q){return IMP(p,q);},function(p,q){return q;}],
+   concl:function(p,q){return p;}, plabels:['p⇒q','q'], clabel:'p'},
+  {name:'Denying the Antecedent', premises:[function(p,q){return IMP(p,q);},function(p,q){return NOT(p);}],
+   concl:function(p,q){return NOT(q);}, plabels:['p⇒q','¬p'], clabel:'¬q'}
+];
+function checkArg(){
+  var a=args[+document.getElementById('argSel').value];
+  var rows=[[true,true],[true,false],[false,true],[false,false]];
+  var valid=true;
+  var h='<tr><th>p</th><th>q</th><th>'+a.plabels[0]+'</th><th>'+a.plabels[1]+'</th><th>'+a.clabel+' (concl.)</th></tr>';
+  rows.forEach(function(r){
+    var p=r[0],q=r[1];
+    var pr1=a.premises[0](p,q), pr2=a.premises[1](p,q), c=a.concl(p,q);
+    var allPrem=pr1&&pr2;
+    if(allPrem&&!c)valid=false;
+    var rowCls=allPrem?'hl':'';
+    h+='<tr class="'+rowCls+'"><td class="'+cls(p)+'">'+tf(p)+'</td><td class="'+cls(q)+'">'+tf(q)+'</td>'+
+       '<td class="'+cls(pr1)+'">'+tf(pr1)+'</td>'+
+       '<td class="'+cls(pr2)+'">'+tf(pr2)+'</td>'+
+       '<td class="res '+cls(c)+'">'+tf(c)+'</td></tr>';
+  });
+  document.getElementById('argTable').innerHTML=h;
+  var v=document.getElementById('argVerdict');
+  if(valid){v.className='verdict taut';v.textContent='VALID — in every highlighted row (all premises true) the conclusion is also true.';}
+  else{v.className='verdict contra';v.textContent='INVALID — there is a highlighted row where premises are true but the conclusion is false.';}
+}
+
+/* ================= VIEW 4: quiz ================= */
+var quiz=[
+  {q:'The statement p⇒q is FALSE only when:',
+   opts:['p is true and q is true','p is true and q is false','p is false and q is true','p is false and q is false'],
+   ans:1,
+   why:'A conditional p⇒q is false exactly when the hypothesis p is true but the conclusion q is false.'},
+  {q:'Which is logically equivalent to the conditional p⇒q?',
+   opts:['Its converse q⇒p','Its inverse ¬p⇒¬q','Its contrapositive ¬q⇒¬p','Its negation p∧¬q'],
+   ans:2,
+   why:'A conditional and its contrapositive have identical truth tables, so they are logically equivalent.'},
+  {q:'The negation of "∀x, P(x)" is:',
+   opts:['∀x, ¬P(x)','∃x, ¬P(x)','∃x, P(x)','¬∃x, P(x)'],
+   ans:1,
+   why:'Negating a universal flips it to existential and negates the predicate: ¬(∀x,P(x)) ≡ ∃x,¬P(x).'}
+];
+function buildQuiz(){
+  var w=document.getElementById('quizWrap');
+  quiz.forEach(function(item,qi){
+    var c=document.createElement('div');
+    c.className='card';
+    var h='<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div>';
+    item.opts.forEach(function(o,oi){
+      h+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+String.fromCharCode(65+oi)+'. '+o+'</div>';
+    });
+    h+='<div class="explain" id="exp'+qi+'"></div>';
+    c.innerHTML=h;
+    w.appendChild(c);
+  });
+  w.querySelectorAll('.opt').forEach(function(op){
+    op.addEventListener('click',function(){
+      var qi=+op.dataset.q, oi=+op.dataset.o;
+      var item=quiz[qi];
+      var parent=op.parentNode;
+      if(parent.dataset.done)return;
+      parent.dataset.done='1';
+      parent.querySelectorAll('.opt').forEach(function(x,ix){
+        if(ix===item.ans)x.classList.add('correct');
+        else if(ix===oi)x.classList.add('wrong');
+      });
+      var ex=document.getElementById('exp'+qi);
+      ex.textContent=(oi===item.ans?'Correct! ':'Not quite. ')+item.why;
+      ex.classList.add('show');
+    });
+  });
+}
+
+/* ---------- init ---------- */
+buildConnButtons();
+renderV1();
+renderForms();
+buildEquivTable();
+checkTaut();
+checkArg();
+buildQuiz();
+</script>
+</body>
+</html>
