@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispersion &amp; Scattering Lab — NIOS Class 12 Physics, Ch 19</title>
+<style>
+  :root{
+    --bg:#0f1320;
+    --panel:#181e2e;
+    --panel2:#212a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#8ad0ff;
+    --accent-soft:rgba(138,208,255,.15);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3550;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:3px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:8px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:10px 0 6px}
+  .panel p{color:var(--muted);font-size:.9rem;margin-bottom:6px}
+  .panel p b{color:var(--ink)}
+
+  .stage{width:100%;background:#080b14;border:1px solid var(--line);border-radius:12px;display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:12px 0}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 90px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1320;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1320}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.85rem}
+  .chip b{color:var(--accent)}
+
+  .formula{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;margin:8px 0;font-size:.92rem}
+  .formula code{color:var(--accent);font-family:"Consolas","Courier New",monospace;font-size:.95rem}
+
+  .q{margin-bottom:14px}
+  .q p.qt{color:var(--ink);font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:7px;font-size:.9rem;cursor:pointer;
+    touch-action:manipulation}
+  .opt:active{transform:scale(.995)}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:4px;display:none}
+  .expl.show{display:block}
+
+  .hidden{display:none}
+  .foot{color:var(--muted);font-size:.8rem;text-align:center;margin-top:8px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+  .sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Dispersion &amp; Scattering</span> Lab</h1>
+    <p>NIOS Class 12 Physics · Ch 19 — Dispersion and Scattering of Light</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="prism">Prism</button>
+    <button class="tab-btn" data-tab="rainbow">Rainbow</button>
+    <button class="tab-btn" data-tab="sky">Sky &amp; Sunset</button>
+    <button class="tab-btn" data-tab="quiz">Quiz</button>
+  </div>
+
+  <!-- ===================== PRISM ===================== -->
+  <section id="prism">
+    <div class="panel">
+      <h2>Prism Dispersion</h2>
+      <p>White light is a mix of wavelengths. Inside glass the refractive index <b>n</b> is
+        larger for shorter wavelengths, so <b>violet bends the most and red the least</b>.
+        The beam fans out into VIBGYOR.</p>
+      <canvas id="prismCanvas" class="stage" width="700" height="380"></canvas>
+      <div class="legend">
+        <span><i class="sw" style="background:#8b00ff"></i>Violet</span>
+        <span><i class="sw" style="background:#4b0082"></i>Indigo</span>
+        <span><i class="sw" style="background:#1e90ff"></i>Blue</span>
+        <span><i class="sw" style="background:#2ecc40"></i>Green</span>
+        <span><i class="sw" style="background:#ffdc00"></i>Yellow</span>
+        <span><i class="sw" style="background:#ff851b"></i>Orange</span>
+        <span><i class="sw" style="background:#ff4136"></i>Red</span>
+      </div>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Angle of incidence: <output id="prIncOut">45°</output></label>
+          <input id="prInc" type="range" min="20" max="70" value="45" step="1">
+        </div>
+        <div class="ctrl">
+          <label>Prism apex angle A: <output id="prApexOut">60°</output></label>
+          <input id="prApex" type="range" min="40" max="70" value="60" step="1">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip">n(violet ~400 nm): <b id="nVio">1.532</b></div>
+        <div class="chip">n(red ~700 nm): <b id="nRed">1.513</b></div>
+        <div class="chip">Deviation violet: <b id="devVio">—</b></div>
+        <div class="chip">Deviation red: <b id="devRed">—</b></div>
+        <div class="chip">Angular dispersion: <b id="disp">—</b></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Formulas</h3>
+      <div class="formula">Cauchy: <code>n(&lambda;) = A + B/&lambda;&sup2;</code> — n falls as &lambda; rises (violet &gt; red).</div>
+      <div class="formula">Deviation: <code>&delta; = i&#8321; + i&#8322; &minus; A</code>, with A = apex angle.</div>
+      <div class="formula">Angular dispersion: <code>&delta;&#7515; &minus; &delta;&#7523; = (n&#7515; &minus; n&#7523;)&middot;A</code> (thin-prism approx).</div>
+    </div>
+  </section>
+
+  <!-- ===================== RAINBOW ===================== -->
+  <section id="rainbow" class="hidden">
+    <div class="panel">
+      <h2>The Primary Rainbow</h2>
+      <p>A ray hits a spherical water drop: it <b>refracts</b> on entry, undergoes one
+        <b>total-ish internal reflection</b> at the back, then <b>refracts</b> again on exit.
+        Because n depends on &lambda;, each colour leaves at a slightly different angle —
+        red near <b>42.4°</b>, violet near <b>40.6°</b> from the anti-solar direction.</p>
+      <canvas id="dropCanvas" class="stage" width="700" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Impact parameter (entry height b/R): <output id="rbOut">0.86</output></label>
+          <input id="rb" type="range" min="0.30" max="0.99" value="0.86" step="0.01">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip">Exit angle (red): <b id="exRed">—</b></div>
+        <div class="chip">Exit angle (violet): <b id="exVio">—</b></div>
+        <div class="chip">Rainbow arc: <b>red on top, violet inside</b></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Why colours separate</h3>
+      <p>The deviation of the emerging ray has a <b>minimum</b> (the "rainbow angle").
+        Light piles up near that minimum, giving a bright arc. Its exact value shifts with
+        wavelength, so the arc splits into colours.</p>
+      <div class="formula">Total deviation: <code>D = 180° + 2i &minus; 4r</code>, where <code>sin i = n&middot;sin r</code>.</div>
+      <div class="formula">Primary bow angle: <code>180° &minus; D&#7509;&#7522;&#8345; &asymp; 42°</code> (red) → 40° (violet).</div>
+    </div>
+  </section>
+
+  <!-- ===================== SKY ===================== -->
+  <section id="sky" class="hidden">
+    <div class="panel">
+      <h2>Scattering — Blue Sky &amp; Red Sunset</h2>
+      <p><b>Rayleigh scattering</b> by air molecules is proportional to <b>1/&lambda;&#8308;</b>.
+        Blue (short &lambda;) scatters roughly 5–10&times; more than red, so the daytime sky
+        looks blue. At sunset light travels a long slanted path; blue is scattered away and
+        the transmitted beam looks red-orange.</p>
+      <canvas id="skyCanvas" class="stage" width="700" height="380"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Sun position: <output id="sunOut">Noon</output></label>
+          <input id="sun" type="range" min="0" max="100" value="15" step="1">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip">Air path length: <b id="pathOut">—</b></div>
+        <div class="chip">Blue scatter vs red: <b id="ratioOut">—</b></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Formulas</h3>
+      <div class="formula">Rayleigh intensity: <code>I &prop; 1/&lambda;&#8308;</code>.</div>
+      <div class="formula">Blue vs red: <code>(&lambda;&#7523;/&lambda;&#7515;)&#8308; = (700/450)&#8308; &asymp; 5.8&times;</code>.</div>
+      <p>Larger particles (dust, cloud droplets) scatter all colours nearly equally
+        (Mie scattering) — that is why clouds look white.</p>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section id="quiz" class="hidden">
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p>Tap an option to check your answer.</p>
+      <div id="quizHost"></div>
+    </div>
+  </section>
+
+  <p class="foot">Interactive study aid · optics values are teaching approximations.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var DEG = Math.PI/180;
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  var sections = {
+    prism: document.getElementById("prism"),
+    rainbow: document.getElementById("rainbow"),
+    sky: document.getElementById("sky"),
+    quiz: document.getElementById("quiz")
+  };
+  var current = "prism";
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      current = t.dataset.tab;
+      for(var k in sections){ sections[k].classList.toggle("hidden", k!==current); }
+    });
+  });
+
+  /* ---------- Cauchy refractive index for crown glass ---------- */
+  // n(lambda) = A + B/lambda^2 ; lambda in micrometres
+  var CA = 1.5046, CB = 0.00420;
+  function nGlass(lamNm){
+    var um = lamNm/1000;
+    return CA + CB/(um*um);
+  }
+  var LAM = [400,445,470,510,570,600,650]; // V I B G Y O R (nm)
+  var COL = ["#8b00ff","#4b0082","#1e90ff","#2ecc40","#ffdc00","#ff851b","#ff4136"];
+
+  /* ============================================================
+     PRISM
+  ============================================================ */
+  var prCanvas = document.getElementById("prismCanvas");
+  var prCtx = prCanvas.getContext("2d");
+  var prInc = document.getElementById("prInc");
+  var prApex = document.getElementById("prApex");
+  var prIncOut = document.getElementById("prIncOut");
+  var prApexOut = document.getElementById("prApexOut");
+
+  // minimum-deviation-style two-surface trace for a prism.
+  // Returns total deviation (deg) for a given n, incidence i1(deg), apex A(deg).
+  function prismDeviation(n, i1, A){
+    var i1r = i1*DEG, Ar = A*DEG;
+    var r1 = Math.asin(Math.sin(i1r)/n);
+    var r2 = Ar - r1;
+    var s = n*Math.sin(r2);
+    if(Math.abs(s) > 1) return null; // total internal reflection
+    var i2 = Math.asin(s);
+    return (i1r + i2 - Ar)/DEG;
+  }
+
+  function drawPrism(){
+    var i1 = +prInc.value, A = +prApex.value;
+    prIncOut.textContent = i1+"°";
+    prApexOut.textContent = A+"°";
+
+    var w = prCanvas.width, h = prCanvas.height;
+    prCtx.clearRect(0,0,w,h);
+    prCtx.fillStyle = "#080b14"; prCtx.fillRect(0,0,w,h);
+
+    // prism triangle (apex up)
+    var cx = w*0.42, cy = h*0.55, size = 150;
+    var half = A*DEG/2;
+    var apex = {x:cx, y:cy-size*0.62};
+    var bl = {x:cx - size*Math.tan(half)*0.9, y:cy+size*0.55};
+    var br = {x:cx + size*Math.tan(half)*0.9, y:cy+size*0.55};
+
+    prCtx.beginPath();
+    prCtx.moveTo(apex.x,apex.y); prCtx.lineTo(bl.x,bl.y); prCtx.lineTo(br.x,br.y);
+    prCtx.closePath();
+    var grad = prCtx.createLinearGradient(bl.x,apex.y,br.x,br.y);
+    grad.addColorStop(0,"rgba(160,200,255,.16)");
+    grad.addColorStop(1,"rgba(160,200,255,.06)");
+    prCtx.fillStyle = grad; prCtx.fill();
+    prCtx.strokeStyle = "#5a6a92"; prCtx.lineWidth = 2; prCtx.stroke();
+
+    // hit point on the left (entry) face, mid-height
+    var hit = {x:(apex.x+bl.x)/2, y:(apex.y+bl.y)/2};
+
+    // incoming white ray
+    prCtx.strokeStyle = "#f2f4ff"; prCtx.lineWidth = 3;
+    prCtx.beginPath();
+    prCtx.moveTo(hit.x-140, hit.y-90);
+    prCtx.lineTo(hit.x, hit.y);
+    prCtx.stroke();
+    // label
+    prCtx.fillStyle="#cfd6ea"; prCtx.font="12px system-ui";
+    prCtx.fillText("white light", hit.x-140, hit.y-96);
+
+    // exit fan of coloured rays from right face
+    var exit = {x:(apex.x+br.x)/2, y:(apex.y+br.y)/2};
+    var devs = [];
+    for(var k=0;k<LAM.length;k++){
+      var n = nGlass(LAM[k]);
+      var d = prismDeviation(n, i1, A);
+      devs.push(d);
+      if(d===null) continue;
+      // base emergence direction ~ horizontal right, tilted down by deviation
+      var ang = (10 + d)*DEG; // downward from horizontal
+      var len = 210;
+      prCtx.strokeStyle = COL[k]; prCtx.lineWidth = 2.4;
+      prCtx.beginPath();
+      prCtx.moveTo(exit.x, exit.y);
+      prCtx.lineTo(exit.x + Math.cos(ang)*len, exit.y + Math.sin(ang)*len);
+      prCtx.stroke();
+    }
+
+    // dashed original direction (for deviation reference)
+    prCtx.setLineDash([5,5]);
+    prCtx.strokeStyle="rgba(200,200,200,.35)"; prCtx.lineWidth=1;
+    prCtx.beginPath();
+    prCtx.moveTo(hit.x, hit.y);
+    prCtx.lineTo(hit.x + 340*Math.cos(35*DEG), hit.y + 340*Math.sin(35*DEG));
+    prCtx.stroke();
+    prCtx.setLineDash([]);
+
+    // labels
+    prCtx.fillStyle="#cfd6ea"; prCtx.font="12px system-ui";
+    prCtx.fillText("A = "+A+"°", apex.x-14, apex.y-8);
+    prCtx.fillStyle="#ff4136"; prCtx.fillText("red", exit.x+180, exit.y+40);
+    prCtx.fillStyle="#8b00ff"; prCtx.fillText("violet", exit.x+165, exit.y+120);
+
+    // readouts
+    var nV = nGlass(400), nR = nGlass(700);
+    document.getElementById("nVio").textContent = nV.toFixed(3);
+    document.getElementById("nRed").textContent = nR.toFixed(3);
+    var dV = prismDeviation(nV, i1, A), dR = prismDeviation(nR, i1, A);
+    document.getElementById("devVio").textContent = dV===null?"TIR":dV.toFixed(1)+"°";
+    document.getElementById("devRed").textContent = dR===null?"TIR":dR.toFixed(1)+"°";
+    document.getElementById("disp").textContent =
+      (dV===null||dR===null)?"—":(dV-dR).toFixed(2)+"°";
+  }
+  prInc.addEventListener("input", drawPrism);
+  prApex.addEventListener("input", drawPrism);
+
+  /* ============================================================
+     RAINBOW (single water drop)
+  ============================================================ */
+  var dropCanvas = document.getElementById("dropCanvas");
+  var dCtx = dropCanvas.getContext("2d");
+  var rb = document.getElementById("rb");
+  var rbOut = document.getElementById("rbOut");
+  var nWater = {red:1.331, violet:1.343};
+
+  // total deviation for primary bow: D = 180 + 2i - 4r ; sin i = n sin r
+  function bowExit(n, b){
+    var i = Math.asin(Math.min(1,b));      // incidence at sphere
+    var r = Math.asin(Math.sin(i)/n);
+    var D = 180 + (2*i - 4*r)/DEG;          // deviation in deg
+    return 180 - D;                         // elevation from anti-solar point
+  }
+
+  function drawDrop(){
+    var b = +rb.value;
+    rbOut.textContent = b.toFixed(2);
+    var w = dropCanvas.width, h = dropCanvas.height;
+    dCtx.clearRect(0,0,w,h);
+    dCtx.fillStyle="#080b14"; dCtx.fillRect(0,0,w,h);
+
+    var cx = w*0.6, cy = h*0.5, R = 120;
+    // drop
+    dCtx.beginPath(); dCtx.arc(cx,cy,R,0,Math.PI*2);
+    var g = dCtx.createRadialGradient(cx-30,cy-30,10,cx,cy,R);
+    g.addColorStop(0,"rgba(150,200,255,.28)");
+    g.addColorStop(1,"rgba(150,200,255,.08)");
+    dCtx.fillStyle=g; dCtx.fill();
+    dCtx.strokeStyle="#5a6a92"; dCtx.lineWidth=2; dCtx.stroke();
+
+    // trace two colours
+    var cols = [["#ff4136",nWater.red],["#8b00ff",nWater.violet]];
+    cols.forEach(function(c){
+      var col=c[0], n=c[1];
+      var yoff = b*R;
+      var i = Math.asin(Math.min(1,b));
+      var r = Math.asin(Math.sin(i)/n);
+      // entry point on left of sphere at height yoff above centre
+      var ex = cx - Math.sqrt(Math.max(0,R*R - yoff*yoff));
+      var ey = cy - yoff;
+      // incoming horizontal ray
+      dCtx.strokeStyle=col; dCtx.lineWidth=2;
+      dCtx.beginPath(); dCtx.moveTo(20, ey); dCtx.lineTo(ex, ey); dCtx.stroke();
+
+      // inside: entry -> back -> exit (schematic chords)
+      var aEntry = Math.atan2(ey-cy, ex-cx); // angle of entry point
+      // refraction bends toward normal by (i-r)
+      var aBack = aEntry + Math.PI - (i - r); // rough back reflection point angle
+      var bx = cx + R*Math.cos(aBack), by = cy + R*Math.sin(aBack);
+      var aExit = aBack + (Math.PI - 2*r) ;
+      // clamp exit onto sphere
+      var exx = cx + R*Math.cos(aExit + 0.6), exy = cy + R*Math.sin(aExit + 0.6);
+      dCtx.beginPath();
+      dCtx.moveTo(ex,ey); dCtx.lineTo(bx,by); dCtx.lineTo(exx,exy);
+      dCtx.stroke();
+      // outgoing ray at rainbow angle down-left toward observer
+      var elev = bowExit(n, b);
+      var outAng = (180 + 35 + (n===nWater.red?0:2))*DEG;
+      dCtx.beginPath();
+      dCtx.moveTo(exx,exy);
+      dCtx.lineTo(exx - 150*Math.cos((elev)*DEG), exy + 150*Math.sin((elev)*DEG));
+      dCtx.stroke();
+    });
+
+    dCtx.fillStyle="#cfd6ea"; dCtx.font="12px system-ui";
+    dCtx.fillText("sunlight →", 22, dropCanvas.height*0.5 - b*R - 8);
+    dCtx.fillText("water drop", cx-34, cy-R-8);
+
+    document.getElementById("exRed").textContent = bowExit(nWater.red,b).toFixed(1)+"°";
+    document.getElementById("exVio").textContent = bowExit(nWater.violet,b).toFixed(1)+"°";
+  }
+  rb.addEventListener("input", drawDrop);
+
+  /* ============================================================
+     SKY / SUNSET
+  ============================================================ */
+  var skyCanvas = document.getElementById("skyCanvas");
+  var sCtx = skyCanvas.getContext("2d");
+  var sun = document.getElementById("sun");
+  var sunOut = document.getElementById("sunOut");
+
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function rgb(r,g,b){return "rgb("+(r|0)+","+(g|0)+","+(b|0)+")";}
+
+  function drawSky(){
+    var t = +sun.value/100; // 0 = noon (high sun), 1 = sunset (low)
+    sunOut.textContent = t<0.25?"Noon":(t<0.6?"Afternoon":(t<0.85?"Golden hour":"Sunset"));
+    var w=skyCanvas.width, h=skyCanvas.height;
+
+    // top-of-sky colour: deep blue at noon -> orange at sunset
+    var topR=lerp(60,40,t),   topG=lerp(130,60,t),  topB=lerp(230,120,t);
+    var horR=lerp(150,255,t), horG=lerp(200,140,t), horB=lerp(240,70,t);
+
+    var g = sCtx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0, rgb(topR,topG,topB));
+    g.addColorStop(0.7, rgb(lerp(topR,horR,.6),lerp(topG,horG,.6),lerp(topB,horB,.6)));
+    g.addColorStop(1, rgb(horR,horG,horB));
+    sCtx.fillStyle=g; sCtx.fillRect(0,0,w,h);
+
+    // ground
+    sCtx.fillStyle="#0c1018"; sCtx.fillRect(0,h*0.82,w,h*0.18);
+
+    // sun: high at noon, low near horizon at sunset
+    var sx = lerp(w*0.5, w*0.82, t);
+    var sy = lerp(h*0.18, h*0.78, t);
+    var sunCol = t<0.6? "#fff6c8" : rgb(255, lerp(230,120,(t-0.6)/0.4), lerp(180,40,(t-0.6)/0.4));
+    var sg = sCtx.createRadialGradient(sx,sy,4,sx,sy,46);
+    sg.addColorStop(0,sunCol); sg.addColorStop(1,"rgba(255,200,120,0)");
+    sCtx.fillStyle=sg; sCtx.beginPath(); sCtx.arc(sx,sy,46,0,Math.PI*2); sCtx.fill();
+    sCtx.fillStyle=sunCol; sCtx.beginPath(); sCtx.arc(sx,sy,18,0,Math.PI*2); sCtx.fill();
+
+    // scattered dots (more blue when high, warmer near horizon)
+    for(var k=0;k<40;k++){
+      var px=(k*97+ (t*30))%w, py=((k*53)%(h*0.75));
+      sCtx.fillStyle = t<0.5? "rgba(180,210,255,.18)":"rgba(255,190,150,.16)";
+      sCtx.fillRect(px,py,2,2);
+    }
+
+    // air path indicator
+    var path = (1/Math.max(0.2, Math.cos(lerp(10,82,t)*DEG))).toFixed(1);
+    document.getElementById("pathOut").textContent = path + "× (relative)";
+    document.getElementById("ratioOut").textContent =
+      Math.pow(700/450,4).toFixed(1) + "× more (blue)";
+
+    sCtx.fillStyle="rgba(255,255,255,.85)"; sCtx.font="13px system-ui";
+    sCtx.fillText(t<0.5? "Blue scatters most → sky is blue"
+                       : "Blue scattered away → beam looks red", 16, h*0.94);
+  }
+  sun.addEventListener("input", drawSky);
+
+  /* ============================================================
+     QUIZ
+  ============================================================ */
+  var QUIZ = [
+    { q:"Why does violet light bend more than red in a glass prism?",
+      opts:["Violet travels faster in glass",
+            "Refractive index is higher for shorter wavelengths",
+            "Red has more energy",
+            "Violet has a longer wavelength"],
+      correct:1,
+      exp:"n(λ) rises as λ falls (Cauchy), so violet (short λ) refracts most." },
+    { q:"The primary rainbow appears at roughly what angle from the anti-solar point?",
+      opts:["0°","23°","42°","90°"],
+      correct:2,
+      exp:"One internal reflection gives a deviation minimum near 42° (red) to 40° (violet)." },
+    { q:"Why is the daytime sky blue?",
+      opts:["Air is coloured blue",
+            "Blue light is absorbed by ozone",
+            "Rayleigh scattering ∝ 1/λ⁴ scatters blue far more than red",
+            "Reflection from the oceans"],
+      correct:2,
+      exp:"Short-wavelength blue scatters ~5–6× more than red, filling the sky." }
+  ];
+  var host = document.getElementById("quizHost");
+  QUIZ.forEach(function(item, qi){
+    var d = document.createElement("div"); d.className="q";
+    var p = document.createElement("p"); p.className="qt";
+    p.textContent = (qi+1)+". "+item.q; d.appendChild(p);
+    var answered=false;
+    item.opts.forEach(function(txt, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=txt;
+      b.addEventListener("click", function(){
+        if(answered) return; answered=true;
+        if(oi===item.correct){ b.classList.add("correct"); }
+        else{
+          b.classList.add("wrong");
+          d.querySelectorAll(".opt")[item.correct].classList.add("correct");
+        }
+        exp.classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var exp=document.createElement("div"); exp.className="expl";
+    exp.textContent="✔ "+item.exp; d.appendChild(exp);
+    host.appendChild(d);
+  });
+
+  /* ---------- initial draw ---------- */
+  function drawAll(){ drawPrism(); drawDrop(); drawSky(); }
+  drawAll();
+
+  // light idle animation on the sky dots only when visible + tab active
+  var raf;
+  function loop(){
+    if(!document.hidden && current==="sky"){ drawSky(); }
+    raf = requestAnimationFrame(loop);
+  }
+  // gentle pulse for sky twinkle
+  var pulse=0;
+  function tick(){
+    if(!document.hidden){
+      pulse++;
+      if(current==="sky" && pulse%30===0){ drawSky(); }
+    }
+    requestAnimationFrame(tick);
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) drawAll();
+  });
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

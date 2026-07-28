@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magnetic Effects Lab — NIOS Physics Ch16</title>
+<style>
+  :root{
+    --bg:#0e1420; --panel:#182234; --panel2:#1f2c42; --line:#2c3a54;
+    --ink:#e8eefb; --muted:#9fb0cc; --accent:#4fd1c5; --accent-d:#2faea2;
+    --accent2:#f6ad55; --good:#68d391; --bad:#fc8181; --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%,#1a2740 0,var(--bg) 60%);
+    color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.5; padding:16px; -webkit-text-size-adjust:100%;
+  }
+  h1{font-size:1.35rem;margin:0 0 2px;}
+  .sub{color:var(--muted);font-size:.85rem;margin-bottom:14px;}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .tab{
+    background:var(--panel);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    min-height:40px;user-select:none;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent);}
+  .tab.active{background:var(--accent);color:#08221f;border-color:var(--accent);font-weight:600;}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media(min-width:820px){.grid{grid-template-columns:1.3fr 1fr;}}
+  canvas{width:100%;height:auto;display:block;background:#0b111c;border-radius:12px;border:1px solid var(--line);touch-action:manipulation;}
+  .ctl{margin:10px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:4px;}
+  .ctl label b{color:var(--accent);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;accent-color:var(--accent);height:28px;}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+  .seg button{
+    flex:1;min-width:90px;min-height:40px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:.85rem;
+  }
+  .seg button.active{background:var(--accent);color:#08221f;border-color:var(--accent);font-weight:600;}
+  .readout{background:var(--panel2);border-radius:12px;padding:12px;font-size:.9rem;}
+  .readout .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line);}
+  .readout .row:last-child{border-bottom:none;}
+  .readout .row b{color:var(--accent2);font-variant-numeric:tabular-nums;}
+  .formulas{font-size:.9rem;}
+  .formulas code{display:block;background:var(--panel2);padding:8px 10px;border-radius:8px;margin:6px 0;color:var(--accent);font-family:ui-monospace,Consolas,monospace;}
+  .note{font-size:.8rem;color:var(--muted);}
+  .quiz .q{background:var(--panel2);border-radius:12px;padding:12px;margin-bottom:12px;}
+  .quiz .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0;}
+  .quiz .opts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);padding:9px 12px;border-radius:8px;cursor:pointer;min-height:40px;}
+  .quiz .opts button.correct{background:rgba(104,211,145,.18);border-color:var(--good);}
+  .quiz .opts button.wrong{background:rgba(252,129,129,.18);border-color:var(--bad);}
+  .quiz .exp{font-size:.82rem;color:var(--muted);display:none;margin-top:6px;}
+  .quiz .exp.show{display:block;}
+  .btn{background:var(--accent);color:#08221f;border:none;padding:9px 14px;border-radius:10px;cursor:pointer;font-weight:600;min-height:40px;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .trainer-fb{font-weight:600;min-height:24px;margin-top:8px;}
+  .trainer-fb.good{color:var(--good);}
+  .trainer-fb.bad{color:var(--bad);}
+  .arrows{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;}
+  .arrows button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;min-height:52px;font-size:1.1rem;cursor:pointer;}
+  .arrows button.sel{border-color:var(--accent);background:rgba(79,209,197,.15);}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.8rem;color:var(--muted);margin:2px;}
+</style>
+</head>
+<body>
+<h1>Magnetic Effects Lab</h1>
+<div class="sub">NIOS Class 12 Physics · Ch16 — Magnetic Effect of Electric Current</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-v="field">1 · Field around conductors</div>
+  <div class="tab" data-v="force">2 · Force on current &amp; charge</div>
+  <div class="tab" data-v="trainer">3 · Right-hand rule trainer</div>
+  <div class="tab" data-v="learn">Formulas &amp; Quiz</div>
+</div>
+
+<!-- ============ VIEW 1: FIELD ============ -->
+<section class="view active" id="v-field">
+  <div class="grid">
+    <div class="panel">
+      <canvas id="cField" width="640" height="440"></canvas>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="seg" id="fieldMode">
+          <button class="active" data-m="wire">Straight wire</button>
+          <button data-m="loop">Circular loop</button>
+          <button data-m="sol">Solenoid</button>
+        </div>
+        <div class="ctl">
+          <label>Current I <b><span id="fI">5.0</span> A</b></label>
+          <input type="range" id="rI" min="0.5" max="15" step="0.5" value="5">
+        </div>
+        <div class="ctl" id="turnsWrap" style="display:none">
+          <label>Turns per metre n <b><span id="fN">400</span> /m</b></label>
+          <input type="range" id="rN" min="100" max="1000" step="50" value="400">
+        </div>
+        <label style="display:flex;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)">
+          <input type="checkbox" id="showRHR" checked> Show right-hand rule hint
+        </label>
+      </div>
+      <div class="panel readout" id="fieldOut"></div>
+      <div class="panel note" id="fieldNote"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIEW 2: FORCE ============ -->
+<section class="view" id="v-force">
+  <div class="grid">
+    <div class="panel">
+      <canvas id="cForce" width="640" height="440"></canvas>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="seg" id="forceMode">
+          <button class="active" data-m="wire">Force on wire (F=BIL sinθ)</button>
+          <button data-m="charge">Moving charge (circular)</button>
+        </div>
+        <div class="ctl">
+          <label>Magnetic field B <b><span id="fB">0.40</span> T</b></label>
+          <input type="range" id="rB" min="0.05" max="1.5" step="0.05" value="0.4">
+        </div>
+        <div id="wireCtls">
+          <div class="ctl">
+            <label>Current I <b><span id="fI2">4.0</span> A</b></label>
+            <input type="range" id="rI2" min="0.5" max="12" step="0.5" value="4">
+          </div>
+          <div class="ctl">
+            <label>Wire length L <b><span id="fL">0.20</span> m</b></label>
+            <input type="range" id="rL" min="0.05" max="0.5" step="0.05" value="0.2">
+          </div>
+          <div class="ctl">
+            <label>Angle θ (I to B) <b><span id="fTh">90</span>°</b></label>
+            <input type="range" id="rTh" min="0" max="180" step="5" value="90">
+          </div>
+        </div>
+        <div id="chargeCtls" style="display:none">
+          <div class="ctl">
+            <label>Speed v <b><span id="fV">2.0</span> ×10⁶ m/s</b></label>
+            <input type="range" id="rV" min="0.5" max="6" step="0.25" value="2">
+          </div>
+          <div class="ctl">
+            <label>Charge |q| <b><span id="fQ">1</span> e</b></label>
+            <input type="range" id="rQ" min="1" max="4" step="1" value="1">
+          </div>
+          <div class="ctl">
+            <label>Mass <b><span id="fM">1</span> mₚ</b></label>
+            <input type="range" id="rM" min="1" max="4" step="1" value="1">
+          </div>
+        </div>
+      </div>
+      <div class="panel readout" id="forceOut"></div>
+      <div class="panel note" id="forceNote"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIEW 3: TRAINER ============ -->
+<section class="view" id="v-trainer">
+  <div class="grid">
+    <div class="panel">
+      <canvas id="cTrain" width="640" height="360"></canvas>
+    </div>
+    <div>
+      <div class="panel">
+        <p style="margin:0 0 8px">Use the right-hand (flat) rule: fingers point along <b style="color:var(--accent2)">B</b>, thumb along the <b style="color:var(--accent)">current I</b> (velocity of positive charge). The palm pushes in the direction of the <b>force F</b>. Pick F below.</p>
+        <div class="pill" id="tPromptI"></div>
+        <div class="pill" id="tPromptB"></div>
+        <div class="arrows" id="tArrows">
+          <button data-d="up">↑ Up</button>
+          <button data-d="down">↓ Down</button>
+          <button data-d="left">← Left</button>
+          <button data-d="right">→ Right</button>
+          <button data-d="out">⊙ Out</button>
+          <button data-d="in">⊗ In</button>
+        </div>
+        <button class="btn" id="tCheck">Check answer</button>
+        <button class="btn ghost" id="tNext">New question</button>
+        <div class="trainer-fb" id="tFb"></div>
+        <div class="note" style="margin-top:8px">Score: <b id="tScore">0 / 0</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIEW 4: LEARN ============ -->
+<section class="view" id="v-learn">
+  <div class="grid">
+    <div class="panel formulas">
+      <h3 style="margin-top:0">Key formulas</h3>
+      <p class="note">Field of a long straight wire at distance r:</p>
+      <code>B = μ₀ I / (2π r)</code>
+      <p class="note">Field at centre of a circular loop (radius R, N turns):</p>
+      <code>B = μ₀ N I / (2R)</code>
+      <p class="note">Uniform field inside a long solenoid:</p>
+      <code>B = μ₀ n I   (n = turns per metre)</code>
+      <p class="note">Force on a current-carrying wire:</p>
+      <code>F = B I L sinθ</code>
+      <p class="note">Force on a moving charge (magnitude, v ⟂ B):</p>
+      <code>F = q v B</code>
+      <p class="note">Radius of the circular path:</p>
+      <code>r = m v / (q B)</code>
+      <p class="note">μ₀ = 4π × 10⁻⁷ T·m/A (permeability of free space)</p>
+    </div>
+    <div class="panel quiz" id="quiz"></div>
+  </div>
+</section>
+
+<script>
+"use strict";
+(function(){
+  var MU0 = 4*Math.PI*1e-7;
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  function $(id){ return document.getElementById(id); }
+  function fmt(x){
+    if(x===0) return "0";
+    var a=Math.abs(x);
+    if(a<1e-3||a>=1e5){
+      var e=Math.floor(Math.log10(a));
+      var m=x/Math.pow(10,e);
+      return m.toFixed(2)+"×10"+sup(e);
+    }
+    if(a<1) return x.toFixed(4);
+    if(a<100) return x.toFixed(2);
+    return x.toFixed(1);
+  }
+  function sup(n){
+    var map={"-":"⁻","0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+    return (""+n).split("").map(function(c){return map[c]||c;}).join("");
+  }
+
+  /* ---------- tab switching ---------- */
+  var tabs=$("tabs").querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      $("v-"+t.dataset.v).classList.add("active");
+    });
+  });
+
+  /* ==================================================
+     VIEW 1 : FIELD
+  ================================================== */
+  var cF=$("cField"), gF=cF.getContext("2d");
+  var fieldState={mode:"wire", I:5, n:400, rhr:true};
+
+  $("fieldMode").querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $("fieldMode").querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      fieldState.mode=b.dataset.m;
+      $("turnsWrap").style.display = (fieldState.mode==="sol")?"block":"none";
+      updateFieldOut();
+    });
+  });
+  $("rI").addEventListener("input",function(){ fieldState.I=+this.value; $("fI").textContent=fieldState.I.toFixed(1); updateFieldOut(); });
+  $("rN").addEventListener("input",function(){ fieldState.n=+this.value; $("fN").textContent=fieldState.n; updateFieldOut(); });
+  $("showRHR").addEventListener("change",function(){ fieldState.rhr=this.checked; });
+
+  function updateFieldOut(){
+    var I=fieldState.I, out=$("fieldOut"), note=$("fieldNote");
+    if(fieldState.mode==="wire"){
+      var r=0.02; var B=MU0*I/(2*Math.PI*r);
+      out.innerHTML="<div class='row'><span>Current I</span><b>"+I.toFixed(1)+" A</b></div>"+
+        "<div class='row'><span>At r = 2.0 cm</span><b>"+fmt(B)+" T</b></div>"+
+        "<div class='row'><span>Formula</span><b>μ₀I / 2πr</b></div>";
+      note.textContent="Field circles the wire. Grip the wire with your right hand, thumb along the current — your fingers curl the way B points. Reverse the current to reverse the circles.";
+    }else if(fieldState.mode==="loop"){
+      var R=0.05; var Bc=MU0*I/(2*R);
+      out.innerHTML="<div class='row'><span>Current I</span><b>"+I.toFixed(1)+" A</b></div>"+
+        "<div class='row'><span>At centre (R=5 cm)</span><b>"+fmt(Bc)+" T</b></div>"+
+        "<div class='row'><span>Formula</span><b>μ₀I / 2R</b></div>";
+      note.textContent="Field lines thread through the loop, straight and strong at the centre. One face acts as N pole, the other as S pole.";
+    }else{
+      var n=fieldState.n; var Bs=MU0*n*I;
+      out.innerHTML="<div class='row'><span>Current I</span><b>"+I.toFixed(1)+" A</b></div>"+
+        "<div class='row'><span>n</span><b>"+n+" /m</b></div>"+
+        "<div class='row'><span>Inside field B</span><b>"+fmt(Bs)+" T</b></div>"+
+        "<div class='row'><span>Formula</span><b>μ₀nI</b></div>";
+      note.textContent="Field inside a long solenoid is uniform and parallel to the axis; outside it is nearly zero. It behaves like a bar magnet.";
+    }
+  }
+
+  function drawArrow(g,x1,y1,x2,y2,col,head){
+    head=head||7;
+    g.strokeStyle=col; g.fillStyle=col; g.lineWidth=2;
+    g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+    var a=Math.atan2(y2-y1,x2-x1);
+    g.beginPath();
+    g.moveTo(x2,y2);
+    g.lineTo(x2-head*Math.cos(a-0.4),y2-head*Math.sin(a-0.4));
+    g.lineTo(x2-head*Math.cos(a+0.4),y2-head*Math.sin(a+0.4));
+    g.closePath(); g.fill();
+  }
+  function dot(g,x,y,r,col){ g.fillStyle=col; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); }
+  function cross(g,x,y,r,col){ g.strokeStyle=col; g.lineWidth=2; g.beginPath(); g.moveTo(x-r,y-r); g.lineTo(x+r,y+r); g.moveTo(x+r,y-r); g.lineTo(x-r,y+r); g.stroke(); }
+
+  var tPhase=0;
+  function drawField(){
+    var W=cF.width,H=cF.height;
+    gF.clearRect(0,0,W,H);
+    gF.fillStyle="#0b111c"; gF.fillRect(0,0,W,H);
+    var cx=W/2, cy=H/2;
+    var acc="#4fd1c5", acc2="#f6ad55";
+    var m=fieldState.mode;
+
+    if(m==="wire"){
+      // wire into the page at centre
+      cross(gF,cx,cy,7,acc2); // wire, current into page
+      dot(gF,cx,cy,10,"transparent");
+      gF.strokeStyle=acc2; gF.lineWidth=1.5;
+      gF.beginPath(); gF.arc(cx,cy,12,0,7); gF.stroke();
+      gF.fillStyle="#e8eefb"; gF.font="13px system-ui"; gF.textAlign="center";
+      gF.fillText("I (into page)", cx, cy+40);
+      // concentric circles with directional arrows (clockwise for into-page by RH rule)
+      var radii=[45,80,115,150,185];
+      radii.forEach(function(r,i){
+        gF.strokeStyle="rgba(79,209,197,"+(0.75-i*0.1)+")"; gF.lineWidth=1.5;
+        gF.beginPath(); gF.arc(cx,cy,r,0,7); gF.stroke();
+        // moving arrowheads to show direction (clockwise)
+        var ang = tPhase*0.5 + i*0.6;
+        var ax=cx+r*Math.cos(ang), ay=cy+r*Math.sin(ang);
+        // tangent clockwise => direction (sin, -cos) ... for into page RH rule field is clockwise when viewed with I into page
+        var tx=Math.sin(ang), ty=-Math.cos(ang);
+        drawArrow(gF,ax-tx*0.1,ay-ty*0.1,ax+tx*12,ay+ty*12,acc,6);
+      });
+    }else if(m==="loop"){
+      // loop drawn as ellipse (edge-on), current: top out, bottom in
+      gF.strokeStyle=acc2; gF.lineWidth=3;
+      gF.beginPath(); gF.ellipse(cx,cy,30,120,0,0,7); gF.stroke();
+      dot(gF,cx,cy-120,6,acc2); // top: out of page
+      gF.strokeStyle=acc2; gF.beginPath(); gF.arc(cx,cy-120,10,0,7); gF.stroke();
+      cross(gF,cx,cy+120,6,acc2); // bottom: into page
+      gF.fillStyle="#e8eefb"; gF.font="12px system-ui"; gF.textAlign="left";
+      gF.fillText("I out ⊙", cx+16, cy-116);
+      gF.fillText("I in ⊗", cx+16, cy+124);
+      // field lines threading through (loops around the wire, uniform-ish through centre)
+      var lines=[[-70,-70],[0,-95],[70,-70],[0,0]];
+      for(var k=-2;k<=2;k++){
+        var off=k*40;
+        gF.strokeStyle="rgba(79,209,197,0.7)"; gF.lineWidth=1.5;
+        gF.beginPath();
+        gF.ellipse(cx, cy, 55+Math.abs(off)*0.4, 120+Math.abs(off), 0, 0, 7);
+        gF.stroke();
+      }
+      // direction arrow through centre (points from bottom face to top => leftward/axis). Show axis field arrow
+      drawArrow(gF,cx,cy+60,cx,cy-60,acc,8);
+      gF.fillStyle=acc; gF.font="12px system-ui"; gF.textAlign="center";
+      gF.fillText("B", cx+14, cy);
+    }else{
+      // solenoid: draw coil turns, uniform field inside
+      var x0=cx-170, x1=cx+170, yt=cy-70, yb=cy+70;
+      gF.strokeStyle=acc2; gF.lineWidth=2.5;
+      var turns=9;
+      for(var t=0;t<turns;t++){
+        var x=x0+(x1-x0)*(t/(turns-1));
+        gF.beginPath(); gF.ellipse(x,cy,10,70,0,0,7); gF.stroke();
+      }
+      // ends labels
+      gF.fillStyle="#e8eefb"; gF.font="13px system-ui"; gF.textAlign="center";
+      gF.fillText("N", x1+22, cy+5);
+      gF.fillText("S", x0-22, cy+5);
+      // uniform interior field lines (rightward), animated dashes
+      for(var yy=yt+18; yy<yb; yy+=26){
+        gF.strokeStyle="rgba(79,209,197,0.65)"; gF.lineWidth=1.5;
+        gF.beginPath(); gF.moveTo(x0+14,yy); gF.lineTo(x1-14,yy); gF.stroke();
+        var px=x0+20+((tPhase*30)%(x1-x0-40));
+        drawArrow(gF,px,yy,px+14,yy,acc,6);
+      }
+      gF.fillStyle="#e8eefb"; gF.textAlign="center"; gF.font="12px system-ui";
+      gF.fillText("Uniform B inside (→)", cx, yb+34);
+    }
+
+    // RHR hint
+    if(fieldState.rhr){
+      gF.fillStyle="rgba(246,173,85,0.9)"; gF.font="12px system-ui"; gF.textAlign="left";
+      var msg = m==="wire" ? "Right-hand grip: thumb = I, curled fingers = B"
+              : m==="loop" ? "Curl fingers along I → thumb gives B through loop"
+              : "Curl fingers along coil current → thumb points to N pole";
+      gF.fillText(msg, 14, 24);
+    }
+  }
+
+  /* ==================================================
+     VIEW 2 : FORCE
+  ================================================== */
+  var cFo=$("cForce"), gFo=cFo.getContext("2d");
+  var MP=1.6726e-27, QE=1.602e-19;
+  var forceState={mode:"wire", B:0.4, I:4, L:0.2, th:90, v:2, q:1, m:1};
+
+  $("forceMode").querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $("forceMode").querySelectorAll("button").forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      forceState.mode=b.dataset.m;
+      $("wireCtls").style.display=(forceState.mode==="wire")?"block":"none";
+      $("chargeCtls").style.display=(forceState.mode==="charge")?"block":"none";
+      resetCharge();
+      updateForceOut();
+    });
+  });
+  $("rB").addEventListener("input",function(){forceState.B=+this.value;$("fB").textContent=forceState.B.toFixed(2);resetCharge();updateForceOut();});
+  $("rI2").addEventListener("input",function(){forceState.I=+this.value;$("fI2").textContent=forceState.I.toFixed(1);updateForceOut();});
+  $("rL").addEventListener("input",function(){forceState.L=+this.value;$("fL").textContent=forceState.L.toFixed(2);updateForceOut();});
+  $("rTh").addEventListener("input",function(){forceState.th=+this.value;$("fTh").textContent=forceState.th;updateForceOut();});
+  $("rV").addEventListener("input",function(){forceState.v=+this.value;$("fV").textContent=forceState.v.toFixed(2);resetCharge();updateForceOut();});
+  $("rQ").addEventListener("input",function(){forceState.q=+this.value;$("fQ").textContent=forceState.q;resetCharge();updateForceOut();});
+  $("rM").addEventListener("input",function(){forceState.m=+this.value;$("fM").textContent=forceState.m;resetCharge();updateForceOut();});
+
+  function updateForceOut(){
+    var out=$("forceOut"), note=$("forceNote");
+    if(forceState.mode==="wire"){
+      var F=forceState.B*forceState.I*forceState.L*Math.sin(forceState.th*Math.PI/180);
+      out.innerHTML="<div class='row'><span>B</span><b>"+forceState.B.toFixed(2)+" T</b></div>"+
+        "<div class='row'><span>I</span><b>"+forceState.I.toFixed(1)+" A</b></div>"+
+        "<div class='row'><span>L</span><b>"+forceState.L.toFixed(2)+" m</b></div>"+
+        "<div class='row'><span>θ</span><b>"+forceState.th+"°</b></div>"+
+        "<div class='row'><span>Force F = BIL sinθ</span><b>"+fmt(F)+" N</b></div>";
+      note.textContent="Force is maximum when the current is perpendicular to B (θ = 90°) and zero when parallel (θ = 0° or 180°). Direction from Fleming's left-hand rule.";
+    }else{
+      var v=forceState.v*1e6, q=forceState.q*QE, m=forceState.m*MP, B=forceState.B;
+      var F=q*v*B; var r=m*v/(q*B); var T=2*Math.PI*m/(q*B);
+      out.innerHTML="<div class='row'><span>B</span><b>"+B.toFixed(2)+" T</b></div>"+
+        "<div class='row'><span>v</span><b>"+forceState.v.toFixed(2)+"×10⁶ m/s</b></div>"+
+        "<div class='row'><span>Force F = qvB</span><b>"+fmt(F)+" N</b></div>"+
+        "<div class='row'><span>Radius r = mv/qB</span><b>"+fmt(r)+" m</b></div>"+
+        "<div class='row'><span>Period T</span><b>"+fmt(T)+" s</b></div>";
+      note.textContent="A charge moving perpendicular to B feels a force always at right angles to its velocity, so it moves in a circle. Faster or heavier → larger radius; stronger B → tighter circle.";
+    }
+  }
+
+  // charge animation
+  var ch={x:0,y:0,ang:0};
+  function resetCharge(){ ch.ang=Math.PI; }
+  resetCharge();
+
+  function drawForce(){
+    var W=cFo.width,H=cFo.height;
+    gFo.clearRect(0,0,W,H);
+    gFo.fillStyle="#0b111c"; gFo.fillRect(0,0,W,H);
+    var acc="#4fd1c5", acc2="#f6ad55";
+
+    if(forceState.mode==="wire"){
+      // Field: uniform into page (crosses grid)
+      gFo.fillStyle="rgba(159,176,204,0.5)";
+      for(var gx=60;gx<W-40;gx+=64){
+        for(var gy=60;gy<H-40;gy+=64){
+          cross(gFo,gx,gy,4,"rgba(159,176,204,0.4)");
+        }
+      }
+      gFo.fillStyle="#9fb0cc"; gFo.font="12px system-ui"; gFo.textAlign="left";
+      gFo.fillText("B into page ⊗", 14, 22);
+
+      var cx=W/2, cy=H/2;
+      var th=forceState.th*Math.PI/180;
+      // current direction vector (in plane), angle measured from +x
+      var dirx=Math.cos(-th+Math.PI/2), diry=Math.sin(-th+Math.PI/2);
+      // draw wire as a segment through centre along current direction
+      var len=110;
+      gFo.strokeStyle=acc2; gFo.lineWidth=5;
+      gFo.beginPath();
+      gFo.moveTo(cx-dirx*len, cy-diry*len);
+      gFo.lineTo(cx+dirx*len, cy+diry*len);
+      gFo.stroke();
+      // current arrow
+      drawArrow(gFo,cx,cy,cx+dirx*len,cy+diry*len,"#fff",10);
+      gFo.fillStyle="#fff"; gFo.font="13px system-ui";
+      gFo.fillText("I", cx+dirx*len+6, cy+diry*len);
+
+      // Force = I L x B. B into page (-z). I direction (dirx,diry,0). F = I(dir x B).
+      // dir x (0,0,-1) = (diry*-1*-1?,..). Compute: (dx,dy,0)x(0,0,-1) = (dy*-1 - 0, 0 - dx*-1, 0) = (-dy, dx,0)?
+      // cross (a)x(b): (ay*bz-az*by, az*bx-ax*bz, ax*by-ay*bx). a=(dx,dy,0) b=(0,0,-1)
+      // = (dy*-1 - 0, 0 - dx*-1, 0) = (-dy, dx, 0)
+      var fx=-diry, fy=dirx;
+      var Fmag=Math.sin(th); // relative
+      if(Fmag>0.01){
+        gFo.save();
+        var flen=70*Fmag+15;
+        drawArrow(gFo,cx,cy,cx+fx*flen,cy+fy*flen,acc,11);
+        gFo.fillStyle=acc; gFo.font="bold 14px system-ui";
+        gFo.fillText("F", cx+fx*flen+6, cy+fy*flen);
+        gFo.restore();
+      } else {
+        gFo.fillStyle=acc; gFo.font="14px system-ui"; gFo.textAlign="center";
+        gFo.fillText("F = 0 (I ∥ B)", cx, cy+140);
+      }
+    } else {
+      // charge circular motion; B out of page assumed
+      gFo.fillStyle="rgba(159,176,204,0.5)";
+      for(var gx2=60;gx2<W-40;gx2+=64){
+        for(var gy2=60;gy2<H-40;gy2+=64){
+          dot(gFo,gx2,gy2,2.5,"rgba(159,176,204,0.4)");
+        }
+      }
+      gFo.fillStyle="#9fb0cc"; gFo.font="12px system-ui"; gFo.textAlign="left";
+      gFo.fillText("B out of page ⊙", 14, 22);
+
+      var W2=cFo.width,H2=cFo.height, cx2=W2/2, cy2=H2/2;
+      // pixel radius scaled from physical radius
+      var v=forceState.v*1e6, q=forceState.q*QE, m=forceState.m*MP, B=forceState.B;
+      var rPhys=m*v/(q*B);
+      // map: choose scale so a mid-range radius ~ 120px
+      var scale=120/ (MP*2e6/(QE*0.4)); // reference
+      var rPix=Math.max(25,Math.min(160, rPhys*scale));
+      // draw orbit
+      gFo.strokeStyle="rgba(79,209,197,0.35)"; gFo.lineWidth=1.5;
+      gFo.beginPath(); gFo.arc(cx2,cy2,rPix,0,7); gFo.stroke();
+      // particle position
+      var px=cx2+rPix*Math.cos(ch.ang), py=cy2+rPix*Math.sin(ch.ang);
+      dot(gFo,px,py,8,acc2);
+      // velocity tangent (counterclockwise for +q, B out)
+      var vx=-Math.sin(ch.ang), vy=Math.cos(ch.ang);
+      drawArrow(gFo,px,py,px+vx*40,py+vy*40,"#fff",8);
+      gFo.fillStyle="#fff"; gFo.font="12px system-ui"; gFo.fillText("v",px+vx*44,py+vy*44);
+      // force toward centre
+      var dxc=cx2-px, dyc=cy2-py, dl=Math.hypot(dxc,dyc)||1;
+      drawArrow(gFo,px,py,px+dxc/dl*34,py+dyc/dl*34,acc,8);
+      gFo.fillStyle=acc; gFo.fillText("F",px+dxc/dl*40,py+dyc/dl*40);
+      gFo.fillStyle="#f6ad55"; gFo.font="12px system-ui"; gFo.textAlign="center";
+      gFo.fillText("+q", px, py-14);
+      gFo.fillStyle="#9fb0cc"; gFo.textAlign="left";
+      gFo.fillText("r ≈ "+fmt(rPhys)+" m", 14, H2-16);
+    }
+  }
+
+  /* ==================================================
+     VIEW 3 : TRAINER (right-hand / Fleming logic)
+  ================================================== */
+  var cT=$("cTrain"), gT=cT.getContext("2d");
+  var trainState={I:null,B:null,answer:null,pick:null,score:0,total:0};
+  // directions: up,down,left,right,out,in
+  // Compute F = I x B using unit vectors (right-hand for positive current)
+  var VEC={up:[0,-1,0],down:[0,1,0],left:[-1,0,0],right:[1,0,0],out:[0,0,1],in:[0,0,-1]};
+  function crossV(a,b){return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];}
+  function vecName(v){
+    for(var k in VEC){ if(VEC[k][0]===v[0]&&VEC[k][1]===v[1]&&VEC[k][2]===v[2]) return k; }
+    return null;
+  }
+  var DIRLABEL={up:"↑ Up",down:"↓ Down",left:"← Left",right:"→ Right",out:"⊙ Out of page",in:"⊗ Into page"};
+
+  function newQuestion(){
+    var keys=Object.keys(VEC);
+    var iK,bK,f;
+    do{
+      iK=keys[Math.floor(Math.random()*keys.length)];
+      bK=keys[Math.floor(Math.random()*keys.length)];
+      f=crossV(VEC[iK],VEC[bK]);
+    }while(f[0]===0&&f[1]===0&&f[2]===0); // avoid parallel (zero force)
+    trainState.I=iK; trainState.B=bK; trainState.answer=vecName(f); trainState.pick=null;
+    $("tPromptI").textContent="Current I : "+DIRLABEL[iK];
+    $("tPromptB").textContent="Field B : "+DIRLABEL[bK];
+    $("tArrows").querySelectorAll("button").forEach(function(x){x.classList.remove("sel");});
+    $("tFb").textContent=""; $("tFb").className="trainer-fb";
+    drawTrain();
+  }
+  $("tArrows").querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click",function(){
+      $("tArrows").querySelectorAll("button").forEach(function(x){x.classList.remove("sel");});
+      b.classList.add("sel"); trainState.pick=b.dataset.d;
+    });
+  });
+  $("tCheck").addEventListener("click",function(){
+    if(!trainState.pick){ $("tFb").textContent="Pick a direction first."; $("tFb").className="trainer-fb bad"; return; }
+    trainState.total++;
+    if(trainState.pick===trainState.answer){
+      trainState.score++;
+      $("tFb").textContent="Correct! F points "+DIRLABEL[trainState.answer]+".";
+      $("tFb").className="trainer-fb good";
+    }else{
+      $("tFb").textContent="Not quite — F should point "+DIRLABEL[trainState.answer]+".";
+      $("tFb").className="trainer-fb bad";
+    }
+    $("tScore").textContent=trainState.score+" / "+trainState.total;
+  });
+  $("tNext").addEventListener("click",newQuestion);
+
+  function symbolAt(g,x,y,dir,col,label){
+    g.strokeStyle=col; g.fillStyle=col; g.lineWidth=2.5; g.font="12px system-ui"; g.textAlign="center";
+    if(dir==="out"){ g.beginPath(); g.arc(x,y,14,0,7); g.stroke(); dot(g,x,y,4,col); }
+    else if(dir==="in"){ g.beginPath(); g.arc(x,y,14,0,7); g.stroke(); cross(g,x,y,9,col); }
+    else {
+      var d=VEC[dir]; drawArrow(g,x-d[0]*22,y+d[1]*22,x+d[0]*22,y-d[1]*22,col,9);
+    }
+    g.fillStyle=col; g.fillText(label,x,y+34);
+  }
+  function drawTrain(){
+    var W=cT.width,H=cT.height;
+    gT.clearRect(0,0,W,H);
+    gT.fillStyle="#0b111c"; gT.fillRect(0,0,W,H);
+    symbolAt(gT, W*0.25, H*0.42, trainState.I, "#4fd1c5", "I (current)");
+    symbolAt(gT, W*0.5, H*0.42, trainState.B, "#f6ad55", "B (field)");
+    // show picked
+    if(trainState.pick){
+      symbolAt(gT, W*0.75, H*0.42, trainState.pick, "#e8eefb", "F (your pick)");
+    } else {
+      gT.fillStyle="#9fb0cc"; gT.font="13px system-ui"; gT.textAlign="center";
+      gT.fillText("F = ?", W*0.75, H*0.42);
+    }
+    gT.fillStyle="#9fb0cc"; gT.font="12px system-ui"; gT.textAlign="center";
+    gT.fillText("F = I × B  (right-hand rule for positive current)", W/2, H-18);
+  }
+
+  /* ==================================================
+     VIEW 4 : QUIZ
+  ================================================== */
+  var QUIZ=[
+    {q:"The magnetic field at distance r from a long straight wire carrying current I is:",
+     opts:["μ₀I / (2πr)","μ₀I / (2r)","μ₀nI","μ₀I r / 2π"], a:0,
+     e:"For a long straight wire, B = μ₀I/(2πr): it falls off as 1/r."},
+    {q:"A proton enters a uniform magnetic field moving perpendicular to it. Its path is:",
+     opts:["A straight line","A parabola","A circle","A spiral that speeds up"], a:2,
+     e:"The magnetic force qvB is always perpendicular to v, giving uniform circular motion of radius r = mv/qB. Speed stays constant."},
+    {q:"The force on a current-carrying wire in a magnetic field is zero when:",
+     opts:["The current is perpendicular to B","The current is parallel to B","B is very strong","The wire is short"], a:1,
+     e:"F = BIL sinθ. When the current is parallel (θ = 0° or 180°), sinθ = 0, so F = 0."}
+  ];
+  function buildQuiz(){
+    var host=$("quiz");
+    host.innerHTML="<h3 style='margin-top:0'>Quick quiz (3 questions)</h3>";
+    QUIZ.forEach(function(item,qi){
+      var div=document.createElement("div"); div.className="q";
+      var p=document.createElement("p"); p.style.margin="0 0 4px"; p.textContent=(qi+1)+". "+item.q; div.appendChild(p);
+      var opts=document.createElement("div"); opts.className="opts";
+      item.opts.forEach(function(o,oi){
+        var b=document.createElement("button"); b.textContent=o;
+        b.addEventListener("click",function(){
+          if(div.dataset.done) return;
+          div.dataset.done="1";
+          opts.querySelectorAll("button").forEach(function(x,xi){
+            if(xi===item.a) x.classList.add("correct");
+          });
+          if(oi!==item.a) b.classList.add("wrong");
+          exp.classList.add("show");
+        });
+        opts.appendChild(b);
+      });
+      div.appendChild(opts);
+      var exp=document.createElement("div"); exp.className="exp"; exp.textContent="Explanation: "+item.e;
+      div.appendChild(exp);
+      host.appendChild(div);
+    });
+  }
+
+  /* ==================================================
+     ANIMATION LOOP
+  ================================================== */
+  function loop(){
+    if(running){
+      tPhase+=0.03;
+      drawField();
+      // advance charge
+      if(forceState.mode==="charge"){
+        var v=forceState.v*1e6, q=forceState.q*QE, m=forceState.m*MP, B=forceState.B;
+        var omega=q*B/m; // rad/s (huge) — scale down for display
+        ch.ang+=Math.min(0.08, omega*1e-9);
+      }
+      drawForce();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // init
+  updateFieldOut();
+  updateForceOut();
+  buildQuiz();
+  newQuestion();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

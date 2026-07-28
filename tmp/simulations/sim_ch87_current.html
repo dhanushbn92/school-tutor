@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Current &amp; Ohm's Law Lab &mdash; NIOS Physics Ch15</title>
+<style>
+  :root{
+    --bg:#12161d; --panel:#1b212b; --panel2:#232b37; --line:#2e3745;
+    --txt:#e6ecf4; --muted:#93a1b3; --accent:#4fd1c5; --accent2:#2c8f87;
+    --danger:#ef6a6a; --warn:#f2c14e;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.5;padding:14px;font-size:15px;
+  }
+  h1{font-size:1.25rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.82rem;margin:0 0 14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.86rem;
+    flex:1 1 auto;min-width:110px;text-align:center;
+  }
+  .tab.active{background:var(--accent);color:#08201e;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:14px;
+  }
+  .mode{display:none}
+  .mode.active{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;touch-action:none}
+  label.ctl{display:block;margin:12px 0 4px;font-size:.85rem;color:var(--muted)}
+  .val{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px}
+  select{
+    width:100%;background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:8px;padding:8px;font-size:.9rem;
+  }
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;flex:1 1 90px;min-width:90px}
+  .stat .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .v{font-size:1.15rem;font-weight:700;color:var(--accent)}
+  .toggle{display:flex;gap:8px;margin:6px 0 4px}
+  .toggle button{
+    flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+    padding:10px;border-radius:10px;cursor:pointer;font-size:.88rem;
+  }
+  .toggle button.on{background:var(--accent);color:#08201e;border-color:var(--accent);font-weight:600}
+  .formulas code{display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:8px 10px;margin:6px 0;font-family:ui-monospace,Consolas,monospace;font-size:.85rem;color:var(--txt)}
+  .formulas .note{color:var(--muted);font-size:.78rem}
+  .quiz .q{margin-bottom:14px}
+  .quiz .q p{margin:0 0 6px;font-weight:600}
+  .quiz .opt{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:4px 0;cursor:pointer;font-size:.87rem}
+  .quiz .opt:hover{border-color:var(--accent)}
+  .quiz .opt.correct{background:#173d33;border-color:var(--accent)}
+  .quiz .opt.wrong{background:#3d1f1f;border-color:var(--danger)}
+  .quiz .ans{font-size:.8rem;color:var(--muted);margin-top:4px;display:none}
+  .quiz .ans.show{display:block}
+  h2{font-size:1rem;margin:0 0 8px;color:var(--accent)}
+  .hint{color:var(--muted);font-size:.78rem;margin-top:8px}
+</style>
+</head>
+<body>
+  <h1>Current &amp; Ohm's Law Lab</h1>
+  <p class="sub">NIOS Class 12 Physics &middot; Ch15 &mdash; Electric Current and Ohm's Law</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="ohm">Ohm's Law</button>
+    <button class="tab" data-mode="res">Resistance Factors</button>
+    <button class="tab" data-mode="comb">Series / Parallel</button>
+  </div>
+
+  <!-- ============ MODE 1: OHM'S LAW ============ -->
+  <section class="mode active" id="mode-ohm">
+    <div class="grid">
+      <div class="panel">
+        <h2>Circuit</h2>
+        <canvas id="cvOhm" width="440" height="260"></canvas>
+        <div class="readout">
+          <div class="stat"><div class="k">Voltage V</div><div class="v"><span id="oV">6.0</span> V</div></div>
+          <div class="stat"><div class="k">Resistance R</div><div class="v"><span id="oR">3.0</span> &#8486;</div></div>
+          <div class="stat"><div class="k">Current I</div><div class="v"><span id="oI">2.00</span> A</div></div>
+          <div class="stat"><div class="k">Power P</div><div class="v"><span id="oP">12.0</span> W</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Controls</h2>
+        <label class="ctl">Voltage V = <span class="val" id="oVl">6.0</span> V</label>
+        <input type="range" id="sV" min="0" max="12" step="0.5" value="6">
+        <label class="ctl">Resistance R = <span class="val" id="oRl">3.0</span> &#8486;</label>
+        <input type="range" id="sR" min="0.5" max="12" step="0.5" value="3">
+        <h2 style="margin-top:16px">V&ndash;I Graph</h2>
+        <canvas id="cvGraph" width="440" height="240"></canvas>
+        <p class="hint">Straight line through origin &mdash; slope = 1/R. Moving the dot along the line = your present operating point.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: RESISTANCE FACTORS ============ -->
+  <section class="mode" id="mode-res">
+    <div class="grid">
+      <div class="panel">
+        <h2>Conductor</h2>
+        <canvas id="cvRes" width="440" height="220"></canvas>
+        <div class="readout">
+          <div class="stat"><div class="k">Length L</div><div class="v"><span id="rL">1.0</span> m</div></div>
+          <div class="stat"><div class="k">Area A</div><div class="v"><span id="rA">1.0</span> mm&sup2;</div></div>
+          <div class="stat"><div class="k">Resistance R</div><div class="v"><span id="rR">0.017</span> &#8486;</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Controls</h2>
+        <label class="ctl">Material (resistivity &rho;)</label>
+        <select id="selMat">
+          <option value="1.68e-8" data-lab="Copper">Copper (1.68&times;10&#8315;&#8312; &#8486;&middot;m)</option>
+          <option value="2.82e-8" data-lab="Aluminium">Aluminium (2.82&times;10&#8315;&#8312; &#8486;&middot;m)</option>
+          <option value="1.59e-8" data-lab="Silver">Silver (1.59&times;10&#8315;&#8312; &#8486;&middot;m)</option>
+          <option value="1.0e-6"  data-lab="Nichrome">Nichrome (1.0&times;10&#8315;&#8310; &#8486;&middot;m)</option>
+          <option value="5.6e-8"  data-lab="Tungsten">Tungsten (5.6&times;10&#8315;&#8312; &#8486;&middot;m)</option>
+        </select>
+        <label class="ctl">Length L = <span class="val" id="rLl">1.0</span> m</label>
+        <input type="range" id="sL" min="0.2" max="5" step="0.1" value="1">
+        <label class="ctl">Cross-section area A = <span class="val" id="rAl">1.0</span> mm&sup2;</label>
+        <input type="range" id="sA" min="0.2" max="5" step="0.1" value="1">
+        <p class="hint">Longer wire &rarr; more resistance. Thicker wire (larger A) &rarr; less resistance. R = &rho;L / A.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: SERIES / PARALLEL ============ -->
+  <section class="mode" id="mode-comb">
+    <div class="grid">
+      <div class="panel">
+        <h2>Two Resistors</h2>
+        <canvas id="cvComb" width="440" height="260"></canvas>
+        <div class="toggle">
+          <button id="btnSeries" class="on">Series</button>
+          <button id="btnParallel">Parallel</button>
+        </div>
+        <div class="readout">
+          <div class="stat"><div class="k">R&#8321;</div><div class="v"><span id="cR1">4.0</span> &#8486;</div></div>
+          <div class="stat"><div class="k">R&#8322;</div><div class="v"><span id="cR2">6.0</span> &#8486;</div></div>
+          <div class="stat"><div class="k">R&#8331;&#8202;q</div><div class="v"><span id="cReq">10.0</span> &#8486;</div></div>
+          <div class="stat"><div class="k">Total I</div><div class="v"><span id="cI">1.20</span> A</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Controls</h2>
+        <label class="ctl">Supply V = <span class="val" id="cVl">12</span> V</label>
+        <input type="range" id="cV" min="1" max="24" step="1" value="12">
+        <label class="ctl">R&#8321; = <span class="val" id="cR1l">4.0</span> &#8486;</label>
+        <input type="range" id="sc1" min="1" max="20" step="0.5" value="4">
+        <label class="ctl">R&#8322; = <span class="val" id="cR2l">6.0</span> &#8486;</label>
+        <input type="range" id="sc2" min="1" max="20" step="0.5" value="6">
+        <div class="readout" id="combDetail"></div>
+        <p class="hint" id="combNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORMULAS ============ -->
+  <div class="panel formulas">
+    <h2>Key Formulas</h2>
+    <code>Ohm's law:&nbsp;&nbsp; V = I &times; R &nbsp;&rarr;&nbsp; I = V / R</code>
+    <code>Resistance:&nbsp; R = &rho; L / A &nbsp;&nbsp;(&rho; = resistivity, L = length, A = area)</code>
+    <code>Series:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; R&#8331;&#8202;q = R&#8321; + R&#8322; &nbsp;(same current, voltage divides)</code>
+    <code>Parallel:&nbsp;&nbsp;&nbsp; 1/R&#8331;&#8202;q = 1/R&#8321; + 1/R&#8322; &nbsp;(same voltage, current divides)</code>
+    <code>Power:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P = V I = I&sup2; R = V&sup2; / R &nbsp;(watts)</code>
+    <p class="note">Units: V in volts (V), I in amperes (A), R in ohms (&#8486;), &rho; in &#8486;&middot;m, P in watts (W).</p>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <div class="panel quiz" id="quiz">
+    <h2>Quick Quiz &mdash; tap an option</h2>
+    <div class="q" data-correct="1">
+      <p>1. A 12 V battery drives 3 A through a resistor. What is R?</p>
+      <div class="opt">36 &#8486;</div>
+      <div class="opt">4 &#8486;</div>
+      <div class="opt">0.25 &#8486;</div>
+      <div class="ans">R = V/I = 12/3 = 4 &#8486;.</div>
+    </div>
+    <div class="q" data-correct="0">
+      <p>2. If a wire's length doubles (area unchanged), its resistance...</p>
+      <div class="opt">doubles</div>
+      <div class="opt">halves</div>
+      <div class="opt">stays the same</div>
+      <div class="ans">R = &rho;L/A, so R is proportional to L &mdash; doubling L doubles R.</div>
+    </div>
+    <div class="q" data-correct="2">
+      <p>3. Two 6 &#8486; resistors in parallel give an equivalent resistance of...</p>
+      <div class="opt">12 &#8486;</div>
+      <div class="opt">6 &#8486;</div>
+      <div class="opt">3 &#8486;</div>
+      <div class="ans">1/R = 1/6 + 1/6 = 1/3, so R = 3 &#8486;.</div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  // ---------- Tab switching ----------
+  var tabs = document.querySelectorAll(".tab");
+  var modes = { ohm:document.getElementById("mode-ohm"),
+                res:document.getElementById("mode-res"),
+                comb:document.getElementById("mode-comb") };
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){ x.classList.remove("active"); });
+      t.classList.add("active");
+      for(var k in modes){ modes[k].classList.remove("active"); }
+      modes[t.dataset.mode].classList.add("active");
+    });
+  });
+
+  function setupCanvas(cv){
+    var ctx = cv.getContext("2d");
+    var css = cv.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.width, h = cv.height; // logical dims from attributes
+    // Draw in logical coords; scale via CSS. Keep backing store crisp:
+    if(css.width){
+      cv.width = Math.round(css.width * dpr);
+      cv.height = Math.round(css.width * (h/w) * dpr);
+      ctx.setTransform(cv.width/w, 0, 0, cv.width/w, 0, 0);
+    }
+    return ctx;
+  }
+
+  // ================= MODE 1: OHM'S LAW =================
+  var cvOhm = document.getElementById("cvOhm");
+  var ctxOhm, ohmW=440, ohmH=260;
+  var cvGraph = document.getElementById("cvGraph");
+  var ctxGraph, gW=440, gH=240;
+  var sV = document.getElementById("sV"), sR = document.getElementById("sR");
+  var flow = 0; // electron animation phase
+
+  function ohmVals(){
+    return { V:parseFloat(sV.value), R:parseFloat(sR.value) };
+  }
+  function updateOhmReadout(){
+    var o = ohmVals();
+    var I = o.V / o.R;
+    var P = o.V * I;
+    document.getElementById("oV").textContent = o.V.toFixed(1);
+    document.getElementById("oR").textContent = o.R.toFixed(1);
+    document.getElementById("oI").textContent = I.toFixed(2);
+    document.getElementById("oP").textContent = P.toFixed(1);
+    document.getElementById("oVl").textContent = o.V.toFixed(1);
+    document.getElementById("oRl").textContent = o.R.toFixed(1);
+  }
+  sV.addEventListener("input", updateOhmReadout);
+  sR.addEventListener("input", updateOhmReadout);
+
+  function drawOhm(){
+    if(!ctxOhm) return;
+    var o = ohmVals();
+    var I = o.V / o.R;
+    var ctx = ctxOhm;
+    ctx.clearRect(0,0,ohmW,ohmH);
+    // wire rectangle path
+    var L=60, R=380, T=50, B=210;
+    ctx.lineWidth=6; ctx.strokeStyle="#4a5666"; ctx.lineJoin="round";
+    ctx.beginPath();
+    ctx.moveTo(L,T); ctx.lineTo(R,T); ctx.lineTo(R,B); ctx.lineTo(L,B); ctx.lineTo(L,T);
+    ctx.stroke();
+    // battery on left side (gap in wire)
+    ctx.save();
+    // draw battery symbol at left-middle
+    var by=130;
+    ctx.strokeStyle="#e6ecf4"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(L,by-24); ctx.lineTo(L,by+24); ctx.stroke(); // clear region visually
+    // long line (+) and short line (-)
+    ctx.beginPath(); ctx.moveTo(L-10,by-16); ctx.lineTo(L+10,by-16); ctx.stroke();
+    ctx.lineWidth=6;
+    ctx.beginPath(); ctx.moveTo(L-6,by+4); ctx.lineTo(L+6,by+4); ctx.stroke();
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(L-10,by+22); ctx.lineTo(L+10,by+22); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle="#93a1b3"; ctx.font="13px system-ui";
+    ctx.fillText(o.V.toFixed(1)+" V", L-46, by+4);
+    // resistor (zig-zag) on top edge
+    var rx1=180, rx2=280, ry=T;
+    ctx.strokeStyle="#f2c14e"; ctx.lineWidth=5;
+    ctx.beginPath();
+    ctx.moveTo(rx1,ry);
+    var seg=(rx2-rx1)/6;
+    for(var i=0;i<6;i++){
+      ctx.lineTo(rx1+seg*(i+0.5), ry + (i%2===0? -14:14));
+    }
+    ctx.lineTo(rx2,ry);
+    ctx.stroke();
+    ctx.fillStyle="#f2c14e"; ctx.font="13px system-ui";
+    ctx.fillText("R = "+o.R.toFixed(1)+" Ω", rx1+2, ry-20);
+    ctx.fillStyle="#4fd1c5";
+    ctx.fillText("I = "+I.toFixed(2)+" A", 300, 235);
+
+    // animated electrons along the loop (perimeter), speed ~ I
+    var pts = [[L,T],[R,T],[R,B],[L,B]];
+    // build perimeter length list
+    var segLens=[], total=0;
+    for(var s=0;s<4;s++){
+      var a=pts[s], b=pts[(s+1)%4];
+      var d=Math.hypot(b[0]-a[0], b[1]-a[1]);
+      segLens.push(d); total+=d;
+    }
+    var n=Math.max(6, Math.round(total/34));
+    ctx.fillStyle="#4fd1c5";
+    for(var e=0;e<n;e++){
+      var dist=((e/n)*total + flow) % total;
+      var acc=0, seg2=0;
+      for(seg2=0;seg2<4;seg2++){ if(acc+segLens[seg2]>=dist) break; acc+=segLens[seg2]; }
+      var a2=pts[seg2], b2=pts[(seg2+1)%4];
+      var f=(dist-acc)/segLens[seg2];
+      var px=a2[0]+(b2[0]-a2[0])*f, py=a2[1]+(b2[1]-a2[1])*f;
+      ctx.beginPath(); ctx.arc(px,py,3.2,0,7); ctx.fill();
+    }
+  }
+
+  function drawGraph(){
+    if(!ctxGraph) return;
+    var o = ohmVals();
+    var ctx = ctxGraph;
+    ctx.clearRect(0,0,gW,gH);
+    var ox=46, oy=200, axW=370, axH=170;
+    // axes
+    ctx.strokeStyle="#4a5666"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ox,oy-axH); ctx.lineTo(ox,oy); ctx.lineTo(ox+axW,oy); ctx.stroke();
+    ctx.fillStyle="#93a1b3"; ctx.font="12px system-ui";
+    ctx.fillText("I (A)", 6, 24);
+    ctx.fillText("V (volts)", ox+axW-56, oy+22);
+    // scales: V 0..12, I 0..(12/Rmin=24). Use fixed I max = 12 for clarity? current can be up to 12/0.5=24
+    var Vmax=12, Imax=12;
+    // line I = V/R  -> slope 1/R in these units
+    ctx.strokeStyle="#4fd1c5"; ctx.lineWidth=2.5;
+    ctx.beginPath();
+    var drawn=false;
+    for(var vv=0;vv<=Vmax;vv+=0.25){
+      var ii=vv/o.R;
+      if(ii>Imax) ii=Imax;
+      var X=ox + (vv/Vmax)*axW;
+      var Y=oy - (ii/Imax)*axH;
+      if(!drawn){ctx.moveTo(X,Y);drawn=true;} else ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+    // operating point
+    var opI=Math.min(o.V/o.R,Imax);
+    var opX=ox+(o.V/Vmax)*axW, opY=oy-(opI/Imax)*axH;
+    ctx.fillStyle="#f2c14e";
+    ctx.beginPath(); ctx.arc(opX,opY,5,0,7); ctx.fill();
+    ctx.fillStyle="#e6ecf4"; ctx.font="12px system-ui";
+    ctx.fillText("("+o.V.toFixed(1)+"V, "+(o.V/o.R).toFixed(2)+"A)", Math.min(opX+8,gW-120), Math.max(opY-8,14));
+    // grid ticks
+    ctx.fillStyle="#67748a"; ctx.font="10px system-ui";
+    for(var t=0;t<=Vmax;t+=3){ var gx=ox+(t/Vmax)*axW; ctx.fillText(t, gx-4, oy+14); }
+    for(var t2=0;t2<=Imax;t2+=3){ var gy=oy-(t2/Imax)*axH; ctx.fillText(t2, ox-22, gy+3); }
+  }
+
+  // ================= MODE 2: RESISTANCE =================
+  var cvRes = document.getElementById("cvRes");
+  var ctxRes, resW=440, resH=220;
+  var selMat=document.getElementById("selMat"), sL=document.getElementById("sL"), sA=document.getElementById("sA");
+  function resVals(){
+    return { rho:parseFloat(selMat.value),
+             L:parseFloat(sL.value),
+             A:parseFloat(sA.value), // mm^2
+             lab:selMat.options[selMat.selectedIndex].getAttribute("data-lab") };
+  }
+  function updateRes(){
+    var r=resVals();
+    var Am2 = r.A * 1e-6; // mm^2 -> m^2
+    var R = r.rho * r.L / Am2;
+    document.getElementById("rL").textContent=r.L.toFixed(1);
+    document.getElementById("rA").textContent=r.A.toFixed(1);
+    document.getElementById("rR").textContent = R>=100? R.toFixed(0) : R.toFixed(R<1?3:2);
+    document.getElementById("rLl").textContent=r.L.toFixed(1);
+    document.getElementById("rAl").textContent=r.A.toFixed(1);
+  }
+  selMat.addEventListener("change",updateRes);
+  sL.addEventListener("input",updateRes);
+  sA.addEventListener("input",updateRes);
+  function drawRes(){
+    if(!ctxRes) return;
+    var r=resVals(); var ctx=ctxRes;
+    ctx.clearRect(0,0,resW,resH);
+    // wire drawn as rectangle: width ~ L, thickness ~ A
+    var maxLen=320, x0=60;
+    var len = 40 + (r.L/5)*maxLen*0.85;
+    var th = 8 + (r.A/5)*70;
+    var cy=110;
+    // leads
+    ctx.strokeStyle="#4a5666"; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(20,cy); ctx.lineTo(x0,cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0+len,cy); ctx.lineTo(x0+len+30,cy); ctx.stroke();
+    // conductor body
+    var grad=ctx.createLinearGradient(0,cy-th/2,0,cy+th/2);
+    grad.addColorStop(0,"#6fe0d6"); grad.addColorStop(1,"#2c8f87");
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    if(ctx.roundRect){ ctx.roundRect(x0,cy-th/2,len,th,4); } else { ctx.rect(x0,cy-th/2,len,th); }
+    ctx.fill();
+    // labels
+    ctx.fillStyle="#93a1b3"; ctx.font="13px system-ui";
+    ctx.fillText(r.lab, x0, cy-th/2-16);
+    // length dimension
+    ctx.strokeStyle="#67748a"; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x0,cy+th/2+18); ctx.lineTo(x0+len,cy+th/2+18); ctx.stroke();
+    ctx.fillText("L = "+r.L.toFixed(1)+" m", x0+len/2-28, cy+th/2+34);
+    ctx.fillText("A = "+r.A.toFixed(1)+" mm²", x0+len+8, cy+4);
+    var Am2=r.A*1e-6; var R=r.rho*r.L/Am2;
+    ctx.fillStyle="#4fd1c5"; ctx.font="15px system-ui";
+    ctx.fillText("R = ρL/A = "+(R>=100?R.toFixed(0):R.toFixed(R<1?3:2))+" Ω", 60, 200);
+  }
+
+  // ================= MODE 3: SERIES/PARALLEL =================
+  var cvComb=document.getElementById("cvComb");
+  var ctxComb, combW=440, combH=260;
+  var cV=document.getElementById("cV"), sc1=document.getElementById("sc1"), sc2=document.getElementById("sc2");
+  var btnS=document.getElementById("btnSeries"), btnP=document.getElementById("btnParallel");
+  var series=true;
+  btnS.addEventListener("click",function(){series=true;btnS.classList.add("on");btnP.classList.remove("on");updateComb();});
+  btnP.addEventListener("click",function(){series=false;btnP.classList.add("on");btnS.classList.remove("on");updateComb();});
+  function combVals(){ return {V:parseFloat(cV.value),R1:parseFloat(sc1.value),R2:parseFloat(sc2.value)}; }
+  function updateComb(){
+    var c=combVals();
+    var Req = series ? (c.R1+c.R2) : (1/(1/c.R1+1/c.R2));
+    var I = c.V/Req;
+    document.getElementById("cR1").textContent=c.R1.toFixed(1);
+    document.getElementById("cR2").textContent=c.R2.toFixed(1);
+    document.getElementById("cReq").textContent=Req.toFixed(2);
+    document.getElementById("cI").textContent=I.toFixed(2);
+    document.getElementById("cVl").textContent=c.V.toFixed(0);
+    document.getElementById("cR1l").textContent=c.R1.toFixed(1);
+    document.getElementById("cR2l").textContent=c.R2.toFixed(1);
+    var det=document.getElementById("combDetail");
+    var note=document.getElementById("combNote");
+    if(series){
+      var V1=I*c.R1, V2=I*c.R2;
+      det.innerHTML='<div class="stat"><div class="k">V across R₁</div><div class="v">'+V1.toFixed(2)+' V</div></div>'+
+                    '<div class="stat"><div class="k">V across R₂</div><div class="v">'+V2.toFixed(2)+' V</div></div>'+
+                    '<div class="stat"><div class="k">Same current</div><div class="v">'+I.toFixed(2)+' A</div></div>';
+      note.textContent="Series: same current everywhere; supply voltage divides between R₁ and R₂ (V₁+V₂ = V).";
+    } else {
+      var I1=c.V/c.R1, I2=c.V/c.R2;
+      det.innerHTML='<div class="stat"><div class="k">I in R₁</div><div class="v">'+I1.toFixed(2)+' A</div></div>'+
+                    '<div class="stat"><div class="k">I in R₂</div><div class="v">'+I2.toFixed(2)+' A</div></div>'+
+                    '<div class="stat"><div class="k">Same voltage</div><div class="v">'+c.V.toFixed(0)+' V</div></div>';
+      note.textContent="Parallel: same voltage across both; total current divides (I₁+I₂ = I).";
+    }
+  }
+  cV.addEventListener("input",updateComb);
+  sc1.addEventListener("input",updateComb);
+  sc2.addEventListener("input",updateComb);
+
+  var combFlow=0;
+  function drawComb(){
+    if(!ctxComb) return;
+    var c=combVals(); var ctx=ctxComb;
+    var Req=series?(c.R1+c.R2):(1/(1/c.R1+1/c.R2));
+    var I=c.V/Req;
+    ctx.clearRect(0,0,combW,combH);
+    function resistor(x,y,wd,label,col){
+      ctx.strokeStyle=col; ctx.lineWidth=5;
+      ctx.beginPath(); ctx.moveTo(x,y);
+      var seg=wd/6;
+      for(var i=0;i<6;i++){ ctx.lineTo(x+seg*(i+0.5), y+(i%2===0?-12:12)); }
+      ctx.lineTo(x+wd,y); ctx.stroke();
+      ctx.fillStyle=col; ctx.font="12px system-ui";
+      ctx.fillText(label, x+wd/2-16, y-18);
+    }
+    // battery symbol helper
+    function battery(x,y){
+      ctx.strokeStyle="#e6ecf4"; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.moveTo(x-9,y-14); ctx.lineTo(x+9,y-14); ctx.stroke();
+      ctx.lineWidth=6; ctx.beginPath(); ctx.moveTo(x-5,y); ctx.lineTo(x+5,y); ctx.stroke();
+      ctx.fillStyle="#93a1b3"; ctx.font="12px system-ui";
+      ctx.fillText(c.V.toFixed(0)+" V", x-30, y+2);
+    }
+    ctx.lineJoin="round";
+    if(series){
+      // single loop: bottom battery, top two resistors
+      var L=50,Rr=390,T=60,B=210;
+      ctx.strokeStyle="#4a5666"; ctx.lineWidth=4;
+      ctx.beginPath();
+      ctx.moveTo(L,B); ctx.lineTo(L,T); ctx.lineTo(120,T); // to R1 start
+      ctx.stroke();
+      resistor(120,T,80,"R₁="+c.R1.toFixed(1)+"Ω","#f2c14e");
+      ctx.beginPath(); ctx.moveTo(200,T); ctx.lineTo(240,T); ctx.stroke();
+      resistor(240,T,80,"R₂="+c.R2.toFixed(1)+"Ω","#ef9d5b");
+      ctx.beginPath(); ctx.moveTo(320,T); ctx.lineTo(Rr,T); ctx.lineTo(Rr,B); ctx.lineTo(L,B); ctx.stroke();
+      battery(L, (T+B)/2);
+      // electrons around the single rectangular loop
+      var pts=[[L,T],[Rr,T],[Rr,B],[L,B]];
+      animateLoop(ctx,pts,I,combFlow,"#4fd1c5");
+      ctx.fillStyle="#4fd1c5"; ctx.font="13px system-ui";
+      ctx.fillText("I = "+I.toFixed(2)+" A (same in both)", 130, 245);
+    } else {
+      // parallel: two branches between two vertical rails
+      var Lx=90, Rx=350, T=70, B=200, mid=(T+B)/2;
+      ctx.strokeStyle="#4a5666"; ctx.lineWidth=4;
+      // left rail with battery, right rail
+      ctx.beginPath(); ctx.moveTo(Lx,T); ctx.lineTo(Lx,B); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(Rx,T); ctx.lineTo(Rx,B); ctx.stroke();
+      // top branch (R1)
+      ctx.beginPath(); ctx.moveTo(Lx,T); ctx.lineTo(150,T); ctx.stroke();
+      resistor(150,T,80,"R₁="+c.R1.toFixed(1)+"Ω","#f2c14e");
+      ctx.beginPath(); ctx.moveTo(230,T); ctx.lineTo(Rx,T); ctx.stroke();
+      // bottom branch (R2)
+      ctx.beginPath(); ctx.moveTo(Lx,B); ctx.lineTo(150,B); ctx.stroke();
+      resistor(150,B,80,"R₂="+c.R2.toFixed(1)+"Ω","#ef9d5b");
+      ctx.beginPath(); ctx.moveTo(230,B); ctx.lineTo(Rx,B); ctx.stroke();
+      // external wires + battery on far left/right
+      ctx.beginPath(); ctx.moveTo(Lx,mid); ctx.lineTo(30,mid); ctx.lineTo(30,mid); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(Rx,mid); ctx.lineTo(410,mid); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(30,mid); ctx.lineTo(30,230); ctx.lineTo(410,230); ctx.lineTo(410,mid); ctx.stroke();
+      // connect rails to mid taps
+      ctx.beginPath(); ctx.moveTo(Lx,mid); ctx.lineTo(Lx,T); ctx.moveTo(Lx,mid); ctx.lineTo(Lx,B); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(Rx,mid); ctx.lineTo(Rx,T); ctx.moveTo(Rx,mid); ctx.lineTo(Rx,B); ctx.stroke();
+      battery(30,mid+40);
+      var I1=c.V/c.R1, I2=c.V/c.R2;
+      // animate each branch, speed by branch current
+      animateLoop(ctx,[[Lx,T],[Rx,T]],I1,combFlow,"#4fd1c5");
+      animateLoop(ctx,[[Lx,B],[Rx,B]],I2,combFlow,"#4fd1c5");
+      ctx.fillStyle="#4fd1c5"; ctx.font="12px system-ui";
+      ctx.fillText("I₁="+I1.toFixed(2)+"A", 150, 55);
+      ctx.fillText("I₂="+I2.toFixed(2)+"A", 150, 232);
+    }
+  }
+  function animateLoop(ctx,pts,I,phase,col){
+    var segLens=[], total=0, closed=pts.length>2;
+    var count = closed? pts.length : pts.length-1;
+    for(var s=0;s<count;s++){
+      var a=pts[s], b=pts[(s+1)%pts.length];
+      segLens.push(Math.hypot(b[0]-a[0],b[1]-a[1]));
+      total+=segLens[s];
+    }
+    if(total<=0) return;
+    var n=Math.max(4, Math.round(total/40));
+    ctx.fillStyle=col;
+    for(var e=0;e<n;e++){
+      var dist=((e/n)*total + phase) % total;
+      var acc=0, seg=0;
+      for(seg=0;seg<segLens.length;seg++){ if(acc+segLens[seg]>=dist) break; acc+=segLens[seg]; }
+      var a2=pts[seg], b2=pts[(seg+1)%pts.length];
+      var f=(dist-acc)/segLens[seg];
+      ctx.beginPath();
+      ctx.arc(a2[0]+(b2[0]-a2[0])*f, a2[1]+(b2[1]-a2[1])*f, 2.8, 0, 7);
+      ctx.fill();
+    }
+  }
+
+  // ---------- Quiz ----------
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var correct=parseInt(q.getAttribute("data-correct"),10);
+    var opts=q.querySelectorAll(".opt");
+    var ans=q.querySelector(".ans");
+    opts.forEach(function(opt,idx){
+      opt.addEventListener("click",function(){
+        if(q.dataset.done) return;
+        q.dataset.done="1";
+        opts[correct].classList.add("correct");
+        if(idx!==correct) opt.classList.add("wrong");
+        ans.classList.add("show");
+      });
+    });
+  });
+
+  // ---------- Animation loop ----------
+  var last=0;
+  function frame(ts){
+    var dt=(ts-last)||16; last=ts;
+    if(running){
+      var o=ohmVals();
+      var I=o.V/o.R;
+      flow += (I*0.9+0.3) * dt*0.06;   // ohm loop electron speed ~ current
+      var c=combVals();
+      var Req=series?(c.R1+c.R2):(1/(1/c.R1+1/c.R2));
+      combFlow += ((c.V/Req)*0.9+0.3) * dt*0.06;
+      drawOhm(); drawGraph(); drawRes(); drawComb();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function initCanvases(){
+    ctxOhm=setupCanvas(cvOhm);
+    ctxGraph=setupCanvas(cvGraph);
+    ctxRes=setupCanvas(cvRes);
+    ctxComb=setupCanvas(cvComb);
+  }
+
+  window.addEventListener("resize", function(){
+    // reset attribute dims before re-measuring
+    cvOhm.width=ohmW; cvOhm.height=ohmH;
+    cvGraph.width=gW; cvGraph.height=gH;
+    cvRes.width=resW; cvRes.height=resH;
+    cvComb.width=combW; cvComb.height=combH;
+    initCanvases();
+  });
+
+  // init
+  cvOhm.width=ohmW;cvOhm.height=ohmH;
+  cvGraph.width=gW;cvGraph.height=gH;
+  cvRes.width=resW;cvRes.height=resH;
+  cvComb.width=combW;cvComb.height=combH;
+  initCanvases();
+  updateOhmReadout(); updateRes(); updateComb();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
