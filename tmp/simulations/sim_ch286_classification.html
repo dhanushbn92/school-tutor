@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classification Lab - NIOS Class 10 Science (Ch19)</title>
+<style>
+  :root{
+    --accent:#6ea8fe;
+    --accent-dark:#4b83e0;
+    --bg:#141a24;
+    --panel:#1d2633;
+    --panel2:#243040;
+    --ink:#e7edf5;
+    --muted:#9fb0c4;
+    --good:#4cc38a;
+    --bad:#f27a7a;
+    --line:#31404f;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,#141a24,#101722);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;}
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:0 0 10px;}
+  h3{font-size:.98rem;margin:14px 0 6px;}
+  p.lead{color:var(--muted);font-size:.9rem;margin:0 0 12px;}
+  .btn{background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:10px;
+    font-weight:600;cursor:pointer;font-size:.9rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);}
+  .btn:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+  /* Kingdom cards */
+  .kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .kcard{background:var(--panel2);border:2px solid var(--line);border-radius:14px;padding:12px;
+    cursor:pointer;transition:.15s;text-align:left;}
+  .kcard:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .kcard.sel{border-color:var(--accent);background:#2b3a4f;}
+  .kcard .kdot{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;
+    justify-content:center;font-size:1.2rem;margin-bottom:8px;}
+  .kcard b{font-size:.98rem;}
+  .kcard small{display:block;color:var(--muted);font-size:.78rem;margin-top:3px;}
+  .kdetail{margin-top:14px;background:var(--panel2);border-radius:14px;padding:14px;
+    border-left:4px solid var(--accent);}
+  .kdetail ul{margin:6px 0 0;padding-left:18px;font-size:.88rem;}
+  .kdetail li{margin-bottom:3px;}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.82rem;}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;}
+  th{background:var(--panel2);color:var(--ink);}
+  td.c{text-align:center;}
+  .tbl-scroll{overflow-x:auto;}
+  /* Sort game */
+  .bank{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:44px;}
+  .org{background:var(--panel2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;
+    cursor:grab;font-size:.88rem;font-weight:600;user-select:none;touch-action:none;transition:.12s;}
+  .org:hover{border-color:var(--accent);}
+  .org.picked{border-color:var(--accent);background:#2b3a4f;}
+  .org .em{margin-right:5px;}
+  .bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .bin{background:var(--panel2);border:2px dashed var(--line);border-radius:14px;padding:10px;min-height:96px;}
+  .bin.over{border-color:var(--accent);background:#26374a;}
+  .bin h4{margin:0 0 8px;font-size:.86rem;display:flex;align-items:center;gap:6px;}
+  .bin .drop{display:flex;flex-wrap:wrap;gap:6px;}
+  .drop .org{cursor:default;padding:6px 9px;font-size:.8rem;}
+  .drop .org.ok{border-color:var(--good);}
+  .drop .org.no{border-color:var(--bad);}
+  .scorebar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px;}
+  .scorebar .s{font-weight:700;}
+  .fb{margin-top:8px;font-size:.86rem;min-height:20px;}
+  .fb.good{color:var(--good);}.fb.bad{color:var(--bad);}
+  /* Hierarchy */
+  .ladder{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .rung{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;
+    background:var(--panel2);border-radius:10px;padding:8px 10px;border-left:4px solid var(--accent);
+    cursor:pointer;transition:.15s;}
+  .rung:hover{background:#2b3a4f;}
+  .rung .rk{font-weight:700;font-size:.86rem;}
+  .rung .rv{font-size:.86rem;color:var(--muted);}
+  .rung .rv i{color:var(--ink);}
+  .rnote{margin-top:10px;font-size:.85rem;color:var(--muted);min-height:18px;}
+  .binom{margin-top:14px;background:var(--panel2);border-radius:12px;padding:12px;font-size:.88rem;}
+  .binom code{background:#0d1520;padding:2px 7px;border-radius:6px;font-style:italic;color:#ffd48a;}
+  /* Facts + quiz */
+  .fact{background:var(--panel2);border-radius:12px;padding:11px 13px;margin-bottom:9px;font-size:.87rem;}
+  .fact b{color:var(--accent);}
+  .q{background:var(--panel2);border-radius:12px;padding:12px;margin-bottom:12px;}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:2px solid var(--line);
+    color:var(--ink);border-radius:9px;padding:8px 11px;margin-bottom:6px;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.ok{border-color:var(--good);background:#1e3a2e;}
+  .opt.no{border-color:var(--bad);background:#3a1e1e;}
+  .opt:disabled{cursor:default;}
+  .qexp{font-size:.82rem;color:var(--muted);margin-top:4px;min-height:16px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+  .sr{position:absolute;left:-9999px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Classification Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 19: Classification of Living Organisms</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="kingdoms" role="tab">Five Kingdoms</button>
+    <button class="tab" data-mode="sort" role="tab">Sort Game</button>
+    <button class="tab" data-mode="hierarchy" role="tab">Hierarchy</button>
+    <button class="tab" data-mode="facts" role="tab">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===== KINGDOMS ===== -->
+  <section class="panel" id="mode-kingdoms">
+    <h2>Whittaker's Five Kingdoms</h2>
+    <p class="lead">Tap a kingdom card to see its defining features. Robert H. Whittaker proposed this system in 1969.</p>
+    <div class="kgrid" id="kgrid"></div>
+    <div class="kdetail" id="kdetail" aria-live="polite">
+      <b>Select a kingdom above</b>
+      <p class="lead" style="margin:6px 0 0">Its cell type, nutrition and examples appear here.</p>
+    </div>
+    <h3>Quick comparison</h3>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>Kingdom</th><th>Cell type</th><th>Body</th><th>Nutrition</th></tr></thead>
+      <tbody id="cmpbody"></tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ===== SORT GAME ===== -->
+  <section class="panel hidden" id="mode-sort">
+    <h2>Sort the Organism</h2>
+    <p class="lead">Drag each organism onto the correct kingdom bin. On touch: tap the organism, then tap a bin.</p>
+    <div class="bank" id="bank" aria-label="Organisms to sort"></div>
+    <div class="bins" id="bins"></div>
+    <div class="scorebar">
+      <span class="s">Score: <span id="score">0</span> / <span id="total">0</span></span>
+      <button class="btn ghost" id="resetGame">Reset</button>
+    </div>
+    <div class="fb" id="gameFb" aria-live="polite"></div>
+  </section>
+
+  <!-- ===== HIERARCHY ===== -->
+  <section class="panel hidden" id="mode-hierarchy">
+    <h2>The Taxonomic Hierarchy</h2>
+    <p class="lead">From broad to specific. Tap a rung to learn what it means. Example: the human being.</p>
+    <div class="ladder" id="ladder"></div>
+    <div class="rnote" id="rnote">Tap any rung to read about it. Going down, groups get smaller and members more alike.</div>
+    <div class="binom">
+      <b>Binomial nomenclature</b> &mdash; devised by Carolus Linnaeus. Every species gets a
+      two-part Latin name: <b>Genus + species</b>. Human = <code>Homo sapiens</code>.
+      The Genus is capitalised, species is lowercase, and the whole name is <i>italicised</i>
+      (or underlined when handwritten).
+    </div>
+  </section>
+
+  <!-- ===== FACTS + QUIZ ===== -->
+  <section class="panel hidden" id="mode-facts">
+    <h2>Key Facts</h2>
+    <div class="fact"><b>Five Kingdoms:</b> R.H. Whittaker (1969) grouped all life into Monera, Protista, Fungi, Plantae and Animalia, based on cell structure, body organisation and mode of nutrition.</div>
+    <div class="fact"><b>Taxonomic hierarchy:</b> Kingdom &rarr; Phylum (Division in plants) &rarr; Class &rarr; Order &rarr; Family &rarr; Genus &rarr; Species. Species is the basic unit of classification.</div>
+    <div class="fact"><b>Binomial nomenclature:</b> Carolus Linnaeus gave each organism a two-word scientific name (Genus + species) in Latin, so scientists worldwide use one common name.</div>
+    <h2 style="margin-top:16px">Check Yourself</h2>
+    <p class="lead">Choose an answer to reveal whether it is correct.</p>
+    <div id="quiz"></div>
+    <div class="fb" id="quizScore" aria-live="polite"></div>
+  </section>
+
+  <footer>Interactive study aid &middot; Content aligned to NIOS Class 10, Chapter 19.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- data ---------- */
+  var KINGDOMS = [
+    {id:"Monera",  em:"●", col:"#4cc38a",
+     cell:"Prokaryotic (no true nucleus)", body:"Unicellular",
+     nutri:"Autotroph or heterotroph",
+     feats:["Prokaryotic cells: no nuclear membrane, no membrane-bound organelles.",
+            "Cell wall present; usually microscopic and unicellular.",
+            "Some make food (autotrophs), many absorb it (heterotrophs)."],
+     ex:"Bacteria, cyanobacteria (blue-green algae)"},
+    {id:"Protista", em:"◆", col:"#6ea8fe",
+     cell:"Eukaryotic", body:"Mostly unicellular",
+     nutri:"Autotroph or heterotroph",
+     feats:["Eukaryotic cells with a true nucleus.",
+            "Mostly unicellular; live in water or moist places.",
+            "Many move using cilia, flagella or pseudopodia."],
+     ex:"Amoeba, Paramecium, Euglena, diatoms"},
+    {id:"Fungi",   em:"♣", col:"#d9a441",
+     cell:"Eukaryotic", body:"Mostly multicellular",
+     nutri:"Heterotroph (saprophyte / parasite)",
+     feats:["Eukaryotic; cell wall made of chitin.",
+            "Cannot make their own food – heterotrophic.",
+            "Saprophytes feed on dead matter; some are parasites."],
+     ex:"Mushroom, yeast, Rhizopus (bread mould), Penicillium"},
+    {id:"Plantae", em:"♠", col:"#57b894",
+     cell:"Eukaryotic", body:"Multicellular",
+     nutri:"Autotroph (photosynthesis)",
+     feats:["Eukaryotic cells with cellulose cell wall.",
+            "Contain chlorophyll – make food by photosynthesis (autotrophs).",
+            "Multicellular; includes mosses, ferns, trees and flowering plants."],
+     ex:"Mango tree, moss, fern, rose, wheat"},
+    {id:"Animalia", em:"❤", col:"#f27a7a",
+     cell:"Eukaryotic", body:"Multicellular",
+     nutri:"Heterotroph (ingestion)",
+     feats:["Eukaryotic cells with NO cell wall.",
+            "Heterotrophic – take in ready-made food (ingestion).",
+            "Multicellular, most can move; have nervous and muscular tissue."],
+     ex:"Human, earthworm, frog, fish, tiger"}
+  ];
+
+  var ORGANISMS = [
+    {name:"Bacterium", em:"●", k:"Monera"},
+    {name:"Cyanobacteria", em:"●", k:"Monera"},
+    {name:"Amoeba", em:"◆", k:"Protista"},
+    {name:"Paramecium", em:"◆", k:"Protista"},
+    {name:"Mushroom", em:"♣", k:"Fungi"},
+    {name:"Yeast", em:"♣", k:"Fungi"},
+    {name:"Mango tree", em:"♠", k:"Plantae"},
+    {name:"Fern", em:"♠", k:"Plantae"},
+    {name:"Human", em:"❤", k:"Animalia"},
+    {name:"Frog", em:"❤", k:"Animalia"}
+  ];
+
+  var HIER = [
+    {rk:"Kingdom", rv:"Animalia", note:"The largest, broadest group – all animals share this level."},
+    {rk:"Phylum",  rv:"Chordata", note:"Animals with a notochord / backbone at some stage."},
+    {rk:"Class",   rv:"Mammalia", note:"Warm-blooded animals with hair and mammary glands."},
+    {rk:"Order",   rv:"Primates", note:"Mammals with grasping hands and forward-facing eyes."},
+    {rk:"Family",  rv:"Hominidae", note:"The great apes and humans."},
+    {rk:"Genus",   rv:"Homo", note:"The genus of humans – first word of the scientific name."},
+    {rk:"Species", rv:"sapiens", note:"The basic unit: members are alike and can interbreed."}
+  ];
+
+  var QUIZ = [
+    {q:"Who proposed the Five Kingdom classification?",
+     opts:["Carolus Linnaeus","Robert H. Whittaker","Charles Darwin","Gregor Mendel"],
+     ans:1, exp:"Whittaker proposed the five kingdoms in 1969."},
+    {q:"Which kingdom contains prokaryotic organisms like bacteria?",
+     opts:["Protista","Fungi","Monera","Plantae"],
+     ans:2, exp:"Monera are prokaryotes – they lack a true nucleus."},
+    {q:"In the name Homo sapiens, the word 'Homo' represents the:",
+     opts:["Species","Genus","Family","Kingdom"],
+     ans:1, exp:"The first, capitalised word is the Genus; 'sapiens' is the species."}
+  ];
+
+  /* ---------- helpers ---------- */
+  function $(id){return document.getElementById(id);}
+  function el(tag,cls){var e=document.createElement(tag);if(cls)e.className=cls;return e;}
+
+  /* ---------- tabs ---------- */
+  var tabs=document.querySelectorAll(".tab");
+  var modes=["kingdoms","sort","hierarchy","facts"];
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      modes.forEach(function(m){
+        $("mode-"+m).classList.toggle("hidden", m!==t.dataset.mode);
+      });
+    });
+  });
+
+  /* ---------- kingdoms ---------- */
+  var kgrid=$("kgrid"), kdetail=$("kdetail"), cmpbody=$("cmpbody");
+  KINGDOMS.forEach(function(k){
+    var c=el("button","kcard");c.type="button";
+    var dot=el("div","kdot");dot.style.background=k.col;dot.style.color="#0d1520";dot.textContent=k.em;
+    c.appendChild(dot);
+    var b=el("b");b.textContent=k.id;c.appendChild(b);
+    var s=el("small");s.textContent=k.cell.split(" (")[0];c.appendChild(s);
+    c.addEventListener("click",function(){
+      document.querySelectorAll(".kcard").forEach(function(x){x.classList.remove("sel");});
+      c.classList.add("sel");
+      showKingdom(k);
+    });
+    kgrid.appendChild(c);
+
+    var tr=el("tr");
+    tr.innerHTML="<td><b>"+k.id+"</b></td><td>"+ (k.cell.indexOf("Prokary")===0?"Prokaryotic":"Eukaryotic")
+      +"</td><td>"+k.body+"</td><td>"+k.nutri+"</td>";
+    cmpbody.appendChild(tr);
+  });
+  function showKingdom(k){
+    var html="<div class='kdot' style='background:"+k.col+";color:#0d1520;display:inline-flex'>"+k.em+"</div>";
+    html+="<b style='margin-left:8px;font-size:1.05rem;vertical-align:6px'>"+k.id+"</b>";
+    html+="<ul>";
+    html+="<li><b>Cell type:</b> "+k.cell+"</li>";
+    html+="<li><b>Body:</b> "+k.body+"</li>";
+    html+="<li><b>Nutrition:</b> "+k.nutri+"</li>";
+    k.feats.forEach(function(f){html+="<li>"+f+"</li>";});
+    html+="<li><b>Examples:</b> "+k.ex+"</li>";
+    html+="</ul>";
+    kdetail.innerHTML=html;
+  }
+
+  /* ---------- sort game ---------- */
+  var bank=$("bank"), bins=$("bins"), gameFb=$("gameFb");
+  var picked=null, placed=0, correct=0;
+  function buildGame(){
+    bank.innerHTML="";bins.innerHTML="";picked=null;placed=0;correct=0;
+    $("score").textContent="0";$("total").textContent=String(ORGANISMS.length);
+    gameFb.className="fb";gameFb.textContent="";
+    // shuffle organisms
+    var list=ORGANISMS.slice();
+    for(var i=list.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=list[i];list[i]=list[j];list[j]=t;}
+    list.forEach(function(o){
+      var d=makeOrg(o);
+      bank.appendChild(d);
+    });
+    KINGDOMS.forEach(function(k){
+      var b=el("div","bin");b.dataset.k=k.id;
+      var h=el("h4");
+      h.innerHTML="<span style='color:"+k.col+"'>"+k.em+"</span> "+k.id;
+      b.appendChild(h);
+      var dp=el("div","drop");b.appendChild(dp);
+      // desktop drag
+      b.addEventListener("dragover",function(e){e.preventDefault();b.classList.add("over");});
+      b.addEventListener("dragleave",function(){b.classList.remove("over");});
+      b.addEventListener("drop",function(e){
+        e.preventDefault();b.classList.remove("over");
+        var name=e.dataTransfer.getData("text/plain");
+        var org=document.querySelector('.org[data-name="'+name+'"]');
+        if(org && org.parentNode===bank) place(org,b);
+      });
+      // touch/click placement
+      b.addEventListener("click",function(){
+        if(picked){place(picked,b);}
+      });
+      bins.appendChild(b);
+    });
+  }
+  function makeOrg(o){
+    var d=el("div","org");d.dataset.name=o.name;d.dataset.k=o.k;d.setAttribute("draggable","true");
+    d.innerHTML="<span class='em'>"+o.em+"</span>"+o.name;
+    d.addEventListener("dragstart",function(e){e.dataTransfer.setData("text/plain",o.name);});
+    d.addEventListener("click",function(e){
+      e.stopPropagation();
+      if(d.parentNode!==bank) return;
+      if(picked===d){d.classList.remove("picked");picked=null;return;}
+      if(picked)picked.classList.remove("picked");
+      picked=d;d.classList.add("picked");
+      gameFb.className="fb";gameFb.textContent="Now tap the "+o.k+"? ... choose a kingdom bin.";
+    });
+    return d;
+  }
+  function place(org,bin){
+    if(picked===org){org.classList.remove("picked");picked=null;}
+    var ok = org.dataset.k===bin.dataset.k;
+    org.classList.add(ok?"ok":"no");
+    org.classList.remove("picked");
+    org.removeAttribute("draggable");
+    org.setAttribute("draggable","false");
+    // strip click move
+    var clone=org.cloneNode(true);
+    bin.querySelector(".drop").appendChild(clone);
+    org.parentNode.removeChild(org);
+    placed++;
+    if(ok)correct++;
+    $("score").textContent=String(correct);
+    gameFb.className="fb "+(ok?"good":"bad");
+    gameFb.textContent = ok ? (org.dataset.name+" is correct ✓")
+       : (org.dataset.name+" belongs to "+org.dataset.k+", not "+bin.dataset.k+".");
+    if(placed===ORGANISMS.length){
+      gameFb.className="fb "+(correct===ORGANISMS.length?"good":"bad");
+      gameFb.textContent="Done! You sorted "+correct+" of "+ORGANISMS.length+" correctly.";
+    }
+  }
+  $("resetGame").addEventListener("click",buildGame);
+  buildGame();
+
+  /* ---------- hierarchy ---------- */
+  var ladder=$("ladder"), rnote=$("rnote");
+  HIER.forEach(function(h){
+    var r=el("div","rung");r.tabIndex=0;
+    var italic = (h.rk==="Genus"||h.rk==="Species");
+    r.innerHTML="<span class='rk'>"+h.rk+"</span><span class='rv'>"
+      +(italic?"<i>"+h.rv+"</i>":h.rv)+"</span>";
+    function sel(){rnote.innerHTML="<b>"+h.rk+"</b> ("+h.rv+"): "+h.note;}
+    r.addEventListener("click",sel);
+    r.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sel();}});
+    ladder.appendChild(r);
+  });
+
+  /* ---------- quiz ---------- */
+  var quiz=$("quiz"), answered=0, qscore=0;
+  QUIZ.forEach(function(item,qi){
+    var box=el("div","q");
+    var p=el("p");p.textContent=(qi+1)+". "+item.q;box.appendChild(p);
+    var exp=el("div","qexp");
+    item.opts.forEach(function(opt,oi){
+      var b=el("button","opt");b.type="button";b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(box.dataset.done)return;
+        box.dataset.done="1";answered++;
+        var correctBtn=box.querySelectorAll(".opt")[item.ans];
+        if(oi===item.ans){b.classList.add("ok");qscore++;}
+        else{b.classList.add("no");correctBtn.classList.add("ok");}
+        box.querySelectorAll(".opt").forEach(function(x){x.disabled=true;});
+        exp.textContent=(oi===item.ans?"Correct. ":"")+item.exp;
+        $("quizScore").className="fb good";
+        $("quizScore").textContent="Score: "+qscore+" / "+QUIZ.length
+          +(answered===QUIZ.length?" – quiz complete!":"");
+      });
+      box.appendChild(b);
+    });
+    box.appendChild(exp);
+    quiz.appendChild(box);
+  });
+})();
+</script>
+</body>
+</html>

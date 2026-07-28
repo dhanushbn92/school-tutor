@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magnetic Effects Lab — Magnetic Effect of Electric Current (NIOS Class 10, Ch 17)</title>
+<style>
+  :root{
+    --bg:#0f1220;
+    --panel:#191d2e;
+    --panel2:#212743;
+    --ink:#e9ecf7;
+    --muted:#98a1c0;
+    --accent:#b48cff;
+    --accent-soft:rgba(180,140,255,.16);
+    --npole:#ff6f7a;
+    --spole:#5aa2ff;
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warm:#ffce54;
+    --line:#2b3252;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 150px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.96rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .hide{display:none!important}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:14px}
+  .ctrl{flex:1 1 200px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .seg button{flex:1 1 110px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 6px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .seg button:active{transform:scale(.98)}
+
+  .btn{min-height:46px;padding:0 16px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .btn.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1220;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1220}
+
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+
+  .readouts{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .stat{flex:1 1 130px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.78rem;color:var(--muted)}
+  .stat .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+  .stat .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .facts{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:640px){.facts{grid-template-columns:1fr 1fr}}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.9rem}
+  .fact b{color:var(--accent)}
+  .fact .eq{font-family:"Cambria Math",Georgia,serif;color:var(--warm);font-size:1.02rem}
+
+  .q{border-top:1px solid var(--line);padding:14px 0}
+  .q:first-of-type{border-top:none}
+  .q p.stem{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.92rem;
+    touch-action:manipulation}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15)}
+  .explain{font-size:.86rem;color:var(--muted);margin-top:4px;min-height:1px}
+  .note{font-size:.84rem;color:var(--muted);margin-top:10px}
+  .badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);border:1px solid var(--accent);margin-left:6px}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Magnetic Effects</span> Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology — Ch 17: Magnetic Effect of Electric Current. Explore field patterns, the electromagnet &amp; motor, and electromagnetic induction.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="field">Field Patterns</button>
+    <button class="tab-btn" data-tab="motor">Electromagnet &amp; Motor</button>
+    <button class="tab-btn" data-tab="induction">Induction</button>
+    <button class="tab-btn" data-tab="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ FIELD PATTERNS ============ -->
+  <section id="tab-field">
+    <div class="panel">
+      <h2>Magnetic Field Patterns</h2>
+      <div class="seg" id="fieldSeg">
+        <button data-fs="bar" class="on">Bar magnet</button>
+        <button data-fs="wire">Straight wire</button>
+        <button data-fs="sol">Solenoid</button>
+      </div>
+      <canvas id="fieldCanvas" width="660" height="360"></canvas>
+
+      <div class="controls">
+        <div class="ctrl" id="fldCurrent">
+          <label>Current I = <output id="fiOut">3.0</output> A <span id="fiDir">(out of page &#8226;)</span></label>
+          <input type="range" id="fiRange" min="-5" max="5" step="0.1" value="3">
+        </div>
+        <div class="ctrl hide" id="fldTurns">
+          <label>Turns = <output id="ftOut">12</output></label>
+          <input type="range" id="ftRange" min="6" max="22" step="1" value="12">
+        </div>
+        <div class="ctrl hide" id="fldFlip" style="flex:0 0 auto">
+          <label>&nbsp;</label>
+          <button class="btn" id="flipBtn">Flip poles &#8646;</button>
+        </div>
+      </div>
+      <p class="note" id="fieldNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ ELECTROMAGNET & MOTOR ============ -->
+  <section id="tab-motor" class="hide">
+    <div class="panel">
+      <h2>Electromagnet &amp; DC Motor</h2>
+      <div class="seg" id="motorSeg">
+        <button data-ms="em" class="on">Electromagnet</button>
+        <button data-ms="dc">DC Motor</button>
+      </div>
+      <canvas id="motorCanvas" width="660" height="340"></canvas>
+
+      <div class="controls" id="emCtrls">
+        <div class="ctrl">
+          <label>Current I = <output id="emiOut">2.5</output> A</label>
+          <input type="range" id="emiRange" min="0" max="5" step="0.1" value="2.5">
+        </div>
+        <div class="ctrl">
+          <label>Turns N = <output id="emtOut">80</output></label>
+          <input type="range" id="emtRange" min="10" max="200" step="5" value="80">
+        </div>
+      </div>
+
+      <div class="controls hide" id="dcCtrls">
+        <div class="ctrl">
+          <label>Current I = <output id="dciOut">3.0</output> A</label>
+          <input type="range" id="dciRange" min="0.5" max="5" step="0.1" value="3">
+        </div>
+        <div class="ctrl">
+          <label>Field B = <output id="dcbOut">1.0</output> T</label>
+          <input type="range" id="dcbRange" min="0.2" max="2" step="0.1" value="1">
+        </div>
+        <div class="ctrl" style="flex:0 0 auto">
+          <label>&nbsp;</label>
+          <button class="btn" id="dcDirBtn">Reverse current &#8646;</button>
+        </div>
+      </div>
+
+      <div class="readouts" id="emStats">
+        <div class="stat"><div class="k">Strength &#8733; N&#215;I</div><div class="v"><span id="emStrength">200</span> <small>A&#183;turns</small></div></div>
+        <div class="stat"><div class="k">Paper clips lifted</div><div class="v"><span id="emClips">4</span></div></div>
+      </div>
+      <div class="readouts hide" id="dcStats">
+        <div class="stat"><div class="k">Force on each side F = B I L</div><div class="v"><span id="dcForce">1.5</span> <small>N (L=0.5 m)</small></div></div>
+        <div class="stat"><div class="k">Spin rate</div><div class="v"><span id="dcRpm">—</span> <small>rev/s</small></div></div>
+      </div>
+      <p class="note" id="motorNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ INDUCTION ============ -->
+  <section id="tab-induction" class="hide">
+    <div class="panel">
+      <h2>Electromagnetic Induction</h2>
+      <div class="seg" id="indSeg">
+        <button data-is="coil" class="on">Magnet &amp; Coil</button>
+        <button data-is="gen">AC Generator</button>
+      </div>
+      <canvas id="indCanvas" width="660" height="330"></canvas>
+
+      <div class="controls" id="coilCtrls">
+        <div class="ctrl">
+          <label>Magnet position = <output id="posOut">10</output> %</label>
+          <input type="range" id="posRange" min="0" max="100" step="1" value="10">
+        </div>
+        <div class="ctrl">
+          <label>Coil turns N = <output id="coilnOut">120</output></label>
+          <input type="range" id="coilnRange" min="20" max="300" step="10" value="120">
+        </div>
+        <div class="ctrl" style="flex:0 0 auto">
+          <label>&nbsp;</label>
+          <button class="btn" id="autoBtn">Auto push in &amp; out</button>
+        </div>
+      </div>
+
+      <div class="controls hide" id="genCtrls">
+        <div class="ctrl">
+          <label>Rotation speed = <output id="genwOut">1.0</output> rev/s</label>
+          <input type="range" id="genwRange" min="0.2" max="3" step="0.1" value="1">
+        </div>
+        <div class="ctrl">
+          <label>Coil turns N = <output id="gennOut">100</output></label>
+          <input type="range" id="gennRange" min="20" max="300" step="10" value="100">
+        </div>
+        <div class="ctrl">
+          <label>Field B = <output id="genbOut">1.0</output> T</label>
+          <input type="range" id="genbRange" min="0.2" max="2" step="0.1" value="1">
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="stat"><div class="k">Induced EMF (relative)</div><div class="v"><span id="indEmf">0</span></div></div>
+        <div class="stat"><div class="k">Current direction</div><div class="v"><span id="indDir">none</span></div></div>
+      </div>
+      <p class="note" id="indNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section id="tab-learn" class="hide">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="facts">
+        <div class="fact"><b>Right-hand thumb rule</b><br>Grip a straight wire with the right hand, thumb pointing along the <i>current</i>. The curled fingers show the direction of the circular magnetic field around the wire.</div>
+        <div class="fact"><b>Field of a straight wire</b><br>Concentric circles around the wire. Field <span class="eq">B &#8733; I / r</span> — stronger near the wire, and it reverses when the current reverses.</div>
+        <div class="fact"><b>Solenoid = bar magnet</b><br>A current-carrying coil has a uniform field inside: <span class="eq">B = &#956;&#8320; n I</span> (n = turns per metre). One end acts as N, the other as S.</div>
+        <div class="fact"><b>Electromagnet</b><br>A solenoid wound on a soft-iron core. Strength grows with current <b>I</b> and number of turns <b>N</b>; it switches off when the current stops.</div>
+        <div class="fact"><b>Force on a conductor</b><br><span class="eq">F = B I L</span>. A current in a magnetic field feels a force — this drives the electric motor.</div>
+        <div class="fact"><b>Fleming's left-hand rule</b><br>Thumb = <b>Force/motion</b>, First finger = <b>Field</b>, seCond finger = <b>Current</b>. Used for the <i>motor</i> (force from a current).</div>
+        <div class="fact"><b>Faraday's law &amp; induction</b><br>A changing magnetic flux through a coil induces an EMF: <span class="eq">EMF = &#8722;N &#916;&#934;/&#916;t</span>. Move the magnet faster &#8594; bigger deflection.</div>
+        <div class="fact"><b>Fleming's right-hand rule &amp; Lenz</b><br>Used for the <i>generator</i> (current from motion). Lenz's law: the induced current opposes the change causing it.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Quick Quiz <span class="badge">tap an option</span></h2>
+      <div id="quiz"></div>
+    </div>
+  </section>
+
+  <footer>Field patterns use a two-pole / circular model; motor &amp; induction values are illustrative (relative). All SI units labelled.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+  function $(id){ return document.getElementById(id); }
+  function clamp(x,a,b){ return x<a?a:(x>b?b:x); }
+  var ACCENT="#b48cff", WARM="#ffce54", MUTED="#98a1c0", LINE="#2b3252",
+      PANEL2="#212743", INK="#e9ecf7", NP="#ff6f7a", SP="#5aa2ff", GOOD="#5fd68b";
+  var TAU=Math.PI*2, dt=1/60;
+
+  function arrowHead(ctx,x,y,ang,size,color){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(ang); ctx.fillStyle=color;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-size,-size*0.55); ctx.lineTo(-size,size*0.55);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function arrow(ctx,x1,y1,x2,y2,color,w,head){
+    ctx.strokeStyle=color; ctx.lineWidth=w||2;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    arrowHead(ctx,x2,y2,Math.atan2(y2-y1,x2-x1),head||7,color);
+  }
+
+  // ---------- tab switching ----------
+  var activeTab="field";
+  var tabs=document.querySelectorAll(".tab-btn");
+  var sections={field:$("tab-field"),motor:$("tab-motor"),induction:$("tab-induction"),learn:$("tab-learn")};
+  tabs.forEach(function(b){
+    b.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      activeTab=b.dataset.tab;
+      for(var k in sections){ sections[k].classList.toggle("hide",k!==activeTab); }
+      if(activeTab==="field") drawField();
+      if(activeTab==="motor") drawMotor();
+      if(activeTab==="induction"){ resetInduction(); }
+    });
+  });
+
+  // =====================================================================
+  //  FIELD PATTERNS
+  // =====================================================================
+  var fCan=$("fieldCanvas"), fctx=fCan.getContext("2d");
+  var fieldSub="bar", barFlip=false, wirePhase=0;
+  var fiRange=$("fiRange"), ftRange=$("ftRange");
+
+  function fieldAt(x,y,poles){
+    var fx=0,fy=0;
+    for(var i=0;i<poles.length;i++){
+      var p=poles[i], dx=x-p.x, dy=y-p.y, r2=dx*dx+dy*dy+40, r=Math.sqrt(r2), inv=p.q/(r2*r);
+      fx+=dx*inv; fy+=dy*inv;
+    }
+    return {fx:fx,fy:fy};
+  }
+  // integrate a field line from (sx,sy) following the field (dir=+1) until near a sink
+  function streamPts(sx,sy,poles,W,H){
+    var pts=[[sx,sy]], x=sx, y=sy;
+    for(var i=0;i<500;i++){
+      var f=fieldAt(x,y,poles), m=Math.hypot(f.fx,f.fy);
+      if(m<1e-9) break;
+      x+=(f.fx/m)*3.2; y+=(f.fy/m)*3.2;
+      pts.push([x,y]);
+      if(x<-30||x>W+30||y<-30||y>H+30) break;
+      // stop near a negative (S) pole
+      for(var k=0;k<poles.length;k++){ if(poles[k].q<0 && Math.hypot(x-poles[k].x,y-poles[k].y)<10){ i=999; break; } }
+    }
+    return pts;
+  }
+  function drawStream(ctx,pts,color){
+    if(pts.length<2) return;
+    ctx.strokeStyle=color; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+    for(var i=1;i<pts.length;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+    ctx.stroke();
+    var mid=Math.floor(pts.length*0.45);
+    if(mid>0 && mid<pts.length){
+      var a=Math.atan2(pts[mid][1]-pts[mid-1][1], pts[mid][0]-pts[mid-1][0]);
+      arrowHead(ctx,pts[mid][0],pts[mid][1],a,6,color);
+    }
+  }
+
+  function drawDipole(cx,cy,hw,cy2,leftIsN){
+    var W=fCan.width,H=fCan.height, ctx=fctx;
+    var nx=leftIsN?cx-hw:cx+hw, sx=leftIsN?cx+hw:cx-hw;
+    var poles=[{x:nx,y:cy2,q:1},{x:sx,y:cy2,q:-1}];
+    // field lines seeded around N pole
+    var rings=[26,40,54];
+    for(var r=0;r<rings.length;r++){
+      var n=10;
+      for(var i=0;i<n;i++){
+        var a=(i/n)*TAU;
+        drawStream(ctx, streamPts(nx+rings[r]*Math.cos(a), cy2+rings[r]*Math.sin(a), poles, W, H), "rgba(180,140,255,.55)");
+      }
+    }
+    return {nx:nx,sx:sx,poles:poles};
+  }
+
+  function drawField(){
+    var ctx=fctx,W=fCan.width,H=fCan.height,cx=W/2,cy=H/2;
+    ctx.clearRect(0,0,W,H);
+    if(fieldSub==="bar"){
+      var hw=80;
+      drawDipole(cx,cy,hw,cy,!barFlip);
+      // magnet body
+      var mw=170,mh=54, mx=cx-mw/2,my=cy-mh/2;
+      var leftN=!barFlip;
+      ctx.fillStyle=leftN?NP:SP; ctx.fillRect(mx,my,mw/2,mh);
+      ctx.fillStyle=leftN?SP:NP; ctx.fillRect(cx,my,mw/2,mh);
+      ctx.strokeStyle="rgba(0,0,0,.35)"; ctx.lineWidth=2; ctx.strokeRect(mx,my,mw,mh);
+      ctx.fillStyle="#fff"; ctx.font="bold 22px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(leftN?"N":"S", cx-mw/4, cy);
+      ctx.fillText(leftN?"S":"N", cx+mw/4, cy);
+      ctx.textBaseline="alphabetic";
+      $("fieldNote").textContent="Iron-filing style field lines run from the N pole to the S pole outside the magnet. Tap “Flip poles” to swap N and S — the whole pattern reverses.";
+    } else if(fieldSub==="wire"){
+      drawWire();
+      return;
+    } else {
+      drawSolenoidField();
+    }
+  }
+
+  function drawWire(){
+    var ctx=fctx,W=fCan.width,H=fCan.height,cx=W/2,cy=H/2;
+    ctx.clearRect(0,0,W,H);
+    var I=parseFloat(fiRange.value);
+    var out=I>=0;                       // + current = out of page
+    var speed=Math.abs(I);
+    // concentric circles
+    var radii=[45,80,115,150];
+    for(var ri=0;ri<radii.length;ri++){
+      var r=radii[ri];
+      ctx.strokeStyle="rgba(180,140,255,"+(0.55-ri*0.09)+")"; ctx.lineWidth=1.6;
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,TAU); ctx.stroke();
+      // moving arrowheads (out-of-page => counter-clockwise on screen)
+      var nA=4;
+      for(var k=0;k<nA;k++){
+        var base=(k/nA)*TAU + (out?-1:1)*wirePhase/r*22;
+        var px=cx+r*Math.cos(base), py=cy+r*Math.sin(base);
+        // tangent: CCW on screen = (sin, -cos); CW = (-sin, cos)
+        var tx=out? Math.sin(base):-Math.sin(base);
+        var ty=out?-Math.cos(base): Math.cos(base);
+        arrowHead(ctx,px,py,Math.atan2(ty,tx),7,WARM);
+      }
+    }
+    // wire symbol
+    ctx.beginPath(); ctx.arc(cx,cy,15,0,TAU);
+    ctx.fillStyle="#0f1220"; ctx.fill(); ctx.strokeStyle=INK; ctx.lineWidth=2; ctx.stroke();
+    ctx.strokeStyle=INK; ctx.lineWidth=2.4;
+    if(Math.abs(I)<0.05){
+      ctx.fillStyle=MUTED; ctx.font="12px system-ui"; ctx.textAlign="center"; ctx.fillText("no I",cx,cy+4);
+    } else if(out){
+      ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(cx,cy,4,0,TAU); ctx.fill();  // dot
+    } else {
+      ctx.beginPath(); ctx.moveTo(cx-8,cy-8); ctx.lineTo(cx+8,cy+8);
+      ctx.moveTo(cx+8,cy-8); ctx.lineTo(cx-8,cy+8); ctx.stroke();             // cross
+    }
+    ctx.fillStyle=MUTED; ctx.font="13px system-ui"; ctx.textAlign="left";
+    ctx.fillText("Current "+(Math.abs(I)<0.05?"off":(out?"out of page •":"into page ×")), 14, H-16);
+    $("fiOut").textContent=I.toFixed(1);
+    $("fiDir").textContent=Math.abs(I)<0.05?"":(out?"(out of page •)":"(into page ×)");
+    $("fieldNote").textContent="Right-hand thumb rule: point the thumb along the current; the curled fingers give the circular field. Reverse the current — the arrows reverse too.";
+  }
+
+  function drawSolenoidField(){
+    var ctx=fctx,W=fCan.width,H=fCan.height,cx=W/2,cy=H/2;
+    ctx.clearRect(0,0,W,H);
+    var I=parseFloat(fiRange.value), turns=parseInt(ftRange.value,10);
+    var half=150, leftN=I>=0;            // + current -> left end is N
+    // draw dipole-like external + internal field via two poles at coil ends
+    var poles=[{x:leftN?cx-half:cx+half,y:cy,q:1},{x:leftN?cx+half:cx-half,y:cy,q:-1}];
+    var rings=[24,42];
+    for(var r=0;r<rings.length;r++){
+      for(var i=0;i<9;i++){
+        var a=(i/9)*TAU;
+        var px=poles[0].x+rings[r]*Math.cos(a), py=cy+rings[r]*Math.sin(a);
+        drawStream(ctx, streamPts(px,py,poles,W,H), "rgba(180,140,255,.5)");
+      }
+    }
+    // straight internal field arrows along axis (N -> S direction inside points S->N; field inside points from S to N)
+    var coilTop=cy-40, coilBot=cy+40;
+    ctx.strokeStyle=WARM;
+    for(var xa=cx-half+30; xa<=cx+half-30; xa+=52){
+      var dirx=leftN?1:-1;              // inside field points toward N end... draw toward N pole (left if leftN)
+      arrow(ctx, xa-14*(leftN?-1:1), cy, xa+14*(leftN?-1:1), cy, WARM,2,6);
+    }
+    // coil loops with current symbols
+    var nLoops=turns, step=(2*half-40)/(nLoops-1);
+    for(var l=0;l<nLoops;l++){
+      var lx=cx-half+20+l*step;
+      ctx.strokeStyle="#c9d0ee"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.ellipse(lx,cy,7,42,0,0,TAU); ctx.stroke();
+      // top symbol / bottom symbol
+      var topOut = I>=0;               // choose so left end becomes N
+      ctx.fillStyle=INK; ctx.strokeStyle=INK; ctx.lineWidth=1.6;
+      // top of loop
+      if(Math.abs(I)>=0.05){
+        if(topOut){ ctx.beginPath(); ctx.arc(lx,coilTop-2,2.6,0,TAU); ctx.fill(); }
+        else{ ctx.beginPath(); ctx.moveTo(lx-3,coilTop-5); ctx.lineTo(lx+3,coilTop+1); ctx.moveTo(lx+3,coilTop-5); ctx.lineTo(lx-3,coilTop+1); ctx.stroke(); }
+      }
+    }
+    // pole labels
+    ctx.font="bold 20px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillStyle=leftN?NP:SP; ctx.fillText(leftN?"N":"S", cx-half-16, cy);
+    ctx.fillStyle=leftN?SP:NP; ctx.fillText(leftN?"S":"N", cx+half+16, cy);
+    ctx.textBaseline="alphabetic";
+    $("fiOut").textContent=I.toFixed(1);
+    $("ftOut").textContent=turns;
+    $("fiDir").textContent=Math.abs(I)<0.05?"":(I>=0?"(left end = N)":"(left end = S)");
+    $("fieldNote").textContent="A solenoid behaves like a bar magnet. Use the right-hand rule on the loops (dots • = current out) to find which end is N. Reverse the current to swap the poles.";
+  }
+
+  // field seg + controls
+  document.querySelectorAll("#fieldSeg button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#fieldSeg button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); fieldSub=b.dataset.fs;
+      $("fldCurrent").classList.toggle("hide", fieldSub==="bar");
+      $("fldTurns").classList.toggle("hide", fieldSub!=="sol");
+      $("fldFlip").classList.toggle("hide", fieldSub!=="bar");
+      drawField();
+    });
+  });
+  fiRange.addEventListener("input",drawField);
+  ftRange.addEventListener("input",drawField);
+  $("flipBtn").addEventListener("click",function(){ barFlip=!barFlip; drawField(); });
+
+  // =====================================================================
+  //  ELECTROMAGNET & MOTOR
+  // =====================================================================
+  var mCan=$("motorCanvas"), mctx=mCan.getContext("2d");
+  var motorSub="em", motorTheta=0, motorDir=1;
+  var emiRange=$("emiRange"), emtRange=$("emtRange"), dciRange=$("dciRange"), dcbRange=$("dcbRange");
+
+  function drawElectromagnet(){
+    var ctx=mctx,W=mCan.width,H=mCan.height;
+    ctx.clearRect(0,0,W,H);
+    var I=parseFloat(emiRange.value), N=parseInt(emtRange.value,10);
+    var strength=N*I, frac=clamp(strength/1000,0,1);
+    // battery + wire schematic on left
+    var coilX=170, coilY=150, coilW=200, coilH=70;
+    // iron core (nail) horizontal
+    ctx.fillStyle="#7c8199"; ctx.fillRect(coilX-30, coilY-14, coilW+80, 28);
+    ctx.fillStyle="#9aa0bb"; ctx.fillRect(coilX-30, coilY-14, coilW+80, 8);
+    // nail tip (pointed) on right
+    ctx.fillStyle="#7c8199"; ctx.beginPath();
+    ctx.moveTo(coilX+coilW+50,coilY-14); ctx.lineTo(coilX+coilW+70,coilY); ctx.lineTo(coilX+coilW+50,coilY+14); ctx.closePath(); ctx.fill();
+    // coil windings
+    var loops=Math.max(4,Math.round(N/12));
+    var step=coilW/loops;
+    ctx.lineWidth=4; ctx.strokeStyle="#d08a3a";
+    for(var l=0;l<loops;l++){
+      var lx=coilX+l*step+step/2;
+      ctx.beginPath(); ctx.ellipse(lx,coilY,step*0.34,coilH/2,0,0,TAU); ctx.stroke();
+    }
+    // field lines strength: draw loops around whose count grows with strength
+    var extLoops=Math.round(1+frac*4);
+    ctx.strokeStyle="rgba(180,140,255,"+(0.25+frac*0.5)+")"; ctx.lineWidth=1.5;
+    for(var e=1;e<=extLoops;e++){
+      var ry=coilH/2+e*16;
+      ctx.beginPath(); ctx.ellipse(coilX+coilW/2,coilY,coilW/2+e*20,ry,0,0,TAU); ctx.stroke();
+    }
+    // N / S labels on the core ends (left end = N if I>0)
+    ctx.font="bold 18px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    if(I>0.05){
+      ctx.fillStyle=NP; ctx.fillText("N",coilX-40,coilY);
+      ctx.fillStyle=SP; ctx.fillText("S",coilX+coilW+78,coilY);
+    }
+    ctx.textBaseline="alphabetic";
+    // paper clips hanging from tip
+    var clips=Math.round(frac*12);
+    ctx.strokeStyle="#cfd4ea"; ctx.lineWidth=2.4; ctx.textAlign="center";
+    var tipx=coilX+coilW+70, tipy=coilY;
+    for(var c=0;c<clips;c++){
+      var yy=tipy+8+c*13;
+      ctx.beginPath(); ctx.ellipse(tipx, yy, 6, 5, 0, 0, TAU); ctx.stroke();
+    }
+    // battery symbol
+    ctx.strokeStyle=INK; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(60,coilY-40); ctx.lineTo(60,coilY+40); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(50,coilY-24); ctx.lineTo(70,coilY-24); ctx.stroke();
+    ctx.fillStyle=MUTED; ctx.font="12px system-ui";
+    ctx.fillText(I.toFixed(1)+" A",60,coilY+56);
+    $("emiOut").textContent=I.toFixed(1);
+    $("emtOut").textContent=N;
+    $("emStrength").textContent=strength.toFixed(0);
+    $("emClips").textContent=clips;
+    $("motorNote").textContent="An electromagnet is a solenoid on a soft-iron core. Increase current or turns → stronger field → more paper clips lifted. Set the current to 0 and it switches off completely.";
+  }
+
+  function drawMotorMachine(){
+    var ctx=mctx,W=mCan.width,H=mCan.height,cx=W/2,cy=H/2;
+    ctx.clearRect(0,0,W,H);
+    var I=parseFloat(dciRange.value), B=parseFloat(dcbRange.value);
+    // magnet poles: N left (red), S right (blue)
+    var pw=60, ph=180;
+    ctx.fillStyle=NP; ctx.fillRect(24,cy-ph/2,pw,ph);
+    ctx.fillStyle=SP; ctx.fillRect(W-24-pw,cy-ph/2,pw,ph);
+    ctx.fillStyle="#fff"; ctx.font="bold 22px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("N",24+pw/2,cy); ctx.fillText("S",W-24-pw/2,cy);
+    ctx.textBaseline="alphabetic";
+    // field arrows N -> S
+    ctx.strokeStyle="rgba(180,140,255,.5)";
+    for(var yy=cy-70; yy<=cy+70; yy+=35){
+      arrow(ctx, 24+pw+10, yy, W-24-pw-10, yy, "rgba(180,140,255,.5)",1.5,6);
+    }
+    // rotating coil about vertical axis
+    var th=motorTheta;
+    var halfW=95, half_h=70, skew=0.30;
+    var cph=Math.cos(th);
+    var lx=cx-halfW*cph, rx=cx+halfW*cph;
+    var ldepth=-halfW*Math.sin(th), rdepth=halfW*Math.sin(th);
+    var lyT=cy-half_h+ldepth*skew, lyB=cy+half_h+ldepth*skew;
+    var ryT=cy-half_h+rdepth*skew, ryB=cy+half_h+rdepth*skew;
+    // axis
+    ctx.strokeStyle="#555b7a"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx,cy-half_h-24); ctx.lineTo(cx,cy+half_h+24); ctx.stroke();
+    // coil quad
+    ctx.strokeStyle=WARM; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(lx,lyT); ctx.lineTo(rx,ryT); ctx.lineTo(rx,ryB); ctx.lineTo(lx,lyB); ctx.closePath(); ctx.stroke();
+    // current symbols on the two vertical sides (which side is "front" -> larger depth)
+    var s=(Math.cos(th)>=0)?1:-1;         // commutator: keep torque one sign
+    // left side symbol & force
+    function sideSymbol(x,yT,yB,sym){
+      var ym=(yT+yB)/2;
+      ctx.fillStyle=INK; ctx.strokeStyle=INK; ctx.lineWidth=2;
+      if(sym>0){ ctx.beginPath(); ctx.arc(x,ym,4,0,TAU); ctx.fill(); }        // out of page
+      else{ ctx.beginPath(); ctx.moveTo(x-5,ym-5); ctx.lineTo(x+5,ym+5); ctx.moveTo(x+5,ym-5); ctx.lineTo(x-5,ym+5); ctx.stroke(); }
+    }
+    var leftSym=s*motorDir, rightSym=-s*motorDir;
+    sideSymbol(lx,lyT,lyB,leftSym);
+    sideSymbol(rx,ryT,ryB,rightSym);
+    // force arrows: opposite on the two sides (F = B I L), flip with commutator to keep spin
+    var Flen=20+B*I*8;
+    var lForceUp = (leftSym>0);          // out-of-page conductor in field toward +x feels one way
+    arrow(ctx, lx, (lyT+lyB)/2, lx, (lyT+lyB)/2+(lForceUp?-Flen:Flen), GOOD,3,8);
+    arrow(ctx, rx, (ryT+ryB)/2, rx, (ryT+ryB)/2+(lForceUp?Flen:-Flen), GOOD,3,8);
+    // labels
+    ctx.fillStyle=MUTED; ctx.font="12px system-ui"; ctx.textAlign="center";
+    ctx.fillText("F = B I L", cx, cy+half_h+42);
+    $("dciOut").textContent=I.toFixed(1);
+    $("dcbOut").textContent=B.toFixed(1);
+    $("dcForce").textContent=(B*I*0.5).toFixed(2);
+    $("dcRpm").textContent=(Math.abs(motorDir)* (0.25*B*I)).toFixed(2);
+    $("motorNote").textContent="A current-carrying coil in a field feels forces (F = B I L, Fleming's LEFT-hand rule) that turn it. The split-ring commutator reverses the current every half-turn so the coil keeps spinning one way. More current or a stronger field → faster spin.";
+  }
+
+  function drawMotor(){ if(motorSub==="em") drawElectromagnet(); else drawMotorMachine(); }
+
+  document.querySelectorAll("#motorSeg button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#motorSeg button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); motorSub=b.dataset.ms;
+      var em=motorSub==="em";
+      $("emCtrls").classList.toggle("hide",!em);
+      $("dcCtrls").classList.toggle("hide",em);
+      $("emStats").classList.toggle("hide",!em);
+      $("dcStats").classList.toggle("hide",em);
+      drawMotor();
+    });
+  });
+  emiRange.addEventListener("input",drawElectromagnet);
+  emtRange.addEventListener("input",drawElectromagnet);
+  dciRange.addEventListener("input",drawMotorMachine);
+  dcbRange.addEventListener("input",drawMotorMachine);
+  $("dcDirBtn").addEventListener("click",function(){ motorDir*=-1; this.classList.toggle("on",motorDir<0); });
+
+  // =====================================================================
+  //  INDUCTION
+  // =====================================================================
+  var iCan=$("indCanvas"), ictx=iCan.getContext("2d");
+  var indSub="coil";
+  var posRange=$("posRange"), coilnRange=$("coilnRange"),
+      genwRange=$("genwRange"), gennRange=$("gennRange"), genbRange=$("genbRange");
+  var prevFlux=0, needle=0, autoOn=false, autoPhase=0, genTheta=0, emfDisp=0, hist=[];
+
+  function resetInduction(){ prevFlux=0; needle=0; hist=[]; }
+
+  function galvanometer(cx,cy,r,defl){
+    var ctx=ictx;
+    ctx.fillStyle="#12162a"; ctx.strokeStyle=LINE; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(cx,cy,r,Math.PI,TAU); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-r,cy); ctx.lineTo(cx+r,cy); ctx.stroke();
+    // scale ticks
+    ctx.strokeStyle=MUTED; ctx.lineWidth=1;
+    for(var t=-4;t<=4;t++){
+      var a=-Math.PI/2 + (t/4)*(Math.PI*0.42);
+      var x1=cx+Math.sin(a)*(r-4), y1=cy-Math.cos(a)*(r-4);
+      var x2=cx+Math.sin(a)*(r-12), y2=cy-Math.cos(a)*(r-12);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    }
+    ctx.fillStyle=MUTED; ctx.font="11px system-ui"; ctx.textAlign="center";
+    ctx.fillText("−",cx-r+12,cy-6); ctx.fillText("+",cx+r-12,cy-6); ctx.fillText("0",cx,cy-r+14);
+    // needle
+    var ang=clamp(defl,-1,1)*(Math.PI*0.42);
+    var nx=cx+Math.sin(ang)*(r-16), ny=cy-Math.cos(ang)*(r-16);
+    ctx.strokeStyle=Math.abs(defl)>0.02?WARM:MUTED; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(nx,ny); ctx.stroke();
+    ctx.fillStyle=INK; ctx.beginPath(); ctx.arc(cx,cy,4,0,TAU); ctx.fill();
+    ctx.fillStyle=MUTED; ctx.font="12px system-ui"; ctx.fillText("Galvanometer",cx,cy+18);
+  }
+
+  function drawCoilStack(cx,cy,turns){
+    var ctx=ictx, n=clamp(Math.round(turns/30),3,10);
+    ctx.strokeStyle="#c9d0ee"; ctx.lineWidth=2.4;
+    for(var i=0;i<n;i++){
+      var lx=cx+i*7-(n*7)/2;
+      ctx.beginPath(); ctx.ellipse(lx,cy,8,46,0,0,TAU); ctx.stroke();
+    }
+  }
+  function drawBarMagnet(x,cy,leftN){
+    var ctx=ictx, mw=110,mh=40;
+    ctx.fillStyle=leftN?NP:SP; ctx.fillRect(x,cy-mh/2,mw/2,mh);
+    ctx.fillStyle=leftN?SP:NP; ctx.fillRect(x+mw/2,cy-mh/2,mw/2,mh);
+    ctx.strokeStyle="rgba(0,0,0,.35)"; ctx.lineWidth=2; ctx.strokeRect(x,cy-mh/2,mw,mh);
+    ctx.fillStyle="#fff"; ctx.font="bold 16px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(leftN?"N":"S", x+mw/4, cy);
+    ctx.fillText(leftN?"S":"N", x+3*mw/4, cy);
+    ctx.textBaseline="alphabetic";
+    return x+mw;                          // right edge
+  }
+
+  function updateInduction(){
+    if(indSub==="coil"){
+      var N=parseInt(coilnRange.value,10);
+      var magPos;
+      if(autoOn){ autoPhase+=dt*3.0; magPos=clamp(0.5+0.5*Math.sin(autoPhase),0,1); posRange.value=Math.round(magPos*100); }
+      else magPos=parseFloat(posRange.value)/100;
+      var W=iCan.width, coilX=W-150;
+      var magRight = 60 + magPos*(coilX-200) + 110;   // right edge x of magnet
+      var gap=Math.max(18,(coilX-30)-magRight)/60;     // in "units"
+      var flux=N*0.9/(gap*gap+0.15);
+      var emf=-(flux-prevFlux)/dt; prevFlux=flux;
+      var target=clamp(emf*0.0016,-1,1);
+      needle += (target-needle)*0.35;
+      emfDisp=emf*0.0016;
+      $("posOut").textContent=posRange.value;
+      $("coilnOut").textContent=N;
+    } else {
+      genTheta += parseFloat(genwRange.value)*TAU*dt;
+      var Ng=parseInt(gennRange.value,10), Bg=parseFloat(genbRange.value), w=parseFloat(genwRange.value);
+      var amp=clamp(Ng*Bg*w*0.0045,0,1);
+      var e=amp*Math.cos(genTheta);
+      needle += (e-needle)*0.5;
+      emfDisp=e;
+      hist.push(e); if(hist.length>200) hist.shift();
+      $("genwOut").textContent=w.toFixed(1);
+      $("gennOut").textContent=Ng;
+      $("genbOut").textContent=Bg.toFixed(1);
+    }
+  }
+
+  function drawInduction(){
+    var ctx=ictx,W=iCan.width,H=iCan.height;
+    ctx.clearRect(0,0,W,H);
+    if(indSub==="coil"){
+      var coilX=W-150, coilY=120;
+      // magnet
+      var magPos=parseFloat(posRange.value)/100;
+      var magX=60+magPos*(coilX-200);
+      var edge=drawBarMagnet(magX,coilY,true);       // N faces right toward coil
+      // motion hint arrow
+      // coil
+      drawCoilStack(coilX,coilY,parseInt(coilnRange.value,10));
+      // wires from coil to galvanometer
+      ctx.strokeStyle="#c9d0ee"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(coilX,coilY+46); ctx.lineTo(coilX,H-70); ctx.lineTo(W/2,H-70); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(coilX+10,coilY+40); ctx.lineTo(coilX+40,coilY+40); ctx.lineTo(coilX+40,H-58); ctx.lineTo(W/2+24,H-58); ctx.stroke();
+      galvanometer(W/2, H-64, 46, needle);
+      var dir = needle>0.02?"one way →":(needle<-0.02?"← the other":"none");
+      $("indEmf").textContent=(emfDisp).toFixed(2);
+      $("indDir").textContent=dir;
+      $("indNote").textContent="Move the magnet (drag the slider) — the changing flux induces an EMF and the needle deflects (Faraday's law). Hold it still: no change, no current. Faster motion or more turns → bigger deflection. Pushing in vs pulling out reverse the deflection (Lenz's law).";
+    } else {
+      // AC generator: rotating coil + sine trace + galvanometer
+      var cx=170, cy=110;
+      // poles
+      ctx.fillStyle=NP; ctx.fillRect(cx-140,cy-60,34,120);
+      ctx.fillStyle=SP; ctx.fillRect(cx+106,cy-60,34,120);
+      ctx.fillStyle="#fff"; ctx.font="bold 16px system-ui"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("N",cx-123,cy); ctx.fillText("S",cx+123,cy); ctx.textBaseline="alphabetic";
+      // rotating coil
+      var th=genTheta, halfW=70, half_h=46, cph=Math.cos(th);
+      var lx=cx-halfW*cph, rx=cx+halfW*cph;
+      ctx.strokeStyle=WARM; ctx.lineWidth=3.5;
+      ctx.beginPath(); ctx.moveTo(lx,cy-half_h); ctx.lineTo(rx,cy-half_h); ctx.lineTo(rx,cy+half_h); ctx.lineTo(lx,cy+half_h); ctx.closePath(); ctx.stroke();
+      // sine trace
+      var gx=30,gy=H-70,gw=W-60,gh=90;
+      ctx.strokeStyle=LINE; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(gx+gw,gy); ctx.stroke();
+      ctx.fillStyle=MUTED; ctx.font="11px system-ui"; ctx.textAlign="left"; ctx.fillText("EMF vs time (AC)",gx,gy-gh/2-4);
+      ctx.strokeStyle=WARM; ctx.lineWidth=2; ctx.beginPath();
+      for(var i=0;i<hist.length;i++){
+        var xx=gx+gw-(hist.length-i)*(gw/200);
+        var yy=gy-hist[i]*(gh/2);
+        if(i===0) ctx.moveTo(xx,yy); else ctx.lineTo(xx,yy);
+      }
+      ctx.stroke();
+      // galvanometer
+      galvanometer(W-90, 110, 44, needle);
+      var dir = needle>0.02?"→":(needle<-0.02?"←":"0");
+      $("indEmf").textContent=emfDisp.toFixed(2);
+      $("indDir").textContent="alternating "+dir;
+      $("indNote").textContent="An AC generator spins a coil in a magnetic field. The flux changes smoothly, so the induced EMF is sinusoidal: EMF = N B A ω sin(ωt). It reverses every half-turn — that is alternating current (AC). Faster spin → higher frequency and larger peak EMF.";
+    }
+  }
+
+  document.querySelectorAll("#indSeg button").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#indSeg button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); indSub=b.dataset.is;
+      var coil=indSub==="coil";
+      $("coilCtrls").classList.toggle("hide",!coil);
+      $("genCtrls").classList.toggle("hide",coil);
+      resetInduction();
+    });
+  });
+  posRange.addEventListener("input",function(){ autoOn=false; $("autoBtn").classList.remove("on"); $("autoBtn").textContent="Auto push in & out"; });
+  $("autoBtn").addEventListener("click",function(){
+    autoOn=!autoOn; this.classList.toggle("on",autoOn);
+    this.textContent=autoOn?"Stop auto":"Auto push in & out";
+  });
+
+  // =====================================================================
+  //  QUIZ
+  // =====================================================================
+  var quiz=[
+    {q:"The magnetic field lines around a straight current-carrying wire are:",
+     opts:["Straight lines along the wire","Concentric circles around the wire","Radial lines away from the wire","No field at all"], a:1,
+     e:"By the right-hand thumb rule the field forms concentric circles around the wire; it reverses if the current reverses."},
+    {q:"Which rule gives the direction of force on a current-carrying conductor in a magnetic field (the motor effect)?",
+     opts:["Fleming's right-hand rule","Ohm's law","Fleming's left-hand rule","Lenz's law"], a:2,
+     e:"Fleming's LEFT-hand rule: thumb = force, first finger = field, second finger = current. It is used for motors."},
+    {q:"Moving a bar magnet quickly into a coil makes the galvanometer deflect. This is:",
+     opts:["Electromagnetic induction (Faraday's law)","The heating effect","Ohm's law","Electrostatic attraction"], a:0,
+     e:"A changing magnetic flux induces an EMF: EMF = −N ΔΦ/Δt. Faster motion → bigger deflection."}
+  ];
+  var qBox=$("quiz");
+  quiz.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var stem=document.createElement("p"); stem.className="stem"; stem.textContent=(qi+1)+". "+item.q;
+    div.appendChild(stem);
+    var ex=document.createElement("div"); ex.className="explain";
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(answered) return; answered=true;
+        if(oi===item.a) b.classList.add("correct");
+        else{ b.classList.add("wrong"); div.querySelectorAll(".opt")[item.a].classList.add("correct"); }
+        ex.textContent="✔ "+item.e;
+      });
+      div.appendChild(b);
+    });
+    div.appendChild(ex); qBox.appendChild(div);
+  });
+
+  // =====================================================================
+  //  ANIMATION LOOP
+  // =====================================================================
+  function loop(){
+    if(running){
+      if(activeTab==="field" && fieldSub==="wire"){ wirePhase+=1.2*(Math.abs(parseFloat(fiRange.value))+0.2); drawWire(); }
+      if(activeTab==="motor" && motorSub==="dc"){
+        var I=parseFloat(dciRange.value), B=parseFloat(dcbRange.value);
+        motorTheta += motorDir*0.03*(0.5+0.25*B*I);
+        drawMotorMachine();
+      }
+      if(activeTab==="induction"){ updateInduction(); drawInduction(); }
+    }
+    requestAnimationFrame(loop);
+  }
+  // initial static draws
+  drawField();
+  drawElectromagnet();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

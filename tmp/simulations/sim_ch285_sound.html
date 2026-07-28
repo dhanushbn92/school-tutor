@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Lab — Sound and Communication (NIOS Class 10, Ch 18)</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --panel:#181f30;
+    --panel2:#212a40;
+    --ink:#e9edf7;
+    --muted:#98a3bd;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b344d;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 140px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+  .mode{display:none}
+  .mode.active{display:block}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;touch-action:none}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:12px 0}
+  .ctrl{flex:1 1 200px;min-width:170px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f1420;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f1420}
+
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 12px;font-size:.9rem}
+  .chip b{color:var(--accent)}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 90px;min-height:44px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .btn{min-height:46px;padding:0 18px;border:1px solid var(--accent);background:var(--accent-soft);
+    color:var(--accent);border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+  .btn:active{transform:scale(.98)}
+
+  .facts{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.facts{grid-template-columns:1fr 1fr}}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .fact b{color:var(--accent)}
+  .fact p{font-size:.88rem;color:var(--muted);margin-top:3px}
+
+  .quiz .q{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--panel2)}
+  .quiz .q p{font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;border:1px solid var(--line);
+    border-radius:10px;background:var(--panel);color:var(--ink);font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .quiz .opt.correct{border-color:var(--good);background:rgba(95,214,139,.15)}
+  .quiz .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.15)}
+  .quiz .exp{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .quiz .exp.show{display:block}
+  .note{font-size:.85rem;color:var(--muted);margin-top:8px}
+  .eq{font-family:"Cambria Math",Georgia,serif;color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Sound</span> Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology — Ch 18: Sound and Communication</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-mode="wave">Wave Properties</button>
+    <button class="tab-btn" data-mode="pitch">Pitch &amp; Loudness</button>
+    <button class="tab-btn" data-mode="echo">Echo &amp; SONAR</button>
+    <button class="tab-btn" data-mode="quiz">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ===================== MODE 1: WAVE ===================== -->
+  <section class="mode active" id="mode-wave">
+    <div class="panel">
+      <h2>Longitudinal Sound Wave</h2>
+      <canvas id="cWave" width="900" height="300"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Frequency (pitch): <output id="oFreq">440</output> Hz</label>
+          <input type="range" id="rFreq" min="20" max="2000" value="440" step="1">
+        </div>
+        <div class="ctrl">
+          <label>Amplitude (loudness): <output id="oAmp">60</output> %</label>
+          <input type="range" id="rAmp" min="10" max="100" value="60" step="1">
+        </div>
+      </div>
+      <div class="ctrl" style="margin-bottom:10px">
+        <label>Medium (sets speed of sound v):</label>
+        <div class="seg" id="segMed">
+          <button data-v="343" class="on">Air (343 m/s)</button>
+          <button data-v="1480">Water (1480 m/s)</button>
+          <button data-v="5960">Steel (5960 m/s)</button>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip">v = f&lambda; &rarr; <b><span id="oV">343</span> m/s</b></div>
+        <div class="chip">Wavelength &lambda; = <b><span id="oLam">0.78</span> m</b></div>
+        <div class="chip">Period T = <b><span id="oT">2.27</span> ms</b></div>
+      </div>
+      <p class="note">Top: air particles bunch into <b>compressions</b> (dense) and spread into <b>rarefactions</b> (sparse). Bottom: the same wave drawn as a waveform. Sound is a <b>longitudinal</b> wave — particles vibrate along the direction of travel.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 2: PITCH ===================== -->
+  <section class="mode" id="mode-pitch">
+    <div class="panel">
+      <h2>Pitch &amp; Loudness</h2>
+      <canvas id="cPitch" width="900" height="260"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Frequency: <output id="oFreq2">440</output> Hz</label>
+          <input type="range" id="rFreq2" min="5" max="25000" value="440" step="1">
+        </div>
+        <div class="ctrl">
+          <label>Amplitude: <output id="oAmp2">60</output> %</label>
+          <input type="range" id="rAmp2" min="5" max="100" value="60" step="1">
+        </div>
+      </div>
+      <div class="readout">
+        <div class="chip">Pitch: <b id="oPitch">Medium</b></div>
+        <div class="chip">Loudness: <b id="oLoud">Moderate</b></div>
+        <div class="chip">Band: <b id="oBand">Audible</b></div>
+      </div>
+      <p class="note"><b>Frequency &rarr; pitch</b> (higher Hz = higher pitch). <b>Amplitude &rarr; loudness</b> (bigger swing = louder). Human audible range: <b>20 Hz to 20 000 Hz</b>. Below 20 Hz = <b>infrasound</b>; above 20 kHz = <b>ultrasound</b>.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 3: ECHO ===================== -->
+  <section class="mode" id="mode-echo">
+    <div class="panel">
+      <h2>Echo, Reflection &amp; SONAR</h2>
+      <canvas id="cEcho" width="900" height="240"></canvas>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Distance to wall d: <output id="oDist">100</output> m</label>
+          <input type="range" id="rDist" min="20" max="500" value="100" step="1">
+        </div>
+        <div class="ctrl">
+          <label>Speed of sound v: <output id="oVe">343</output> m/s</label>
+          <input type="range" id="rVe" min="300" max="1600" value="343" step="1">
+        </div>
+      </div>
+      <button class="btn" id="btnPing">Emit pulse &raquo;</button>
+      <div class="readout" style="margin-top:12px">
+        <div class="chip">Round trip 2d = <b><span id="o2d">200</span> m</b></div>
+        <div class="chip">Echo delay t = 2d/v = <b><span id="oDelay">0.583</span> s</b></div>
+      </div>
+      <p class="note">A pulse travels to the wall and reflects back. From the delay: <span class="eq">2d = v &times; t</span>, so distance <span class="eq">d = v&middot;t / 2</span>. This is how <b>SONAR</b> finds sea depth and how medical <b>ultrasound</b> images the body — send a pulse, time the echo, compute distance.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MODE 4: FACTS + QUIZ ===================== -->
+  <section class="mode" id="mode-quiz">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="facts">
+        <div class="fact"><b>v = f&lambda;</b><p>Wave speed equals frequency times wavelength. In a fixed medium v is constant, so higher f means shorter &lambda;.</p></div>
+        <div class="fact"><b>Longitudinal wave</b><p>Sound travels as compressions and rarefactions; particles vibrate along the direction of travel. It needs a medium — no sound in vacuum.</p></div>
+        <div class="fact"><b>Frequency = pitch</b><p>More vibrations per second = higher pitch. Measured in hertz (Hz).</p></div>
+        <div class="fact"><b>Amplitude = loudness</b><p>Larger vibration = louder sound. Loudness level is measured in decibels (dB).</p></div>
+        <div class="fact"><b>Echo</b><p>A reflected sound heard distinctly after the original. 2d = v&middot;t. Ear resolves an echo if the delay is at least about 0.1 s.</p></div>
+        <div class="fact"><b>Audible range</b><p>20 Hz - 20 kHz for humans. Below = infrasound, above = ultrasound (used in SONAR &amp; scans).</p></div>
+      </div>
+    </div>
+    <div class="panel quiz" id="quiz">
+      <h2>Quick Quiz</h2>
+      <div class="q" data-a="1">
+        <p>1. Which property of a sound wave determines its <b>pitch</b>?</p>
+        <button class="opt">Amplitude</button>
+        <button class="opt">Frequency</button>
+        <button class="opt">Speed in air</button>
+        <div class="exp">Pitch depends on frequency — higher frequency gives a higher pitch.</div>
+      </div>
+      <div class="q" data-a="2">
+        <p>2. Sound travels <b>fastest</b> in which medium?</p>
+        <button class="opt">Air</button>
+        <button class="opt">Water</button>
+        <button class="opt">Steel</button>
+        <div class="exp">Sound is fastest in solids like steel (~5960 m/s) because particles are tightly packed; slowest in gases.</div>
+      </div>
+      <div class="q" data-a="1">
+        <p>3. A SONAR pulse returns after 0.4 s in water (v = 1500 m/s). How deep is the seabed?</p>
+        <button class="opt">150 m</button>
+        <button class="opt">300 m</button>
+        <button class="opt">600 m</button>
+        <div class="exp">d = v&middot;t / 2 = 1500 &times; 0.4 / 2 = 300 m (the pulse covers the round trip 2d in 0.4 s).</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var running = true;
+  document.addEventListener("visibilitychange", function(){ running = !document.hidden; });
+
+  // ---------- tab switching ----------
+  var tabs = document.querySelectorAll(".tab-btn");
+  var modes = document.querySelectorAll(".mode");
+  tabs.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabs.forEach(function(b){ b.classList.remove("active"); });
+      modes.forEach(function(m){ m.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("mode-" + btn.dataset.mode).classList.add("active");
+    });
+  });
+
+  function fit(cv){
+    var w = cv.clientWidth || 900;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var ratio = cv.height / cv.width || (300/900);
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(w * ratio * dpr);
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, W: w, H: w * ratio };
+  }
+
+  // ===================== MODE 1: WAVE =====================
+  var cWave = document.getElementById("cWave");
+  var rFreq = document.getElementById("rFreq"), oFreq = document.getElementById("oFreq");
+  var rAmp = document.getElementById("rAmp"), oAmp = document.getElementById("oAmp");
+  var segMed = document.getElementById("segMed");
+  var oV = document.getElementById("oV"), oLam = document.getElementById("oLam"), oT = document.getElementById("oT");
+  var medV = 343;
+
+  segMed.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    segMed.querySelectorAll("button").forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    medV = parseFloat(b.dataset.v);
+    updateWaveReadout();
+  });
+
+  function updateWaveReadout(){
+    var f = parseFloat(rFreq.value);
+    var lam = medV / f;
+    oFreq.textContent = f;
+    oAmp.textContent = rAmp.value;
+    oV.textContent = medV;
+    oLam.textContent = lam >= 1 ? lam.toFixed(2) : lam.toFixed(3);
+    oT.textContent = (1000 / f).toFixed(2);
+  }
+  rFreq.addEventListener("input", updateWaveReadout);
+  rAmp.addEventListener("input", updateWaveReadout);
+  updateWaveReadout();
+
+  var waveT = 0;
+  function drawWave(dt){
+    var d = fit(cWave), ctx = d.ctx, W = d.W, H = d.H;
+    ctx.clearRect(0,0,W,H);
+    var f = parseFloat(rFreq.value);
+    var amp = parseFloat(rAmp.value) / 100;
+    // spatial frequency: map so visible wavelengths change with f
+    var k = (f / 2000) * 22 + 1.5;   // radians per (W fraction)
+    var speed = 2.2;                 // animation phase speed
+    waveT += dt * speed;
+
+    // ----- particle band (top half) -----
+    var topH = H * 0.5;
+    var rows = 3, cols = 90;
+    ctx.fillStyle = "#4fd1c5";
+    for(var r=0;r<rows;r++){
+      var y = topH*0.22 + r*(topH*0.28);
+      for(var c=0;c<cols;c++){
+        var x0 = (c + 0.5) / cols;
+        var disp = amp * 0.5 / cols * Math.sin(2*Math.PI*(k*x0) - waveT);
+        var x = (x0 + disp) * W;
+        var dens = 0.6 + 0.9 * Math.abs(Math.cos(Math.PI*(k*x0) - waveT/2));
+        ctx.globalAlpha = 0.35 + 0.55*Math.abs(Math.cos(2*Math.PI*(k*x0) - waveT));
+        ctx.beginPath();
+        ctx.arc(x, y, 3.1, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+    // labels compression/rarefaction
+    ctx.fillStyle = "#98a3bd"; ctx.font = "12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("particles: compressions (dense) & rarefactions (sparse)", 8, 14);
+
+    // ----- waveform (bottom half) -----
+    var midY = H*0.76, ampPx = H*0.18*amp;
+    ctx.strokeStyle = "#2b344d"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+    ctx.strokeStyle = "#4fd1c5"; ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    for(var xx=0; xx<=W; xx+=2){
+      var xf = xx / W;
+      var yv = midY - ampPx * Math.sin(2*Math.PI*(k*xf) - waveT);
+      if(xx===0) ctx.moveTo(xx,yv); else ctx.lineTo(xx,yv);
+    }
+    ctx.stroke();
+    ctx.fillStyle="#98a3bd"; ctx.fillText("waveform", 8, midY - ampPx - 8);
+  }
+
+  // ===================== MODE 2: PITCH =====================
+  var cPitch = document.getElementById("cPitch");
+  var rFreq2 = document.getElementById("rFreq2"), oFreq2 = document.getElementById("oFreq2");
+  var rAmp2 = document.getElementById("rAmp2"), oAmp2 = document.getElementById("oAmp2");
+  var oPitch = document.getElementById("oPitch"), oLoud = document.getElementById("oLoud"), oBand = document.getElementById("oBand");
+
+  function updatePitchReadout(){
+    var f = parseFloat(rFreq2.value), a = parseFloat(rAmp2.value);
+    oFreq2.textContent = f; oAmp2.textContent = a;
+    oPitch.textContent = f < 250 ? "Low" : (f < 2000 ? "Medium" : "High");
+    oLoud.textContent = a < 30 ? "Soft" : (a < 70 ? "Moderate" : "Loud");
+    if(f < 20){ oBand.textContent = "Infrasound (< 20 Hz)"; }
+    else if(f > 20000){ oBand.textContent = "Ultrasound (> 20 kHz)"; }
+    else { oBand.textContent = "Audible (20 Hz - 20 kHz)"; }
+    oBand.style.color = (f<20||f>20000) ? "#ff7b7b" : "#5fd68b";
+  }
+  rFreq2.addEventListener("input", updatePitchReadout);
+  rAmp2.addEventListener("input", updatePitchReadout);
+  updatePitchReadout();
+
+  var pitchT = 0;
+  function drawPitch(dt){
+    var d = fit(cPitch), ctx = d.ctx, W = d.W, H = d.H;
+    ctx.clearRect(0,0,W,H);
+    var f = parseFloat(rFreq2.value), a = parseFloat(rAmp2.value)/100;
+    pitchT += dt * 2.4;
+    var midY = H*0.5, ampPx = H*0.4*a;
+    // cycles across screen scale with log(freq) so extremes stay visible
+    var cycles = Math.max(0.6, Math.log(f+1)/Math.log(25001) * 30);
+    ctx.strokeStyle = "#2b344d"; ctx.beginPath(); ctx.moveTo(0,midY); ctx.lineTo(W,midY); ctx.stroke();
+    var band = (f<20||f>20000);
+    ctx.strokeStyle = band ? "#ff7b7b" : "#4fd1c5"; ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    for(var x=0;x<=W;x+=2){
+      var xf = x/W;
+      var y = midY - ampPx*Math.sin(2*Math.PI*cycles*xf - pitchT);
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.fillStyle="#98a3bd"; ctx.font="12px system-ui"; ctx.textAlign="left";
+    ctx.fillText("more cycles = higher pitch  •  taller = louder", 8, 16);
+  }
+
+  // ===================== MODE 3: ECHO =====================
+  var cEcho = document.getElementById("cEcho");
+  var rDist = document.getElementById("rDist"), oDist = document.getElementById("oDist");
+  var rVe = document.getElementById("rVe"), oVe = document.getElementById("oVe");
+  var o2d = document.getElementById("o2d"), oDelay = document.getElementById("oDelay");
+  var btnPing = document.getElementById("btnPing");
+  var pulse = null; // {pos 0..1, dir}
+
+  function updateEchoReadout(){
+    var dd = parseFloat(rDist.value), v = parseFloat(rVe.value);
+    oDist.textContent = dd; oVe.textContent = v;
+    o2d.textContent = (2*dd);
+    oDelay.textContent = (2*dd/v).toFixed(3);
+  }
+  rDist.addEventListener("input", updateEchoReadout);
+  rVe.addEventListener("input", updateEchoReadout);
+  updateEchoReadout();
+
+  btnPing.addEventListener("click", function(){ pulse = { pos:0, dir:1 }; });
+
+  function drawEcho(dt){
+    var d = fit(cEcho), ctx = d.ctx, W = d.W, H = d.H;
+    ctx.clearRect(0,0,W,H);
+    var padL = 60, padR = 40, y = H*0.55;
+    var wallX = W - padR;
+    // ground line
+    ctx.strokeStyle = "#2b344d"; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(wallX, y); ctx.stroke();
+    // source
+    ctx.fillStyle = "#4fd1c5";
+    ctx.beginPath(); ctx.arc(padL, y, 10, 0, 2*Math.PI); ctx.fill();
+    ctx.fillStyle="#98a3bd"; ctx.font="12px system-ui"; ctx.textAlign="center";
+    ctx.fillText("source", padL, y+26);
+    // wall
+    ctx.fillStyle = "#212a40"; ctx.strokeStyle="#4fd1c5"; ctx.lineWidth=2;
+    ctx.fillRect(wallX, y-46, 16, 92); ctx.strokeRect(wallX, y-46, 16, 92);
+    ctx.fillStyle="#98a3bd"; ctx.fillText("wall (d)", wallX, y+40);
+
+    // pulse animation: physical speed scaled to travel time = delay
+    if(pulse){
+      var v = parseFloat(rVe.value), dd = parseFloat(rDist.value);
+      var totalT = 2*dd/v;                 // seconds real
+      var animDur = Math.min(4, Math.max(1.2, totalT*3)); // seconds anim
+      pulse.pos += dt * (2 / animDur);     // 0->1 out, 1->2 back over animDur
+      var p = pulse.pos;
+      var frac = p<=1 ? p : (2-p);
+      var px = padL + (wallX - padL) * frac;
+      // wavefront arcs
+      ctx.strokeStyle = p<=1 ? "#4fd1c5" : "#ffd166";
+      ctx.lineWidth = 2;
+      for(var i=0;i<3;i++){
+        ctx.globalAlpha = 0.7 - i*0.2;
+        ctx.beginPath();
+        ctx.arc(px, y, 8 + i*7, -Math.PI*0.55, Math.PI*0.55);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = p<=1 ? "#4fd1c5" : "#ffd166";
+      ctx.beginPath(); ctx.arc(px, y, 6, 0, 2*Math.PI); ctx.fill();
+      ctx.fillStyle="#98a3bd"; ctx.textAlign="center";
+      ctx.fillText(p<=1 ? "outgoing" : "echo returning", px, y-20);
+      if(pulse.pos >= 2){ pulse = null; }
+    } else {
+      ctx.fillStyle="#98a3bd"; ctx.textAlign="center";
+      ctx.fillText("press “Emit pulse” to send a sound pulse", W/2, y-24);
+    }
+  }
+
+  // ---------- quiz ----------
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var ans = parseInt(q.dataset.a,10);
+    var opts = q.querySelectorAll(".opt");
+    var exp = q.querySelector(".exp");
+    opts.forEach(function(opt, idx){
+      opt.addEventListener("click", function(){
+        if(q.dataset.done) return;
+        q.dataset.done = "1";
+        opts[ans].classList.add("correct");
+        if(idx !== ans) opt.classList.add("wrong");
+        exp.classList.add("show");
+      });
+    });
+  });
+
+  // ---------- main loop ----------
+  var last = performance.now();
+  function loop(now){
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if(running){
+      var active = document.querySelector(".mode.active").id;
+      if(active === "mode-wave") drawWave(dt);
+      else if(active === "mode-pitch") drawPitch(dt);
+      else if(active === "mode-echo") drawEcho(dt);
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  window.addEventListener("resize", function(){ /* fit() recomputes each frame */ });
+})();
+</script>
+</body>
+</html>

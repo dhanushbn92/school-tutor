@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell &amp; Tissues Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#17212e; --panel2:#1e2b3a; --line:#2b3a4d;
+    --txt:#dce6f0; --muted:#8da0b6; --accent:#48c9a9;
+    --accent-soft:#48c9a922; --plant:#f2c14e; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:var(--bg); color:var(--txt); line-height:1.5;
+    padding:14px; -webkit-text-size-adjust:100%;
+  }
+  header{max-width:920px;margin:0 auto 14px}
+  h1{font-size:1.35rem;font-weight:700}
+  .sub{color:var(--muted);font-size:.9rem;margin-top:2px}
+  main{max-width:920px;margin:0 auto}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;font-size:.9rem;cursor:pointer;
+    transition:.15s;flex:1 1 auto;min-width:120px;text-align:center;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:14px;
+  }
+  .view{display:none}
+  .view.active{display:block}
+  h2{font-size:1.05rem;margin-bottom:4px}
+  .hint{color:var(--muted);font-size:.85rem;margin-bottom:12px}
+  /* Cell explorer */
+  .toggle-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .toggle-row .tab{flex:0 1 auto;min-width:110px}
+  .cell-wrap{display:flex;flex-direction:column;gap:14px}
+  @media(min-width:720px){.cell-wrap{flex-direction:row}.cell-svg-box{flex:1 1 55%}.info-box{flex:1 1 45%}}
+  .cell-svg-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation}
+  .hot{cursor:pointer;transition:opacity .15s}
+  .hot:hover{opacity:.75}
+  .hot.sel{stroke:var(--accent);stroke-width:3}
+  .info-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:120px}
+  .info-box h3{font-size:1.05rem;color:var(--accent);margin-bottom:6px}
+  .info-box .fn{font-size:.92rem}
+  .badge{display:inline-block;background:var(--plant);color:#1a1200;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:10px}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--plant);vertical-align:middle;margin-right:4px}
+  /* Tissue cards */
+  .grp-title{font-weight:700;color:var(--accent);margin:12px 0 8px;font-size:.95rem}
+  .cards{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.cards{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .card h4{font-size:.98rem;margin-bottom:4px}
+  .card .role{font-size:.85rem;color:var(--txt)}
+  .card .loc{font-size:.8rem;color:var(--muted);margin-top:5px}
+  .card .loc b{color:var(--accent)}
+  /* Levels */
+  .levels{display:flex;flex-direction:column;gap:8px}
+  .lvl{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .lvl .n{width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700}
+  .lvl .lt{font-weight:600}
+  .lvl .le{color:var(--muted);font-size:.85rem}
+  .arrow{text-align:center;color:var(--accent);font-size:1.1rem;margin:-2px 0}
+  /* Facts */
+  .facts details{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+  .facts summary{cursor:pointer;font-weight:600}
+  .facts p{font-size:.88rem;color:var(--txt);margin-top:8px}
+  table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+  th{background:var(--accent-soft);color:var(--accent)}
+  /* Quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .q .qt{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--txt);padding:9px 12px;border-radius:9px;margin-bottom:6px;cursor:pointer;font-size:.88rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt.right{background:#1f5e4d;border-color:var(--accent);color:#eafff8}
+  .opt.wrong{background:#5e2020;border-color:#c96b6b}
+  .expl{font-size:.83rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  footer{max-width:920px;margin:6px auto;color:var(--muted);font-size:.75rem;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Cell &amp; Tissues Lab</h1>
+  <div class="sub">NIOS Class 10 Science &amp; Technology &middot; Ch 21 &mdash; Building Blocks of Life</div>
+</header>
+<main>
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="cell">Cell Explorer</button>
+    <button class="tab" data-view="tissue">Tissue Types</button>
+    <button class="tab" data-view="levels">Levels of Organization</button>
+    <button class="tab" data-view="facts">Facts</button>
+    <button class="tab" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- CELL EXPLORER -->
+  <section class="view active" id="cell">
+    <div class="panel">
+      <h2>Cell Explorer</h2>
+      <div class="hint">Tap any labelled part to see its name and function. Toggle between an animal and a plant cell.</div>
+      <div class="toggle-row">
+        <button class="tab active" id="btnAnimal">Animal Cell</button>
+        <button class="tab" id="btnPlant">Plant Cell</button>
+      </div>
+      <div class="cell-wrap">
+        <div class="cell-svg-box">
+          <svg id="cellSvg" viewBox="0 0 340 300" aria-label="cell diagram"></svg>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="info-box" id="cellInfo">
+          <h3>Click an organelle</h3>
+          <div class="fn">Select any coloured structure in the diagram to read what it does.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TISSUES -->
+  <section class="view" id="tissue">
+    <div class="panel">
+      <h2>Tissue Types</h2>
+      <div class="hint">A tissue is a group of similar cells performing a common function.</div>
+      <div class="grp-title">Plant Tissues</div>
+      <div class="cards" id="plantTissues"></div>
+      <div class="grp-title">Animal Tissues</div>
+      <div class="cards" id="animalTissues"></div>
+    </div>
+  </section>
+
+  <!-- LEVELS -->
+  <section class="view" id="levels">
+    <div class="panel">
+      <h2>Levels of Organization</h2>
+      <div class="hint">How life is built up, small to large &mdash; example shown in green.</div>
+      <div class="levels" id="levelsList"></div>
+    </div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="view" id="facts">
+    <div class="panel facts">
+      <h2>Key Facts</h2>
+      <div class="hint">Tap each to expand.</div>
+      <details open>
+        <summary>Cell Theory</summary>
+        <p>1) All living organisms are made of one or more cells. 2) The cell is the basic structural and functional unit of life. 3) All cells arise from pre-existing cells. Proposed by Schleiden, Schwann and later Virchow.</p>
+      </details>
+      <details>
+        <summary>Tissue = group of similar cells</summary>
+        <p>A tissue is a group of similar cells, along with intercellular substances, that work together to perform a specific function &mdash; for example muscle tissue for movement or xylem for water transport.</p>
+      </details>
+      <details>
+        <summary>Animal Cell vs Plant Cell</summary>
+        <table>
+          <tr><th>Feature</th><th>Animal</th><th>Plant</th></tr>
+          <tr><td>Cell wall</td><td>Absent</td><td>Present (cellulose)</td></tr>
+          <tr><td>Chloroplast</td><td>Absent</td><td>Present</td></tr>
+          <tr><td>Vacuole</td><td>Small, many</td><td>One large central</td></tr>
+          <tr><td>Shape</td><td>Irregular</td><td>Fixed, rectangular</td></tr>
+          <tr><td>Centriole</td><td>Present</td><td>Usually absent</td></tr>
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="view" id="quiz">
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <div class="hint">Tap an option &mdash; the answer and reason are revealed.</div>
+      <div id="quizBox"></div>
+    </div>
+  </section>
+</main>
+<footer>Cell &amp; Tissues Lab &middot; Self-contained interactive &middot; NIOS Science Ch 21</footer>
+
+<script>
+"use strict";
+
+/* ---------------- Organelle data ---------------- */
+var ANIMAL = [
+  {id:"membrane",  name:"Cell Membrane", fn:"Thin flexible boundary; controls what enters and leaves the cell (selectively permeable)."},
+  {id:"nucleus",   name:"Nucleus", fn:"Control centre of the cell; holds DNA and directs all cell activities."},
+  {id:"mito",      name:"Mitochondrion", fn:"Powerhouse of the cell; releases energy (ATP) by respiration."},
+  {id:"ribo",      name:"Ribosome", fn:"Tiny granules that build proteins from amino acids."},
+  {id:"er",        name:"Endoplasmic Reticulum", fn:"Network of tubes that transports materials and helps make proteins and lipids."},
+  {id:"golgi",     name:"Golgi Apparatus", fn:"Packages, modifies and dispatches proteins and other substances."},
+  {id:"lyso",      name:"Lysosome", fn:"Contains enzymes to digest worn-out parts and waste; the cell's cleaner."}
+];
+var PLANT_EXTRA = [
+  {id:"wall",      name:"Cell Wall", fn:"Rigid outer layer of cellulose; gives shape and support.", plant:true},
+  {id:"chloro",    name:"Chloroplast", fn:"Contains chlorophyll; carries out photosynthesis to make food.", plant:true},
+  {id:"vacuole",   name:"Central Vacuole", fn:"Large sac storing water, food and waste; keeps the cell firm (turgid).", plant:true}
+];
+
+/* ---------------- SVG builders ---------------- */
+function el(tag,attrs){
+  var e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(var k in attrs){ e.setAttribute(k,attrs[k]); }
+  return e;
+}
+function hot(node,id,name,fn,isPlant){
+  node.setAttribute("class","hot"+(isPlant?" plantpart":""));
+  node.setAttribute("data-id",id);
+  node.setAttribute("data-name",name);
+  node.setAttribute("data-fn",fn);
+  node.setAttribute("data-plant",isPlant?"1":"0");
+  return node;
+}
+
+var svg=document.getElementById("cellSvg");
+var legend=document.getElementById("legend");
+var mode="animal";
+
+function drawAnimal(){
+  svg.innerHTML="";
+  legend.innerHTML="";
+  // cytoplasm blob
+  var m=el("ellipse",{cx:170,cy:150,rx:150,ry:130,fill:"#2a3f52",stroke:"#3d5670","stroke-width":"2"});
+  hot(m,"membrane",ANIMAL[0].name,ANIMAL[0].fn,false); svg.appendChild(m);
+  // nucleus
+  var n=el("circle",{cx:150,cy:135,r:46,fill:"#7d5ba6"});
+  hot(n,"nucleus",ANIMAL[1].name,ANIMAL[1].fn,false); svg.appendChild(n);
+  svg.appendChild(el("circle",{cx:150,cy:135,r:14,fill:"#5b3f80"})); // nucleolus deco
+  // mitochondria x2
+  [[250,110],[95,225]].forEach(function(p){
+    var g=el("ellipse",{cx:p[0],cy:p[1],rx:30,ry:16,fill:"#e07a5f",transform:"rotate(25 "+p[0]+" "+p[1]+")"});
+    hot(g,"mito",ANIMAL[2].name,ANIMAL[2].fn,false); svg.appendChild(g);
+  });
+  // ER (wavy path near nucleus)
+  var er=el("path",{d:"M210 175 q20 -18 40 -4 q-14 20 6 34 q-24 8 -32 -12",fill:"none",stroke:"#5fa8d3","stroke-width":"7","stroke-linecap":"round"});
+  hot(er,"er",ANIMAL[4].name,ANIMAL[4].fn,false); svg.appendChild(er);
+  // golgi (stacked arcs)
+  var golgi=el("g",{});
+  [0,7,14].forEach(function(dy){ golgi.appendChild(el("path",{d:"M215 235 q28 -14 56 0",fill:"none",stroke:"#f2cc8f","stroke-width":"5",transform:"translate(0 "+dy+")"})); });
+  hot(golgi,"golgi",ANIMAL[5].name,ANIMAL[5].fn,false); svg.appendChild(golgi);
+  // lysosome
+  var ly=el("circle",{cx:110,cy:95,r:16,fill:"#81b29a"});
+  hot(ly,"lyso",ANIMAL[6].name,ANIMAL[6].fn,false); svg.appendChild(ly);
+  // ribosomes (dots) - group
+  var rg=el("g",{});
+  [[200,110],[212,124],[190,128],[95,160],[110,175],[240,190]].forEach(function(p){
+    rg.appendChild(el("circle",{cx:p[0],cy:p[1],r:4.5,fill:"#f4d35e"}));
+  });
+  hot(rg,"ribo",ANIMAL[3].name,ANIMAL[3].fn,false); svg.appendChild(rg);
+}
+
+function drawPlant(){
+  svg.innerHTML="";
+  // cell wall (rounded rect outer)
+  var wall=el("rect",{x:14,y:20,width:312,height:260,rx:24,fill:"#3a5a3f",stroke:"#f2c14e","stroke-width":"5"});
+  hot(wall,"wall",PLANT_EXTRA[0].name,PLANT_EXTRA[0].fn,true); svg.appendChild(wall);
+  // membrane inner
+  var mem=el("rect",{x:26,y:32,width:288,height:236,rx:18,fill:"#2a3f52",stroke:"#3d5670","stroke-width":"2"});
+  hot(mem,"membrane",ANIMAL[0].name,ANIMAL[0].fn,false); svg.appendChild(mem);
+  // central vacuole (big)
+  var vac=el("ellipse",{cx:180,cy:155,rx:96,ry:92,fill:"#3d6a8a"});
+  hot(vac,"vacuole",PLANT_EXTRA[2].name,PLANT_EXTRA[2].fn,true); svg.appendChild(vac);
+  // nucleus pushed to side
+  var n=el("circle",{cx:70,cy:90,r:32,fill:"#7d5ba6"});
+  hot(n,"nucleus",ANIMAL[1].name,ANIMAL[1].fn,false); svg.appendChild(n);
+  // chloroplasts x3
+  [[70,210],[280,90],[285,215]].forEach(function(p){
+    var c=el("ellipse",{cx:p[0],cy:p[1],rx:26,ry:14,fill:"#57cc99",transform:"rotate(-20 "+p[0]+" "+p[1]+")"});
+    hot(c,"chloro",PLANT_EXTRA[1].name,PLANT_EXTRA[1].fn,true); svg.appendChild(c);
+  });
+  // mitochondrion
+  var mt=el("ellipse",{cx:120,cy:250,rx:26,ry:14,fill:"#e07a5f"});
+  hot(mt,"mito",ANIMAL[2].name,ANIMAL[2].fn,false); svg.appendChild(mt);
+  // golgi
+  var golgi=el("g",{});
+  [0,7,14].forEach(function(dy){ golgi.appendChild(el("path",{d:"M235 235 q26 -12 52 0",fill:"none",stroke:"#f2cc8f","stroke-width":"5",transform:"translate(0 "+dy+")"})); });
+  hot(golgi,"golgi",ANIMAL[5].name,ANIMAL[5].fn,false); svg.appendChild(golgi);
+  // ER near nucleus
+  var er=el("path",{d:"M95 120 q18 14 4 34 q-22 -4 -28 -22",fill:"none",stroke:"#5fa8d3","stroke-width":"6","stroke-linecap":"round"});
+  hot(er,"er",ANIMAL[4].name,ANIMAL[4].fn,false); svg.appendChild(er);
+  // ribosomes
+  var rg=el("g",{});
+  [[110,70],[125,95],[95,55],[250,150],[110,250]].forEach(function(p){
+    rg.appendChild(el("circle",{cx:p[0],cy:p[1],r:4.5,fill:"#f4d35e"}));
+  });
+  hot(rg,"ribo",ANIMAL[3].name,ANIMAL[3].fn,false); svg.appendChild(rg);
+  legend.innerHTML='<span class="dot"></span> Plant-only structures (highlighted with yellow border on select)';
+}
+
+var cellInfo=document.getElementById("cellInfo");
+var selected=null;
+function onHot(e){
+  var t=e.target.closest(".hot");
+  if(!t) return;
+  if(selected) selected.classList.remove("sel");
+  selected=t; t.classList.add("sel");
+  var isP=t.getAttribute("data-plant")==="1";
+  cellInfo.innerHTML='<h3>'+t.getAttribute("data-name")+(isP?'<span class="badge">Plant only</span>':'')+'</h3><div class="fn">'+t.getAttribute("data-fn")+'</div>';
+}
+svg.addEventListener("click",onHot);
+
+function setMode(m){
+  mode=m; selected=null;
+  document.getElementById("btnAnimal").classList.toggle("active",m==="animal");
+  document.getElementById("btnPlant").classList.toggle("active",m==="plant");
+  cellInfo.innerHTML='<h3>Click an organelle</h3><div class="fn">Select any coloured structure in the diagram to read what it does.</div>';
+  if(m==="animal"){ drawAnimal(); legend.innerHTML=""; } else { drawPlant(); }
+}
+document.getElementById("btnAnimal").addEventListener("click",function(){setMode("animal");});
+document.getElementById("btnPlant").addEventListener("click",function(){setMode("plant");});
+
+/* ---------------- Tissues ---------------- */
+var PLANT_T=[
+  {n:"Meristematic",r:"Actively dividing cells that make the plant grow.",l:"Tips of roots &amp; shoots"},
+  {n:"Parenchyma",r:"Living packing tissue; stores food and does photosynthesis.",l:"Soft parts, leaves, stems"},
+  {n:"Collenchyma",r:"Living support tissue with flexible thickened corners.",l:"Below epidermis in stems &amp; leaf stalks"},
+  {n:"Sclerenchyma",r:"Dead, hard cells giving rigid mechanical strength.",l:"Husks, nut shells, seed coats"},
+  {n:"Xylem",r:"Conducting tissue that carries water &amp; minerals upward.",l:"Roots to leaves"},
+  {n:"Phloem",r:"Conducting tissue that carries food made in leaves.",l:"Throughout the plant"}
+];
+var ANIMAL_T=[
+  {n:"Epithelial",r:"Covering &amp; protective tissue; lines surfaces and cavities.",l:"Skin, lining of mouth &amp; gut"},
+  {n:"Connective",r:"Binds, supports and joins other tissues and organs.",l:"Bone, cartilage, blood, tendon"},
+  {n:"Muscular",r:"Contracts to produce movement of body parts.",l:"Limbs, heart, gut walls"},
+  {n:"Nervous",r:"Carries electrical impulses; controls and coordinates the body.",l:"Brain, spinal cord, nerves"}
+];
+function renderCards(list,box){
+  box.innerHTML=list.map(function(c){
+    return '<div class="card"><h4>'+c.n+'</h4><div class="role">'+c.r+'</div><div class="loc"><b>Found:</b> '+c.l+'</div></div>';
+  }).join("");
+}
+renderCards(PLANT_T,document.getElementById("plantTissues"));
+renderCards(ANIMAL_T,document.getElementById("animalTissues"));
+
+/* ---------------- Levels ---------------- */
+var LEVELS=[
+  {t:"Cell",e:"Muscle cell"},
+  {t:"Tissue",e:"Muscle tissue"},
+  {t:"Organ",e:"Heart"},
+  {t:"Organ System",e:"Circulatory system"},
+  {t:"Organism",e:"Human being"}
+];
+document.getElementById("levelsList").innerHTML=LEVELS.map(function(l,i){
+  var row='<div class="lvl"><div class="n">'+(i+1)+'</div><div><div class="lt">'+l.t+'</div><div class="le">Example: '+l.e+'</div></div></div>';
+  return row+(i<LEVELS.length-1?'<div class="arrow">&#9660;</div>':'');
+}).join("");
+
+/* ---------------- Quiz ---------------- */
+var QUIZ=[
+  {q:"Which organelle is called the 'powerhouse of the cell'?",
+   o:["Nucleus","Mitochondrion","Ribosome","Golgi apparatus"],a:1,
+   e:"Mitochondria release energy as ATP through respiration."},
+  {q:"Which structure is found ONLY in plant cells?",
+   o:["Cell membrane","Ribosome","Chloroplast","Nucleus"],a:2,
+   e:"Chloroplasts (with chlorophyll) occur in plant cells and carry out photosynthesis."},
+  {q:"Xylem and phloem are examples of which tissue type?",
+   o:["Meristematic tissue","Muscular tissue","Conducting (vascular) tissue","Epithelial tissue"],a:2,
+   e:"Xylem carries water and phloem carries food; both are conducting tissues in plants."}
+];
+var qb=document.getElementById("quizBox");
+qb.innerHTML=QUIZ.map(function(item,qi){
+  var opts=item.o.map(function(op,oi){
+    return '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+op+'</button>';
+  }).join("");
+  return '<div class="q"><div class="qt">Q'+(qi+1)+'. '+item.q+'</div>'+opts+'<div class="expl" id="ex'+qi+'">'+item.e+'</div></div>';
+}).join("");
+qb.addEventListener("click",function(e){
+  var b=e.target.closest(".opt");
+  if(!b) return;
+  var qi=+b.getAttribute("data-q"), oi=+b.getAttribute("data-o");
+  var q=b.parentNode;
+  if(q.getAttribute("data-done")) return;
+  q.setAttribute("data-done","1");
+  var btns=q.querySelectorAll(".opt");
+  for(var i=0;i<btns.length;i++){ btns[i].disabled=true; }
+  if(oi===QUIZ[qi].a){ b.classList.add("right"); }
+  else{ b.classList.add("wrong"); btns[QUIZ[qi].a].classList.add("right"); }
+  document.getElementById("ex"+qi).classList.add("show");
+});
+
+/* ---------------- Tab switching ---------------- */
+document.querySelectorAll(".tabs .tab").forEach(function(tab){
+  tab.addEventListener("click",function(){
+    document.querySelectorAll(".tabs .tab").forEach(function(t){t.classList.remove("active");});
+    tab.classList.add("active");
+    var v=tab.getAttribute("data-view");
+    document.querySelectorAll(".view").forEach(function(sec){
+      sec.classList.toggle("active",sec.id===v);
+    });
+  });
+});
+
+/* init */
+drawAnimal();
+</script>
+</body>
+</html>

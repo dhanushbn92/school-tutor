@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History of Life Lab — NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#151a21; --panel:#1e2530; --panel2:#252e3b; --ink:#e7edf4;
+    --muted:#9fb0c2; --line:#33404f; --accent:#4fd1a5; --accent-d:#2fa384;
+    --shadow:0 6px 20px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  header{padding:18px 16px 8px;text-align:center}
+  h1{margin:0 0 4px;font-size:1.35rem}
+  .sub{color:var(--muted);font-size:.9rem;margin:0}
+  .wrap{max-width:900px;margin:0 auto;padding:0 12px 40px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0}
+  .tab{
+    background:var(--panel);color:var(--ink);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;font-size:.9rem;cursor:pointer;
+    min-height:40px;transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent)}
+  .tab.active{background:var(--accent);color:#0c1116;border-color:var(--accent);font-weight:600}
+  .view{display:none;animation:fade .25s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin:14px 0;box-shadow:var(--shadow);
+  }
+  h2{margin:0 0 8px;font-size:1.1rem;color:var(--accent)}
+  h3{margin:10px 0 6px;font-size:1rem}
+  p{margin:6px 0}
+  .muted{color:var(--muted);font-size:.88rem}
+  /* Timeline */
+  .tl-scroll{overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+  .tl-track{display:flex;gap:0;min-width:640px;position:relative;padding:26px 4px 8px}
+  .tl-track::before{content:"";position:absolute;left:0;right:0;top:38px;height:4px;
+    background:linear-gradient(90deg,var(--accent-d),var(--accent));border-radius:2px}
+  .era{flex:1 1 0;min-width:96px;text-align:center;position:relative;cursor:pointer}
+  .dot{width:16px;height:16px;border-radius:50%;background:var(--panel2);
+    border:3px solid var(--accent);margin:6px auto 8px;position:relative;z-index:1;transition:.15s}
+  .era:hover .dot,.era.sel .dot{background:var(--accent);transform:scale(1.25)}
+  .era .yr{font-size:.72rem;color:var(--muted);display:block}
+  .era .nm{font-size:.8rem;font-weight:600;display:block;margin-top:2px}
+  .era.sel .nm{color:var(--accent)}
+  .era-info{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+  .badge{display:inline-block;background:var(--accent-d);color:#eafff8;font-size:.72rem;
+    padding:2px 8px;border-radius:999px;margin:2px 4px 2px 0}
+  /* Evidence cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card h3{margin-top:0;color:var(--accent)}
+  .limbrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px}
+  .limb{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;flex:1 1 150px;min-width:150px}
+  .limb svg{display:block;margin:0 auto}
+  /* Natural selection */
+  .ns-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+  button.btn{background:var(--accent);color:#0c1116;border:none;border-radius:10px;
+    padding:10px 16px;font-size:.92rem;font-weight:600;cursor:pointer;min-height:42px}
+  button.btn:hover{background:var(--accent-d);color:#eafff8}
+  button.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:8px;padding:8px;min-height:40px;font-size:.9rem}
+  #mothCanvas{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);background:#0f141a}
+  .stat{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+  .stat div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.85rem;flex:1 1 120px;text-align:center}
+  .stat b{display:block;font-size:1.2rem;color:var(--accent)}
+  /* Quiz */
+  .q{margin:12px 0;padding:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+  .q .opts{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+  .opt{padding:9px 12px;border:1px solid var(--line);border-radius:9px;cursor:pointer;background:var(--panel);min-height:40px}
+  .opt:hover{border-color:var(--accent)}
+  .opt.right{background:#1c3a30;border-color:var(--accent)}
+  .opt.wrong{background:#3a2222;border-color:#c65}
+  .ans{display:none;margin-top:6px;font-size:.88rem;color:var(--accent)}
+  .ans.show{display:block}
+  footer{text-align:center;color:var(--muted);font-size:.78rem;padding:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>History of Life Lab</h1>
+  <p class="sub">NIOS Class 10 Science &amp; Technology — Ch 20: History of Life on Earth</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="timeline">Geological Timeline</button>
+    <button class="tab" data-view="evidence">Evidence for Evolution</button>
+    <button class="tab" data-view="selection">Natural Selection</button>
+    <button class="tab" data-view="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- TIMELINE -->
+  <section class="view active" id="timeline">
+    <div class="panel">
+      <h2>Geological Timeline of Life</h2>
+      <p class="muted">Scroll sideways and tap any era to learn what lived then. Dates are approximate (bya = billion years ago, mya = million years ago).</p>
+      <div class="tl-scroll">
+        <div class="tl-track" id="tlTrack"></div>
+      </div>
+      <div class="era-info" id="eraInfo"></div>
+    </div>
+  </section>
+
+  <!-- EVIDENCE -->
+  <section class="view" id="evidence">
+    <div class="panel">
+      <h2>Evidence for Evolution</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Fossils</h3>
+          <p>Preserved remains or impressions of ancient organisms in rock. They show life has changed over time.</p>
+          <p class="muted"><b>Example:</b> <i>Archaeopteryx</i> — a fossil with reptile teeth and tail plus bird feathers, linking reptiles and birds.</p>
+        </div>
+        <div class="card">
+          <h3>Homologous organs</h3>
+          <p>Same basic structure, different functions — inherited from a common ancestor (shows divergent evolution).</p>
+          <p class="muted"><b>Example:</b> forelimbs of humans, bats and whales share the same bone pattern.</p>
+        </div>
+        <div class="card">
+          <h3>Analogous organs</h3>
+          <p>Different structure but same function — evolved separately for a similar job (convergent evolution).</p>
+          <p class="muted"><b>Example:</b> wing of an insect vs wing of a bird — both fly, but are built differently.</p>
+        </div>
+        <div class="card">
+          <h3>Vestigial organs</h3>
+          <p>Reduced, functionless remnants of organs that were useful in ancestors.</p>
+          <p class="muted"><b>Example:</b> vermiform appendix, wisdom teeth and ear muscles in humans.</p>
+        </div>
+        <div class="card">
+          <h3>Embryology</h3>
+          <p>Early embryos of different vertebrates look remarkably alike, hinting at shared ancestry.</p>
+          <p class="muted"><b>Example:</b> fish, tortoise, chick and human embryos all show gill-like slits early on.</p>
+        </div>
+        <div class="card">
+          <h3>Connecting links</h3>
+          <p>Living or fossil forms with features of two groups.</p>
+          <p class="muted"><b>Example:</b> <i>Duck-billed platypus</i> — a mammal that lays eggs, linking reptiles and mammals.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Homologous forelimbs — same bones, different jobs</h3>
+      <p class="muted">Colours mark matching bones: humerus, radius/ulna, and digits. Notice the shared plan.</p>
+      <div class="limbrow" id="limbRow"></div>
+    </div>
+  </section>
+
+  <!-- SELECTION -->
+  <section class="view" id="selection">
+    <div class="panel">
+      <h2>Natural Selection — the Peppered Moth</h2>
+      <p class="muted">Moths rest on tree bark. Birds eat the moths they can see. Pick a tree colour, then run generations and watch which moth colour survives — the environment "selects" the favourable variation.</p>
+      <div class="ns-controls">
+        <label>Tree bark:
+          <select id="treeSel">
+            <option value="light">Light (clean forest)</option>
+            <option value="dark">Dark (soot-covered)</option>
+          </select>
+        </label>
+        <button class="btn" id="genBtn">Run 1 Generation</button>
+        <button class="btn ghost" id="resetBtn">Reset</button>
+      </div>
+      <canvas id="mothCanvas" width="600" height="300" aria-label="Moths on tree bark"></canvas>
+      <div class="stat">
+        <div>Generation<b id="genN">0</b></div>
+        <div>Light moths<b id="lightN">25</b></div>
+        <div>Dark moths<b id="darkN">25</b></div>
+      </div>
+      <p class="muted" id="nsMsg">Well-camouflaged moths survive and reproduce more, so their colour becomes common over generations. This is natural selection.</p>
+    </div>
+  </section>
+
+  <!-- FACTS + QUIZ -->
+  <section class="view" id="facts">
+    <div class="panel">
+      <h2>Key Facts</h2>
+      <div class="grid">
+        <div class="card"><h3>Evolution</h3><p>The slow change in inherited characteristics of populations over many generations, giving rise to new species from earlier ones.</p></div>
+        <div class="card"><h3>Natural selection</h3><p>Nature favours variations that suit the environment; those individuals survive, reproduce, and pass on the traits. Proposed by Charles Darwin (1859, <i>On the Origin of Species</i>).</p></div>
+        <div class="card"><h3>Charles Darwin</h3><p>English naturalist whose voyage on HMS <i>Beagle</i> and study of Galapagos finches led to the theory of evolution by natural selection.</p></div>
+        <div class="card"><h3>Origin of life</h3><p>Life likely began in ancient oceans ~3.8 bya from simple molecules. Oparin and Haldane proposed the chemical-origin idea, tested by the Miller–Urey experiment.</p></div>
+        <div class="card"><h3>Types of evidence</h3><p>Fossils, homologous &amp; analogous organs, vestigial organs, embryology and connecting links all point to common descent.</p></div>
+        <div class="card"><h3>Acquired vs inherited</h3><p>Lamarck suggested inheritance of acquired traits; Darwin showed only heritable variations are passed on and shaped by selection.</p></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p class="muted">Tap an answer — the correct one lights up.</p>
+      <div id="quiz"></div>
+    </div>
+  </section>
+</div>
+
+<footer>History of Life Lab · self-contained interactive · dates approximate, order correct</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- TABS ---------- */
+  var tabs=document.querySelectorAll(".tab");
+  var views=document.querySelectorAll(".view");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("active")});
+      views.forEach(function(v){v.classList.remove("active")});
+      t.classList.add("active");
+      document.getElementById(t.dataset.view).classList.add("active");
+    });
+  });
+
+  /* ---------- TIMELINE ---------- */
+  var eras=[
+    {yr:"4.6 bya",nm:"Earth forms",desc:"A molten young Earth cools and forms a solid crust and oceans. No life yet.",life:["Molten rock","Early atmosphere","First oceans"]},
+    {yr:"3.8 bya",nm:"First life",desc:"Simple single-celled life (prokaryotes like bacteria) appears in the seas.",life:["Bacteria","Cyanobacteria"]},
+    {yr:"2.1 bya",nm:"Complex cells",desc:"Eukaryotic cells with a nucleus evolve; oxygen builds up from photosynthesis.",life:["Eukaryotes","Algae"]},
+    {yr:"540 mya",nm:"Cambrian explosion",desc:"A rapid burst of new animal body plans; oceans fill with invertebrates.",life:["Trilobites","Molluscs","Early arthropods"]},
+    {yr:"420 mya",nm:"Age of Fishes",desc:"Fish diversify and become dominant; first plants spread onto land.",life:["Jawed fish","Sharks","Early land plants"]},
+    {yr:"360 mya",nm:"Amphibians",desc:"Vertebrates first move onto land as amphibians; giant forests form coal.",life:["Amphibians","Ferns","Insects"]},
+    {yr:"300 mya",nm:"Reptiles",desc:"Reptiles with tough, shelled eggs conquer dry land.",life:["Early reptiles","Giant insects"]},
+    {yr:"230 mya",nm:"Dinosaurs",desc:"Dinosaurs rule the land for over 150 million years; first mammals and birds appear.",life:["Dinosaurs","Early mammals","Early birds"]},
+    {yr:"66 mya",nm:"Age of Mammals",desc:"A mass extinction ends the dinosaurs; mammals spread and diversify.",life:["Mammals","Flowering plants","Birds"]},
+    {yr:"0.2 mya",nm:"Humans",desc:"Modern humans (Homo sapiens) evolve in Africa — a very recent arrival.",life:["Homo sapiens","Modern life"]}
+  ];
+  var track=document.getElementById("tlTrack");
+  var info=document.getElementById("eraInfo");
+  function showEra(i){
+    document.querySelectorAll(".era").forEach(function(e,k){e.classList.toggle("sel",k===i)});
+    var e=eras[i];
+    var b=e.life.map(function(l){return '<span class="badge">'+l+'</span>'}).join("");
+    info.innerHTML='<h3>'+e.nm+' <span class="muted">('+e.yr+')</span></h3><p>'+e.desc+'</p><div>'+b+'</div>';
+  }
+  eras.forEach(function(e,i){
+    var d=document.createElement("div");
+    d.className="era";
+    d.innerHTML='<span class="yr">'+e.yr+'</span><div class="dot"></div><span class="nm">'+e.nm+'</span>';
+    d.addEventListener("click",function(){showEra(i)});
+    track.appendChild(d);
+  });
+  showEra(0);
+
+  /* ---------- HOMOLOGOUS LIMBS (SVG) ---------- */
+  // colours: humerus, radius/ulna, digits
+  var C={hum:"#4fd1a5",rad:"#f2b84b",dig:"#7aa7e0",out:"#33404f"};
+  function limbSVG(title,paths){
+    return '<div class="limb"><svg width="130" height="130" viewBox="0 0 130 130">'+paths+
+      '</svg><div style="font-size:.85rem;font-weight:600;margin-top:4px">'+title+'</div></div>';
+  }
+  var row=document.getElementById("limbRow");
+  // Human arm
+  var human=
+    '<rect x="58" y="12" width="14" height="42" rx="7" fill="'+C.hum+'"/>'+
+    '<rect x="52" y="52" width="10" height="40" rx="5" fill="'+C.rad+'"/>'+
+    '<rect x="66" y="52" width="10" height="40" rx="5" fill="'+C.rad+'"/>'+
+    '<g fill="'+C.dig+'">'+
+    '<rect x="46" y="92" width="6" height="26" rx="3"/>'+
+    '<rect x="56" y="92" width="6" height="30" rx="3"/>'+
+    '<rect x="66" y="92" width="6" height="30" rx="3"/>'+
+    '<rect x="76" y="92" width="6" height="26" rx="3"/></g>';
+  // Bat wing (long digits)
+  var bat=
+    '<rect x="58" y="12" width="12" height="34" rx="6" fill="'+C.hum+'"/>'+
+    '<rect x="54" y="44" width="9" height="30" rx="4" fill="'+C.rad+'"/>'+
+    '<rect x="65" y="44" width="9" height="30" rx="4" fill="'+C.rad+'"/>'+
+    '<g fill="'+C.dig+'">'+
+    '<rect x="40" y="72" width="5" height="46" rx="2" transform="rotate(-18 42 95)"/>'+
+    '<rect x="55" y="72" width="5" height="50" rx="2"/>'+
+    '<rect x="68" y="72" width="5" height="48" rx="2" transform="rotate(12 70 95)"/>'+
+    '<rect x="80" y="72" width="5" height="42" rx="2" transform="rotate(24 82 92)"/></g>'+
+    '<path d="M42 78 Q95 90 88 116 L58 112 Z" fill="'+C.dig+'" opacity="0.18"/>';
+  // Whale flipper (short, wide, many digits)
+  var whale=
+    '<path d="M40 40 Q65 20 90 40 L86 118 Q65 128 44 118 Z" fill="'+C.out+'" opacity="0.35"/>'+
+    '<rect x="59" y="20" width="12" height="30" rx="6" fill="'+C.hum+'"/>'+
+    '<rect x="54" y="48" width="9" height="24" rx="4" fill="'+C.rad+'"/>'+
+    '<rect x="65" y="48" width="9" height="24" rx="4" fill="'+C.rad+'"/>'+
+    '<g fill="'+C.dig+'">'+
+    '<rect x="48" y="70" width="6" height="40" rx="3"/>'+
+    '<rect x="56" y="70" width="6" height="44" rx="3"/>'+
+    '<rect x="64" y="70" width="6" height="44" rx="3"/>'+
+    '<rect x="72" y="70" width="6" height="40" rx="3"/></g>';
+  row.innerHTML=limbSVG("Human arm",human)+limbSVG("Bat wing",bat)+limbSVG("Whale flipper",whale)+
+    '<div class="limb" style="flex:1 1 100%"><div class="muted" style="font-size:.8rem">'+
+    '<span style="color:'+C.hum+'">■ humerus</span> &nbsp; '+
+    '<span style="color:'+C.rad+'">■ radius/ulna</span> &nbsp; '+
+    '<span style="color:'+C.dig+'">■ digits (fingers)</span></div></div>';
+
+  /* ---------- NATURAL SELECTION ---------- */
+  var cv=document.getElementById("mothCanvas");
+  var ctx=cv.getContext("2d");
+  var W=cv.width,H=cv.height;
+  var moths=[],gen=0;
+  function initMoths(){
+    moths=[];gen=0;
+    for(var i=0;i<50;i++){
+      moths.push({dark:i<25,x:20+Math.random()*(W-40),y:20+Math.random()*(H-40)});
+    }
+    updateStats();draw();
+  }
+  function treeColor(){return document.getElementById("treeSel").value==="dark"?"#2a2622":"#c9c1b0";}
+  function draw(){
+    ctx.fillStyle=treeColor();ctx.fillRect(0,0,W,H);
+    // bark streaks
+    ctx.strokeStyle="rgba(0,0,0,0.10)";ctx.lineWidth=2;
+    for(var s=0;s<10;s++){var x=s*(W/10)+((s*37)%20);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+15,H);ctx.stroke();}
+    moths.forEach(function(m){
+      ctx.beginPath();
+      ctx.fillStyle=m.dark?"#20242a":"#eef0f2";
+      ctx.strokeStyle=m.dark?"#000":"#b9bcc0";ctx.lineWidth=1;
+      // simple moth: two wings
+      ctx.save();ctx.translate(m.x,m.y);
+      ctx.beginPath();ctx.ellipse(-5,0,6,4,0,0,7);ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.ellipse(5,0,6,4,0,0,7);ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.fillStyle=m.dark?"#0d0f12":"#c9ccd0";ctx.ellipse(0,0,2,5,0,0,7);ctx.fill();
+      ctx.restore();
+    });
+  }
+  function updateStats(){
+    var l=moths.filter(function(m){return !m.dark}).length;
+    var d=moths.length-l;
+    document.getElementById("genN").textContent=gen;
+    document.getElementById("lightN").textContent=l;
+    document.getElementById("darkN").textContent=d;
+  }
+  function runGen(){
+    var darkTree=document.getElementById("treeSel").value==="dark";
+    // survival: camouflaged moths survive more. Each moth survives with prob based on match.
+    var survivors=moths.filter(function(m){
+      var camo=(m.dark===darkTree); // matches bark
+      var p=camo?0.85:0.35;
+      return Math.random()<p;
+    });
+    if(survivors.length===0){survivors=moths.slice(0,4);}
+    // reproduce back up toward 50, offspring inherit parent's colour
+    var next=[];
+    while(next.length<50){
+      var par=survivors[Math.floor(Math.random()*survivors.length)];
+      next.push({dark:par.dark,x:20+Math.random()*(W-40),y:20+Math.random()*(H-40)});
+    }
+    moths=next;gen++;
+    updateStats();draw();
+    var dc=moths.filter(function(m){return m.dark}).length;
+    var msg=document.getElementById("nsMsg");
+    if(darkTree){
+      msg.textContent="On dark bark the dark moths are camouflaged, so they survive and spread. Dark moths now: "+dc+"/50.";
+    }else{
+      msg.textContent="On light bark the light moths are camouflaged, so they survive and spread. Light moths now: "+(50-dc)+"/50.";
+    }
+  }
+  document.getElementById("genBtn").addEventListener("click",runGen);
+  document.getElementById("resetBtn").addEventListener("click",initMoths);
+  document.getElementById("treeSel").addEventListener("change",draw);
+  initMoths();
+
+  /* ---------- QUIZ ---------- */
+  var quiz=[
+    {q:"Which scientist proposed the theory of evolution by natural selection?",
+     opts:["Gregor Mendel","Charles Darwin","Louis Pasteur","Robert Hooke"],a:1,
+     e:"Charles Darwin explained natural selection in On the Origin of Species (1859)."},
+    {q:"Forelimbs of a human, a bat and a whale have the same basic bone plan. These are examples of:",
+     opts:["Analogous organs","Vestigial organs","Homologous organs","Fossils"],a:2,
+     e:"Same structure, different function inherited from a common ancestor = homologous organs."},
+    {q:"Which is the BEST direct evidence that life has changed over geological time?",
+     opts:["Fossils in rock layers","Colour of leaves","Number of stars","Shape of clouds"],a:0,
+     e:"Fossils are preserved remains that record how life forms changed through the ages."}
+  ];
+  var qbox=document.getElementById("quiz");
+  quiz.forEach(function(item,qi){
+    var d=document.createElement("div");d.className="q";
+    var html='<b>'+(qi+1)+'. '+item.q+'</b><div class="opts">';
+    item.opts.forEach(function(o,oi){html+='<div class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</div>';});
+    html+='</div><div class="ans" id="ans'+qi+'"></div>';
+    d.innerHTML=html;qbox.appendChild(d);
+  });
+  qbox.addEventListener("click",function(ev){
+    var el=ev.target.closest(".opt");if(!el)return;
+    var qi=+el.dataset.q,oi=+el.dataset.o,item=quiz[qi];
+    var opts=el.parentNode.querySelectorAll(".opt");
+    opts.forEach(function(o){o.classList.remove("right","wrong");});
+    if(oi===item.a){el.classList.add("right");}
+    else{el.classList.add("wrong");opts[item.a].classList.add("right");}
+    var ans=document.getElementById("ans"+qi);
+    ans.textContent=(oi===item.a?"Correct! ":"Answer: "+item.opts[item.a]+". ")+item.e;
+    ans.classList.add("show");
+  });
+})();
+</script>
+</body>
+</html>
