@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heredity Lab - NIOS Class 10 Science &amp; Technology (Ch25)</title>
+<style>
+  :root{
+    --accent:#7c9cf5;
+    --accent-dark:#5b7be0;
+    --bg:#161c2b;
+    --bg2:#1d2436;
+    --panel:#222b40;
+    --panel2:#283349;
+    --ink:#e8edf7;
+    --muted:#9aa8c4;
+    --line:#33405c;
+    --dom:#7c9cf5;
+    --rec:#f0a868;
+    --good:#57c98a;
+    --bad:#ef7676;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#20293e,#161c2b 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.1rem;margin:2px 0 10px;}
+  h3{font-size:.98rem;margin:14px 0 6px;}
+  label{font-size:.85rem;color:var(--muted);font-weight:600;}
+  select,.btn{font-family:inherit;}
+  select{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    padding:8px 10px;border-radius:10px;font-size:.9rem;min-height:40px;
+  }
+  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;}
+  .ctl{display:flex;flex-direction:column;gap:5px;}
+  .btn{
+    background:var(--accent);color:#fff;border:none;padding:9px 16px;border-radius:10px;
+    font-weight:600;cursor:pointer;font-size:.88rem;transition:.15s;min-height:40px;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;}
+  .col{flex:1 1 300px;min-width:270px;}
+  /* Punnett table */
+  table.pun{border-collapse:collapse;width:100%;max-width:360px;margin:6px auto;}
+  table.pun td,table.pun th{
+    border:1px solid var(--line);text-align:center;padding:10px;font-weight:700;
+    font-size:1.05rem;width:33%;
+  }
+  table.pun th{background:var(--panel2);color:var(--muted);font-size:.95rem;}
+  td.cell{background:var(--bg2);font-size:1.1rem;transition:.2s;}
+  .g-dom{color:var(--dom);}
+  .g-rec{color:var(--rec);}
+  .allele-dom{color:var(--dom);font-weight:800;}
+  .allele-rec{color:var(--rec);font-weight:800;}
+  .ratios{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .ratio{flex:1 1 140px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;}
+  .ratio b{display:block;font-size:1.15rem;}
+  .ratio span{font-size:.78rem;color:var(--muted);}
+  .pheno-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+    padding:5px 12px;font-size:.82rem;}
+  .note{background:var(--panel2);border-left:3px solid var(--rec);border-radius:8px;
+    padding:10px 12px;font-size:.85rem;color:var(--muted);margin-top:12px;}
+  .note b{color:var(--ink);}
+  /* Mendel cards */
+  .cards{display:flex;gap:12px;flex-wrap:wrap;}
+  .mcard{flex:1 1 260px;min-width:240px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:14px;padding:14px;cursor:pointer;transition:.15s;}
+  .mcard:hover{border-color:var(--accent);}
+  .mcard h3{margin:0 0 6px;color:var(--accent);}
+  .mcard p{margin:0;font-size:.85rem;color:var(--muted);}
+  .mcard .ex{margin-top:10px;font-size:.83rem;color:var(--ink);
+    display:none;background:var(--bg2);border-radius:10px;padding:10px;}
+  .mcard.open .ex{display:block;}
+  .mcard .tag{font-size:.72rem;color:var(--muted);margin-top:8px;display:inline-block;}
+  /* zoom */
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .zoom-wrap{display:flex;gap:16px;flex-wrap:wrap;}
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px 14px;}
+  .facts dl{margin:0;}
+  .facts dt{font-weight:700;color:var(--accent);margin-top:10px;font-size:.9rem;}
+  .facts dd{margin:2px 0 0;font-size:.85rem;color:var(--muted);}
+  /* quiz */
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:12px;}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--bg2);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:6px 0;
+    cursor:pointer;font-size:.87rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.right{background:rgba(87,201,138,.18);border-color:var(--good);}
+  .opt.wrong{background:rgba(239,118,118,.16);border-color:var(--bad);}
+  .expl{font-size:.83rem;color:var(--muted);margin-top:6px;display:none;}
+  .expl.show{display:block;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:10px 0 24px;}
+  @media(max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Heredity Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 25: Heredity &mdash; how traits pass from parents to offspring.</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="pun">Punnett Square</div>
+    <div class="tab" data-t="laws">Mendel's Laws</div>
+    <div class="tab" data-t="dna">Genes, DNA &amp; Sex</div>
+    <div class="tab" data-t="quiz">Quiz</div>
+  </div>
+
+  <!-- PUNNETT -->
+  <section class="panel" id="pan-pun">
+    <h2>Monohybrid Cross &mdash; Punnett Square</h2>
+    <div class="controls">
+      <div class="ctl">
+        <label for="trait">Trait</label>
+        <select id="trait"></select>
+      </div>
+      <div class="ctl">
+        <label for="p1">Parent 1 genotype</label>
+        <select id="p1"></select>
+      </div>
+      <div class="ctl">
+        <label for="p2">Parent 2 genotype</label>
+        <select id="p2"></select>
+      </div>
+      <button class="btn ghost" id="ttbtn">Try Tt &times; Tt</button>
+    </div>
+
+    <div class="stage">
+      <div class="col">
+        <p id="crossLbl" style="font-weight:700;text-align:center;margin:4px 0"></p>
+        <table class="pun" id="punTbl"></table>
+        <p style="text-align:center;font-size:.78rem;color:var(--muted)">
+          <span class="allele-dom">Blue = dominant allele</span> &middot;
+          <span class="allele-rec">Orange = recessive allele</span>
+        </p>
+      </div>
+      <div class="col">
+        <h3>Genotypic ratio</h3>
+        <div class="ratios" id="genoR"></div>
+        <h3>Phenotypic ratio</h3>
+        <div class="ratios" id="phenoR"></div>
+        <div class="pheno-row" id="phenoChips"></div>
+        <div class="note" id="reappear"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAWS -->
+  <section class="panel hidden" id="pan-laws">
+    <h2>Mendel's Three Laws</h2>
+    <p style="color:var(--muted);font-size:.87rem;margin-top:0">Tap a card to reveal a worked example.</p>
+    <div class="cards">
+      <div class="mcard" data-c>
+        <h3>1. Law of Dominance</h3>
+        <p>In a pair of contrasting factors, one (dominant) masks the other (recessive) in the F&#8321; generation.</p>
+        <div class="ex">
+          Cross a <b>pure tall (TT)</b> pea with a <b>pure dwarf (tt)</b>.
+          All F&#8321; offspring are <b>Tt</b> and look <b>tall</b> &mdash; the dwarf factor is hidden, not lost.
+        </div>
+        <span class="tag">Tap to toggle example</span>
+      </div>
+      <div class="mcard" data-c>
+        <h3>2. Law of Segregation</h3>
+        <p>The two alleles of a gene separate during gamete formation; each gamete carries only one.</p>
+        <div class="ex">
+          A <b>Tt</b> plant makes gametes that are <b>½ T</b> and <b>½ t</b>.
+          Crossing Tt &times; Tt lets the hidden <b>t</b> pair up again, so dwarf reappears in F&#8322; at <b>3 tall : 1 dwarf</b>.
+        </div>
+        <span class="tag">Tap to toggle example</span>
+      </div>
+      <div class="mcard" data-c>
+        <h3>3. Independent Assortment</h3>
+        <p>Alleles of different genes are distributed to gametes independently of one another.</p>
+        <div class="ex">
+          A dihybrid cross <b>RrYy &times; RrYy</b> (Round/Yellow) gives four phenotypes in a
+          <b>9 : 3 : 3 : 1</b> ratio &mdash; seed shape sorts independently of seed colour.
+        </div>
+        <span class="tag">Tap to toggle example</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DNA + SEX -->
+  <section class="panel hidden" id="pan-dna">
+    <h2>From Gene to DNA</h2>
+    <div class="zoom-wrap">
+      <div class="col">
+        <svg viewBox="0 0 360 220" role="img" aria-label="Zoom from cell to chromosome to gene to DNA">
+          <!-- cell -->
+          <circle cx="55" cy="60" r="40" fill="#283349" stroke="#33405c"/>
+          <circle cx="55" cy="60" r="20" fill="#7c9cf5" opacity=".35"/>
+          <text x="55" y="115" text-anchor="middle" fill="#9aa8c4" font-size="11">Cell &rarr; nucleus</text>
+          <!-- chromosome -->
+          <g transform="translate(150,30)">
+            <path d="M0 10 Q-6 30 4 40 Q-6 55 4 70 M18 10 Q24 30 14 40 Q24 55 14 70"
+                  stroke="#7c9cf5" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <rect x="1" y="36" width="16" height="8" fill="#f0a868"/>
+            <text x="9" y="98" text-anchor="middle" fill="#9aa8c4" font-size="11">Chromosome</text>
+            <text x="9" y="112" text-anchor="middle" fill="#f0a868" font-size="10">(orange = gene)</text>
+          </g>
+          <!-- gene arrow -->
+          <text x="248" y="40" fill="#9aa8c4" font-size="11">Gene =</text>
+          <text x="248" y="55" fill="#9aa8c4" font-size="11">a length</text>
+          <text x="248" y="70" fill="#9aa8c4" font-size="11">of DNA</text>
+          <!-- DNA helix -->
+          <g transform="translate(250,90)">
+            <g id="helix"></g>
+            <text x="45" y="120" text-anchor="middle" fill="#9aa8c4" font-size="11">DNA double helix</text>
+          </g>
+        </svg>
+        <div class="note"><b>Chain:</b> Cell &rarr; Nucleus &rarr; Chromosome &rarr; Gene &rarr; DNA. A <b>gene</b> is a segment of DNA that codes for one trait; humans have 23 pairs of chromosomes.</div>
+      </div>
+      <div class="col">
+        <h2>Sex Determination (XX / XY)</h2>
+        <p style="font-size:.85rem;color:var(--muted);margin-top:0">
+          Mother is <b>XX</b> (all eggs carry X). Father is <b>XY</b> (½ sperm X, ½ sperm Y).
+          The father's sperm decides the child's sex.</p>
+        <table class="pun" id="sexTbl"></table>
+        <div class="ratios">
+          <div class="ratio"><b>2 : 2</b><span>XX girls : XY boys &rarr; ~50 : 50</span></div>
+        </div>
+        <div class="note">Because the mother always gives an X, the <b>sex of the baby depends on whether the sperm carries X (girl) or Y (boy)</b>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel hidden" id="pan-quiz">
+    <h2>Quick Quiz</h2>
+    <p style="color:var(--muted);font-size:.87rem;margin-top:0">Tap an answer to check it.</p>
+    <div id="quiz"></div>
+  </section>
+
+  <!-- FACTS -->
+  <section class="panel">
+    <h2>Key Terms</h2>
+    <div class="facts">
+      <dl>
+        <dt>Gene</dt><dd>A unit of heredity; a segment of DNA on a chromosome that controls one trait.</dd>
+        <dt>Allele</dt><dd>An alternative form of a gene (e.g. T for tall, t for dwarf).</dd>
+        <dt>Genotype</dt><dd>The genetic make-up (allele pair), e.g. TT, Tt, tt.</dd>
+        <dt>Phenotype</dt><dd>The visible trait produced, e.g. tall or dwarf.</dd>
+        <dt>Dominant &amp; Recessive</dt><dd>A dominant allele (capital) shows even with one copy; a recessive allele (small) shows only when both copies are recessive (tt).</dd>
+        <dt>Homozygous / Heterozygous</dt><dd>Same alleles (TT, tt) / different alleles (Tt).</dd>
+        <dt>Mendel</dt><dd>Gregor Mendel, the "Father of Genetics", worked out heredity using garden pea plants.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>Heredity Lab &middot; Ratios computed live from the alleles you pick.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- data ----------
+  var TRAITS = {
+    "Height (pea)":      {dom:"T", rec:"t", domP:"Tall",  recP:"Dwarf"},
+    "Seed shape (pea)":  {dom:"R", rec:"r", domP:"Round", recP:"Wrinkled"},
+    "Flower colour":     {dom:"P", rec:"p", domP:"Purple",recP:"White"},
+    "Earlobe (human)":   {dom:"E", rec:"e", domP:"Free",  recP:"Attached"}
+  };
+
+  var traitSel = document.getElementById("trait");
+  var p1Sel = document.getElementById("p1");
+  var p2Sel = document.getElementById("p2");
+  Object.keys(TRAITS).forEach(function(k){
+    var o=document.createElement("option");o.value=k;o.textContent=k;traitSel.appendChild(o);
+  });
+
+  function genotypes(t){
+    var D=t.dom, r=t.rec;
+    return [D+D, D+r, r+r]; // TT, Tt, tt
+  }
+  function fillParents(){
+    var t=TRAITS[traitSel.value];
+    var gs=genotypes(t);
+    [p1Sel,p2Sel].forEach(function(sel){
+      var prev=sel.value; sel.innerHTML="";
+      gs.forEach(function(g){
+        var lbl = g[0]===g[1] ? (g[0]===t.dom?"Homozygous dominant":"Homozygous recessive") : "Heterozygous";
+        var o=document.createElement("option");o.value=g;o.textContent=g+" ("+lbl+")";sel.appendChild(o);
+      });
+      if(gs.indexOf(prev)>=0) sel.value=prev;
+    });
+  }
+
+  // gametes: each allele of the genotype
+  function gametes(g){ return [g[0], g[1]]; }
+
+  function alleleSpan(a,t){
+    var cls = a===t.dom ? "allele-dom" : "allele-rec";
+    return '<span class="'+cls+'">'+a+'</span>';
+  }
+  // order genotype so dominant allele first (e.g. tT -> Tt)
+  function order(g,t){
+    if(g.indexOf(t.dom)>=0 && g.indexOf(t.rec)>=0) return t.dom+t.rec;
+    return g;
+  }
+
+  function renderPunnett(){
+    var t=TRAITS[traitSel.value];
+    var g1=p1Sel.value, g2=p2Sel.value;
+    var ga=gametes(g1), gb=gametes(g2);
+    document.getElementById("crossLbl").innerHTML =
+      "Cross: "+alleleSpan(g1[0],t)+alleleSpan(g1[1],t)+" &times; "+alleleSpan(g2[0],t)+alleleSpan(g2[1],t);
+
+    // build table: corner + gb columns, ga rows
+    var html = "<tr><th></th>";
+    gb.forEach(function(a){ html += "<th>"+a+"</th>"; });
+    html += "</tr>";
+    var counts = {}; // genotype -> count
+    ga.forEach(function(ra){
+      html += "<tr><th>"+ra+"</th>";
+      gb.forEach(function(ca){
+        var geno = order(ra+ca, t);
+        counts[geno]=(counts[geno]||0)+1;
+        html += "<td class='cell'>"+alleleSpan(geno[0],t)+alleleSpan(geno[1],t)+"</td>";
+      });
+      html += "</tr>";
+    });
+    document.getElementById("punTbl").innerHTML = html;
+
+    // genotype order for display: TT, Tt, tt
+    var order3 = [t.dom+t.dom, t.dom+t.rec, t.rec+t.rec];
+    var gR = document.getElementById("genoR"); gR.innerHTML="";
+    order3.forEach(function(g){
+      if(counts[g]){
+        var d=document.createElement("div");d.className="ratio";
+        d.innerHTML="<b>"+counts[g]+"/4</b><span>"+g+"</span>";
+        gR.appendChild(d);
+      }
+    });
+
+    // phenotype counts
+    var domCount=0, recCount=0;
+    for(var g in counts){
+      if(g===t.rec+t.rec) recCount+=counts[g]; else domCount+=counts[g];
+    }
+    var pR=document.getElementById("phenoR"); pR.innerHTML="";
+    if(domCount){var d1=document.createElement("div");d1.className="ratio";
+      d1.innerHTML="<b>"+domCount+"/4</b><span>"+t.domP+" (dominant)</span>";pR.appendChild(d1);}
+    if(recCount){var d2=document.createElement("div");d2.className="ratio";
+      d2.innerHTML="<b>"+recCount+"/4</b><span>"+t.recP+" (recessive)</span>";pR.appendChild(d2);}
+
+    // simplified ratio text chips
+    var chips=document.getElementById("phenoChips"); chips.innerHTML="";
+    var gsimp = simplify([counts[order3[0]]||0, counts[order3[1]]||0, counts[order3[2]]||0]);
+    var gtxt = gsimp.filter(function(x){return x>0;}).join(" : ");
+    var psimp = simplify([domCount,recCount]).filter(function(x){return x>0;}).join(" : ");
+    chips.innerHTML =
+      "<span class='chip'>Genotype ratio "+gtxt+"</span>"+
+      "<span class='chip'>Phenotype ratio "+psimp+"</span>";
+
+    // reappearance note
+    var re=document.getElementById("reappear");
+    var recPresent = recCount>0;
+    if(g1===t.dom+t.rec && g2===t.dom+t.rec){
+      re.innerHTML="<b>Recessive reappears!</b> Both parents are heterozygous ("+t.dom+t.rec+
+        "), so the hidden "+t.rec+" alleles can pair up. "+t.recP+" shows in 1 of 4 offspring even though neither parent shows it &mdash; a classic 3 : 1 cross.";
+    } else if(recPresent && g1.indexOf(t.rec)>=0 && g2.indexOf(t.rec)>=0){
+      re.innerHTML="Both parents carry a recessive "+t.rec+" allele, so the recessive "+t.recP+
+        " phenotype can appear in the offspring.";
+    } else if(recPresent){
+      re.innerHTML="One parent is "+t.rec+t.rec+" (recessive), so recessive offspring are possible.";
+    } else {
+      re.innerHTML="No offspring show the recessive "+t.recP+" trait here &mdash; at least one dominant "+
+        t.dom+" allele is always present. Try "+t.dom+t.rec+" &times; "+t.dom+t.rec+" to make it reappear.";
+    }
+  }
+
+  function gcd(a,b){return b?gcd(b,a%b):a;}
+  function simplify(arr){
+    var nz=arr.filter(function(x){return x>0;});
+    if(!nz.length) return arr;
+    var g=nz.reduce(function(a,b){return gcd(a,b);});
+    if(g<1)g=1;
+    return arr.map(function(x){return x/g;});
+  }
+
+  traitSel.addEventListener("change", function(){ fillParents(); renderPunnett(); });
+  p1Sel.addEventListener("change", renderPunnett);
+  p2Sel.addEventListener("change", renderPunnett);
+  document.getElementById("ttbtn").addEventListener("click", function(){
+    traitSel.value="Height (pea)"; fillParents();
+    p1Sel.value="Tt"; p2Sel.value="Tt"; renderPunnett();
+  });
+  fillParents();
+  // default to Tt x Tt showing reappearance
+  p1Sel.value="Tt"; p2Sel.value="Tt";
+  renderPunnett();
+
+  // ---------- tabs ----------
+  var tabs=document.getElementById("tabs");
+  var panels={pun:"pan-pun",laws:"pan-laws",dna:"pan-dna",quiz:"pan-quiz"};
+  tabs.addEventListener("click", function(e){
+    var t=e.target.closest(".tab"); if(!t) return;
+    [].forEach.call(tabs.children,function(c){c.classList.remove("active");});
+    t.classList.add("active");
+    for(var k in panels){
+      document.getElementById(panels[k]).classList.toggle("hidden", k!==t.dataset.t);
+    }
+  });
+
+  // ---------- mendel cards ----------
+  [].forEach.call(document.querySelectorAll(".mcard"),function(c){
+    c.addEventListener("click",function(){c.classList.toggle("open");});
+  });
+
+  // ---------- DNA helix ----------
+  (function(){
+    var h=document.getElementById("helix"); if(!h) return;
+    var s="";
+    for(var i=0;i<9;i++){
+      var y=i*11;
+      var w=Math.sin(i*0.7)*18;
+      var x1=45-w, x2=45+w;
+      s+='<line x1="'+x1+'" y1="'+y+'" x2="'+x2+'" y2="'+y+'" stroke="#f0a868" stroke-width="2"/>';
+      s+='<circle cx="'+x1+'" cy="'+y+'" r="2.6" fill="#7c9cf5"/>';
+      s+='<circle cx="'+x2+'" cy="'+y+'" r="2.6" fill="#7c9cf5"/>';
+    }
+    h.innerHTML=s;
+  })();
+
+  // ---------- sex determination table ----------
+  (function(){
+    // Mother XX (rows) x Father XY (cols)
+    var mother=["X","X"], father=["X","Y"];
+    var html="<tr><th>&#9792; / &#9794;</th>";
+    father.forEach(function(f){ html+="<th>"+f+"</th>"; });
+    html+="</tr>";
+    mother.forEach(function(m){
+      html+="<tr><th>"+m+"</th>";
+      father.forEach(function(f){
+        var combo = (m+f).split("").sort().join(""); // XX or XY
+        var who = combo==="XX" ? "Girl" : "Boy";
+        var col = combo==="XX" ? "var(--rec)" : "var(--dom)";
+        html+="<td class='cell' style='color:"+col+"'>"+combo+"<br><span style='font-size:.7rem;color:var(--muted)'>"+who+"</span></td>";
+      });
+      html+="</tr>";
+    });
+    document.getElementById("sexTbl").innerHTML=html;
+  })();
+
+  // ---------- quiz ----------
+  var QUIZ=[
+    {q:"In a Tt &times; Tt cross, what phenotypic ratio appears in the offspring?",
+     opts:["1 : 1","3 : 1 (dominant : recessive)","9 : 3 : 3 : 1","1 : 2 : 1"],
+     ans:1, ex:"Three offspring show the dominant trait (TT, Tt, Tt) and one shows the recessive (tt) — a 3 : 1 phenotypic ratio."},
+    {q:"A recessive trait can reappear in the offspring only when …",
+     opts:["one parent is dominant","both parents carry a recessive allele","the trait is on the Y chromosome","the offspring is female"],
+     ans:1, ex:"The recessive phenotype needs two recessive alleles (tt), so both parents must pass a recessive allele."},
+    {q:"Who determines the sex of a human baby, and how?",
+     opts:["The mother, via her X eggs","The father, via X or Y sperm","Both equally give Y","It is random and gene-free"],
+     ans:1, ex:"The mother always gives an X. The father's sperm carries either X (girl, XX) or Y (boy, XY), so the father determines the sex."}
+  ];
+  var quizBox=document.getElementById("quiz");
+  QUIZ.forEach(function(item,qi){
+    var div=document.createElement("div");div.className="q";
+    var p=document.createElement("p");p.textContent=(qi+1)+". "+item.q;div.appendChild(p);
+    var ex=document.createElement("div");ex.className="expl";ex.textContent=item.ex;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(div.dataset.done) return;
+        div.dataset.done="1";
+        [].forEach.call(div.querySelectorAll(".opt"),function(o,idx){
+          if(idx===item.ans)o.classList.add("right");
+        });
+        if(oi!==item.ans)b.classList.add("wrong");
+        ex.classList.add("show");
+      });
+      div.appendChild(b);
+    });
+    div.appendChild(ex);
+    quizBox.appendChild(div);
+  });
+})();
+</script>
+</body>
+</html>

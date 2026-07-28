@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Processes Lab - NIOS Class 10 Science (Ch22)</title>
+<style>
+  :root{
+    --accent:#4fd1c5;
+    --accent-dark:#2fb3a7;
+    --bg:#0e1620;
+    --panel:#17222f;
+    --panel2:#1e2c3c;
+    --ink:#e7eef5;
+    --muted:#93a4b7;
+    --line:#2b3b4e;
+    --good:#5fd68a;
+    --bad:#f08a8a;
+    --oxy:#e05a63;
+    --deoxy:#5a7fe0;
+    --radius:16px;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#16283a,#0e1620);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:2px solid transparent;padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#04201d;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:0 0 8px;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .diagram{flex:1 1 320px;min-width:280px;}
+  .side{flex:1 1 260px;min-width:240px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{filter:brightness(1.12);}
+  .hot.sel{stroke:#fff;stroke-width:3;}
+  .info{
+    background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:12px;min-height:110px;
+  }
+  .info h3{margin:0 0 6px;font-size:1rem;color:var(--accent);}
+  .info p{margin:0;font-size:.9rem;color:var(--ink);}
+  .info .muted{color:var(--muted);font-size:.82rem;margin-top:6px;}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .btn{
+    background:var(--accent);color:#04201d;border:none;padding:9px 15px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--accent);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#04201d;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;}
+  .fact h4{margin:0 0 5px;font-size:.92rem;color:var(--accent);}
+  .fact p{margin:0;font-size:.84rem;color:var(--ink);}
+  .eq{background:#12202b;border:1px dashed var(--accent-dark);border-radius:10px;
+    padding:10px 12px;font-size:.9rem;text-align:center;margin-top:6px;color:var(--ink);}
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);padding:9px 12px;border-radius:9px;margin-bottom:6px;cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(95,214,138,.18);border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:rgba(240,138,138,.15);border-color:var(--bad);color:var(--bad);}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:4px;display:none;}
+  .expl.show{display:block;}
+  .score{font-weight:700;color:var(--accent);margin-top:4px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:10px 0 20px;}
+  .txt{font:600 12px -apple-system,"Segoe UI",sans-serif;fill:var(--ink);}
+  .txt.sm{font-size:10px;fill:var(--muted);}
+  @media(max-width:420px){header h1{font-size:1.15rem;}.tab{min-width:104px;font-size:.82rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Life Processes Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Ch22: Nutrition, Transportation, Respiration &amp; Excretion</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="digest">Digestion</button>
+    <button class="tab" data-mode="circ">Respiration &amp; Circulation</button>
+    <button class="tab" data-mode="excr">Excretion</button>
+    <button class="tab" data-mode="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ============ DIGESTION ============ -->
+  <section class="panel" id="mode-digest">
+    <h2>Human Digestive System</h2>
+    <div class="stage">
+      <div class="diagram">
+        <svg viewBox="0 0 320 400" role="img" aria-label="Digestive tract">
+          <!-- body outline -->
+          <rect x="8" y="8" width="304" height="384" rx="20" fill="#12202b" stroke="#223143"/>
+          <!-- mouth -->
+          <ellipse class="hot" data-part="mouth" cx="160" cy="40" rx="30" ry="16" fill="#c98"/>
+          <text class="txt" x="160" y="44" text-anchor="middle">Mouth</text>
+          <!-- oesophagus -->
+          <rect class="hot" data-part="oeso" x="150" y="56" width="20" height="70" rx="8" fill="#d9a24f"/>
+          <text class="txt sm" x="196" y="94" text-anchor="start">Oesophagus</text>
+          <!-- stomach -->
+          <path class="hot" data-part="stomach" d="M150,128 q-42,6 -46,52 q-4,40 34,50 q30,6 34,-24 q4,-40 -6,-72 z" fill="#e07b7b"/>
+          <text class="txt" x="118" y="182" text-anchor="middle">Stomach</text>
+          <!-- liver -->
+          <path class="hot" data-part="liver" d="M182,132 q52,-8 66,26 q6,22 -22,26 q-40,4 -46,-24 z" fill="#a05b3c"/>
+          <text class="txt sm" x="222" y="156" text-anchor="middle">Liver</text>
+          <!-- pancreas -->
+          <ellipse class="hot" data-part="pancreas" cx="196" cy="200" rx="34" ry="12" fill="#c7a24f" transform="rotate(-12 196 200)"/>
+          <text class="txt sm" x="212" y="204" text-anchor="middle">Pancreas</text>
+          <!-- small intestine -->
+          <path class="hot" data-part="small" d="M150,224 q-30,6 -28,34 q2,26 30,24 q30,-2 30,26 q0,26 -28,26 q-30,0 -30,24" fill="none" stroke="#e0a94f" stroke-width="16" stroke-linecap="round"/>
+          <text class="txt sm" x="215" y="290" text-anchor="middle">Small intestine</text>
+          <!-- large intestine -->
+          <path class="hot" data-part="large" d="M96,236 q-22,0 -22,40 l0,64 q0,20 22,20 l40,0" fill="none" stroke="#b98a5a" stroke-width="20" stroke-linecap="round"/>
+          <text class="txt sm" x="70" y="300" text-anchor="middle" transform="rotate(-90 70 300)">Large intestine</text>
+          <!-- rectum/anus -->
+          <rect class="hot" data-part="anus" x="150" y="366" width="20" height="18" rx="6" fill="#8a5a3c"/>
+          <text class="txt sm" x="196" y="380" text-anchor="start">Rectum</text>
+          <!-- travelling bolus -->
+          <circle id="bolus" cx="160" cy="40" r="7" fill="var(--accent)" stroke="#04201d" stroke-width="1.5"/>
+        </svg>
+        <div class="controls">
+          <button class="btn" id="digRun">Send food bolus</button>
+          <button class="btn ghost" id="digPause">Pause</button>
+        </div>
+      </div>
+      <div class="side">
+        <div class="info" id="digInfo">
+          <h3>Tap a part</h3>
+          <p>Tap any organ in the tract to see its role. Press <b>Send food bolus</b> to watch food travel and read what happens at each step.</p>
+          <p class="muted" id="digStep"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CIRCULATION ============ -->
+  <section class="panel hidden" id="mode-circ">
+    <h2>Double Circulation &amp; Respiration</h2>
+    <div class="stage">
+      <div class="diagram">
+        <svg viewBox="0 0 320 320" role="img" aria-label="Heart and double circulation">
+          <rect x="6" y="6" width="308" height="308" rx="18" fill="#12202b" stroke="#223143"/>
+          <!-- lungs -->
+          <ellipse cx="90" cy="46" rx="30" ry="18" fill="#3a5a86" opacity=".55"/>
+          <text class="txt sm" x="90" y="50" text-anchor="middle">Lungs</text>
+          <!-- body -->
+          <rect x="200" y="252" width="90" height="34" rx="10" fill="#5a4a86" opacity=".5"/>
+          <text class="txt sm" x="245" y="273" text-anchor="middle">Body tissues</text>
+          <!-- heart body -->
+          <path d="M160,96 q-56,0 -56,58 l0,66 q0,26 56,26 q56,0 56,-26 l0,-66 q0,-58 -56,-58 z" fill="#26160f" stroke="#402" opacity=".2"/>
+          <!-- 4 chambers -->
+          <rect class="hot" data-part="ra" x="112" y="112" width="46" height="48" rx="9" fill="var(--deoxy)"/>
+          <text class="txt" x="135" y="140" text-anchor="middle">RA</text>
+          <rect class="hot" data-part="la" x="162" y="112" width="46" height="48" rx="9" fill="var(--oxy)"/>
+          <text class="txt" x="185" y="140" text-anchor="middle">LA</text>
+          <rect class="hot" data-part="rv" x="112" y="164" width="46" height="72" rx="9" fill="var(--deoxy)"/>
+          <text class="txt" x="135" y="204" text-anchor="middle">RV</text>
+          <rect class="hot" data-part="lv" x="162" y="164" width="46" height="72" rx="9" fill="var(--oxy)"/>
+          <text class="txt" x="185" y="204" text-anchor="middle">LV</text>
+          <line x1="160" y1="108" x2="160" y2="240" stroke="#0e1620" stroke-width="4"/>
+          <!-- vessels -->
+          <path id="path-lung" d="M135,112 C120,80 100,66 90,62" fill="none" stroke="var(--deoxy)" stroke-width="5"/>
+          <path id="path-plung" d="M185,112 C168,84 130,60 120,54" fill="none" stroke="var(--oxy)" stroke-width="5"/>
+          <path id="path-body" d="M185,236 C230,236 245,244 245,252" fill="none" stroke="var(--oxy)" stroke-width="5"/>
+          <path id="path-return" d="M135,160 C70,160 70,270 200,272" fill="none" stroke="var(--deoxy)" stroke-width="5" opacity=".7"/>
+          <!-- flowing cells -->
+          <circle id="rbc1" r="5" fill="#fff" stroke="#04201d" stroke-width="1"/>
+          <circle id="rbc2" r="5" fill="#ffe" stroke="#04201d" stroke-width="1"/>
+        </svg>
+        <div class="controls">
+          <button class="btn ghost on" id="circToggle">Flow: ON</button>
+        </div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--deoxy)"></i>Deoxygenated</span>
+          <span><i class="dot" style="background:var(--oxy)"></i>Oxygenated</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="info" id="circInfo">
+          <h3>Tap a chamber</h3>
+          <p>The human heart has 4 chambers. Blood passes through the heart <b>twice</b> per cycle &mdash; this is double circulation. Tap RA, LA, RV or LV.</p>
+        </div>
+        <div class="eq" style="margin-top:12px">
+          <b>Aerobic:</b> Glucose + O&#8322; &rarr; CO&#8322; + H&#8322;O + <b>much energy</b><br>
+          <b>Anaerobic (muscle):</b> Glucose &rarr; Lactic acid + <b>little energy</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXCRETION ============ -->
+  <section class="panel hidden" id="mode-excr">
+    <h2>Excretion &mdash; Kidney &amp; Nephron</h2>
+    <div class="stage">
+      <div class="diagram">
+        <svg viewBox="0 0 320 320" role="img" aria-label="Kidney and nephron">
+          <rect x="6" y="6" width="308" height="308" rx="18" fill="#12202b" stroke="#223143"/>
+          <!-- kidney -->
+          <path class="hot" data-part="kidney" d="M64,60 q-34,0 -34,64 q0,64 34,64 q30,0 26,-40 q-4,-30 4,-56 q6,-32 -30,-32 z" fill="#8a4a4a"/>
+          <text class="txt sm" x="50" y="130" text-anchor="middle">Kidney</text>
+          <path class="hot" data-part="ureter" d="M78,178 q6,40 18,70" fill="none" stroke="#c7a24f" stroke-width="7" stroke-linecap="round"/>
+          <text class="txt sm" x="118" y="230" text-anchor="middle">Ureter</text>
+          <ellipse class="hot" data-part="bladder" cx="104" cy="264" rx="26" ry="20" fill="#c7a24f"/>
+          <text class="txt sm" x="104" y="268" text-anchor="middle">Bladder</text>
+          <!-- nephron blow-up -->
+          <line x1="92" y1="96" x2="176" y2="70" stroke="#334" stroke-dasharray="3 3"/>
+          <circle class="hot" data-part="glom" cx="200" cy="80" r="22" fill="none" stroke="#e05a63" stroke-width="6"/>
+          <path d="M200,58 q-14,4 -12,20 q2,16 16,18 q16,2 18,-14 q2,-18 -22,-24" fill="none" stroke="#e05a63" stroke-width="3"/>
+          <text class="txt sm" x="200" y="46" text-anchor="middle">Glomerulus</text>
+          <circle cx="200" cy="80" r="30" fill="none" stroke="#5a7fe0" stroke-width="2" opacity=".6"/>
+          <text class="txt sm" x="256" y="80" text-anchor="start">Bowman's</text>
+          <!-- tubule -->
+          <path class="hot" data-part="tubule" d="M212,100 q30,10 20,40 q-10,28 20,34 q34,6 24,44" fill="none" stroke="#5fd68a" stroke-width="8" stroke-linecap="round"/>
+          <text class="txt sm" x="292" y="150" text-anchor="middle" transform="rotate(90 292 150)">Tubule</text>
+          <!-- collecting to ureter -->
+          <path class="hot" data-part="collect" d="M296,218 q-10,40 -60,58" fill="none" stroke="#c7a24f" stroke-width="7" stroke-linecap="round"/>
+          <text class="txt sm" x="250" y="300" text-anchor="middle">Urine &rarr; ureter</text>
+        </svg>
+        <div class="legend">
+          <span><i class="dot" style="background:#e05a63"></i>Filtration</span>
+          <span><i class="dot" style="background:#5fd68a"></i>Reabsorption</span>
+          <span><i class="dot" style="background:#c7a24f"></i>Urine</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="info" id="excrInfo">
+          <h3>Tap a part</h3>
+          <p>Each kidney holds about a million <b>nephrons</b>, the filtering units. Tap parts to follow how blood is cleaned and urine is formed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section class="panel hidden" id="mode-facts">
+    <h2>Key Facts</h2>
+    <div class="facts">
+      <div class="fact"><h4>Nutrition types</h4><p><b>Autotrophic</b> (green plants make food by photosynthesis) and <b>heterotrophic</b> (animals, fungi depend on others). Human nutrition is holozoic.</p></div>
+      <div class="fact"><h4>Digestive enzymes</h4><p>Salivary amylase (mouth), pepsin + HCl (stomach), and pancreatic + intestinal enzymes plus bile break carbohydrates, proteins and fats into absorbable units.</p></div>
+      <div class="fact"><h4>Double circulation</h4><p>Blood flows through the heart twice in one cycle: pulmonary circuit (heart&harr;lungs) and systemic circuit (heart&harr;body). Keeps oxygenated and deoxygenated blood separate.</p></div>
+      <div class="fact"><h4>Respiration equation</h4><p>Cellular respiration releases energy stored in glucose.<span class="eq">C&#8326;H&#8321;&#8322;O&#8326; + 6O&#8322; &rarr; 6CO&#8322; + 6H&#8322;O + energy (ATP)</span></p></div>
+      <div class="fact"><h4>Aerobic vs anaerobic</h4><p>Aerobic (with O&#8322;) fully breaks glucose in mitochondria, releasing much energy. Anaerobic (without O&#8322;) gives lactic acid in muscles or ethanol in yeast, with little energy.</p></div>
+      <div class="fact"><h4>Excretion</h4><p>Kidneys filter nitrogenous waste (mainly <b>urea</b>) from blood, forming urine: filtration in the glomerulus, then selective reabsorption in the tubule.</p></div>
+    </div>
+
+    <h2 style="margin-top:16px">Quick Quiz</h2>
+    <div class="quiz" id="quiz"></div>
+    <div class="score" id="score"></div>
+  </section>
+
+  <footer>Diagrams are simplified for learning &middot; NIOS Class 10 Science &amp; Technology</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var raf;
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll('.tab');
+  var modes = {
+    digest: document.getElementById('mode-digest'),
+    circ: document.getElementById('mode-circ'),
+    excr: document.getElementById('mode-excr'),
+    facts: document.getElementById('mode-facts')
+  };
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var m = t.dataset.mode;
+      Object.keys(modes).forEach(function(k){
+        modes[k].classList.toggle('hidden', k!==m);
+      });
+    });
+  });
+
+  /* ---------- digestion ---------- */
+  var digData = {
+    mouth:{t:'Mouth (Buccal cavity)',d:'Teeth chew food; saliva\'s salivary amylase (ptyalin) starts breaking starch into sugar. The tongue rolls food into a bolus.'},
+    oeso:{t:'Oesophagus',d:'A muscular tube. Rhythmic muscle waves called peristalsis push the food bolus down into the stomach. No enzymes act here.'},
+    stomach:{t:'Stomach',d:'Gastric juice has HCl (kills germs, activates enzyme) and pepsin, which digests proteins into peptides. Food becomes a paste called chyme.'},
+    liver:{t:'Liver',d:'Makes bile, stored in the gall bladder. Bile has no enzyme but emulsifies fats into tiny droplets so enzymes act faster.'},
+    pancreas:{t:'Pancreas',d:'Secretes pancreatic juice with amylase, trypsin and lipase, digesting carbohydrates, proteins and fats in the small intestine.'},
+    small:{t:'Small intestine',d:'Main site of digestion and absorption. Bile, pancreatic and intestinal juices finish digestion; villi absorb nutrients into the blood.'},
+    large:{t:'Large intestine',d:'Absorbs remaining water and salts from undigested matter, forming semi-solid faeces.'},
+    anus:{t:'Rectum &amp; Anus',d:'Faeces are stored in the rectum and egested through the anus (egestion).'}
+  };
+  var digInfo = document.getElementById('digInfo');
+  function showDig(k){
+    var o = digData[k]; if(!o) return;
+    digInfo.innerHTML = '<h3>'+o.t+'</h3><p>'+o.d+'</p>';
+    document.querySelectorAll('#mode-digest .hot').forEach(function(h){
+      h.classList.toggle('sel', h.dataset.part===k);
+    });
+  }
+  document.querySelectorAll('#mode-digest .hot').forEach(function(h){
+    h.addEventListener('click', function(){ showDig(h.dataset.part); });
+  });
+
+  /* bolus animation along waypoints */
+  var bolus = document.getElementById('bolus');
+  var digStep = document.getElementById('digStep');
+  var way = [
+    {x:160,y:40, msg:'Mouth: chewing + salivary amylase on starch.'},
+    {x:160,y:90, msg:'Oesophagus: peristalsis pushes bolus down.'},
+    {x:120,y:170,msg:'Stomach: HCl + pepsin digest proteins.'},
+    {x:150,y:250,msg:'Small intestine: bile + enzymes; villi absorb nutrients.'},
+    {x:150,y:310,msg:'Small intestine: absorption continues.'},
+    {x:96,y:300, msg:'Large intestine: water reabsorbed.'},
+    {x:160,y:375,msg:'Rectum: faeces egested through anus.'}
+  ];
+  var seg=0, prog=0, running=false;
+  function digFrame(){
+    if(!running){ return; }
+    if(document.hidden){ raf=requestAnimationFrame(digFrame); return; }
+    var a=way[seg], b=way[(seg+1)%way.length];
+    prog += 0.012;
+    if(prog>=1){ prog=0; seg++;
+      if(seg>=way.length-1){ seg=way.length-1; running=false;
+        digStep.textContent = way[way.length-1].msg; positionBolus(way[way.length-1]); return; }
+    }
+    var x=a.x+(b.x-a.x)*prog, y=a.y+(b.y-a.y)*prog;
+    bolus.setAttribute('cx',x); bolus.setAttribute('cy',y);
+    digStep.textContent = a.msg;
+    raf=requestAnimationFrame(digFrame);
+  }
+  function positionBolus(p){ bolus.setAttribute('cx',p.x); bolus.setAttribute('cy',p.y); }
+  document.getElementById('digRun').addEventListener('click', function(){
+    seg=0; prog=0; running=true; positionBolus(way[0]);
+    cancelAnimationFrame(raf); raf=requestAnimationFrame(digFrame);
+  });
+  document.getElementById('digPause').addEventListener('click', function(){
+    running=!running;
+    this.textContent = running?'Pause':'Resume';
+    if(running){ cancelAnimationFrame(raf); raf=requestAnimationFrame(digFrame); }
+  });
+
+  /* ---------- circulation ---------- */
+  var circData = {
+    ra:{t:'Right Atrium (RA)',d:'Receives deoxygenated blood returning from the body via the vena cava, then passes it to the right ventricle.'},
+    rv:{t:'Right Ventricle (RV)',d:'Pumps deoxygenated blood to the lungs through the pulmonary artery to pick up oxygen (pulmonary circulation).'},
+    la:{t:'Left Atrium (LA)',d:'Receives oxygenated blood from the lungs via the pulmonary veins and passes it to the left ventricle.'},
+    lv:{t:'Left Ventricle (LV)',d:'Has the thickest wall; pumps oxygenated blood at high pressure to the whole body (systemic circulation).'}
+  };
+  var circInfo = document.getElementById('circInfo');
+  document.querySelectorAll('#mode-circ .hot').forEach(function(h){
+    h.addEventListener('click', function(){
+      var o=circData[h.dataset.part]; if(!o) return;
+      circInfo.innerHTML='<h3>'+o.t+'</h3><p>'+o.d+'</p>';
+      document.querySelectorAll('#mode-circ .hot').forEach(function(x){
+        x.classList.toggle('sel', x===h);
+      });
+    });
+  });
+  var rbc1=document.getElementById('rbc1'), rbc2=document.getElementById('rbc2');
+  var pR=document.getElementById('path-lung'), pP=document.getElementById('path-body');
+  var flowOn=true, tt=0;
+  function circFrame(){
+    if(document.hidden){ raf2=requestAnimationFrame(circFrame); return; }
+    var lenR=pR.getTotalLength(), lenP=pP.getTotalLength();
+    if(flowOn && lenR>0 && lenP>0){
+      tt=(tt+0.006)%1;
+      var p1=pR.getPointAtLength(lenR*tt);
+      var p2=pP.getPointAtLength(lenP*((tt+0.5)%1));
+      rbc1.setAttribute('cx',p1.x); rbc1.setAttribute('cy',p1.y);
+      rbc1.setAttribute('fill', tt<0.5?'#9fb4e8':'#f0b0b0');
+      rbc2.setAttribute('cx',p2.x); rbc2.setAttribute('cy',p2.y);
+      rbc2.setAttribute('fill','#f0b0b0');
+    }
+    raf2=requestAnimationFrame(circFrame);
+  }
+  var raf2=requestAnimationFrame(circFrame);
+  document.getElementById('circToggle').addEventListener('click', function(){
+    flowOn=!flowOn; this.classList.toggle('on',flowOn);
+    this.textContent='Flow: '+(flowOn?'ON':'OFF');
+  });
+
+  /* ---------- excretion ---------- */
+  var excrData = {
+    kidney:{t:'Kidney',d:'A bean-shaped organ; we have two. Blood enters via the renal artery, is filtered, and cleaned blood leaves by the renal vein.'},
+    glom:{t:'Glomerulus',d:'A tuft of capillaries inside Bowman\'s capsule. Here blood is filtered under pressure &mdash; water, glucose, salts and urea pass out (ultrafiltration).'},
+    tubule:{t:'Tubule',d:'Selective reabsorption: useful substances like glucose, most water and salts are taken back into the blood. Wastes stay behind.'},
+    collect:{t:'Collecting duct',d:'Concentrated urine (water + urea + salts) drains from the nephrons toward the ureter.'},
+    ureter:{t:'Ureter',d:'Carries urine from the kidney down to the urinary bladder.'},
+    bladder:{t:'Urinary bladder',d:'Stores urine until it is released from the body through the urethra (micturition).'}
+  };
+  var excrInfo = document.getElementById('excrInfo');
+  document.querySelectorAll('#mode-excr .hot').forEach(function(h){
+    h.addEventListener('click', function(){
+      var o=excrData[h.dataset.part]; if(!o) return;
+      excrInfo.innerHTML='<h3>'+o.t+'</h3><p>'+o.d+'</p>';
+      document.querySelectorAll('#mode-excr .hot').forEach(function(x){
+        x.classList.toggle('sel', x===h);
+      });
+    });
+  });
+
+  /* ---------- quiz ---------- */
+  var quiz = [
+    {q:'Which enzyme in saliva begins the digestion of starch?',
+     o:['Pepsin','Salivary amylase','Trypsin','Lipase'], a:1,
+     e:'Salivary amylase (ptyalin) breaks starch into sugar in the mouth.'},
+    {q:'The overall equation for aerobic respiration produces:',
+     o:['Only lactic acid','CO₂ + H₂O + energy','Ethanol + CO₂','Only oxygen'], a:1,
+     e:'Glucose + O₂ → CO₂ + H₂O + energy (much energy released).'},
+    {q:'In the nephron, filtration of blood takes place in the:',
+     o:['Ureter','Bladder','Glomerulus','Left ventricle'], a:2,
+     e:'The glomerulus filters blood under pressure inside Bowman\'s capsule.'}
+  ];
+  var qWrap=document.getElementById('quiz'), scoreEl=document.getElementById('score');
+  var answered=0, correct=0;
+  quiz.forEach(function(item, qi){
+    var div=document.createElement('div'); div.className='q';
+    var p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; div.appendChild(p);
+    var done=false;
+    item.o.forEach(function(opt, oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.addEventListener('click', function(){
+        if(done) return; done=true; answered++;
+        if(oi===item.a){ b.classList.add('correct'); correct++; }
+        else{ b.classList.add('wrong');
+          div.querySelectorAll('.opt')[item.a].classList.add('correct'); }
+        expl.classList.add('show');
+        scoreEl.textContent='Score: '+correct+' / '+answered;
+      });
+      div.appendChild(b);
+    });
+    var expl=document.createElement('div'); expl.className='expl'; expl.textContent=item.e;
+    div.appendChild(expl);
+    qWrap.appendChild(div);
+  });
+
+  /* pause animations when hidden */
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden){
+      if(running){ cancelAnimationFrame(raf); raf=requestAnimationFrame(digFrame); }
+    }
+  });
+})();
+</script>
+</body>
+</html>

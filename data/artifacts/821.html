@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Air &amp; Water Lab — NIOS Class 10 Science (Ch26)</title>
+<style>
+  :root{
+    --bg:#0e1622; --panel:#16223250; --panel2:#182838; --ink:#e8eef6;
+    --muted:#9fb1c4; --accent:#3fd0c9; --accent2:#2aa79f; --line:#26384c;
+    --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(160deg,#0b131f,#0e1622 40%,#101d2b);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px 14px 60px}
+  header h1{font-size:1.35rem;margin:0 0 4px}
+  header p{margin:0;color:var(--muted);font-size:.9rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+  .tab{
+    background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    min-height:40px;
+  }
+  .tab.active{background:var(--accent);color:#04211f;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel2);border:1px solid var(--line);border-radius:16px;
+    padding:16px;margin-bottom:16px;
+  }
+  .panel h2{margin:0 0 6px;font-size:1.05rem;color:var(--accent)}
+  .panel h3{margin:14px 0 6px;font-size:.95rem}
+  .mode{display:none}
+  .mode.active{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:16px}
+  .col{flex:1 1 300px;min-width:0}
+  svg{display:block;max-width:100%;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{
+    display:flex;align-items:center;gap:7px;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:7px 10px;
+    cursor:pointer;font-size:.85rem;min-height:38px;
+  }
+  .chip.sel{border-color:var(--accent);background:#12333150}
+  .sw{width:14px;height:14px;border-radius:4px;flex:none}
+  .info{
+    margin-top:12px;background:var(--panel);border:1px dashed var(--line);
+    border-radius:12px;padding:12px;font-size:.9rem;min-height:64px;
+  }
+  .info b{color:var(--accent)}
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:10px 0}
+  .controls label{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+  input[type=range]{width:170px;accent-color:var(--accent);height:26px}
+  button.btn{
+    background:var(--accent);color:#04211f;border:none;border-radius:10px;
+    padding:9px 14px;font-size:.9rem;font-weight:600;cursor:pointer;min-height:40px;
+  }
+  button.ghost{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
+  .steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .step{
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:8px 10px;font-size:.82rem;flex:1 1 120px;text-align:center;
+  }
+  .step span{display:block;font-size:1.3rem;margin-bottom:2px}
+  .facts{list-style:none;padding:0;margin:8px 0 0}
+  .facts li{padding:6px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+  .facts li:last-child{border-bottom:none}
+  .facts li::before{content:"◆ ";color:var(--accent)}
+  .quiz .q{margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:12px}
+  .quiz .q:last-child{border-bottom:none}
+  .quiz p.qt{font-weight:600;margin:0 0 8px}
+  .opt{
+    display:block;width:100%;text-align:left;background:var(--panel);
+    color:var(--ink);border:1px solid var(--line);border-radius:10px;
+    padding:10px;margin:6px 0;cursor:pointer;font-size:.88rem;min-height:40px;
+  }
+  .opt.correct{border-color:var(--good);background:#123020}
+  .opt.wrong{border-color:var(--bad);background:#301616}
+  .expl{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px}
+  .badge{display:inline-block;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;padding:2px 8px;font-size:.78rem;color:var(--muted);margin:2px 4px 2px 0}
+  @media (max-width:400px){
+    input[type=range]{width:140px}
+    header h1{font-size:1.15rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Air &amp; Water Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology · Ch26 — Air and Water</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="air">Composition of Air</button>
+    <button class="tab" data-mode="cycle">Water Cycle</button>
+    <button class="tab" data-mode="pollution">Pollution &amp; Purification</button>
+    <button class="tab" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- ===================== AIR ===================== -->
+  <section class="mode active" id="mode-air">
+    <div class="panel">
+      <h2>What is air made of?</h2>
+      <div class="row">
+        <div class="col">
+          <svg id="airPie" viewBox="0 0 220 220" aria-label="Composition of air pie chart" role="img"></svg>
+        </div>
+        <div class="col">
+          <p style="font-size:.9rem;color:var(--muted);margin:0 0 6px">
+            Tap a component to learn its role. Percentages are by volume of dry air.</p>
+          <div class="legend" id="airLegend"></div>
+        </div>
+      </div>
+      <div class="info" id="airInfo">Select a gas above to see its share and use.</div>
+      <p class="note">Note: air also holds variable water vapour (0–4%) plus dust and microbes; the pie shows dry-air values.</p>
+    </div>
+  </section>
+
+  <!-- ===================== WATER CYCLE ===================== -->
+  <section class="mode" id="mode-cycle">
+    <div class="panel">
+      <h2>The Water Cycle</h2>
+      <svg id="cycleSvg" viewBox="0 0 400 240" aria-label="Animated water cycle" role="img"></svg>
+      <div class="controls">
+        <label>Sun / Temperature: <span id="tempVal">Warm</span>
+          <input type="range" id="tempSlider" min="1" max="5" value="3">
+        </label>
+        <button class="btn" id="cyclePause">Pause</button>
+      </div>
+      <div class="steps">
+        <div class="step"><span>☀️</span>Evaporation<br>water → vapour</div>
+        <div class="step"><span>☁️</span>Condensation<br>vapour → clouds</div>
+        <div class="step"><span>🌧️</span>Precipitation<br>rain / snow</div>
+        <div class="step"><span>🌊</span>Collection<br>runoff &amp; storage</div>
+      </div>
+      <div class="info" id="cycleInfo">The sun drives evaporation. Raise the temperature to see faster evaporation and more rain.</div>
+    </div>
+  </section>
+
+  <!-- ===================== POLLUTION ===================== -->
+  <section class="mode" id="mode-pollution">
+    <div class="panel">
+      <h2>Air Pollution &amp; its Effects</h2>
+      <div class="legend" id="pollLegend"></div>
+      <div class="info" id="pollInfo">Tap a pollutant to see its source and effect.</div>
+    </div>
+    <div class="panel">
+      <h2>Water Purification</h2>
+      <svg id="waterTreat" viewBox="0 0 400 120" aria-label="Water treatment steps" role="img"></svg>
+      <div class="steps">
+        <div class="step"><span>🪨</span>Sedimentation<br>heavy dirt settles</div>
+        <div class="step"><span>⛲</span>Filtration<br>sand/gravel beds</div>
+        <div class="step"><span>🧪</span>Chlorination<br>kills germs</div>
+      </div>
+      <h3>Hard vs Soft Water</h3>
+      <p style="font-size:.88rem;margin:0">
+        <span class="badge">Hard water</span> has dissolved Ca²⁺ and Mg²⁺ salts; it wastes soap and forms scale in boilers.
+        <span class="badge">Soft water</span> lathers easily. Hardness is removed by boiling (temporary) or using washing soda / ion exchange (permanent).
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== QUIZ ===================== -->
+  <section class="mode" id="mode-quiz">
+    <div class="panel quiz" id="quizBox">
+      <h2>Quick Quiz — tap to reveal answers</h2>
+      <div id="quizList"></div>
+      <p class="note" id="quizScore"></p>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h2>Key Facts</h2>
+    <ul class="facts">
+      <li>Nitrogen (78%) is the most abundant gas in air; it dilutes oxygen and cycles into proteins via nitrogen fixation.</li>
+      <li>Oxygen (21%) supports respiration and combustion; it is renewed by photosynthesis.</li>
+      <li>Only about 0.04% of air is CO₂, yet it is vital for photosynthesis and traps heat (greenhouse effect).</li>
+      <li>SO₂ and NO₂ dissolve in rainwater to form acid rain, which harms plants, soils and buildings.</li>
+      <li>Water is purified in stages: sedimentation → filtration → chlorination before it reaches taps.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- Tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  var modes = document.querySelectorAll(".mode");
+  tabs.forEach(function(t){
+    t.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var m = t.getAttribute("data-mode");
+      modes.forEach(function(sec){
+        sec.classList.toggle("active", sec.id === "mode-"+m);
+      });
+    });
+  });
+
+  /* ---------- AIR composition ---------- */
+  var air = [
+    {name:"Nitrogen (N₂)", pct:78.09, color:"#3fd0c9",
+      use:"Most abundant gas. It dilutes oxygen so burning is controlled, and is the raw material for making ammonia, fertilisers and proteins."},
+    {name:"Oxygen (O₂)", pct:20.95, color:"#f59e0b",
+      use:"Needed for respiration in living things and for burning fuels. Renewed by green plants during photosynthesis."},
+    {name:"Argon (Ar)", pct:0.93, color:"#a78bfa",
+      use:"An inert noble gas. Used to fill electric bulbs and in welding, because it does not react."},
+    {name:"Carbon dioxide (CO₂)", pct:0.04, color:"#f87171",
+      use:"Used by plants in photosynthesis and in fizzy drinks and fire extinguishers. A greenhouse gas that warms the Earth."},
+    {name:"Water vapour + others", pct:0.05, color:"#60a5fa",
+      use:"Variable water vapour drives the water cycle and weather; traces of neon, helium and dust are also present."}
+  ];
+  var pieView = 220, cx=110, cy=110, r=95;
+  function polar(a){return [cx + r*Math.cos(a), cy + r*Math.sin(a)];}
+  function buildPie(){
+    var svg = document.getElementById("airPie");
+    var start = -Math.PI/2, ns="http://www.w3.org/2000/svg";
+    // scale small slices for visibility using sqrt-ish minimum, but keep angle = pct
+    air.forEach(function(g, i){
+      var ang = (g.pct/100)*Math.PI*2;
+      var end = start + ang;
+      var large = ang > Math.PI ? 1 : 0;
+      var p0 = polar(start), p1 = polar(end);
+      var path = document.createElementNS(ns,"path");
+      var d = "M"+cx+" "+cy+" L"+p0[0].toFixed(2)+" "+p0[1].toFixed(2)+
+              " A"+r+" "+r+" 0 "+large+" 1 "+p1[0].toFixed(2)+" "+p1[1].toFixed(2)+" Z";
+      path.setAttribute("d", d);
+      path.setAttribute("fill", g.color);
+      path.setAttribute("stroke", "#0e1622");
+      path.setAttribute("stroke-width","2");
+      path.style.cursor="pointer";
+      path.addEventListener("click", function(){selectGas(i);});
+      svg.appendChild(path);
+      start = end;
+    });
+    var legend = document.getElementById("airLegend");
+    air.forEach(function(g,i){
+      var c = document.createElement("div");
+      c.className="chip"; c.setAttribute("data-i",i);
+      c.innerHTML='<span class="sw" style="background:'+g.color+'"></span>'+
+        g.name+' <b style="margin-left:auto;color:#9fb1c4">'+g.pct+'%</b>';
+      c.addEventListener("click", function(){selectGas(i);});
+      legend.appendChild(c);
+    });
+  }
+  function selectGas(i){
+    var g = air[i];
+    document.getElementById("airInfo").innerHTML =
+      "<b>"+g.name+" — "+g.pct+"%</b><br>"+g.use;
+    document.querySelectorAll("#airLegend .chip").forEach(function(c){
+      c.classList.toggle("sel", c.getAttribute("data-i")==String(i));
+    });
+  }
+  buildPie();
+
+  /* ---------- POLLUTION ---------- */
+  var pollutants = [
+    {n:"SO₂", c:"#fbbf24", t:"Sulphur dioxide",
+     s:"From burning coal and diesel that contain sulphur.",
+     e:"Dissolves in rain to form sulphuric acid → <b>acid rain</b>, which harms plants, lakes and marble buildings."},
+    {n:"NO₂", c:"#f87171", t:"Nitrogen dioxide",
+     s:"From vehicle engines and factories at high temperatures.",
+     e:"Forms nitric acid (acid rain) and helps create <b>photochemical smog</b>; irritates the lungs."},
+    {n:"CO", c:"#a78bfa", t:"Carbon monoxide",
+     s:"From incomplete burning of fuel in vehicles and stoves.",
+     e:"A poisonous gas: it binds to blood haemoglobin, reducing oxygen supply to the body."},
+    {n:"PM", c:"#60a5fa", t:"Particulates (dust, soot)",
+     s:"Tiny solid particles from smoke, construction and burning.",
+     e:"Cause <b>smog</b> and breathing problems; they scatter light and reduce visibility."}
+  ];
+  var pl = document.getElementById("pollLegend");
+  pollutants.forEach(function(p,i){
+    var c=document.createElement("div");
+    c.className="chip"; c.setAttribute("data-i",i);
+    c.innerHTML='<span class="sw" style="background:'+p.c+'"></span>'+p.n+' — '+p.t;
+    c.addEventListener("click", function(){
+      document.getElementById("pollInfo").innerHTML =
+        "<b>"+p.t+" ("+p.n+")</b><br>Source: "+p.s+"<br>Effect: "+p.e;
+      document.querySelectorAll("#pollLegend .chip").forEach(function(x){
+        x.classList.toggle("sel", x.getAttribute("data-i")==String(i));
+      });
+    });
+    pl.appendChild(c);
+  });
+
+  /* water treatment static diagram */
+  (function(){
+    var ns="http://www.w3.org/2000/svg";
+    var svg=document.getElementById("waterTreat");
+    var stages=[{x:20,lbl:"Dirty water",col:"#6b7280"},
+                {x:120,lbl:"Sediment",col:"#8b5e3c"},
+                {x:220,lbl:"Filter",col:"#3fd0c9"},
+                {x:320,lbl:"Chlorine",col:"#60a5fa"}];
+    stages.forEach(function(s,i){
+      var rect=document.createElementNS(ns,"rect");
+      rect.setAttribute("x",s.x);rect.setAttribute("y",30);
+      rect.setAttribute("width",60);rect.setAttribute("height",55);
+      rect.setAttribute("rx",8);rect.setAttribute("fill",s.col);
+      rect.setAttribute("opacity","0.75");
+      svg.appendChild(rect);
+      var tx=document.createElementNS(ns,"text");
+      tx.setAttribute("x",s.x+30);tx.setAttribute("y",100);
+      tx.setAttribute("text-anchor","middle");tx.setAttribute("fill","#9fb1c4");
+      tx.setAttribute("font-size","9");tx.textContent=s.lbl;
+      svg.appendChild(tx);
+      if(i<stages.length-1){
+        var ar=document.createElementNS(ns,"text");
+        ar.setAttribute("x",s.x+90);ar.setAttribute("y",62);
+        ar.setAttribute("text-anchor","middle");ar.setAttribute("fill","#e8eef6");
+        ar.setAttribute("font-size","16");ar.textContent="→";
+        svg.appendChild(ar);
+      }
+    });
+  })();
+
+  /* ---------- QUIZ ---------- */
+  var quiz = [
+    {q:"Which gas makes up about 78% of air?",
+     o:["Oxygen","Nitrogen","Carbon dioxide","Argon"], a:1,
+     e:"Nitrogen is ~78% by volume; oxygen is ~21%."},
+    {q:"Which stage of the water cycle turns water vapour back into clouds?",
+     o:["Evaporation","Precipitation","Condensation","Runoff"], a:2,
+     e:"Condensation cools vapour into tiny droplets that form clouds."},
+    {q:"Acid rain is mainly caused by which pollutants?",
+     o:["CO and CO₂","SO₂ and NO₂","Argon and Neon","O₂ and N₂"], a:1,
+     e:"SO₂ and NO₂ dissolve in rain to form sulphuric and nitric acids."}
+  ];
+  var answered = 0, score = 0;
+  var ql = document.getElementById("quizList");
+  quiz.forEach(function(item, qi){
+    var wrap=document.createElement("div"); wrap.className="q";
+    var p=document.createElement("p"); p.className="qt";
+    p.textContent=(qi+1)+". "+item.q; wrap.appendChild(p);
+    var done=false;
+    item.o.forEach(function(opt, oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(done) return; done=true; answered++;
+        if(oi===item.a){ b.classList.add("correct"); score++; }
+        else{
+          b.classList.add("wrong");
+          wrap.querySelectorAll(".opt")[item.a].classList.add("correct");
+        }
+        wrap.querySelector(".expl").classList.add("show");
+        updateScore();
+      });
+      wrap.appendChild(b);
+    });
+    var ex=document.createElement("div"); ex.className="expl";
+    ex.innerHTML="Answer: <b>"+item.o[item.a]+"</b>. "+item.e;
+    wrap.appendChild(ex);
+    ql.appendChild(wrap);
+  });
+  function updateScore(){
+    document.getElementById("quizScore").textContent =
+      "Score: "+score+" / "+quiz.length+
+      (answered===quiz.length?"  — all done!":"");
+  }
+
+  /* ---------- WATER CYCLE animation (canvas-like via SVG + rAF) ---------- */
+  var cs = document.getElementById("cycleSvg");
+  var NS="http://www.w3.org/2000/svg";
+  // static scene
+  cs.innerHTML =
+    '<defs>'+
+    '<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#16324a"/><stop offset="1" stop-color="#1d4a5c"/></linearGradient>'+
+    '<linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#2aa79f"/><stop offset="1" stop-color="#12414a"/></linearGradient>'+
+    '</defs>'+
+    '<rect x="0" y="0" width="400" height="240" fill="url(#sky)"/>'+
+    '<circle id="sun" cx="60" cy="50" r="24" fill="#f59e0b"/>'+
+    '<path d="M0 175 Q100 150 200 172 T400 168 L400 240 L0 240 Z" fill="url(#sea)"/>'+
+    '<path d="M230 240 L230 185 Q300 150 400 178 L400 240 Z" fill="#1c3a2a"/>'+
+    '<text x="60" y="230" fill="#bfe" font-size="10" text-anchor="middle">Ocean</text>'+
+    '<text x="330" y="232" fill="#bfe" font-size="10" text-anchor="middle">Land</text>'+
+    '<g id="clouds"></g><g id="drops"></g><g id="vapour"></g>'+
+    '<text x="150" y="70" fill="#cfe" font-size="10">Condensation ↓</text>'+
+    '<text x="20" y="140" fill="#cfe" font-size="10">Evaporation ↑</text>'+
+    '<text x="250" y="150" fill="#cfe" font-size="10">Precipitation</text>';
+
+  // cloud shape
+  var cloudG=document.getElementById("clouds");
+  var cloud=document.createElementNS(NS,"g");
+  cloud.setAttribute("id","cloud");
+  cloud.setAttribute("transform","translate(150,58)");
+  cloud.innerHTML='<ellipse cx="0" cy="0" rx="34" ry="16" fill="#dfeaf2"/>'+
+    '<ellipse cx="-22" cy="4" rx="18" ry="12" fill="#cfd9e2"/>'+
+    '<ellipse cx="22" cy="4" rx="18" ry="12" fill="#cfd9e2"/>';
+  cloudG.appendChild(cloud);
+
+  var vap=[], drops=[], vapG=document.getElementById("vapour"), dropG=document.getElementById("drops");
+  var running=true, temp=3, raf=null, tick=0;
+  function makeVapour(){
+    var e=document.createElementNS(NS,"circle");
+    var x=20+Math.random()*180;
+    e.setAttribute("cx",x); e.setAttribute("cy",178);
+    e.setAttribute("r",1.5+Math.random()*1.5);
+    e.setAttribute("fill","#bfe3e0"); e.setAttribute("opacity","0.8");
+    vapG.appendChild(e);
+    vap.push({el:e, x:x, y:178, sp:0.4+Math.random()*0.4});
+  }
+  function makeDrop(){
+    var e=document.createElementNS(NS,"line");
+    var x=120+Math.random()*160;
+    e.setAttribute("x1",x); e.setAttribute("y1",78);
+    e.setAttribute("x2",x); e.setAttribute("y2",84);
+    e.setAttribute("stroke","#7fd7ff"); e.setAttribute("stroke-width","2");
+    e.setAttribute("stroke-linecap","round");
+    dropG.appendChild(e);
+    drops.push({el:e, x:x, y:78, sp:2+Math.random()*1.5});
+  }
+  function frame(){
+    if(!running){raf=null;return;}
+    tick++;
+    // sun pulse with temp
+    var sun=document.getElementById("sun");
+    var pr=24+Math.sin(tick/20)*1.5+temp;
+    sun.setAttribute("r", pr.toFixed(1));
+    // spawn vapour proportional to temp
+    if(tick % Math.max(2, 9-temp) === 0) makeVapour();
+    if(tick % Math.max(4, 12-temp*2) === 0 && temp>=2) makeDrop();
+    // move vapour up
+    for(var i=vap.length-1;i>=0;i--){
+      var v=vap[i]; v.y-=v.sp*(0.6+temp*0.15);
+      v.x+=Math.sin(v.y/20)*0.5;
+      v.el.setAttribute("cx",v.x.toFixed(1));
+      v.el.setAttribute("cy",v.y.toFixed(1));
+      v.el.setAttribute("opacity", Math.max(0,(v.y-70)/108).toFixed(2));
+      if(v.y<74){ vapG.removeChild(v.el); vap.splice(i,1); }
+    }
+    // move drops down
+    for(var j=drops.length-1;j>=0;j--){
+      var d=drops[j]; d.y+=d.sp;
+      d.el.setAttribute("y1",d.y.toFixed(1));
+      d.el.setAttribute("y2",(d.y+6).toFixed(1));
+      if(d.y>176){ dropG.removeChild(d.el); drops.splice(j,1); }
+    }
+    // gentle cloud drift
+    var cloudEl=document.getElementById("cloud");
+    var cxp=150+Math.sin(tick/120)*24;
+    cloudEl.setAttribute("transform","translate("+cxp.toFixed(1)+",58)");
+    raf=requestAnimationFrame(frame);
+  }
+  function start(){ if(!raf && running) raf=requestAnimationFrame(frame); }
+  function stop(){ if(raf){cancelAnimationFrame(raf); raf=null;} }
+
+  document.getElementById("tempSlider").addEventListener("input", function(e){
+    temp=parseInt(e.target.value,10);
+    var names=["Cold","Cool","Warm","Hot","Very hot"];
+    document.getElementById("tempVal").textContent=names[temp-1];
+    document.getElementById("cycleInfo").innerHTML=
+      "Temperature: <b>"+names[temp-1]+"</b>. Higher temperature = faster evaporation and more clouds and rain.";
+  });
+  document.getElementById("cyclePause").addEventListener("click", function(){
+    running=!running;
+    this.textContent = running ? "Pause" : "Play";
+    if(running) start(); else stop();
+  });
+
+  // pause when tab hidden
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){ stop(); }
+    else if(running){ start(); }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>

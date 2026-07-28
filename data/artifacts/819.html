@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproduction Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#0e1520; --panel:#16202e; --panel2:#1c2836; --line:#2a3a4d;
+    --ink:#e7eef6; --muted:#9fb0c3; --accent:#4fd1a5; --accent-d:#2ea882;
+    --warn:#f2b45a; --pink:#e58ab0; --blue:#6fb1e0;
+    --radius:16px; --sh:0 6px 18px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 70% -10%,#17293a 0%,var(--bg) 60%);
+    color:var(--ink); font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:940px;margin:0 auto;padding:18px 14px 60px}
+  header h1{font-size:1.55rem;margin:.2em 0 .1em}
+  header p{color:var(--muted);margin:.2em 0 1em;font-size:.95rem}
+  .accentbar{height:4px;width:70px;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;margin-bottom:14px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .tab{
+    background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    transition:.18s;flex:0 0 auto;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:var(--accent);color:#06231a;border-color:var(--accent);font-weight:600}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:var(--sh);margin-bottom:16px;
+  }
+  .panel h2{margin:.1em 0 .5em;font-size:1.15rem}
+  .panel h3{margin:.6em 0 .3em;font-size:1rem;color:var(--accent)}
+  .mode{display:none}
+  .mode.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .card{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px;cursor:pointer;transition:.18s;text-align:center;
+  }
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(79,209,165,.25)}
+  .card h4{margin:.3em 0;font-size:.95rem;color:var(--ink)}
+  .card p{margin:0;font-size:.78rem;color:var(--muted)}
+  .card svg{width:100%;height:70px}
+  .facts{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;margin-top:12px}
+  .facts h3{color:var(--accent);margin:.1em 0 .4em}
+  .facts p{margin:.2em 0;font-size:.9rem;color:var(--ink)}
+  .btn{
+    background:var(--accent);color:#06231a;border:none;border-radius:10px;
+    padding:9px 16px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-d)}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .stage{background:#0c131d;border:1px solid var(--line);border-radius:12px;padding:8px;margin-top:10px}
+  .stage svg{width:100%;height:auto;display:block}
+  .rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .info{font-size:.9rem;color:var(--muted);min-height:1.4em;margin-top:8px}
+  .partlbl{font-size:.82rem;cursor:pointer}
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .quiz .q p.qt{font-weight:600;margin:.1em 0 .5em}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);border-radius:9px;padding:9px 11px;margin:6px 0;cursor:pointer;font-size:.9rem;transition:.15s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(79,209,165,.18);border-color:var(--accent)}
+  .opt.wrong{background:rgba(229,138,176,.16);border-color:var(--pink)}
+  .expl{font-size:.85rem;color:var(--muted);margin-top:6px;display:none}
+  .expl.show{display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .legend span{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+  .note{font-size:.82rem;color:var(--warn);background:rgba(242,180,90,.08);border:1px solid rgba(242,180,90,.3);
+    border-radius:9px;padding:8px 11px;margin-top:10px}
+  .sysgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.sysgrid{grid-template-columns:1fr}}
+  .clickable{cursor:pointer}
+  .clickable:hover{opacity:.85}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:24px}
+  .pulse{animation:pl 1.4s infinite}
+  @keyframes pl{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="accentbar"></div>
+    <h1>Reproduction Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 24 &mdash; Life Processes 3: Reproduction</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-mode="asx">Asexual vs Sexual</button>
+    <button class="tab" data-mode="flr">Flower &amp; Pollination</button>
+    <button class="tab" data-mode="hum">Human Reproduction</button>
+    <button class="tab" data-mode="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: ASEXUAL vs SEXUAL ============ -->
+  <section class="mode active" id="asx">
+    <div class="panel">
+      <h2>Asexual Reproduction &mdash; one parent, identical offspring</h2>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:0">Tap a method to see it animate and read the facts.</p>
+      <div class="grid" id="asexCards"></div>
+      <div class="stage"><svg id="asexStage" viewBox="0 0 400 180" aria-label="asexual animation"></svg></div>
+      <div class="facts" id="asexFacts"><h3>Facts</h3><p>Select a method above.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>Sexual Reproduction &mdash; two parents, gametes, variation</h2>
+      <div class="stage"><svg id="sexStage" viewBox="0 0 400 160" aria-label="sexual reproduction"></svg></div>
+      <div class="rowbtns"><button class="btn" id="fuseBtn">Fuse gametes &rarr; zygote</button>
+        <button class="btn ghost" id="fuseReset">Reset</button></div>
+      <div class="facts"><h3>Why variation matters</h3>
+        <p>Two parents each donate a haploid <b>gamete</b> (male + female). Their fusion (<b>fertilisation</b>) makes a <b>zygote</b> that mixes both sets of genes.</p>
+        <p>This <b>variation</b> helps a species adapt and survive changing environments &mdash; the key advantage over asexual reproduction.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: FLOWER & POLLINATION ============ -->
+  <section class="mode" id="flr">
+    <div class="panel">
+      <h2>Parts of a Flower</h2>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:0">Tap a labelled part to learn its role.</p>
+      <div class="stage"><svg id="flowerSvg" viewBox="0 0 400 300" aria-label="flower diagram"></svg></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--pink)"></i>Petal / Sepal (protection &amp; attraction)</span>
+        <span><i class="dot" style="background:var(--warn)"></i>Stamen &mdash; male</span>
+        <span><i class="dot" style="background:var(--accent)"></i>Carpel &mdash; female</span>
+      </div>
+      <div class="facts" id="flrFacts"><h3>Facts</h3><p>Tap any part of the flower.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>Pollination &rarr; Fertilisation &rarr; Fruit</h2>
+      <div class="stage"><svg id="pollSvg" viewBox="0 0 400 220" aria-label="pollination animation"></svg></div>
+      <div class="rowbtns">
+        <button class="btn" id="pollBtn">Play pollination</button>
+        <button class="btn ghost" id="pollReset">Reset</button>
+      </div>
+      <div class="info" id="pollInfo">A pollen grain lands on the stigma &hellip;</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: HUMAN REPRODUCTION ============ -->
+  <section class="mode" id="hum">
+    <div class="panel">
+      <h2>Human Reproductive System &mdash; an overview</h2>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:0">A Class-10 level diagram. Tap a labelled part to read its role.</p>
+      <div class="sysgrid">
+        <div>
+          <h3>Male system</h3>
+          <div class="stage"><svg id="maleSvg" viewBox="0 0 200 240" aria-label="male reproductive system"></svg></div>
+        </div>
+        <div>
+          <h3>Female system</h3>
+          <div class="stage"><svg id="femaleSvg" viewBox="0 0 200 240" aria-label="female reproductive system"></svg></div>
+        </div>
+      </div>
+      <div class="facts" id="humFacts"><h3>Facts</h3><p>Tap a labelled part in either diagram.</p></div>
+      <div class="note">Fertilisation of an egg by a sperm forms a single-celled <b>zygote</b>, which divides and develops into an embryo inside the uterus.</div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 4: QUIZ ============ -->
+  <section class="mode" id="quiz">
+    <div class="panel">
+      <h2>Quick Quiz</h2>
+      <p style="color:var(--muted);font-size:.9rem;margin-top:0">Tap an answer to check it.</p>
+      <div class="quiz" id="quizBox"></div>
+      <div class="info" id="score"></div>
+    </div>
+  </section>
+
+  <footer>Reproduction Lab &middot; Self-contained interactive &middot; Biology accurate, educational use</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  function el(ns,name,attrs){var e=document.createElementNS(ns,name);if(attrs){for(var k in attrs)e.setAttribute(k,attrs[k]);}return e;}
+  var SVGNS="http://www.w3.org/2000/svg";
+  function svg(name,attrs){return el(SVGNS,name,attrs);}
+
+  /* ---------- TABS ---------- */
+  $$("#tabs .tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $$("#tabs .tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      $$(".mode").forEach(function(m){m.classList.remove("active");});
+      $("#"+t.dataset.mode).classList.add("active");
+    });
+  });
+
+  /* ================= MODE 1: ASEXUAL ================= */
+  var asexMethods=[
+    {id:"fission",name:"Binary fission",sub:"Amoeba",
+      facts:["One parent cell splits into two equal daughter cells.","The nucleus divides first, then the cytoplasm pinches into two.","Seen in Amoeba, Paramecium and many bacteria."]},
+    {id:"budding",name:"Budding",sub:"Hydra / Yeast",
+      facts:["A small outgrowth (bud) forms on the parent body.","The bud grows, develops, then detaches as a new individual.","Common in Hydra and in yeast cells."]},
+    {id:"frag",name:"Fragmentation",sub:"Spirogyra",
+      facts:["The body breaks into two or more fragments.","Each fragment grows into a complete new organism.","Seen in Spirogyra and Planaria."]},
+    {id:"spore",name:"Spore formation",sub:"Rhizopus",
+      facts:["Special structures make many tiny spores.","Spores are dispersed and germinate into new organisms.","Seen in Rhizopus (bread mould) and ferns."]},
+    {id:"veg",name:"Vegetative propagation",sub:"Potato / Bryophyllum",
+      facts:["New plants grow from roots, stems or leaves.","Potato tuber 'eyes', Bryophyllum leaf buds, onion bulbs.","Used widely in agriculture and gardening."]}
+  ];
+  var asexGrid=$("#asexCards");
+  asexMethods.forEach(function(m){
+    var c=document.createElement("div");
+    c.className="card"; c.dataset.id=m.id;
+    c.innerHTML=miniIcon(m.id)+"<h4>"+m.name+"</h4><p>"+m.sub+"</p>";
+    c.addEventListener("click",function(){selectAsex(m.id);});
+    asexGrid.appendChild(c);
+  });
+
+  function miniIcon(id){
+    // small static preview icons
+    var s='<svg viewBox="0 0 100 60">';
+    if(id==="fission") s+='<ellipse cx="34" cy="30" rx="15" ry="12" fill="#6fb1e0"/><ellipse cx="66" cy="30" rx="15" ry="12" fill="#6fb1e0"/>';
+    else if(id==="budding") s+='<circle cx="42" cy="34" r="16" fill="#4fd1a5"/><circle cx="66" cy="20" r="8" fill="#4fd1a5"/>';
+    else if(id==="frag") s+='<rect x="20" y="26" width="20" height="8" rx="4" fill="#e58ab0"/><rect x="46" y="26" width="14" height="8" rx="4" fill="#e58ab0"/><rect x="66" y="26" width="14" height="8" rx="4" fill="#e58ab0"/>';
+    else if(id==="spore") s+='<ellipse cx="50" cy="40" rx="12" ry="9" fill="#f2b45a"/><circle cx="42" cy="18" r="3" fill="#f2b45a"/><circle cx="50" cy="14" r="3" fill="#f2b45a"/><circle cx="58" cy="18" r="3" fill="#f2b45a"/>';
+    else if(id==="veg") s+='<ellipse cx="50" cy="42" rx="18" ry="10" fill="#b98a5a"/><rect x="48" y="14" width="4" height="20" fill="#4fd1a5"/><path d="M50 16 l10 -6 M50 16 l-10 -6" stroke="#4fd1a5" stroke-width="3" fill="none"/>';
+    return s+'</svg>';
+  }
+
+  var asexStage=$("#asexStage"), asexFacts=$("#asexFacts"), asexAnim=null;
+  function selectAsex(id){
+    $$("#asexCards .card").forEach(function(c){c.classList.toggle("sel",c.dataset.id===id);});
+    var m=asexMethods.filter(function(x){return x.id===id;})[0];
+    asexFacts.innerHTML="<h3>"+m.name+" &mdash; "+m.sub+"</h3>"+m.facts.map(function(f){return "<p>&bull; "+f+"</p>";}).join("");
+    animAsex(id);
+  }
+  function clearNode(n){while(n.firstChild)n.removeChild(n.firstChild);}
+  function animAsex(id){
+    if(asexAnim){clearInterval(asexAnim);asexAnim=null;}
+    clearNode(asexStage);
+    var t=0;
+    if(id==="fission"){
+      var a=svg("ellipse",{cx:200,cy:90,rx:52,ry:40,fill:"#6fb1e0"});
+      var b=svg("ellipse",{cx:200,cy:90,rx:0,ry:0,fill:"#4fd1a5"});
+      var na=svg("circle",{cx:200,cy:90,r:12,fill:"#0c131d"});
+      var nb=svg("circle",{cx:200,cy:90,r:0,fill:"#0c131d"});
+      asexStage.appendChild(a);asexStage.appendChild(b);asexStage.appendChild(na);asexStage.appendChild(nb);
+      asexStage.appendChild(label(200,160,"Amoeba: one cell splits into two"));
+      asexAnim=setInterval(function(){
+        t+=.03; if(t>1.1) t=0;
+        var d=Math.min(t,1)*60;
+        a.setAttribute("cx",200-d); a.setAttribute("rx",52-Math.min(t,1)*14);
+        na.setAttribute("cx",200-d); na.setAttribute("r",12-Math.min(t,1)*2);
+        b.setAttribute("cx",200+d); b.setAttribute("rx",Math.min(t,1)*38); b.setAttribute("ry",Math.min(t,1)*40);
+        nb.setAttribute("cx",200+d); nb.setAttribute("r",Math.min(t,1)*10);
+      },40);
+    } else if(id==="budding"){
+      var body=svg("circle",{cx:150,cy:95,r:45,fill:"#4fd1a5"});
+      var bud=svg("circle",{cx:230,cy:60,r:4,fill:"#4fd1a5"});
+      asexStage.appendChild(body);asexStage.appendChild(bud);
+      asexStage.appendChild(label(200,165,"Hydra / yeast: a bud grows and detaches"));
+      asexAnim=setInterval(function(){
+        t+=.025; if(t>1.3)t=0;
+        var g=Math.min(t,1);
+        bud.setAttribute("r",4+g*24);
+        if(t>1){bud.setAttribute("cx",230+(t-1)*120);bud.setAttribute("cy",60-(t-1)*30);}
+        else{bud.setAttribute("cx",230);bud.setAttribute("cy",60);}
+      },40);
+    } else if(id==="frag"){
+      var segs=[];
+      for(var i=0;i<3;i++){segs.push(svg("rect",{x:120+i*55,y:80,width:48,height:22,rx:11,fill:"#e58ab0"}));asexStage.appendChild(segs[i]);}
+      asexStage.appendChild(label(200,155,"Spirogyra: fragments each grow anew"));
+      asexAnim=setInterval(function(){
+        t+=.03; if(t>1.4)t=0;
+        segs.forEach(function(s,i){
+          var off=Math.min(Math.max(t-0.2*i,0),1)*20;
+          s.setAttribute("y",80-off+ i*0); s.setAttribute("x",120+i*55+off);
+          s.setAttribute("height",22+Math.min(Math.max(t-0.2*i,0),1)*10);
+        });
+      },40);
+    } else if(id==="spore"){
+      var sac=svg("ellipse",{cx:200,cy:120,rx:34,ry:26,fill:"#f2b45a"});
+      var stalk=svg("rect",{x:196,y:120,width:8,height:40,fill:"#8a6a3a"});
+      asexStage.appendChild(stalk);asexStage.appendChild(sac);
+      var spores=[];
+      for(var j=0;j<7;j++){var sp=svg("circle",{cx:200,cy:120,r:4,fill:"#f2b45a"});spores.push(sp);asexStage.appendChild(sp);}
+      asexStage.appendChild(label(200,180,"Rhizopus: spores burst out and disperse"));
+      asexAnim=setInterval(function(){
+        t+=.03; if(t>1.3)t=0;
+        var g=Math.min(t,1);
+        spores.forEach(function(sp,k){
+          var ang=(k/7)*Math.PI-Math.PI/2;
+          sp.setAttribute("cx",200+Math.cos(ang)*g*90);
+          sp.setAttribute("cy",120+Math.sin(ang)*g*70- g*10);
+          sp.setAttribute("opacity",1-g*.4);
+        });
+      },40);
+    } else if(id==="veg"){
+      var tuber=svg("ellipse",{cx:150,cy:120,rx:60,ry:32,fill:"#b98a5a"});
+      asexStage.appendChild(tuber);
+      var eye=svg("circle",{cx:150,cy:100,r:5,fill:"#6a4a2a"});
+      asexStage.appendChild(eye);
+      var stem=svg("rect",{x:148,y:100,width:5,height:0,fill:"#4fd1a5"});
+      asexStage.appendChild(stem);
+      var lf1=svg("path",{d:"",stroke:"#4fd1a5","stroke-width":4,fill:"none"});
+      var lf2=svg("path",{d:"",stroke:"#4fd1a5","stroke-width":4,fill:"none"});
+      asexStage.appendChild(lf1);asexStage.appendChild(lf2);
+      asexStage.appendChild(label(200,175,"Potato tuber: new shoot grows from an 'eye'"));
+      asexAnim=setInterval(function(){
+        t+=.02; if(t>1.3)t=0;
+        var g=Math.min(t,1);
+        stem.setAttribute("y",100-g*60); stem.setAttribute("height",g*60);
+        var top=100-g*60;
+        lf1.setAttribute("d","M150 "+(top+10)+" q 18 -8 28 -20");
+        lf2.setAttribute("d","M150 "+(top+22)+" q -18 -8 -28 -20");
+        lf1.setAttribute("opacity",g);lf2.setAttribute("opacity",g);
+      },40);
+    }
+  }
+  function label(x,y,txt){var t=svg("text",{x:x,y:y,fill:"#9fb0c3","font-size":"11","text-anchor":"middle"});t.textContent=txt;return t;}
+  selectAsex("fission");
+
+  /* ---- sexual reproduction fuse animation ---- */
+  var sexStage=$("#sexStage");
+  function drawSex(){
+    clearNode(sexStage);
+    var male=svg("circle",{cx:70,cy:80,r:22,fill:"#6fb1e0"});
+    var tail=svg("path",{d:"M48 80 q -14 6 -26 0",stroke:"#6fb1e0","stroke-width":4,fill:"none"});
+    var female=svg("circle",{cx:330,cy:80,r:34,fill:"#e58ab0"});
+    var fn=svg("circle",{cx:330,cy:80,r:12,fill:"#1c2836"});
+    sexStage.appendChild(tail);sexStage.appendChild(male);sexStage.appendChild(female);sexStage.appendChild(fn);
+    sexStage.appendChild(label(70,130,"Male gamete (sperm)"));
+    sexStage.appendChild(label(330,140,"Female gamete (egg)"));
+    return {male:male,tail:tail,female:female,fn:fn};
+  }
+  var sexEls=drawSex(), sexAnim=null;
+  $("#fuseBtn").addEventListener("click",function(){
+    if(sexAnim)return;
+    var t=0;
+    sexAnim=setInterval(function(){
+      t+=.03;
+      var x=70+t*(300-70);
+      sexEls.male.setAttribute("cx",x);
+      sexEls.tail.setAttribute("d","M"+(x-22)+" 80 q -14 6 -26 0");
+      if(t>=1){
+        clearInterval(sexAnim);sexAnim=null;
+        clearNode(sexStage);
+        var z=svg("circle",{cx:200,cy:80,r:40,fill:"#4fd1a5",class:"pulse"});
+        var zn=svg("circle",{cx:200,cy:80,r:14,fill:"#06231a"});
+        sexStage.appendChild(z);sexStage.appendChild(zn);
+        sexStage.appendChild(label(200,145,"Zygote formed — carries genes of both parents (variation)"));
+      }
+    },30);
+  });
+  $("#fuseReset").addEventListener("click",function(){if(sexAnim){clearInterval(sexAnim);sexAnim=null;}sexEls=drawSex();});
+
+  /* ================= MODE 2: FLOWER ================= */
+  var flowerParts={
+    sepal:{c:"var(--accent)",t:"Sepal","name":"Sepal (Calyx)",fact:"Green leaf-like parts that enclose and protect the flower bud before it opens."},
+    petal:{c:"var(--pink)",t:"Petal","name":"Petal (Corolla)",fact:"Bright, often scented parts that attract insects and birds for pollination."},
+    anther:{c:"var(--warn)",t:"Anther","name":"Anther (part of stamen)",fact:"The male part that produces pollen grains containing male gametes."},
+    filament:{c:"var(--warn)",t:"Filament","name":"Filament (part of stamen)",fact:"The stalk that holds up the anther. Anther + filament = the stamen."},
+    stigma:{c:"var(--accent)",t:"Stigma","name":"Stigma (part of carpel)",fact:"The sticky tip that receives pollen grains during pollination."},
+    style:{c:"var(--accent)",t:"Style","name":"Style (part of carpel)",fact:"The tube through which the pollen tube grows down towards the ovary."},
+    ovary:{c:"var(--accent)",t:"Ovary","name":"Ovary (part of carpel)",fact:"Contains ovules (female gametes). After fertilisation it becomes the fruit; ovules become seeds."}
+  };
+  var flowerSvg=$("#flowerSvg"), flrFacts=$("#flrFacts");
+  function buildFlower(){
+    clearNode(flowerSvg);
+    // sepals
+    ["sepal"].forEach(function(){});
+    var g=svg("g",{});
+    // sepals behind petals
+    [[-1,1],[1,1]].forEach(function(){});
+    // Draw sepals
+    var sepalL=svg("path",{d:"M120 235 q -30 5 -46 -18 q 30 -6 52 2 Z",fill:"#3f7d5a",class:"clickable"});
+    var sepalR=svg("path",{d:"M280 235 q 30 5 46 -18 q -30 -6 -52 2 Z",fill:"#3f7d5a",class:"clickable"});
+    tagPart(sepalL,"sepal");tagPart(sepalR,"sepal");
+    flowerSvg.appendChild(sepalL);flowerSvg.appendChild(sepalR);
+    // petals (5) around center 200,120
+    var pc=[[200,50],[290,95],[262,190],[138,190],[110,95]];
+    pc.forEach(function(p){
+      var pet=svg("ellipse",{cx:p[0],cy:p[1],rx:42,ry:32,fill:"#e58ab0",opacity:.92,class:"clickable"});
+      pet.setAttribute("transform","rotate("+(Math.atan2(p[1]-120,p[0]-200)*180/Math.PI+90)+" "+p[0]+" "+p[1]+")");
+      tagPart(pet,"petal"); flowerSvg.appendChild(pet);
+    });
+    // receptacle/stem
+    flowerSvg.appendChild(svg("rect",{x:196,y:235,width:8,height:55,fill:"#3f7d5a"}));
+    // carpel in center: ovary (bulb), style, stigma
+    var ovary=svg("ellipse",{cx:200,cy:150,rx:20,ry:26,fill:"#4fd1a5",class:"clickable"});
+    var style=svg("rect",{x:196,y:95,width:8,height:55,rx:4,fill:"#7fe0c0",class:"clickable"});
+    var stigma=svg("ellipse",{cx:200,cy:92,rx:14,ry:8,fill:"#2ea882",class:"clickable"});
+    tagPart(ovary,"ovary");tagPart(style,"style");tagPart(stigma,"stigma");
+    // stamens (male) - filament + anther, a few around
+    [[160,120],[240,120]].forEach(function(a){
+      var fil=svg("line",{x1:200,y1:150,x2:a[0],y2:a[1],stroke:"#caa15a","stroke-width":4,class:"clickable"});
+      var anth=svg("ellipse",{cx:a[0],cy:a[1],rx:10,ry:6,fill:"#f2b45a",class:"clickable"});
+      tagPart(fil,"filament");tagPart(anth,"anther");
+      flowerSvg.appendChild(fil);flowerSvg.appendChild(anth);
+    });
+    flowerSvg.appendChild(ovary);flowerSvg.appendChild(style);flowerSvg.appendChild(stigma);
+    // small text labels
+    addLbl(200,84,"Stigma");addLbl(258,118,"Anther");addLbl(200,150,"Ovary");
+  }
+  function addLbl(x,y,t){var e=svg("text",{x:x,y:y,fill:"#0c131d","font-size":"9","text-anchor":"middle","font-weight":"700"});e.textContent=t;flowerSvg.appendChild(e);}
+  function tagPart(node,key){
+    node.addEventListener("click",function(){
+      var p=flowerParts[key];
+      flrFacts.innerHTML="<h3>"+p.name+"</h3><p>"+p.fact+"</p>";
+    });
+  }
+  buildFlower();
+
+  /* ---- pollination animation ---- */
+  var pollSvg=$("#pollSvg"), pollInfo=$("#pollInfo"), pollAnim=null;
+  var pollSteps=[
+    "A pollen grain lands on the stigma (pollination).",
+    "The pollen grows a pollen tube down through the style.",
+    "The tube reaches an ovule in the ovary.",
+    "Male gamete fuses with the egg — fertilisation forms a zygote.",
+    "The ovule becomes a seed and the ovary ripens into a fruit."
+  ];
+  function buildPoll(){
+    clearNode(pollSvg);
+    // pistil cross-section
+    pollSvg.appendChild(svg("ellipse",{cx:200,cy:40,rx:40,ry:12,fill:"#2ea882"})); // stigma
+    pollSvg.appendChild(svg("rect",{x:188,y:40,width:24,height:110,fill:"#7fe0c0"})); // style
+    pollSvg.appendChild(svg("ellipse",{cx:200,cy:180,rx:55,ry:38,fill:"#4fd1a5"})); // ovary
+    pollSvg.appendChild(svg("circle",{cx:200,cy:185,r:12,fill:"#06231a"})); // ovule
+    pollSvg.appendChild(label(200,45,""));
+    var pollen=svg("circle",{cx:120,cy:30,r:7,fill:"#f2b45a",id:"pgrain"});
+    pollSvg.appendChild(pollen);
+    var tube=svg("path",{d:"",stroke:"#f2b45a","stroke-width":3,fill:"none"});
+    pollSvg.appendChild(tube);
+    // labels
+    pollSvg.appendChild(textAt(255,40,"Stigma"));
+    pollSvg.appendChild(textAt(240,105,"Style"));
+    pollSvg.appendChild(textAt(200,180,"Ovule",true));
+    return {pollen:pollen,tube:tube};
+  }
+  function textAt(x,y,t,center){var e=svg("text",{x:x,y:y,fill:"#9fb0c3","font-size":"10","text-anchor":center?"middle":"start"});e.textContent=t;return e;}
+  var pollEls=buildPoll();
+  $("#pollBtn").addEventListener("click",function(){
+    if(pollAnim)return;
+    pollEls=buildPoll();
+    var phase=0,t=0;
+    pollInfo.textContent=pollSteps[0];
+    pollAnim=setInterval(function(){
+      t+=.02;
+      if(phase===0){ // pollen moves to stigma
+        pollEls.pollen.setAttribute("cx",120+t*80);
+        pollEls.pollen.setAttribute("cy",30+t*8);
+        if(t>=1){phase=1;t=0;pollInfo.textContent=pollSteps[1];}
+      } else if(phase===1){ // tube grows down style
+        var y=40+t*110;
+        pollEls.tube.setAttribute("d","M200 40 L200 "+y);
+        if(t>=1){phase=2;t=0;pollInfo.textContent=pollSteps[2];}
+      } else if(phase===2){ // reach ovule
+        var y2=150+t*35;
+        pollEls.tube.setAttribute("d","M200 40 L200 "+y2);
+        if(t>=1){phase=3;t=0;pollInfo.textContent=pollSteps[3];}
+      } else if(phase===3){ // fertilise: ovule pulses
+        var ov=pollSvg.querySelector("circle[fill='#06231a']");
+        if(ov)ov.setAttribute("fill", (Math.floor(t*8)%2)?"#f2b45a":"#06231a");
+        if(t>=1){phase=4;t=0;pollInfo.textContent=pollSteps[4];}
+      } else { // fruit forms
+        var ovary=pollSvg.querySelector("ellipse[cx='200'][cy='180']");
+        if(ovary){ovary.setAttribute("fill","#b98a5a");ovary.setAttribute("rx",55+t*8);ovary.setAttribute("ry",38+t*8);}
+        var seed=pollSvg.querySelector("circle[fill='#06231a'],circle[fill='#f2b45a']");
+        if(seed){seed.setAttribute("fill","#6a4a2a");}
+        if(t>=1){clearInterval(pollAnim);pollAnim=null;}
+      }
+    },30);
+  });
+  $("#pollReset").addEventListener("click",function(){if(pollAnim){clearInterval(pollAnim);pollAnim=null;}pollEls=buildPoll();pollInfo.textContent=pollSteps[0];});
+
+  /* ================= MODE 3: HUMAN ================= */
+  var maleParts={
+    testis:{name:"Testes",fact:"Produce male gametes (sperm) and the hormone testosterone."},
+    scrotum:{name:"Scrotum",fact:"A pouch holding the testes outside the body, keeping them slightly cooler for sperm formation."},
+    vas:{name:"Sperm duct (vas deferens)",fact:"Carries sperm from the testes towards the urethra."},
+    gland:{name:"Associated glands",fact:"Add fluids to sperm to form semen, giving nutrition and easing movement."},
+    penis:{name:"Penis",fact:"The organ that delivers sperm into the female reproductive tract."}
+  };
+  var femaleParts={
+    ovary:{name:"Ovaries",fact:"Produce female gametes (eggs/ova) and hormones like oestrogen. Usually one egg is released each month."},
+    oviduct:{name:"Oviduct (Fallopian tube)",fact:"Carries the egg towards the uterus; fertilisation usually happens here."},
+    uterus:{name:"Uterus (womb)",fact:"A muscular organ where the fertilised egg implants and the baby develops."},
+    cervix:{name:"Cervix",fact:"The narrow lower opening of the uterus leading to the vagina."},
+    vagina:{name:"Vagina",fact:"The passage that receives sperm and through which the baby is born."}
+  };
+  var humFacts=$("#humFacts");
+  function humSelect(p){humFacts.innerHTML="<h3>"+p.name+"</h3><p>"+p.fact+"</p>";}
+
+  function buildMale(){
+    var s=$("#maleSvg"); clearNode(s);
+    // simplified schematic
+    var mk=function(node,key){node.classList.add("clickable");node.addEventListener("click",function(){humSelect(maleParts[key]);});s.appendChild(node);};
+    // sperm ducts
+    mk(svg("path",{d:"M60 150 q 10 -60 40 -70",stroke:"#6fb1e0","stroke-width":6,fill:"none"}),"vas");
+    mk(svg("path",{d:"M140 150 q -10 -60 -40 -70",stroke:"#6fb1e0","stroke-width":6,fill:"none"}),"vas");
+    // glands
+    mk(svg("ellipse",{cx:100,cy:78,rx:16,ry:11,fill:"#f2b45a"}),"gland");
+    // penis / urethra
+    mk(svg("rect",{x:92,y:88,width:16,height:70,rx:8,fill:"#e58ab0"}),"penis");
+    // scrotum
+    mk(svg("ellipse",{cx:100,cy:180,rx:44,ry:34,fill:"#3a4a5d"}),"scrotum");
+    // testes
+    mk(svg("ellipse",{cx:80,cy:182,rx:16,ry:20,fill:"#4fd1a5"}),"testis");
+    mk(svg("ellipse",{cx:120,cy:182,rx:16,ry:20,fill:"#4fd1a5"}),"testis");
+    s.appendChild(txt(100,20,"Male (schematic)"));
+    s.appendChild(txt(100,232,"Tap parts to learn"));
+  }
+  function buildFemale(){
+    var s=$("#femaleSvg"); clearNode(s);
+    var mk=function(node,key){node.classList.add("clickable");node.addEventListener("click",function(){humSelect(femaleParts[key]);});s.appendChild(node);};
+    // uterus (pear shape)
+    mk(svg("path",{d:"M100 70 q 40 15 34 70 q -6 40 -34 46 q -28 -6 -34 -46 q -6 -55 34 -70 Z",fill:"#e58ab0"}),"uterus");
+    // oviducts
+    mk(svg("path",{d:"M100 78 q 40 -30 62 -10",stroke:"#f2b45a","stroke-width":6,fill:"none"}),"oviduct");
+    mk(svg("path",{d:"M100 78 q -40 -30 -62 -10",stroke:"#f2b45a","stroke-width":6,fill:"none"}),"oviduct");
+    // ovaries
+    mk(svg("ellipse",{cx:158,cy:70,rx:13,ry:16,fill:"#4fd1a5"}),"ovary");
+    mk(svg("ellipse",{cx:42,cy:70,rx:13,ry:16,fill:"#4fd1a5"}),"ovary");
+    // cervix
+    mk(svg("rect",{x:92,y:182,width:16,height:16,fill:"#c96f96"}),"cervix");
+    // vagina
+    mk(svg("rect",{x:90,y:198,width:20,height:34,rx:8,fill:"#b45a80"}),"vagina");
+    s.appendChild(txt(100,20,"Female (schematic)"));
+    s.appendChild(txt(158,44,"Ovary"));
+  }
+  function txt(x,y,t){var e=svg("text",{x:x,y:y,fill:"#9fb0c3","font-size":"10","text-anchor":"middle"});e.textContent=t;return e;}
+  buildMale();buildFemale();
+
+  /* ================= MODE 4: QUIZ ================= */
+  var quiz=[
+    {q:"Which of these is an example of asexual reproduction by binary fission?",
+     opts:["Hydra","Amoeba","Human","Rose (cutting)"],a:1,
+     ex:"Amoeba splits into two equal daughter cells by binary fission."},
+    {q:"In a flower, which part produces the pollen grains?",
+     opts:["Stigma","Ovary","Anther","Sepal"],a:2,
+     ex:"The anther (part of the stamen, the male organ) produces pollen."},
+    {q:"Fertilisation of an egg by a sperm produces a single cell called the:",
+     opts:["Gamete","Zygote","Spore","Bud"],a:1,
+     ex:"The fused cell is the zygote, which develops into an embryo."}
+  ];
+  var quizBox=$("#quizBox"), scoreEl=$("#score"), answered=0,correct=0;
+  quiz.forEach(function(item,qi){
+    var q=document.createElement("div");q.className="q";
+    var p=document.createElement("p");p.className="qt";p.textContent=(qi+1)+". "+item.q;q.appendChild(p);
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button");b.className="opt";b.textContent=opt;
+      b.addEventListener("click",function(){
+        if(q.dataset.done)return; q.dataset.done="1";answered++;
+        var btns=$$(".opt",q);
+        btns.forEach(function(x,ix){x.disabled=true;if(ix===item.a)x.classList.add("correct");});
+        if(oi===item.a){correct++;}else{b.classList.add("wrong");}
+        $(".expl",q).classList.add("show");
+        scoreEl.textContent="Score: "+correct+" / "+answered+(answered===quiz.length?"  — quiz complete!":"");
+      });
+      q.appendChild(b);
+    });
+    var ex=document.createElement("div");ex.className="expl";ex.textContent="✓ "+item.ex;q.appendChild(ex);
+    quizBox.appendChild(q);
+  });
+})();
+</script>
+</body>
+</html>

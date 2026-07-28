@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control &amp; Coordination Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --accent:#7bd0c1;
+    --accent-dark:#4fae9c;
+    --bg:#0f1720;
+    --panel:#18232f;
+    --panel2:#1f2d3b;
+    --ink:#e7eef4;
+    --muted:#93a4b5;
+    --good:#5fd08a;
+    --bad:#e58b8b;
+    --line:#2c3d4d;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(120% 120% at 20% 0%,#16222f,#0d141c);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#0f1720;background:var(--accent);border-color:var(--accent-dark);}
+  .tab:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
+  .hidden{display:none;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .figure{flex:1 1 340px;min-width:280px;background:var(--panel2);border-radius:14px;padding:10px;}
+  .side{flex:1 1 260px;min-width:240px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{opacity:.85;}
+  .hot:focus-visible{outline:3px solid var(--accent);}
+  .info{background:var(--panel2);border-radius:12px;padding:12px 14px;border-left:4px solid var(--accent);min-height:96px;}
+  .info h3{margin:0 0 6px;font-size:1.02rem;color:var(--accent);}
+  .info p{margin:0;font-size:.9rem;color:var(--ink);}
+  .info .tag{display:inline-block;font-size:.72rem;font-weight:700;background:var(--accent);color:#0f1720;padding:2px 8px;border-radius:20px;margin-bottom:6px;}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  .btn{background:var(--accent);color:#0f1720;border:none;padding:9px 16px;border-radius:10px;font-weight:700;cursor:pointer;font-size:.9rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn:disabled{opacity:.5;cursor:default;}
+  .btn.ghost{background:var(--panel2);color:var(--accent);border:1px solid var(--line);}
+  .btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+  .facts{background:var(--panel2);border-radius:12px;padding:12px 14px;margin-top:12px;}
+  .facts h4{margin:0 0 6px;font-size:.95rem;color:var(--accent);}
+  .facts ul{margin:0;padding-left:18px;font-size:.86rem;color:var(--muted);}
+  .facts li{margin-bottom:4px;}
+  .legend{font-size:.78rem;color:var(--muted);margin-top:6px;}
+  .contrast{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+  .ccard{flex:1 1 180px;background:var(--panel2);border-radius:12px;padding:10px 12px;border-top:3px solid var(--accent);}
+  .ccard h4{margin:0 0 4px;font-size:.9rem;color:var(--accent);}
+  .ccard p{margin:0;font-size:.82rem;color:var(--muted);}
+  .bonus{margin-top:12px;background:linear-gradient(150deg,#1c3a35,#1a2b30);border-radius:12px;padding:12px 14px;border:1px dashed var(--accent-dark);}
+  .bonus h4{margin:0 0 4px;color:var(--accent);font-size:.95rem;}
+  .bonus p{margin:0;font-size:.84rem;color:var(--ink);}
+  .quiz .q{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line);}
+  .quiz .q:last-child{border-bottom:none;}
+  .quiz p.qt{font-weight:600;margin:0 0 8px;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:.87rem;transition:.15s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(95,208,138,.18);border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:rgba(229,139,139,.15);border-color:var(--bad);color:var(--bad);}
+  .opt:focus-visible{outline:3px solid var(--accent);outline-offset:1px;}
+  .fb{font-size:.82rem;margin-top:4px;min-height:18px;}
+  .score{font-weight:700;color:var(--accent);margin-top:6px;}
+  text{font-family:inherit;}
+  @media (max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Control &amp; Coordination Lab</h1>
+    <p>NIOS Class 10 - Life Processes 2. Explore how nerves, brain and hormones keep the body in control.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="neuron" role="tab">Neuron &amp; Reflex</button>
+    <button class="tab" data-mode="brain" role="tab">Nervous System</button>
+    <button class="tab" data-mode="hormone" role="tab">Hormones</button>
+    <button class="tab" data-mode="quiz" role="tab">Quiz</button>
+  </div>
+
+  <!-- ================= NEURON & REFLEX ================= -->
+  <section class="panel" id="mode-neuron">
+    <div class="stage">
+      <div class="figure">
+        <svg id="neuronSvg" viewBox="0 0 480 300" aria-label="Neuron diagram">
+          <!-- dendrites -->
+          <g class="hot" tabindex="0" data-part="dendrite" role="button" aria-label="Dendrite">
+            <path d="M70 150 L20 110 M70 150 L15 150 M70 150 L22 195 M55 135 L30 90 M60 175 L28 210" stroke="#e0b15a" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- cell body -->
+          <circle class="hot" tabindex="0" data-part="cellbody" role="button" aria-label="Cell body" cx="90" cy="150" r="34" fill="#5a86c9"/>
+          <circle cx="90" cy="150" r="12" fill="#2f4d7d"/>
+          <!-- axon -->
+          <rect class="hot" tabindex="0" data-part="axon" role="button" aria-label="Axon" x="124" y="142" width="220" height="16" rx="8" fill="#8bc9b9"/>
+          <!-- myelin -->
+          <rect x="165" y="139" width="26" height="22" rx="6" fill="#c9e6df"/>
+          <rect x="225" y="139" width="26" height="22" rx="6" fill="#c9e6df"/>
+          <rect x="285" y="139" width="26" height="22" rx="6" fill="#c9e6df"/>
+          <!-- axon terminals -->
+          <path d="M344 150 L385 120 M344 150 L392 150 M344 150 L385 180" stroke="#8bc9b9" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <!-- synapse -->
+          <g class="hot" tabindex="0" data-part="synapse" role="button" aria-label="Synapse">
+            <circle cx="388" cy="118" r="7" fill="#e58b8b"/>
+            <circle cx="396" cy="150" r="7" fill="#e58b8b"/>
+            <circle cx="388" cy="182" r="7" fill="#e58b8b"/>
+            <path d="M410 130 L430 130 M410 150 L430 150 M410 170 L430 170" stroke="#7bd0c1" stroke-width="3"/>
+          </g>
+          <text x="90" y="205" fill="#93a4b5" font-size="11" text-anchor="middle">tap a labelled part</text>
+        </svg>
+        <div class="legend">Signal travels: dendrite &rarr; cell body &rarr; axon &rarr; synapse &rarr; next cell.</div>
+      </div>
+      <div class="side">
+        <div class="info" id="neuronInfo" aria-live="polite">
+          <span class="tag">Neuron</span>
+          <h3>The nerve cell</h3>
+          <p>A neuron is the structural and functional unit of the nervous system. Tap the dendrite, cell body, axon or synapse to learn its job.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin:16px 0 6px;font-size:1rem;">Reflex arc: hand off a hot object</h3>
+    <div class="figure" style="flex:1 1 100%;">
+      <svg id="reflexSvg" viewBox="0 0 480 260" aria-label="Reflex arc animation">
+        <!-- spinal cord -->
+        <rect x="360" y="30" width="70" height="200" rx="18" fill="#243447" stroke="#3a5170" stroke-width="2"/>
+        <path d="M395 40 Q378 130 395 220" stroke="#5a86c9" stroke-width="6" fill="none" opacity=".5"/>
+        <text x="395" y="245" fill="#93a4b5" font-size="11" text-anchor="middle">spinal cord</text>
+        <!-- hand -->
+        <g id="hand">
+          <ellipse cx="60" cy="90" rx="30" ry="20" fill="#e0b48a"/>
+          <rect x="45" y="70" width="10" height="26" rx="5" fill="#e0b48a"/>
+          <rect x="58" y="66" width="10" height="30" rx="5" fill="#e0b48a"/>
+          <rect x="71" y="70" width="10" height="26" rx="5" fill="#e0b48a"/>
+        </g>
+        <!-- hot object -->
+        <g id="flame">
+          <path d="M60 150 q-14 -18 0 -34 q6 12 14 6 q4 16 -14 28 z" fill="#e58b5a"/>
+          <path d="M60 148 q-7 -10 0 -20 q6 8 0 20 z" fill="#f2c14e"/>
+          <text x="60" y="176" fill="#93a4b5" font-size="10" text-anchor="middle">hot object</text>
+        </g>
+        <!-- pathway nodes -->
+        <circle class="node" data-n="0" cx="60"  cy="120" r="9" fill="#33475b"/>
+        <circle class="node" data-n="1" cx="150" cy="120" r="9" fill="#33475b"/>
+        <circle class="node" data-n="2" cx="260" cy="120" r="9" fill="#33475b"/>
+        <circle class="node" data-n="3" cx="395" cy="120" r="9" fill="#33475b"/>
+        <circle class="node" data-n="4" cx="260" cy="190" r="9" fill="#33475b"/>
+        <circle class="node" data-n="5" cx="60"  cy="190" r="9" fill="#33475b"/>
+        <!-- path lines -->
+        <path d="M60 120 L150 120 L260 120 L395 120" stroke="#33475b" stroke-width="3" fill="none"/>
+        <path d="M395 130 L395 190 L260 190 L60 190 L60 108" stroke="#33475b" stroke-width="3" fill="none"/>
+        <!-- moving pulse -->
+        <circle id="pulse" r="7" cx="60" cy="120" fill="#7bd0c1" opacity="0"/>
+        <text x="105" y="112" fill="#93a4b5" font-size="10" text-anchor="middle">receptor</text>
+        <text x="205" y="112" fill="#93a4b5" font-size="10" text-anchor="middle">sensory</text>
+        <text x="160" y="205" fill="#93a4b5" font-size="10" text-anchor="middle">motor &rarr; muscle</text>
+      </svg>
+      <div class="row">
+        <button class="btn" id="reflexBtn">&#9654; Fire reflex</button>
+        <button class="btn ghost" id="reflexReset">Reset</button>
+        <span id="reflexStage" style="font-size:.85rem;color:var(--accent);font-weight:600;"></span>
+      </div>
+    </div>
+
+    <div class="facts">
+      <h4>Key facts</h4>
+      <ul>
+        <li>A <strong>reflex action</strong> is an automatic, rapid response that does not need conscious thought from the brain.</li>
+        <li>The path taken by the nerve impulse in a reflex is the <strong>reflex arc</strong>, coordinated by the spinal cord.</li>
+        <li>Order: stimulus &rarr; receptor &rarr; sensory neuron &rarr; spinal cord &rarr; motor neuron &rarr; effector (muscle).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= NERVOUS SYSTEM MAP ================= -->
+  <section class="panel hidden" id="mode-brain">
+    <div class="stage">
+      <div class="figure">
+        <svg id="brainSvg" viewBox="0 0 360 320" aria-label="Brain and spinal cord">
+          <!-- cerebrum -->
+          <path class="hot" tabindex="0" data-region="cerebrum" role="button" aria-label="Cerebrum"
+            d="M60 120 Q55 55 130 45 Q200 30 250 60 Q300 75 290 130 Q285 150 250 150 L90 150 Q62 150 60 120 Z"
+            fill="#5a86c9" stroke="#2f4d7d" stroke-width="2"/>
+          <path d="M110 60 Q120 90 110 145 M160 50 Q168 95 160 148 M210 55 Q216 100 210 148 M250 70 Q252 110 248 148"
+            stroke="#2f4d7d" stroke-width="2" fill="none" opacity=".55"/>
+          <!-- cerebellum -->
+          <path class="hot" tabindex="0" data-region="cerebellum" role="button" aria-label="Cerebellum"
+            d="M255 150 Q315 150 315 195 Q315 225 270 225 L245 200 Z"
+            fill="#e0a95a" stroke="#a9762f" stroke-width="2"/>
+          <!-- medulla / brain stem -->
+          <path class="hot" tabindex="0" data-region="medulla" role="button" aria-label="Medulla oblongata"
+            d="M180 150 L250 150 L245 200 L215 210 L185 200 Z"
+            fill="#c97ea6" stroke="#8a4d70" stroke-width="2"/>
+          <!-- spinal cord -->
+          <rect class="hot" tabindex="0" data-region="spinal" role="button" aria-label="Spinal cord"
+            x="188" y="205" width="26" height="100" rx="12" fill="#8bc9b9" stroke="#4fae9c" stroke-width="2"/>
+          <text x="105" y="105" fill="#0f1720" font-size="12" font-weight="700">Cerebrum</text>
+          <text x="278" y="192" fill="#0f1720" font-size="10" font-weight="700" text-anchor="middle">Cerebellum</text>
+          <text x="215" y="180" fill="#0f1720" font-size="9" font-weight="700" text-anchor="middle">Medulla</text>
+          <text x="201" y="255" fill="#0f1720" font-size="9" font-weight="700" text-anchor="middle" transform="rotate(90 201 255)">Spinal cord</text>
+        </svg>
+        <div class="legend">Tap a region to see its function.</div>
+      </div>
+      <div class="side">
+        <div class="info" id="brainInfo" aria-live="polite">
+          <span class="tag">Nervous system</span>
+          <h3>Master control network</h3>
+          <p>The nervous system has two parts. Tap a labelled region of the brain or the spinal cord to learn what it does.</p>
+        </div>
+        <div class="contrast">
+          <div class="ccard">
+            <h4>CNS</h4>
+            <p>Central Nervous System = brain + spinal cord. It processes information and makes decisions.</p>
+          </div>
+          <div class="ccard">
+            <h4>PNS</h4>
+            <p>Peripheral Nervous System = all nerves branching out. It carries messages to and from the CNS.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="facts">
+      <h4>Key facts</h4>
+      <ul>
+        <li>The <strong>cerebrum</strong> is the largest part - the seat of thinking, memory and voluntary action.</li>
+        <li>The <strong>cerebellum</strong> keeps posture and balance, and coordinates precise muscle movement.</li>
+        <li>The <strong>medulla oblongata</strong> controls involuntary vital actions: heartbeat, breathing, blood pressure.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= HORMONES ================= -->
+  <section class="panel hidden" id="mode-hormone">
+    <div class="stage">
+      <div class="figure">
+        <svg id="glandSvg" viewBox="0 0 240 340" aria-label="Endocrine glands body map">
+          <!-- body -->
+          <path d="M120 20 a26 26 0 1 1 -0.1 0 Z" fill="#26384a"/>
+          <path d="M84 70 Q120 58 156 70 L168 150 L150 165 L150 300 L90 300 L90 165 L72 150 Z" fill="#26384a"/>
+          <!-- pituitary -->
+          <circle class="hot" tabindex="0" data-gland="pituitary" role="button" aria-label="Pituitary gland" cx="120" cy="32" r="7" fill="#7bd0c1"/>
+          <!-- thyroid -->
+          <ellipse class="hot" tabindex="0" data-gland="thyroid" role="button" aria-label="Thyroid gland" cx="120" cy="74" rx="13" ry="7" fill="#e0a95a"/>
+          <!-- adrenal (on kidneys) -->
+          <ellipse class="hot" tabindex="0" data-gland="adrenal" role="button" aria-label="Adrenal glands" cx="102" cy="150" rx="8" ry="6" fill="#c97ea6"/>
+          <ellipse class="hot" tabindex="0" data-gland="adrenal" role="button" aria-label="Adrenal glands" cx="138" cy="150" rx="8" ry="6" fill="#c97ea6"/>
+          <!-- pancreas -->
+          <path class="hot" tabindex="0" data-gland="pancreas" role="button" aria-label="Pancreas"
+            d="M105 175 Q125 168 148 178 Q135 190 118 185 Q110 184 105 175 Z" fill="#8bc9b9"/>
+          <text x="120" y="18" fill="#93a4b5" font-size="9" text-anchor="middle">pituitary</text>
+          <text x="176" y="76" fill="#93a4b5" font-size="9">thyroid</text>
+          <text x="176" y="152" fill="#93a4b5" font-size="9">adrenal</text>
+          <text x="176" y="182" fill="#93a4b5" font-size="9">pancreas</text>
+        </svg>
+        <div class="legend">Tap a gland to see its hormone and effect.</div>
+      </div>
+      <div class="side">
+        <div class="info" id="glandInfo" aria-live="polite">
+          <span class="tag">Endocrine</span>
+          <h3>Chemical messengers</h3>
+          <p>Endocrine glands release <strong>hormones</strong> straight into the blood. Tap a gland to see the hormone it makes and what it does.</p>
+        </div>
+        <div class="contrast">
+          <div class="ccard">
+            <h4>Nervous control</h4>
+            <p>Uses electrical impulses through nerves. Very <strong>fast</strong>, short-lived, and targeted.</p>
+          </div>
+          <div class="ccard">
+            <h4>Hormonal control</h4>
+            <p>Uses chemicals in the blood. <strong>Slower</strong> to start but longer-lasting and widespread.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bonus">
+      <h4>Bonus: coordination in plants</h4>
+      <p>Plants have no nervous system. They respond with <strong>tropisms</strong> - directional growth guided by hormones. <strong>Auxin</strong> gathers on the shaded side of a shoot, making those cells grow longer so the shoot bends toward light (phototropism). Roots show gravitropism, growing downward.</p>
+    </div>
+    <div class="facts">
+      <h4>Key facts</h4>
+      <ul>
+        <li>The <strong>pituitary</strong> is the "master gland" - its hormones control other glands and growth.</li>
+        <li><strong>Insulin</strong> from the pancreas lowers blood sugar; too little causes diabetes.</li>
+        <li><strong>Adrenaline</strong> from adrenal glands prepares the body for "fight or flight" emergencies.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="panel hidden" id="mode-quiz">
+    <div class="quiz" id="quizBox" aria-live="polite"></div>
+    <div class="score" id="quizScore"></div>
+    <div class="row"><button class="btn ghost" id="quizReset">Reset quiz</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- tab switching ----------
+  var tabs = document.querySelectorAll('.tab');
+  var sections = {
+    neuron: document.getElementById('mode-neuron'),
+    brain: document.getElementById('mode-brain'),
+    hormone: document.getElementById('mode-hormone'),
+    quiz: document.getElementById('mode-quiz')
+  };
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      Object.keys(sections).forEach(function(k){ sections[k].classList.add('hidden'); });
+      sections[t.dataset.mode].classList.remove('hidden');
+    });
+  });
+
+  function setInfo(el, tag, title, body){
+    el.innerHTML = '<span class="tag">'+tag+'</span><h3>'+title+'</h3><p>'+body+'</p>';
+  }
+
+  // ---------- neuron parts ----------
+  var neuronData = {
+    dendrite:{t:'Dendrite', b:'Short branched fibres that <strong>receive</strong> signals from other neurons and carry the impulse toward the cell body.'},
+    cellbody:{t:'Cell body', b:'Contains the nucleus and cytoplasm. It <strong>processes</strong> incoming information from the dendrites.'},
+    axon:{t:'Axon', b:'A long fibre that <strong>carries the impulse away</strong> from the cell body toward the axon terminals. Often insulated by a myelin sheath.'},
+    synapse:{t:'Synapse', b:'The tiny gap between two neurons. The signal crosses using <strong>chemicals (neurotransmitters)</strong> to reach the next cell.'}
+  };
+  var neuronInfo = document.getElementById('neuronInfo');
+  document.querySelectorAll('#neuronSvg .hot').forEach(function(g){
+    function act(){
+      document.querySelectorAll('#neuronSvg .hot').forEach(function(x){x.removeAttribute('stroke');});
+      g.setAttribute('stroke','#e7eef4'); g.setAttribute('stroke-width','2');
+      var d = neuronData[g.dataset.part];
+      setInfo(neuronInfo,'Neuron', d.t, d.b);
+    }
+    g.addEventListener('click', act);
+    g.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();act();} });
+  });
+
+  // ---------- reflex arc animation ----------
+  var reflexSvg = document.getElementById('reflexSvg');
+  var pulse = document.getElementById('pulse');
+  var hand = document.getElementById('hand');
+  var stageLbl = document.getElementById('reflexStage');
+  var reflexBtn = document.getElementById('reflexBtn');
+  var nodes = reflexSvg.querySelectorAll('.node');
+  // waypoints matching node positions in order
+  var waypoints = [
+    {x:60,y:120,  label:'Stimulus: heat detected by receptor'},
+    {x:150,y:120, label:'Sensory neuron carries impulse'},
+    {x:260,y:120, label:'Impulse reaches spinal cord'},
+    {x:395,y:120, label:'Spinal cord relays the signal'},
+    {x:260,y:190, label:'Motor neuron fires'},
+    {x:60,y:190,  label:'Effector: muscle pulls hand back'}
+  ];
+  var animId = null, startTime = null, seg = 0, running = false;
+
+  function resetReflex(){
+    if(animId){ cancelAnimationFrame(animId); animId=null; }
+    running=false; seg=0; startTime=null;
+    pulse.setAttribute('opacity','0');
+    pulse.setAttribute('cx','60'); pulse.setAttribute('cy','120');
+    hand.setAttribute('transform','');
+    stageLbl.textContent='';
+    nodes.forEach(function(n){ n.setAttribute('fill','#33475b'); });
+    reflexBtn.disabled=false;
+  }
+
+  function step(ts){
+    if(document.hidden){ animId=requestAnimationFrame(step); return; }
+    if(startTime===null) startTime=ts;
+    var segDur = 550; // ms per segment
+    var from = waypoints[seg];
+    var to = waypoints[seg+1];
+    var p = Math.min(1,(ts-startTime)/segDur);
+    var x = from.x + (to.x-from.x)*p;
+    var y = from.y + (to.y-from.y)*p;
+    pulse.setAttribute('cx',x); pulse.setAttribute('cy',y);
+    pulse.setAttribute('opacity','1');
+    if(p>=1){
+      nodes[seg+1].setAttribute('fill','#7bd0c1');
+      stageLbl.textContent=to.label;
+      seg++;
+      startTime=ts;
+      if(seg===waypoints.length-1){
+        // final: pull hand away
+        hand.setAttribute('transform','translate(0,-26)');
+        running=false;
+        reflexBtn.disabled=false;
+        return;
+      }
+    }
+    animId=requestAnimationFrame(step);
+  }
+
+  reflexBtn.addEventListener('click', function(){
+    if(running) return;
+    resetReflex();
+    running=true; reflexBtn.disabled=true;
+    nodes[0].setAttribute('fill','#7bd0c1');
+    stageLbl.textContent=waypoints[0].label;
+    animId=requestAnimationFrame(step);
+  });
+  document.getElementById('reflexReset').addEventListener('click', resetReflex);
+
+  document.addEventListener('visibilitychange', function(){
+    // when tab hidden, step() self-pauses; nothing else needed
+  });
+
+  // ---------- brain regions ----------
+  var brainData = {
+    cerebrum:{t:'Cerebrum (CNS)', b:'The largest, most developed part. Controls <strong>thinking, memory, reasoning, speech and voluntary actions</strong>, and receives sensory information.'},
+    cerebellum:{t:'Cerebellum (CNS)', b:'Maintains <strong>balance, posture and coordination</strong> of precise voluntary movements like walking or writing.'},
+    medulla:{t:'Medulla oblongata (CNS)', b:'Part of the brain stem. Controls <strong>involuntary vital actions</strong> - heartbeat, breathing, blood pressure, vomiting.'},
+    spinal:{t:'Spinal cord (CNS)', b:'A cord of nerve tissue from the medulla down the back. Coordinates <strong>reflex actions</strong> and connects the brain to body nerves (PNS).'}
+  };
+  var brainInfo = document.getElementById('brainInfo');
+  document.querySelectorAll('#brainSvg .hot').forEach(function(g){
+    function act(){
+      document.querySelectorAll('#brainSvg .hot').forEach(function(x){x.setAttribute('stroke-width','2');});
+      g.setAttribute('stroke','#e7eef4'); g.setAttribute('stroke-width','4');
+      var d = brainData[g.dataset.region];
+      setInfo(brainInfo,'Nervous system', d.t, d.b);
+    }
+    g.addEventListener('click', act);
+    g.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();act();} });
+  });
+
+  // ---------- glands ----------
+  var glandData = {
+    pituitary:{t:'Pituitary - growth hormone', b:'The <strong>master gland</strong> at the base of the brain. Its growth hormone controls body growth, and it directs other endocrine glands.'},
+    thyroid:{t:'Thyroid - thyroxine', b:'Makes <strong>thyroxine</strong>, which regulates the rate of metabolism. It needs iodine; a shortage causes goitre.'},
+    pancreas:{t:'Pancreas - insulin', b:'Releases <strong>insulin</strong>, which lowers blood sugar by helping cells take in glucose. Too little insulin causes diabetes.'},
+    adrenal:{t:'Adrenal - adrenaline', b:'Sits above the kidneys. Its <strong>adrenaline</strong> triggers "fight or flight": faster heartbeat, quick breathing and raised blood sugar.'}
+  };
+  var glandInfo = document.getElementById('glandInfo');
+  document.querySelectorAll('#glandSvg .hot').forEach(function(g){
+    function act(){
+      document.querySelectorAll('#glandSvg .hot').forEach(function(x){x.removeAttribute('stroke');});
+      document.querySelectorAll('#glandSvg .hot[data-gland="'+g.dataset.gland+'"]').forEach(function(x){
+        x.setAttribute('stroke','#e7eef4'); x.setAttribute('stroke-width','2');
+      });
+      var d = glandData[g.dataset.gland];
+      setInfo(glandInfo,'Endocrine', d.t, d.b);
+    }
+    g.addEventListener('click', act);
+    g.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();act();} });
+  });
+
+  // ---------- quiz ----------
+  var quiz = [
+    {q:'In a reflex action such as pulling your hand off a hot object, which part coordinates the response?',
+     opts:['Cerebrum','Spinal cord','Cerebellum','Pituitary gland'], ans:1,
+     fb:'The spinal cord runs the reflex arc, so the response is fast and needs no conscious thought.'},
+    {q:'Which hormone lowers the level of sugar in the blood?',
+     opts:['Adrenaline','Thyroxine','Insulin','Growth hormone'], ans:2,
+     fb:'Insulin from the pancreas helps cells absorb glucose, lowering blood sugar.'},
+    {q:'How is hormonal control different from nervous control?',
+     opts:['It is faster and uses nerves','It is slower and uses chemicals in blood','It only works in plants','It uses electrical impulses only'], ans:1,
+     fb:'Hormones travel in the blood - slower to act but longer-lasting than nerve impulses.'}
+  ];
+  var quizBox = document.getElementById('quizBox');
+  var quizScore = document.getElementById('quizScore');
+  var answered = [];
+
+  function renderQuiz(){
+    answered = quiz.map(function(){return false;});
+    quizBox.innerHTML='';
+    quiz.forEach(function(item, qi){
+      var qd = document.createElement('div'); qd.className='q';
+      var p = document.createElement('p'); p.className='qt'; p.textContent=(qi+1)+'. '+item.q;
+      qd.appendChild(p);
+      item.opts.forEach(function(opt, oi){
+        var b = document.createElement('button');
+        b.className='opt'; b.type='button'; b.textContent=opt;
+        b.addEventListener('click', function(){
+          if(answered[qi]) return;
+          answered[qi]=true;
+          var btns = qd.querySelectorAll('.opt');
+          btns.forEach(function(x,idx){
+            if(idx===item.ans) x.classList.add('correct');
+            x.disabled=true;
+          });
+          if(oi!==item.ans) b.classList.add('wrong');
+          fb.textContent=(oi===item.ans?'Correct! ':'Not quite. ')+item.fb;
+          fb.style.color = oi===item.ans ? 'var(--good)' : 'var(--bad)';
+          updateScore();
+        });
+        qd.appendChild(b);
+      });
+      var fb = document.createElement('div'); fb.className='fb'; qd.appendChild(fb);
+      quizBox.appendChild(qd);
+    });
+    quizScore.textContent='';
+  }
+  function updateScore(){
+    var done = answered.filter(Boolean).length;
+    var correct = 0;
+    var qs = quizBox.querySelectorAll('.q');
+    qs.forEach(function(q, i){
+      if(!answered[i]) return;
+      var wrong = q.querySelector('.opt.wrong');
+      if(!wrong) correct++;
+    });
+    if(done===quiz.length){
+      quizScore.textContent='Score: '+correct+' / '+quiz.length;
+    }
+  }
+  document.getElementById('quizReset').addEventListener('click', renderQuiz);
+  renderQuiz();
+
+})();
+</script>
+</body>
+</html>
