@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Force &amp; Motion Lab — Force and Motion (NIOS Class 10, Ch 10)</title>
+<style>
+  :root{
+    --bg:#10141f;
+    --panel:#1a2030;
+    --panel2:#222a3f;
+    --ink:#e8ecf6;
+    --muted:#9aa5bd;
+    --accent:#5cc8ff;
+    --accent-soft:rgba(92,200,255,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --warn:#ffb454;
+    --line:#2e3852;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 10px}
+  header h1{font-size:1.45rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.92rem;margin-top:2px}
+
+  .tabs{display:flex;gap:8px;margin:14px 0 16px;flex-wrap:wrap}
+  .tab-btn{flex:1 1 120px;min-height:52px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.98rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:10px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin-bottom:6px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl label b{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 90px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #10141f;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #10141f}
+
+  .btn{min-height:48px;padding:0 20px;border-radius:12px;border:none;font-size:1rem;font-weight:700;
+    cursor:pointer;touch-action:manipulation;transition:transform .1s}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--accent);color:#06202e}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+  canvas{display:block;width:100%;height:auto;border-radius:12px;background:#0b0f1a;border:1px solid var(--line)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:8px 12px;min-width:100px;flex:1 1 100px;text-align:center}
+  .chip .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .chip .v{font-size:1.08rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .chip .v small{font-size:.72rem;color:var(--muted);font-weight:500}
+
+  .caption{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--panel2);
+    border-left:4px solid var(--accent);font-size:.9rem;color:var(--ink)}
+  .caption b{color:var(--accent)}
+
+  .facts{columns:2;column-gap:16px}
+  .facts .card{break-inside:avoid;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .facts .card h4{color:var(--accent);font-size:.92rem;margin-bottom:4px}
+  .facts .card p{font-size:.86rem;color:var(--muted)}
+  .facts .card p b{color:var(--ink)}
+  @media(max-width:560px){.facts{columns:1}}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+  .quiz .q p.stem{font-size:.94rem;font-weight:600;margin-bottom:8px}
+  .quiz .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:10px 12px;margin-bottom:7px;font-size:.9rem;cursor:pointer;
+    touch-action:manipulation}
+  .quiz .opt:active{transform:scale(.995)}
+  .quiz .opt.correct{background:rgba(95,214,139,.18);border-color:var(--good);color:var(--good)}
+  .quiz .opt.wrong{background:rgba(255,123,123,.16);border-color:var(--bad);color:var(--bad)}
+  .quiz .fb{font-size:.84rem;margin-top:4px;color:var(--muted);min-height:1em}
+
+  .hidden{display:none}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Force &amp; Motion <span>Lab</span></h1>
+    <p>Newton's laws, momentum &amp; impulse — NIOS Class 10 Science &amp; Technology, Ch 10.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="fma">F = ma</button>
+    <button class="tab-btn" data-tab="laws">1st &amp; 3rd Laws</button>
+    <button class="tab-btn" data-tab="mom">Momentum</button>
+    <button class="tab-btn" data-tab="learn">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- ================= F = ma ================= -->
+  <section class="panel" id="tab-fma">
+    <h2>Newton's 2nd Law &mdash; F = ma</h2>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Applied force F = <b><output id="fmaFout">30</output> N</b></label>
+        <input type="range" id="fmaF" min="0" max="80" step="1" value="30">
+      </div>
+      <div class="ctrl">
+        <label>Mass m = <b><output id="fmaMout">3</output> kg</b></label>
+        <input type="range" id="fmaM" min="1" max="10" step="0.5" value="3">
+      </div>
+      <div class="ctrl">
+        <label>Friction coeff. &mu; = <b><output id="fmaUout">0.20</output></b></label>
+        <input type="range" id="fmaU" min="0" max="0.6" step="0.01" value="0.20">
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="fmaRun">Push</button>
+      <button class="btn ghost" id="fmaReset">Reset</button>
+    </div>
+    <canvas id="fmaCanvas" width="900" height="340"></canvas>
+    <div class="chips">
+      <div class="chip"><div class="k">Friction f</div><div class="v"><span id="fmaFric">6.0</span> <small>N</small></div></div>
+      <div class="chip"><div class="k">Net force</div><div class="v"><span id="fmaNet">24.0</span> <small>N</small></div></div>
+      <div class="chip"><div class="k">Acceleration a</div><div class="v"><span id="fmaA">8.00</span> <small>m/s&sup2;</small></div></div>
+      <div class="chip"><div class="k">Velocity v</div><div class="v"><span id="fmaV">0.00</span> <small>m/s</small></div></div>
+    </div>
+    <div class="caption">Net force = F &minus; friction, and <b>a = F<sub>net</sub> / m</b>. If applied force cannot beat static friction, the block stays still (1st law). Force unit: <b>1 N = 1 kg&middot;m&middot;s&#8315;&sup2;</b>.</div>
+  </section>
+
+  <!-- ================= Laws ================= -->
+  <section class="panel hidden" id="tab-laws">
+    <h2>Newton's 1st Law (inertia) &amp; 3rd Law (action&ndash;reaction)</h2>
+    <div class="seg" id="lawsSeg" style="margin-bottom:12px">
+      <button class="on" data-demo="inertia">Inertia (1st law)</button>
+      <button data-demo="rocket">Rocket / balloon (3rd law)</button>
+      <button data-demo="wall">Push a wall (3rd law)</button>
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="lawsAction">Apply force</button>
+      <button class="btn ghost" id="lawsReset">Reset</button>
+    </div>
+    <canvas id="lawsCanvas" width="900" height="340"></canvas>
+    <div class="caption" id="lawsCaption"></div>
+  </section>
+
+  <!-- ================= Momentum ================= -->
+  <section class="panel hidden" id="tab-mom">
+    <h2>Conservation of Momentum &amp; Impulse</h2>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Mass m&#8321; = <b><output id="momM1out">2</output> kg</b></label>
+        <input type="range" id="momM1" min="1" max="8" step="0.5" value="2">
+      </div>
+      <div class="ctrl">
+        <label>Velocity u&#8321; = <b><output id="momU1out">4</output> m/s</b></label>
+        <input type="range" id="momU1" min="-6" max="6" step="0.5" value="4">
+      </div>
+      <div class="ctrl">
+        <label>Mass m&#8322; = <b><output id="momM2out">3</output> kg</b></label>
+        <input type="range" id="momM2" min="1" max="8" step="0.5" value="3">
+      </div>
+      <div class="ctrl">
+        <label>Velocity u&#8322; = <b><output id="momU2out">-2</output> m/s</b></label>
+        <input type="range" id="momU2" min="-6" max="6" step="0.5" value="-2">
+      </div>
+      <div class="ctrl">
+        <label>Collision type</label>
+        <div class="seg" id="momSeg">
+          <button class="on" data-e="1">Elastic</button>
+          <button data-e="0">Perfectly inelastic</button>
+        </div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="momRun">Collide</button>
+      <button class="btn ghost" id="momReset">Reset</button>
+    </div>
+    <canvas id="momCanvas" width="900" height="300"></canvas>
+    <div class="chips">
+      <div class="chip"><div class="k">p before</div><div class="v"><span id="momPb">2.0</span> <small>kg&middot;m/s</small></div></div>
+      <div class="chip"><div class="k">p after</div><div class="v"><span id="momPa">2.0</span> <small>kg&middot;m/s</small></div></div>
+      <div class="chip"><div class="k">v&#8321; after</div><div class="v"><span id="momV1">0.0</span> <small>m/s</small></div></div>
+      <div class="chip"><div class="k">v&#8322; after</div><div class="v"><span id="momV2">0.0</span> <small>m/s</small></div></div>
+      <div class="chip"><div class="k">Impulse on 1</div><div class="v"><span id="momJ">0.0</span> <small>N&middot;s</small></div></div>
+    </div>
+    <div class="caption">Total momentum is conserved: <b>m&#8321;u&#8321; + m&#8322;u&#8322; = m&#8321;v&#8321; + m&#8322;v&#8322;</b>. Impulse <b>J = F&Delta;t = &Delta;p</b> (unit N&middot;s = kg&middot;m/s). Right is positive.</div>
+  </section>
+
+  <!-- ================= Facts & Quiz ================= -->
+  <section class="panel hidden" id="tab-learn">
+    <h2>Key Facts</h2>
+    <div class="facts">
+      <div class="card"><h4>1st Law (Inertia)</h4><p>A body stays at rest, or moves with <b>uniform velocity in a straight line</b>, unless an unbalanced (net) external force acts on it.</p></div>
+      <div class="card"><h4>2nd Law</h4><p>Rate of change of momentum &prop; applied force. In everyday form <b>F = m a</b>. Also F = &Delta;p/&Delta;t.</p></div>
+      <div class="card"><h4>3rd Law</h4><p>To every action there is an <b>equal and opposite reaction</b>. The pair acts on <b>two different bodies</b>.</p></div>
+      <div class="card"><h4>Momentum</h4><p><b>p = m v</b> (unit kg&middot;m/s). Total momentum of an isolated system is conserved.</p></div>
+      <div class="card"><h4>Impulse</h4><p><b>J = F &Delta;t = &Delta;p</b> (unit N&middot;s). A small force over a long time can equal a large force over a short time.</p></div>
+      <div class="card"><h4>Units</h4><p>Force: <b>1 newton (N) = 1 kg&middot;m&middot;s&#8315;&sup2;</b> &mdash; the force that gives a 1 kg mass an acceleration of 1 m/s&sup2;.</p></div>
+    </div>
+
+    <h2 style="margin-top:6px">Quick Quiz</h2>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>Self-contained interactive simulation &middot; physics values are illustrative and rounded for clarity.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var G = 9.8; // m/s^2
+
+  /* ---------- tab switching ---------- */
+  var tabs = document.querySelectorAll(".tab-btn");
+  var sections = {fma:"tab-fma", laws:"tab-laws", mom:"tab-mom", learn:"tab-learn"};
+  tabs.forEach(function(b){
+    b.addEventListener("click", function(){
+      tabs.forEach(function(x){x.classList.remove("active");});
+      b.classList.add("active");
+      var t = b.getAttribute("data-tab");
+      for(var k in sections){
+        document.getElementById(sections[k]).classList.toggle("hidden", k!==t);
+      }
+    });
+  });
+
+  /* ---------- canvas helper: crisp scaling ---------- */
+  function fitCanvas(cv){
+    var cssW = cv.clientWidth || 900;
+    var ratio = cv.height / cv.width;
+    var cssH = cssW * ratio;
+    cv.width = Math.round(cssW * DPR);
+    cv.height = Math.round(cssH * DPR);
+    cv.style.height = cssH + "px";
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    return {ctx:ctx, w:cssW, h:cssH};
+  }
+
+  function arrow(ctx, x, y, dx, dy, color, label){
+    if(Math.abs(dx)<0.5 && Math.abs(dy)<0.5) return;
+    ctx.save();
+    ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.lineCap="round";
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+dx,y+dy); ctx.stroke();
+    var ang=Math.atan2(dy,dx), hl=10;
+    ctx.beginPath();
+    ctx.moveTo(x+dx,y+dy);
+    ctx.lineTo(x+dx-hl*Math.cos(ang-0.4), y+dy-hl*Math.sin(ang-0.4));
+    ctx.lineTo(x+dx-hl*Math.cos(ang+0.4), y+dy-hl*Math.sin(ang+0.4));
+    ctx.closePath(); ctx.fill();
+    if(label){
+      ctx.font="600 13px system-ui,sans-serif";
+      ctx.fillText(label, x+dx+ (dx>=0?6:-ctx.measureText(label).width-6), y+dy-6);
+    }
+    ctx.restore();
+  }
+
+  /* ==================================================
+     MODE 1 : F = ma
+  ================================================== */
+  var fma = {
+    F:30, m:3, u:0.20, x:0, v:0, a:0, fric:0, net:0, running:false
+  };
+  var fmaEls = {
+    F:document.getElementById("fmaF"), M:document.getElementById("fmaM"), U:document.getElementById("fmaU"),
+    Fout:document.getElementById("fmaFout"), Mout:document.getElementById("fmaMout"), Uout:document.getElementById("fmaUout"),
+    fric:document.getElementById("fmaFric"), net:document.getElementById("fmaNet"),
+    a:document.getElementById("fmaA"), v:document.getElementById("fmaV")
+  };
+  function fmaCompute(){
+    fma.F = +fmaEls.F.value; fma.m = +fmaEls.M.value; fma.u = +fmaEls.U.value;
+    fmaEls.Fout.textContent = fma.F;
+    fmaEls.Mout.textContent = fma.m;
+    fmaEls.Uout.textContent = fma.u.toFixed(2);
+    var maxStatic = fma.u * fma.m * G; // static ~ kinetic here
+    if(fma.F <= maxStatic + 1e-9 && Math.abs(fma.v) < 1e-6){
+      fma.fric = fma.F;         // friction just balances applied force
+      fma.net = 0; fma.a = 0;
+    } else {
+      fma.fric = maxStatic;
+      fma.net = fma.F - fma.fric;
+      fma.a = fma.net / fma.m;
+    }
+    fmaEls.fric.textContent = fma.fric.toFixed(1);
+    fmaEls.net.textContent  = fma.net.toFixed(1);
+    fmaEls.a.textContent    = fma.a.toFixed(2);
+  }
+  [fmaEls.F, fmaEls.M, fmaEls.U].forEach(function(e){ e.addEventListener("input", function(){ if(!fma.running){ fma.v=0; fma.x=0; } fmaCompute(); }); });
+  document.getElementById("fmaRun").addEventListener("click", function(){ fmaCompute(); fma.running=true; });
+  document.getElementById("fmaReset").addEventListener("click", function(){ fma.running=false; fma.v=0; fma.x=0; fmaCompute(); });
+
+  function drawFma(dt){
+    var cv=document.getElementById("fmaCanvas");
+    var d=fitCanvas(cv), ctx=d.ctx, w=d.w, h=d.h;
+    // physics step (metres -> pixels)
+    if(fma.running){
+      fma.v += fma.a * dt;
+      if(fma.v<0) fma.v=0;
+      fma.x += fma.v * dt * 26; // px per metre-ish
+      var bx = 60 + fma.x;
+      if(bx > w-120){ fma.running=false; }
+    }
+    fmaEls.v.textContent = fma.v.toFixed(2);
+    // ground
+    var groundY = h-70;
+    ctx.fillStyle="#0b0f1a"; ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#2e3852"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(w,groundY); ctx.stroke();
+    // hatch for friction surface
+    ctx.strokeStyle="rgba(154,165,189,.4)"; ctx.lineWidth=1;
+    for(var i=0;i<w;i+=16){ ctx.beginPath(); ctx.moveTo(i,groundY); ctx.lineTo(i-10,groundY+12); ctx.stroke(); }
+    // block
+    var size = 46 + fma.m*5;
+    var bx = 60 + fma.x;
+    if(bx > w-size-20) bx = w-size-20;
+    var by = groundY - size;
+    ctx.fillStyle="#5cc8ff33"; ctx.strokeStyle="#5cc8ff"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.rect(bx,by,size,size); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#e8ecf6"; ctx.font="600 14px system-ui,sans-serif"; ctx.textBaseline="middle";
+    ctx.fillText(fma.m+" kg", bx+8, by+size/2);
+    ctx.textBaseline="alphabetic";
+    // arrows
+    var cy = by + size/2;
+    arrow(ctx, bx+size, cy, fma.F*2.6, 0, "#5fd68b", "F "+fma.F+" N");
+    if(fma.fric>0.1) arrow(ctx, bx, cy, -fma.fric*2.6, 0, "#ff7b7b", "f "+fma.fric.toFixed(0)+" N");
+    // weight & normal
+    arrow(ctx, bx+size/2, by+size, 0, 34, "#ffb454", "mg");
+    arrow(ctx, bx+size/2, by, 0, -34, "#9aa5bd", "N");
+    // net force label
+    ctx.fillStyle="#9aa5bd"; ctx.font="13px system-ui,sans-serif";
+    ctx.fillText("Net = "+fma.net.toFixed(1)+" N   a = "+fma.a.toFixed(2)+" m/s²", 12, 22);
+  }
+
+  /* ==================================================
+     MODE 2 : 1st & 3rd laws
+  ================================================== */
+  var laws = { demo:"inertia", t:0, active:false, x:0, v:0, puff:[] };
+  var lawsCap = document.getElementById("lawsCaption");
+  var lawsCaptions = {
+    inertia:"1st law: the puck feels no net force, so it keeps moving in a straight line at constant speed. Friction (if any) is what usually slows real objects &mdash; here the surface is frictionless.",
+    rocket:"3rd law: the rocket pushes gas <b>down/back</b> (action); the gas pushes the rocket <b>up/forward</b> with an equal, opposite force (reaction). The two forces act on different bodies.",
+    wall:"3rd law: you push the wall (action); the wall pushes back on you with an equal and opposite force (reaction). That reaction is what stops your hand."
+  };
+  document.querySelectorAll("#lawsSeg button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#lawsSeg button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      laws.demo=b.getAttribute("data-demo");
+      lawsReset();
+    });
+  });
+  function lawsReset(){
+    laws.active=false; laws.t=0; laws.puff=[];
+    if(laws.demo==="inertia"){ laws.x=80; laws.v=0; }
+    else if(laws.demo==="rocket"){ laws.x=0; laws.v=0; }
+    else { laws.x=0; laws.v=0; }
+    lawsCap.innerHTML = lawsCaptions[laws.demo];
+  }
+  document.getElementById("lawsReset").addEventListener("click", lawsReset);
+  document.getElementById("lawsAction").addEventListener("click", function(){
+    laws.active=true; laws.t=0;
+    if(laws.demo==="inertia"){ laws.v=140; }        // give it a shove, then no force
+    else if(laws.demo==="rocket"){ laws.v=0; }
+  });
+  lawsReset();
+
+  function drawLaws(dt){
+    var cv=document.getElementById("lawsCanvas");
+    var d=fitCanvas(cv), ctx=d.ctx, w=d.w, h=d.h;
+    ctx.fillStyle="#0b0f1a"; ctx.fillRect(0,0,w,h);
+    var midY=h/2;
+
+    if(laws.demo==="inertia"){
+      var groundY=h-60;
+      ctx.strokeStyle="#2e3852"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(w,groundY); ctx.stroke();
+      if(laws.active){ laws.x += laws.v*dt; if(laws.x>w-40){laws.x=w-40; laws.v=0; laws.active=false;} }
+      var r=26, cx=laws.x, cyc=groundY-r;
+      ctx.fillStyle="#5cc8ff33"; ctx.strokeStyle="#5cc8ff"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(cx,cyc,r,0,7); ctx.fill(); ctx.stroke();
+      if(laws.v>1) arrow(ctx, cx+r, cyc, 70, 0, "#5fd68b", "v (constant)");
+      ctx.fillStyle="#9aa5bd"; ctx.font="13px system-ui,sans-serif";
+      ctx.fillText("No net force → velocity stays constant (frictionless).", 12, 24);
+    }
+    else if(laws.demo==="rocket"){
+      if(laws.active){
+        laws.v += 90*dt; laws.x += laws.v*dt;
+        if(laws.x>h){ lawsReset(); }
+        if(Math.random()<0.9){ laws.puff.push({x:0,y:0,life:1,sp:40+Math.random()*40,off:(Math.random()-0.5)*10}); }
+      }
+      laws.puff.forEach(function(p){ p.life-=dt*1.6; p.y+=p.sp*dt; });
+      laws.puff=laws.puff.filter(function(p){return p.life>0;});
+      var rx=w/2, ry=h-70-laws.x;
+      // exhaust
+      laws.puff.forEach(function(p){
+        ctx.globalAlpha=Math.max(0,p.life);
+        ctx.fillStyle= p.life>0.6? "#ffb454":"#ff7b7b";
+        ctx.beginPath(); ctx.arc(rx+p.off, ry+40+p.y*0.4, 6+ (1-p.life)*10, 0,7); ctx.fill();
+      });
+      ctx.globalAlpha=1;
+      // rocket body
+      ctx.fillStyle="#5cc8ff"; ctx.strokeStyle="#5cc8ff";
+      ctx.beginPath();
+      ctx.moveTo(rx,ry-34); ctx.lineTo(rx+16,ry+20); ctx.lineTo(rx-16,ry+20); ctx.closePath(); ctx.fill();
+      // arrows: action (gas down), reaction (rocket up)
+      arrow(ctx, rx, ry+26, 0, 60, "#ffb454", "action: gas down");
+      arrow(ctx, rx, ry-40, 0, -60, "#5fd68b", "reaction: thrust up");
+      ctx.fillStyle="#9aa5bd"; ctx.font="13px system-ui,sans-serif";
+      ctx.fillText("Equal & opposite forces on two bodies (gas & rocket).", 12, 24);
+    }
+    else { // wall
+      var groundY=h-50;
+      ctx.strokeStyle="#2e3852"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(w,groundY); ctx.stroke();
+      // wall
+      var wallX=w-90;
+      ctx.fillStyle="#222a3f"; ctx.strokeStyle="#2e3852"; ctx.lineWidth=2;
+      ctx.fillRect(wallX,60,60,groundY-60); ctx.strokeRect(wallX,60,60,groundY-60);
+      // person (simple)
+      var lean = laws.active? 10:0;
+      var px=wallX-150+lean;
+      ctx.strokeStyle="#5cc8ff"; ctx.lineWidth=4; ctx.lineCap="round";
+      var head=groundY-120;
+      ctx.beginPath(); ctx.arc(px, head, 16, 0,7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(px,head+16); ctx.lineTo(px,head+70); // body
+      ctx.moveTo(px,head+30); ctx.lineTo(px+70,head+34); // arm to wall
+      ctx.moveTo(px,head+70); ctx.lineTo(px-16,groundY); // leg
+      ctx.moveTo(px,head+70); ctx.lineTo(px+18,groundY); // leg
+      ctx.stroke();
+      var handX=px+70, handY=head+34;
+      if(laws.active){
+        arrow(ctx, handX, handY, 60, 0, "#5fd68b", "action: you → wall");
+        arrow(ctx, wallX, handY+6, -60, 0, "#ff7b7b", "reaction: wall → you");
+      }
+      ctx.fillStyle="#9aa5bd"; ctx.font="13px system-ui,sans-serif";
+      ctx.fillText(laws.active? "Both forces are equal in size, opposite in direction.":"Press 'Apply force' to push the wall.", 12, 24);
+    }
+  }
+
+  /* ==================================================
+     MODE 3 : Momentum
+  ================================================== */
+  var mom = {
+    m1:2,u1:4,m2:3,u2:-2, elastic:true,
+    x1:0,x2:0,v1:0,v2:0, phase:"idle", stuck:false
+  };
+  var momEls={
+    m1:document.getElementById("momM1"),u1:document.getElementById("momU1"),
+    m2:document.getElementById("momM2"),u2:document.getElementById("momU2"),
+    m1o:document.getElementById("momM1out"),u1o:document.getElementById("momU1out"),
+    m2o:document.getElementById("momM2out"),u2o:document.getElementById("momU2out"),
+    pb:document.getElementById("momPb"),pa:document.getElementById("momPa"),
+    v1:document.getElementById("momV1"),v2:document.getElementById("momV2"),j:document.getElementById("momJ")
+  };
+  document.querySelectorAll("#momSeg button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#momSeg button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on");
+      mom.elastic = b.getAttribute("data-e")==="1";
+      momReset();
+    });
+  });
+  function momReadInputs(){
+    mom.m1=+momEls.m1.value; mom.u1=+momEls.u1.value;
+    mom.m2=+momEls.m2.value; mom.u2=+momEls.u2.value;
+    momEls.m1o.textContent=mom.m1; momEls.u1o.textContent=mom.u1;
+    momEls.m2o.textContent=mom.m2; momEls.u2o.textContent=mom.u2;
+  }
+  function momComputeOutcome(){
+    var m1=mom.m1,m2=mom.m2,u1=mom.u1,u2=mom.u2, v1,v2;
+    if(mom.elastic){
+      v1=((m1-m2)*u1 + 2*m2*u2)/(m1+m2);
+      v2=((m2-m1)*u2 + 2*m1*u1)/(m1+m2);
+    } else {
+      var vc=(m1*u1+m2*u2)/(m1+m2);
+      v1=vc; v2=vc;
+    }
+    return {v1:v1,v2:v2};
+  }
+  function momUpdatePanel(after){
+    var pb=mom.m1*mom.u1 + mom.m2*mom.u2;
+    momEls.pb.textContent=pb.toFixed(1);
+    if(after){
+      var o=momComputeOutcome();
+      var pa=mom.m1*o.v1 + mom.m2*o.v2;
+      momEls.pa.textContent=pa.toFixed(1);
+      momEls.v1.textContent=o.v1.toFixed(1);
+      momEls.v2.textContent=o.v2.toFixed(1);
+      momEls.j.textContent=(mom.m1*(o.v1-mom.u1)).toFixed(1);
+    } else {
+      momEls.pa.textContent=pb.toFixed(1);
+      momEls.v1.textContent="–"; momEls.v2.textContent="–"; momEls.j.textContent="0.0";
+    }
+  }
+  function momReset(){
+    momReadInputs();
+    mom.phase="idle"; mom.stuck=false;
+    mom.x1=0.22; mom.x2=0.72; // fractions of width
+    mom.v1=0; mom.v2=0;
+    momUpdatePanel(false);
+  }
+  [momEls.m1,momEls.u1,momEls.m2,momEls.u2].forEach(function(e){ e.addEventListener("input", momReset); });
+  document.getElementById("momReset").addEventListener("click", momReset);
+  document.getElementById("momRun").addEventListener("click", function(){
+    momReadInputs();
+    mom.phase="run"; mom.stuck=false;
+    mom.x1=0.22; mom.x2=0.72; mom.v1=mom.u1; mom.v2=mom.u2;
+    momUpdatePanel(false);
+  });
+  momReset();
+
+  function drawMom(dt){
+    var cv=document.getElementById("momCanvas");
+    var d=fitCanvas(cv), ctx=d.ctx, w=d.w, h=d.h;
+    ctx.fillStyle="#0b0f1a"; ctx.fillRect(0,0,w,h);
+    var groundY=h-64;
+    ctx.strokeStyle="#2e3852"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(w,groundY); ctx.stroke();
+
+    var scale=26; // px per (m/s) per second of motion
+    var s1=20+mom.m1*6, s2=20+mom.m2*6; // half-sizes
+    function px(frac){ return frac*w; }
+    var x1=px(mom.x1), x2=px(mom.x2);
+
+    if(mom.phase==="run"){
+      x1 = px(mom.x1) ; // recompute below
+      mom.x1 += (mom.v1*dt*scale)/w;
+      mom.x2 += (mom.v2*dt*scale)/w;
+      x1=px(mom.x1); x2=px(mom.x2);
+      // collision detection (edges touch)
+      if(!mom.stuck && (x2 - x1) <= (s1+s2) && mom.v1>mom.v2){
+        var o=momComputeOutcome();
+        mom.v1=o.v1; mom.v2=o.v2;
+        if(!mom.elastic){ mom.stuck=true; }
+        // separate to contact point
+        var overlap=(s1+s2)-(x2-x1);
+        mom.x1 -= (overlap/2)/w; mom.x2 += (overlap/2)/w;
+        x1=px(mom.x1); x2=px(mom.x2);
+        momUpdatePanel(true);
+      }
+      if(mom.stuck){ // move together
+        mom.x2 = mom.x1 + (s1+s2)/w;
+        x2=px(mom.x2);
+      }
+      // stop when off screen both sides
+      if(x1< -80 && x2>w+80){ mom.phase="done"; }
+      if(x1>w+120 || x2< -120){ /* let it drift, will end */ }
+    }
+
+    function block(cx,size,label,col,vel){
+      var y=groundY-size*2;
+      ctx.fillStyle=col+"33"; ctx.strokeStyle=col; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.rect(cx-size, y, size*2, size*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle="#e8ecf6"; ctx.font="600 12px system-ui,sans-serif"; ctx.textAlign="center";
+      ctx.fillText(label, cx, y+size);
+      ctx.textAlign="left";
+      if(Math.abs(vel)>0.05) arrow(ctx, cx+(vel>0?size:-size), y-10, vel*10, 0, col, vel.toFixed(1)+" m/s");
+    }
+    block(x1,s1,mom.m1+" kg","#5cc8ff", mom.phase==="idle"?mom.u1:mom.v1);
+    block(x2,s2,mom.m2+" kg","#ffb454", mom.phase==="idle"?mom.u2:mom.v2);
+
+    ctx.fillStyle="#9aa5bd"; ctx.font="13px system-ui,sans-serif";
+    var msg = mom.phase==="idle" ? "Press 'Collide'. Arrows show initial velocities (right = +)."
+            : (mom.stuck? "Perfectly inelastic: they stick and move together." : "Momentum conserved before & after.");
+    ctx.fillText(msg, 12, 22);
+  }
+
+  /* ==================================================
+     QUIZ
+  ================================================== */
+  var quizData=[
+    {q:"A 4 kg object accelerates at 2 m/s². What net force acts on it?",
+     opts:["2 N","6 N","8 N","0.5 N"], a:2, why:"F = m a = 4 × 2 = 8 N."},
+    {q:"When a gun is fired, the gun recoils backward. This is an example of:",
+     opts:["Newton's 1st law","Newton's 2nd law","Newton's 3rd law","Law of gravitation"], a:2,
+     why:"The bullet's forward momentum is matched by the gun's backward momentum — action & reaction (3rd law / momentum conservation)."},
+    {q:"The SI unit of momentum is:",
+     opts:["N","kg·m/s","N·s²","m/s²"], a:1,
+     why:"p = m v, so units are kg·m/s (which also equals N·s)."}
+  ];
+  var quizWrap=document.getElementById("quiz");
+  quizData.forEach(function(item,qi){
+    var div=document.createElement("div"); div.className="q";
+    var stem=document.createElement("p"); stem.className="stem"; stem.textContent=(qi+1)+". "+item.q;
+    div.appendChild(stem);
+    var fb=document.createElement("div"); fb.className="fb";
+    var answered=false;
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=opt;
+      b.addEventListener("click", function(){
+        if(answered) return; answered=true;
+        var btns=div.querySelectorAll(".opt");
+        btns[item.a].classList.add("correct");
+        if(oi!==item.a) b.classList.add("wrong");
+        fb.innerHTML=(oi===item.a?"✓ Correct. ":"✗ Not quite. ")+item.why;
+      });
+      div.appendChild(b);
+    });
+    div.appendChild(fb);
+    quizWrap.appendChild(div);
+  });
+
+  /* ==================================================
+     ANIMATION LOOP (single RAF, pause on hidden)
+  ================================================== */
+  fmaCompute();
+  var last=performance.now();
+  function loop(now){
+    var dt=Math.min((now-last)/1000, 0.05); last=now;
+    if(!document.hidden){
+      var active=document.querySelector(".tab-btn.active").getAttribute("data-tab");
+      if(active==="fma") drawFma(dt);
+      else if(active==="laws") drawLaws(dt);
+      else if(active==="mom") drawMom(dt);
+    }
+    requestAnimationFrame(loop);
+  }
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden){ last=performance.now(); } });
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Lab — Motion and its Description (NIOS Class 10, Ch 9)</title>
+<style>
+  :root{
+    --bg:#0f131d;
+    --panel:#181e2c;
+    --panel2:#212a3d;
+    --ink:#e9edf7;
+    --muted:#95a1ba;
+    --accent:#4fd1c5;
+    --accent-soft:rgba(79,209,197,.16);
+    --good:#5fd68b;
+    --bad:#ff7b7b;
+    --line:#2b3450;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:960px;margin:0 auto;padding:14px 14px 48px}
+  header{padding:18px 4px 8px}
+  header h1{font-size:1.4rem;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  header p{color:var(--muted);font-size:.9rem;margin-top:2px}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 16px}
+  .tab-btn{flex:1 1 120px;min-height:50px;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);color:var(--muted);font-size:.95rem;font-weight:600;
+    cursor:pointer;transition:all .15s;touch-action:manipulation;padding:6px 8px}
+  .tab-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .tab-btn:active{transform:scale(.98)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;margin-bottom:16px}
+  .panel h2{font-size:1.05rem;margin-bottom:4px;color:var(--accent)}
+  .panel h3{font-size:.95rem;margin:12px 0 6px}
+  .lead{color:var(--muted);font-size:.9rem;margin-bottom:12px}
+  .view{display:none}
+  .view.active{display:block}
+
+  .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:12px}
+  .ctrl{flex:1 1 190px;min-width:160px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .ctrl output{color:var(--ink);font-weight:600}
+
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1 1 130px;min-height:46px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--muted);border-radius:12px;font-size:.9rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;padding:4px 8px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .btn{min-height:46px;padding:0 16px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--ink);border-radius:12px;font-size:.92rem;font-weight:600;cursor:pointer;
+    touch-action:manipulation;flex:1 1 auto}
+  .btn.primary{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .btn:active{transform:scale(.98)}
+
+  input[type=range]{width:100%;height:34px;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--accent);margin-top:-10px;border:3px solid #0f131d;box-shadow:0 0 0 1px var(--accent)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--accent);border:3px solid #0f131d}
+
+  canvas{width:100%;display:block;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+  .canvas-label{font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+  .graphs{display:flex;flex-wrap:wrap;gap:12px}
+  .graphs .gcol{flex:1 1 260px;min-width:220px}
+
+  .eqbox{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .eq{flex:1 1 200px;min-width:180px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px}
+  .eq .name{font-size:.78rem;color:var(--muted)}
+  .eq .exp{font-size:1.02rem;font-weight:600;margin:2px 0}
+  .eq .val{font-size:.86rem;color:var(--accent)}
+
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .stat{flex:1 1 120px;min-width:110px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px}
+  .stat .k{font-size:.76rem;color:var(--muted)}
+  .stat .v{font-size:1.1rem;font-weight:700}
+
+  ul.facts{list-style:none;margin-top:4px}
+  ul.facts li{padding:8px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+  ul.facts li:last-child{border-bottom:none}
+  ul.facts b{color:var(--accent)}
+  .unitchip{display:inline-block;background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:1px 8px;font-size:.8rem;color:var(--muted);margin:2px 4px 2px 0}
+
+  .quiz .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .quiz .q p{font-weight:600;margin-bottom:8px;font-size:.92rem}
+  .opt{display:block;width:100%;text-align:left;padding:10px 12px;margin:6px 0;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);border-radius:10px;font-size:.9rem;cursor:pointer;touch-action:manipulation}
+  .opt:active{transform:scale(.995)}
+  .opt.correct{border-color:var(--good);background:rgba(95,214,139,.14);color:var(--good)}
+  .opt.wrong{border-color:var(--bad);background:rgba(255,123,123,.14);color:var(--bad)}
+  .explain{font-size:.85rem;color:var(--muted);margin-top:8px;display:none}
+  .explain.show{display:block}
+  .score{font-weight:700;color:var(--accent);margin-top:4px}
+
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 4px}
+  @media(max-width:420px){header h1{font-size:1.2rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span>Motion Lab</span> — Motion and its Description</h1>
+    <p>NIOS Class 10 Science &amp; Technology · Chapter 9</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-view="grapher">Motion Grapher</button>
+    <button class="tab-btn" data-view="uniform">Uniform vs Non-uniform</button>
+    <button class="tab-btn" data-view="dvd">Distance vs Displacement</button>
+    <button class="tab-btn" data-view="facts">Facts</button>
+    <button class="tab-btn" data-view="quiz">Quiz</button>
+  </div>
+
+  <!-- ============ MODE 1: GRAPHER ============ -->
+  <section class="view active" id="grapher">
+    <div class="panel">
+      <h2>Motion Grapher</h2>
+      <p class="lead">Set initial velocity <b>u</b> and acceleration <b>a</b>, then press Start. Watch the car move while the position–time and velocity–time graphs are drawn live.</p>
+      <div class="controls">
+        <div class="ctrl">
+          <label>Initial velocity u <output id="uOut">4 m/s</output></label>
+          <input type="range" id="uSlide" min="0" max="20" step="0.5" value="4">
+        </div>
+        <div class="ctrl">
+          <label>Acceleration a <output id="aOut">2 m/s²</output></label>
+          <input type="range" id="aSlide" min="-4" max="6" step="0.5" value="2">
+        </div>
+      </div>
+      <div class="btnrow">
+        <button class="btn primary" id="gStart">Start</button>
+        <button class="btn" id="gPause">Pause</button>
+        <button class="btn" id="gReset">Reset</button>
+      </div>
+
+      <div class="canvas-label">Car on a straight track (metres)</div>
+      <canvas id="trackCv" width="900" height="140"></canvas>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Time t</div><div class="v" id="stT">0.0 s</div></div>
+        <div class="stat"><div class="k">Velocity v</div><div class="v" id="stV">4.0 m/s</div></div>
+        <div class="stat"><div class="k">Displacement s</div><div class="v" id="stS">0.0 m</div></div>
+      </div>
+
+      <div class="graphs" style="margin-top:14px">
+        <div class="gcol">
+          <div class="canvas-label">Position–time (s vs t)</div>
+          <canvas id="stCv" width="440" height="260"></canvas>
+        </div>
+        <div class="gcol">
+          <div class="canvas-label">Velocity–time (v vs t)</div>
+          <canvas id="vtCv" width="440" height="260"></canvas>
+        </div>
+      </div>
+
+      <div class="eqbox">
+        <div class="eq"><div class="name">Velocity–time</div><div class="exp">v = u + at</div><div class="val" id="eq1">—</div></div>
+        <div class="eq"><div class="name">Position–time</div><div class="exp">s = ut + ½at²</div><div class="val" id="eq2">—</div></div>
+        <div class="eq"><div class="name">Velocity–displacement</div><div class="exp">v² = u² + 2as</div><div class="val" id="eq3">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: UNIFORM VS NON-UNIFORM ============ -->
+  <section class="view" id="uniform">
+    <div class="panel">
+      <h2>Uniform vs Non-uniform motion</h2>
+      <p class="lead">Compare the graph shapes. Uniform motion (constant velocity, a = 0) gives a straight-line s–t graph. Non-uniform motion (constant acceleration) gives a curved s–t graph.</p>
+      <div class="seg" id="uniSeg">
+        <button class="on" data-mode="uniform">Uniform (a = 0)</button>
+        <button data-mode="accel">Non-uniform (a &gt; 0)</button>
+      </div>
+      <div class="btnrow">
+        <button class="btn primary" id="uStart">Start</button>
+        <button class="btn" id="uPause">Pause</button>
+        <button class="btn" id="uReset">Reset</button>
+      </div>
+
+      <div class="canvas-label">Two balls launched together (same u)</div>
+      <canvas id="uTrackCv" width="900" height="120"></canvas>
+
+      <div class="graphs" style="margin-top:14px">
+        <div class="gcol">
+          <div class="canvas-label">Position–time (s vs t)</div>
+          <canvas id="uStCv" width="440" height="260"></canvas>
+        </div>
+        <div class="gcol">
+          <div class="canvas-label">Velocity–time (v vs t)</div>
+          <canvas id="uVtCv" width="440" height="260"></canvas>
+        </div>
+      </div>
+      <p class="lead" id="uNote" style="margin-top:12px"></p>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: DISTANCE VS DISPLACEMENT ============ -->
+  <section class="view" id="dvd">
+    <div class="panel">
+      <h2>Distance vs Displacement · Speed vs Velocity</h2>
+      <p class="lead">A runner goes right to the flag, then comes back partway. Distance keeps adding up; displacement is the straight gap from start. Watch how they differ on the return trip.</p>
+      <div class="btnrow">
+        <button class="btn primary" id="dStart">Start trip</button>
+        <button class="btn" id="dPause">Pause</button>
+        <button class="btn" id="dReset">Reset</button>
+      </div>
+
+      <div class="canvas-label">There-and-back path</div>
+      <canvas id="pathCv" width="900" height="150"></canvas>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Time</div><div class="v" id="dT">0.0 s</div></div>
+        <div class="stat"><div class="k">Distance (path)</div><div class="v" id="dDist">0.0 m</div></div>
+        <div class="stat"><div class="k">Displacement</div><div class="v" id="dDisp">0.0 m</div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k">Average speed</div><div class="v" id="dSpeed">0.0 m/s</div></div>
+        <div class="stat"><div class="k">Average velocity</div><div class="v" id="dVel">0.0 m/s</div></div>
+      </div>
+      <p class="lead" id="dNote" style="margin-top:12px">Distance ≥ magnitude of displacement, always. When the runner turns back they stop being equal.</p>
+    </div>
+  </section>
+
+  <!-- ============ FACTS ============ -->
+  <section class="view" id="facts">
+    <div class="panel">
+      <h2>Key facts &amp; formulae</h2>
+      <ul class="facts">
+        <li><b>Distance</b> — total length of the path travelled. Scalar (only magnitude).</li>
+        <li><b>Displacement</b> — shortest straight line from start to end, with direction. Vector.</li>
+        <li><b>Speed</b> = distance ÷ time. Scalar. <b>Velocity</b> = displacement ÷ time. Vector.</li>
+        <li><b>Acceleration</b> = rate of change of velocity = (v − u) ÷ t.</li>
+        <li><b>Uniform motion</b> — equal distances in equal time intervals (constant velocity, a = 0).</li>
+        <li><b>Non-uniform motion</b> — velocity changes with time (a ≠ 0).</li>
+      </ul>
+      <h3>Three equations of motion (uniform acceleration)</h3>
+      <div class="eqbox">
+        <div class="eq"><div class="name">First</div><div class="exp">v = u + at</div></div>
+        <div class="eq"><div class="name">Second</div><div class="exp">s = ut + ½at²</div></div>
+        <div class="eq"><div class="name">Third</div><div class="exp">v² = u² + 2as</div></div>
+      </div>
+      <h3>Symbols &amp; SI units</h3>
+      <div>
+        <span class="unitchip">u = initial velocity · m/s</span>
+        <span class="unitchip">v = final velocity · m/s</span>
+        <span class="unitchip">a = acceleration · m/s²</span>
+        <span class="unitchip">s = displacement · m</span>
+        <span class="unitchip">t = time · s</span>
+      </div>
+      <h3>Graph clues</h3>
+      <ul class="facts">
+        <li>On a <b>position–time</b> graph the <b>slope = velocity</b>. Straight line ⇒ uniform motion; curve ⇒ acceleration.</li>
+        <li>On a <b>velocity–time</b> graph the <b>slope = acceleration</b> and the <b>area under the line = displacement</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="view" id="quiz">
+    <div class="panel quiz" id="quizPanel">
+      <h2>Quick check (3 questions)</h2>
+      <p class="lead">Tap an option to check your answer.</p>
+      <div class="score" id="score">Score: 0 / 3</div>
+    </div>
+  </section>
+
+  <footer>Motion Lab · self-contained interactive · physics uses the three equations of motion.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- tab switching ----------
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var views = document.querySelectorAll('.view');
+  tabBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      tabBtns.forEach(function(x){x.classList.remove('active');});
+      views.forEach(function(v){v.classList.remove('active');});
+      b.classList.add('active');
+      document.getElementById(b.dataset.view).classList.add('active');
+    });
+  });
+
+  function fmt(n,d){ if(d===undefined)d=1; return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toFixed(d); }
+
+  // Set canvas backing resolution to match displayed size (crisp on all screens)
+  function fitCanvas(cv){
+    var ratio = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || cv.width;
+    var h = cv.getAttribute('height')*1;
+    // keep aspect from attributes
+    var aspect = cv.getAttribute('height')/cv.getAttribute('width');
+    var cssH = w*aspect;
+    cv.style.height = cssH+'px';
+    cv.width = Math.round(w*ratio);
+    cv.height = Math.round(cssH*ratio);
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    cv._cw = w; cv._ch = cssH;
+    return ctx;
+  }
+
+  var CSS = getComputedStyle(document.documentElement);
+  var C_ACCENT = CSS.getPropertyValue('--accent').trim() || '#4fd1c5';
+  var C_INK    = CSS.getPropertyValue('--ink').trim() || '#e9edf7';
+  var C_MUTED  = CSS.getPropertyValue('--muted').trim() || '#95a1ba';
+  var C_LINE   = CSS.getPropertyValue('--line').trim() || '#2b3450';
+  var C_GOOD   = CSS.getPropertyValue('--good').trim() || '#5fd68b';
+  var C_BAD    = CSS.getPropertyValue('--bad').trim() || '#ff7b7b';
+
+  // generic axis+line graph helper
+  function drawGraph(ctx,w,h,opts){
+    ctx.clearRect(0,0,w,h);
+    var padL=42,padB=28,padT=12,padR=12;
+    var gx=padL, gy=padT, gw=w-padL-padR, gh=h-padT-padB;
+    // background grid
+    ctx.strokeStyle=C_LINE; ctx.lineWidth=1;
+    ctx.fillStyle=C_MUTED; ctx.font='11px system-ui,sans-serif';
+    var i;
+    for(i=0;i<=4;i++){
+      var yy=gy+gh*(i/4);
+      ctx.beginPath();ctx.moveTo(gx,yy);ctx.lineTo(gx+gw,yy);ctx.stroke();
+      var vlab=opts.ymax*(1-i/4);
+      ctx.textAlign='right';ctx.textBaseline='middle';
+      ctx.fillText(fmt(vlab,0),gx-6,yy);
+    }
+    for(i=0;i<=4;i++){
+      var xx=gx+gw*(i/4);
+      ctx.beginPath();ctx.moveTo(xx,gy);ctx.lineTo(xx,gy+gh);ctx.stroke();
+      ctx.textAlign='center';ctx.textBaseline='top';
+      ctx.fillText(fmt(opts.xmax*(i/4),0),xx,gy+gh+6);
+    }
+    // axis labels
+    ctx.fillStyle=C_MUTED;ctx.textAlign='center';
+    ctx.fillText(opts.xlab,gx+gw/2,h-12);
+    ctx.save();ctx.translate(12,gy+gh/2);ctx.rotate(-Math.PI/2);
+    ctx.fillText(opts.ylab,0,0);ctx.restore();
+    // helper to map
+    function px(t){return gx+gw*(t/opts.xmax);}
+    function py(v){var f=(v-opts.ymin)/(opts.ymax-opts.ymin);return gy+gh*(1-f);}
+    // multiple series
+    (opts.series||[]).forEach(function(s){
+      if(s.pts.length<1) return;
+      ctx.strokeStyle=s.color;ctx.lineWidth=s.width||2.5;
+      ctx.beginPath();
+      s.pts.forEach(function(p,idx){
+        var X=px(p[0]),Y=py(p[1]);
+        if(idx===0)ctx.moveTo(X,Y);else ctx.lineTo(X,Y);
+      });
+      ctx.stroke();
+      // marker at last point
+      var last=s.pts[s.pts.length-1];
+      ctx.fillStyle=s.color;
+      ctx.beginPath();ctx.arc(px(last[0]),py(last[1]),4,0,Math.PI*2);ctx.fill();
+    });
+    return {px:px,py:py,gx:gx,gy:gy,gw:gw,gh:gh};
+  }
+
+  // =================================================================
+  // MODE 1: GRAPHER
+  // =================================================================
+  var G = {
+    u:4, a:2, t:0, running:false, s:0, v:4,
+    pts_s:[], pts_v:[], tMax:10, sMax:40, vMax:20
+  };
+  var uSlide=document.getElementById('uSlide'), aSlide=document.getElementById('aSlide');
+  var uOut=document.getElementById('uOut'), aOut=document.getElementById('aOut');
+  var trackCv=document.getElementById('trackCv'), stCv=document.getElementById('stCv'), vtCv=document.getElementById('vtCv');
+
+  function gReset(){
+    G.u=parseFloat(uSlide.value); G.a=parseFloat(aSlide.value);
+    G.t=0; G.s=0; G.v=G.u; G.pts_s=[[0,0]]; G.pts_v=[[0,G.u]];
+    gComputeScales(); gUpdateReadouts(); gDraw();
+  }
+  function gComputeScales(){
+    // predict range over tMax to auto-scale graphs
+    G.tMax=10;
+    var sEnd=G.u*G.tMax+0.5*G.a*G.tMax*G.tMax;
+    var sPeak=sEnd;
+    // if decelerating, peak displacement may occur when v=0
+    if(G.a<0){ var tv=-G.u/G.a; if(tv>0 && tv<G.tMax){ sPeak=G.u*tv+0.5*G.a*tv*tv; } }
+    var smax=Math.max(sPeak, sEnd, 10);
+    G.sMax=Math.ceil(smax/10)*10;
+    var vEnd=G.u+G.a*G.tMax;
+    G.vMax=Math.max(Math.ceil(Math.max(G.u,vEnd,4)/4)*4,4);
+    G.vMin=Math.min(0, Math.floor(Math.min(G.u,vEnd)/4)*4);
+  }
+  function gUpdateReadouts(){
+    uOut.textContent=fmt(G.u,1)+' m/s';
+    aOut.textContent=fmt(G.a,1)+' m/s²';
+    document.getElementById('stT').textContent=fmt(G.t,1)+' s';
+    document.getElementById('stV').textContent=fmt(G.v,1)+' m/s';
+    document.getElementById('stS').textContent=fmt(G.s,1)+' m';
+    document.getElementById('eq1').textContent='v = '+fmt(G.u,1)+' + ('+fmt(G.a,1)+')('+fmt(G.t,1)+') = '+fmt(G.v,1)+' m/s';
+    document.getElementById('eq2').textContent='s = '+fmt(G.u,1)+'×'+fmt(G.t,1)+' + ½('+fmt(G.a,1)+')('+fmt(G.t,1)+')² = '+fmt(G.s,1)+' m';
+    var v2=G.u*G.u+2*G.a*G.s;
+    document.getElementById('eq3').textContent='v² = '+fmt(G.u*G.u,1)+' + 2('+fmt(G.a,1)+')('+fmt(G.s,1)+') = '+fmt(v2,1)+' (m/s)²';
+  }
+  function gDrawTrack(){
+    var ctx=fitCanvas(trackCv),w=trackCv._cw,h=trackCv._ch;
+    ctx.clearRect(0,0,w,h);
+    var mL=30,mR=30,roadY=h*0.62,roadW=w-mL-mR;
+    // road
+    ctx.fillStyle='#2a3350';ctx.fillRect(mL,roadY,roadW,10);
+    // metre ticks
+    ctx.strokeStyle=C_LINE;ctx.fillStyle=C_MUTED;ctx.font='10px system-ui';ctx.textAlign='center';
+    var maxD=G.sMax;
+    for(var m=0;m<=maxD;m+=(maxD/8)){
+      var x=mL+roadW*(m/maxD);
+      ctx.beginPath();ctx.moveTo(x,roadY);ctx.lineTo(x,roadY+14);ctx.stroke();
+      ctx.fillText(fmt(m,0),x,roadY+26);
+    }
+    // car position (clamp to track for display; use path distance forward)
+    var disp=G.s; if(disp<0)disp=0; if(disp>maxD)disp=maxD;
+    var cx=mL+roadW*(disp/maxD);
+    var cy=roadY-14;
+    // body
+    ctx.fillStyle=C_ACCENT;
+    roundRect(ctx,cx-18,cy-14,36,16,5);ctx.fill();
+    roundRect(ctx,cx-10,cy-24,20,12,4);ctx.fill();
+    // wheels
+    ctx.fillStyle='#0f131d';
+    ctx.beginPath();ctx.arc(cx-9,cy+2,5,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(cx+9,cy+2,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=C_INK;ctx.font='11px system-ui';ctx.textAlign='center';
+    ctx.fillText('s = '+fmt(G.s,1)+' m',cx,cy-30);
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+  }
+  function gDraw(){
+    gDrawTrack();
+    var ctxS=fitCanvas(stCv);
+    drawGraph(ctxS,stCv._cw,stCv._ch,{xmax:G.tMax,ymin:0,ymax:G.sMax,xlab:'time t (s)',ylab:'s (m)',
+      series:[{pts:G.pts_s,color:C_ACCENT}]});
+    var ctxV=fitCanvas(vtCv);
+    drawGraph(ctxV,vtCv._cw,vtCv._ch,{xmax:G.tMax,ymin:G.vMin,ymax:G.vMax,xlab:'time t (s)',ylab:'v (m/s)',
+      series:[{pts:G.pts_v,color:C_GOOD}]});
+  }
+  uSlide.addEventListener('input',function(){ if(!G.running) gReset(); else {uOut.textContent=fmt(parseFloat(uSlide.value),1)+' m/s';} });
+  aSlide.addEventListener('input',function(){ if(!G.running) gReset(); else {aOut.textContent=fmt(parseFloat(aSlide.value),1)+' m/s²';} });
+  document.getElementById('gStart').addEventListener('click',function(){ if(G.t>=G.tMax) gReset(); G.running=true; });
+  document.getElementById('gPause').addEventListener('click',function(){ G.running=false; });
+  document.getElementById('gReset').addEventListener('click',function(){ G.running=false; gReset(); });
+
+  // =================================================================
+  // MODE 2: UNIFORM VS NON-UNIFORM
+  // =================================================================
+  var U = { u:6, a:1.6, mode:'uniform', t:0, running:false, tMax:10,
+            pts_s_uni:[], pts_v_uni:[], pts_s_acc:[], pts_v_acc:[] };
+  var uTrackCv=document.getElementById('uTrackCv'), uStCv=document.getElementById('uStCv'), uVtCv=document.getElementById('uVtCv');
+  function uReset(){
+    U.t=0; U.pts_s_uni=[[0,0]];U.pts_v_uni=[[0,U.u]];U.pts_s_acc=[[0,0]];U.pts_v_acc=[[0,U.u]];
+    uDraw();
+    var showBoth=true;
+    document.getElementById('uNote').innerHTML = U.mode==='uniform'
+      ? 'Uniform: v stays '+U.u+' m/s (flat v–t line), s grows steadily as a <b>straight</b> line.'
+      : 'Non-uniform: v climbs (sloped v–t line), so s grows faster and faster — a <b>curve</b>.';
+  }
+  function uSVals(t){
+    var sUni=U.u*t;
+    var sAcc=U.u*t+0.5*U.a*t*t;
+    return [sUni,sAcc];
+  }
+  function uMaxes(){
+    var sUniEnd=U.u*U.tMax;
+    var sAccEnd=U.u*U.tMax+0.5*U.a*U.tMax*U.tMax;
+    U.sMax=Math.ceil(Math.max(sUniEnd,sAccEnd,10)/10)*10;
+    U.vMax=Math.ceil((U.u+U.a*U.tMax)/4)*4;
+  }
+  function uDraw(){
+    uMaxes();
+    var ctx=fitCanvas(uTrackCv),w=uTrackCv._cw,h=uTrackCv._ch;
+    ctx.clearRect(0,0,w,h);
+    var mL=30,mR=30,roadW=w-mL-mR;
+    var lanes=[h*0.35,h*0.72];
+    var vals=uSVals(U.t);
+    var labels=['Uniform (const v)','Non-uniform (const a)'];
+    var cols=[C_ACCENT,C_GOOD];
+    for(var i=0;i<2;i++){
+      var y=lanes[i];
+      ctx.strokeStyle=C_LINE;ctx.beginPath();ctx.moveTo(mL,y+8);ctx.lineTo(w-mR,y+8);ctx.stroke();
+      var s=vals[i]; var frac=Math.min(s/U.sMax,1);
+      var x=mL+roadW*frac;
+      ctx.fillStyle=cols[i];ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=C_MUTED;ctx.font='11px system-ui';ctx.textAlign='left';
+      ctx.fillText(labels[i]+' — s='+fmt(s,1)+' m',mL,y-14);
+    }
+    // graphs — show both series always for direct contrast
+    var ctxS=fitCanvas(uStCv);
+    drawGraph(ctxS,uStCv._cw,uStCv._ch,{xmax:U.tMax,ymin:0,ymax:U.sMax,xlab:'time t (s)',ylab:'s (m)',
+      series:[{pts:U.pts_s_uni,color:C_ACCENT},{pts:U.pts_s_acc,color:C_GOOD}]});
+    var ctxV=fitCanvas(uVtCv);
+    drawGraph(ctxV,uVtCv._cw,uVtCv._ch,{xmax:U.tMax,ymin:0,ymax:U.vMax,xlab:'time t (s)',ylab:'v (m/s)',
+      series:[{pts:U.pts_v_uni,color:C_ACCENT},{pts:U.pts_v_acc,color:C_GOOD}]});
+  }
+  document.querySelectorAll('#uniSeg button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#uniSeg button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); U.mode=b.dataset.mode; U.running=false; uReset();
+    });
+  });
+  document.getElementById('uStart').addEventListener('click',function(){ if(U.t>=U.tMax) uReset(); U.running=true; });
+  document.getElementById('uPause').addEventListener('click',function(){ U.running=false; });
+  document.getElementById('uReset').addEventListener('click',function(){ U.running=false; uReset(); });
+
+  // =================================================================
+  // MODE 3: DISTANCE VS DISPLACEMENT
+  // =================================================================
+  // Runner: 0->100 m at 5 m/s (20 s), then back 100->40 m at 5 m/s (12 s).
+  var D = { t:0, running:false, speed:5, out:100, backTo:40, tOut:20, tTotal:32 };
+  var pathCv=document.getElementById('pathCv');
+  function dPos(t){
+    if(t<=D.tOut) return D.speed*t;                       // going right
+    return D.out - D.speed*(t-D.tOut);                    // coming back
+  }
+  function dDistance(t){
+    if(t<=D.tOut) return D.speed*t;
+    return D.out + D.speed*(t-D.tOut);
+  }
+  function dReset(){ D.t=0; dDraw(); dReadouts(); }
+  function dReadouts(){
+    var pos=dPos(D.t), dist=dDistance(D.t);
+    document.getElementById('dT').textContent=fmt(D.t,1)+' s';
+    document.getElementById('dDist').textContent=fmt(dist,1)+' m';
+    document.getElementById('dDisp').textContent=fmt(pos,1)+' m';
+    var t=D.t>0?D.t:1e-9;
+    document.getElementById('dSpeed').textContent=fmt(dist/t,2)+' m/s';
+    document.getElementById('dVel').textContent=fmt(pos/t,2)+' m/s';
+  }
+  function dDraw(){
+    var ctx=fitCanvas(pathCv),w=pathCv._cw,h=pathCv._ch;
+    ctx.clearRect(0,0,w,h);
+    var mL=40,mR=40,y=h*0.55,roadW=w-mL-mR;
+    // track line
+    ctx.strokeStyle='#2a3350';ctx.lineWidth=6;
+    ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(w-mR,y);ctx.stroke();
+    // start marker
+    ctx.fillStyle=C_MUTED;ctx.font='11px system-ui';ctx.textAlign='center';
+    ctx.fillText('start (0 m)',mL,y+26);
+    // flag at 100 m
+    var fx=mL+roadW;
+    ctx.strokeStyle=C_MUTED;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,y);ctx.lineTo(fx,y-26);ctx.stroke();
+    ctx.fillStyle=C_BAD;ctx.beginPath();ctx.moveTo(fx,y-26);ctx.lineTo(fx-16,y-21);ctx.lineTo(fx,y-16);ctx.closePath();ctx.fill();
+    ctx.fillStyle=C_MUTED;ctx.fillText('flag (100 m)',fx,y+26);
+    var pos=dPos(D.t);
+    var rx=mL+roadW*(pos/D.out);
+    // displacement arc (green) from start to runner
+    ctx.strokeStyle=C_GOOD;ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(mL,y+12);ctx.lineTo(rx,y+12);ctx.stroke();
+    // runner
+    ctx.fillStyle=C_ACCENT;ctx.beginPath();ctx.arc(rx,y-12,10,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#0f131d';ctx.font='bold 11px system-ui';ctx.fillText('R',rx,y-9);
+    ctx.fillStyle=C_INK;ctx.textAlign='center';ctx.font='11px system-ui';
+    var goingBack=D.t>D.tOut;
+    ctx.fillText(goingBack?'← returning':'→ outward',rx,y-30);
+  }
+  document.getElementById('dStart').addEventListener('click',function(){ if(D.t>=D.tTotal) dReset(); D.running=true; });
+  document.getElementById('dPause').addEventListener('click',function(){ D.running=false; });
+  document.getElementById('dReset').addEventListener('click',function(){ D.running=false; dReset(); });
+
+  // =================================================================
+  // QUIZ
+  // =================================================================
+  var QUIZ=[
+    {q:'A body moves 3 m east, then 4 m west. What is its displacement magnitude?',
+     opts:['7 m','1 m','12 m','0 m'],ans:1,
+     ex:'Distance = 3+4 = 7 m, but displacement = 3 − 4 = 1 m (net, toward west).'},
+    {q:'On a velocity–time graph, the area under the line represents:',
+     opts:['Acceleration','Speed','Displacement','Force'],ans:2,
+     ex:'Area under a v–t graph equals displacement; its slope equals acceleration.'},
+    {q:'Using v = u + at, a car starts at u = 2 m/s and accelerates at 3 m/s² for 4 s. Final velocity?',
+     opts:['12 m/s','14 m/s','5 m/s','6 m/s'],ans:1,
+     ex:'v = 2 + 3×4 = 2 + 12 = 14 m/s.'}
+  ];
+  var qPanel=document.getElementById('quizPanel'), scoreEl=document.getElementById('score');
+  var answered=[], correctCount=0;
+  QUIZ.forEach(function(item,qi){
+    answered[qi]=false;
+    var box=document.createElement('div');box.className='q';
+    var p=document.createElement('p');p.textContent=(qi+1)+'. '+item.q;box.appendChild(p);
+    item.opts.forEach(function(opt,oi){
+      var btn=document.createElement('button');btn.className='opt';btn.textContent=opt;
+      btn.addEventListener('click',function(){
+        if(answered[qi])return; answered[qi]=true;
+        var kids=box.querySelectorAll('.opt');
+        kids[item.ans].classList.add('correct');
+        if(oi!==item.ans) btn.classList.add('wrong');
+        else correctCount++;
+        box.querySelector('.explain').classList.add('show');
+        scoreEl.textContent='Score: '+correctCount+' / '+QUIZ.length;
+      });
+      box.appendChild(btn);
+    });
+    var ex=document.createElement('div');ex.className='explain';ex.textContent=item.ex;box.appendChild(ex);
+    qPanel.appendChild(box);
+  });
+
+  // =================================================================
+  // ANIMATION LOOP
+  // =================================================================
+  var last=null, SPEED=1.0; // sim seconds per real second
+  function step(ts){
+    if(document.hidden){ last=ts; requestAnimationFrame(step); return; }
+    if(last===null)last=ts;
+    var dt=(ts-last)/1000; last=ts;
+    if(dt>0.1)dt=0.1;
+
+    // Mode 1
+    if(G.running){
+      G.t+=dt*SPEED;
+      if(G.t>=G.tMax){G.t=G.tMax;G.running=false;}
+      G.v=G.u+G.a*G.t;
+      G.s=G.u*G.t+0.5*G.a*G.t*G.t;
+      G.pts_s.push([G.t,Math.max(0,G.s)]);
+      G.pts_v.push([G.t,G.v]);
+      gUpdateReadouts(); gDraw();
+    }
+    // Mode 2
+    if(U.running){
+      U.t+=dt*SPEED;
+      if(U.t>=U.tMax){U.t=U.tMax;U.running=false;}
+      U.pts_s_uni.push([U.t,U.u*U.t]);
+      U.pts_v_uni.push([U.t,U.u]);
+      U.pts_s_acc.push([U.t,U.u*U.t+0.5*U.a*U.t*U.t]);
+      U.pts_v_acc.push([U.t,U.u+U.a*U.t]);
+      uDraw();
+    }
+    // Mode 3
+    if(D.running){
+      D.t+=dt*SPEED;
+      if(D.t>=D.tTotal){D.t=D.tTotal;D.running=false;}
+      dDraw(); dReadouts();
+    }
+    requestAnimationFrame(step);
+  }
+
+  // init & redraw on resize
+  function initAll(){ gReset(); uReset(); dReset(); }
+  window.addEventListener('resize',function(){ gDraw(); uDraw(); dDraw(); });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) last=null; });
+  initAll();
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

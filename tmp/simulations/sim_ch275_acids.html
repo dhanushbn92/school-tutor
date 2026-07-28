@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acids, Bases &amp; Salts Lab - NIOS Class 10 Science</title>
+<style>
+  :root{
+    --accent:#6bb3e0;
+    --accent-dark:#4a90c4;
+    --bg:#181f2a;
+    --bg2:#141a24;
+    --panel:#232c3b;
+    --panel2:#2b3546;
+    --ink:#e8eef6;
+    --muted:#93a2b8;
+    --good:#4dd39a;
+    --bad:#f0796b;
+    --line:#33415a;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(165deg,#181f2a,#111722);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.88rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;
+    background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#0d1420;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+  }
+  h2{font-size:1.05rem;margin:0 0 10px;}
+  h3{font-size:.95rem;margin:14px 0 8px;color:var(--accent);}
+  .hidden{display:none;}
+  label.fld{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 6px;}
+  input[type=range]{width:100%;accent-color:var(--accent);height:26px;}
+  select,button.pick{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    padding:9px 12px;border-radius:10px;font-size:.9rem;font-family:inherit;
+  }
+  select{width:100%;}
+  .btn{
+    background:var(--accent);color:#0d1420;border:none;
+    padding:9px 16px;border-radius:10px;font-weight:700;
+    cursor:pointer;font-size:.9rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);}
+  .btn.ghost{background:var(--panel2);color:var(--accent);border:1px solid var(--line);}
+  .grid{display:flex;gap:16px;flex-wrap:wrap;}
+  .col{flex:1 1 300px;min-width:270px;}
+  .beaker-wrap{display:flex;justify-content:center;}
+  svg{width:100%;height:auto;display:block;max-width:340px;}
+  .big{font-size:2.2rem;font-weight:800;line-height:1;}
+  .chip{display:inline-block;padding:5px 12px;border-radius:20px;font-weight:700;font-size:.9rem;}
+  .chip.acid{background:#5a2b30;color:#ffb3ab;}
+  .chip.base{background:#123c4a;color:#8fdcff;}
+  .chip.neutral{background:#2c3a2e;color:#a9e7bd;}
+  .readout{background:var(--panel2);border-radius:12px;padding:12px 14px;margin-top:10px;}
+  .readout .row{display:flex;justify-content:space-between;font-size:.88rem;padding:3px 0;}
+  .readout .row span:last-child{font-weight:700;}
+  .swatch{width:100%;height:44px;border-radius:10px;border:1px solid var(--line);margin-top:8px;}
+  table.ex{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px;}
+  table.ex td{padding:5px 6px;border-bottom:1px solid var(--line);}
+  table.ex td:first-child{color:var(--muted);}
+  table.ex td:last-child{text-align:right;font-weight:700;}
+  .eq{font-size:1.05rem;font-weight:700;text-align:center;background:var(--panel2);
+      padding:12px;border-radius:12px;margin-top:10px;letter-spacing:.3px;}
+  .fb{margin-top:12px;padding:11px 14px;border-radius:12px;font-size:.9rem;display:none;}
+  .fb.show{display:block;}
+  .fb.ok{background:#173a2c;color:var(--good);border:1px solid #245c44;}
+  .fb.no{background:#3a1f1c;color:var(--bad);border:1px solid #5c2f29;}
+  .facts li{margin-bottom:8px;font-size:.88rem;}
+  .facts b{color:var(--accent);}
+  .quiz .q{margin-bottom:16px;}
+  .quiz .opts{display:flex;flex-direction:column;gap:7px;margin-top:8px;}
+  .quiz .opt{
+    background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:9px 12px;cursor:pointer;font-size:.88rem;transition:.12s;
+  }
+  .quiz .opt:hover{border-color:var(--accent);}
+  .quiz .opt.correct{background:#173a2c;border-color:#245c44;color:var(--good);}
+  .quiz .opt.wrong{background:#3a1f1c;border-color:#5c2f29;color:var(--bad);}
+  .quiz .ans{font-size:.83rem;color:var(--muted);margin-top:7px;display:none;}
+  .quiz .ans.show{display:block;}
+  canvas{width:100%;height:auto;display:block;background:var(--panel2);border-radius:12px;}
+  .scalebar{height:26px;border-radius:8px;margin-top:6px;
+    background:linear-gradient(90deg,#e2352b,#e8622b,#e89a2b,#e8c92b,#a8d02b,#4dd39a,#2bb3a8,#2b7fd0,#4a4ad0,#7a2bd0,#a02bd0);}
+  .scalelabels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:2px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:6px 0 18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Acids, Bases &amp; Salts Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology &middot; Chapter 8. Explore pH, indicators, neutralization and test substances.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-t="ph">pH &amp; Indicators</div>
+    <div class="tab" data-t="neut">Neutralization</div>
+    <div class="tab" data-t="test">Test-it</div>
+    <div class="tab" data-t="facts">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ============ pH SCALE ============ -->
+  <section id="ph" class="panel">
+    <h2>pH scale &amp; indicators</h2>
+    <div class="grid">
+      <div class="col">
+        <label class="fld">Drag to set the pH value</label>
+        <input type="range" id="phSlider" min="0" max="14" step="0.1" value="7">
+        <div class="scalebar"></div>
+        <div class="scalelabels"><span>0 acid</span><span>7 neutral</span><span>14 base</span></div>
+
+        <div class="readout">
+          <div class="row"><span>pH value</span><span id="phVal">7.0</span></div>
+          <div class="row"><span>Nature</span><span id="phNature">Neutral</span></div>
+          <div class="row"><span>Litmus paper</span><span id="phLitmus">No change</span></div>
+          <div class="row"><span>H&#8314; vs OH&#8315;</span><span id="phIons">equal</span></div>
+        </div>
+      </div>
+      <div class="col">
+        <h3>Universal indicator colour</h3>
+        <div class="swatch" id="uiSwatch"></div>
+        <div style="text-align:center;margin-top:6px;font-size:.82rem;color:var(--muted)" id="uiName">Green</div>
+        <h3>Example substances near this pH</h3>
+        <table class="ex"><tbody id="exBody"></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEUTRALIZATION ============ -->
+  <section id="neut" class="panel hidden">
+    <h2>Neutralization: acid + base &#8594; salt + water</h2>
+    <div class="grid">
+      <div class="col">
+        <label class="fld">Start with a <b>base</b> (NaOH). Slide to add <b>acid</b> (HCl).</label>
+        <input type="range" id="titSlider" min="0" max="100" step="1" value="0">
+        <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)">
+          <span>0 mL acid</span><span>25 mL (equivalence)</span><span>50 mL acid</span>
+        </div>
+        <div class="beaker-wrap" style="margin-top:12px">
+          <svg viewBox="0 0 200 200" id="beaker">
+            <rect x="55" y="30" width="90" height="150" rx="10" fill="none" stroke="#4a5a75" stroke-width="4"/>
+            <rect id="liquid" x="59" y="90" width="82" height="86" rx="6" fill="#4dd39a"/>
+            <ellipse cx="100" cy="90" rx="41" ry="7" fill="#ffffff" opacity=".12"/>
+            <rect x="70" y="8" width="14" height="34" rx="5" fill="#4a5a75"/>
+            <circle id="drop" cx="77" cy="46" r="4" fill="#f0796b" opacity="0"/>
+          </svg>
+        </div>
+      </div>
+      <div class="col">
+        <div class="readout">
+          <div class="row"><span>Acid added</span><span id="tAcid">0 mL</span></div>
+          <div class="row"><span>pH of mixture</span><span id="tPh">13.0</span></div>
+          <div class="row"><span>State</span><span id="tState">Strongly basic</span></div>
+        </div>
+        <div class="eq" id="tEq">HCl + NaOH &#8594; NaCl + H&#8322;O</div>
+        <h3>Titration curve</h3>
+        <canvas id="curve" width="320" height="200"></canvas>
+        <p style="font-size:.8rem;color:var(--muted);margin:8px 0 0">
+          The steep jump at the middle is the <b>equivalence point</b> (pH&nbsp;7): all acid has reacted with all base, leaving only common salt (NaCl) and water.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEST-IT ============ -->
+  <section id="test" class="panel hidden">
+    <h2>Test-it: predict, then check</h2>
+    <label class="fld">Pick a substance</label>
+    <select id="subSel"></select>
+    <label class="fld">Your prediction &mdash; is it acidic, basic or neutral/salt?</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="pick btn ghost" data-g="acid">Acidic</button>
+      <button class="pick btn ghost" data-g="base">Basic</button>
+      <button class="pick btn ghost" data-g="neutral">Neutral / Salt</button>
+    </div>
+    <div class="fb" id="testFb"></div>
+    <div class="readout" id="testCard" style="display:none">
+      <div class="row"><span>Substance</span><span id="tcName"></span></div>
+      <div class="row"><span>Approx. pH</span><span id="tcPh"></span></div>
+      <div class="row"><span>Blue litmus</span><span id="tcBlue"></span></div>
+      <div class="row"><span>Red litmus</span><span id="tcRed"></span></div>
+      <div class="row"><span>Class</span><span id="tcClass"></span></div>
+    </div>
+  </section>
+
+  <!-- ============ FACTS + QUIZ ============ -->
+  <section id="facts" class="panel hidden">
+    <h2>Key facts</h2>
+    <ul class="facts">
+      <li><b>Acids</b> release hydrogen ions (<b>H&#8314;</b>) in water; they taste sour, turn <b>blue litmus red</b>, and have pH &lt; 7. Examples: HCl, H&#8322;SO&#8324;, citric acid.</li>
+      <li><b>Bases / alkalis</b> release hydroxide ions (<b>OH&#8315;</b>) in water; they taste bitter, feel soapy, turn <b>red litmus blue</b>, and have pH &gt; 7. Examples: NaOH, KOH, Ca(OH)&#8322;.</li>
+      <li><b>pH scale</b> runs 0&ndash;14. pH 7 is neutral (pure water). Lower pH = more acidic (more H&#8314;); higher pH = more basic (more OH&#8315;).</li>
+      <li><b>Indicators</b> change colour with pH: litmus, methyl orange, phenolphthalein (pink in base, colourless in acid) and the multi-colour <b>universal indicator</b>.</li>
+      <li><b>Neutralization:</b> an acid reacts with a base to give a <b>salt + water</b>, e.g. HCl + NaOH &#8594; NaCl + H&#8322;O. The pH moves toward 7.</li>
+      <li><b>Salts</b> form from the acid&rsquo;s negative ion and the base&rsquo;s positive ion. Common salt is <b>NaCl</b>. Some salts are acidic, some basic, some neutral.</li>
+    </ul>
+    <h2 style="margin-top:18px">Quick quiz</h2>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>Interactive learning tool &middot; colours and products are illustrative and chemistry-accurate for teaching.</footer>
+</div>
+
+<script>
+"use strict";
+// ---------- tab switching ----------
+var tabs=document.querySelectorAll(".tab");
+var secs={ph:document.getElementById("ph"),neut:document.getElementById("neut"),test:document.getElementById("test"),facts:document.getElementById("facts")};
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    for(var k in secs){secs[k].classList.add("hidden");}
+    secs[t.dataset.t].classList.remove("hidden");
+    if(t.dataset.t==="neut"){drawCurve();}
+  });
+});
+
+// ---------- universal indicator colour by pH ----------
+function uiColor(ph){
+  // classic universal-indicator ramp: red -> orange -> yellow -> green -> blue -> indigo/violet
+  var stops=[
+    [0,"#e2352b"],[2,"#e8622b"],[4,"#e8a52b"],[5,"#e8c92b"],
+    [6,"#a8d02b"],[7,"#4dd39a"],[8,"#2bb3a8"],[10,"#2b7fd0"],
+    [12,"#4a4ad0"],[14,"#8a2bd0"]
+  ];
+  for(var i=0;i<stops.length-1;i++){
+    if(ph<=stops[i+1][0]){
+      var a=stops[i],b=stops[i+1];
+      var f=(ph-a[0])/(b[0]-a[0]);
+      return lerpHex(a[1],b[1],f);
+    }
+  }
+  return stops[stops.length-1][1];
+}
+function lerpHex(h1,h2,f){
+  function p(h){return [parseInt(h.substr(1,2),16),parseInt(h.substr(3,2),16),parseInt(h.substr(5,2),16)];}
+  var a=p(h1),b=p(h2);
+  var r=Math.round(a[0]+(b[0]-a[0])*f),g=Math.round(a[1]+(b[1]-a[1])*f),bl=Math.round(a[2]+(b[2]-a[2])*f);
+  return "rgb("+r+","+g+","+bl+")";
+}
+function uiNameFor(ph){
+  if(ph<2)return "Red (strong acid)";
+  if(ph<4)return "Orange";
+  if(ph<6)return "Yellow";
+  if(ph<7)return "Yellow-green";
+  if(ph<7.5)return "Green (neutral)";
+  if(ph<9)return "Blue-green";
+  if(ph<11)return "Blue";
+  if(ph<13)return "Indigo";
+  return "Violet (strong base)";
+}
+
+var examples=[
+  {ph:1,name:"Battery acid"},{ph:2,name:"Lemon juice"},{ph:2.5,name:"Vinegar"},
+  {ph:3,name:"Orange juice"},{ph:4,name:"Tomato / acid rain"},{ph:5.5,name:"Black coffee"},
+  {ph:6.5,name:"Milk"},{ph:7,name:"Pure water"},{ph:7.4,name:"Blood"},
+  {ph:8,name:"Sea water"},{ph:8.5,name:"Baking soda"},{ph:10.5,name:"Milk of magnesia"},
+  {ph:11.5,name:"Soap / ammonia"},{ph:13,name:"Bleach"},{ph:14,name:"Drain cleaner (NaOH)"}
+];
+
+var phSlider=document.getElementById("phSlider");
+function updatePh(){
+  var ph=parseFloat(phSlider.value);
+  document.getElementById("phVal").textContent=ph.toFixed(1);
+  var nat,lit,ion;
+  if(ph<6.5){nat="Acidic";lit="Blue turns red";ion="H⁺ > OH⁻";}
+  else if(ph>7.5){nat="Basic (alkaline)";lit="Red turns blue";ion="OH⁻ > H⁺";}
+  else {nat="Neutral";lit="No change";ion="H⁺ = OH⁻";}
+  var nEl=document.getElementById("phNature");
+  nEl.innerHTML='<span class="chip '+(ph<6.5?"acid":ph>7.5?"base":"neutral")+'">'+nat+'</span>';
+  document.getElementById("phLitmus").textContent=lit;
+  document.getElementById("phIons").textContent=ion;
+  var c=uiColor(ph);
+  document.getElementById("uiSwatch").style.background=c;
+  document.getElementById("uiName").textContent=uiNameFor(ph);
+  // nearest examples
+  var sorted=examples.slice().sort(function(a,b){return Math.abs(a.ph-ph)-Math.abs(b.ph-ph);}).slice(0,4);
+  sorted.sort(function(a,b){return a.ph-b.ph;});
+  var html="";
+  sorted.forEach(function(e){html+="<tr><td>"+e.name+"</td><td>pH "+e.ph+"</td></tr>";});
+  document.getElementById("exBody").innerHTML=html;
+}
+phSlider.addEventListener("input",updatePh);
+updatePh();
+
+// ---------- neutralization ----------
+var titSlider=document.getElementById("titSlider");
+// model: start 25 mL of 0.1M NaOH; add x mL of 0.1M HCl (0..50). pH from strong acid/base mixing.
+function phFromAcidMl(x){
+  var Vb=25, Cb=0.1, Ca=0.1; // base fixed
+  var molB=Vb*Cb, molA=x*Ca, Vt=Vb+x;
+  var diff=molB-molA; // + => excess base
+  if(Math.abs(diff)<1e-6){return 7;}
+  if(diff>0){ var OH=diff/Vt; return 14+Math.log10(OH); }
+  var H=(-diff)/Vt; return -Math.log10(H);
+}
+function updateTit(){
+  var raw=parseInt(titSlider.value,10); // 0..100 -> 0..50 mL
+  var ml=raw*0.5;
+  var ph=phFromAcidMl(ml);
+  ph=Math.max(0,Math.min(14,ph));
+  document.getElementById("tAcid").textContent=ml.toFixed(1)+" mL";
+  document.getElementById("tPh").textContent=ph.toFixed(1);
+  var st,cls;
+  if(ph<3){st="Strongly acidic";cls="acid";}
+  else if(ph<6.5){st="Acidic";cls="acid";}
+  else if(ph<=7.5){st="Neutral (equivalence)";cls="neutral";}
+  else if(ph<11){st="Basic";cls="base";}
+  else {st="Strongly basic";cls="base";}
+  document.getElementById("tState").innerHTML='<span class="chip '+cls+'">'+st+'</span>';
+  // liquid colour + level
+  var liq=document.getElementById("liquid");
+  liq.setAttribute("fill",uiColor(ph));
+  var h=60+raw*0.9; // grows a little as volume added
+  liq.setAttribute("y",(176-h).toString());
+  liq.setAttribute("height",h.toString());
+  var drop=document.getElementById("drop");
+  drop.setAttribute("opacity",raw>0&&raw<100?"0.9":"0");
+  drawCurve(ml);
+}
+titSlider.addEventListener("input",updateTit);
+
+var canvas=document.getElementById("curve"),ctx=canvas.getContext("2d");
+function drawCurve(marker){
+  var W=canvas.width,H=canvas.height,pad=28;
+  ctx.clearRect(0,0,W,H);
+  // axes
+  ctx.strokeStyle="#4a5a75";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad,8);ctx.lineTo(pad,H-pad);ctx.lineTo(W-8,H-pad);ctx.stroke();
+  ctx.fillStyle="#93a2b8";ctx.font="10px sans-serif";
+  ctx.fillText("pH",6,14);
+  ctx.fillText("acid added (mL)",W-95,H-8);
+  ctx.fillText("14",pad-18,14);ctx.fillText("7",pad-12,(H-pad+8)/2+4);ctx.fillText("0",pad-10,H-pad+3);
+  // grid line at pH7
+  var y7=8+(14-7)/14*(H-pad-8);
+  ctx.strokeStyle="#33415a";ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(pad,y7);ctx.lineTo(W-8,y7);ctx.stroke();ctx.setLineDash([]);
+  // curve
+  ctx.strokeStyle="#6bb3e0";ctx.lineWidth=2.5;ctx.beginPath();
+  for(var i=0;i<=100;i++){
+    var ml=i*0.5;
+    var ph=Math.max(0,Math.min(14,phFromAcidMl(ml)));
+    var x=pad+(ml/50)*(W-8-pad);
+    var y=8+(14-ph)/14*(H-pad-8);
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  // marker
+  if(typeof marker==="number"){
+    var mph=Math.max(0,Math.min(14,phFromAcidMl(marker)));
+    var mx=pad+(marker/50)*(W-8-pad);
+    var my=8+(14-mph)/14*(H-pad-8);
+    ctx.fillStyle="#f0796b";ctx.beginPath();ctx.arc(mx,my,4.5,0,Math.PI*2);ctx.fill();
+  }
+}
+updateTit();
+
+// ---------- test-it ----------
+var subs=[
+  {name:"Lemon juice",ph:2,cls:"acid"},
+  {name:"Vinegar (acetic acid)",ph:2.8,cls:"acid"},
+  {name:"Dilute HCl",ph:1,cls:"acid"},
+  {name:"Pure water",ph:7,cls:"neutral"},
+  {name:"Common salt solution (NaCl)",ph:7,cls:"neutral"},
+  {name:"Sugar solution",ph:7,cls:"neutral"},
+  {name:"Baking soda (NaHCO₃)",ph:8.5,cls:"base"},
+  {name:"Soap solution",ph:10,cls:"base"},
+  {name:"Milk of magnesia",ph:10.5,cls:"base"},
+  {name:"Dilute NaOH",ph:13,cls:"base"}
+];
+var subSel=document.getElementById("subSel");
+subs.forEach(function(s,i){var o=document.createElement("option");o.value=i;o.textContent=s.name;subSel.appendChild(o);});
+function litFor(cls,paper){
+  if(cls==="acid")return paper==="blue"?"Turns RED":"Stays red";
+  if(cls==="base")return paper==="blue"?"Stays blue":"Turns BLUE";
+  return "No change";
+}
+function showTestCard(){
+  var s=subs[parseInt(subSel.value,10)];
+  document.getElementById("tcName").textContent=s.name;
+  document.getElementById("tcPh").textContent="~ "+s.ph;
+  document.getElementById("tcBlue").textContent=litFor(s.cls,"blue");
+  document.getElementById("tcRed").textContent=litFor(s.cls,"red");
+  var lbl=s.cls==="acid"?"Acid":s.cls==="base"?"Base":"Neutral / Salt";
+  document.getElementById("tcClass").innerHTML='<span class="chip '+s.cls+'">'+lbl+'</span>';
+  document.getElementById("testCard").style.display="block";
+}
+document.querySelectorAll(".pick").forEach(function(b){
+  b.addEventListener("click",function(){
+    var s=subs[parseInt(subSel.value,10)];
+    var fb=document.getElementById("testFb");
+    fb.className="fb show "+(b.dataset.g===s.cls?"ok":"no");
+    if(b.dataset.g===s.cls){
+      fb.textContent="Correct! "+s.name+" is "+(s.cls==="neutral"?"neutral/salt":s.cls)+" (pH ≈ "+s.ph+").";
+    }else{
+      var real=s.cls==="acid"?"acidic":s.cls==="base"?"basic":"neutral / a salt";
+      fb.textContent="Not quite — "+s.name+" is actually "+real+" (pH ≈ "+s.ph+"). Check the litmus results below.";
+    }
+    showTestCard();
+  });
+});
+subSel.addEventListener("change",function(){
+  document.getElementById("testFb").className="fb";
+  document.getElementById("testCard").style.display="none";
+});
+
+// ---------- quiz ----------
+var quizData=[
+  {q:"1. An acid turns blue litmus paper:",
+   opts:["Blue","Red","Green","No change"],a:1,
+   exp:"Acids turn blue litmus red. Bases turn red litmus blue."},
+  {q:"2. The pH of a neutral solution such as pure water is:",
+   opts:["0","7","14","1"],a:1,
+   exp:"pH 7 is neutral: equal H⁺ and OH⁻ ions."},
+  {q:"3. When hydrochloric acid reacts with sodium hydroxide, the products are:",
+   opts:["Salt + hydrogen","Salt + water","Acid + base","Only water"],a:1,
+   exp:"HCl + NaOH → NaCl + H₂O. A neutralization gives salt and water."}
+];
+var quizEl=document.getElementById("quiz");
+quizData.forEach(function(item,qi){
+  var d=document.createElement("div");d.className="q";
+  var h="<div>"+item.q+"</div><div class='opts'>";
+  item.opts.forEach(function(o,oi){h+="<div class='opt' data-q='"+qi+"' data-o='"+oi+"'>"+o+"</div>";});
+  h+="</div><div class='ans' id='ans"+qi+"'>"+item.exp+"</div>";
+  d.innerHTML=h;quizEl.appendChild(d);
+});
+quizEl.addEventListener("click",function(e){
+  var t=e.target;
+  if(!t.classList.contains("opt"))return;
+  var qi=parseInt(t.dataset.q,10),oi=parseInt(t.dataset.o,10);
+  var parent=t.parentNode;
+  if(parent.dataset.done)return;
+  parent.dataset.done="1";
+  Array.prototype.forEach.call(parent.children,function(c){
+    var co=parseInt(c.dataset.o,10);
+    if(co===quizData[qi].a)c.classList.add("correct");
+    else if(co===oi)c.classList.add("wrong");
+  });
+  document.getElementById("ans"+qi).classList.add("show");
+});
+</script>
+</body>
+</html>

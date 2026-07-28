@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chemical Bonding Lab - NIOS Class 10 Science &amp; Technology (Ch7)</title>
+<style>
+  :root{
+    --accent:#7c9cff;
+    --accent-dark:#5b78e0;
+    --bg:#131722;
+    --bg2:#1a2030;
+    --panel:#1e2637;
+    --panel2:#232c40;
+    --ink:#e7ecf5;
+    --muted:#9aa7c0;
+    --line:#2e3853;
+    --good:#4bd08b;
+    --bad:#ff7a85;
+    --pos:#ff8a5c;
+    --neg:#5cc8ff;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 20% -10%,#20293e,#131722 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;min-height:100vh;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:110px;background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;font-size:.9rem;font-weight:600;
+    color:var(--muted);box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab.active{color:#fff;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 10px;}
+  h3{font-size:.95rem;margin:14px 0 8px;color:var(--accent);}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .btn{background:var(--accent);color:#fff;border:none;padding:9px 15px;border-radius:10px;
+    font-weight:600;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);}
+  .btn:disabled{opacity:.5;cursor:default;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#fff;border-color:var(--accent-dark);}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;
+    background:var(--bg2);border-radius:12px;border:1px solid var(--line);}
+  .cap{color:var(--muted);font-size:.85rem;margin:8px 0 0;min-height:1.2em;}
+  .lbl{font-size:.82rem;color:var(--muted);margin-right:4px;}
+  select{background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:9px;padding:8px 10px;font-size:.88rem;font-weight:600;}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;}
+  th{color:var(--muted);font-weight:600;}
+  .ionic-col{color:var(--pos);}
+  .cov-col{color:var(--neg);}
+  .facts li{margin-bottom:8px;font-size:.9rem;}
+  .facts b{color:var(--accent);}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.78rem;
+    font-weight:700;margin-left:6px;}
+  .pill.ionic{background:rgba(255,138,92,.18);color:var(--pos);}
+  .pill.cov{background:rgba(92,200,255,.18);color:var(--neg);}
+  .q{margin-bottom:16px;}
+  .q p{margin:0 0 8px;font-weight:600;font-size:.92rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px;
+    cursor:pointer;font-size:.88rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(75,208,139,.2);border-color:var(--good);color:#d6ffe8;}
+  .opt.wrong{background:rgba(255,122,133,.18);border-color:var(--bad);color:#ffd9dc;}
+  .fb{font-size:.85rem;margin-top:4px;min-height:1em;}
+  .fb.ok{color:var(--good);} .fb.no{color:var(--bad);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;margin-right:4px;}
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr;}}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⚛️ Chemical Bonding Lab</h1>
+    <p>NIOS Class 10 Science &amp; Technology · Chapter 7 — Chemical Bonding</p>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-mode="ionic">Ionic Bonding</div>
+    <div class="tab" data-mode="covalent">Covalent Bonding</div>
+    <div class="tab" data-mode="compare">Compare &amp; Classify</div>
+    <div class="tab" data-mode="facts">Facts &amp; Quiz</div>
+  </div>
+
+  <!-- ============ IONIC ============ -->
+  <section class="panel" id="mode-ionic">
+    <h2>Ionic Bonding — electron transfer</h2>
+    <div class="row">
+      <span class="lbl">Example:</span>
+      <select id="ionicPick">
+        <option value="nacl">NaCl (Na + Cl)</option>
+        <option value="mgo">MgO (Mg + O)</option>
+      </select>
+      <button class="btn" id="ionicPlay">▶ Transfer electron(s)</button>
+      <button class="btn ghost" id="ionicReset">Reset</button>
+    </div>
+    <svg id="ionicSvg" viewBox="0 0 640 340" role="img" aria-label="Ionic bonding animation"></svg>
+    <p class="cap" id="ionicCap"></p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--accent)"></span>metal / valence e⁻</span>
+      <span><span class="dot" style="background:var(--neg)"></span>non-metal shell</span>
+      <span><span class="dot" style="background:var(--pos)"></span>transferred e⁻</span>
+    </div>
+  </section>
+
+  <!-- ============ COVALENT ============ -->
+  <section class="panel hidden" id="mode-covalent">
+    <h2>Covalent Bonding — sharing electron pairs (Lewis dots)</h2>
+    <div class="row">
+      <span class="lbl">Molecule:</span>
+      <select id="covPick">
+        <option value="h2">H₂ — single bond</option>
+        <option value="o2">O₂ — double bond</option>
+        <option value="n2">N₂ — triple bond</option>
+        <option value="h2o">H₂O — water</option>
+        <option value="ch4">CH₄ — methane</option>
+      </select>
+      <button class="btn" id="covPlay">▶ Animate sharing</button>
+      <button class="btn ghost" id="covReset">Reset</button>
+    </div>
+    <svg id="covSvg" viewBox="0 0 640 340" role="img" aria-label="Covalent bonding Lewis structure"></svg>
+    <p class="cap" id="covCap"></p>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--muted)"></span>lone pair e⁻</span>
+      <span><span class="dot" style="background:var(--good)"></span>shared (bonding) pair</span>
+    </div>
+  </section>
+
+  <!-- ============ COMPARE ============ -->
+  <section class="panel hidden" id="mode-compare">
+    <h2>Ionic vs Covalent — properties</h2>
+    <table>
+      <thead><tr><th>Property</th><th class="ionic-col">Ionic compounds</th><th class="cov-col">Covalent compounds</th></tr></thead>
+      <tbody>
+        <tr><td>Bond formed by</td><td class="ionic-col">Transfer of electrons</td><td class="cov-col">Sharing of electrons</td></tr>
+        <tr><td>Made of</td><td class="ionic-col">Metal + non-metal</td><td class="cov-col">Non-metals only</td></tr>
+        <tr><td>Melting / boiling point</td><td class="ionic-col">Very high</td><td class="cov-col">Low</td></tr>
+        <tr><td>State at room temp</td><td class="ionic-col">Solid (crystals)</td><td class="cov-col">Gas / liquid / soft solid</td></tr>
+        <tr><td>Conducts electricity</td><td class="ionic-col">Yes — molten or in water</td><td class="cov-col">Usually no</td></tr>
+        <tr><td>Solubility in water</td><td class="ionic-col">Mostly soluble</td><td class="cov-col">Often insoluble</td></tr>
+        <tr><td>Example</td><td class="ionic-col">NaCl, MgO, CaCl₂</td><td class="cov-col">H₂O, CO₂, CH₄, O₂</td></tr>
+      </tbody>
+    </table>
+    <h3>Classify a compound</h3>
+    <div class="row">
+      <span class="lbl">Pick one:</span>
+      <select id="classPick">
+        <option value="">— choose —</option>
+        <option value="i">Sodium chloride (NaCl)</option>
+        <option value="i">Magnesium oxide (MgO)</option>
+        <option value="i">Calcium chloride (CaCl₂)</option>
+        <option value="i">Potassium bromide (KBr)</option>
+        <option value="c">Water (H₂O)</option>
+        <option value="c">Carbon dioxide (CO₂)</option>
+        <option value="c">Methane (CH₄)</option>
+        <option value="c">Ammonia (NH₃)</option>
+        <option value="c">Chlorine (Cl₂)</option>
+      </select>
+    </div>
+    <p class="cap" id="classResult">Select a compound to see whether it is ionic or covalent, and why.</p>
+  </section>
+
+  <!-- ============ FACTS & QUIZ ============ -->
+  <section class="panel hidden" id="mode-facts">
+    <div class="grid2">
+      <div>
+        <h2>Why atoms bond</h2>
+        <ul class="facts">
+          <li><b>Octet rule:</b> atoms are most stable with <b>8</b> electrons in their outer shell (a full octet). H, He aim for a <b>duet</b> of 2.</li>
+          <li><b>Why bond?</b> Atoms gain, lose, or share electrons to reach a stable noble-gas configuration — lower energy = more stable.</li>
+          <li><b>Ionic bond:</b> a metal <b>gives away</b> electrons (becomes +) and a non-metal <b>takes</b> them (becomes −). Opposite charges attract → strong electrostatic bond.</li>
+          <li><b>Covalent bond:</b> two non-metals <b>share</b> pairs of electrons. One shared pair = single bond, two = double, three = triple.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>Quick quiz</h2>
+        <div id="quiz"></div>
+        <button class="btn ghost" id="quizReset">Reset quiz</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>Self-contained interactive · draws atoms &amp; electrons with SVG · animation pauses when tab is hidden.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs){var e=document.createElementNS(SVGNS,tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  var raf=null, paused=false;
+  document.addEventListener("visibilitychange",function(){paused=document.hidden;});
+
+  /* ---------- tab switching ---------- */
+  var tabs=document.getElementById("tabs");
+  tabs.addEventListener("click",function(e){
+    var t=e.target.closest(".tab"); if(!t) return;
+    [].forEach.call(tabs.children,function(c){c.classList.remove("active");});
+    t.classList.add("active");
+    var mode=t.getAttribute("data-mode");
+    ["ionic","covalent","compare","facts"].forEach(function(m){
+      document.getElementById("mode-"+m).classList.toggle("hidden",m!==mode);
+    });
+    stopAnim();
+  });
+  function stopAnim(){ if(raf){cancelAnimationFrame(raf);raf=null;} }
+
+  /* ---------- shared drawing helpers ---------- */
+  function atom(svg,cx,cy,r,label,color,sub){
+    var g=el("g");
+    g.appendChild(el("circle",{cx:cx,cy:cy,r:r,fill:"none",stroke:color,"stroke-width":2.5,opacity:.9}));
+    var nuc=el("circle",{cx:cx,cy:cy,r:22,fill:color,opacity:.22,stroke:color,"stroke-width":1.5});
+    g.appendChild(nuc);
+    var tx=el("text",{x:cx,y:cy+6,"text-anchor":"middle","font-size":"20","font-weight":"700",fill:"#fff"});
+    tx.textContent=label; g.appendChild(tx);
+    if(sub){var s=el("text",{x:cx,y:cy+r+22,"text-anchor":"middle","font-size":"13",fill:"#9aa7c0"});s.textContent=sub;g.appendChild(s);}
+    svg.appendChild(g); return g;
+  }
+  function edot(svg,cx,cy,r,ang,color){
+    var x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+    var c=el("circle",{cx:x,cy:y,r:4.5,fill:color||"#9aa7c0"});
+    svg.appendChild(c); return c;
+  }
+
+  /* =======================================================
+     IONIC MODE
+  ======================================================= */
+  var ionicSvg=document.getElementById("ionicSvg");
+  var ionicCap=document.getElementById("ionicCap");
+  var IONIC={
+    nacl:{a:"Na",an:2,b:"Cl",bn:7,move:1,asub:"metal · 1 valence e⁻",bsub:"non-metal · 7 valence e⁻",
+      msg:"Na gives its 1 outer electron to Cl. Na becomes Na⁺, Cl becomes Cl⁻ → they attract to form NaCl.",
+      res:"Na⁺  +  Cl⁻  →  NaCl (ionic)"},
+    mgo:{a:"Mg",an:2,b:"O",bn:6,move:2,asub:"metal · 2 valence e⁻",bsub:"non-metal · 6 valence e⁻",
+      msg:"Mg gives 2 electrons to O. Mg becomes Mg²⁺, O becomes O²⁻ → strong attraction forms MgO.",
+      res:"Mg²⁺  +  O²⁻  →  MgO (ionic)"}
+  };
+  var ionicKey="nacl", ionicDone=false;
+  function drawIonic(t){ // t=0 start .. 1 transferred
+    while(ionicSvg.firstChild) ionicSvg.removeChild(ionicSvg.firstChild);
+    var d=IONIC[ionicKey];
+    var ax=160, bx=480, cy=150, r=70;
+    // shift together as bond forms
+    var pull=t>=1?22:0;
+    atom(ionicSvg,ax+pull,cy,r,d.a,"var(--accent)",d.asub);
+    atom(ionicSvg,bx-pull,cy,r,d.b,"var(--neg)",d.bsub);
+    // Cl/O existing valence dots (bn)
+    var bn=d.bn;
+    for(var i=0;i<bn;i++){edot(ionicSvg,bx-pull,cy,r,(-90+i*(360/8))*Math.PI/180,"var(--neg)");}
+    // Na/Mg remaining electrons (after transfer -> 0 shown of valence)
+    var remain = t>=1 ? 0 : d.move;
+    for(var j=0;j<remain;j++){edot(ionicSvg,ax+pull,cy,r,(-90+j*40)*Math.PI/180,"var(--accent)");}
+    // moving electron(s)
+    var startAng=-90*Math.PI/180;
+    for(var m=0;m<d.move;m++){
+      var sx=ax+r*Math.cos(startAng+m*0.5), sy=cy+r*Math.sin(startAng+m*0.5);
+      var slot=(bn+m); var ea=(-90+slot*45)*Math.PI/180;
+      var ex=(bx-pull)+r*Math.cos(ea), ey=cy+r*Math.sin(ea);
+      var x=sx+(ex-sx)*t, y=sy+(ey-sy)*t;
+      ionicSvg.appendChild(el("circle",{cx:x,cy:y,r:5.5,fill:"var(--pos)",stroke:"#fff","stroke-width":1}));
+    }
+    // charges + attraction when done
+    if(t>=1){
+      var ch=el("text",{x:ax+pull,y:cy-r-14,"text-anchor":"middle","font-size":"18","font-weight":"700",fill:"var(--pos)"});
+      ch.textContent=d.a+(d.move===1?"⁺":"²⁺"); ionicSvg.appendChild(ch);
+      var ch2=el("text",{x:bx-pull,y:cy-r-14,"text-anchor":"middle","font-size":"18","font-weight":"700",fill:"var(--neg)"});
+      ch2.textContent=d.b+(d.move===1?"⁻":"²⁻"); ionicSvg.appendChild(ch2);
+      var ln=el("line",{x1:ax+pull+r,y1:cy,x2:bx-pull-r,y2:cy,stroke:"var(--good)","stroke-width":2,"stroke-dasharray":"5 4"});
+      ionicSvg.appendChild(ln);
+      var at=el("text",{x:320,y:cy-10,"text-anchor":"middle","font-size":"13",fill:"var(--good)"});
+      at.textContent="electrostatic attraction"; ionicSvg.appendChild(at);
+      var rt=el("text",{x:320,y:300,"text-anchor":"middle","font-size":"17","font-weight":"700",fill:"var(--ink)"});
+      rt.textContent=d.res; ionicSvg.appendChild(rt);
+    }
+  }
+  function playIonic(){
+    stopAnim(); ionicDone=false; var t=0, last=performance.now();
+    (function step(now){
+      if(paused){ raf=requestAnimationFrame(step); return; }
+      var dt=(now-last)/1000; last=now;
+      t=Math.min(1,t+dt/1.6); drawIonic(t);
+      if(t<1){ raf=requestAnimationFrame(step); }
+      else{ ionicDone=true; ionicCap.textContent=IONIC[ionicKey].msg; raf=null; }
+    })(performance.now());
+    ionicCap.textContent="Transferring electron(s)…";
+  }
+  document.getElementById("ionicPick").addEventListener("change",function(){ionicKey=this.value;drawIonic(0);ionicCap.textContent="Press ▶ to see the electron transfer.";});
+  document.getElementById("ionicPlay").addEventListener("click",playIonic);
+  document.getElementById("ionicReset").addEventListener("click",function(){stopAnim();drawIonic(0);ionicCap.textContent="Press ▶ to see the electron transfer.";});
+  drawIonic(0); ionicCap.textContent="Press ▶ to see the electron transfer.";
+
+  /* =======================================================
+     COVALENT MODE  (Lewis dot structures)
+  ======================================================= */
+  var covSvg=document.getElementById("covSvg");
+  var covCap=document.getElementById("covCap");
+  // each molecule: list of atoms {x,y,label,color}, bonds {a,b,order}, lone pairs per atom
+  var COV={
+    h2:{atoms:[{x:250,y:170,l:"H",c:"var(--accent)"},{x:390,y:170,l:"H",c:"var(--accent)"}],
+        bonds:[{a:0,b:1,order:1}],lone:[0,0],
+        cap:"H₂: each H shares 1 electron. The single shared pair gives both a stable duet (2 e⁻)."},
+    o2:{atoms:[{x:230,y:170,l:"O",c:"var(--neg)"},{x:410,y:170,l:"O",c:"var(--neg)"}],
+        bonds:[{a:0,b:1,order:2}],lone:[2,2],
+        cap:"O₂: two shared pairs = a double bond. Each O reaches an octet (4 shared + 4 lone)."},
+    n2:{atoms:[{x:230,y:170,l:"N",c:"var(--neg)"},{x:410,y:170,l:"N",c:"var(--neg)"}],
+        bonds:[{a:0,b:1,order:3}],lone:[1,1],
+        cap:"N₂: three shared pairs = a triple bond. Each N gets an octet (6 shared + 2 lone)."},
+    h2o:{atoms:[{x:320,y:120,l:"O",c:"var(--neg)"},{x:210,y:230,l:"H",c:"var(--accent)"},{x:430,y:230,l:"H",c:"var(--accent)"}],
+        bonds:[{a:0,b:1,order:1},{a:0,b:2,order:1}],lone:[2,0,0],
+        cap:"H₂O: O shares one pair with each H. O gets an octet; each H a duet. O keeps 2 lone pairs (bent shape)."},
+    ch4:{atoms:[{x:320,y:170,l:"C",c:"var(--good)"},{x:320,y:70,l:"H",c:"var(--accent)"},{x:320,y:270,l:"H",c:"var(--accent)"},{x:190,y:170,l:"H",c:"var(--accent)"},{x:450,y:170,l:"H",c:"var(--accent)"}],
+        bonds:[{a:0,b:1,order:1},{a:0,b:2,order:1},{a:0,b:3,order:1},{a:0,b:4,order:1}],lone:[0,0,0,0,0],
+        cap:"CH₄: C shares one pair with each of 4 H atoms → C gets an octet, each H a duet."}
+  };
+  var covKey="h2";
+  function drawCov(prog){ // prog 0..1 : shared pairs slide to midpoint
+    while(covSvg.firstChild) covSvg.removeChild(covSvg.firstChild);
+    var d=COV[covKey];
+    // bonds first (behind)
+    d.bonds.forEach(function(b){
+      var A=d.atoms[b.a], B=d.atoms[b.b];
+      var dx=B.x-A.x, dy=B.y-A.y, len=Math.sqrt(dx*dx+dy*dy);
+      var nx=-dy/len, ny=dx/len; // perpendicular
+      var gap=6;
+      for(var o=0;o<b.order;o++){
+        var off=(o-(b.order-1)/2)*gap;
+        // shared electron dots: start near each atom, move to middle line as prog->1
+        var ax=A.x+dx*0.30+nx*off, ay=A.y+dy*0.30+ny*off;
+        var bx=A.x+dx*0.70+nx*off, by=A.y+dy*0.70+ny*off;
+        var mx=A.x+dx*0.5+nx*off, my=A.y+dy*0.5+ny*off;
+        var e1x=ax+(mx-ax)*prog*0.55, e1y=ay+(my-ay)*prog*0.55;
+        var e2x=bx+(mx-bx)*prog*0.55, e2y=by+(my-by)*prog*0.55;
+        if(prog>=1){
+          covSvg.appendChild(el("circle",{cx:e1x,cy:e1y,r:4.5,fill:"var(--good)"}));
+          covSvg.appendChild(el("circle",{cx:e2x,cy:e2y,r:4.5,fill:"var(--good)"}));
+        }else{
+          covSvg.appendChild(el("circle",{cx:e1x,cy:e1y,r:4.5,fill:"var(--good)",opacity:.9}));
+          covSvg.appendChild(el("circle",{cx:e2x,cy:e2y,r:4.5,fill:"var(--good)",opacity:.9}));
+        }
+      }
+    });
+    // atoms with letter circle
+    d.atoms.forEach(function(a){
+      covSvg.appendChild(el("circle",{cx:a.x,cy:a.y,r:26,fill:a.c,opacity:.22,stroke:a.c,"stroke-width":2}));
+      var tx=el("text",{x:a.x,y:a.y+7,"text-anchor":"middle","font-size":"22","font-weight":"700",fill:"#fff"});
+      tx.textContent=a.l; covSvg.appendChild(tx);
+    });
+    // lone pairs (grey), placed on outward side
+    d.atoms.forEach(function(a,i){
+      var lp=d.lone[i]; if(!lp) return;
+      // direction pointing away from molecule centroid
+      var cxm=0,cym=0; d.atoms.forEach(function(p){cxm+=p.x;cym+=p.y;});
+      cxm/=d.atoms.length; cym/=d.atoms.length;
+      var vx=a.x-cxm, vy=a.y-cym, vl=Math.sqrt(vx*vx+vy*vy)||1; vx/=vl; vy/=vl;
+      var baseAng=Math.atan2(vy,vx);
+      for(var p=0;p<lp;p++){
+        var spread=(p-(lp-1)/2)*0.9 + (0); // spread around outward dir
+        var ang=baseAng + spread;
+        // two dots for a pair, offset slightly
+        for(var q=-1;q<=1;q+=2){
+          var pa=ang+q*0.13;
+          covSvg.appendChild(el("circle",{cx:a.x+34*Math.cos(pa),cy:a.y+34*Math.sin(pa),r:4,fill:"var(--muted)"}));
+        }
+      }
+    });
+    // bond-order label
+    var order=d.bonds[0]?d.bonds[0].order:1;
+    var name={1:"single bond",2:"double bond",3:"triple bond"}[order];
+    var lt=el("text",{x:320,y:315,"text-anchor":"middle","font-size":"14",fill:"var(--muted)"});
+    lt.textContent=(d.bonds.length>1?"single bonds":name)+" · "+d.atoms.length+" atoms"; covSvg.appendChild(lt);
+  }
+  function playCov(){
+    stopAnim(); var t=0,last=performance.now();
+    covCap.textContent="Bringing atoms together to share electrons…";
+    (function step(now){
+      if(paused){raf=requestAnimationFrame(step);return;}
+      var dt=(now-last)/1000; last=now; t=Math.min(1,t+dt/1.4); drawCov(t);
+      if(t<1){raf=requestAnimationFrame(step);}
+      else{covCap.textContent=COV[covKey].cap;raf=null;}
+    })(performance.now());
+  }
+  document.getElementById("covPick").addEventListener("change",function(){covKey=this.value;drawCov(0);covCap.textContent="Press ▶ to animate the electron sharing.";});
+  document.getElementById("covPlay").addEventListener("click",playCov);
+  document.getElementById("covReset").addEventListener("click",function(){stopAnim();drawCov(0);covCap.textContent="Press ▶ to animate the electron sharing.";});
+  drawCov(1); covCap.textContent="Press ▶ to animate the electron sharing.";
+
+  /* =======================================================
+     COMPARE / CLASSIFY
+  ======================================================= */
+  var classSel=document.getElementById("classPick");
+  var classRes=document.getElementById("classResult");
+  classSel.addEventListener("change",function(){
+    var v=this.value, name=this.options[this.selectedIndex].text;
+    if(v==="i"){
+      classRes.innerHTML=name+' <span class="pill ionic">IONIC</span><br>Formed between a <b>metal and a non-metal</b> by <b>transfer</b> of electrons. Expect: high melting point, solid crystal, conducts when molten or dissolved.';
+    }else if(v==="c"){
+      classRes.innerHTML=name+' <span class="pill cov">COVALENT</span><br>Formed between <b>non-metals</b> by <b>sharing</b> electron pairs. Expect: low melting point, gas/liquid/soft solid, usually does not conduct.';
+    }else{
+      classRes.textContent="Select a compound to see whether it is ionic or covalent, and why.";
+    }
+  });
+
+  /* =======================================================
+     QUIZ
+  ======================================================= */
+  var QUIZ=[
+    {q:"An atom becomes stable by getting how many electrons in its outermost shell (octet rule)?",
+     opts:["2","6","8","10"],ans:2,fb:"The octet rule: a full outer shell of 8 electrons is stable (H and He aim for a duet of 2)."},
+    {q:"In an ionic bond between sodium and chlorine, what happens?",
+     opts:["Both atoms share a pair of electrons","Na gives an electron to Cl","Cl gives an electron to Na","No electrons move"],ans:1,
+     fb:"Na (a metal) transfers its 1 outer electron to Cl. Na becomes Na⁺, Cl becomes Cl⁻."},
+    {q:"How many shared electron pairs are in a nitrogen molecule, N₂?",
+     opts:["1 (single bond)","2 (double bond)","3 (triple bond)","4"],ans:2,
+     fb:"N₂ has a triple bond — three shared pairs — so each N reaches an octet."}
+  ];
+  var quizBox=document.getElementById("quiz");
+  function buildQuiz(){
+    quizBox.innerHTML="";
+    QUIZ.forEach(function(item,qi){
+      var wrap=document.createElement("div"); wrap.className="q";
+      var p=document.createElement("p"); p.textContent=(qi+1)+". "+item.q; wrap.appendChild(p);
+      var fb=document.createElement("div"); fb.className="fb";
+      item.opts.forEach(function(o,oi){
+        var b=document.createElement("button"); b.className="opt"; b.textContent=o;
+        b.addEventListener("click",function(){
+          if(wrap.getAttribute("data-done")) return;
+          wrap.setAttribute("data-done","1");
+          [].forEach.call(wrap.querySelectorAll(".opt"),function(x,xi){
+            if(xi===item.ans) x.classList.add("correct");
+            x.disabled=true;
+          });
+          if(oi===item.ans){fb.className="fb ok";fb.textContent="✔ Correct. "+item.fb;}
+          else{b.classList.add("wrong");fb.className="fb no";fb.textContent="✗ Not quite. "+item.fb;}
+        });
+        wrap.appendChild(b);
+      });
+      wrap.appendChild(fb); quizBox.appendChild(wrap);
+    });
+  }
+  document.getElementById("quizReset").addEventListener("click",buildQuiz);
+  buildQuiz();
+})();
+</script>
+</body>
+</html>

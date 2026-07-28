@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periodic Table Explorer — NIOS Class 10 Science</title>
+<style>
+  :root{
+    --bg:#0f1720; --panel:#182430; --panel2:#1f2e3d; --ink:#e8eef4;
+    --muted:#9db0c2; --accent:#38bdf8; --accent-d:#0e7490;
+    --metal:#f59e0b; --nonmetal:#34d399; --metalloid:#a78bfa;
+    --line:#2b3d4f; --shadow:0 6px 20px rgba(0,0,0,.35);
+    --ok:#22c55e; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    line-height:1.5;padding:14px}
+  h1{font-size:1.35rem;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:.86rem;margin:0 0 14px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:9px 14px;border-radius:999px;cursor:pointer;font-size:.9rem;
+    transition:.15s;min-height:40px}
+  .tab.active{background:var(--accent);color:#052434;border-color:var(--accent);font-weight:600}
+  .tab:hover{border-color:var(--accent)}
+  .view{display:none}
+  .view.active{display:block}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:14px;box-shadow:var(--shadow);margin-bottom:14px}
+  .wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+  .ptable{display:grid;grid-template-columns:repeat(18,minmax(38px,1fr));
+    gap:4px;min-width:720px}
+  .cell{aspect-ratio:1/1;border-radius:8px;border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;position:relative;transition:.12s;background:var(--panel2);
+    padding:2px;user-select:none}
+  .cell:hover{transform:translateY(-2px);border-color:var(--accent)}
+  .cell .z{font-size:.52rem;color:var(--muted);position:absolute;top:2px;left:4px}
+  .cell .sym{font-size:.98rem;font-weight:700}
+  .cell .nm{font-size:.42rem;color:var(--muted);text-align:center;line-height:1}
+  .cell.metal{background:rgba(245,158,11,.18);border-color:rgba(245,158,11,.5)}
+  .cell.nonmetal{background:rgba(52,211,153,.16);border-color:rgba(52,211,153,.5)}
+  .cell.metalloid{background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.5)}
+  .cell.dim{opacity:.22}
+  .cell.sel{outline:3px solid var(--accent);outline-offset:1px}
+  .cell.hl{outline:3px solid #fbbf24;outline-offset:1px;z-index:2}
+  .cell.heat{color:#08131c}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;margin-top:10px;color:var(--muted)}
+  .swatch{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+  .info{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.9rem}
+  .info .big{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .infoSym{width:74px;height:74px;border-radius:14px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;font-weight:800;font-size:1.7rem;border:1px solid var(--line)}
+  .k{color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:8px 13px;border-radius:10px;cursor:pointer;font-size:.85rem;min-height:38px;transition:.15s}
+  .btn.active{background:var(--accent);color:#052434;border-color:var(--accent);font-weight:600}
+  .btn:hover{border-color:var(--accent)}
+  .note{background:var(--panel2);border-left:3px solid var(--accent);border-radius:8px;
+    padding:10px 12px;font-size:.86rem;color:var(--ink);margin-top:10px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:820px){.grid2{grid-template-columns:1.6fr 1fr}}
+  .quiz .q{font-weight:600;margin-bottom:8px}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);
+    border:1px solid var(--line);color:var(--ink);padding:9px 12px;border-radius:9px;
+    margin-bottom:6px;cursor:pointer;font-size:.86rem;min-height:40px;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:rgba(34,197,94,.2);border-color:var(--ok)}
+  .opt.wrong{background:rgba(239,68,68,.2);border-color:var(--bad)}
+  .feed{font-size:.82rem;margin-top:4px;color:var(--muted);min-height:1.1em}
+  ul{margin:6px 0;padding-left:20px;font-size:.88rem}
+  li{margin-bottom:4px}
+  .arrow{font-size:.8rem;color:#fbbf24;margin-top:8px;font-weight:600}
+  h3{margin:0 0 8px;font-size:1rem}
+  .small{font-size:.8rem;color:var(--muted)}
+</style>
+</head>
+<body>
+  <h1>Periodic Table Explorer</h1>
+  <p class="sub">NIOS Class 10 Science &amp; Technology — Chapter 6: Periodic Classification of Elements</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-view="explore">1 · Explore</button>
+    <button class="tab" data-view="trends">2 · Trends</button>
+    <button class="tab" data-view="groups">3 · Groups &amp; Periods</button>
+    <button class="tab" data-view="facts">Facts &amp; Quiz</button>
+  </div>
+
+  <!-- VIEW 1: EXPLORE -->
+  <section class="view active" id="explore">
+    <div class="grid2">
+      <div class="panel">
+        <h3>Click any element</h3>
+        <div class="wrap"><div class="ptable" id="tableExplore"></div></div>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--metal)"></span>Metals</span>
+          <span><span class="swatch" style="background:var(--nonmetal)"></span>Non-metals</span>
+          <span><span class="swatch" style="background:var(--metalloid)"></span>Metalloids</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Element details</h3>
+        <div class="info" id="detail">
+          <div class="small">Tap an element to see its symbol, atomic number, group, period and electronic configuration.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: TRENDS -->
+  <section class="view" id="trends">
+    <div class="panel">
+      <h3>Periodic trends</h3>
+      <div class="controls" id="trendBtns">
+        <button class="btn active" data-trend="none">Off</button>
+        <button class="btn" data-trend="size">Atomic size</button>
+        <button class="btn" data-trend="metal">Metallic character</button>
+        <button class="btn" data-trend="react">Reactivity</button>
+      </div>
+      <div class="wrap"><div class="ptable" id="tableTrends"></div></div>
+      <div class="arrow" id="trendArrow"></div>
+      <div class="note" id="trendNote">Pick a trend to shade the table as a heatmap (darker = larger value) and see the direction it changes.</div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: GROUPS -->
+  <section class="view" id="groups">
+    <div class="panel">
+      <h3>Highlight a group / family</h3>
+      <div class="controls" id="groupBtns">
+        <button class="btn active" data-fam="none">None</button>
+        <button class="btn" data-fam="alkali">Alkali metals (Gp 1)</button>
+        <button class="btn" data-fam="alkaline">Alkaline earth (Gp 2)</button>
+        <button class="btn" data-fam="halogen">Halogens (Gp 17)</button>
+        <button class="btn" data-fam="noble">Noble gases (Gp 18)</button>
+      </div>
+      <div class="wrap"><div class="ptable" id="tableGroups"></div></div>
+      <div class="note" id="groupNote">Choose a family to highlight its members and read their shared properties.</div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: FACTS + QUIZ -->
+  <section class="view" id="facts">
+    <div class="grid2">
+      <div class="panel">
+        <h3>Key facts</h3>
+        <p class="small"><strong>Mendeleev's Periodic Law (1869):</strong> the properties of elements are a periodic function of their <em>atomic masses</em>. He arranged elements in order of increasing atomic mass and left gaps, predicting undiscovered elements (e.g. eka-silicon = germanium).</p>
+        <p class="small"><strong>Modern Periodic Law (Moseley):</strong> the properties of elements are a periodic function of their <em>atomic numbers</em> (number of protons). This fixed anomalies in Mendeleev's table.</p>
+        <ul>
+          <li><strong>Periods</strong> = horizontal rows (7 in total). Period number = number of occupied shells.</li>
+          <li><strong>Groups</strong> = vertical columns (18 in total). Elements in a group have the same number of valence electrons and similar properties.</li>
+          <li>Metals sit on the left/centre, non-metals on the upper right, metalloids along the zig-zag staircase between them.</li>
+        </ul>
+      </div>
+      <div class="panel quiz">
+        <h3>Quick quiz</h3>
+        <div id="quiz"></div>
+      </div>
+    </div>
+  </section>
+
+<script>
+"use strict";
+// Element data: sym, z, name, col(1-18), row(1-7), cat, config(shells)
+var E = [
+ ["H",1,"Hydrogen",1,1,"nonmetal","1"],
+ ["He",2,"Helium",18,1,"nonmetal","2"],
+ ["Li",3,"Lithium",1,2,"metal","2,1"],
+ ["Be",4,"Beryllium",2,2,"metal","2,2"],
+ ["B",5,"Boron",13,2,"metalloid","2,3"],
+ ["C",6,"Carbon",14,2,"nonmetal","2,4"],
+ ["N",7,"Nitrogen",15,2,"nonmetal","2,5"],
+ ["O",8,"Oxygen",16,2,"nonmetal","2,6"],
+ ["F",9,"Fluorine",17,2,"nonmetal","2,7"],
+ ["Ne",10,"Neon",18,2,"nonmetal","2,8"],
+ ["Na",11,"Sodium",1,3,"metal","2,8,1"],
+ ["Mg",12,"Magnesium",2,3,"metal","2,8,2"],
+ ["Al",13,"Aluminium",13,3,"metal","2,8,3"],
+ ["Si",14,"Silicon",14,3,"metalloid","2,8,4"],
+ ["P",15,"Phosphorus",15,3,"nonmetal","2,8,5"],
+ ["S",16,"Sulphur",16,3,"nonmetal","2,8,6"],
+ ["Cl",17,"Chlorine",17,3,"nonmetal","2,8,7"],
+ ["Ar",18,"Argon",18,3,"nonmetal","2,8,8"],
+ ["K",19,"Potassium",1,4,"metal","2,8,8,1"],
+ ["Ca",20,"Calcium",2,4,"metal","2,8,8,2"],
+ // period 4 transition + p-block
+ ["Sc",21,"Scandium",3,4,"metal",""],["Ti",22,"Titanium",4,4,"metal",""],
+ ["V",23,"Vanadium",5,4,"metal",""],["Cr",24,"Chromium",6,4,"metal",""],
+ ["Mn",25,"Manganese",7,4,"metal",""],["Fe",26,"Iron",8,4,"metal",""],
+ ["Co",27,"Cobalt",9,4,"metal",""],["Ni",28,"Nickel",10,4,"metal",""],
+ ["Cu",29,"Copper",11,4,"metal",""],["Zn",30,"Zinc",12,4,"metal",""],
+ ["Ga",31,"Gallium",13,4,"metal",""],["Ge",32,"Germanium",14,4,"metalloid",""],
+ ["As",33,"Arsenic",15,4,"metalloid",""],["Se",34,"Selenium",16,4,"nonmetal",""],
+ ["Br",35,"Bromine",17,4,"nonmetal",""],["Kr",36,"Krypton",18,4,"nonmetal",""],
+ // period 5
+ ["Rb",37,"Rubidium",1,5,"metal",""],["Sr",38,"Strontium",2,5,"metal",""],
+ ["Y",39,"Yttrium",3,5,"metal",""],["Zr",40,"Zirconium",4,5,"metal",""],
+ ["Nb",41,"Niobium",5,5,"metal",""],["Mo",42,"Molybdenum",6,5,"metal",""],
+ ["Tc",43,"Technetium",7,5,"metal",""],["Ru",44,"Ruthenium",8,5,"metal",""],
+ ["Rh",45,"Rhodium",9,5,"metal",""],["Pd",46,"Palladium",10,5,"metal",""],
+ ["Ag",47,"Silver",11,5,"metal",""],["Cd",48,"Cadmium",12,5,"metal",""],
+ ["In",49,"Indium",13,5,"metal",""],["Sn",50,"Tin",14,5,"metal",""],
+ ["Sb",51,"Antimony",15,5,"metalloid",""],["Te",52,"Tellurium",16,5,"metalloid",""],
+ ["I",53,"Iodine",17,5,"nonmetal",""],["Xe",54,"Xenon",18,5,"nonmetal",""],
+ // period 6 main (transition abbreviated, lanthanides omitted from grid)
+ ["Cs",55,"Caesium",1,6,"metal",""],["Ba",56,"Barium",2,6,"metal",""],
+ ["Hf",72,"Hafnium",4,6,"metal",""],["Ta",73,"Tantalum",5,6,"metal",""],
+ ["W",74,"Tungsten",6,6,"metal",""],["Re",75,"Rhenium",7,6,"metal",""],
+ ["Os",76,"Osmium",8,6,"metal",""],["Ir",77,"Iridium",9,6,"metal",""],
+ ["Pt",78,"Platinum",10,6,"metal",""],["Au",79,"Gold",11,6,"metal",""],
+ ["Hg",80,"Mercury",12,6,"metal",""],["Tl",81,"Thallium",13,6,"metal",""],
+ ["Pb",82,"Lead",14,6,"metal",""],["Bi",83,"Bismuth",15,6,"metal",""],
+ ["Po",84,"Polonium",16,6,"metalloid",""],["At",85,"Astatine",17,6,"metalloid",""],
+ ["Rn",86,"Radon",18,6,"nonmetal",""],
+ // period 7 (selected)
+ ["Fr",87,"Francium",1,7,"metal",""],["Ra",88,"Radium",2,7,"metal",""]
+];
+
+var CATNAME={metal:"Metal",nonmetal:"Non-metal",metalloid:"Metalloid"};
+
+function shellsFor(z){
+  // fill shells 2,8,8,18,18,32 order (approx for main-block display)
+  var cap=[2,8,18,32,32,18,8];
+  // Use simple 2,8,18,... capacity per shell (Bohr-Bury)
+  var caps=[2,8,18,32,32];
+  var rem=z, out=[];
+  var order=[2,8,8,18,18,32];
+  // For NIOS level, show Bohr scheme up to Ca precisely; beyond, use n,l ordering-lite
+  var s=[2,8,18,32,32,18,8], filled=[];
+  var i=0, r=z;
+  var perShell=[2,8,18,32,32,18,8];
+  while(r>0 && i<perShell.length){var take=Math.min(r,perShell[i]);filled.push(take);r-=take;i++;}
+  return filled.join(",");
+}
+
+function groupOf(el){
+  var c=el[3];
+  if(el[0]==="H") return "1";
+  if(el[0]==="He") return "18";
+  return String(c);
+}
+
+var byPos={}, byZ={};
+E.forEach(function(e){byPos[e[4]+"_"+e[3]]=e; byZ[e[1]]=e;});
+
+function makeTable(container, opts){
+  opts=opts||{};
+  container.innerHTML="";
+  for(var row=1;row<=7;row++){
+    for(var col=1;col<=18;col++){
+      var el=byPos[row+"_"+col];
+      var d=document.createElement("div");
+      if(!el){
+        d.style.visibility="hidden";
+        d.className="cell";
+        d.setAttribute("aria-hidden","true");
+        container.appendChild(d);
+        continue;
+      }
+      d.className="cell "+el[5];
+      d.dataset.z=el[1];
+      d.dataset.col=el[3];
+      d.dataset.cat=el[5];
+      d.setAttribute("role","button");
+      d.setAttribute("tabindex","0");
+      d.setAttribute("aria-label",el[2]+", atomic number "+el[1]);
+      d.innerHTML='<span class="z">'+el[1]+'</span><span class="sym">'+el[0]+
+        '</span><span class="nm">'+el[2]+'</span>';
+      if(opts.onClick){
+        (function(el,d){
+          function act(){opts.onClick(el,d);}
+          d.addEventListener("click",act);
+          d.addEventListener("keydown",function(ev){
+            if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();act();}
+          });
+        })(el,d);
+      }
+      container.appendChild(d);
+    }
+  }
+}
+
+/* ---- Tabs ---- */
+var tabs=document.querySelectorAll(".tab");
+tabs.forEach(function(t){
+  t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active");});
+    t.classList.add("active");
+    document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+    document.getElementById(t.dataset.view).classList.add("active");
+  });
+});
+
+/* ---- View 1: Explore ---- */
+var detail=document.getElementById("detail");
+var tableExplore=document.getElementById("tableExplore");
+makeTable(tableExplore,{onClick:function(el,d){
+  document.querySelectorAll("#tableExplore .cell").forEach(function(c){c.classList.remove("sel");});
+  d.classList.add("sel");
+  showDetail(el);
+}});
+function showDetail(el){
+  var cfg = el[6] || shellsFor(el[1]);
+  var color = el[5]==="metal"?"var(--metal)":el[5]==="nonmetal"?"var(--nonmetal)":"var(--metalloid)";
+  detail.innerHTML=
+    '<div class="big"><div class="infoSym" style="background:'+color+'22;border-color:'+color+'">'+
+      '<span style="font-size:1.7rem">'+el[0]+'</span>'+
+      '<span style="font-size:.6rem;color:var(--muted)">'+el[1]+'</span></div>'+
+      '<div><div style="font-size:1.15rem;font-weight:700">'+el[2]+'</div>'+
+      '<div class="small">'+CATNAME[el[5]]+'</div></div></div>'+
+    '<span class="k">Symbol</span><span>'+el[0]+'</span>'+
+    '<span class="k">Atomic number (Z)</span><span>'+el[1]+'</span>'+
+    '<span class="k">Group</span><span>'+groupOf(el)+'</span>'+
+    '<span class="k">Period</span><span>'+el[4]+'</span>'+
+    '<span class="k">Electron config</span><span>'+cfg+'</span>'+
+    '<span class="k">Category</span><span>'+CATNAME[el[5]]+'</span>';
+}
+
+/* ---- View 2: Trends ---- */
+var tableTrends=document.getElementById("tableTrends");
+makeTable(tableTrends,{});
+var trendArrow=document.getElementById("trendArrow");
+var trendNote=document.getElementById("trendNote");
+var trendCfg={
+  none:{note:"Pick a trend to shade the table as a heatmap (darker = larger value) and see the direction it changes.",arrow:""},
+  size:{note:"Atomic size (radius) increases DOWN a group (more shells added) and decreases ACROSS a period left→right (nucleus pulls the same shell tighter).",
+    arrow:"↓ increases down a group   •   ← increases toward the left of a period",
+    val:function(el){ return el[4]*3 - el[3]; }},
+  metal:{note:"Metallic character increases DOWN a group and decreases ACROSS a period. Most metallic elements sit at the bottom-left, most non-metallic at the top-right.",
+    arrow:"↙ metallic character increases toward the bottom-left",
+    val:function(el){ return el[4]*3 + (18-el[3]); }},
+  react:{note:"Metals get MORE reactive down a group (Na<K<Rb). Non-metals get LESS reactive down a group (F>Cl>Br). Halogens & alkali metals are the most reactive families.",
+    arrow:"Alkali metals: reactivity ↑ down   •   Halogens: reactivity ↓ down",
+    val:function(el){
+      var c=el[3];
+      if(c===1) return el[4]*4;             // alkali: more reactive lower
+      if(c===17) return (8-el[4])*4;        // halogens: more reactive higher
+      if(c===18) return 1;                  // noble gases: inert
+      return el[4]+ (c<=2?8:0);
+    }}
+};
+function heatColor(t){ // t 0..1 -> accent scale
+  var r=Math.round(15+ t*(56-15));
+  var g=Math.round(23+ t*(189-23));
+  var b=Math.round(32+ t*(248-32));
+  return "rgb("+r+","+g+","+b+")";
+}
+function applyTrend(key){
+  var cfg=trendCfg[key];
+  var cells=tableTrends.querySelectorAll(".cell[data-z]");
+  if(key==="none"||!cfg.val){
+    cells.forEach(function(c){
+      var z=+c.dataset.z, el=byZ[z];
+      c.style.background=""; c.classList.remove("heat");
+      c.className="cell "+el[5];
+      c.setAttribute("tabindex","0");
+    });
+    trendArrow.textContent=""; trendNote.textContent=cfg.note; return;
+  }
+  var vals=[]; cells.forEach(function(c){vals.push(cfg.val(byZ[+c.dataset.z]));});
+  var mn=Math.min.apply(null,vals), mx=Math.max.apply(null,vals);
+  cells.forEach(function(c){
+    var v=cfg.val(byZ[+c.dataset.z]);
+    var t=(v-mn)/(mx-mn||1);
+    c.classList.add("heat");
+    c.style.background=heatColor(t);
+  });
+  trendArrow.textContent=cfg.arrow;
+  trendNote.textContent=cfg.note;
+}
+var trendBtns=document.querySelectorAll("#trendBtns .btn");
+trendBtns.forEach(function(b){
+  b.addEventListener("click",function(){
+    trendBtns.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    applyTrend(b.dataset.trend);
+  });
+});
+
+/* ---- View 3: Groups ---- */
+var tableGroups=document.getElementById("tableGroups");
+makeTable(tableGroups,{});
+var groupNote=document.getElementById("groupNote");
+var fam={
+  none:{cols:[],note:"Choose a family to highlight its members and read their shared properties."},
+  alkali:{cols:[1],skipH:true,note:
+    "<strong>Alkali metals (Group 1: Li, Na, K, Rb, Cs, Fr)</strong> — 1 valence electron; soft, silvery metals; very reactive (stored under oil); form +1 ions; react vigorously with water giving alkalis + hydrogen. Reactivity increases down the group. (Hydrogen is not an alkali metal.)"},
+  alkaline:{cols:[2],note:
+    "<strong>Alkaline earth metals (Group 2: Be, Mg, Ca, Sr, Ba, Ra)</strong> — 2 valence electrons; reactive metals (less than Group 1); form +2 ions; harder and denser than alkali metals."},
+  halogen:{cols:[17],note:
+    "<strong>Halogens (Group 17: F, Cl, Br, I, At)</strong> — 7 valence electrons; very reactive non-metals; exist as diatomic molecules; form −1 ions (salts). Reactivity decreases down the group; fluorine is the most reactive non-metal."},
+  noble:{cols:[18],note:
+    "<strong>Noble gases (Group 18: He, Ne, Ar, Kr, Xe, Rn)</strong> — full outermost shell (He=2, others=8), so they are chemically inert / unreactive; colourless, monatomic gases."}
+};
+function applyFam(key){
+  var f=fam[key];
+  var cells=tableGroups.querySelectorAll(".cell[data-z]");
+  cells.forEach(function(c){
+    c.classList.remove("hl","dim");
+    var col=+c.dataset.col, z=+c.dataset.z;
+    if(!f.cols.length) return;
+    var hit=f.cols.indexOf(col)>=0;
+    if(f.skipH && z===1) hit=false;       // exclude H from alkali
+    if(key==="noble" && z===2) hit=true;  // He belongs to noble gases
+    if(hit) c.classList.add("hl"); else c.classList.add("dim");
+  });
+  groupNote.innerHTML=f.note;
+}
+var groupBtns=document.querySelectorAll("#groupBtns .btn");
+groupBtns.forEach(function(b){
+  b.addEventListener("click",function(){
+    groupBtns.forEach(function(x){x.classList.remove("active");});
+    b.classList.add("active");
+    applyFam(b.dataset.fam);
+  });
+});
+
+/* ---- Quiz ---- */
+var QUIZ=[
+  {q:"1. The modern periodic law states that properties of elements are a periodic function of their:",
+   opts:["Atomic mass","Atomic number","Number of neutrons","Density"],a:1,
+   why:"Moseley showed atomic number (protons) is the true basis, replacing Mendeleev's atomic mass."},
+  {q:"2. Which family consists of the least reactive (inert) elements?",
+   opts:["Alkali metals","Halogens","Noble gases","Alkaline earth metals"],a:2,
+   why:"Noble gases (Group 18) have complete outer shells, so they are chemically inert."},
+  {q:"3. As you move LEFT to RIGHT across a period, atomic size generally:",
+   opts:["Increases","Decreases","Stays the same","Doubles"],a:1,
+   why:"Nuclear charge rises while electrons enter the same shell, pulling it inward, so radius decreases."}
+];
+var quizBox=document.getElementById("quiz");
+QUIZ.forEach(function(item,qi){
+  var wrap=document.createElement("div");
+  wrap.style.marginBottom="14px";
+  var h=document.createElement("div"); h.className="q"; h.textContent=item.q;
+  wrap.appendChild(h);
+  var feed=document.createElement("div"); feed.className="feed";
+  item.opts.forEach(function(opt,oi){
+    var b=document.createElement("button");
+    b.className="opt"; b.textContent=opt;
+    b.addEventListener("click",function(){
+      var btns=wrap.querySelectorAll(".opt");
+      btns.forEach(function(x){x.disabled=true;});
+      if(oi===item.a){ b.classList.add("correct"); feed.textContent="Correct! "+item.why; feed.style.color="var(--ok)"; }
+      else { b.classList.add("wrong"); btns[item.a].classList.add("correct");
+        feed.textContent="Not quite. "+item.why; feed.style.color="var(--bad)"; }
+    });
+    wrap.appendChild(b);
+  });
+  wrap.appendChild(feed);
+  quizBox.appendChild(wrap);
+});
+</script>
+</body>
+</html>
