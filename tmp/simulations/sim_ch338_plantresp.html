@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cellular Respiration Lab — Respiration in Plants (NIOS Class 12 Biology)</title>
+<style>
+  :root{
+    --bg:#0f1720;
+    --panel:#182430;
+    --panel2:#1f2e3c;
+    --ink:#e7eef5;
+    --muted:#9db0c2;
+    --line:#2b3d4f;
+    --accent:#43d9a3;
+    --accent-dim:#2c8a6a;
+    --warn:#f0b45c;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%,#16303a 0%,var(--bg) 55%);
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:16px 14px 60px}
+  header h1{font-size:1.35rem;margin:.2rem 0 .1rem}
+  header p.sub{color:var(--muted);margin:.1rem 0 1rem;font-size:.92rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tab{
+    flex:1 1 auto;min-width:120px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    padding:10px 12px;border-radius:12px;font-size:.9rem;font-weight:600;
+    transition:.15s;text-align:center;
+  }
+  .tab[aria-selected="true"]{
+    background:linear-gradient(180deg,var(--accent-dim),#1c4f42);
+    border-color:var(--accent);color:#eafff7;box-shadow:var(--shadow);
+  }
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:16px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .panel h2{margin:.1rem 0 .6rem;font-size:1.08rem;color:var(--accent)}
+  .panel h3{margin:1rem 0 .35rem;font-size:.98rem}
+  p,li{font-size:.92rem}
+  .muted{color:var(--muted)}
+  .eq{
+    background:var(--panel2);border:1px dashed var(--line);border-radius:12px;
+    padding:12px;font-size:1.02rem;text-align:center;letter-spacing:.2px;
+    overflow-x:auto;white-space:nowrap;
+  }
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .card h4{margin:0 0 .3rem;font-size:.92rem;color:var(--accent)}
+  .pill{display:inline-block;background:#123;border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:2px 10px;font-size:.75rem;margin:2px 4px 2px 0}
+  .btn{
+    background:var(--accent-dim);border:1px solid var(--accent);color:#eafff7;
+    padding:8px 14px;border-radius:10px;font-weight:600;cursor:pointer;font-size:.88rem;
+    transition:.15s;
+  }
+  .btn:hover{filter:brightness(1.12)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  svg{max-width:100%;height:auto;display:block}
+  .tally{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;
+  }
+  .tally .box{
+    flex:1 1 90px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:10px;text-align:center;
+  }
+  .tally .box b{display:block;font-size:1.4rem;color:var(--accent)}
+  .tally .box span{font-size:.72rem;color:var(--muted)}
+  .stagelog{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;margin-top:10px;min-height:56px;font-size:.88rem;
+  }
+  .stagelog b{color:var(--warn)}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left}
+  th{background:var(--panel2);color:var(--accent)}
+  .quiz .q{margin-bottom:14px;border-top:1px solid var(--line);padding-top:12px}
+  .quiz .q:first-child{border-top:none;padding-top:0}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel2);
+    border:1px solid var(--line);color:var(--ink);border-radius:10px;
+    padding:9px 12px;margin:6px 0;cursor:pointer;font-size:.88rem;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{background:#12402f;border-color:var(--accent);color:#d9ffef}
+  .opt.wrong{background:#402020;border-color:#c85a5a;color:#ffdede}
+  .opt:disabled{cursor:default}
+  .explain{font-size:.82rem;color:var(--muted);margin-top:6px;display:none}
+  .explain.show{display:block}
+  .hidden{display:none !important}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.78rem;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:20px}
+  @media (max-width:420px){
+    header h1{font-size:1.15rem}
+    .tab{min-width:calc(50% - 4px)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Cellular Respiration Lab</h1>
+    <p class="sub">NIOS Class 12 Biology · Chapter 12 — Respiration in Plants</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Simulation modes">
+    <button class="tab" role="tab" id="tab-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+    <button class="tab" role="tab" id="tab-stages" aria-controls="p-stages" aria-selected="false">Stages Animation</button>
+    <button class="tab" role="tab" id="tab-ferment" aria-controls="p-ferment" aria-selected="false">Aerobic vs Anaerobic</button>
+  </div>
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <section class="panel" id="p-overview" role="tabpanel" aria-labelledby="tab-overview">
+    <h2>Aerobic Respiration — The Big Picture</h2>
+    <p class="muted">Cells break down glucose to release chemical energy stored as <b>ATP</b>. In the presence of oxygen this happens completely, yielding water and carbon dioxide.</p>
+    <div class="eq">C&#8326;H&#8321;&#8322;O&#8326; + 6&nbsp;O&#8322; &nbsp;&#8594;&nbsp; 6&nbsp;CO&#8322; + 6&nbsp;H&#8322;O + energy&nbsp;(~36&#8211;38&nbsp;ATP)</div>
+
+    <h3>Where each stage happens in the cell</h3>
+    <svg viewBox="0 0 640 260" role="img" aria-label="Diagram of a cell showing cytoplasm and a mitochondrion with its matrix and inner membrane">
+      <defs>
+        <linearGradient id="cellg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1e2f3d"/><stop offset="1" stop-color="#182430"/>
+        </linearGradient>
+      </defs>
+      <rect x="6" y="6" width="628" height="248" rx="26" fill="url(#cellg)" stroke="#2b3d4f"/>
+      <text x="22" y="30" fill="#9db0c2" font-size="13">Cell</text>
+      <!-- cytoplasm label -->
+      <text x="26" y="120" fill="#43d9a3" font-size="14" font-weight="700">Cytoplasm</text>
+      <text x="26" y="140" fill="#e7eef5" font-size="12">Glycolysis</text>
+      <text x="26" y="156" fill="#9db0c2" font-size="11">glucose &#8594; 2 pyruvate</text>
+      <!-- mitochondrion -->
+      <ellipse cx="430" cy="130" rx="180" ry="92" fill="#14232e" stroke="#43d9a3" stroke-width="2"/>
+      <path d="M270 130 q30 -34 60 0 q30 34 60 0 q30 -34 60 0 q30 34 60 0 q30 -34 60 0"
+            fill="none" stroke="#2c8a6a" stroke-width="2" opacity=".8"/>
+      <text x="352" y="70" fill="#43d9a3" font-size="13" font-weight="700">Mitochondrion</text>
+      <text x="322" y="128" fill="#e7eef5" font-size="12">Matrix:</text>
+      <text x="322" y="144" fill="#9db0c2" font-size="11">Link reaction + Krebs cycle</text>
+      <text x="322" y="182" fill="#e7eef5" font-size="12">Inner membrane:</text>
+      <text x="322" y="198" fill="#9db0c2" font-size="11">Electron transport chain</text>
+    </svg>
+    <div class="legend">
+      <span><i style="background:#43d9a3"></i>Cytoplasm — glycolysis</span>
+      <span><i style="background:#2c8a6a"></i>Mitochondrial matrix — link reaction &amp; Krebs</span>
+      <span><i style="background:#f0b45c"></i>Inner membrane — ETC / oxidative phosphorylation</span>
+    </div>
+
+    <h3>The four stages at a glance</h3>
+    <div class="grid">
+      <div class="card"><h4>1. Glycolysis</h4><p class="muted">Cytoplasm. Glucose &#8594; 2 pyruvate.<br>Net <b>2 ATP</b> + 2 NADH. Anaerobic start.</p></div>
+      <div class="card"><h4>2. Link Reaction</h4><p class="muted">Matrix. Pyruvate &#8594; acetyl-CoA.<br>Releases 2 CO&#8322;, makes 2 NADH.</p></div>
+      <div class="card"><h4>3. Krebs Cycle</h4><p class="muted">Matrix. 2 turns per glucose.<br>4 CO&#8322;, 6 NADH, 2 FADH&#8322;, <b>2 ATP</b>.</p></div>
+      <div class="card"><h4>4. ETC / Ox. Phos.</h4><p class="muted">Inner membrane. NADH &amp; FADH&#8322; oxidised.<br>O&#8322; is final e&#8315; acceptor &#8594; H&#8322;O. ~<b>32&#8211;34 ATP</b>.</p></div>
+    </div>
+    <p class="muted" style="margin-top:12px"><span class="pill">Key idea</span> Most ATP comes from the ETC, not from glucose splitting directly. Oxygen's job is to accept electrons at the very end so the chain keeps running.</p>
+  </section>
+
+  <!-- ===================== STAGES ===================== -->
+  <section class="panel hidden" id="p-stages" role="tabpanel" aria-labelledby="tab-stages">
+    <h2>Stages Animation — Follow the Carbon &amp; the ATP</h2>
+    <p class="muted">Step through respiration one stage at a time, or press Play. Watch the running ATP tally build to ~36 per glucose.</p>
+
+    <svg id="stageSvg" viewBox="0 0 640 220" role="img" aria-label="Animated flow of respiration stages">
+      <!-- stage nodes drawn by JS -->
+    </svg>
+
+    <div class="controls">
+      <button class="btn" id="playBtn">&#9654; Play</button>
+      <button class="btn ghost" id="stepBtn">Step &#8594;</button>
+      <button class="btn ghost" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="stagelog" id="stageLog" aria-live="polite">Press <b>Step</b> or <b>Play</b> to begin at glycolysis.</div>
+
+    <div class="tally" aria-label="Running molecule tally">
+      <div class="box"><b id="tAtp">0</b><span>ATP (net)</span></div>
+      <div class="box"><b id="tNadh">0</b><span>NADH</span></div>
+      <div class="box"><b id="tFadh">0</b><span>FADH&#8322;</span></div>
+      <div class="box"><b id="tCo2">0</b><span>CO&#8322; released</span></div>
+    </div>
+
+    <h3>ATP accounting (per glucose)</h3>
+    <table>
+      <tr><th>Stage</th><th>Direct ATP</th><th>NADH</th><th>FADH&#8322;</th><th>CO&#8322;</th></tr>
+      <tr><td>Glycolysis</td><td>2 (net)</td><td>2</td><td>0</td><td>0</td></tr>
+      <tr><td>Link reaction</td><td>0</td><td>2</td><td>0</td><td>2</td></tr>
+      <tr><td>Krebs cycle (×2)</td><td>2</td><td>6</td><td>2</td><td>4</td></tr>
+      <tr><td>ETC (from 10 NADH, 2 FADH&#8322;)</td><td>~32&#8211;34</td><td>&#8211;</td><td>&#8211;</td><td>0</td></tr>
+      <tr><th>Total</th><th>~36&#8211;38</th><th>&#8211;</th><th>&#8211;</th><th>6</th></tr>
+    </table>
+    <p class="muted" style="margin-top:6px">Each NADH yields ~3 ATP and each FADH&#8322; ~2 ATP in the ETC (older estimates give 38; newer measurements ~30&#8211;32 because of the cost of moving molecules into the mitochondrion).</p>
+  </section>
+
+  <!-- ===================== FERMENTATION ===================== -->
+  <section class="panel hidden" id="p-ferment" role="tabpanel" aria-labelledby="tab-ferment">
+    <h2>Aerobic vs Anaerobic Respiration</h2>
+    <p class="muted">Without oxygen the ETC stops, so pyruvate cannot be fully oxidised. Cells fall back on <b>fermentation</b> to regenerate NAD&#8314; and keep glycolysis going — but with a tiny ATP yield.</p>
+
+    <div class="controls">
+      <button class="btn" id="fAlc">Alcoholic (yeast)</button>
+      <button class="btn ghost" id="fLac">Lactic acid (muscle)</button>
+    </div>
+
+    <svg id="fermSvg" viewBox="0 0 640 210" role="img" aria-label="Fermentation pathway diagram"></svg>
+    <div class="stagelog" id="fermLog" aria-live="polite"></div>
+
+    <h3>Yield comparison (per glucose)</h3>
+    <table>
+      <tr><th>Feature</th><th>Aerobic respiration</th><th>Fermentation (anaerobic)</th></tr>
+      <tr><td>Oxygen</td><td>Required</td><td>Not used</td></tr>
+      <tr><td>Location</td><td>Cytoplasm + mitochondria</td><td>Cytoplasm only</td></tr>
+      <tr><td>End products</td><td>CO&#8322; + H&#8322;O</td><td>Ethanol + CO&#8322;, or lactic acid</td></tr>
+      <tr><td>ATP yield</td><td>~36&#8211;38 ATP</td><td>Only 2 ATP</td></tr>
+    </table>
+
+    <h3>Respiratory Quotient (RQ)</h3>
+    <p class="muted">RQ = volume of CO&#8322; released &#247; volume of O&#8322; consumed. It reveals the respiratory substrate:</p>
+    <div class="grid">
+      <div class="card"><h4>Carbohydrate</h4><p class="muted">RQ = <b>1.0</b><br>e.g. glucose: 6 CO&#8322; / 6 O&#8322;.</p></div>
+      <div class="card"><h4>Fats</h4><p class="muted">RQ &#8776; <b>0.7</b><br>Fats need more O&#8322; per CO&#8322;.</p></div>
+      <div class="card"><h4>Proteins</h4><p class="muted">RQ &#8776; <b>0.8&#8211;0.9</b></p></div>
+      <div class="card"><h4>Anaerobic / organic acids</h4><p class="muted">RQ &gt; 1, or &#8734; when no O&#8322; is used (alcoholic fermentation).</p></div>
+    </div>
+  </section>
+
+  <!-- ===================== FACTS + QUIZ ===================== -->
+  <section class="panel">
+    <h2>Facts Panel</h2>
+    <ul>
+      <li>Glycolysis is universal — it happens in the cytoplasm of every living cell, with or without oxygen.</li>
+      <li>The link reaction and Krebs cycle occur in the mitochondrial <b>matrix</b>; the ETC sits on the <b>inner mitochondrial membrane</b>.</li>
+      <li>Oxygen is the <b>final electron acceptor</b> in the ETC and combines with electrons and protons to form water.</li>
+      <li>All 6 CO&#8322; from a glucose molecule come from the link reaction (2) and Krebs cycle (4) — none from glycolysis or the ETC.</li>
+      <li>Fermentation yields only 2 ATP because glucose is not fully oxidised; its purpose is to recycle NAD&#8314;.</li>
+      <li>In plants, seeds and roots in waterlogged soil may switch to alcoholic fermentation, producing ethanol.</li>
+    </ul>
+  </section>
+
+  <section class="panel quiz" id="quiz">
+    <h2>Quick Quiz (3 questions)</h2>
+    <div class="q" data-answer="1">
+      <p><b>1.</b> In eukaryotic cells, glycolysis takes place in the:</p>
+      <button class="opt">Mitochondrial matrix</button>
+      <button class="opt">Cytoplasm</button>
+      <button class="opt">Inner mitochondrial membrane</button>
+      <button class="opt">Nucleus</button>
+      <div class="explain">Glycolysis is entirely cytoplasmic and does not require oxygen or mitochondria.</div>
+    </div>
+    <div class="q" data-answer="2">
+      <p><b>2.</b> What is the role of oxygen in aerobic respiration?</p>
+      <button class="opt">It splits glucose into pyruvate</button>
+      <button class="opt">It is produced as a waste product</button>
+      <button class="opt">It is the final electron acceptor in the ETC, forming water</button>
+      <button class="opt">It directly makes most of the ATP</button>
+      <div class="explain">O&#8322; accepts electrons at the end of the ETC and combines with H&#8314; to form water, keeping the chain running.</div>
+    </div>
+    <div class="q" data-answer="0">
+      <p><b>3.</b> Compared with aerobic respiration, alcoholic fermentation of one glucose molecule yields:</p>
+      <button class="opt">Far less ATP (only 2) plus ethanol and CO&#8322;</button>
+      <button class="opt">More ATP because no oxygen is wasted</button>
+      <button class="opt">The same ATP but different products</button>
+      <button class="opt">Lactic acid and 6 CO&#8322;</button>
+      <div class="explain">Fermentation stops at glycolysis-level yield (2 ATP). Yeast produces ethanol + CO&#8322;; muscle produces lactic acid.</div>
+    </div>
+  </section>
+
+  <footer>Interactive study aid · biology values are teaching approximations (ATP ~36&#8211;38 per glucose).</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Tabs ---------- */
+  var tabs=[["tab-overview","p-overview"],["tab-stages","p-stages"],["tab-ferment","p-ferment"]];
+  function selectTab(id){
+    tabs.forEach(function(t){
+      var btn=document.getElementById(t[0]);
+      var pan=document.getElementById(t[1]);
+      var on=(t[0]===id);
+      btn.setAttribute("aria-selected",on?"true":"false");
+      pan.classList.toggle("hidden",!on);
+    });
+    if(id!=="tab-stages") stopPlay();
+  }
+  tabs.forEach(function(t){
+    document.getElementById(t[0]).addEventListener("click",function(){selectTab(t[0]);});
+  });
+
+  /* ---------- Stages data ---------- */
+  var STAGES=[
+    {name:"Glycolysis", where:"Cytoplasm",
+     msg:"<b>Glycolysis</b> (cytoplasm): 1 glucose &#8594; 2 pyruvate. Net gain +2 ATP and 2 NADH. No oxygen needed here.",
+     atp:2,nadh:2,fadh:0,co2:0},
+    {name:"Link", where:"Matrix",
+     msg:"<b>Link reaction</b> (matrix): 2 pyruvate &#8594; 2 acetyl-CoA. Releases 2 CO&#8322;, makes 2 NADH.",
+     atp:0,nadh:2,fadh:0,co2:2},
+    {name:"Krebs", where:"Matrix",
+     msg:"<b>Krebs cycle</b> (matrix, 2 turns): releases 4 CO&#8322;, makes 6 NADH, 2 FADH&#8322; and 2 ATP.",
+     atp:2,nadh:6,fadh:2,co2:4},
+    {name:"ETC", where:"Inner membrane",
+     msg:"<b>ETC / oxidative phosphorylation</b> (inner membrane): 10 NADH + 2 FADH&#8322; drive ~32 ATP. O&#8322; accepts electrons &#8594; H&#8322;O.",
+     atp:32,nadh:0,fadh:0,co2:0}
+  ];
+  var COLORS=["#43d9a3","#5cc0f0","#f0b45c","#e07ad0"];
+  var cur=-1; // index of last completed stage
+  var tally={atp:0,nadh:0,fadh:0,co2:0};
+
+  var svg=document.getElementById("stageSvg");
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(t,a){var e=document.createElementNS(SVGNS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+  function drawStages(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var n=STAGES.length, gap=14, pad=16;
+    var w=(640-pad*2-gap*(n-1))/n;
+    for(var i=0;i<n;i++){
+      var x=pad+i*(w+gap);
+      var active=(i===cur);
+      var done=(i<cur);
+      var box=el("rect",{x:x,y:40,width:w,height:120,rx:16,
+        fill:active?"#12402f":(done?"#16303a":"#1f2e3c"),
+        stroke:active?COLORS[i]:(done?COLORS[i]:"#2b3d4f"),
+        "stroke-width":active?3:1.5});
+      box.style.transition="all .3s";
+      svg.appendChild(box);
+      svg.appendChild(el("circle",{cx:x+w/2,cy:70,r:12,fill:COLORS[i],
+        opacity:active?1:(done?.9:.4)}));
+      var num=el("text",{x:x+w/2,y:74,"text-anchor":"middle",fill:"#0f1720",
+        "font-size":12,"font-weight":700});num.textContent=(i+1);svg.appendChild(num);
+      var t1=el("text",{x:x+w/2,y:108,"text-anchor":"middle",fill:"#e7eef5",
+        "font-size":13,"font-weight":700});t1.textContent=STAGES[i].name;svg.appendChild(t1);
+      var t2=el("text",{x:x+w/2,y:126,"text-anchor":"middle",fill:"#9db0c2",
+        "font-size":10});t2.textContent=STAGES[i].where;svg.appendChild(t2);
+      // arrow
+      if(i<n-1){
+        var ax=x+w+gap/2;
+        var ar=el("path",{d:"M"+(x+w+2)+" 100 L"+(x+w+gap-2)+" 100",
+          stroke:"#2b3d4f","stroke-width":2,"marker-end":"none"});
+        svg.appendChild(ar);
+        svg.appendChild(el("polygon",{points:(x+w+gap-2)+",100 "+(x+w+gap-8)+",96 "+(x+w+gap-8)+",104",
+          fill:"#2b3d4f"}));
+      }
+    }
+  }
+
+  function refreshTally(){
+    document.getElementById("tAtp").textContent=tally.atp;
+    document.getElementById("tNadh").textContent=tally.nadh;
+    document.getElementById("tFadh").textContent=tally.fadh;
+    document.getElementById("tCo2").textContent=tally.co2;
+  }
+
+  function stepStage(){
+    if(cur>=STAGES.length-1){
+      document.getElementById("stageLog").innerHTML=
+        "&#10003; Complete! Total ~<b>36 ATP</b> and 6 CO&#8322; per glucose. Press Reset to replay.";
+      stopPlay();
+      return false;
+    }
+    cur++;
+    var s=STAGES[cur];
+    tally.atp+=s.atp; tally.nadh+=s.nadh; tally.fadh+=s.fadh; tally.co2+=s.co2;
+    // ETC consumes the NADH/FADH2 pool
+    if(s.name==="ETC"){ tally.nadh=0; tally.fadh=0; }
+    document.getElementById("stageLog").innerHTML=s.msg;
+    drawStages(); refreshTally();
+    return true;
+  }
+
+  function resetStages(){
+    cur=-1; tally={atp:0,nadh:0,fadh:0,co2:0};
+    document.getElementById("stageLog").innerHTML=
+      "Press <b>Step</b> or <b>Play</b> to begin at glycolysis.";
+    drawStages(); refreshTally(); stopPlay();
+  }
+
+  /* ---------- Play loop (pauses on document.hidden) ---------- */
+  var timer=null;
+  function playing(){return timer!==null;}
+  function tick(){
+    if(document.hidden) return; // pause while tab hidden
+    var ok=stepStage();
+    if(!ok) stopPlay();
+  }
+  function startPlay(){
+    if(playing()) return;
+    if(cur>=STAGES.length-1) resetStages();
+    document.getElementById("playBtn").innerHTML="&#10073;&#10073; Pause";
+    timer=setInterval(tick,1400);
+  }
+  function stopPlay(){
+    if(timer){clearInterval(timer);timer=null;}
+    var b=document.getElementById("playBtn");
+    if(b) b.innerHTML="&#9654; Play";
+  }
+  document.getElementById("playBtn").addEventListener("click",function(){
+    playing()?stopPlay():startPlay();
+  });
+  document.getElementById("stepBtn").addEventListener("click",function(){stopPlay();stepStage();});
+  document.getElementById("resetBtn").addEventListener("click",resetStages);
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden) stopPlay();
+  });
+
+  /* ---------- Fermentation ---------- */
+  var fermSvg=document.getElementById("fermSvg");
+  function fEl(t,a){var e=document.createElementNS(SVGNS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+  function node(x,y,w,txt,sub,color){
+    var g=fEl("g",{});
+    g.appendChild(fEl("rect",{x:x,y:y,width:w,height:52,rx:12,fill:"#1f2e3c",stroke:color,"stroke-width":2}));
+    var t=fEl("text",{x:x+w/2,y:y+24,"text-anchor":"middle",fill:"#e7eef5","font-size":13,"font-weight":700});
+    t.textContent=txt;g.appendChild(t);
+    if(sub){var s=fEl("text",{x:x+w/2,y:y+42,"text-anchor":"middle",fill:"#9db0c2","font-size":10});
+      s.textContent=sub;g.appendChild(s);}
+    return g;
+  }
+  function arrow(x1,y1,x2,y2){
+    var g=fEl("g",{});
+    g.appendChild(fEl("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:"#43d9a3","stroke-width":2}));
+    g.appendChild(fEl("polygon",{points:x2+","+y2+" "+(x2-7)+","+(y2-4)+" "+(x2-7)+","+(y2+4),fill:"#43d9a3"}));
+    return g;
+  }
+  function drawFerment(type){
+    while(fermSvg.firstChild) fermSvg.removeChild(fermSvg.firstChild);
+    // common: glucose -> 2 pyruvate (+2 ATP, +2 NADH)
+    fermSvg.appendChild(node(20,80,140,"Glucose","",COLORS[0]));
+    fermSvg.appendChild(arrow(162,106,215,106));
+    var atpTxt=fEl("text",{x:188,y:96,"text-anchor":"middle",fill:"#43d9a3","font-size":10,"font-weight":700});
+    atpTxt.textContent="+2 ATP";fermSvg.appendChild(atpTxt);
+    fermSvg.appendChild(node(217,80,150,"2 Pyruvate","glycolysis",COLORS[1]));
+    fermSvg.appendChild(arrow(369,106,420,106));
+    var re=fEl("text",{x:394,y:96,"text-anchor":"middle",fill:"#9db0c2","font-size":10});
+    re.textContent="NAD⁺ recycled";fermSvg.appendChild(re);
+    if(type==="alc"){
+      fermSvg.appendChild(node(422,80,196,"Ethanol + CO₂","alcoholic (yeast)",COLORS[3]));
+      document.getElementById("fermLog").innerHTML=
+        "<b>Alcoholic fermentation</b> (yeast, plant seeds/roots in low O&#8322;): 2 pyruvate &#8594; 2 ethanol + 2 CO&#8322;. Net yield stays at just <b>2 ATP</b> from glycolysis. Used in baking &amp; brewing.";
+    }else{
+      fermSvg.appendChild(node(422,80,196,"2 Lactic acid","lactic (muscle/bacteria)",COLORS[2]));
+      document.getElementById("fermLog").innerHTML=
+        "<b>Lactic acid fermentation</b> (overworked muscle, some bacteria): 2 pyruvate &#8594; 2 lactic acid. No CO&#8322; released. Net yield only <b>2 ATP</b>. Causes muscle fatigue.";
+    }
+    fermSvg.appendChild(fEl("text",{x:320,y:170,"text-anchor":"middle",fill:"#f0b45c","font-size":12,"font-weight":700}))
+      .textContent="Total ATP = 2 (vs ~36 aerobic)";
+  }
+  document.getElementById("fAlc").addEventListener("click",function(){drawFerment("alc");});
+  document.getElementById("fLac").addEventListener("click",function(){drawFerment("lac");});
+
+  /* ---------- Quiz ---------- */
+  document.querySelectorAll("#quiz .q").forEach(function(q){
+    var ans=parseInt(q.getAttribute("data-answer"),10);
+    var opts=q.querySelectorAll(".opt");
+    var exp=q.querySelector(".explain");
+    opts.forEach(function(opt,idx){
+      opt.addEventListener("click",function(){
+        opts.forEach(function(o,i){
+          o.disabled=true;
+          if(i===ans) o.classList.add("correct");
+        });
+        if(idx!==ans) opt.classList.add("wrong");
+        exp.classList.add("show");
+      });
+    });
+  });
+
+  /* ---------- Init ---------- */
+  drawStages(); refreshTally(); drawFerment("alc");
+})();
+</script>
+</body>
+</html>

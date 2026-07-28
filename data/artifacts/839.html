@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Human Digestion Lab — NIOS Class 12 Biology (Ch13)</title>
+<style>
+  :root{
+    --bg:#0f1620; --panel:#17212e; --panel2:#1e2b3a; --edge:#2b3b4e;
+    --ink:#e8eef5; --muted:#9db0c4; --accent:#4fd1a5; --accent-dim:#2e8b6f;
+    --warn:#f0a04b; --shadow:0 6px 20px rgba(0,0,0,.35);
+    --organ:#c76b7a; --gland:#e0a95c;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%,#1a2636,var(--bg));
+    color:var(--ink); font-family:"Segoe UI",system-ui,Arial,sans-serif;
+    line-height:1.5; -webkit-text-size-adjust:100%;
+  }
+  header{padding:16px 18px 6px}
+  h1{font-size:1.25rem;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:.82rem}
+  .wrap{max-width:960px;margin:0 auto;padding:10px 14px 40px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+  .tab{
+    flex:1 1 auto;min-width:120px;text-align:center;cursor:pointer;
+    background:var(--panel);border:1px solid var(--edge);color:var(--muted);
+    padding:10px 8px;border-radius:12px;font-size:.85rem;font-weight:600;
+    transition:.15s;
+  }
+  .tab:hover{border-color:var(--accent-dim)}
+  .tab.active{background:var(--panel2);color:var(--accent);border-color:var(--accent)}
+  .panel{
+    background:var(--panel);border:1px solid var(--edge);border-radius:16px;
+    padding:14px;margin-bottom:14px;box-shadow:var(--shadow);
+  }
+  .mode{display:none}
+  .mode.on{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:760px){.grid.two{grid-template-columns:1.15fr .85fr}}
+  .stage{background:var(--panel2);border:1px solid var(--edge);border-radius:14px;overflow:hidden}
+  svg{display:block;width:100%;height:auto;touch-action:manipulation}
+  .facts h3{margin:2px 0 6px;font-size:.95rem;color:var(--accent)}
+  .facts p{margin:6px 0;font-size:.86rem;color:var(--ink)}
+  .facts .hint{color:var(--muted);font-size:.8rem}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  button.ctl{
+    background:var(--accent);color:#08130e;border:none;border-radius:10px;
+    padding:9px 14px;font-weight:700;font-size:.85rem;cursor:pointer;
+  }
+  button.ctl.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  button.ctl:active{transform:translateY(1px)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.76rem;color:var(--muted);margin-top:8px}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+  .clickable{cursor:pointer}
+  .clickable:hover{opacity:.85}
+  .lbl{font-size:11px;fill:var(--muted);pointer-events:none}
+  .lbl.acc{fill:var(--accent)}
+  table.enz{width:100%;border-collapse:collapse;font-size:.8rem}
+  table.enz th,table.enz td{border:1px solid var(--edge);padding:6px 7px;text-align:left}
+  table.enz th{background:var(--panel2);color:var(--accent)}
+  table.enz tr.hi td{background:#233448}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .chip{background:var(--panel2);border:1px solid var(--edge);border-radius:20px;padding:6px 12px;font-size:.8rem;cursor:pointer;color:var(--muted)}
+  .chip.active{border-color:var(--accent);color:var(--accent)}
+  .quiz .q{margin:10px 0;padding:10px;background:var(--panel2);border-radius:12px;border:1px solid var(--edge)}
+  .quiz .q p{margin:0 0 8px;font-weight:600;font-size:.88rem}
+  .opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--edge);
+    color:var(--ink);border-radius:9px;padding:8px 10px;margin:5px 0;cursor:pointer;font-size:.83rem}
+  .opt:hover{border-color:var(--accent-dim)}
+  .opt.correct{border-color:var(--accent);background:#1c3a30}
+  .opt.wrong{border-color:#b4576b;background:#3a1c24}
+  .explain{font-size:.8rem;color:var(--muted);margin-top:6px;display:none}
+  .explain.show{display:block}
+  footer{color:var(--muted);font-size:.74rem;text-align:center;padding:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap" style="padding-bottom:0">
+    <h1>Human Digestion Lab</h1>
+    <div class="sub">NIOS Class 12 Biology · Ch13 Nutrition and Digestion — interactive</div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-mode="tour" role="tab">1 · System Tour</div>
+    <div class="tab" data-mode="enzymes" role="tab">2 · Enzymes &amp; Nutrients</div>
+    <div class="tab" data-mode="absorb" role="tab">3 · Absorption</div>
+    <div class="tab" data-mode="quiz" role="tab">Quiz</div>
+  </div>
+
+  <!-- ================= MODE 1: TOUR ================= -->
+  <section class="mode on" id="mode-tour">
+    <div class="grid two">
+      <div class="stage">
+        <svg id="tourSvg" viewBox="0 0 340 460" aria-label="Human alimentary canal">
+          <!-- body outline -->
+          <path d="M60 30 Q170 10 280 30 L275 440 Q170 455 65 440 Z" fill="#141d29" stroke="#223244" stroke-width="1.5"/>
+          <!-- organs group; each clickable -->
+          <g id="organs">
+            <!-- mouth / salivary -->
+            <g class="clickable" data-organ="mouth">
+              <ellipse cx="170" cy="52" rx="30" ry="16" fill="var(--gland)" opacity=".9"/>
+              <circle cx="140" cy="60" r="6" fill="var(--gland)"/><circle cx="200" cy="60" r="6" fill="var(--gland)"/>
+              <text class="lbl acc" x="170" y="30" text-anchor="middle">Mouth &amp; salivary glands</text>
+            </g>
+            <!-- oesophagus -->
+            <g class="clickable" data-organ="oeso">
+              <rect x="160" y="66" width="20" height="70" rx="9" fill="var(--organ)"/>
+              <text class="lbl" x="230" y="104" text-anchor="start">Oesophagus</text>
+            </g>
+            <!-- stomach -->
+            <g class="clickable" data-organ="stomach">
+              <path d="M170 136 q46 4 44 46 q-2 40 -40 44 q-34 4 -30 -30 q3 -22 -4 -34 q-6 -12 12 -20 q10 -6 18 -6 Z" fill="var(--organ)"/>
+              <text class="lbl acc" x="248" y="168" text-anchor="start">Stomach</text>
+            </g>
+            <!-- liver -->
+            <g class="clickable" data-organ="liver">
+              <path d="M70 140 q54 -10 78 8 q-6 26 -40 30 q-38 4 -38 -38 Z" fill="#8a5a4e"/>
+              <text class="lbl" x="66" y="132" text-anchor="start">Liver</text>
+            </g>
+            <!-- gallbladder -->
+            <g class="clickable" data-organ="gall">
+              <ellipse cx="120" cy="186" rx="10" ry="14" fill="var(--gland)"/>
+              <text class="lbl" x="60" y="196" text-anchor="start">Gall-<tspan x="60" dy="12">bladder</tspan></text>
+            </g>
+            <!-- pancreas -->
+            <g class="clickable" data-organ="pancreas">
+              <path d="M118 214 q40 -6 78 6 q-2 12 -18 12 q-40 -2 -60 -6 q-8 -2 0 -12 Z" fill="var(--gland)"/>
+              <text class="lbl acc" x="212" y="222" text-anchor="start">Pancreas</text>
+            </g>
+            <!-- small intestine -->
+            <g class="clickable" data-organ="small">
+              <path d="M150 236 q60 6 54 60 q-6 46 -60 44 q-56 -2 -58 -40 q-2 -30 30 -30 q26 0 24 22 q-2 18 -22 16"
+                    fill="none" stroke="var(--organ)" stroke-width="12" stroke-linecap="round"/>
+              <text class="lbl acc" x="230" y="300" text-anchor="start">Small intestine</text>
+            </g>
+            <!-- large intestine -->
+            <g class="clickable" data-organ="large">
+              <path d="M96 300 L96 400 Q96 418 118 418 L222 418 Q244 418 244 400 L244 316"
+                    fill="none" stroke="#9a6b8a" stroke-width="16" stroke-linecap="round"/>
+              <text class="lbl" x="118" y="440" text-anchor="middle">Large intestine</text>
+            </g>
+          </g>
+          <!-- bolus dot (animated along path) -->
+          <circle id="bolus" cx="170" cy="52" r="7" fill="var(--accent)" stroke="#08130e" stroke-width="1.5"/>
+        </svg>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--organ)"></span>alimentary canal</span>
+          <span><span class="swatch" style="background:var(--gland)"></span>glands</span>
+          <span><span class="swatch" style="background:var(--accent)"></span>food bolus</span>
+        </div>
+      </div>
+      <div class="panel facts">
+        <h3 id="tourTitle">Tap any organ</h3>
+        <div id="tourBody"><p class="hint">Tap an organ on the diagram to read its role in digestion, or press <b>Play tour</b> to animate a food bolus through the gut and watch what happens at each station.</p></div>
+        <div class="btnrow">
+          <button class="ctl" id="playBtn">▶ Play tour</button>
+          <button class="ctl sec" id="resetBtn">Reset</button>
+        </div>
+        <p class="hint" id="tourStep" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 2: ENZYMES ================= -->
+  <section class="mode" id="mode-enzymes">
+    <div class="grid two">
+      <div>
+        <div class="panel">
+          <h3 style="margin:2px 0 8px;color:var(--accent);font-size:.95rem">Pick a nutrient to trace its digestion</h3>
+          <div class="chips" id="nutChips">
+            <span class="chip active" data-nut="carb">Carbohydrate</span>
+            <span class="chip" data-nut="protein">Protein</span>
+            <span class="chip" data-nut="fat">Fat (lipid)</span>
+          </div>
+          <div class="stage" style="padding:6px">
+            <svg id="enzSvg" viewBox="0 0 340 200" aria-label="Nutrient digestion pathway">
+              <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0 0 L8 4 L0 8 Z" fill="var(--accent)"/></marker></defs>
+              <g id="enzFlow"></g>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="panel facts">
+        <h3>Enzyme map</h3>
+        <table class="enz">
+          <thead><tr><th>Site</th><th>Enzyme</th><th>Reaction</th></tr></thead>
+          <tbody id="enzTbody"></tbody>
+        </table>
+        <p class="hint" style="margin-top:8px" id="enzNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODE 3: ABSORPTION ================= -->
+  <section class="mode" id="mode-absorb">
+    <div class="grid two">
+      <div class="stage">
+        <svg id="villiSvg" viewBox="0 0 340 300" aria-label="Villus of small intestine">
+          <rect x="0" y="0" width="340" height="300" fill="#121b27"/>
+          <!-- lumen -->
+          <text class="lbl" x="170" y="18" text-anchor="middle">Lumen (digested food)</text>
+          <!-- villi -->
+          <g id="villiGroup"></g>
+          <!-- single enlarged villus callout drawn in JS -->
+          <g class="clickable" data-part="villus" id="bigVillus"></g>
+        </svg>
+        <div class="legend">
+          <span><span class="swatch" style="background:#c2415a"></span>capillary (blood)</span>
+          <span><span class="swatch" style="background:var(--accent)"></span>lacteal (lymph/fat)</span>
+        </div>
+      </div>
+      <div class="panel facts">
+        <h3 id="absTitle">Small intestine — the absorptive organ</h3>
+        <div id="absBody">
+          <p>The inner lining is folded into millions of finger-like <b>villi</b>; each villus cell has a brush border of <b>microvilli</b>. This raises the surface area to roughly 200&nbsp;m² for absorption.</p>
+          <p class="hint">Tap a labelled part of the villus to learn how each is adapted for absorption.</p>
+        </div>
+        <div class="btnrow">
+          <button class="ctl" id="absorbBtn">▶ Absorb nutrients</button>
+          <button class="ctl sec" id="absResetBtn">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="mode" id="mode-quiz">
+    <div class="panel quiz" id="quizBox"></div>
+  </section>
+
+  <footer>Diagrams are schematic. Enzymes, sites and products follow NIOS senior-secondary biology.</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  /* ---------- tab switching ---------- */
+  var tabs=document.querySelectorAll('.tab');
+  var modes={tour:document.getElementById('mode-tour'),enzymes:document.getElementById('mode-enzymes'),
+             absorb:document.getElementById('mode-absorb'),quiz:document.getElementById('mode-quiz')};
+  tabs.forEach(function(t){
+    t.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      Object.keys(modes).forEach(function(k){modes[k].classList.remove('on');});
+      modes[t.dataset.mode].classList.add('on');
+    });
+  });
+
+  /* ================= MODE 1: TOUR ================= */
+  var ORGANS={
+    mouth:{t:"Mouth & salivary glands",b:"Mechanical breakdown by teeth (mastication) plus saliva. Salivary glands secrete <b>salivary amylase (ptyalin)</b> which begins digesting cooked starch into maltose at ~pH 6.8. The tongue rolls food into a bolus that is swallowed."},
+    oeso:{t:"Oesophagus",b:"A muscular tube. No enzymes here — waves of <b>peristalsis</b> (rhythmic muscle contractions) push the bolus from pharynx to stomach. A sphincter controls entry into the stomach."},
+    stomach:{t:"Stomach",b:"Gastric glands secrete <b>gastric juice</b>: HCl (pH ~1.5–2) plus <b>pepsin</b> which digests proteins into peptones/polypeptides. HCl activates pepsinogen and kills microbes. Churning forms semi-liquid <b>chyme</b>. (Rennin in infants curdles milk.)"},
+    liver:{t:"Liver",b:"Largest gland. Produces <b>bile</b> (no enzymes) containing bile salts that <b>emulsify fats</b> — breaking large fat globules into tiny droplets so lipase can act. Bile also neutralises acidic chyme. The liver also processes absorbed nutrients (assimilation)."},
+    gall:{t:"Gall bladder",b:"Stores and concentrates bile made by the liver. It releases bile through the bile duct into the duodenum when fatty food arrives."},
+    pancreas:{t:"Pancreas",b:"Secretes <b>pancreatic juice</b> into the duodenum: <b>pancreatic amylase</b> (starch→maltose), <b>trypsin</b> (proteins→peptides), and <b>lipase</b> (emulsified fats→fatty acids + glycerol). Bicarbonate makes the medium alkaline (~pH 8)."},
+    small:{t:"Small intestine",b:"Main site of <b>digestion completion and absorption</b>. Intestinal (succus entericus) enzymes — maltase, sucrase, lactase, peptidases, lipase — finish digestion: maltose→glucose, peptides→amino acids. Villi absorb the end products."},
+    large:{t:"Large intestine",b:"Undigested residue passes here. Its main job is <b>absorption of water and minerals</b>, forming semi-solid faeces stored in the rectum before egestion. Gut bacteria synthesise some vitamin K and B vitamins."}
+  };
+  // ordered stations for the bolus animation with approx svg points
+  var STATIONS=[
+    {k:'mouth',x:170,y:52},{k:'oeso',x:170,y:110},{k:'stomach',x:185,y:180},
+    {k:'pancreas',x:160,y:222},{k:'small',x:172,y:300},{k:'large',x:170,y:410}
+  ];
+  var tourTitle=document.getElementById('tourTitle'),
+      tourBody=document.getElementById('tourBody'),
+      tourStep=document.getElementById('tourStep'),
+      bolus=document.getElementById('bolus');
+
+  function showOrgan(k){
+    var o=ORGANS[k]; if(!o) return;
+    tourTitle.textContent=o.t;
+    tourBody.innerHTML='<p>'+o.b+'</p>';
+  }
+  document.querySelectorAll('#organs .clickable').forEach(function(g){
+    g.addEventListener('click',function(){ stopTour(); showOrgan(g.dataset.organ); });
+  });
+
+  // bolus animation
+  var tourTimer=null,segStart=null,segIdx=0,rafId=null;
+  function stopTour(){ if(tourTimer){clearTimeout(tourTimer);tourTimer=null;} if(rafId){cancelAnimationFrame(rafId);rafId=null;} }
+  function resetTour(){ stopTour(); segIdx=0; bolus.setAttribute('cx',170); bolus.setAttribute('cy',52); tourStep.textContent=''; }
+  document.getElementById('resetBtn').addEventListener('click',resetTour);
+
+  function animateSeg(){
+    if(document.hidden){ tourTimer=setTimeout(animateSeg,200); return; }
+    if(segIdx>=STATIONS.length-1){ tourStep.textContent='Tour complete. Undigested residue reaches the large intestine.'; return; }
+    var a=STATIONS[segIdx],b=STATIONS[segIdx+1];
+    showOrgan(b.k);
+    tourStep.textContent='Station '+(segIdx+2)+'/'+STATIONS.length+': '+ORGANS[b.k].t;
+    var dur=1400,t0=null;
+    function step(ts){
+      if(document.hidden){ rafId=requestAnimationFrame(step); return; }
+      if(t0===null) t0=ts;
+      var p=Math.min((ts-t0)/dur,1);
+      var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2; // easeInOut
+      bolus.setAttribute('cx',a.x+(b.x-a.x)*e);
+      bolus.setAttribute('cy',a.y+(b.y-a.y)*e);
+      if(p<1){ rafId=requestAnimationFrame(step); }
+      else { segIdx++; tourTimer=setTimeout(animateSeg,650); }
+    }
+    rafId=requestAnimationFrame(step);
+  }
+  document.getElementById('playBtn').addEventListener('click',function(){
+    resetTour(); showOrgan('mouth'); tourStep.textContent='Station 1/'+STATIONS.length+': Mouth'; segIdx=0;
+    tourTimer=setTimeout(animateSeg,700);
+  });
+
+  /* ================= MODE 2: ENZYMES ================= */
+  var NUTS={
+    carb:{
+      steps:['Starch','Maltose','Glucose'],
+      flow:[
+        {site:'Mouth',enz:'Salivary amylase',rxn:'Starch → maltose'},
+        {site:'Small intestine (pancreas)',enz:'Pancreatic amylase',rxn:'Starch → maltose'},
+        {site:'Small intestine',enz:'Maltase / sucrase / lactase',rxn:'Maltose → glucose'}
+      ],
+      note:'Final product glucose (a monosaccharide) is absorbed by villi. No carbohydrate digestion occurs in the stomach.'
+    },
+    protein:{
+      steps:['Protein','Peptides','Amino acids'],
+      flow:[
+        {site:'Stomach',enz:'Pepsin (in HCl)',rxn:'Proteins → peptones/peptides'},
+        {site:'Small intestine (pancreas)',enz:'Trypsin',rxn:'Peptides → smaller peptides'},
+        {site:'Small intestine',enz:'Peptidases (erepsin)',rxn:'Peptides → amino acids'}
+      ],
+      note:'Pepsin needs the acidic pH of the stomach; trypsin needs the alkaline pH of the duodenum. Final product: amino acids.'
+    },
+    fat:{
+      steps:['Fat globule','Emulsified droplets','Fatty acids + glycerol'],
+      flow:[
+        {site:'Liver / gall bladder',enz:'Bile salts (emulsify, not enzyme)',rxn:'Large fat → tiny droplets'},
+        {site:'Small intestine (pancreas)',enz:'Pancreatic lipase',rxn:'Fat → fatty acids + glycerol'},
+        {site:'Small intestine',enz:'Intestinal lipase',rxn:'Completes fat digestion'}
+      ],
+      note:'Bile only emulsifies fat (increases surface area); lipase does the chemical digestion. Products: fatty acids + glycerol, absorbed via lacteals.'
+    }
+  };
+  var enzFlow=document.getElementById('enzFlow'),
+      enzTbody=document.getElementById('enzTbody'),
+      enzNote=document.getElementById('enzNote');
+  function SVGel(tag,attrs,txt){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(var k in attrs)e.setAttribute(k,attrs[k]); if(txt!=null)e.textContent=txt; return e;}
+  function drawNut(key){
+    var n=NUTS[key];
+    enzFlow.innerHTML='';
+    var ys=100, xs=[36,170,304];
+    n.steps.forEach(function(s,i){
+      var g=SVGel('g',{});
+      g.appendChild(SVGel('rect',{x:xs[i]-34,y:ys-22,width:68,height:44,rx:10,
+        fill:i===n.steps.length-1?'#1c3a30':'#233448',stroke:'var(--accent)','stroke-width':i===n.steps.length-1?1.5:1}));
+      var words=s.split(' ');
+      var ty=words.length>1?ys-4:ys+4;
+      words.forEach(function(w,wi){
+        g.appendChild(SVGel('text',{x:xs[i],y:ty+wi*13,'text-anchor':'middle',
+          'font-size':'11','fill':'var(--ink)'},w));
+      });
+      enzFlow.appendChild(g);
+      if(i<n.steps.length-1){
+        enzFlow.appendChild(SVGel('line',{x1:xs[i]+36,y1:ys,x2:xs[i+1]-38,y2:ys,
+          stroke:'var(--accent)','stroke-width':2,'marker-end':'url(#arrow)'}));
+        enzFlow.appendChild(SVGel('text',{x:(xs[i]+xs[i+1])/2,y:ys-16,'text-anchor':'middle',
+          'font-size':'9','fill':'var(--muted)'},n.flow[i]?n.flow[i].enz.split(' (')[0]:''));
+      }
+    });
+    // table
+    enzTbody.innerHTML='';
+    n.flow.forEach(function(f){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+f.site+'</td><td>'+f.enz+'</td><td>'+f.rxn+'</td>';
+      enzTbody.appendChild(tr);
+    });
+    enzNote.innerHTML=n.note;
+  }
+  document.querySelectorAll('#nutChips .chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('#nutChips .chip').forEach(function(x){x.classList.remove('active');});
+      c.classList.add('active'); drawNut(c.dataset.nut);
+    });
+  });
+  drawNut('carb');
+
+  /* ================= MODE 3: ABSORPTION ================= */
+  var villiGroup=document.getElementById('villiGroup');
+  // draw a row of small villi
+  for(var i=0;i<9;i++){
+    var vx=25+i*36;
+    var p=SVGel('path',{d:'M'+vx+' 250 q-9 -70 0 -110 q9 40 0 110 Z',fill:'#c76b7a',opacity:.65});
+    villiGroup.appendChild(p);
+  }
+  villiGroup.appendChild(SVGel('rect',{x:0,y:248,width:340,height:52,fill:'#182433'}));
+  // big labelled villus
+  var big=document.getElementById('bigVillus');
+  function drawBigVillus(){
+    big.innerHTML='';
+    // outer villus shape
+    big.appendChild(SVGel('path',{d:'M170 250 q-34 -120 0 -190 q34 70 0 190 Z',
+      fill:'#a94f60',stroke:'#d67',id:'villusBody'}));
+    // capillary network (blood)
+    big.appendChild(SVGel('path',{d:'M162 240 q-14 -90 6 -150 q18 60 -2 150',
+      fill:'none',stroke:'#c2415a','stroke-width':3,id:'cap'}));
+    // lacteal (lymph, central)
+    big.appendChild(SVGel('rect',{x:167,y:88,width:6,height:150,rx:3,fill:'var(--accent)',opacity:.85,id:'lacteal'}));
+    // microvilli hint at top (brush border)
+    for(var m=0;m<8;m++){ big.appendChild(SVGel('line',{x1:150+m*5,y1:62,x2:150+m*5,y2:52,stroke:'#f2c'+ '', 'stroke-width':1,opacity:0}));}
+    // clickable labels
+    var labels=[
+      {x:250,y:80,t:'Microvilli',part:'micro'},
+      {x:250,y:150,t:'Capillary',part:'cap'},
+      {x:250,y:200,t:'Lacteal',part:'lact'},
+      {x:60,y:150,t:'Epithelium',part:'epi'}
+    ];
+    labels.forEach(function(L){
+      var g=SVGel('g',{class:'clickable','data-vpart':L.part});
+      g.appendChild(SVGel('text',{x:L.x,y:L.y,'text-anchor':L.x>170?'start':'end',
+        'font-size':'11','fill':'var(--accent)'},L.t));
+      big.appendChild(g);
+    });
+    big.querySelectorAll('.clickable').forEach(function(g){
+      g.addEventListener('click',function(){ showVpart(g.dataset.vpart); });
+    });
+  }
+  var VPARTS={
+    micro:{t:'Microvilli (brush border)',b:'Tiny projections on each epithelial cell that multiply the surface area enormously and carry the final intestinal enzymes. Glucose and amino acids are absorbed here, partly by active transport.'},
+    cap:{t:'Blood capillaries',b:'Absorbed <b>glucose and amino acids</b> pass into the capillary network and travel via the hepatic portal vein to the liver, then to body cells (assimilation).'},
+    lact:{t:'Lacteal (lymph vessel)',b:'The central lymph vessel absorbs <b>fatty acids and glycerol</b> (as tiny fat droplets / chylomicrons), which enter the lymph and later the blood.'},
+    epi:{t:'Epithelium & thin wall',b:'A single-cell-thick, moist lining with a rich blood supply gives a short diffusion distance — ideal for rapid absorption of end products.'},
+    villus:{t:'Villus',b:'The whole finger-like fold: large surface area, thin wall, blood capillaries plus a lacteal. Together the villi make the small intestine the main absorptive organ.'}
+  };
+  var absTitle=document.getElementById('absTitle'),absBody=document.getElementById('absBody');
+  function showVpart(k){var v=VPARTS[k]; if(!v)return; absTitle.textContent=v.t; absBody.innerHTML='<p>'+v.b+'</p>';}
+  drawBigVillus();
+
+  // absorption animation: dots moving into capillary + lacteal
+  var absTimer=null,absRaf=null;
+  function stopAbs(){ if(absTimer){clearTimeout(absTimer);absTimer=null;} if(absRaf){cancelAnimationFrame(absRaf);absRaf=null;}
+    var old=big.querySelectorAll('.absdot'); old.forEach(function(d){d.remove();}); }
+  document.getElementById('absResetBtn').addEventListener('click',function(){stopAbs();
+    absTitle.textContent='Small intestine — the absorptive organ';
+    absBody.innerHTML='<p>The inner lining is folded into millions of finger-like <b>villi</b>; each villus cell has a brush border of <b>microvilli</b>. This raises the surface area to roughly 200&nbsp;m² for absorption.</p><p class="hint">Tap a labelled part of the villus to learn how each is adapted for absorption.</p>';
+  });
+  document.getElementById('absorbBtn').addEventListener('click',function(){
+    stopAbs();
+    absTitle.textContent='Absorption & assimilation in action';
+    absBody.innerHTML='<p><span style="color:#c2415a">■</span> Glucose &amp; amino acids → blood capillary → liver.<br><span style="color:var(--accent)">■</span> Fatty acids &amp; glycerol → lacteal (lymph).</p><p class="hint">The large intestine then reabsorbs water from the remaining residue.</p>';
+    spawnDots();
+  });
+  function spawnDots(){
+    var count=0;
+    function emit(){
+      if(count>=8){ absTimer=setTimeout(function(){var d=big.querySelectorAll('.absdot');d.forEach(function(x){x.remove();});},1200); return; }
+      if(document.hidden){ absTimer=setTimeout(emit,200); return; }
+      var toCap=count%2===0;
+      var dot=SVGel('circle',{class:'absdot',r:4,cx:130+Math.random()*80,cy:64,
+        fill:toCap?'#c2415a':'var(--accent)'});
+      big.appendChild(dot);
+      var t0=null,dur=1600,endY=toCap?236:236,endX=toCap?162:170;
+      var startX=parseFloat(dot.getAttribute('cx')),startY=64;
+      (function move(){
+        function step(ts){
+          if(document.hidden){ absRaf=requestAnimationFrame(step); return; }
+          if(t0===null)t0=ts; var p=Math.min((ts-t0)/dur,1);
+          dot.setAttribute('cx',startX+(endX-startX)*p);
+          dot.setAttribute('cy',startY+(endY-startY)*p);
+          dot.setAttribute('opacity',1-p*0.7);
+          if(p<1)absRaf=requestAnimationFrame(step); else dot.remove();
+        }
+        absRaf=requestAnimationFrame(step);
+      })();
+      count++; absTimer=setTimeout(emit,320);
+    }
+    emit();
+  }
+
+  /* ================= QUIZ ================= */
+  var QUIZ=[
+    {q:'Which enzyme begins the digestion of starch, and where?',
+     opts:['Pepsin, in the stomach','Salivary amylase, in the mouth','Trypsin, in the duodenum','Lipase, in the ileum'],
+     a:1,e:'Salivary amylase (ptyalin) from the salivary glands starts converting cooked starch to maltose in the mouth.'},
+    {q:'Bile secreted by the liver helps fat digestion by:',
+     opts:['Chemically splitting fat into fatty acids','Emulsifying fat into tiny droplets','Providing the enzyme lipase','Making the stomach acidic'],
+     a:1,e:'Bile contains no enzymes; its salts emulsify fat (increase surface area) so pancreatic lipase can act. Products: fatty acids + glycerol.'},
+    {q:'End products of protein digestion are absorbed mainly into the villus as:',
+     opts:['Fatty acids, via the lacteal','Glucose, via the capillary','Amino acids, via the blood capillary','Glycerol, via the lymph'],
+     a:2,e:'Proteins are finally broken to amino acids, absorbed into blood capillaries and carried by the hepatic portal vein to the liver.'}
+  ];
+  var quizBox=document.getElementById('quizBox');
+  QUIZ.forEach(function(item,qi){
+    var d=document.createElement('div'); d.className='q';
+    var p=document.createElement('p'); p.textContent=(qi+1)+'. '+item.q; d.appendChild(p);
+    item.opts.forEach(function(opt,oi){
+      var b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+      b.addEventListener('click',function(){
+        var chosen=d.querySelectorAll('.opt');
+        chosen.forEach(function(x){x.disabled=true;});
+        if(oi===item.a){ b.classList.add('correct'); }
+        else { b.classList.add('wrong'); chosen[item.a].classList.add('correct'); }
+        d.querySelector('.explain').classList.add('show');
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement('div'); ex.className='explain'; ex.innerHTML='<b>Why:</b> '+item.e; d.appendChild(ex);
+    quizBox.appendChild(d);
+  });
+
+  /* pause everything when tab hidden already handled by document.hidden checks */
+  document.addEventListener('visibilitychange',function(){
+    // rAF loops self-check document.hidden; nothing else needed
+  });
+})();
+</script>
+</body>
+</html>

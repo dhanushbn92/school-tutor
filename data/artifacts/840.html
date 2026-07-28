@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Respiration &amp; Excretion Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#4fb0a5;
+    --accent-dark:#2f8c82;
+    --bg:#0f1720;
+    --panel:#18222e;
+    --panel2:#1f2c3a;
+    --ink:#e6eef5;
+    --muted:#93a7bb;
+    --line:#2c3c4d;
+    --good:#4fd08b;
+    --bad:#e0736b;
+    --o2:#5aa9e6;
+    --co2:#e0a15a;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2733,#0f1720 60%);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.35rem;margin:0 0 2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;
+    background:var(--panel);border:2px solid transparent;
+    padding:10px 12px;border-radius:12px;cursor:pointer;
+    font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#04241f;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{
+    background:var(--panel);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px;margin-bottom:16px;
+    border:1px solid var(--line);
+  }
+  .hidden{display:none;}
+  h2{font-size:1.05rem;margin:0 0 10px;}
+  h3{font-size:.95rem;margin:14px 0 6px;color:var(--accent);}
+  .toggle-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .btn{
+    background:var(--accent);color:#04241f;border:none;
+    padding:9px 15px;border-radius:10px;font-weight:700;
+    cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#04241f;border-color:var(--accent-dark);}
+  .btn:focus-visible,.tab:focus-visible,.mcq li:focus-visible{outline:3px solid var(--o2);outline-offset:2px;}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;}
+  .figbox{flex:1 1 340px;min-width:280px;}
+  .side{flex:1 1 260px;min-width:240px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{filter:brightness(1.18);}
+  .hot.sel{stroke:#fff;stroke-width:3;}
+  .lbl{font-size:11px;fill:var(--muted);}
+  .lbl.b{fill:var(--ink);font-weight:600;}
+  .info{
+    background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;padding:12px;min-height:96px;font-size:.9rem;
+  }
+  .info h4{margin:0 0 6px;color:var(--accent);font-size:.95rem;}
+  .facts{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.88rem;}
+  .facts ul{margin:6px 0 0;padding-left:18px;}
+  .facts li{margin:4px 0;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:8px;}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
+  .stagebar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;}
+  .stagebar button{flex:1 1 90px;font-size:.8rem;padding:7px 6px;}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;}
+  .card{flex:1 1 200px;min-width:200px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;}
+  .card.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(79,176,165,.4);}
+  .card h4{margin:0 0 6px;font-size:1rem;}
+  .pill{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:20px;background:var(--accent);color:#04241f;font-weight:700;margin-bottom:6px;}
+  table.waste{width:100%;border-collapse:collapse;margin-top:10px;font-size:.85rem;}
+  table.waste th,table.waste td{border:1px solid var(--line);padding:7px 8px;text-align:left;}
+  table.waste th{background:var(--panel2);color:var(--accent);}
+  .mcq{list-style:none;padding:0;margin:6px 0 0;}
+  .mcq>li{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;}
+  .q{font-weight:600;margin-bottom:8px;}
+  .opts{list-style:none;padding:0;margin:0;}
+  .opts li{padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin:6px 0;cursor:pointer;font-size:.88rem;transition:.12s;}
+  .opts li:hover{border-color:var(--accent);}
+  .opts li.correct{background:rgba(79,208,139,.18);border-color:var(--good);}
+  .opts li.wrong{background:rgba(224,115,107,.18);border-color:var(--bad);}
+  .explain{margin-top:8px;font-size:.83rem;color:var(--muted);display:none;}
+  .explain.show{display:block;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:8px 0 20px;}
+  @media (max-width:420px){header h1{font-size:1.15rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Respiration &amp; Excretion Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Ch 14 &mdash; Respiration and Elimination of Nitrogenous Wastes</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="resp" role="tab">Respiratory System</button>
+    <button class="tab" data-mode="exc" role="tab">Excretory System</button>
+    <button class="tab" data-mode="waste" role="tab">Nitrogenous Wastes</button>
+    <button class="tab" data-mode="quiz" role="tab">Quiz</button>
+  </div>
+
+  <!-- ================= RESPIRATORY ================= -->
+  <section class="panel" id="mode-resp">
+    <h2>Human Respiratory System</h2>
+    <div class="toggle-row">
+      <button class="btn" id="breatheBtn">Start breathing</button>
+      <button class="btn ghost" id="gasBtn">Show gas exchange</button>
+      <span class="muted" style="color:var(--muted);font-size:.82rem">Click a labelled part to learn about it.</span>
+    </div>
+    <div class="stage">
+      <div class="figbox">
+        <svg viewBox="0 0 340 400" role="img" aria-label="Human respiratory system diagram">
+          <!-- head/nasal -->
+          <path class="hot" data-part="nostrils" d="M150 18 q30 6 30 30 q0 14 -14 20 l-30 6 q-8 -30 14 -56 Z" fill="#31485c" stroke="#43607a"/>
+          <text class="lbl" x="188" y="34">Nasal cavity /</text>
+          <text class="lbl" x="188" y="46">nostrils</text>
+          <!-- pharynx -->
+          <path class="hot" data-part="pharynx" d="M150 72 l22 0 l-2 26 l-20 0 Z" fill="#3a5468" stroke="#4d6d86"/>
+          <text class="lbl" x="184" y="86">Pharynx</text>
+          <!-- larynx -->
+          <path class="hot" data-part="larynx" d="M150 100 l20 0 l0 20 l-20 0 Z" fill="#43607a" stroke="#5a7c98"/>
+          <text class="lbl" x="184" y="116">Larynx (voice box)</text>
+          <!-- trachea -->
+          <rect class="hot" data-part="trachea" x="153" y="122" width="14" height="70" rx="6" fill="#4a6a84" stroke="#628aa6"/>
+          <text class="lbl" x="184" y="150">Trachea</text>
+          <text class="lbl" x="184" y="162">(windpipe)</text>
+          <!-- bronchi -->
+          <path class="hot" data-part="bronchi" d="M160 190 q-30 8 -46 34 M160 190 q30 8 46 34" fill="none" stroke="#6a97b4" stroke-width="9" stroke-linecap="round"/>
+          <text class="lbl" x="10" y="214">Bronchi</text>
+          <!-- lungs -->
+          <path class="hot" data-part="lungs" id="lungL" d="M112 220 q-46 6 -50 66 q-4 54 24 78 q26 20 40 -6 q6 -66 2 -132 q-6 -8 -16 -6 Z" fill="#7a4a56" stroke="#9a5e6c" opacity=".92"/>
+          <path class="hot" data-part="lungs" id="lungR" d="M170 218 q46 6 52 66 q4 54 -24 78 q-26 20 -42 -6 q-6 -66 -2 -132 q6 -8 16 -6 Z" fill="#7a4a56" stroke="#9a5e6c" opacity=".92"/>
+          <text class="lbl b" x="70" y="270">Lung</text>
+          <text class="lbl b" x="186" y="270">Lung</text>
+          <!-- bronchioles hint -->
+          <path class="hot" data-part="bronchioles" d="M158 236 q-14 20 -30 30 M176 236 q14 20 30 30" fill="none" stroke="#c98fa0" stroke-width="3"/>
+          <text class="lbl" x="120" y="300" text-anchor="middle">Bronchioles</text>
+          <!-- alveoli cluster -->
+          <g class="hot" data-part="alveoli">
+            <circle cx="150" cy="330" r="7" fill="#f0b8c6" stroke="#c98fa0"/>
+            <circle cx="164" cy="336" r="6" fill="#f0b8c6" stroke="#c98fa0"/>
+            <circle cx="140" cy="342" r="6" fill="#f0b8c6" stroke="#c98fa0"/>
+            <circle cx="158" cy="346" r="5" fill="#f0b8c6" stroke="#c98fa0"/>
+          </g>
+          <text class="lbl" x="176" y="336">Alveoli</text>
+          <!-- ribs -->
+          <g id="ribs" stroke="#c7d3de" stroke-width="2" fill="none" opacity=".55">
+            <path d="M96 238 q74 -18 148 0"/>
+            <path d="M92 262 q78 -18 156 0"/>
+            <path d="M92 286 q78 -16 156 0"/>
+          </g>
+          <!-- diaphragm -->
+          <path class="hot" data-part="diaphragm" id="diaphragm" d="M78 380 q92 -18 184 0" fill="none" stroke="#e0a15a" stroke-width="6" stroke-linecap="round"/>
+          <text class="lbl b" x="112" y="396">Diaphragm</text>
+        </svg>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--o2)"></span>O&#8322; (oxygen)</span>
+          <span><span class="dot" style="background:var(--co2)"></span>CO&#8322; (carbon dioxide)</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="info" id="respInfo">
+          <h4>Explore the airway</h4>
+          <p>Air travels: nostrils &rarr; pharynx &rarr; larynx &rarr; trachea &rarr; bronchi &rarr; bronchioles &rarr; alveoli, where gas exchange occurs. Tap any labelled part.</p>
+        </div>
+        <div class="facts" style="margin-top:12px">
+          <strong>Breathing mechanics &amp; transport</strong>
+          <ul>
+            <li><b>Inhalation:</b> diaphragm contracts &amp; flattens, ribs rise &mdash; thoracic volume &uarr;, pressure &darr;, air rushes in.</li>
+            <li><b>Exhalation:</b> diaphragm relaxes &amp; domes up, ribs fall &mdash; volume &darr;, pressure &uarr;, air pushed out.</li>
+            <li><b>O&#8322; transport:</b> ~97% carried by <b>haemoglobin</b> as oxyhaemoglobin in RBCs.</li>
+            <li><b>CO&#8322; transport:</b> ~70% as bicarbonate (HCO&#8323;&#8315;) in plasma, ~23% as carbamino-haemoglobin, ~7% dissolved.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EXCRETORY ================= -->
+  <section class="panel hidden" id="mode-exc">
+    <h2>Excretory System &amp; the Nephron</h2>
+    <div class="toggle-row">
+      <button class="btn ghost on" id="viewOrgan">Organs</button>
+      <button class="btn ghost" id="viewNephron">Nephron zoom</button>
+      <button class="btn" id="formBtn">Animate urine formation</button>
+    </div>
+
+    <div class="stage" id="excStage">
+      <div class="figbox">
+        <!-- ORGAN VIEW -->
+        <svg id="organSvg" viewBox="0 0 300 380" role="img" aria-label="Excretory organs">
+          <path class="hot" data-part="kidneyL" d="M78 70 q-34 4 -34 56 q0 44 34 52 q22 4 22 -22 q0 -64 0 -66 q0 -24 -22 -20 Z" fill="#8a4c58" stroke="#a9606e"/>
+          <path class="hot" data-part="kidneyR" d="M182 70 q34 4 34 56 q0 44 -34 52 q-22 4 -22 -22 q0 -64 0 -66 q0 -24 22 -20 Z" fill="#8a4c58" stroke="#a9606e"/>
+          <text class="lbl b" x="24" y="120">Kidney</text>
+          <text class="lbl b" x="224" y="120">Kidney</text>
+          <path class="hot" data-part="ureterL" d="M96 174 q6 60 44 96" fill="none" stroke="#c98f6a" stroke-width="6" stroke-linecap="round"/>
+          <path class="hot" data-part="ureterR" d="M204 174 q-6 60 -44 96" fill="none" stroke="#c98f6a" stroke-width="6" stroke-linecap="round"/>
+          <text class="lbl" x="40" y="230">Ureter</text>
+          <text class="lbl" x="224" y="230">Ureter</text>
+          <path class="hot" data-part="bladder" d="M118 272 q32 -16 64 0 q10 34 -12 52 q-20 12 -40 0 q-22 -18 -12 -52 Z" fill="#c9a24c" stroke="#e0b95a"/>
+          <text class="lbl b" x="196" y="304">Urinary bladder</text>
+          <rect class="hot" data-part="urethra" x="145" y="326" width="10" height="40" rx="5" fill="#c98f6a" stroke="#e0a97a"/>
+          <text class="lbl" x="162" y="352">Urethra</text>
+        </svg>
+
+        <!-- NEPHRON VIEW -->
+        <svg id="nephronSvg" class="hidden" viewBox="0 0 360 380" role="img" aria-label="Nephron structure">
+          <!-- afferent/efferent + glomerulus in Bowman's capsule -->
+          <circle class="hot" data-part="glomerulus" cx="70" cy="70" r="26" fill="none" stroke="#5aa9e6" stroke-width="10" opacity=".85"/>
+          <path class="hot" data-part="glomerulus" d="M56 62 q10 -8 20 4 q8 10 -2 18 q-12 8 -20 -4 q-6 -10 2 -18Z" fill="#5aa9e6"/>
+          <circle class="hot" data-part="bowman" cx="70" cy="70" r="34" fill="none" stroke="#9fb6c9" stroke-width="3"/>
+          <text class="lbl b" x="8" y="30">Glomerulus in</text>
+          <text class="lbl b" x="8" y="42">Bowman&#39;s capsule</text>
+          <!-- PCT -->
+          <path class="hot" data-part="pct" d="M104 70 q40 -6 44 24 q4 20 -22 24 q-24 4 -18 22" fill="none" stroke="#4fb0a5" stroke-width="10" stroke-linecap="round"/>
+          <text class="lbl b" x="150" y="60">PCT</text>
+          <text class="lbl" x="150" y="72">(prox. convoluted)</text>
+          <!-- loop of Henle -->
+          <path class="hot" data-part="loop" d="M112 158 l6 120 q2 26 26 26 q24 0 26 -26 l6 -120" fill="none" stroke="#c98f6a" stroke-width="10" stroke-linecap="round"/>
+          <text class="lbl b" x="60" y="300">Loop of Henle</text>
+          <!-- DCT -->
+          <path class="hot" data-part="dct" d="M176 158 q26 -4 22 24 q-3 20 20 22 q22 2 24 20" fill="none" stroke="#b06ac9" stroke-width="10" stroke-linecap="round"/>
+          <text class="lbl b" x="214" y="150">DCT</text>
+          <text class="lbl" x="214" y="162">(distal convoluted)</text>
+          <!-- collecting duct -->
+          <path class="hot" data-part="collect" d="M242 226 l0 120" fill="none" stroke="#c9a24c" stroke-width="12" stroke-linecap="round"/>
+          <text class="lbl b" x="256" y="300">Collecting</text>
+          <text class="lbl b" x="256" y="312">duct</text>
+          <text class="lbl" x="256" y="342">&darr; to ureter</text>
+        </svg>
+      </div>
+      <div class="side">
+        <div class="stagebar" id="formStages"></div>
+        <div class="info" id="excInfo">
+          <h4>Kidney &amp; nephron</h4>
+          <p>Each kidney has ~1 million <b>nephrons</b> &mdash; the functional units that filter blood and form urine. Switch to <b>Nephron zoom</b>, then run the animation to watch filtration, reabsorption and secretion.</p>
+        </div>
+      </div>
+    </div>
+    <div class="facts" style="margin-top:12px">
+      <strong>Urine formation &mdash; three stages</strong>
+      <ul>
+        <li><b>1. Glomerular filtration:</b> high pressure in the glomerulus forces water, glucose, salts, urea &amp; amino acids out of blood into Bowman&#39;s capsule (filtrate). Blood cells &amp; proteins stay behind.</li>
+        <li><b>2. Selective reabsorption:</b> in PCT, loop &amp; DCT, useful materials (all glucose, most water, ions) return to blood capillaries.</li>
+        <li><b>3. Tubular secretion:</b> extra H&#8314;, K&#8314;, ammonia &amp; drugs are actively added from blood into the tubule &mdash; final urine flows via collecting duct &rarr; ureter &rarr; bladder.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= WASTES ================= -->
+  <section class="panel hidden" id="mode-waste">
+    <h2>Nitrogenous Wastes &amp; Water Availability</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-top:0">Proteins &amp; nucleic acids break down to toxic <b>ammonia</b>. How an animal disposes of it depends on how much water it can afford to lose. Tap a card.</p>
+    <div class="cards" id="wasteCards"></div>
+    <div class="info" id="wasteInfo" style="margin-top:12px">
+      <h4>Why the difference?</h4>
+      <p>Ammonia is very toxic and needs lots of water to flush out; urea is far less toxic; uric acid is almost non-toxic and nearly insoluble, so it is excreted as a paste with minimal water loss &mdash; ideal where water is scarce.</p>
+    </div>
+    <table class="waste">
+      <tr><th>Type</th><th>Main waste</th><th>Toxicity</th><th>Water needed</th><th>Examples</th></tr>
+      <tr><td>Ammonotelic</td><td>Ammonia (NH&#8323;)</td><td>Very high</td><td>Very high</td><td>Bony fish, aquatic amphibian larvae, many aquatic invertebrates</td></tr>
+      <tr><td>Ureotelic</td><td>Urea</td><td>Moderate</td><td>Moderate</td><td>Mammals (incl. humans), adult amphibians, cartilaginous fish (sharks)</td></tr>
+      <tr><td>Uricotelic</td><td>Uric acid</td><td>Low</td><td>Very low</td><td>Birds, reptiles, insects, land snails</td></tr>
+    </table>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section class="panel hidden" id="mode-quiz">
+    <h2>Check Your Understanding</h2>
+    <ul class="mcq" id="quiz"></ul>
+    <p id="score" style="font-weight:700;color:var(--accent)"></p>
+  </section>
+
+  <footer>Self-contained interactive &middot; Biology-accurate &middot; Animation pauses when the tab is hidden.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+
+  /* ---------- tab switching ---------- */
+  var modes={resp:"mode-resp",exc:"mode-exc",waste:"mode-waste",quiz:"mode-quiz"};
+  $$(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $$(".tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var m=t.getAttribute("data-mode");
+      Object.keys(modes).forEach(function(k){
+        $("#"+modes[k]).classList.toggle("hidden",k!==m);
+      });
+    });
+  });
+
+  /* ================= RESPIRATORY ================= */
+  var respData={
+    nostrils:["Nasal cavity / nostrils","Air enters here and is warmed, moistened and filtered by hairs and mucus before moving deeper."],
+    pharynx:["Pharynx","A common passage for air and food (throat). Air passes from the nasal cavity toward the larynx."],
+    larynx:["Larynx (voice box)","Contains the vocal cords; produces sound. The epiglottis guards its opening to keep food out of the airway."],
+    trachea:["Trachea (windpipe)","A tube kept open by C-shaped cartilage rings. Its ciliated, mucus-lined wall traps and sweeps out dust."],
+    bronchi:["Bronchi","The trachea divides into left and right bronchi, one entering each lung."],
+    bronchioles:["Bronchioles","Bronchi branch repeatedly into ever-finer bronchioles that end in air sacs."],
+    alveoli:["Alveoli","Tiny thin-walled air sacs wrapped in capillaries. Site of gas exchange: O₂ diffuses into blood, CO₂ diffuses out. Huge surface area (~70 m²)."],
+    lungs:["Lungs","A pair of spongy organs in the thoracic cavity, protected by ribs and covered by pleural membranes."],
+    diaphragm:["Diaphragm","A dome-shaped muscle below the lungs. Its contraction (flattening) drives inhalation; relaxation drives exhalation."]
+  };
+  var respInfo=$("#respInfo");
+  $$('#mode-resp .hot').forEach(function(el){
+    el.addEventListener("click",function(){
+      var k=el.getAttribute("data-part");var d=respData[k];if(!d)return;
+      $$('#mode-resp .hot').forEach(function(x){x.classList.remove("sel");});
+      $$('#mode-resp .hot[data-part="'+k+'"]').forEach(function(x){x.classList.add("sel");});
+      respInfo.innerHTML="<h4>"+d[0]+"</h4><p>"+d[1]+"</p>";
+    });
+  });
+
+  /* breathing + gas animation */
+  var breathing=false, showGas=false, t=0, gasParts=[];
+  var lungL=$("#lungL"),lungR=$("#lungR"),diaph=$("#diaphragm"),ribs=$("#ribs");
+  var svgResp=$('#mode-resp svg');
+  function makeGas(){
+    // create O2 (in) and CO2 (out) particles near alveoli
+    gasParts=[];
+    for(var i=0;i<5;i++){
+      gasParts.push({type:"o2",x:150+ (Math.random()*20-10),y:330,ph:Math.random()});
+      gasParts.push({type:"co2",x:150+ (Math.random()*20-10),y:330,ph:Math.random()});
+    }
+  }
+  var gasLayer=null;
+  function ensureGasLayer(){
+    if(!gasLayer){
+      gasLayer=document.createElementNS("http://www.w3.org/2000/svg","g");
+      gasLayer.setAttribute("id","gasLayer");
+      svgResp.appendChild(gasLayer);
+    }
+  }
+  function renderGas(){
+    ensureGasLayer();
+    gasLayer.innerHTML="";
+    if(!showGas)return;
+    gasParts.forEach(function(p){
+      var c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      var ph=(t*0.02+p.ph)%1;
+      // o2 moves toward alveoli/into blood (left), co2 moves outward (up)
+      var x=p.x + (p.type==="o2"? -1: 1)*Math.sin(ph*6.28)*8;
+      var y=p.y + (p.type==="co2"? -1: 1)*ph*22;
+      c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",3);
+      c.setAttribute("fill",p.type==="o2"?"#5aa9e6":"#e0a15a");
+      c.setAttribute("opacity",0.9-ph*0.5);
+      gasLayer.appendChild(c);
+    });
+  }
+  function respFrame(){
+    if(breathing){
+      t++;
+      var s=(Math.sin(t*0.05)+1)/2; // 0..1 breathing cycle
+      var sc=1+s*0.06;
+      lungL.setAttribute("transform","translate("+(-6*s)+",0) scale("+sc+" "+(1+s*0.09)+")");
+      lungL.style.transformOrigin="90px 300px";
+      lungR.setAttribute("transform","translate("+(6*s)+",0) scale("+sc+" "+(1+s*0.09)+")");
+      lungR.style.transformOrigin="200px 300px";
+      diaph.setAttribute("transform","translate(0,"+(s*14)+")");
+      ribs.setAttribute("transform","translate(0,"+(-s*6)+")");
+    }
+    renderGas();
+    rafResp=requestAnimationFrame(respFrame);
+  }
+  var rafResp=null;
+  $("#breatheBtn").addEventListener("click",function(){
+    breathing=!breathing;
+    this.textContent=breathing?"Pause breathing":"Start breathing";
+  });
+  $("#gasBtn").addEventListener("click",function(){
+    showGas=!showGas;
+    this.classList.toggle("on",showGas);
+    this.textContent=showGas?"Hide gas exchange":"Show gas exchange";
+    if(showGas){makeGas();respInfo.innerHTML="<h4>Gas exchange at alveoli</h4><p><span style='color:#5aa9e6'>O₂</span> diffuses from alveolar air into blood (binds haemoglobin); <span style='color:#e0a15a'>CO₂</span> diffuses from blood into the alveoli to be breathed out.</p>";}
+  });
+  rafResp=requestAnimationFrame(respFrame);
+
+  /* ================= EXCRETORY ================= */
+  var organSvg=$("#organSvg"),nephronSvg=$("#nephronSvg");
+  var excData={
+    kidneyL:["Kidney","Bean-shaped organ that filters blood to form urine and regulates water, salts and pH. Contains ~1 million nephrons."],
+    kidneyR:["Kidney","Bean-shaped organ that filters blood to form urine and regulates water, salts and pH. Contains ~1 million nephrons."],
+    ureterL:["Ureter","Muscular tube that carries urine from the kidney to the urinary bladder by peristalsis."],
+    ureterR:["Ureter","Muscular tube that carries urine from the kidney to the urinary bladder by peristalsis."],
+    bladder:["Urinary bladder","A stretchable muscular sac that stores urine until it is released."],
+    urethra:["Urethra","The tube through which urine leaves the body; controlled by sphincter muscles."],
+    glomerulus:["Glomerulus","A tuft of capillaries under high pressure. Here blood is filtered into Bowman's capsule."],
+    bowman:["Bowman's capsule","Cup-shaped start of the nephron that collects the glomerular filtrate."],
+    pct:["Proximal convoluted tubule (PCT)","Major site of reabsorption: all glucose & amino acids, most water and Na⁴ return to the blood."],
+    loop:["Loop of Henle","Creates a salt gradient in the medulla, enabling water reabsorption and concentrated urine."],
+    dct:["Distal convoluted tubule (DCT)","Fine-tunes salts, water and pH; site of tubular secretion of H⁴/K⁴ (hormone-controlled)."],
+    collect:["Collecting duct","Final water reabsorption under ADH; carries concentrated urine toward the ureter."]
+  };
+  var excInfo=$("#excInfo");
+  function bindExc(){
+    $$('#mode-exc .hot').forEach(function(el){
+      el.addEventListener("click",function(){
+        var k=el.getAttribute("data-part");var d=excData[k];if(!d)return;
+        $$('#mode-exc .hot').forEach(function(x){x.classList.remove("sel");});
+        el.classList.add("sel");
+        excInfo.innerHTML="<h4>"+d[0]+"</h4><p>"+d[1]+"</p>";
+      });
+    });
+  }
+  bindExc();
+  $("#viewOrgan").addEventListener("click",function(){
+    this.classList.add("on");$("#viewNephron").classList.remove("on");
+    organSvg.classList.remove("hidden");nephronSvg.classList.add("hidden");
+  });
+  $("#viewNephron").addEventListener("click",function(){
+    this.classList.add("on");$("#viewOrgan").classList.remove("on");
+    nephronSvg.classList.remove("hidden");organSvg.classList.add("hidden");
+  });
+
+  /* urine formation animation on nephron */
+  var stages=[
+    {n:"Filtration",part:"glomerulus",txt:"Blood pressure forces water, glucose, salts, urea & amino acids from the glomerulus into Bowman's capsule. Cells & proteins remain in blood."},
+    {n:"Reabsorption",part:"pct",txt:"In the PCT, loop of Henle and DCT, useful substances — all glucose, most water and ions — are reabsorbed back into surrounding capillaries."},
+    {n:"Secretion",part:"dct",txt:"Extra H⁴, K⁴, ammonia and drugs are actively secreted from blood into the tubule to adjust blood composition."},
+    {n:"Excretion",part:"collect",txt:"The final concentrated urine flows through the collecting duct → ureter → bladder → out via the urethra."}
+  ];
+  var sb=$("#formStages");
+  stages.forEach(function(s,i){
+    var b=document.createElement("button");b.className="btn ghost";b.textContent=(i+1)+". "+s.n;
+    b.addEventListener("click",function(){setStage(i);});
+    sb.appendChild(b);
+  });
+  var curStage=-1, flowRaf=null, flowT=0;
+  function setStage(i){
+    curStage=i;var s=stages[i];
+    $$("#nephronSvg .hot").forEach(function(x){x.classList.remove("sel");});
+    $$('#nephronSvg .hot[data-part="'+s.part+'"]').forEach(function(x){x.classList.add("sel");});
+    excInfo.innerHTML="<h4>Stage "+(i+1)+": "+s.n+"</h4><p>"+s.txt+"</p>";
+    $$("#formStages button").forEach(function(b,j){b.classList.toggle("on",j===i);});
+    // ensure nephron view visible
+    $("#viewNephron").click();
+  }
+  var forming=false;
+  $("#formBtn").addEventListener("click",function(){
+    forming=!forming;
+    this.textContent=forming?"Stop animation":"Animate urine formation";
+    if(forming){$("#viewNephron").click();}
+  });
+  function flowFrame(){
+    if(forming){
+      flowT++;
+      if(flowT%90===0){setStage((curStage+1)%stages.length);}
+    }
+    flowRaf=requestAnimationFrame(flowFrame);
+  }
+  flowRaf=requestAnimationFrame(flowFrame);
+
+  /* ================= WASTES ================= */
+  var wastes=[
+    {id:"amm",tag:"Fish",title:"Ammonotelic",waste:"Ammonia (NH₃)",why:"Ammonia is highly toxic but very soluble. Aquatic animals live surrounded by water, so they can excrete it directly and dilute it instantly — no need to convert it to a safer form."},
+    {id:"ure",tag:"Mammals",title:"Ureotelic",waste:"Urea",why:"Land mammals (including humans) convert ammonia to urea in the liver (ornithine/urea cycle). Urea is much less toxic and needs only a moderate amount of water, excreted in urine."},
+    {id:"uric",tag:"Birds & reptiles",title:"Uricotelic",waste:"Uric acid",why:"Birds, reptiles and insects convert waste to uric acid — almost non-toxic and nearly insoluble. It is excreted as a semi-solid paste with very little water loss, valuable where water is scarce or for egg-laying."}
+  ];
+  var wc=$("#wasteCards"),wInfo=$("#wasteInfo");
+  wastes.forEach(function(w){
+    var d=document.createElement("div");d.className="card";d.tabIndex=0;
+    d.innerHTML="<span class='pill'>"+w.tag+"</span><h4>"+w.title+"</h4><p style='margin:0;font-size:.85rem'>Excretes <b>"+w.waste+"</b></p>";
+    function sel(){
+      $$("#wasteCards .card").forEach(function(x){x.classList.remove("sel");});
+      d.classList.add("sel");
+      wInfo.innerHTML="<h4>"+w.title+" &mdash; "+w.waste+"</h4><p>"+w.why+"</p>";
+    }
+    d.addEventListener("click",sel);
+    d.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sel();}});
+    wc.appendChild(d);
+  });
+
+  /* ================= QUIZ ================= */
+  var quiz=[
+    {q:"At which structure does gas exchange (O₂ in, CO₂ out) actually take place?",
+     o:["Trachea","Bronchi","Alveoli","Larynx"],a:2,
+     e:"Alveoli are thin-walled air sacs wrapped in capillaries, giving a huge surface for diffusion of O₂ and CO₂."},
+    {q:"During inhalation, the diaphragm...",
+     o:["relaxes and domes upward","contracts and flattens downward","stays completely still","secretes mucus"],a:1,
+     e:"Contracting and flattening the diaphragm increases thoracic volume, lowering pressure so air flows in."},
+    {q:"Which sequence correctly orders the three stages of urine formation?",
+     o:["Reabsorption → filtration → secretion","Filtration → reabsorption → secretion","Secretion → reabsorption → filtration","Filtration → secretion → reabsorption"],a:1,
+     e:"Blood is first filtered at the glomerulus, useful matter is then reabsorbed, and finally extra wastes are secreted into the tubule."},
+    {q:"A bony fish living in fresh water is mainly...",
+     o:["ureotelic (urea)","uricotelic (uric acid)","ammonotelic (ammonia)","non-excretory"],a:2,
+     e:"Aquatic fish excrete toxic ammonia directly because abundant surrounding water dilutes it at once."}
+  ];
+  var qUL=$("#quiz"),answered=0,correct=0;
+  quiz.forEach(function(item,qi){
+    var li=document.createElement("li");
+    var opts="<ul class='opts'>"+item.o.map(function(t,oi){return "<li data-q='"+qi+"' data-o='"+oi+"'>"+t+"</li>";}).join("")+"</ul>";
+    li.innerHTML="<div class='q'>"+(qi+1)+". "+item.q+"</div>"+opts+"<div class='explain' id='ex"+qi+"'></div>";
+    qUL.appendChild(li);
+  });
+  var done={};
+  $$("#quiz .opts li").forEach(function(li){
+    li.addEventListener("click",function(){
+      var qi=+li.getAttribute("data-q"),oi=+li.getAttribute("data-o");
+      if(done[qi])return;done[qi]=true;
+      var item=quiz[qi];
+      var lis=$$(".opts li",li.parentNode);
+      lis.forEach(function(x,i){
+        if(i===item.a)x.classList.add("correct");
+        if(i===oi&&oi!==item.a)x.classList.add("wrong");
+      });
+      var ex=$("#ex"+qi);ex.textContent=(oi===item.a?"Correct! ":"Not quite. ")+item.e;ex.classList.add("show");
+      answered++;if(oi===item.a)correct++;
+      $("#score").textContent="Score: "+correct+" / "+quiz.length+"  ("+answered+" answered)";
+    });
+  });
+
+  /* ================= pause on hidden ================= */
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden){
+      if(rafResp)cancelAnimationFrame(rafResp);rafResp=null;
+      if(flowRaf)cancelAnimationFrame(flowRaf);flowRaf=null;
+    }else{
+      if(!rafResp)rafResp=requestAnimationFrame(respFrame);
+      if(!flowRaf)flowRaf=requestAnimationFrame(flowFrame);
+    }
+  });
+})();
+</script>
+</body>
+</html>

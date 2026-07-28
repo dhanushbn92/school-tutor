@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locomotion &amp; Movement Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#f0883e;
+    --accent-dark:#d9701f;
+    --bg:#161b26;
+    --bg2:#1e2635;
+    --panel:#222c3d;
+    --panel2:#2a3547;
+    --ink:#e8edf4;
+    --muted:#9aa8bd;
+    --line:#33415a;
+    --good:#4cc38a;
+    --bad:#e5674b;
+    --radius:16px;
+    --shadow:0 8px 22px rgba(0,0,0,.32);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#22304a,#161b26 60%);
+    color:var(--ink);line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.45rem;margin:0 0 3px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:2px solid transparent;padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    box-shadow:var(--shadow);transition:.15s;text-align:center;
+  }
+  .tab:hover{color:var(--ink);}
+  .tab.active{color:#231405;background:var(--accent);border-color:var(--accent-dark);}
+  .panel{background:var(--panel);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:16px;margin-bottom:16px;border:1px solid var(--line);}
+  .hidden{display:none;}
+  h2{font-size:1.08rem;margin:0 0 10px;}
+  h3{font-size:.98rem;margin:14px 0 6px;color:var(--accent);}
+  .stage{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;}
+  .viz{flex:1 1 340px;min-width:280px;}
+  .side{flex:1 1 300px;min-width:260px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .btn{background:var(--accent);color:#231405;border:none;padding:9px 15px;
+    border-radius:10px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.15s;}
+  .btn:hover{background:var(--accent-dark);color:#fff;}
+  .btn:active{transform:translateY(1px);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:var(--accent);color:#231405;border-color:var(--accent-dark);}
+  .chip{display:inline-flex;gap:6px;flex-wrap:wrap;}
+  .chip button{background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+    padding:7px 11px;border-radius:20px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;}
+  .chip button.on{background:var(--accent);color:#231405;border-color:var(--accent-dark);}
+  .info{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;min-height:96px;}
+  .info h4{margin:0 0 5px;font-size:.98rem;color:var(--accent);}
+  .info p{margin:0;font-size:.88rem;color:var(--ink);}
+  .info .tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;color:var(--muted);background:var(--bg2);
+    padding:2px 8px;border-radius:6px;margin-bottom:6px;}
+  .facts{margin-top:12px;font-size:.85rem;color:var(--muted);}
+  .facts li{margin-bottom:5px;}
+  .hot{cursor:pointer;transition:.12s;}
+  .hot:hover{opacity:.82;}
+  .sel{stroke:#fff;stroke-width:2.4;stroke-dasharray:4 3;}
+  .lbl{font-size:11px;fill:var(--muted);pointer-events:none;}
+  .rng{width:100%;accent-color:var(--accent);}
+  .cards{display:flex;gap:12px;flex-wrap:wrap;}
+  .card{flex:1 1 220px;min-width:200px;background:var(--panel2);border:1px solid var(--line);
+    border-radius:14px;padding:14px;}
+  .card h4{margin:0 0 8px;font-size:.98rem;color:var(--accent);}
+  .card table{width:100%;border-collapse:collapse;font-size:.82rem;}
+  .card td{padding:4px 2px;border-bottom:1px solid var(--line);vertical-align:top;}
+  .card td:first-child{color:var(--muted);width:42%;}
+  .quiz{margin-top:6px;}
+  .q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;margin-bottom:12px;}
+  .q p.stem{margin:0 0 9px;font-weight:600;font-size:.9rem;}
+  .opt{display:block;width:100%;text-align:left;background:var(--bg2);color:var(--ink);
+    border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin-bottom:7px;
+    cursor:pointer;font-size:.86rem;transition:.12s;}
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(76,195,138,.18);border-color:var(--good);color:#c9f4dd;}
+  .opt.wrong{background:rgba(229,103,75,.16);border-color:var(--bad);color:#f6cabd;}
+  .expl{margin:6px 0 0;font-size:.82rem;color:var(--muted);display:none;}
+  .expl.show{display:block;}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:8px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block;}
+  .note{font-size:.8rem;color:var(--muted);margin-top:8px;}
+  footer{color:var(--muted);font-size:.78rem;text-align:center;padding:6px 0 18px;}
+  @media(max-width:420px){header h1{font-size:1.2rem;}.btn{padding:8px 12px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Locomotion &amp; Movement Lab</h1>
+    <p>NIOS Class 12 Biology &middot; Chapter 16 &mdash; explore the skeleton, joints, muscles and the sliding-filament mechanism.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-mode="skeleton">1 &middot; Skeletal System</button>
+    <button class="tab" data-mode="muscle">2 &middot; Muscles &amp; Sliding Filament</button>
+    <button class="tab" data-mode="types">3 &middot; Muscle Types</button>
+  </div>
+
+  <!-- ============ MODE 1: SKELETON ============ -->
+  <section class="panel" id="mode-skeleton">
+    <h2>The Human Skeleton &amp; Joints</h2>
+    <div class="chip" style="margin-bottom:12px">
+      <button class="jb" data-joint="none">Skeleton map</button>
+      <button class="jb" data-joint="ballsocket">Ball &amp; socket</button>
+      <button class="jb" data-joint="hinge">Hinge</button>
+      <button class="jb" data-joint="pivot">Pivot</button>
+      <button class="jb" data-joint="gliding">Gliding</button>
+    </div>
+    <div class="stage">
+      <div class="viz">
+        <!-- Skeleton SVG -->
+        <svg id="skelSvg" viewBox="0 0 260 420" role="img" aria-label="Human skeleton">
+          <rect x="0" y="0" width="260" height="420" fill="transparent"/>
+          <!-- axial: skull -->
+          <g class="hot" data-bone="skull" data-cat="Axial">
+            <ellipse cx="130" cy="40" rx="24" ry="28" fill="#e7eef7" stroke="#b7c4d6" stroke-width="1.5"/>
+            <path d="M118 52 q12 12 24 0" fill="none" stroke="#9fb0c6" stroke-width="1.4"/>
+          </g>
+          <!-- vertebral column -->
+          <g class="hot" data-bone="vertebral" data-cat="Axial">
+            <rect x="125" y="70" width="10" height="150" rx="5" fill="#e7eef7" stroke="#b7c4d6" stroke-width="1.4"/>
+            <line x1="122" y1="86" x2="138" y2="86" stroke="#9fb0c6"/>
+            <line x1="122" y1="104" x2="138" y2="104" stroke="#9fb0c6"/>
+            <line x1="122" y1="122" x2="138" y2="122" stroke="#9fb0c6"/>
+            <line x1="122" y1="140" x2="138" y2="140" stroke="#9fb0c6"/>
+            <line x1="122" y1="158" x2="138" y2="158" stroke="#9fb0c6"/>
+            <line x1="122" y1="176" x2="138" y2="176" stroke="#9fb0c6"/>
+            <line x1="122" y1="194" x2="138" y2="194" stroke="#9fb0c6"/>
+          </g>
+          <!-- ribs -->
+          <g class="hot" data-bone="ribs" data-cat="Axial">
+            <path d="M130 92 C96 96 90 118 96 140" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 104 C92 108 86 132 96 154" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 116 C90 122 86 148 98 168" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 128 C92 136 90 160 102 178" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 92 C164 96 170 118 164 140" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 104 C168 108 174 132 164 154" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 116 C170 122 174 148 162 168" fill="none" stroke="#e7eef7" stroke-width="4"/>
+            <path d="M130 128 C168 136 170 160 158 178" fill="none" stroke="#e7eef7" stroke-width="4"/>
+          </g>
+          <!-- pectoral girdle -->
+          <g class="hot" data-bone="pectoral" data-cat="Appendicular">
+            <line x1="96" y1="84" x2="164" y2="84" stroke="#e7eef7" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <!-- arms -->
+          <g class="hot" data-bone="arms" data-cat="Appendicular">
+            <line x1="96" y1="86" x2="78" y2="150" stroke="#e7eef7" stroke-width="5" stroke-linecap="round"/>
+            <line x1="78" y1="150" x2="70" y2="210" stroke="#e7eef7" stroke-width="4" stroke-linecap="round"/>
+            <line x1="164" y1="86" x2="182" y2="150" stroke="#e7eef7" stroke-width="5" stroke-linecap="round"/>
+            <line x1="182" y1="150" x2="190" y2="210" stroke="#e7eef7" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="68" cy="216" r="6" fill="#e7eef7"/>
+            <circle cx="192" cy="216" r="6" fill="#e7eef7"/>
+          </g>
+          <!-- pelvic girdle -->
+          <g class="hot" data-bone="pelvic" data-cat="Appendicular">
+            <path d="M108 224 q22 22 44 0 q4 16 -22 20 q-26 -4 -22 -20 Z" fill="#e7eef7" stroke="#b7c4d6" stroke-width="1.4"/>
+          </g>
+          <!-- legs -->
+          <g class="hot" data-bone="legs" data-cat="Appendicular">
+            <line x1="116" y1="250" x2="108" y2="330" stroke="#e7eef7" stroke-width="6" stroke-linecap="round"/>
+            <line x1="108" y1="330" x2="104" y2="404" stroke="#e7eef7" stroke-width="5" stroke-linecap="round"/>
+            <line x1="144" y1="250" x2="152" y2="330" stroke="#e7eef7" stroke-width="6" stroke-linecap="round"/>
+            <line x1="152" y1="330" x2="156" y2="404" stroke="#e7eef7" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="108" cy="330" r="6" fill="#e7eef7"/>
+            <circle cx="152" cy="330" r="6" fill="#e7eef7"/>
+          </g>
+        </svg>
+        <!-- Joint animation SVG (hidden until a joint chosen) -->
+        <svg id="jointSvg" class="hidden" viewBox="0 0 260 200" role="img" aria-label="Joint animation">
+          <rect width="260" height="200" fill="transparent"/>
+          <g id="jointStage"></g>
+        </svg>
+        <div class="legend">
+          <span><span class="sw" style="background:#f0883e"></span>Axial skeleton</span>
+          <span><span class="sw" style="background:#7fb2ff"></span>Appendicular skeleton</span>
+        </div>
+      </div>
+      <div class="side">
+        <div class="info" id="skelInfo">
+          <span class="tag">Tap a bone or joint</span>
+          <h4>The Human Skeleton</h4>
+          <p>206 bones grouped into the <b>axial</b> skeleton (skull, vertebral column, ribs, sternum &mdash; 80 bones) and the <b>appendicular</b> skeleton (limbs and their girdles &mdash; 126 bones). Tap any part to learn more, or pick a joint type above to watch it move.</p>
+        </div>
+        <ul class="facts">
+          <li>Bones store calcium &amp; phosphorus and house red marrow that makes blood cells.</li>
+          <li>A joint (articulation) is where two or more bones meet; freely movable ones are <b>synovial</b> joints.</li>
+          <li>Ligaments join bone to bone; tendons attach muscle to bone.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: MUSCLES ============ -->
+  <section class="panel hidden" id="mode-muscle">
+    <h2>Antagonistic Muscles &amp; the Sliding-Filament Theory</h2>
+    <div class="toolbar">
+      <button class="btn" id="armPlay">Pause</button>
+      <button class="btn ghost" id="armFlex">Flex</button>
+      <button class="btn ghost" id="armExtend">Extend</button>
+      <span class="note">Biceps &amp; triceps are an <b>antagonistic pair</b>.</span>
+    </div>
+    <div class="stage">
+      <div class="viz">
+        <svg id="armSvg" viewBox="0 0 260 240" role="img" aria-label="Arm with biceps and triceps">
+          <rect width="260" height="240" fill="transparent"/>
+          <!-- shoulder pivot -->
+          <circle cx="70" cy="50" r="7" fill="#cdd8e8"/>
+          <!-- upper arm (fixed) humerus -->
+          <line x1="70" y1="50" x2="70" y2="150" stroke="#e7eef7" stroke-width="8" stroke-linecap="round"/>
+          <!-- forearm group rotates around elbow (70,150) -->
+          <g id="forearm">
+            <line x1="70" y1="150" x2="70" y2="240" stroke="#e7eef7" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="70" cy="238" r="9" fill="#cdd8e8"/>
+          </g>
+          <!-- elbow joint -->
+          <circle cx="70" cy="150" r="6" fill="#aebdd2"/>
+          <!-- biceps (flexor, front) -->
+          <path id="biceps" d="M64 58 q-16 46 6 88" fill="none" stroke="#f0883e" stroke-width="12" stroke-linecap="round"/>
+          <!-- triceps (extensor, back) -->
+          <path id="triceps" d="M78 58 q18 44 -2 88" fill="none" stroke="#6f86ff" stroke-width="10" stroke-linecap="round"/>
+          <text x="16" y="96" class="lbl" fill="#f0883e">biceps</text>
+          <text x="120" y="96" class="lbl" fill="#6f86ff">triceps</text>
+        </svg>
+        <div class="legend">
+          <span><span class="sw" style="background:#f0883e"></span>Biceps (flexor) contracting</span>
+          <span><span class="sw" style="background:#6f86ff"></span>Triceps (extensor) relaxing</span>
+        </div>
+        <h3>Zoom: one sarcomere</h3>
+        <svg id="sarcSvg" viewBox="0 0 260 150" role="img" aria-label="Sarcomere sliding filaments">
+          <rect width="260" height="150" fill="transparent"/>
+          <g id="sarcStage"></g>
+        </svg>
+        <input class="rng" id="sarcRange" type="range" min="0" max="100" value="0" aria-label="Contraction level">
+        <div class="note">Drag to slide the filaments, or press Play to animate contraction.</div>
+      </div>
+      <div class="side">
+        <div class="info" id="muscleInfo">
+          <span class="tag">Sliding-filament theory</span>
+          <h4>How a muscle shortens</h4>
+          <p>A nerve impulse releases <b>Ca<sup>2+</sup></b> from the sarcoplasmic reticulum. Ca<sup>2+</sup> binds troponin, exposing binding sites on <b>actin</b>. <b>Myosin</b> heads form cross-bridges and, powered by <b>ATP</b>, pull the thin filaments toward the centre. The Z-lines are drawn closer and the sarcomere shortens &mdash; the filaments themselves do not shrink.</p>
+        </div>
+        <ul class="facts">
+          <li><b>Sarcomere</b> = functional unit, from one Z-line to the next.</li>
+          <li>On contraction the <b>H-zone</b> and <b>I-band</b> narrow; the A-band stays constant.</li>
+          <li>ATP is needed both to power the power-stroke <b>and</b> to detach myosin from actin (its absence causes rigor).</li>
+          <li>Antagonistic pair: when the biceps contracts the arm flexes; when the triceps contracts it extends.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: MUSCLE TYPES ============ -->
+  <section class="panel hidden" id="mode-types">
+    <h2>Three Types of Muscle</h2>
+    <div class="chip" style="margin-bottom:12px">
+      <button class="tb on" data-mt="skeletal">Skeletal</button>
+      <button class="tb" data-mt="smooth">Smooth</button>
+      <button class="tb" data-mt="cardiac">Cardiac</button>
+    </div>
+    <div class="stage">
+      <div class="viz">
+        <svg id="mtSvg" viewBox="0 0 260 170" role="img" aria-label="Muscle tissue structure">
+          <rect width="260" height="170" fill="transparent"/>
+          <g id="mtStage"></g>
+        </svg>
+        <div class="note" id="mtCaption">Long, cylindrical, striated fibres with many peripheral nuclei.</div>
+      </div>
+      <div class="side">
+        <div class="cards">
+          <div class="card" id="mtCard">
+            <h4 id="mtTitle">Skeletal muscle</h4>
+            <table>
+              <tr><td>Location</td><td id="mtLoc"></td></tr>
+              <tr><td>Cell shape</td><td id="mtShape"></td></tr>
+              <tr><td>Striations</td><td id="mtStr"></td></tr>
+              <tr><td>Nuclei</td><td id="mtNuc"></td></tr>
+              <tr><td>Control</td><td id="mtCtrl"></td></tr>
+              <tr><td>Contraction</td><td id="mtCon"></td></tr>
+            </table>
+          </div>
+        </div>
+        <ul class="facts">
+          <li><b>Voluntary</b> = under conscious control; <b>involuntary</b> = automatic (autonomic / self-generated).</li>
+          <li>Only cardiac muscle has <b>intercalated discs</b> that synchronise the heartbeat.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel">
+    <h2>Quick Check &mdash; 3 Questions</h2>
+    <div class="quiz" id="quiz"></div>
+  </section>
+
+  <footer>Locomotion &amp; Movement Lab &middot; self-contained interactive &middot; NIOS Class 12 Biology, Ch 16</footer>
+</div>
+
+<script>
+"use strict";
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s);};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+  var SVGNS="http://www.w3.org/2000/svg";
+  function el(n,a){var e=document.createElementNS(SVGNS,n);if(a)for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+  /* ---------- tab switching ---------- */
+  var modes={skeleton:$("#mode-skeleton"),muscle:$("#mode-muscle"),types:$("#mode-types")};
+  $$(".tab").forEach(function(t){
+    t.addEventListener("click",function(){
+      $$(".tab").forEach(function(x){x.classList.remove("active");});
+      t.classList.add("active");
+      var m=t.getAttribute("data-mode");
+      for(var k in modes){modes[k].classList.toggle("hidden",k!==m);}
+    });
+  });
+
+  /* ================= MODE 1: SKELETON ================= */
+  var boneData={
+    skull:{cat:"Axial",t:"Skull (cranium)",d:"22 bones enclosing and protecting the brain and forming the face. The cranial bones meet at immovable <b>sutures</b> (fibrous joints)."},
+    vertebral:{cat:"Axial",t:"Vertebral column",d:"33 vertebrae (7 cervical, 12 thoracic, 5 lumbar, 5 fused sacral, 4 fused coccygeal) form a flexible, protective canal around the spinal cord."},
+    ribs:{cat:"Axial",t:"Rib cage",d:"12 pairs of ribs join the thoracic vertebrae behind and (most) the sternum in front, forming a cage that protects the heart and lungs and aids breathing."},
+    pectoral:{cat:"Appendicular",t:"Pectoral girdle",d:"Clavicle + scapula anchor the arms to the axial skeleton. The glenoid cavity of the scapula forms a ball-and-socket joint with the humerus."},
+    arms:{cat:"Appendicular",t:"Forelimbs (arms)",d:"Humerus (upper arm) meets radius & ulna (forearm), then carpals, metacarpals and phalanges. The elbow is a hinge joint; the shoulder is ball-and-socket."},
+    pelvic:{cat:"Appendicular",t:"Pelvic girdle",d:"Two hip bones (ilium, ischium, pubis fused) connect the legs to the vertebral column and bear the body's weight. The acetabulum forms the hip ball-and-socket joint."},
+    legs:{cat:"Appendicular",t:"Hindlimbs (legs)",d:"Femur (thigh, the longest bone) meets tibia & fibula, then tarsals, metatarsals and phalanges. The knee is a hinge joint."}
+  };
+  var skelInfo=$("#skelInfo");
+  function showBone(name){
+    var b=boneData[name]; if(!b)return;
+    $$("#skelSvg .hot").forEach(function(g){g.classList.remove("sel");});
+    $$("#skelSvg .hot[data-bone='"+name+"']").forEach(function(g){g.classList.add("sel");});
+    skelInfo.innerHTML='<span class="tag">'+b.cat+' skeleton</span><h4>'+b.t+'</h4><p>'+b.d+'</p>';
+  }
+  $$("#skelSvg .hot").forEach(function(g){
+    g.addEventListener("click",function(){showBone(g.getAttribute("data-bone"));});
+    // colour appendicular bluish for legend
+    if(g.getAttribute("data-cat")==="Appendicular"){
+      $$("*",g).forEach(function(s){
+        if(s.getAttribute("stroke")==="#e7eef7")s.setAttribute("stroke","#cfe0ff");
+        if(s.getAttribute("fill")==="#e7eef7")s.setAttribute("fill","#cfe0ff");
+      });
+    }
+  });
+
+  /* ---- joints ---- */
+  var jointSvg=$("#jointSvg"), skelSvg=$("#skelSvg"), jointStage=$("#jointStage");
+  var jointData={
+    ballsocket:{t:"Ball-and-socket joint",eg:"Shoulder &amp; hip",d:"The rounded head of one bone fits into a cup of another, allowing movement in <b>all directions</b> (rotation + flexion/extension + abduction/adduction) &mdash; the most freely movable joint."},
+    hinge:{t:"Hinge joint",eg:"Elbow, knee &amp; fingers",d:"Allows movement in <b>one plane only</b>, like a door hinge &mdash; flexion and extension. No rotation."},
+    pivot:{t:"Pivot joint",eg:"Atlas-axis (neck), radius-ulna",d:"One bone rotates about another around a single axis &mdash; it lets you turn your head <b>side to side</b> to say 'no'."},
+    gliding:{t:"Gliding (plane) joint",eg:"Wrist &amp; ankle (carpals/tarsals)",d:"Flat or slightly curved surfaces <b>slide</b> over one another, giving small sliding movements in several directions."}
+  };
+  var jointAnimName=null, jointT=0;
+  function buildJoint(name){
+    jointStage.textContent="";
+    if(name==="ballsocket"){
+      jointStage.appendChild(el("path",{id:"j_socket",d:"M60 60 A70 70 0 0 0 60 160",fill:"none",stroke:"#cdd8e8","stroke-width":"14","stroke-linecap":"round"}));
+      jointStage.appendChild(el("circle",{id:"j_ball",cx:"90",cy:"110",r:"26",fill:"#f0883e"}));
+      jointStage.appendChild(el("line",{id:"j_bone",x1:"90",y1:"110",x2:"210",y2:"110",stroke:"#e7eef7","stroke-width":"12","stroke-linecap":"round"}));
+    }else if(name==="hinge"){
+      jointStage.appendChild(el("line",{x1:"130",y1:"30",x2:"130",y2:"110",stroke:"#e7eef7","stroke-width":"12","stroke-linecap":"round"}));
+      jointStage.appendChild(el("circle",{cx:"130",cy:"110",r:"10",fill:"#f0883e"}));
+      jointStage.appendChild(el("line",{id:"j_bone",x1:"130",y1:"110",x2:"130",y2:"190",stroke:"#e7eef7","stroke-width":"11","stroke-linecap":"round"}));
+    }else if(name==="pivot"){
+      jointStage.appendChild(el("line",{x1:"70",y1:"150",x2:"190",y2:"150",stroke:"#e7eef7","stroke-width":"12","stroke-linecap":"round"}));
+      jointStage.appendChild(el("circle",{cx:"130",cy:"150",r:"9",fill:"#cdd8e8"}));
+      jointStage.appendChild(el("g",{id:"j_bone"}));
+      var g=$("#j_bone");
+      g.appendChild(el("line",{x1:"130",y1:"150",x2:"130",y2:"60",stroke:"#f0883e","stroke-width":"10","stroke-linecap":"round"}));
+      g.appendChild(el("ellipse",{cx:"130",cy:"52",rx:"20",ry:"14",fill:"#f0883e"}));
+    }else if(name==="gliding"){
+      jointStage.appendChild(el("rect",{x:"40",y:"110",width:"180",height:"18",rx:"6",fill:"#cdd8e8"}));
+      jointStage.appendChild(el("rect",{id:"j_bone",x:"70",y:"84",width:"120",height:"18",rx:"6",fill:"#f0883e"}));
+    }
+  }
+  function chooseJoint(name){
+    $$(".jb").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-joint")===name);});
+    if(name==="none"){
+      jointSvg.classList.add("hidden"); skelSvg.classList.remove("hidden"); jointAnimName=null;
+      skelInfo.innerHTML='<span class="tag">Tap a bone or joint</span><h4>The Human Skeleton</h4><p>206 bones grouped into the <b>axial</b> skeleton and the <b>appendicular</b> skeleton. Tap any part, or pick a joint type to watch it move.</p>';
+      return;
+    }
+    skelSvg.classList.add("hidden"); jointSvg.classList.remove("hidden");
+    buildJoint(name); jointAnimName=name; jointT=0;
+    var j=jointData[name];
+    skelInfo.innerHTML='<span class="tag">'+j.eg+'</span><h4>'+j.t+'</h4><p>'+j.d+'</p>';
+  }
+  $$(".jb").forEach(function(b){b.addEventListener("click",function(){chooseJoint(b.getAttribute("data-joint"));});});
+
+  function animJoint(dt){
+    if(!jointAnimName)return;
+    jointT+=dt;
+    var s=Math.sin(jointT*1.6); // -1..1
+    var bone=$("#j_bone"); if(!bone)return;
+    if(jointAnimName==="ballsocket"){
+      var ang=s*40; bone.setAttribute("transform","rotate("+ang+" 90 110)");
+    }else if(jointAnimName==="hinge"){
+      var a=(Math.sin(jointT*1.6)*0.5+0.5)*80; // 0..80 one direction only
+      bone.setAttribute("transform","rotate("+(-a)+" 130 110)");
+    }else if(jointAnimName==="pivot"){
+      var r=s*55; bone.setAttribute("transform","rotate("+r+" 130 150)");
+    }else if(jointAnimName==="gliding"){
+      var x=s*28; bone.setAttribute("transform","translate("+x+",0)");
+    }
+  }
+
+  /* ================= MODE 2: MUSCLES ================= */
+  var forearm=$("#forearm"), biceps=$("#biceps"), triceps=$("#triceps");
+  var armPlaying=true, armDir=1, armAngle=0; // 0=extended(down) .. 130=flexed
+  var armPlayBtn=$("#armPlay");
+  armPlayBtn.addEventListener("click",function(){armPlaying=!armPlaying;armPlayBtn.textContent=armPlaying?"Pause":"Play";});
+  $("#armFlex").addEventListener("click",function(){armPlaying=false;armPlayBtn.textContent="Play";armDir=1;});
+  $("#armExtend").addEventListener("click",function(){armPlaying=false;armPlayBtn.textContent="Play";armDir=-1;});
+
+  function renderArm(){
+    // rotate forearm around elbow (70,150). Flexion raises forearm toward biceps.
+    forearm.setAttribute("transform","rotate("+(-armAngle)+" 70 150)");
+    var f=armAngle/130; // 0..1 flex fraction
+    // biceps thickens/shortens on flexion, triceps on extension
+    biceps.setAttribute("stroke-width",(9+f*7).toFixed(1));
+    triceps.setAttribute("stroke-width",(11-f*5).toFixed(1));
+  }
+
+  /* ---- sarcomere ---- */
+  var sarcStage=$("#sarcStage"), sarcRange=$("#sarcRange");
+  var sarcDrag=false;
+  function buildSarc(){
+    sarcStage.textContent="";
+    // static frame drawn once; dynamic parts get ids
+    var g=sarcStage;
+    // z-lines
+    g.appendChild(el("line",{id:"zL",x1:"30",y1:"25",x2:"30",y2:"125",stroke:"#e7eef7","stroke-width":"5"}));
+    g.appendChild(el("line",{id:"zR",x1:"230",y1:"25",x2:"230",y2:"125",stroke:"#e7eef7","stroke-width":"5"}));
+    g.appendChild(el("text",{id:"tZL",x:"22",y:"142",class:"lbl"})).textContent="Z";
+    g.appendChild(el("text",{id:"tZR",x:"224",y:"142",class:"lbl"})).textContent="Z";
+    // myosin (thick, centre) - fixed centre bundle
+    var myo=el("g",{id:"myo"}); g.appendChild(myo);
+    for(var y=45;y<=105;y+=20){
+      myo.appendChild(el("line",{x1:"95",y1:y,x2:"165",y2:y,stroke:"#6f86ff","stroke-width":"6","stroke-linecap":"round"}));
+    }
+    // actin thin filaments left and right (these slide)
+    var aL=el("g",{id:"actL"}), aR=el("g",{id:"actR"});
+    g.appendChild(aL); g.appendChild(aR);
+    for(var yy=38;yy<=112;yy+=37){
+      aL.appendChild(el("line",{x1:"30",y1:yy,x2:"110",y2:yy,stroke:"#f0883e","stroke-width":"3.5","stroke-linecap":"round"}));
+      aR.appendChild(el("line",{x1:"230",y1:yy,x2:"150",y2:yy,stroke:"#f0883e","stroke-width":"3.5","stroke-linecap":"round"}));
+    }
+    g.appendChild(el("text",{x:"112",y:"20",class:"lbl",fill:"#6f86ff"})).textContent="myosin (thick)";
+    g.appendChild(el("text",{x:"30",y:"20",class:"lbl",fill:"#f0883e"})).textContent="actin (thin)";
+  }
+  function renderSarc(c){ // c=0..1 contraction
+    var slide=c*26; // how far z-lines & actin move inward
+    $("#zL").setAttribute("transform","translate("+slide+",0)");
+    $("#zR").setAttribute("transform","translate("+(-slide)+",0)");
+    $("#tZL").setAttribute("transform","translate("+slide+",0)");
+    $("#tZR").setAttribute("transform","translate("+(-slide)+",0)");
+    $("#actL").setAttribute("transform","translate("+slide+",0)");
+    $("#actR").setAttribute("transform","translate("+(-slide)+",0)");
+  }
+  sarcRange.addEventListener("input",function(){
+    armPlaying=false; armPlayBtn.textContent="Play";
+    renderSarc(sarcRange.value/100);
+  });
+
+  /* ================= MODE 3: MUSCLE TYPES ================= */
+  var mtStage=$("#mtStage");
+  var mtData={
+    skeletal:{title:"Skeletal muscle",cap:"Long, cylindrical, unbranched, striated fibres with many nuclei pushed to the edge.",
+      loc:"Attached to bones (via tendons)",shape:"Long cylinders",str:"Striated (banded)",nuc:"Multinucleate, at the edge",ctrl:"Voluntary",con:"Rapid, powerful, tires quickly"},
+    smooth:{title:"Smooth muscle",cap:"Spindle-shaped cells, tapering at both ends, a single central nucleus, no striations.",
+      loc:"Walls of gut, blood vessels, iris, uterus",shape:"Spindle (tapered)",str:"Non-striated (smooth)",nuc:"Single, central",ctrl:"Involuntary (autonomic)",con:"Slow, sustained, tires slowly"},
+    cardiac:{title:"Cardiac muscle",cap:"Branched, striated fibres joined end-to-end by intercalated discs; one or two central nuclei.",
+      loc:"Wall of the heart (myocardium) only",shape:"Branched cylinders",str:"Striated",nuc:"One or two, central",ctrl:"Involuntary (myogenic)",con:"Rhythmic, never tires"}
+  };
+  function drawMuscle(type){
+    mtStage.textContent="";
+    var i, g=mtStage;
+    if(type==="skeletal"){
+      for(i=0;i<3;i++){
+        var y=30+i*45;
+        g.appendChild(el("rect",{x:"20",y:y-14,width:"220",height:"28",rx:"14",fill:"#3a4a63",stroke:"#f0883e","stroke-width":"1.5"}));
+        for(var x=32;x<236;x+=10){g.appendChild(el("line",{x1:x,y1:y-13,x2:x,y2:y+13,stroke:"#8aa0c4","stroke-width":"1.4"}));}
+        g.appendChild(el("circle",{cx:"34",cy:y-9,r:"3.4",fill:"#e7eef7"}));
+        g.appendChild(el("circle",{cx:"120",cy:y-9,r:"3.4",fill:"#e7eef7"}));
+        g.appendChild(el("circle",{cx:"210",cy:y-9,r:"3.4",fill:"#e7eef7"}));
+      }
+    }else if(type==="smooth"){
+      for(i=0;i<8;i++){
+        var cx=40+ (i%4)*55, cy=55+ Math.floor(i/4)*60;
+        var p=el("path",{d:"M"+(cx-30)+" "+cy+" Q"+cx+" "+(cy-16)+" "+(cx+30)+" "+cy+" Q"+cx+" "+(cy+16)+" "+(cx-30)+" "+cy+" Z",fill:"#3a4a63",stroke:"#f0883e","stroke-width":"1.5"});
+        g.appendChild(p);
+        g.appendChild(el("ellipse",{cx:cx,cy:cy,rx:"6",ry:"4",fill:"#e7eef7"}));
+      }
+    }else if(type==="cardiac"){
+      for(i=0;i<3;i++){
+        var yy=35+i*45;
+        g.appendChild(el("rect",{x:"20",y:yy-13,width:"90",height:"26",rx:"12",fill:"#3a4a63",stroke:"#f0883e","stroke-width":"1.5"}));
+        g.appendChild(el("rect",{x:"118",y:yy-13,width:"120",height:"26",rx:"12",fill:"#3a4a63",stroke:"#f0883e","stroke-width":"1.5"}));
+        // intercalated disc (dark step line between)
+        g.appendChild(el("line",{x1:"114",y1:yy-13,x2:"114",y2:yy+13,stroke:"#ffd27f","stroke-width":"3"}));
+        for(var xx=30;xx<232;xx+=10){if(xx>108&&xx<120)continue;g.appendChild(el("line",{x1:xx,y1:yy-12,x2:xx,y2:yy+12,stroke:"#8aa0c4","stroke-width":"1.3"}));}
+        g.appendChild(el("circle",{cx:"64",cy:yy,r:"3.6",fill:"#e7eef7"}));
+        g.appendChild(el("circle",{cx:"175",cy:yy,r:"3.6",fill:"#e7eef7"}));
+      }
+      g.appendChild(el("text",{x:"120",y:"162",class:"lbl",fill:"#ffd27f"})).textContent="intercalated disc";
+    }
+  }
+  function showMt(type){
+    var d=mtData[type];
+    $$(".tb").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-mt")===type);});
+    drawMuscle(type);
+    $("#mtCaption").textContent=d.cap;
+    $("#mtTitle").textContent=d.title;
+    $("#mtLoc").innerHTML=d.loc; $("#mtShape").innerHTML=d.shape; $("#mtStr").innerHTML=d.str;
+    $("#mtNuc").innerHTML=d.nuc; $("#mtCtrl").innerHTML=d.ctrl; $("#mtCon").innerHTML=d.con;
+  }
+  $$(".tb").forEach(function(b){b.addEventListener("click",function(){showMt(b.getAttribute("data-mt"));});});
+
+  /* ================= QUIZ ================= */
+  var quiz=[
+    {q:"Which movement is possible ONLY at a ball-and-socket joint, not at a hinge joint?",
+     opts:["Flexion","Extension","Rotation in all directions","Locking straight"],a:2,
+     e:"Ball-and-socket joints (shoulder, hip) allow movement in every plane including rotation; a hinge joint (elbow, knee) moves in one plane only."},
+    {q:"During muscle contraction, which band or zone does NOT change in width?",
+     opts:["The I-band","The H-zone","The A-band","The sarcomere"],a:2,
+     e:"The A-band equals the length of the thick (myosin) filaments, which do not shorten. The I-band, H-zone and whole sarcomere all narrow as actin slides inward."},
+    {q:"Which feature is unique to cardiac muscle?",
+     opts:["Striations","Spindle-shaped cells","Intercalated discs","Multiple peripheral nuclei"],a:2,
+     e:"Intercalated discs join cardiac fibres end-to-end and synchronise contraction. Striations also occur in skeletal muscle; spindle cells are smooth muscle."}
+  ];
+  var quizBox=$("#quiz");
+  quiz.forEach(function(item,qi){
+    var d=document.createElement("div"); d.className="q";
+    var p=document.createElement("p"); p.className="stem"; p.textContent=(qi+1)+". "+item.q; d.appendChild(p);
+    item.opts.forEach(function(o,oi){
+      var b=document.createElement("button"); b.className="opt"; b.textContent=o;
+      b.addEventListener("click",function(){
+        if(d.getAttribute("data-done"))return;
+        d.setAttribute("data-done","1");
+        $$(".opt",d).forEach(function(x,xi){
+          if(xi===item.a)x.classList.add("correct");
+          else if(xi===oi)x.classList.add("wrong");
+          x.disabled=true;
+        });
+        $(".expl",d).classList.add("show");
+      });
+      d.appendChild(b);
+    });
+    var ex=document.createElement("p"); ex.className="expl";
+    ex.innerHTML="<b>"+item.opts[item.a]+".</b> "+item.e; d.appendChild(ex);
+    quizBox.appendChild(d);
+  });
+
+  /* ================= ANIMATION LOOP ================= */
+  var last=0;
+  function loop(ts){
+    var dt=(ts-last)/1000; if(!last)dt=0; last=ts;
+    if(dt>0.1)dt=0.1;
+    if(!document.hidden){
+      // joint animation
+      animJoint(dt);
+      // arm + sarcomere linked
+      if(armPlaying){
+        armAngle+=armDir*70*dt;
+        if(armAngle>=130){armAngle=130;armDir=-1;}
+        if(armAngle<=0){armAngle=0;armDir=1;}
+      }else{
+        // ease toward target when using flex/extend buttons
+        var target=armDir>0?130:0;
+        armAngle+=(target-armAngle)*Math.min(1,dt*4);
+        if(Math.abs(target-armAngle)<0.4)armAngle=target;
+      }
+      renderArm();
+      var c=armAngle/130;
+      if(!sarcDrag){ sarcRange.value=Math.round(c*100); }
+      renderSarc(c);
+    }
+    requestAnimationFrame(loop);
+  }
+
+  /* init */
+  buildSarc(); renderSarc(0);
+  buildJoint("hinge"); // preload something (hidden)
+  jointSvg.classList.add("hidden");
+  showMt("skeletal");
+  renderArm();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

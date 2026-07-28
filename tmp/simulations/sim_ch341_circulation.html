@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circulation Lab - NIOS Class 12 Biology</title>
+<style>
+  :root{
+    --accent:#ff6b81;
+    --accent-2:#ff8fa3;
+    --bg:#141a24;
+    --bg2:#1b2330;
+    --panel:#1f2836;
+    --panel2:#26313f;
+    --ink:#e7edf5;
+    --muted:#93a2b6;
+    --line:#324055;
+    --oxy:#ff5c72;
+    --deoxy:#5b8def;
+    --good:#3fbf82;
+    --bad:#ff6b81;
+    --radius:16px;
+    --shadow:0 8px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#20293a,#141a24);
+    color:var(--ink);line-height:1.55;-webkit-text-size-adjust:100%;
+    min-height:100vh;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:16px;}
+  header h1{font-size:1.45rem;margin:0 0 3px;letter-spacing:.2px;}
+  header p{margin:0 0 14px;color:var(--muted);font-size:.9rem;}
+  .accent{color:var(--accent-2);}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .tab{
+    flex:1 1 auto;min-width:130px;background:var(--panel);
+    border:1px solid var(--line);padding:11px 12px;border-radius:12px;
+    cursor:pointer;font-size:.9rem;font-weight:600;color:var(--muted);
+    transition:.15s;text-align:center;
+  }
+  .tab:hover{border-color:var(--accent);color:var(--ink);}
+  .tab.active{color:#fff;background:linear-gradient(160deg,var(--accent),#e0475d);border-color:var(--accent);box-shadow:var(--shadow);}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px;}
+  .hidden{display:none;}
+  .row{display:flex;gap:16px;flex-wrap:wrap;}
+  .col-svg{flex:1 1 340px;min-width:280px;}
+  .col-side{flex:1 1 260px;min-width:240px;}
+  svg{width:100%;height:auto;display:block;touch-action:manipulation;}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .btn{
+    background:linear-gradient(160deg,var(--accent),#e0475d);color:#fff;border:none;
+    padding:9px 15px;border-radius:10px;font-weight:600;cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn.ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);}
+  .btn.ghost.on{background:linear-gradient(160deg,var(--accent),#e0475d);border-color:var(--accent);color:#fff;}
+  .info{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .info h3{margin:0 0 6px;font-size:1.05rem;color:var(--accent-2);}
+  .info p{margin:0 0 6px;font-size:.9rem;}
+  .info .hint{color:var(--muted);font-style:italic;}
+  .hot{cursor:pointer;transition:.15s;}
+  .hot:hover{opacity:.85;}
+  .hot.sel{stroke:#fff;stroke-width:2.5;stroke-dasharray:5 3;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin-top:10px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
+  .phase-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-weight:700;font-size:.82rem;background:var(--panel2);border:1px solid var(--line);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px;}
+  .card h4{margin:0 0 6px;font-size:.98rem;display:flex;align-items:center;gap:8px;}
+  .card p{margin:0;font-size:.85rem;color:var(--muted);}
+  .swatch{width:14px;height:14px;border-radius:4px;display:inline-block;flex:none;}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);}
+  th{color:var(--muted);font-weight:600;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.74rem;font-weight:700;}
+  .pill.yes{background:rgba(63,191,130,.18);color:var(--good);}
+  .pill.no{background:rgba(255,107,129,.18);color:var(--bad);}
+  select{
+    background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+    border-radius:10px;padding:9px 10px;font-size:.9rem;font-weight:600;min-width:90px;
+  }
+  .field{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);}
+  .result-box{margin-top:14px;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);font-size:.92rem;}
+  .facts{margin-top:6px;}
+  .facts li{margin-bottom:7px;font-size:.88rem;}
+  .quiz-q{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+  .quiz-q:last-child{border-bottom:none;}
+  .qtext{font-weight:600;margin-bottom:10px;font-size:.95rem;}
+  .options{display:grid;gap:8px;}
+  .opt{
+    text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:10px 12px;border-radius:10px;cursor:pointer;font-size:.88rem;transition:.15s;
+  }
+  .opt:hover{border-color:var(--accent);}
+  .opt.correct{background:rgba(63,191,130,.16);border-color:var(--good);color:#c9f5df;}
+  .opt.wrong{background:rgba(255,107,129,.16);border-color:var(--bad);color:#ffd6dd;}
+  .explain{margin-top:8px;font-size:.83rem;color:var(--muted);display:none;}
+  .explain.show{display:block;}
+  .vessel-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .vt{flex:1 1 auto;min-width:90px;padding:8px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;font-weight:600;font-size:.85rem;text-align:center;color:var(--muted);}
+  .vt.on{background:linear-gradient(160deg,var(--accent),#e0475d);color:#fff;border-color:var(--accent);}
+  .bp-readout{font-size:1.4rem;font-weight:800;color:var(--accent-2);}
+  label.sld{font-size:.82rem;color:var(--muted);display:block;margin:8px 0 3px;}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .foot{color:var(--muted);font-size:.78rem;text-align:center;margin:8px 0 24px;}
+  text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>&#10084;&#65039; Circulation <span class="accent">Lab</span></h1>
+    <p>NIOS Class 12 Biology &middot; Ch 15 &mdash; Circulation of Body Fluids</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <div class="tab active" data-tab="heart" role="tab">Human Heart</div>
+    <div class="tab" data-tab="blood" role="tab">Blood Components</div>
+    <div class="tab" data-tab="vessel" role="tab">Vessels &amp; Pressure</div>
+    <div class="tab" data-tab="quiz" role="tab">Quiz</div>
+  </div>
+
+  <!-- ============ HEART ============ -->
+  <section class="panel" id="tab-heart">
+    <div class="controls">
+      <button class="btn" id="playBtn">&#10073;&#10073; Pause</button>
+      <button class="btn ghost on" id="flowBtn">Blood flow</button>
+      <span class="phase-badge" id="phaseBadge">Diastole</span>
+    </div>
+    <div class="row">
+      <div class="col-svg">
+        <svg viewBox="0 0 400 380" id="heartSvg" role="img" aria-label="Labeled human heart">
+          <defs>
+            <linearGradient id="oxyG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ff7a8c"/><stop offset="1" stop-color="#e0475d"/>
+            </linearGradient>
+            <linearGradient id="deoxyG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#6a9bf0"/><stop offset="1" stop-color="#3f6fd1"/>
+            </linearGradient>
+          </defs>
+          <!-- great vessels -->
+          <path d="M150 40 q-6 40 6 70" stroke="#3f6fd1" stroke-width="16" fill="none" class="hot" id="v_vc"/>
+          <path d="M205 26 q4 44 -6 78" stroke="#e0475d" stroke-width="14" fill="none" class="hot" id="v_aorta"/>
+          <path d="M235 60 q10 20 -4 46" stroke="#5b8def" stroke-width="12" fill="none" class="hot" id="v_pa"/>
+          <path d="M300 96 q-24 4 -44 12" stroke="#e0475d" stroke-width="9" fill="none" class="hot" id="v_pv"/>
+
+          <!-- Right atrium (deoxygenated) -->
+          <path id="ra" class="hot" fill="url(#deoxyG)" stroke="#22314a" stroke-width="2"
+            d="M120 95 q-40 -6 -46 40 q-4 40 40 46 q40 4 44 -30 l-2 -50 q-16 -6 -36 -6 z"/>
+          <!-- Left atrium (oxygenated) -->
+          <path id="la" class="hot" fill="url(#oxyG)" stroke="#4a1f28" stroke-width="2"
+            d="M244 96 q46 -4 52 42 q2 40 -42 46 q-38 2 -42 -30 l2 -50 q14 -8 30 -8 z"/>
+          <!-- Right ventricle (deoxygenated) -->
+          <path id="rv" class="hot" fill="url(#deoxyG)" stroke="#22314a" stroke-width="2"
+            d="M118 190 q-30 6 -30 70 q0 46 62 54 q34 4 44 -14 l-2 -108 q-30 -8 -74 -2 z"/>
+          <!-- Left ventricle (oxygenated) - thicker wall -->
+          <path id="lv" class="hot" fill="url(#oxyG)" stroke="#4a1f28" stroke-width="5"
+            d="M204 188 q64 -4 82 60 q10 60 -50 78 q-40 6 -46 -18 l2 -112 q6 -8 12 -8 z"/>
+
+          <!-- septum -->
+          <line x1="188" y1="120" x2="196" y2="300" stroke="#141a24" stroke-width="6" opacity=".55"/>
+
+          <!-- valves -->
+          <g id="valves">
+            <line id="tri" x1="132" y1="176" x2="176" y2="176" stroke="#ffd34d" stroke-width="5" stroke-linecap="round" class="hot"/>
+            <line id="bic" x1="212" y1="176" x2="256" y2="176" stroke="#ffd34d" stroke-width="5" stroke-linecap="round" class="hot"/>
+            <line id="psl" x1="228" y1="112" x2="248" y2="112" stroke="#7bd88f" stroke-width="5" stroke-linecap="round" class="hot"/>
+            <line id="asl" x1="196" y1="96" x2="214" y2="98" stroke="#7bd88f" stroke-width="5" stroke-linecap="round" class="hot"/>
+          </g>
+
+          <!-- blood dots -->
+          <g id="dots"></g>
+
+          <!-- labels -->
+          <g fill="#c7d4e6" font-size="11">
+            <text x="150" y="34" text-anchor="middle">Vena cava</text>
+            <text x="205" y="20" text-anchor="middle">Aorta</text>
+            <text x="252" y="58" text-anchor="start">Pulmonary artery</text>
+            <text x="304" y="96" text-anchor="start">Pulm. vein</text>
+            <text x="86" y="118" text-anchor="middle" fill="#9fc0ff">RA</text>
+            <text x="270" y="120" text-anchor="middle" fill="#ffb3bf">LA</text>
+            <text x="120" y="256" text-anchor="middle" fill="#9fc0ff">RV</text>
+            <text x="238" y="256" text-anchor="middle" fill="#ffb3bf">LV</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--deoxy)"></span> Deoxygenated (right)</span>
+          <span><span class="dot" style="background:var(--oxy)"></span> Oxygenated (left)</span>
+          <span><span class="dot" style="background:#ffd34d"></span> AV valves</span>
+          <span><span class="dot" style="background:#7bd88f"></span> Semilunar</span>
+        </div>
+      </div>
+      <div class="col-side">
+        <div class="info" id="heartInfo">
+          <h3>Tap a part</h3>
+          <p class="hint">Tap any chamber, valve, or vessel on the heart to read its role. Watch the beating cycle and the double-circulation path.</p>
+        </div>
+        <div class="info" style="margin-top:12px;">
+          <h3>Double circulation</h3>
+          <p><b>Pulmonary circuit:</b> RV &rarr; pulmonary artery &rarr; lungs &rarr; pulmonary vein &rarr; LA (picks up O&#8322;).</p>
+          <p><b>Systemic circuit:</b> LV &rarr; aorta &rarr; body &rarr; vena cava &rarr; RA (delivers O&#8322;).</p>
+          <p class="hint">Blood passes through the heart twice per full loop &mdash; oxygenated and deoxygenated blood never mix.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BLOOD ============ -->
+  <section class="panel hidden" id="tab-blood">
+    <div class="grid2">
+      <div class="card"><h4><span class="swatch" style="background:#e0475d"></span>Red Blood Cells (RBC)</h4><p>Biconcave, no nucleus (mammals). Carry O&#8322; via haemoglobin; ~5 million/mm&sup3;; live ~120 days. Made in red bone marrow.</p></div>
+      <div class="card"><h4><span class="swatch" style="background:#f2f2f2"></span>White Blood Cells (WBC)</h4><p>Nucleated defence cells; ~7000/mm&sup3;. Neutrophils/monocytes phagocytose; lymphocytes make antibodies (immunity).</p></div>
+      <div class="card"><h4><span class="swatch" style="background:#b98edb"></span>Platelets (Thrombocytes)</h4><p>Cell fragments; ~2.5 lakh/mm&sup3;. Trigger clotting to seal wounds and stop bleeding.</p></div>
+      <div class="card"><h4><span class="swatch" style="background:#ffe08a"></span>Plasma</h4><p>~55% of blood; straw-coloured fluid (90% water). Carries proteins, nutrients, hormones, wastes, CO&#8322; and heat.</p></div>
+    </div>
+
+    <h3 class="accent" style="margin:18px 0 6px;">Blood groups &amp; transfusion tool</h3>
+    <p style="font-size:.86rem;color:var(--muted);margin:0 0 12px;">ABO group = antigen on RBC. Rh&#8314; has D-antigen. A safe transfusion means the <b>recipient's plasma antibodies must not attack the donor's RBC antigens.</b></p>
+    <div class="row">
+      <div class="col-side" style="flex:1 1 200px;">
+        <div class="grid2" style="grid-template-columns:1fr 1fr;">
+          <label class="field">Donor group
+            <select id="donor">
+              <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+              <option>B-</option><option>B+</option><option>AB-</option><option selected>AB+</option>
+            </select>
+          </label>
+          <label class="field">Recipient group
+            <select id="recip">
+              <option>O-</option><option selected>O+</option><option>A-</option><option>A+</option>
+              <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+            </select>
+          </label>
+        </div>
+        <div class="result-box" id="transfuseResult">Choose donor &amp; recipient to check compatibility.</div>
+      </div>
+      <div class="col-side" style="flex:1 1 260px;">
+        <table>
+          <thead><tr><th>Group</th><th>Antigen</th><th>Antibody</th></tr></thead>
+          <tbody>
+            <tr><td>A</td><td>A</td><td>anti-B</td></tr>
+            <tr><td>B</td><td>B</td><td>anti-A</td></tr>
+            <tr><td>AB</td><td>A &amp; B</td><td>none <span class="pill yes">universal recipient</span></td></tr>
+            <tr><td>O</td><td>none</td><td>anti-A, anti-B <span class="pill yes">universal donor</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VESSELS ============ -->
+  <section class="panel hidden" id="tab-vessel">
+    <div class="vessel-tabs">
+      <div class="vt on" data-v="artery">Artery</div>
+      <div class="vt" data-v="vein">Vein</div>
+      <div class="vt" data-v="capillary">Capillary</div>
+    </div>
+    <div class="row">
+      <div class="col-svg">
+        <svg viewBox="0 0 400 240" id="vesselSvg" role="img" aria-label="Blood vessel cross-section">
+          <ellipse id="vOuter" cx="200" cy="120" rx="150" ry="95" fill="#33202a" stroke="#e0475d" stroke-width="18"/>
+          <ellipse id="vMid" cx="200" cy="120" rx="118" ry="70" fill="#3a2530" stroke="#c96" stroke-width="10"/>
+          <ellipse id="vLumen" cx="200" cy="120" rx="88" ry="48" fill="#2a1720"/>
+          <g id="vBlood"></g>
+          <text id="vLabel" x="200" y="126" text-anchor="middle" fill="#ffd6dd" font-size="15" font-weight="700">Artery</text>
+        </svg>
+      </div>
+      <div class="col-side">
+        <div class="info" id="vesselInfo"></div>
+      </div>
+    </div>
+
+    <h3 class="accent" style="margin:16px 0 6px;">Blood pressure &amp; pulse</h3>
+    <div class="row">
+      <div class="col-side" style="flex:1 1 240px;">
+        <div class="info">
+          <p>BP is the force of blood on artery walls, written as <b>systolic/diastolic</b> mm Hg. Normal adult &asymp; <b>120/80</b>.</p>
+          <p class="hint">Pulse = the artery expanding with each ventricular systole; resting rate ~72 beats/min.</p>
+        </div>
+      </div>
+      <div class="col-side" style="flex:1 1 240px;">
+        <div class="info">
+          <div class="bp-readout" id="bpReadout">120 / 80</div>
+          <div style="font-size:.8rem;color:var(--muted);" id="bpStatus">Normal</div>
+          <label class="sld">Systolic <span id="sysVal">120</span> mm Hg</label>
+          <input type="range" id="sysSld" min="90" max="180" value="120">
+          <label class="sld">Diastolic <span id="diaVal">80</span> mm Hg</label>
+          <input type="range" id="diaSld" min="50" max="120" value="80">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="panel hidden" id="tab-quiz">
+    <h3 class="accent" style="margin-top:0;">Quick check &mdash; tap an answer</h3>
+    <div id="quizHolder"></div>
+  </section>
+
+  <div class="foot">Self-contained interactive &middot; animation pauses when tab is hidden</div>
+</div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- Tabs ----------
+  var tabs = document.querySelectorAll('.tab');
+  var sections = {heart:'tab-heart', blood:'tab-blood', vessel:'tab-vessel', quiz:'tab-quiz'};
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active');
+      var key = t.getAttribute('data-tab');
+      for(var k in sections){
+        document.getElementById(sections[k]).classList.toggle('hidden', k!==key);
+      }
+    });
+  });
+
+  // ---------- Heart info ----------
+  var heartInfo = document.getElementById('heartInfo');
+  var HEART = {
+    ra:['Right Atrium','Receives deoxygenated blood from the body via the superior & inferior vena cava, then pumps it into the right ventricle through the tricuspid valve.'],
+    la:['Left Atrium','Receives oxygenated blood from the lungs via the pulmonary veins, then sends it to the left ventricle through the bicuspid (mitral) valve.'],
+    rv:['Right Ventricle','Pumps deoxygenated blood to the lungs through the pulmonary artery. Thinner wall (low-pressure pulmonary circuit).'],
+    lv:['Left Ventricle','Pumps oxygenated blood to the whole body via the aorta. Thickest muscular wall &mdash; generates the highest pressure (systemic circuit).'],
+    tri:['Tricuspid Valve','Right atrioventricular valve (3 cusps). Prevents backflow from right ventricle to right atrium during systole.'],
+    bic:['Bicuspid / Mitral Valve','Left atrioventricular valve (2 cusps). Stops backflow from left ventricle to left atrium.'],
+    psl:['Pulmonary Semilunar Valve','Guards the base of the pulmonary artery; stops blood returning to the right ventricle.'],
+    asl:['Aortic Semilunar Valve','Guards the base of the aorta; prevents backflow into the left ventricle when it relaxes.'],
+    v_vc:['Vena Cava','Largest veins; return oxygen-poor blood from the body to the right atrium.'],
+    v_aorta:['Aorta','Largest artery; carries oxygen-rich blood from the left ventricle to the whole body.'],
+    v_pa:['Pulmonary Artery','The only artery carrying deoxygenated blood &mdash; from right ventricle to the lungs.'],
+    v_pv:['Pulmonary Vein','The only vein carrying oxygenated blood &mdash; from lungs to the left atrium.']
+  };
+  var selEl=null;
+  Object.keys(HEART).forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', function(){
+      if(selEl) selEl.classList.remove('sel');
+      el.classList.add('sel'); selEl=el;
+      heartInfo.innerHTML='<h3>'+HEART[id][0]+'</h3><p>'+HEART[id][1]+'</p>';
+    });
+  });
+
+  // ---------- Cardiac cycle animation ----------
+  var svgNS='http://www.w3.org/2000/svg';
+  var dotsG=document.getElementById('dots');
+  var rv=document.getElementById('rv'), lv=document.getElementById('lv');
+  var ra=document.getElementById('ra'), la=document.getElementById('la');
+  var phaseBadge=document.getElementById('phaseBadge');
+  var playing=true, showFlow=true, t=0;
+
+  // path of blood dots: deoxy loop (RA->RV->PA) & oxy loop (LA->LV->Aorta)
+  var deoxyPath=[[100,130],[112,175],[120,240],[150,280],[210,120],[235,80]]; // RA->RV->lungs(PA)
+  var oxyPath=[[262,150],[230,140],[220,200],[240,270],[205,120],[205,40]]; // LA->LV->aorta
+  var dots=[];
+  function makeDot(color, off, path){
+    var c=document.createElementNS(svgNS,'circle');
+    c.setAttribute('r','4'); c.setAttribute('fill',color); c.setAttribute('opacity','.9');
+    dotsG.appendChild(c);
+    dots.push({el:c, off:off, path:path});
+  }
+  for(var i=0;i<6;i++){ makeDot('#6a9bf0', i/6, deoxyPath); }
+  for(var j=0;j<6;j++){ makeDot('#ff7a8c', j/6, oxyPath); }
+
+  function lerpPath(path, u){
+    // u in [0,1) across the whole polyline
+    var seg=path.length-1;
+    var f=u*seg; var i=Math.floor(f)%seg; var lt=f-Math.floor(f);
+    var a=path[i], b=path[i+1];
+    return [a[0]+(b[0]-a[0])*lt, a[1]+(b[1]-a[1])*lt];
+  }
+
+  var playBtn=document.getElementById('playBtn');
+  playBtn.addEventListener('click', function(){
+    playing=!playing;
+    playBtn.innerHTML = playing ? '&#10073;&#10073; Pause' : '&#9654; Play';
+  });
+  var flowBtn=document.getElementById('flowBtn');
+  flowBtn.addEventListener('click', function(){
+    showFlow=!showFlow;
+    flowBtn.classList.toggle('on',showFlow);
+    dotsG.style.display = showFlow ? '' : 'none';
+  });
+
+  var last=performance.now();
+  function frame(now){
+    var dt=(now-last)/1000; last=now;
+    if(playing && !document.hidden){
+      t += dt*0.55; // ~one beat per ~1.8s
+      var cyc = t % 1; // 0..1 one cardiac cycle
+      // systole: ventricles contract (scale down) roughly cyc 0.15-0.5
+      var systole = cyc>0.12 && cyc<0.5;
+      var vScale = systole ? 0.93 : 1.0;
+      var aScale = systole ? 1.0 : 0.95; // atria contract in early diastole/atrial systole
+      rv.setAttribute('transform','translate(160 260) scale('+vScale+') translate(-160 -260)');
+      lv.setAttribute('transform','translate(240 260) scale('+vScale+') translate(-240 -260)');
+      ra.setAttribute('transform','translate(105 130) scale('+aScale+') translate(-105 -130)');
+      la.setAttribute('transform','translate(262 130) scale('+aScale+') translate(-262 -130)');
+      phaseBadge.textContent = systole ? 'Systole (ventricles contract)' : 'Diastole (heart relaxes, fills)';
+      phaseBadge.style.color = systole ? '#ff8fa3' : '#9fc0ff';
+      // move dots
+      if(showFlow){
+        for(var k=0;k<dots.length;k++){
+          var d=dots[k];
+          var u=(t*0.6 + d.off)%1;
+          var p=lerpPath(d.path, u);
+          d.el.setAttribute('cx',p[0].toFixed(1));
+          d.el.setAttribute('cy',p[1].toFixed(1));
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  document.addEventListener('visibilitychange', function(){ last=performance.now(); });
+
+  // ---------- Transfusion tool ----------
+  var ABO={ 'O':{anti:['A','B'],ag:[]}, 'A':{anti:['B'],ag:['A']}, 'B':{anti:['A'],ag:['B']}, 'AB':{anti:[],ag:['A','B']} };
+  function parse(g){
+    var rh=g.slice(-1); var abo=g.slice(0,-1);
+    return {abo:abo, rh:rh};
+  }
+  function checkTransfusion(donor, recip){
+    var d=parse(donor), r=parse(recip);
+    // recipient antibodies must not meet donor antigens
+    var reasons=[];
+    ABO[r.abo].anti.forEach(function(ab){
+      if(ABO[d.abo].ag.indexOf(ab)>=0) reasons.push('recipient anti-'+ab+' attacks donor '+ab+' antigen');
+    });
+    // Rh: Rh- recipient cannot receive Rh+ donor
+    if(r.rh==='-' && d.rh==='+') reasons.push('Rh&#8722; recipient reacts to Rh&#8314; (D) antigen');
+    return reasons;
+  }
+  var donorSel=document.getElementById('donor'), recipSel=document.getElementById('recip');
+  var tbox=document.getElementById('transfuseResult');
+  function updateTransfusion(){
+    var reasons=checkTransfusion(donorSel.value, recipSel.value);
+    if(reasons.length===0){
+      tbox.innerHTML='<b style="color:var(--good)">&#10003; Compatible</b><br>'+donorSel.value+' &rarr; '+recipSel.value+' is a safe transfusion. No antibody&ndash;antigen clash.';
+      tbox.style.borderColor='var(--good)';
+    } else {
+      tbox.innerHTML='<b style="color:var(--bad)">&#10007; Incompatible</b><br>'+donorSel.value+' &rarr; '+recipSel.value+' would agglutinate: '+reasons.join('; ')+'.';
+      tbox.style.borderColor='var(--bad)';
+    }
+  }
+  donorSel.addEventListener('change', updateTransfusion);
+  recipSel.addEventListener('change', updateTransfusion);
+  updateTransfusion();
+
+  // ---------- Vessels ----------
+  var VESSEL={
+    artery:{label:'Artery', outer:'#e0475d', mid:'#cc9966', lumenRx:78, lumenRy:40, wall:18,
+      info:'<h3>Artery</h3><p>Carries blood <b>away</b> from the heart, usually oxygenated (except pulmonary artery).</p><p><b>Thick, elastic, muscular walls</b> withstand high pressure. Narrow lumen; <b>no valves</b> (except at heart exits). Blood flows in spurts &mdash; you feel this as a pulse.</p>'},
+    vein:{label:'Vein', outer:'#5b8def', mid:'#3f6fd1', lumenRx:100, lumenRy:60, wall:9,
+      info:'<h3>Vein</h3><p>Carries blood <b>toward</b> the heart, usually deoxygenated (except pulmonary vein).</p><p><b>Thin walls, large lumen</b>, low pressure. Has <b>valves</b> that prevent backflow so blood moves against gravity back to the heart.</p>'},
+    capillary:{label:'Capillary', outer:'#b98edb', mid:'#b98edb', lumenRx:30, lumenRy:18, wall:3,
+      info:'<h3>Capillary</h3><p>Microscopic vessels connecting arterioles to venules.</p><p>Wall is a <b>single cell layer thick</b> (endothelium). This is where <b>exchange of O&#8322;, CO&#8322;, nutrients and wastes</b> happens between blood and tissues.</p>'}
+  };
+  var vOuter=document.getElementById('vOuter'), vMid=document.getElementById('vMid'),
+      vLumen=document.getElementById('vLumen'), vLabel=document.getElementById('vLabel'),
+      vesselInfo=document.getElementById('vesselInfo'), vBlood=document.getElementById('vBlood');
+  var vDots=[];
+  for(var vi=0; vi<10; vi++){
+    var c=document.createElementNS(svgNS,'circle');
+    c.setAttribute('r','5'); c.setAttribute('fill','#e0475d'); c.setAttribute('opacity','.85');
+    vBlood.appendChild(c);
+    vDots.push({el:c, off:Math.random()});
+  }
+  var curVessel='artery';
+  function setVessel(v){
+    curVessel=v;
+    var V=VESSEL[v];
+    vOuter.setAttribute('stroke',V.outer);
+    vOuter.setAttribute('stroke-width',V.wall);
+    vMid.setAttribute('stroke',V.mid);
+    vMid.setAttribute('rx', V.lumenRx+22); vMid.setAttribute('ry', V.lumenRy+18);
+    vLumen.setAttribute('rx', V.lumenRx); vLumen.setAttribute('ry', V.lumenRy);
+    vLabel.textContent=V.label;
+    vesselInfo.innerHTML=V.info;
+    document.querySelectorAll('.vt').forEach(function(x){ x.classList.toggle('on', x.getAttribute('data-v')===v); });
+  }
+  document.querySelectorAll('.vt').forEach(function(x){
+    x.addEventListener('click', function(){ setVessel(x.getAttribute('data-v')); });
+  });
+  setVessel('artery');
+
+  // vessel blood animation (reuse main loop clock via own rAF-lite counter)
+  function vesselFrame(){
+    if(!document.hidden && !document.getElementById('tab-vessel').classList.contains('hidden')){
+      var V=VESSEL[curVessel];
+      for(var i=0;i<vDots.length;i++){
+        var d=vDots[i];
+        d.off=(d.off+0.004)%1;
+        var x=112 + d.off*176;
+        var y=120 + (Math.sin(d.off*6.28+i)*V.lumenRy*0.3);
+        d.el.setAttribute('cx',x.toFixed(1));
+        d.el.setAttribute('cy',y.toFixed(1));
+        d.el.setAttribute('fill', curVessel==='vein' ? '#6a9bf0' : (curVessel==='capillary' ? '#c78ae0' : '#ff7a8c'));
+        d.el.style.display = (x>112+V.lumenRx*2||Math.abs(y-120)>V.lumenRy) ? 'none':'';
+      }
+    }
+    requestAnimationFrame(vesselFrame);
+  }
+  requestAnimationFrame(vesselFrame);
+
+  // ---------- Blood pressure ----------
+  var sysSld=document.getElementById('sysSld'), diaSld=document.getElementById('diaSld');
+  var bpReadout=document.getElementById('bpReadout'), bpStatus=document.getElementById('bpStatus');
+  var sysVal=document.getElementById('sysVal'), diaVal=document.getElementById('diaVal');
+  function updateBP(){
+    var s=+sysSld.value, d=+diaSld.value;
+    sysVal.textContent=s; diaVal.textContent=d;
+    bpReadout.textContent=s+' / '+d;
+    var status, col;
+    if(s<90||d<60){status='Low (hypotension)';col='#9fc0ff';}
+    else if(s<=120 && d<=80){status='Normal';col='var(--good)';}
+    else if(s<=139 || d<=89){status='Elevated / pre-high';col='#ffd34d';}
+    else{status='High (hypertension)';col='var(--bad)';}
+    bpStatus.textContent=status; bpStatus.style.color=col;
+    bpReadout.style.color=col;
+  }
+  sysSld.addEventListener('input',updateBP);
+  diaSld.addEventListener('input',updateBP);
+  updateBP();
+
+  // ---------- Quiz ----------
+  var QUIZ=[
+    {q:'Which chamber has the thickest muscular wall and why?',
+     opts:['Right atrium &mdash; it receives blood from lungs','Left ventricle &mdash; it pumps blood to the whole body','Right ventricle &mdash; it pumps to the aorta','Left atrium &mdash; it stores oxygenated blood'],
+     ans:1, ex:'The left ventricle drives the high-pressure systemic circuit, so its wall is thickest.'},
+    {q:'Which valve prevents backflow from the left ventricle to the left atrium?',
+     opts:['Tricuspid valve','Aortic semilunar valve','Bicuspid (mitral) valve','Pulmonary semilunar valve'],
+     ans:2, ex:'The bicuspid/mitral valve is the left atrioventricular valve with two cusps.'},
+    {q:'A person with blood group O&#8722; is called a universal donor because their RBCs have:',
+     opts:['Both A and B antigens','A antigen only','No A, B or Rh(D) antigens','Rh antigen only'],
+     ans:2, ex:'O&#8722; cells carry no A, B or D antigens, so no recipient antibody attacks them.'}
+  ];
+  var holder=document.getElementById('quizHolder');
+  QUIZ.forEach(function(item, qi){
+    var wrap=document.createElement('div'); wrap.className='quiz-q';
+    var qt=document.createElement('div'); qt.className='qtext'; qt.innerHTML=(qi+1)+'. '+item.q;
+    wrap.appendChild(qt);
+    var opts=document.createElement('div'); opts.className='options';
+    var answered=false;
+    item.opts.forEach(function(o, oi){
+      var b=document.createElement('button'); b.className='opt'; b.innerHTML=o;
+      b.addEventListener('click', function(){
+        if(answered) return; answered=true;
+        if(oi===item.ans){ b.classList.add('correct'); }
+        else{ b.classList.add('wrong'); opts.children[item.ans].classList.add('correct'); }
+        ex.classList.add('show');
+      });
+      opts.appendChild(b);
+    });
+    wrap.appendChild(opts);
+    var ex=document.createElement('div'); ex.className='explain'; ex.innerHTML='&#128161; '+item.ex;
+    wrap.appendChild(ex);
+    holder.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
