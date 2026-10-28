@@ -37,7 +37,7 @@ import { cn } from "@/lib/utils";
  * the point. Smaller badges (in the dashboard strip, for example)
  * omit the ribbon and the surrounding metadata so they fit inline.
  */
-export interface StampBadgeProps {
+interface StampBadgeProps {
   kind: StampKind;
   size?: "xs" | "sm" | "md" | "lg";
   /** Show the tagline ribbon under the badge. Defaults to false. */
@@ -81,10 +81,10 @@ export function StampBadge({
   locked = false,
   className,
 }: StampBadgeProps) {
+  const id = useId();
   const meta = STAMP_PRESENTATION[kind];
   if (!meta) return null;
   const Icon = ICONS[meta.iconName] ?? Trophy;
-  const id = useId();
 
   // Tier-specific palette adjustments. The base hue comes from the brand
   // colour assigned to the stamp; we layer a lighter highlight at the

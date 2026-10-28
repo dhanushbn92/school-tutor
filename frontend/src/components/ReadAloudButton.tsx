@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
  * the chapter" affordances.
  */
 
-export interface ReadAloudButtonProps {
+interface ReadAloudButtonProps {
   text: string;
   /** BCP 47 lang tag for the text. Defaults to "en-IN". */
   lang?: string;

@@ -10,7 +10,7 @@ import type { IPureNode } from "markmap-common";
  *     these for chapters where multi-level structure is genuinely
  *     useful, and this component will render the depth automatically).
  */
-export type MindMapDetail = string | MindMapNode;
+type MindMapDetail = string | MindMapNode;
 
 /**
  * Interactive mind-map view, powered by `markmap-view` (the same

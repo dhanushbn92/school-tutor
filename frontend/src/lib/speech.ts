@@ -57,7 +57,7 @@ export function useVoices(): SpeechSynthesisVoice[] {
  *   3. Any default voice on the system.
  *  Returns null when no voices are available yet — caller should
  *  fall back to letting the browser pick. */
-export function pickVoice(
+function pickVoice(
   voices: SpeechSynthesisVoice[],
   lang: string,
   preferredUri: string | null,
@@ -82,7 +82,7 @@ export function pickVoice(
 }
 
 
-export interface UseSpeechOptions {
+interface UseSpeechOptions {
   /** BCP 47 language tag, e.g. "en-IN", "hi-IN". Defaults to "en-IN". */
   lang?: string;
   /** Override the user's preferred voice URI for this utterance. */
@@ -256,7 +256,7 @@ export function playStruggleSuccessChime(): void {
 const SOUNDS_STORAGE_KEY = "dhananjaya.sounds_enabled";
 
 
-export function getSoundsEnabled(): boolean {
+function getSoundsEnabled(): boolean {
   if (typeof window === "undefined") return true;
   const raw = window.localStorage.getItem(SOUNDS_STORAGE_KEY);
   // Default ON — the chimes are short and pleasant. Users who want
@@ -266,7 +266,7 @@ export function getSoundsEnabled(): boolean {
 }
 
 
-export function setSoundsEnabled(value: boolean): void {
+function setSoundsEnabled(value: boolean): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(SOUNDS_STORAGE_KEY, String(value));
   // Custom storage event so other tabs / siblings re-read.

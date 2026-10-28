@@ -37,7 +37,7 @@ export type StampIconName =
   | "Sun"
   | "ClipboardCheck";
 
-export interface StampDesign {
+interface StampDesign {
   label: string;
   color: string;
   description: string;

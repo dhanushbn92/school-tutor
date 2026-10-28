@@ -16,7 +16,7 @@ import type { SchoolClass, Subject } from "@/lib/types";
  * Used to scope Curriculum / Learn / Content pickers so a Class 10 student
  * doesn't see Class 12 material (or vice versa) in the dropdowns.
  */
-export function useLearnerOwnClassLevel(): {
+function useLearnerOwnClassLevel(): {
   classLevel: number | undefined;
   isLoading: boolean;
 } {

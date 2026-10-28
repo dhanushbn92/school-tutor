@@ -19,9 +19,9 @@ import { useEffect, useState } from "react";
  * accessibility kit and the hooks all share an opt-out pattern.
  */
 
-export type FontPreference = "default" | "dyslexia-friendly";
-export type ContrastPreference = "default" | "high";
-export type TouchPreference = "default" | "large";
+type FontPreference = "default" | "dyslexia-friendly";
+type ContrastPreference = "default" | "high";
+type TouchPreference = "default" | "large";
 
 const STORAGE_KEYS = {
   font: "dhananjaya.a11y.font",
@@ -143,7 +143,7 @@ export function useTouchPreference(): [TouchPreference, (v: TouchPreference) => 
 
 /* --- Take-a-break nudge ----------------------------------------- */
 
-export function getBreakNudgeEnabled(): boolean {
+function getBreakNudgeEnabled(): boolean {
   if (typeof window === "undefined") return true;
   const raw = window.localStorage.getItem(STORAGE_KEYS.breakNudge);
   // Default ON — learners benefit from the prompt; those who don't

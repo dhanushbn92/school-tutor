@@ -38,7 +38,7 @@ export const SelectTrigger = forwardRef<
 ));
 SelectTrigger.displayName = "SelectTrigger";
 
-export const SelectScrollUpButton = forwardRef<
+const SelectScrollUpButton = forwardRef<
   ElementRef<typeof SelectPrimitive.ScrollUpButton>,
   ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
 >(({ className, ...props }, ref) => (
@@ -55,7 +55,7 @@ export const SelectScrollUpButton = forwardRef<
 ));
 SelectScrollUpButton.displayName = "SelectScrollUpButton";
 
-export const SelectScrollDownButton = forwardRef<
+const SelectScrollDownButton = forwardRef<
   ElementRef<typeof SelectPrimitive.ScrollDownButton>,
   ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
 >(({ className, ...props }, ref) => (

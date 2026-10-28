@@ -11,5 +11,3 @@ export const VALID_BOARDS = [
   "State Board",
   "Other",
 ] as const;
-
-export type Board = (typeof VALID_BOARDS)[number];

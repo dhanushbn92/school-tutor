@@ -51,7 +51,6 @@ interface PositionedNode extends FlowNode {
  *  Nodes within the same rank are spread evenly horizontally. */
 export function FlowDiagram({ data }: { data: FlowDiagramData }) {
   const { positioned, edgesWithPath, width, height } = useMemo(() => {
-    const byId = new Map(data.nodes.map((n) => [n.id, n]));
     const outgoing = new Map<string, string[]>();
     const incoming = new Map<string, string[]>();
     for (const n of data.nodes) {
@@ -152,8 +151,6 @@ export function FlowDiagram({ data }: { data: FlowDiagramData }) {
     });
 
     return { positioned, edgesWithPath, width, height };
-    // byId is referenced in dev only; suppress unused warning by reading it.
-    void byId;
   }, [data]);
 
   return (
