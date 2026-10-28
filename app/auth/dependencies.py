@@ -23,6 +23,15 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
+    # A token carrying a `scope` claim is issued for one narrow purpose (for
+    # example a smart-speaker test session) and must never act as a login.
+    if claims.get("scope"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This token cannot be used to sign in.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     user_id_raw = claims.get("sub")
     if not user_id_raw:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Malformed token")

@@ -44,6 +44,17 @@ class Settings(BaseSettings):
     anthropic_api_key: str | None = None
     anthropic_default_model: str = "claude-sonnet-4-5"
 
+    # Smart-speaker / voice integration (public device API). A single shared
+    # secret gates every /smart-speaker call (sent as the X-API-Key header),
+    # and the calling device identifies the learner with X-User-Email. Leave
+    # unset to keep the surface disabled (endpoints return 503). This is the
+    # least-secure auth model — a leaked key exposes every user whose email is
+    # known — so rotate it if it leaks and prefer per-device tokens later.
+    smart_speaker_api_key: str | None = None
+    # Lifetime of a stateless turn-by-turn test session token (minted at
+    # tests/start, replayed on tests/answer). Long enough for one sitting.
+    smart_speaker_session_ttl_minutes: int = 240
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     @property

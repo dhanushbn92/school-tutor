@@ -15,6 +15,7 @@ from app.api.routes import (
     platform,
     questions,
     schools,
+    smart_speaker,
 )
 from app.core.config import get_settings
 from app.db.base import Base
@@ -57,6 +58,7 @@ def create_app() -> FastAPI:
     app.include_router(ai_chat.router)
     app.include_router(ai_chat.admin_router)
     app.include_router(platform.router)
+    app.include_router(smart_speaker.router)
     return app
 
 
