@@ -25,9 +25,8 @@ import {
   Palette,
   type LucideIcon,
 } from "lucide-react";
-import type { CSSProperties } from "react";
 
-export type SubjectThemeKey =
+type SubjectThemeKey =
   | "math"
   | "science"
   | "social"
@@ -47,9 +46,17 @@ const SUBJECT_GROUPS: Record<Exclude<SubjectThemeKey, "default">, string[]> = {
     "computer science",
     "informatics practices",
     "ict",
+    "data entry operations",
+    "data entry operations (deo)",
+    "statistics",
+    "applied mathematics",
   ],
   science: [
     "science",
+    "science and technology",
+    "science & technology",
+    "environmental science",
+    "environmental studies",
     "physics",
     "chemistry",
     "biology",
@@ -78,6 +85,8 @@ const SUBJECT_GROUPS: Record<Exclude<SubjectThemeKey, "default">, string[]> = {
   indian: ["hindi", "sanskrit", "urdu"],
   arts: [
     "arts",
+    "painting",
+    "indian culture and heritage",
     "fine art",
     "sangeet",
     "vocational education",
@@ -103,7 +112,7 @@ export function subjectTheme(name: string | null | undefined): SubjectThemeKey {
 }
 
 /** Lucide icon glyph paired with each theme. Picked to read at 16–24 px. */
-export function subjectIcon(theme: SubjectThemeKey): LucideIcon {
+function subjectIcon(theme: SubjectThemeKey): LucideIcon {
   switch (theme) {
     case "math":
       return Calculator;
@@ -124,24 +133,19 @@ export function subjectIcon(theme: SubjectThemeKey): LucideIcon {
 }
 
 /**
- * Inline-style helper that exposes the theme's tokens as generic CSS custom
- * properties — `--theme`, `--theme-foreground`, `--theme-soft`. Components
- * can use these via inline `style` attributes (most reliable) or via
- * Tailwind v4 arbitrary-property syntax like `bg-(--theme)` (works only
- * when the cascade brings the variable down — prefer inline style for
- * consistent rendering).
- *
- * @example
- *   const t = subjectTheme(subject.name);
- *   <div style={{ background: subjectVar(t) }}>{subject.name}</div>
+ * Static theme-to-icon lookup. Rendering `const Icon = SUBJECT_ICONS[theme]`
+ * keeps React's compiler lint happy (calling `subjectIcon()` in a component
+ * body reads as creating a component during render).
  */
-export function subjectStyle(theme: SubjectThemeKey): CSSProperties {
-  return {
-    ["--theme" as string]: `var(--color-subject-${theme})`,
-    ["--theme-foreground" as string]: `var(--color-subject-${theme}-foreground)`,
-    ["--theme-soft" as string]: `var(--color-subject-${theme}-soft)`,
-  };
-}
+export const SUBJECT_ICONS: Record<SubjectThemeKey, LucideIcon> = {
+  math: subjectIcon("math"),
+  science: subjectIcon("science"),
+  social: subjectIcon("social"),
+  english: subjectIcon("english"),
+  indian: subjectIcon("indian"),
+  arts: subjectIcon("arts"),
+  default: subjectIcon("default"),
+};
 
 /**
  * Direct CSS-var reference for the theme's vivid colour. Use in inline
@@ -160,27 +164,4 @@ export function subjectVarForeground(theme: SubjectThemeKey): string {
 /** Very light tinted variant — for pale page backgrounds and soft chips. */
 export function subjectVarSoft(theme: SubjectThemeKey): string {
   return `var(--color-subject-${theme}-soft)`;
-}
-
-/** Human label for the theme — useful for "Math · Science · Languages"
- *  groupings if we ever add a tabbed subject browser. Not used yet but kept
- *  here so the helper stays the single source of truth for subject UX. */
-export function subjectThemeLabel(theme: SubjectThemeKey): string {
-  switch (theme) {
-    case "math":
-      return "Math & Computing";
-    case "science":
-      return "Science & Health";
-    case "social":
-      return "Social Sciences";
-    case "english":
-      return "English";
-    case "indian":
-      return "Indian Languages";
-    case "arts":
-      return "Arts & Vocational";
-    case "default":
-    default:
-      return "General";
-  }
 }
