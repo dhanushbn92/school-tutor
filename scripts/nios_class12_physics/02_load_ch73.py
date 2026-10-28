@@ -6,7 +6,6 @@ Run:
     PYTHONPATH=. .venv/Scripts/python.exe scripts/nios_class12_physics/02_load_ch73.py
 """
 
-from pathlib import Path
 
 from app.db.session import SessionLocal
 from app.models.curriculum import BloomLevel

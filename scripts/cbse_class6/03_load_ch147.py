@@ -138,7 +138,7 @@ def main() -> None:
             db.add(LearningOutcome(chapter_id=CHAPTER_ID, topic_id=topic_id_by_name.get(o["topic_name"]),
                 code=o["code"], description=o["description"], bloom_level=o["bloom"]))
         db.commit()
-        print(f"[ok] topics + outcomes inserted")
+        print("[ok] topics + outcomes inserted")
 
         outcome_map = {r.code: r.id for r in db.scalars(select(LearningOutcome).where(LearningOutcome.chapter_id == CHAPTER_ID)).all()}
         questions_data = json.loads((DATA_DIR / f"{PREFIX}_questions.json").read_text(encoding="utf-8"))["questions"]

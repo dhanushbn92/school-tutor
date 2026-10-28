@@ -13,7 +13,6 @@ Run:
 
 from __future__ import annotations
 
-from sqlalchemy import select
 
 from app.db.session import SessionLocal
 from app.llm.schemas.simulation import SimulationOutput

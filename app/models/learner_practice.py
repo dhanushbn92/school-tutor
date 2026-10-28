@@ -283,9 +283,7 @@ class LearnerAudioPreferences(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), index=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     autoplay_questions: Mapped[bool] = mapped_column(Boolean, default=False)
     # Free-form URI from SpeechSynthesisVoice.voiceURI. Null means
     # "use the browser default for the text's language".
@@ -319,9 +317,7 @@ class LearnerMascotState(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), index=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     current_outfit: Mapped[str] = mapped_column(String(40), default="default")
     created_at: Mapped[datetime] = mapped_column(

@@ -10,7 +10,7 @@ Usage:
 from sqlalchemy import select
 
 from app.db.session import SessionLocal
-from app.models.curriculum import BloomLevel, Book, Chapter, LearningOutcome
+from app.models.curriculum import BloomLevel, Book, LearningOutcome
 
 
 CHAPTER_CODE_PREFIX = {

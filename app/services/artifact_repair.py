@@ -26,7 +26,6 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.llm.schemas.chapter_summary import ChapterSummaryOutput
 from app.llm.schemas.diagram import DiagramOutput
 from app.llm.schemas.lesson_plan import LessonPlanOutput
 from app.llm.schemas.ppt import PPTOutlineOutput

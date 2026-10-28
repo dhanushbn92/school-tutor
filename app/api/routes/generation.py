@@ -43,7 +43,6 @@ from app.rendering.simulation_html import render_simulation_html
 from pydantic import BaseModel, ValidationError
 from app.services.artifact_repair import (
     ArtifactRepairError,
-    EXTENSION_FOR_TYPE,
     rerender_from_output_json,
 )
 from app.services.artifact_store import get_artifact_store

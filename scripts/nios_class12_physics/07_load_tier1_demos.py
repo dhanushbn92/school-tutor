@@ -17,9 +17,7 @@ Run:
     PYTHONPATH=. .venv/Scripts/python.exe scripts/nios_class12_physics/07_load_tier1_demos.py
 """
 
-import json
 from datetime import datetime, timezone
-from pathlib import Path
 
 from sqlalchemy import select
 

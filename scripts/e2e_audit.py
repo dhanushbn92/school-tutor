@@ -13,7 +13,6 @@ Writes a report to scripts/e2e_audit_report.txt.
 
 from __future__ import annotations
 
-import json
 import sys
 import traceback
 from collections import Counter, defaultdict
@@ -21,7 +20,6 @@ from pathlib import Path
 from typing import Any
 
 from sqlalchemy import select, func, text
-from sqlalchemy.exc import SQLAlchemyError
 
 REPORT_PATH = Path(__file__).parent / "e2e_audit_report.txt"
 REPORT_LINES: list[str] = []
@@ -52,7 +50,7 @@ def section(title: str) -> None:
 
 def main() -> int:
     from app.db.session import SessionLocal
-    from app.models.curriculum import SchoolClass, Subject, Book, Chapter, Topic, LearningOutcome
+    from app.models.curriculum import Topic, LearningOutcome
     from app.models.question import Question, QuestionType
     from app.models.generation import GeneratedContent, GeneratedContentType
     from app.llm.schemas.chapter_summary import ChapterSummaryOutput
@@ -118,7 +116,7 @@ def main() -> int:
                 buckets[key].append((cid, cnum, title, book_title))
 
         w(f"\nFully loaded chapters:           {len(loaded_chapter_ids)}")
-        w(f"  (full_text + topics + questions + blobs)")
+        w("  (full_text + topics + questions + blobs)")
         w(f"Text-only (full_text uploaded but no topics/questions/blobs): {len(text_only_chapter_ids)}")
         w(f"Scaffold-only (placeholder full_text):                        {len(scaffold_chapter_ids)}")
         w(f"Total chapters:                  {len(loaded_chapter_ids) + len(text_only_chapter_ids) + len(scaffold_chapter_ids)}")
@@ -243,7 +241,7 @@ def main() -> int:
         w(f"  schema FAIL:               {schema_fail}")
         w(f"  rows with status=FAILED:   {schema_skipped_failed}  (skipped)")
         w(f"  rows of unmapped type:     {schema_unknown_type}  (skipped)")
-        w(f"  by type:")
+        w("  by type:")
         for t, n in sorted(per_type.items()):
             w(f"    {t}: {n}")
 

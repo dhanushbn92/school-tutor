@@ -33,7 +33,6 @@ import argparse
 import json
 import logging
 import re
-from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select, update

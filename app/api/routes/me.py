@@ -9,7 +9,6 @@ from app.auth.dependencies import (
     get_current_user,
     require_learner,
     require_parent,
-    require_teacher_or_school_admin,
 )
 from app.db.session import get_db
 from app.models import LearnerAudioPreferences, LearnerMascotState
@@ -34,7 +33,6 @@ from app.schemas.assessment import AssessmentRead
 from app.schemas.intervention import InterventionNoteRead
 from app.schemas.school import SectionRead, StudentRead, TeacherSubjectsRead
 from app.services import (
-    analytics_service,
     assessment_service,
     intervention_service,
     learner_mistake_service,

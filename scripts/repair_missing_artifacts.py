@@ -21,7 +21,6 @@ from app.db.session import SessionLocal
 from app.models.generation import (
     GeneratedContent,
     GeneratedContentStatus,
-    GeneratedContentType,
 )
 from app.services.artifact_repair import (
     ArtifactRepairError,

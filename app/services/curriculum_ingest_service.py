@@ -53,7 +53,6 @@ from app.models.curriculum import (
     Topic,
 )
 from app.models.generation import (
-    GeneratedContent,
     GeneratedContentStatus,
     GeneratedContentType,
 )

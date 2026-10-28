@@ -1,7 +1,7 @@
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
-from app.models.curriculum import Book, Chapter, LearningOutcome, SchoolClass, Subject, Topic
+from app.models.curriculum import Book, Chapter, SchoolClass, Subject, Topic
 
 
 def list_classes(db: Session) -> list[SchoolClass]:

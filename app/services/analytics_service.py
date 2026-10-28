@@ -10,11 +10,10 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.assessment import (
     Assessment,
-    AssessmentStatus,
     Submission,
     SubmissionStatus,
 )
-from app.models.curriculum import Book, Chapter, LearningOutcome, SchoolClass, Subject, Topic
+from app.models.curriculum import Book, Chapter, SchoolClass, Subject, Topic
 from app.models.mastery import CognitiveBucket, SkillMastery
 from app.models.school import (
     Enrollment,

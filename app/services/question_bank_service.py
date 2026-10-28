@@ -6,12 +6,11 @@ generation, so quiz delivery is a pure DB read + random draw.
 """
 import random
 from collections import Counter, defaultdict
-from typing import Sequence
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models.curriculum import BloomLevel, LearningOutcome
+from app.models.curriculum import LearningOutcome
 from app.models.mastery import CognitiveBucket
 from app.models.question import (
     Question,

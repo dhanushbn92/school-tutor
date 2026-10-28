@@ -32,15 +32,6 @@ _AUTO_TYPES = {
 }
 
 
-def is_auto_gradable(question_type: QuestionType) -> bool:
-    return question_type in _AUTO_TYPES
-
-
-def is_subjective(question_type: QuestionType) -> bool:
-    """Subjective = student self-evaluates; the platform won't score it."""
-    return question_type not in _AUTO_TYPES
-
-
 def auto_grade(
     question: Question, answer_text: str | None, max_marks: int
 ) -> tuple[int | None, bool, dict[str, Any] | None]:

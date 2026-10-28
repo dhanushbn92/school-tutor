@@ -3,7 +3,6 @@
 import hashlib, json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 from sqlalchemy import select
 from app.db.session import SessionLocal
 from app.llm.schemas.chapter_summary import ChapterSummaryOutput

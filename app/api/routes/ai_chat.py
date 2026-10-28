@@ -17,7 +17,7 @@ from app.auth.dependencies import (
     require_platform_admin,
 )
 from app.db.session import get_db
-from app.models.ai_chat import ChatMessage, ChatScope, ChatSession
+from app.models.ai_chat import ChatScope, ChatSession
 from app.models.school import Student, User
 from app.services import ai_chat_service
 from app.services.ai_chat_service import (

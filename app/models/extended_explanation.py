@@ -26,7 +26,6 @@ from enum import StrEnum
 from sqlalchemy import (
     DateTime,
     ForeignKey,
-    Integer,
     String,
     Text,
     UniqueConstraint,

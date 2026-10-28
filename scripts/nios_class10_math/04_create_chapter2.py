@@ -19,7 +19,6 @@ from sqlalchemy import select
 from app.db.session import SessionLocal
 from app.models.curriculum import (
     BloomLevel,
-    Book,
     Chapter,
     LearningOutcome,
     Topic,
@@ -224,7 +223,7 @@ def main() -> None:
             if chapter.content_hash != content_hash:
                 chapter.full_text = full_text
                 chapter.content_hash = content_hash
-                print(f"[ok]   updated chapter full_text (hash changed)")
+                print("[ok]   updated chapter full_text (hash changed)")
 
         # 2. Topics + verbatim slices --------------------------------------
         existing_topic_names = {

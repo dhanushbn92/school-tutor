@@ -238,7 +238,7 @@ def main() -> None:
     print(f"Dropped {total_dupes} duplicate questions.")
     if total_failed:
         print(f"{total_failed} batches failed (rate-limit, validation, etc.)")
-    print(f"Run scripts.coverage_report to see updated coverage.")
+    print("Run scripts.coverage_report to see updated coverage.")
 
 
 if __name__ == "__main__":

@@ -4,8 +4,6 @@ Target per chapter: ~100 objective + ~30–40 subjective questions.
 Idempotent — duplicates are skipped by question text uniqueness.
 """
 
-import json
-from pathlib import Path
 from sqlalchemy import select
 from app.db.session import SessionLocal
 from app.models.curriculum import BloomLevel, LearningOutcome

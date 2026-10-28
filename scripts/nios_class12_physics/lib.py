@@ -20,12 +20,11 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.session import SessionLocal
 from app.llm.schemas.chapter_summary import ChapterSummaryOutput
 from app.llm.schemas.diagram import DiagramOutput
 from app.llm.schemas.lesson_plan import LessonPlanOutput

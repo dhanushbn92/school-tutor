@@ -26,12 +26,3 @@ _BLOOM_TO_BUCKET: dict[BloomLevel, CognitiveBucket] = {
 def to_bucket(level: BloomLevel) -> CognitiveBucket:
     """Roll a 6-level Bloom value up to one of FACTUAL/UNDERSTANDING/APPLICATION."""
     return _BLOOM_TO_BUCKET[level]
-
-
-def bucket_label(bucket: CognitiveBucket) -> str:
-    """Human-friendly label used in API payloads + UI tooltips."""
-    return {
-        CognitiveBucket.FACTUAL: "Factual",
-        CognitiveBucket.UNDERSTANDING: "Understanding",
-        CognitiveBucket.APPLICATION: "Application",
-    }[bucket]
