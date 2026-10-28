@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   MascotContext,
+  type MascotBubbleIcon,
   type MascotContextValue,
   type MascotMood,
   type MascotReactionOptions,
@@ -25,6 +26,7 @@ import {
 export function MascotProvider({ children }: { children: ReactNode }) {
   const [mood, setMood] = useState<MascotMood>("IDLE");
   const [message, setMessage] = useState<string | null>(null);
+  const [icon, setIcon] = useState<MascotBubbleIcon | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const reset = useCallback(() => {
@@ -34,6 +36,7 @@ export function MascotProvider({ children }: { children: ReactNode }) {
     }
     setMood("IDLE");
     setMessage(null);
+    setIcon(null);
   }, []);
 
   const reactWith = useCallback(
@@ -44,10 +47,12 @@ export function MascotProvider({ children }: { children: ReactNode }) {
       }
       setMood(nextMood);
       setMessage(opts?.message ?? null);
+      setIcon(opts?.icon ?? null);
       if (opts?.autoResetMs && opts.autoResetMs > 0) {
         resetTimer.current = setTimeout(() => {
           setMood("IDLE");
           setMessage(null);
+          setIcon(null);
           resetTimer.current = null;
         }, opts.autoResetMs);
       }
@@ -59,12 +64,13 @@ export function MascotProvider({ children }: { children: ReactNode }) {
     () => ({
       mood,
       message,
+      icon,
       setMood,
       setMessage,
       reactWith,
       reset,
     }),
-    [mood, message, reactWith, reset],
+    [mood, message, icon, reactWith, reset],
   );
 
   return (

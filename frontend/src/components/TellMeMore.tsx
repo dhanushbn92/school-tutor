@@ -7,6 +7,7 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
+import { useMascot } from "@/lib/mascotContext";
 import { useExplainTier } from "@/lib/queries";
 import type { ExplanationTier, ExtendedExplanation } from "@/lib/types";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
@@ -74,6 +75,7 @@ function TierBlock({
   icon: React.ReactNode;
 }) {
   const explain = useExplainTier();
+  const mascot = useMascot();
   const [data, setData] = useState<ExtendedExplanation | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,13 @@ function TierBlock({
     explain.mutate(
       { question_id: questionId, tier },
       {
-        onSuccess: (res) => setData(res),
+        onSuccess: (res) => {
+          setData(res);
+          mascot.reactWith("HINT", {
+            message: "Here is another way to see it.",
+            autoResetMs: 5000,
+          });
+        },
         onError: (err) => {
           // The backend returns a friendly message on 503; surface
           // it verbatim. Other errors fall back to a generic.

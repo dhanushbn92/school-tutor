@@ -225,8 +225,8 @@ function SurpriseSection() {
   function rollAgain() {
     setRevealed(false);
     setActive(true);
-    mascot.reactWith("DRAWN", {
-      message: "Just look at it. No pressure.",
+    mascot.reactWith("SURPRISED", {
+      message: "Surprise! Just look at it. No pressure.",
       autoResetMs: 3500,
     });
     q.refetch();
@@ -254,8 +254,8 @@ function SurpriseSection() {
             <Button
               onClick={() => {
                 setActive(true);
-                mascot.reactWith("DRAWN", {
-                  message: "Just look at it. No pressure.",
+                mascot.reactWith("SURPRISED", {
+                  message: "Surprise! Just look at it. No pressure.",
                   autoResetMs: 3500,
                 });
               }}

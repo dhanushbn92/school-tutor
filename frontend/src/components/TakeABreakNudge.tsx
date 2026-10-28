@@ -98,7 +98,7 @@ export function TakeABreakNudge() {
   return (
     <div
       role="status"
-      className="fixed bottom-24 right-4 z-40 max-w-sm rounded-lg border border-(--color-border) bg-(--color-card) p-4 shadow-xl md:right-6"
+      className="fixed bottom-28 right-4 z-40 md:bottom-24 max-w-sm rounded-lg border border-(--color-border) bg-(--color-card) p-4 shadow-xl md:right-6"
     >
       <div className="flex items-start gap-3">
         <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-200">

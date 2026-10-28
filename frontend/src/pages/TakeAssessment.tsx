@@ -197,19 +197,35 @@ export function TakeAssessmentPage() {
           ? `Submitted — review your subjective answers below`
           : `Submitted — ${sub.total_awarded}/${sub.max_marks}`,
       );
-      // Stage 5 — mascot reaction on submission. VICTORY pose for a
-      // perfect score, plain FIRES for anything below perfect (the
-      // arrow still hit the target — there's something to celebrate).
-      const perfect =
-        sub.total_awarded !== null &&
-        sub.max_marks > 0 &&
-        sub.total_awarded >= sub.max_marks;
-      mascot.reactWith(perfect ? "VICTORY" : "FIRES", {
-        message: perfect
-          ? "Bullseye! Every mark earned."
-          : `Arrow's in. ${sub.total_awarded}/${sub.max_marks} this round.`,
-        autoResetMs: 6000,
-      });
+      // Mascot reaction on submission, matched to how it went: celebrating for
+      // a perfect score, happy for a good one, encouraging otherwise (a zero
+      // should never be congratulated). Subjective-only quizzes have no score yet.
+      const score = sub.total_awarded;
+      const max = sub.max_marks;
+      const ratio = score !== null && max > 0 ? score / max : null;
+      if (ratio === null) {
+        mascot.reactWith("FIRES", {
+          message: "Submitted! Review your answers below.",
+          autoResetMs: 6000,
+        });
+      } else if (ratio >= 1) {
+        mascot.reactWith("VICTORY", {
+          message: "Perfect score! Every mark earned.",
+          icon: "trophy",
+          autoResetMs: 6000,
+        });
+      } else if (ratio >= 0.6) {
+        mascot.reactWith("FIRES", {
+          message: `Great job! You scored ${score}/${max}.`,
+          icon: "trophy",
+          autoResetMs: 6000,
+        });
+      } else {
+        mascot.reactWith("RESTRING", {
+          message: `You scored ${score}/${max}. Check the answers below, then try again. You can do it!`,
+          autoResetMs: 8000,
+        });
+      }
       // Clear the persisted start time so a future re-open doesn't race
       // a fresh countdown against the existing submission.
       clearTimer();
