@@ -8,6 +8,7 @@ from app.models.assessment import (
     SubmissionAnswer,
     SubmissionStatus,
 )
+from app.models.chapter_video import ChapterVideo, VideoProvider
 from app.models.curriculum import (
     AcademicYear,
     BloomLevel,
@@ -66,6 +67,8 @@ __all__ = [
     "Book",
     "Chapter",
     "ChapterSection",
+    "ChapterVideo",
+    "VideoProvider",
     "ChatMessage",
     "ChatRole",
     "ChatScope",

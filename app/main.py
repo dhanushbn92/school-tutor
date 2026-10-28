@@ -6,6 +6,7 @@ from app.api.routes import (
     analytics,
     assessments,
     auth,
+    chapter_videos,
     curriculum,
     generation,
     health,
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router)
     app.include_router(me.router)
     app.include_router(curriculum.router)
+    app.include_router(chapter_videos.router)
     app.include_router(generation.router)
     app.include_router(questions.router)
     app.include_router(assessments.router)
