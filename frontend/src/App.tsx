@@ -31,6 +31,7 @@ import { CurriculumPage } from "@/pages/Curriculum";
 import { LearnPage } from "@/pages/Learn";
 import { LearnSubjectPage } from "@/pages/LearnSubject";
 import { LearnChapterPage } from "@/pages/LearnChapter";
+import { VideosPage } from "@/pages/Videos";
 import { ReportCardPage } from "@/pages/ReportCard";
 import { SchoolReportPage } from "@/pages/SchoolReport";
 import { ChatPage } from "@/pages/Chat";
@@ -171,6 +172,14 @@ export default function App() {
                 element={
                   <RequireRole allowed={["platform_admin", "student", "individual_learner", "teacher", "school_admin"]}>
                     <LearnPage />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="videos"
+                element={
+                  <RequireRole allowed={["platform_admin", "student", "individual_learner", "teacher", "school_admin"]}>
+                    <VideosPage />
                   </RequireRole>
                 }
               />

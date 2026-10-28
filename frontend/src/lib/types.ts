@@ -282,7 +282,7 @@ export interface Student {
 export type ChatScope = "CHAPTER" | "TOPIC";
 export type ChatRole = "USER" | "ASSISTANT";
 
-export interface ChatSessionRead {
+interface ChatSessionRead {
   id: number;
   student_id: number;
   scope: ChatScope;
@@ -325,9 +325,9 @@ export type GeneratedContentType =
  *  map go as deep as the content warrants. Older chapter summaries
  *  emitted only string details — those still type-check because
  *  string is one half of the union. */
-export type ChapterSummaryDiagramDetail = string | ChapterSummaryDiagramBranch;
+type ChapterSummaryDiagramDetail = string | ChapterSummaryDiagramBranch;
 
-export interface ChapterSummaryDiagramBranch {
+interface ChapterSummaryDiagramBranch {
   label: string;
   details: ChapterSummaryDiagramDetail[];
 }
@@ -475,22 +475,39 @@ export interface PPTOutlineOutput {
   outcome_codes_covered?: string[];
 }
 
-export interface ResourceItem {
-  title: string;
-  url: string;
-  kind: string;
-  summary: string;
-  estimated_time_minutes?: number | null;
-  note_for_teacher?: string | null;
-}
-
-export interface ResourceListOutput {
-  chapter_focus: string;
-  intro: string;
-  items: ResourceItem[];
-}
-
 export type GeneratedContentStatus = "pending" | "ready" | "approved" | "failed";
+
+/** One video lecture attached to a chapter (GET /chapter-videos). */
+export interface ChapterVideo {
+  id: number;
+  chapter_id: number;
+  /** 1-based play order within the chapter. */
+  sequence: number;
+  title: string;
+  /** "lesson" = the main lecture, "word_by_word" = verse-by-verse walkthrough. */
+  kind: string;
+  /** Where the video is hosted; only "gdrive" is supported today. */
+  provider: string;
+  /** Provider-specific id (a Google Drive file id for "gdrive"). */
+  external_id: string;
+}
+
+/** A chapter with published video lectures (GET /chapter-videos/featured). */
+export interface FeaturedVideoChapter {
+  chapter_id: number;
+  chapter_number: number;
+  chapter_title: string;
+  subject_id: number;
+  subject_name: string;
+  video_count: number;
+}
+
+/** What the dashboard promo needs: totals plus the chapters to link to. */
+export interface FeaturedVideos {
+  total_videos: number;
+  total_chapters: number;
+  chapters: FeaturedVideoChapter[];
+}
 
 export interface GeneratedContent {
   id: number;
@@ -629,13 +646,13 @@ export interface Assessment {
   questions: AssessmentQuestion[];
 }
 
-export interface GradingDetailsMatched {
+interface GradingDetailsMatched {
   label: string;
   matched_phrase: string;
   marks: number;
 }
 
-export interface GradingDetailsMissed {
+interface GradingDetailsMissed {
   label: string;
   any_of: string[];
   marks: number;
@@ -727,7 +744,7 @@ export interface StudentMasteryGrid {
   };
 }
 
-export interface SectionTopicAveragesOutcome {
+interface SectionTopicAveragesOutcome {
   outcome_id: number;
   code: string;
   description: string;

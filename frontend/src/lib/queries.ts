@@ -6,11 +6,12 @@ import type {
   ChatMessageRead,
   ChatScope,
   ChatSessionDetailRead,
-  ChatSessionRead,
   Book,
   Chapter,
   ChapterDetail,
+  ChapterVideo,
   CurriculumContext,
+  FeaturedVideos,
   GeneratedContent,
   GeneratedContentStatus,
   GeneratedContentType,
@@ -46,7 +47,7 @@ import type {
 } from "./types";
 
 // ---------- schools (Phase B) ----------
-export interface MySchool {
+interface MySchool {
   id: number;
   name: string;
   board: string;
@@ -81,7 +82,7 @@ export function useUpdateMySchool() {
   });
 }
 
-export interface TeacherRow {
+interface TeacherRow {
   id: number;
   user_id: number;
   school_id: number;
@@ -505,7 +506,7 @@ export function useExtractTopicTexts() {
  * background tasks. Response describes what's queued so the UI can
  * link the admin into the Content library to monitor progress.
  */
-export interface BootstrapJobInfo {
+interface BootstrapJobInfo {
   id: number;
   content_type: string;
   status: string;
@@ -711,7 +712,7 @@ export function useMyStamps(limit = 200) {
 
 /* ---------- Mistake review (Stage 2 of child-centric roadmap) ---------- */
 
-export interface MistakesFilter {
+interface MistakesFilter {
   chapter_id?: number;
   subject_id?: number;
   limit?: number;
@@ -738,7 +739,7 @@ export function useMyMistakes(filter: MistakesFilter = {}) {
 
 /* ---------- Audio / read-aloud (Stage 8 of child-centric roadmap) ---------- */
 
-export interface AudioPreferences {
+interface AudioPreferences {
   autoplay_questions: boolean;
   preferred_voice_uri: string | null;
 }
@@ -837,25 +838,25 @@ export function useFlashcards(params: { count?: number; chapter_id?: number; ena
 
 /* ---------- Parent / guardian (Stage 6 of child-centric roadmap) ---------- */
 
-export interface ParentInviteCode {
+interface ParentInviteCode {
   code: string;
   expires_at: string;
   created_at?: string;
 }
 
-export interface ParentSummary {
+interface ParentSummary {
   user_id: number;
   full_name: string;
   email: string;
 }
 
-export interface ChildSummary {
+interface ChildSummary {
   user_id: number;
   full_name: string;
   email: string;
 }
 
-export interface ChildOutcomeHighlight {
+interface ChildOutcomeHighlight {
   code: string;
   description: string;
   mastery: number; // 0..1
@@ -865,7 +866,7 @@ export interface ChildOutcomeHighlight {
   chapter_title: string | null;
 }
 
-export interface ChildWeeklySummary {
+interface ChildWeeklySummary {
   child: { user_id: number; full_name: string };
   week_start: string;
   week_end: string;
@@ -906,7 +907,7 @@ export interface ChildWeeklySummary {
   stamps_by_kind: Record<string, number>;
 }
 
-export interface FamilyEncouragement {
+interface FamilyEncouragement {
   id: number;
   parent_user_id: number;
   message: string;
@@ -1040,7 +1041,7 @@ export function useSendEncouragement() {
 
 /* ---------- Vidyārthi mascot (Stage 5 of child-centric roadmap) ---------- */
 
-export interface MascotState {
+interface MascotState {
   enabled: boolean;
   current_outfit: string;
   available_outfits: string[];
@@ -1048,9 +1049,11 @@ export interface MascotState {
 
 /** Per-learner mascot preferences. The mascot itself reads `enabled`
  *  and `current_outfit` from this query before rendering anything. */
-export function useMascotState() {
+export function useMascotState(enabled = true) {
   return useQuery({
     queryKey: ["me", "mascot"],
+    // The endpoint is learner-only; staff roles must not call it (it 403s).
+    enabled,
     queryFn: async () => {
       const { data } = await api.get<MascotState>("/me/mascot");
       return data;
@@ -1135,7 +1138,7 @@ export function useRetryMistake() {
 
 /* ---------- AI tutor chat (premium) ---------- */
 
-export interface ChatStatus {
+interface ChatStatus {
   ai_chat_enabled: boolean;
 }
 
@@ -1144,16 +1147,6 @@ export function useChatStatus() {
     queryKey: ["me", "chat-status"],
     queryFn: async () => {
       const { data } = await api.get<ChatStatus>("/me/chat-sessions/_/me");
-      return data;
-    },
-  });
-}
-
-export function useMyChatSessions() {
-  return useQuery({
-    queryKey: ["me", "chat-sessions"],
-    queryFn: async () => {
-      const { data } = await api.get<ChatSessionRead[]>("/me/chat-sessions");
       return data;
     },
   });
@@ -1199,16 +1192,6 @@ export function useSendChatMessage(sessionId?: number) {
       qc.invalidateQueries({ queryKey: ["me", "chat-session", sessionId] });
       qc.invalidateQueries({ queryKey: ["me", "chat-sessions"] });
     },
-  });
-}
-
-export function useDeleteChatSession() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (sessionId: number) => {
-      await api.delete(`/me/chat-sessions/${sessionId}`);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["me", "chat-sessions"] }),
   });
 }
 
@@ -1318,7 +1301,7 @@ export function useClassWeakTopics(params: {
   });
 }
 
-export interface SectionLeaderboardEntry {
+interface SectionLeaderboardEntry {
   student_id: number;
   full_name: string | null;
   roll_number: string | null;
@@ -1327,7 +1310,7 @@ export interface SectionLeaderboardEntry {
   average_mastery: number | null;
 }
 
-export interface SectionLeaderboard {
+interface SectionLeaderboard {
   section_id: number;
   subject_id: number | null;
   students: SectionLeaderboardEntry[];
@@ -1354,6 +1337,12 @@ export function useStudentMastery(params: {
   student_id?: number;
   class_level?: number;
   subject_id?: number;
+  /**
+   * Opt in to the whole-syllabus grid (every subject in the class) when no
+   * `subject_id` is given. Off by default so pages that are about to pick a
+   * subject don't fire a pointless all-subjects request first.
+   */
+  allSubjects?: boolean;
 }) {
   return useQuery({
     queryKey: ["analytics", "student-mastery", params],
@@ -1367,7 +1356,7 @@ export function useStudentMastery(params: {
     enabled:
       params.student_id !== undefined &&
       params.class_level !== undefined &&
-      params.subject_id !== undefined,
+      (params.subject_id !== undefined || params.allSubjects === true),
   });
 }
 
@@ -1445,6 +1434,32 @@ export function useGeneratedContentList(filters: {
       });
       return data;
     },
+  });
+}
+
+/** Ordered video lectures for a chapter (empty when the chapter has none). */
+export function useChapterVideos(chapterId?: number) {
+  return useQuery({
+    queryKey: ["chapter-videos", chapterId],
+    enabled: chapterId != null,
+    queryFn: async () => {
+      const { data } = await api.get<ChapterVideo[]>("/chapter-videos", {
+        params: { chapter_id: chapterId },
+      });
+      return data;
+    },
+  });
+}
+
+/** Chapters with video lectures that the signed-in user can watch (their class and board). */
+export function useFeaturedVideos() {
+  return useQuery({
+    queryKey: ["chapter-videos", "featured"],
+    queryFn: async () => {
+      const { data } = await api.get<FeaturedVideos>("/chapter-videos/featured");
+      return data;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 }
 
