@@ -25,6 +25,7 @@ from app.models.assessment import Submission, SubmissionAnswer
 from app.models.curriculum import Book, Chapter, LearningOutcome, SchoolClass, Subject
 from app.models.mastery import CognitiveBucket, SkillMastery
 from app.models.question import Question
+from app.models.school import School, Student
 from app.services.cognitive import to_bucket
 
 
@@ -153,6 +154,15 @@ def build_student_grid(
         .where(SchoolClass.level == class_level)
         .options(selectinload(Chapter.learning_outcomes))
     )
+    # A class is shared between boards, so keep the grid inside the learner's
+    # own school board (a NIOS learner must not get CBSE chapters of the same class).
+    board = db.scalar(
+        select(School.board)
+        .join(Student, Student.school_id == School.id)
+        .where(Student.id == student_id)
+    )
+    if board:
+        chapter_stmt = chapter_stmt.where(Subject.board == board)
     if subject_id is not None:
         chapter_stmt = chapter_stmt.where(Subject.id == subject_id).order_by(
             Chapter.chapter_number
@@ -165,7 +175,6 @@ def build_student_grid(
     chapters_with_subject: list[tuple[Chapter, Subject]] = [
         (row[0], row[1]) for row in chapter_rows
     ]
-    chapters = [c for c, _ in chapters_with_subject]
 
     mastery_rows = db.scalars(
         select(SkillMastery).where(SkillMastery.student_id == student_id)
