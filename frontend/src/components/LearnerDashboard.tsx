@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  ClipboardList,
   Loader2,
-  Sparkles,
   TrendingDown,
   TrendingUp,
   Trophy,
@@ -18,12 +16,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ThemedPage } from "@/components/themed";
-import { DashboardHero } from "@/components/DashboardHero";
-import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
+import { Disclosure } from "@/components/Disclosure";
 import { PracticeCard } from "@/components/PracticeCard";
-import { LearnerProgressNarrative } from "@/components/LearnerProgressNarrative";
+import { UpNextCard } from "@/components/home/UpNextCard";
+import { SubjectCards } from "@/components/home/SubjectCards";
+import { HomeAside } from "@/components/home/HomeAside";
+import { MascotReminder } from "@/components/home/MascotReminder";
 import { MascotToggleHint } from "@/components/MascotToggleHint";
 import { FamilyNotesCard } from "@/components/FamilyNotesCard";
 import { ParentInviteCard } from "@/components/ParentInviteCard";
@@ -50,6 +48,7 @@ import { Badge } from "@/components/ui/badge";
 import { Empty } from "@/components/ui/empty";
 import { useAuth } from "@/lib/auth";
 import {
+  useFeaturedVideos,
   useMyAssessments,
   useMySections,
   useMyStudents,
@@ -57,6 +56,7 @@ import {
   useStudentTrend,
   useSubjects,
 } from "@/lib/queries";
+import { pickBestPlace, pickStrongest, rollupChapters, rollupSubjects } from "@/lib/progress";
 import { formatDateTime } from "@/lib/utils";
 
 export function LearnerDashboard() {
@@ -82,6 +82,7 @@ export function LearnerDashboard() {
   const masteryQ = useStudentMastery({
     student_id: myStudent?.id,
     class_level: section?.class_level ?? undefined,
+    allSubjects: true,
     // No subject_id — get all subjects.
   });
   // Score trend across all subjects (no subject_id) so the line
@@ -93,6 +94,27 @@ export function LearnerDashboard() {
   const assessmentsQ = useMyAssessments();
 
   const [view, setView] = useState<HeatmapView>("combined");
+
+  // Home-page picks, all derived from the whole-syllabus mastery grid.
+  const featuredQ = useFeaturedVideos();
+  const rollups = useMemo(() => rollupChapters(masteryQ.data), [masteryQ.data]);
+  const subjects = useMemo(
+    () => rollupSubjects(rollups, subject?.name),
+    [rollups, subject?.name],
+  );
+  const upNext = useMemo(() => pickBestPlace(rollups), [rollups]);
+  const strongest = useMemo(() => pickStrongest(rollups), [rollups]);
+  const videoChapterIds = useMemo(
+    () => new Set((featuredQ.data?.chapters ?? []).map((c) => c.chapter_id)),
+    [featuredQ.data],
+  );
+  const videosBySubject = useMemo(() => {
+    const m = new Map<number, number>();
+    for (const c of featuredQ.data?.chapters ?? []) {
+      m.set(c.subject_id, (m.get(c.subject_id) ?? 0) + c.video_count);
+    }
+    return m;
+  }, [featuredQ.data]);
 
   const recent = (assessmentsQ.data ?? []).slice(0, 5);
   const published = recent.filter((a) => a.status === "PUBLISHED");
@@ -112,368 +134,359 @@ export function LearnerDashboard() {
   // the lower strengths/weaknesses lists' empty-state copy.
   const { strengths, weaknesses } = pickOutcomeHighlights(masteryQ.data);
 
+  const firstName = (user?.full_name ?? "").split(/\s+/)[0];
+  const quizHref = isIndividual ? "/quick-quiz" : "/assessments";
+  const quizLabel = isIndividual ? "Start a quiz" : "My quizzes";
+  const hasStarted = rollups.some((r) => r.outcomes_attempted > 0);
+  const subline = upNext
+    ? hasStarted
+      ? `You are on chapter ${upNext.chapter_number}${upNext.subject_name ? ` of ${upNext.subject_name}` : ""}. Pick up where you left off.`
+      : `Ready when you are. Start with chapter ${upNext.chapter_number}${upNext.subject_name ? ` of ${upNext.subject_name}` : ""}.`
+    : "Take a quiz and your progress shows up here.";
+
   return (
-    <ThemedPage>
-      <DashboardHero
-        role="learner"
-        userName={(user?.full_name ?? "").split(/\s+/)[0] || undefined}
-      />
-      {/* The platform's purpose panel — practice ethos + a primary
-          CTA pointing at the next quiz. Sits above the mastery
-          widgets so the practice prompt is unmissable. */}
-      <DashboardPurposePanel role="learner" />
-      {/* "Your practice" card — weekly progress ring + stamp strip.
-          Stage 1 of the child-centric roadmap. */}
-      <PracticeCard />
-      {/* Stage 5 — only renders if the Dhananjaya mascot is currently
-          disabled. Gives the learner a one-click path back to enabling
-          the companion. Legacy: the in-component off-switch was removed;
-          this hint stays for users whose mascot is disabled from earlier. */}
-      <MascotToggleHint />
-      {/* Stage 6 — "Notes from family" card. Renders nothing if no
-          undismissed parent encouragements exist, so it stays
-          invisible for learners without a linked parent. */}
-      <FamilyNotesCard />
-      <PageHeader
-        title={`Welcome, ${(user?.full_name ?? "").split(/\s+/)[0]}`}
-        description={
-          isIndividual
-            ? "Your private practice — track your mastery, see your trend, and start a fresh quiz any time."
-            : "Your assigned quizzes and progress across the syllabus."
-        }
-        actions={
-          isIndividual ? (
-            <Button asChild>
-              <Link to="/quick-quiz">
-                <Sparkles className="h-4 w-4" />
-                Start a quiz
-              </Link>
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link to="/assessments">
-                <ClipboardList className="h-4 w-4" />
-                My quizzes
-              </Link>
-            </Button>
-          )
-        }
-      />
-
-      {/* Stage 4 — Story-shaped progress.
-          Replaces the four-card stat row (Outcomes mastered / Average
-          mastery / Focus area / Quizzes taken) with a narrative
-          rendering: three chapter-state tiles + strongest concept +
-          best-place-to-practise + a topic-tree visual. The bare numbers
-          aren't gone — they're folded into the dot grid and the
-          per-chapter "X/Y outcomes mastered" caption, where they
-          finally read as part of a story rather than a report card. */}
-      <LearnerProgressNarrative
-        data={masteryQ.data}
-        subjectName={subject?.name}
-        showPracticeLinks={isIndividual}
-      />
-
-      <div className="mb-6 grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-(--color-success)" />
-              <CardTitle>Your strengths</CardTitle>
+    <div>
+      {/* Lets the learning buddy nudge about waiting reviews once per session. */}
+      <MascotReminder />
+      {/* On a phone the page is one column ordered by the `order-*` classes
+          (the wrappers use `contents`); from `lg` up it is the main column
+          plus a side column. */}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+        <div className="contents lg:block lg:min-w-0 lg:flex-1 lg:space-y-6">
+          <div className="order-1 space-y-6">
+            <div>
+              <h1 className="font-display text-3xl font-extrabold tracking-tight">
+                {firstName ? `Hi, ${firstName}` : "Hi there"}
+              </h1>
+              <p className="mt-1.5 text-base text-(--color-muted-foreground)">
+                {subline}
+              </p>
             </div>
-            <CardDescription>
-              Outcomes where you're scoring 75% or higher across recent attempts.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {strengths.length === 0 ? (
-              <Empty
-                title="No strong topics yet"
-                description="Take a few quizzes — your top topics will show up here once you're consistently above 75%."
-                className="border-0 py-4"
-              />
-            ) : (
-              <ul className="space-y-2">
-                {strengths.map((o) => (
-                  <li
-                    key={`${o.chapter_id}-${o.code}`}
-                    className="flex items-center justify-between gap-3 rounded-md border border-(--color-border) px-3 py-2 text-sm"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{outcomeShortCode(o.code)}</Badge>
-                        <span className="truncate font-medium">{o.description}</span>
-                      </div>
-                      <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
-                        Ch {o.chapter_number}. {o.chapter_title} · {o.attempts} attempt
-                        {o.attempts === 1 ? "" : "s"}
-                      </div>
-                    </div>
-                    <Badge variant="success">
-                      {Math.round((o.mastery ?? 0) * 100)}%
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-(--color-warning)" />
-              <CardTitle>Areas to focus on</CardTitle>
-            </div>
-            <CardDescription>
-              Outcomes where mastery is below 60%. A short focused practice goes a long way.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {weaknesses.length === 0 ? (
-              <Empty
-                title="Nothing flagged yet"
-                description={
-                  summary && summary.outcomes_attempted > 0
-                    ? "You're holding above 60% on every attempted topic. Keep going!"
-                    : "Take a quiz to see which topics need extra work."
-                }
-                className="border-0 py-4"
-              />
-            ) : (
-              <ul className="space-y-2">
-                {weaknesses.map((o) => (
-                  <li
-                    key={`${o.chapter_id}-${o.code}`}
-                    className="flex items-center justify-between gap-3 rounded-md border border-(--color-border) px-3 py-2 text-sm"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{outcomeShortCode(o.code)}</Badge>
-                        <span className="truncate font-medium">{o.description}</span>
-                      </div>
-                      <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
-                        Ch {o.chapter_number}. {o.chapter_title} · {o.attempts} attempt
-                        {o.attempts === 1 ? "" : "s"}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="warning">
-                        {Math.round((o.mastery ?? 0) * 100)}%
-                      </Badge>
-                      {isIndividual && (
-                        <Button asChild size="sm" variant="outline">
-                          <Link to={`/quick-quiz?chapter=${o.chapter_id}`}>
-                            Practice
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          {masteryQ.data ? (
-            <MasteryHeatmap
-              title="Topic mastery map"
-              description="How much of your whole syllabus you've practised so far. Cells fill in as you submit quizzes."
-              view={view}
-              headerSlot={
-                <div className="w-48">
-                  <Select value={view} onValueChange={(v) => setView(v as HeatmapView)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="combined">Combined</SelectItem>
-                      <SelectItem value="FACTUAL">Factual only</SelectItem>
-                      <SelectItem value="UNDERSTANDING">Understanding only</SelectItem>
-                      <SelectItem value="APPLICATION">Application only</SelectItem>
-                      <SelectItem value="remember">Bloom · Remember</SelectItem>
-                      <SelectItem value="understand">Bloom · Understand</SelectItem>
-                      <SelectItem value="apply">Bloom · Apply</SelectItem>
-                      <SelectItem value="analyze">Bloom · Analyze</SelectItem>
-                      <SelectItem value="evaluate">Bloom · Evaluate</SelectItem>
-                      <SelectItem value="create">Bloom · Create</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              }
-              chapters={masteryQ.data.chapters.map((ch) => ({
-                chapter_id: ch.chapter_id,
-                chapter_number: ch.chapter_number,
-                // Prefix the chapter title with the subject name so a
-                // multi-subject heatmap row stays readable. Single-
-                // subject classes degrade gracefully — the prefix is
-                // omitted when there's no subject_name (the older
-                // single-subject API shape).
-                chapter_title: ch.subject_name
-                  ? `${ch.subject_name} · ${ch.chapter_title}`
-                  : ch.chapter_title,
-                outcomes: ch.outcomes.map((o) => ({
-                  code: o.code,
-                  description: o.description,
-                  mastery: o.mastery,
-                  attempts: o.attempts,
-                  buckets: o.buckets,
-                })),
-              }))}
+            {/* Notes from family: renders nothing without undismissed
+                parent encouragements. */}
+            <FamilyNotesCard />
+            <UpNextCard
+              loading={masteryQ.isLoading}
+              pick={upNext}
+              hasChapters={rollups.length > 0}
+              hasVideo={upNext ? videoChapterIds.has(upNext.chapter_id) : false}
+              quizHref={quizHref}
+              quizLabel={quizLabel}
             />
-          ) : (
-            <Card>
-              <CardContent className="p-6">
-                <Empty
-                  icon={<TrendingUp className="h-6 w-6" />}
-                  title="No mastery yet"
-                  description={
-                    isIndividual
-                      ? "Take your first quiz to start filling in your map."
-                      : "When you take an assigned quiz, your mastery map fills in here."
-                  }
-                  action={
-                    isIndividual ? (
-                      <Button asChild>
-                        <Link to="/quick-quiz">Start a quiz</Link>
-                      </Button>
-                    ) : undefined
-                  }
-                  className="border-0"
-                />
-              </CardContent>
-            </Card>
-          )}
+          </div>
+          <div className="order-3">
+            <SubjectCards subjects={subjects} videosBySubject={videosBySubject} />
+          </div>
         </div>
+        <div className="contents lg:block lg:w-80 lg:shrink-0 lg:space-y-5 xl:w-[22rem]">
+          <HomeAside
+            strongest={strongest}
+            isIndividual={isIndividual}
+            quizHref={quizHref}
+            quizLabel={quizLabel}
+          />
+        </div>
+      </div>
 
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Score trend</CardTitle>
-              <CardDescription>Your evaluated quizzes over time.</CardDescription>
-            </CardHeader>
-            <CardContent className="h-56">
-              {trendQ.data && trendQ.data.series.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={trendQ.data.series.map((p, i) => ({
-                      index: i + 1,
-                      name: p.assessment_title,
-                      percentage: p.percentage,
-                    }))}
-                    margin={{ top: 6, right: 12, bottom: 0, left: -12 }}
-                  >
-                    <CartesianGrid stroke="oklch(90% 0.008 260)" strokeDasharray="3 3" />
-                    <XAxis dataKey="index" tickLine={false} axisLine={false} fontSize={11} />
-                    <YAxis
-                      domain={[0, 100]}
-                      tickLine={false}
-                      axisLine={false}
-                      fontSize={11}
-                      unit="%"
+      {/* Everything that used to crowd the top of this page now lives
+          one tap away, so the home page stays about the next step. */}
+      <div className="mt-10 space-y-4">
+        <Disclosure title="Your progress in detail">
+          <div className="space-y-6">
+            <PracticeCard />
+            <div className="mb-6 grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4 text-(--color-success)" />
+                    <CardTitle>Your strengths</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Outcomes where you're scoring 75% or higher across recent attempts.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {strengths.length === 0 ? (
+                    <Empty
+                      title="No strong topics yet"
+                      description="Take a few quizzes — your top topics will show up here once you're consistently above 75%."
+                      className="border-0 py-4"
                     />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid oklch(90% 0.008 260)",
-                      }}
-                      labelFormatter={(_, p) => p[0]?.payload?.name ?? ""}
-                      formatter={(value) => [`${value}%`, "Score"] as [string, string]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="percentage"
-                      stroke="oklch(56% 0.14 257)"
-                      strokeWidth={2.5}
-                      dot={{ r: 4, strokeWidth: 2 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <Empty title="No quizzes evaluated yet" className="border-0 py-6" />
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent quizzes</CardTitle>
-              <CardDescription>Latest quizzes you can take.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {published.length === 0 ? (
-                <Empty
-                  title="No quizzes ready"
-                  description={
-                    isIndividual
-                      ? "Tap Start a quiz to draw fresh questions from the bank."
-                      : "Your teacher hasn't published anything yet."
-                  }
-                  className="border-0 py-6"
-                />
-              ) : (
-                <ul className="space-y-2">
-                  {published.map((a) => (
-                    <li
-                      key={a.id}
-                      className="flex items-center justify-between gap-2 rounded-md border border-(--color-border) p-3 text-sm"
-                    >
-                      <div className="min-w-0">
-                        <div className="truncate font-medium">{a.title}</div>
-                        <div className="text-[11px] text-(--color-muted-foreground)">
-                          <Badge variant="outline" className="mr-1">
-                            {a.type}
+                  ) : (
+                    <ul className="space-y-2">
+                      {strengths.map((o) => (
+                        <li
+                          key={`${o.chapter_id}-${o.code}`}
+                          className="flex items-center justify-between gap-3 rounded-md border border-(--color-border) px-3 py-2 text-sm"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{outcomeShortCode(o.code)}</Badge>
+                              <span className="truncate font-medium">{o.description}</span>
+                            </div>
+                            <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
+                              Ch {o.chapter_number}. {o.chapter_title} · {o.attempts} attempt
+                              {o.attempts === 1 ? "" : "s"}
+                            </div>
+                          </div>
+                          <Badge variant="success">
+                            {Math.round((o.mastery ?? 0) * 100)}%
                           </Badge>
-                          {a.total_marks} marks · {formatDateTime(a.published_at)}
-                        </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <TrendingDown className="h-4 w-4 text-(--color-warning)" />
+                    <CardTitle>Areas to focus on</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Outcomes where mastery is below 60%. A short focused practice goes a long way.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {weaknesses.length === 0 ? (
+                    <Empty
+                      title="Nothing flagged yet"
+                      description={
+                        summary && summary.outcomes_attempted > 0
+                          ? "You're holding above 60% on every attempted topic. Keep going!"
+                          : "Take a quiz to see which topics need extra work."
+                      }
+                      className="border-0 py-4"
+                    />
+                  ) : (
+                    <ul className="space-y-2">
+                      {weaknesses.map((o) => (
+                        <li
+                          key={`${o.chapter_id}-${o.code}`}
+                          className="flex items-center justify-between gap-3 rounded-md border border-(--color-border) px-3 py-2 text-sm"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{outcomeShortCode(o.code)}</Badge>
+                              <span className="truncate font-medium">{o.description}</span>
+                            </div>
+                            <div className="mt-1 text-[11px] text-(--color-muted-foreground)">
+                              Ch {o.chapter_number}. {o.chapter_title} · {o.attempts} attempt
+                              {o.attempts === 1 ? "" : "s"}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="warning">
+                              {Math.round((o.mastery ?? 0) * 100)}%
+                            </Badge>
+                            {isIndividual && (
+                              <Button asChild size="sm" variant="outline">
+                                <Link to={`/quick-quiz?chapter=${o.chapter_id}`}>
+                                  Practice
+                                  <ArrowRight className="h-3.5 w-3.5" />
+                                </Link>
+                              </Button>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                {masteryQ.data ? (
+                  <MasteryHeatmap
+                    title="Topic mastery map"
+                    description="How much of your whole syllabus you've practised so far. Cells fill in as you submit quizzes."
+                    view={view}
+                    headerSlot={
+                      <div className="w-48">
+                        <Select value={view} onValueChange={(v) => setView(v as HeatmapView)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="combined">Combined</SelectItem>
+                            <SelectItem value="FACTUAL">Factual only</SelectItem>
+                            <SelectItem value="UNDERSTANDING">Understanding only</SelectItem>
+                            <SelectItem value="APPLICATION">Application only</SelectItem>
+                            <SelectItem value="remember">Bloom · Remember</SelectItem>
+                            <SelectItem value="understand">Bloom · Understand</SelectItem>
+                            <SelectItem value="apply">Bloom · Apply</SelectItem>
+                            <SelectItem value="analyze">Bloom · Analyze</SelectItem>
+                            <SelectItem value="evaluate">Bloom · Evaluate</SelectItem>
+                            <SelectItem value="create">Bloom · Create</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                      <Button asChild size="sm">
-                        <Link to={`/assessments/${a.id}/take`}>
-                          Take
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </Link>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                    }
+                    chapters={masteryQ.data.chapters.map((ch) => ({
+                      chapter_id: ch.chapter_id,
+                      chapter_number: ch.chapter_number,
+                      // Prefix the chapter title with the subject name so a
+                      // multi-subject heatmap row stays readable. Single-
+                      // subject classes degrade gracefully — the prefix is
+                      // omitted when there's no subject_name (the older
+                      // single-subject API shape).
+                      chapter_title: ch.subject_name
+                        ? `${ch.subject_name} · ${ch.chapter_title}`
+                        : ch.chapter_title,
+                      outcomes: ch.outcomes.map((o) => ({
+                        code: o.code,
+                        description: o.description,
+                        mastery: o.mastery,
+                        attempts: o.attempts,
+                        buckets: o.buckets,
+                      })),
+                    }))}
+                  />
+                ) : (
+                  <Card>
+                    <CardContent className="p-6">
+                      <Empty
+                        icon={<TrendingUp className="h-6 w-6" />}
+                        title="No mastery yet"
+                        description={
+                          isIndividual
+                            ? "Take your first quiz to start filling in your map."
+                            : "When you take an assigned quiz, your mastery map fills in here."
+                        }
+                        action={
+                          isIndividual ? (
+                            <Button asChild>
+                              <Link to="/quick-quiz">Start a quiz</Link>
+                            </Button>
+                          ) : undefined
+                        }
+                        className="border-0"
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Score trend</CardTitle>
+                    <CardDescription>Your evaluated quizzes over time.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-56">
+                    {trendQ.data && trendQ.data.series.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={trendQ.data.series.map((p, i) => ({
+                            index: i + 1,
+                            name: p.assessment_title,
+                            percentage: p.percentage,
+                          }))}
+                          margin={{ top: 6, right: 12, bottom: 0, left: -12 }}
+                        >
+                          <CartesianGrid stroke="oklch(90% 0.008 260)" strokeDasharray="3 3" />
+                          <XAxis dataKey="index" tickLine={false} axisLine={false} fontSize={11} />
+                          <YAxis
+                            domain={[0, 100]}
+                            tickLine={false}
+                            axisLine={false}
+                            fontSize={11}
+                            unit="%"
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              borderRadius: 8,
+                              border: "1px solid oklch(90% 0.008 260)",
+                            }}
+                            labelFormatter={(_, p) => p[0]?.payload?.name ?? ""}
+                            formatter={(value) => [`${value}%`, "Score"] as [string, string]}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="percentage"
+                            stroke="oklch(56% 0.14 257)"
+                            strokeWidth={2.5}
+                            dot={{ r: 4, strokeWidth: 2 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <Empty title="No quizzes evaluated yet" className="border-0 py-6" />
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent quizzes</CardTitle>
+                    <CardDescription>Latest quizzes you can take.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {published.length === 0 ? (
+                      <Empty
+                        title="No quizzes ready"
+                        description={
+                          isIndividual
+                            ? "Tap Start a quiz to draw fresh questions from the bank."
+                            : "Your teacher hasn't published anything yet."
+                        }
+                        className="border-0 py-6"
+                      />
+                    ) : (
+                      <ul className="space-y-2">
+                        {published.map((a) => (
+                          <li
+                            key={a.id}
+                            className="flex items-center justify-between gap-2 rounded-md border border-(--color-border) p-3 text-sm"
+                          >
+                            <div className="min-w-0">
+                              <div className="truncate font-medium">{a.title}</div>
+                              <div className="text-[11px] text-(--color-muted-foreground)">
+                                <Badge variant="outline" className="mr-1">
+                                  {a.type}
+                                </Badge>
+                                {a.total_marks} marks · {formatDateTime(a.published_at)}
+                              </div>
+                            </div>
+                            <Button asChild size="sm">
+                              <Link to={`/assessments/${a.id}/take`}>
+                                Take
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </Link>
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </Disclosure>
+
+        <Disclosure title="Settings and family">
+          <div className="space-y-6">
+            {/* Read-aloud voice and autoplay (Stage 8). */}
+            <AudioSettingsCard />
+            {/* Dyslexia font, high contrast, larger targets, break nudge (Stage 10). */}
+            <AccessibilityCard />
+            {/* Invite a parent or guardian (Stage 6). */}
+            <ParentInviteCard />
+          </div>
+        </Disclosure>
       </div>
 
-      {/* Stage 8 — audio / read-aloud settings. Sits with the other
-          "configure once" affordances at the bottom of the dashboard
-          rather than competing with the practice headline. The 🔊
-          button itself appears next to every question text across
-          the app; this card is just where the learner picks the
-          voice + autoplay preference. */}
+      {/* Only renders if the mascot is disabled: a one-click way back. */}
       <div className="mt-6">
-        <AudioSettingsCard />
+        <MascotToggleHint />
       </div>
-
-      {/* Stage 10 — accessibility toggles: dyslexia-friendly font,
-          high contrast, larger tap targets, take-a-break nudge.
-          All four are per-device (localStorage) so a phone can
-          have larger targets while the desktop stays normal. */}
-      <div className="mt-6">
-        <AccessibilityCard />
-      </div>
-
-      {/* Stage 6 — invite a parent / guardian. Sits at the bottom of
-          the dashboard rather than competing with the practice
-          headline; it's a "configure once" affordance, not a
-          day-to-day widget. */}
-      <div className="mt-6">
-        <ParentInviteCard />
-      </div>
-    </ThemedPage>
+    </div>
   );
 }
 

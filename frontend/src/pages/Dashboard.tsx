@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AlertTriangle,
@@ -37,6 +37,7 @@ import { DashboardHero } from "@/components/DashboardHero";
 import { DashboardPurposePanel } from "@/components/DashboardPurposePanel";
 import { LearnerDashboard } from "@/components/LearnerDashboard";
 import { ParentDashboard } from "@/components/ParentDashboard";
+import { TeacherDashboard } from "@/components/TeacherDashboard";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import { useAuth } from "@/lib/auth";
 import {
@@ -50,6 +51,7 @@ import {
 import { useAvailableClasses, useAvailableSubjects } from "@/lib/scope";
 import { formatDate } from "@/lib/utils";
 
+/** Picks the dashboard for the signed-in role; each one owns its own hooks. */
 export function DashboardPage() {
   const { user } = useAuth();
   if (user?.role === "student" || user?.role === "individual_learner") {
@@ -58,6 +60,31 @@ export function DashboardPage() {
   if (user?.role === "parent") {
     return <ParentDashboard />;
   }
+  if (user?.role === "teacher") {
+    return <TeacherHome />;
+  }
+  return <StaffDashboard />;
+}
+
+/** A teacher with a class gets the class view; one without falls back to the general staff home. */
+function TeacherHome() {
+  const sectionsQ = useMySections();
+  if (sectionsQ.isLoading) {
+    return (
+      <div className="flex items-center gap-2 text-(--color-muted-foreground)">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading...
+      </div>
+    );
+  }
+  if (sectionsQ.data && sectionsQ.data.length > 0) {
+    return <TeacherDashboard sections={sectionsQ.data} />;
+  }
+  return <StaffDashboard />;
+}
+
+/** Platform admin, school admin and teacher dashboard. */
+function StaffDashboard() {
+  const { user } = useAuth();
   const sectionsQ = useMySections();
   const firstSection = sectionsQ.data?.[0];
   const studentsQ = useMyStudents(firstSection?.id);
@@ -78,18 +105,14 @@ export function DashboardPage() {
     (availableClasses.isScoped ? undefined : firstSection?.class_level);
   const availableSubjects = useAvailableSubjects(effectiveClass);
   const [pickedSubject, setPickedSubject] = useState<number | undefined>();
+  // A pick that does not belong to the current class's subjects is ignored,
+  // so changing the class falls back to the default subject automatically.
   const effectiveSubject: number | undefined =
     pickedSubject !== undefined &&
     availableSubjects.subjects.some((s) => s.id === pickedSubject)
       ? pickedSubject
       : availableSubjects.subjects.find((s) => s.name === "Science")?.id ??
         availableSubjects.subjects[0]?.id;
-
-  // Reset the subject pick whenever the class changes — old subject_id won't
-  // belong to the new class.
-  useEffect(() => {
-    setPickedSubject(undefined);
-  }, [effectiveClass]);
 
   const questionsQ = useQuestions({ status: "DRAFT", limit: 100 });
   const generationsQ = useGeneratedContentList({ status: "ready", limit: 20 });
@@ -102,7 +125,6 @@ export function DashboardPage() {
     );
   }
 
-  // Learner roles handled by the early-return at the top of the function.
   const isPlatformAdmin = user?.role === "platform_admin";
   const isSchoolAdmin = user?.role === "school_admin";
 
@@ -283,6 +305,8 @@ export function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {/* Weak topics are per school class, so the platform team (no school) skips them. */}
+        {!isPlatformAdmin && (
         <div className="space-y-3 lg:col-span-2">
           <div className="flex flex-wrap items-end gap-3 rounded-md border border-(--color-border) bg-(--color-card) p-3">
             <div className="grid gap-1.5">
@@ -340,8 +364,9 @@ export function DashboardPage() {
             limit={8}
           />
         </div>
+        )}
 
-        <Card>
+        <Card className={isPlatformAdmin ? "lg:col-span-3" : undefined}>
           <CardHeader>
             <CardTitle>Pending reviews</CardTitle>
             <CardDescription>Approve or edit before students see them.</CardDescription>

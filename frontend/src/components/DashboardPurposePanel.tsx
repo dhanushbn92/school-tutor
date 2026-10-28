@@ -27,7 +27,7 @@ import { BRAND_NAME } from "@/lib/brand";
  * splash-screen welcome animation is a one-moment ritual; this
  * panel is the durable place where the platform's purpose lives.
  */
-export type RoleKey =
+type RoleKey =
   | "learner"
   | "teacher"
   | "school_admin"
