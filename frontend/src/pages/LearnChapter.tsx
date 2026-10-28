@@ -1,19 +1,25 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useMascot } from "@/lib/mascotContext";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
   Bot,
   BookOpen,
   BookText,
+  Check,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   ClipboardCheck,
   ClipboardList,
   Eye,
   EyeOff,
+  ExternalLink,
   FileText,
+  Maximize2,
+  Minimize2,
   RotateCcw,
   XCircle,
   GraduationCap,
@@ -29,6 +35,8 @@ import {
   Upload,
   User as UserIcon,
   Users,
+  Video,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,13 +48,14 @@ import { ThemedSection, ThemedTitleMark } from "@/components/themed";
 import { MindMapInteractive } from "@/components/MindMapInteractive";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import type { FlowDiagramData } from "@/components/FlowDiagram";
-import { openArtifact } from "@/lib/artifact";
+import { loadArtifactObjectUrl, openArtifact } from "@/lib/artifact";
 import { humanError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import {
   useChapterDetail,
+  useChapterVideos,
   useChatStatus,
   useCreateChatSession,
   useGeneratedContentList,
@@ -55,18 +64,16 @@ import {
   type MySubmission,
 } from "@/lib/queries";
 import {
-  subjectIcon,
-  subjectStyle,
   subjectTheme,
   subjectVar,
   subjectVarForeground,
-  subjectVarSoft,
 } from "@/lib/subjectTheme";
 import type {
   Assessment,
   ChapterSummaryOutput,
   ChapterSummarySection,
   ChapterSummaryGlossaryTerm,
+  ChapterVideo,
   ClassroomActivitySetOutput,
   ClassroomActivity,
   GeneratedContent,
@@ -81,6 +88,15 @@ export function LearnChapterPage() {
   const { user } = useAuth();
   const { chapterId: chapterIdParam } = useParams();
   const chapterId = chapterIdParam ? Number(chapterIdParam) : undefined;
+
+  // The learning buddy studies along while a chapter is open (a no-op for
+  // anyone without the mascot).
+  const mascot = useMascot();
+  const { reactWith: mascotReact, reset: mascotReset } = mascot;
+  useEffect(() => {
+    mascotReact("READING");
+    return () => mascotReset();
+  }, [mascotReact, mascotReset]);
 
   const detailQ = useChapterDetail(chapterId);
 
@@ -126,6 +142,9 @@ export function LearnChapterPage() {
     limit: 10,
   });
   const extraContent = extraContentQ.data ?? [];
+  // Video lectures — shown between the summary-family tabs and the worksheets.
+  const videosQ = useChapterVideos(chapterId);
+  const videos = videosQ.data ?? [];
 
   // Assessments for this chapter — surfaces in the Assessments tab so the
   // student can take a test in-place rather than navigating to /assessments.
@@ -220,6 +239,7 @@ export function LearnChapterPage() {
   const loadErrors = {
     summary: summariesQ.isError,
     visuals: flowsQ.isError || diagramsQ.isError,
+    videos: videosQ.isError,
     worksheets: worksheetsQ.isError,
     assessments: assessmentsQ.isError,
     simulations: simulationsQ.isError,
@@ -240,6 +260,7 @@ export function LearnChapterPage() {
       pptOutline={pptOutline}
       flows={flows}
       diagrams={diagrams}
+      videos={videos}
       worksheets={worksheets}
       simulations={simulations}
       extraContent={extraContent}
@@ -264,6 +285,7 @@ type TabKey =
   | "takeaways"
   | "glossary"
   | "visuals"
+  | "videos"
   | "worksheets"
   | "assessments"
   | "simulations"
@@ -278,6 +300,8 @@ interface TabSpec {
   icon: ReactNode;
   available: boolean;
   render: () => ReactNode;
+  /** Small count/label pill shown inside the tab (e.g. number of videos). */
+  badge?: string;
 }
 
 interface ChapterTabbedLayoutProps {
@@ -296,6 +320,7 @@ interface ChapterTabbedLayoutProps {
   pptOutline: PPTOutlineOutput | null;
   flows: GeneratedContent[];
   diagrams: GeneratedContent[];
+  videos: ChapterVideo[];
   worksheets: GeneratedContent[];
   simulations: GeneratedContent[];
   extraContent: GeneratedContent[];
@@ -310,6 +335,7 @@ interface ChapterTabbedLayoutProps {
   loadErrors: {
     summary: boolean;
     visuals: boolean;
+    videos: boolean;
     worksheets: boolean;
     assessments: boolean;
     simulations: boolean;
@@ -336,6 +362,7 @@ function ChapterTabbedLayout(props: ChapterTabbedLayoutProps) {
     pptOutline,
     flows,
     diagrams,
+    videos,
     worksheets,
     simulations,
     extraContent,
@@ -353,10 +380,8 @@ function ChapterTabbedLayout(props: ChapterTabbedLayoutProps) {
   // functions and the hero panel below. Declared once at the top of the
   // function so React's useMemo dep array sees stable identities.
   const chapterTheme = subjectTheme(ch.subject_name);
-  const ChapterSubjectIcon = subjectIcon(chapterTheme);
   const themeColor = subjectVar(chapterTheme);
   const themeFg = subjectVarForeground(chapterTheme);
-  const themeSoft = subjectVarSoft(chapterTheme);
 
   // A tab is shown only if its content actually exists. A learner won't see
   // an empty "Lesson plan" tab; a chapter with no uploaded extras hides
@@ -436,6 +461,21 @@ function ChapterTabbedLayout(props: ChapterTabbedLayoutProps) {
           <TabErrorState label="Visuals" />
         ) : (
           <VisualsTab flows={flows} diagrams={diagrams} themeColor={themeColor} />
+        ),
+    });
+    // Video lectures sit after the summary-family tabs and before the
+    // worksheets: learners watch the lesson, then practise.
+    list.push({
+      key: "videos",
+      label: "Videos",
+      icon: <Video className="h-4 w-4" />,
+      badge: videos.length > 0 ? String(videos.length) : undefined,
+      available: videos.length > 0 || loadErrors.videos,
+      render: () =>
+        loadErrors.videos && videos.length === 0 ? (
+          <TabErrorState label="Videos" />
+        ) : (
+          <VideosTab videos={videos} themeColor={themeColor} />
         ),
     });
     list.push({
@@ -547,6 +587,7 @@ function ChapterTabbedLayout(props: ChapterTabbedLayoutProps) {
     summariesLoading,
     flows,
     diagrams,
+    videos,
     worksheets,
     simulations,
     isTeacherOrAdmin,
@@ -564,311 +605,313 @@ function ChapterTabbedLayout(props: ChapterTabbedLayoutProps) {
   ]);
 
   const visibleTabs = tabs.filter((t) => t.available);
-  const [activeKey, setActiveKey] = useState<TabKey>(
-    () => visibleTabs[0]?.key ?? "topics",
-  );
+
+  // A link like /learn/chapters/12?tab=videos opens straight on that tab. It is
+  // derived rather than copied into state, so it still works when the tabs
+  // arrive after the first render (the video list loads on its own), and a
+  // tab the learner picks always wins.
+  const [searchParams] = useSearchParams();
+  const requestedKey = visibleTabs.find((t) => t.key === searchParams.get("tab"))?.key;
+  const [pickedKey, setPickedKey] = useState<TabKey | null>(null);
+  // Learners land on the video lesson when there is one (watch, then
+  // practise); everyone else on the first tab.
+  const defaultKey: TabKey =
+    isLearner && visibleTabs.some((t) => t.key === "videos")
+      ? "videos"
+      : (visibleTabs[0]?.key ?? "topics");
+  const activeKey: TabKey = pickedKey ?? requestedKey ?? defaultKey;
   // If the active tab disappears (data changed underneath), fall back to
   // the first visible one rather than rendering nothing.
-  const activeTab =
-    visibleTabs.find((t) => t.key === activeKey) ?? visibleTabs[0];
+  const activeTab = visibleTabs.find((t) => t.key === activeKey) ?? visibleTabs[0];
+
+  // "Your path": a tab counts as done once the learner has opened it and moved
+  // on, remembered on this device; the quiz step is done once a quiz for this
+  // chapter has been submitted.
+  const { user } = useAuth();
+  const visitedKey = `st.chapter-path.${user?.id ?? "anon"}.${ch.id}`;
+  const [visited, setVisited] = useState<Set<TabKey>>(() => readVisited(visitedKey));
+  function openTab(next: TabKey) {
+    if (next === activeKey) return;
+    if (isLearner) {
+      const seen = new Set(visited).add(activeKey);
+      setVisited(seen);
+      writeVisited(visitedKey, seen);
+    }
+    setPickedKey(next);
+    setMoreOpen(false);
+  }
+  const hasTab = (k: TabKey) => visibleTabs.some((t) => t.key === k);
+  const quizDone = mySubmissions.some(
+    (s) =>
+      s.status !== "DRAFT" && assessments.some((a) => a.id === s.assessment_id),
+  );
+  const pathSteps: PathStep[] = isLearner
+    ? [
+        ...(hasTab("videos") ? [{ id: "videos", label: "Watch the lesson", tab: "videos" as TabKey }] : []),
+        ...(hasTab("summary") ? [{ id: "summary", label: "Read the summary", tab: "summary" as TabKey }] : []),
+        ...(hasTab("worksheets") ? [{ id: "worksheets", label: "Do the worksheet", tab: "worksheets" as TabKey }] : []),
+        { id: "quiz", label: "Take the chapter quiz", tab: null },
+      ]
+    : [];
+  const isDone = (s: PathStep) => (s.tab ? visited.has(s.tab) : quizDone);
+  const doneCount = pathSteps.filter(isDone).length;
+  const nextStep = pathSteps.find((s) => !isDone(s));
+
+  // The tab strip shows the main sections; the rest live under "More".
+  const primaryKeys: TabKey[] = isLearner
+    ? ["videos", "summary", "topics", "simulations", "worksheets"]
+    : ["topics", "summary", "videos", "simulations", "worksheets"];
+  const primaryTabs = primaryKeys
+    .map((k) => visibleTabs.find((t) => t.key === k))
+    .filter((t): t is TabSpec => t !== undefined);
+  const moreTabs = visibleTabs.filter((t) => !primaryKeys.includes(t.key));
+  const moreActive = moreTabs.find((t) => t.key === activeKey);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!moreRef.current?.contains(e.target as Node)) setMoreOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   // Back link targets the parent subject page when we know it; otherwise
   // we fall back to the all-subjects list.
   const backTo = ch.subject_id ? `/learn/subjects/${ch.subject_id}` : "/learn";
   const backLabel = ch.subject_name ? `Back to ${ch.subject_name}` : "Back to subjects";
 
-  return (
-    <div
-      style={subjectStyle(chapterTheme)}
-      // Subject-tinted page wash via the soft variant — bleeds into the
-      // route container's negative margins so the colour spans edge to
-      // edge instead of getting clipped at the content max-width.
-      className="-mx-4 -my-4 md:-mx-6 md:-my-6"
-    >
-      <div
-        className="relative min-h-screen px-4 py-4 md:px-6 md:py-6"
-        style={{
-          // Page-wide subject wash: stronger tint at top fading through
-          // the rest of the page to a very light version (NOT to white).
-          // This keeps the whole route visibly subject-themed, not just
-          // the hero — cards float on a coloured canvas instead of
-          // sitting on dead white space below the fold.
-          background: `linear-gradient(180deg, ${themeSoft} 0%, color-mix(in oklab, ${themeSoft} 50%, white) 600px, color-mix(in oklab, ${themeSoft} 30%, white) 100%)`,
-        }}
+  const tabButton = (t: TabSpec) => {
+    const active = activeKey === t.key;
+    return (
+      <button
+        key={t.key}
+        type="button"
+        role="tab"
+        aria-selected={active}
+        onClick={() => openTab(t.key)}
+        className={cn(
+          "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+          active
+            ? "bg-(--color-primary)/10 text-(--color-primary)"
+            : "text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)",
+        )}
       >
-        {/* Page-wide dot grid — same texture as the hero but extended
-            across the whole route at very low opacity. Uses the
-            subject colour so it tones with the wash above. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, color-mix(in oklab, ${themeColor} 25%, transparent) 1px, transparent 0)`,
-            backgroundSize: "32px 32px",
-          }}
-        />
-        <div className="relative">
-        {/* Chapter hero — bigger, bolder, with visible floating blobs
-            and a subtle dot-grid texture for paper feel. The blobs +
-            dotted texture form the app's signature visual motif so
-            every page hero shares the same shape language. */}
-        <div
-          className="relative mb-6 overflow-hidden rounded-3xl border border-(--color-border) shadow-lg"
-          style={{
-            background: `linear-gradient(135deg, ${themeSoft} 0%, var(--color-card) 60%)`,
-          }}
-        >
-          {/* Subtle dot-grid texture — radial-gradient circles in the
-              subject colour at very low opacity. Repeats every 24px so
-              it reads as paper-grain rather than a pattern. Sits
-              underneath the floating blobs so both layers compose into
-              a friendly, slightly playful background. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-40"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, color-mix(in oklab, ${themeColor} 40%, transparent) 1px, transparent 0)`,
-              backgroundSize: "24px 24px",
-            }}
-          />
-          {/* Decorative floating blobs — three soft circles in the
-              subject colour. Each gets a different float animation so
-              they drift independently and the hero feels alive when
-              the page is idle. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full opacity-30 blur-3xl animate-float-slow"
-            style={{ background: themeColor }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute right-8 top-4 h-32 w-32 rounded-full opacity-25 blur-2xl animate-float-medium"
-            style={{ background: themeColor }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-16 right-40 h-40 w-40 rounded-full opacity-20 blur-2xl animate-float-fast"
-            style={{ background: themeColor }}
-          />
+        {t.label}
+        {t.badge && (
+          <span className="rounded-full bg-(--color-primary)/10 px-2 py-0.5 text-xs font-bold text-(--color-primary)">
+            {t.badge}
+          </span>
+        )}
+      </button>
+    );
+  };
 
-          <div className="relative px-6 py-8 md:px-10 md:py-10">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="flex min-w-0 items-start gap-4 md:gap-6">
-                {/* Big bold subject tile — h-24 on desktop, with a
-                    saturated gradient and proper drop shadow. This is
-                    the page's strongest visual signal: see green tile
-                    → know it's Science. Subtle white inner ring helps
-                    the tile read against the soft gradient backdrop. */}
-                <div
-                  className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-3xl shadow-xl ring-2 ring-white/30 md:h-24 md:w-24"
-                  style={{
-                    background: `linear-gradient(135deg, ${themeColor}, color-mix(in oklab, ${themeColor} 70%, black))`,
-                    color: themeFg,
-                  }}
-                >
-                  <ChapterSubjectIcon className="h-9 w-9 md:h-11 md:w-11" />
-                </div>
-                <div className="min-w-0 pt-1">
-                  {/* Subject as a bold filled colour chip + chapter
-                      pill. Reads at a glance; reinforces colour story. */}
-                  {ch.subject_name && (
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <span
-                        className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide shadow-sm"
-                        style={{
-                          background: themeColor,
-                          color: themeFg,
-                        }}
-                      >
-                        {ch.subject_name}
-                      </span>
-                      <span className="inline-flex items-center rounded-full bg-(--color-card) px-3 py-1 text-xs font-medium text-(--color-muted-foreground) ring-1 ring-(--color-border)">
-                        Chapter {ch.chapter_number}
-                      </span>
-                    </div>
-                  )}
-                  <h1 className="text-3xl font-bold leading-[1.05] tracking-tight md:text-5xl">
-                    {ch.title}
-                  </h1>
-                  {/* Hand-drawn-style wavy underline beneath the
-                      title — a friendly visual signature unique to
-                      the platform. The path rides slightly into the
-                      negative space below the text and uses the
-                      subject colour at moderate opacity so it reads
-                      as a highlight rather than punctuation. */}
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 220 12"
-                    fill="none"
-                    className="mt-1 h-2 w-40 md:h-3 md:w-56"
-                    preserveAspectRatio="none"
-                  >
-                    <path
-                      d="M 2 8 Q 30 0 60 6 T 120 6 T 180 6 T 218 8"
-                      stroke={themeColor}
-                      strokeWidth="3.5"
-                      strokeLinecap="round"
-                      fill="none"
-                      opacity="0.7"
-                    />
-                  </svg>
-                  <p className="mt-3 text-base text-(--color-muted-foreground) md:text-lg">
-                    {/* Friendlier description for learners with a small
-                        sparkle to add warmth — students see this every
-                        time they open a chapter; tone matters. */}
-                    {isLearner ? (
-                      <>
-                        <Sparkles className="mr-1 inline h-4 w-4 align-text-bottom" />
-                        {topics.length}{" "}
-                        {topics.length === 1 ? "topic" : "topics"} ahead —
-                        pick one to start exploring
-                      </>
-                    ) : (
-                      <>
-                        {topics.length}{" "}
-                        {topics.length === 1 ? "topic" : "topics"} in this
-                        chapter
-                      </>
-                    )}
-                    {!ch.subject_name &&
-                      ` · Chapter ${ch.chapter_number}`}
-                  </p>
-                </div>
-              </div>
-              <Button asChild variant="outline" className="rounded-full">
-                <Link to={backTo}>
-                  <ArrowLeft className="h-4 w-4" />
-                  {backLabel}
-                </Link>
-              </Button>
-            </div>
-
-            {/* Learner CTAs — Practice is the primary, filled with
-                the subject gradient. Friendly voice ("Let's practice")
-                and a hover scale that feels tactile on tablets. */}
-            {isLearner && (
-              <div className="relative mt-7 flex flex-wrap gap-3">
-                <Button
-                  asChild
-                  size="lg"
-                  className="rounded-full shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]"
-                  style={{
-                    background: `linear-gradient(135deg, ${themeColor}, color-mix(in oklab, ${themeColor} 70%, black))`,
-                    color: themeFg,
-                  }}
-                >
-                  <Link to={`/quick-quiz?chapter=${ch.id}`}>
-                    <Sparkles className="h-4 w-4" /> Let's practice
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="rounded-full transition-transform hover:scale-[1.03] active:scale-[0.98]"
-                  onClick={() => startChat("CHAPTER")}
-                  disabled={createChatPending}
-                  title={
-                    aiChatEnabled
-                      ? "Start an AI tutor chat scoped to this whole chapter"
-                      : "AI tutor is a premium feature — ask your admin to enable it"
-                  }
-                >
-                  {aiChatEnabled ? (
-                    <Bot className="h-4 w-4" />
-                  ) : (
-                    <Lock className="h-4 w-4" />
-                  )}
-                  {aiChatEnabled ? "Ask the AI tutor" : "AI tutor (premium)"}
-                </Button>
-              </div>
-            )}
-          </div>
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <Link
+            to={backTo}
+            className="inline-flex items-center gap-1.5 text-sm text-(--color-muted-foreground) hover:text-(--color-foreground)"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {backLabel}
+          </Link>
+          <h1 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight md:text-3xl">
+            Chapter {ch.chapter_number} · {ch.title}
+          </h1>
+          <p className="mt-1 text-sm text-(--color-muted-foreground)">
+            {topics.length} {topics.length === 1 ? "topic" : "topics"}
+            {isLearner ? " ahead. Watch, read, then practise." : " in this chapter"}
+          </p>
         </div>
+        {isLearner && (
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg" className="rounded-xl">
+              <Link to={`/quick-quiz?chapter=${ch.id}`}>
+                <Sparkles className="h-4 w-4" /> Let's practise
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="rounded-xl"
+              onClick={() => startChat("CHAPTER")}
+              disabled={createChatPending}
+              title={
+                aiChatEnabled
+                  ? "Start an AI tutor chat scoped to this whole chapter"
+                  : "AI tutor is a premium feature. Ask your admin to enable it"
+              }
+            >
+              {aiChatEnabled ? <Bot className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+              {aiChatEnabled ? "Ask the AI tutor" : "AI tutor (premium)"}
+            </Button>
+          </div>
+        )}
+      </div>
 
-        {/* Quick-explore band — colourful shortcut chips for the
-            actions a learner most often wants to take. Each chip
-            uses its own accent hue (not the subject colour) so the
-            page picks up visible colour variety beyond just the
-            subject palette. Only renders for learners; teachers and
-            admins skip straight to the tab strip below. */}
-        {isLearner && visibleTabs.length > 1 && (
-          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {visibleTabs.find((t) => t.key === "summary") && (
-              <ExploreChip
-                accentColor="oklch(60% 0.16 240)"
-                accentSoft="oklch(95% 0.04 240)"
-                icon={<BookOpen className="h-5 w-5" />}
-                label="Read the summary"
-                hint="Quick recap to anchor the chapter"
-                onClick={() => setActiveKey("summary")}
-              />
-            )}
-            {visibleTabs.find((t) => t.key === "visuals") && (
-              <ExploreChip
-                accentColor="oklch(64% 0.18 200)"
-                accentSoft="oklch(95% 0.04 200)"
-                icon={<Network className="h-5 w-5" />}
-                label="See the visuals"
-                hint="Concept maps and flow diagrams"
-                onClick={() => setActiveKey("visuals")}
-              />
-            )}
-            {visibleTabs.find((t) => t.key === "worksheets") && (
-              <ExploreChip
-                accentColor="oklch(66% 0.18 65)"
-                accentSoft="oklch(96% 0.04 65)"
-                icon={<FileText className="h-5 w-5" />}
-                label="Try a worksheet"
-                hint="Self-check questions with answers"
-                onClick={() => setActiveKey("worksheets")}
-              />
-            )}
-            {visibleTabs.find((t) => t.key === "assessments") && (
-              <ExploreChip
-                accentColor="oklch(60% 0.2 290)"
-                accentSoft="oklch(95% 0.04 290)"
-                icon={<ClipboardCheck className="h-5 w-5" />}
-                label="Take a test"
-                hint="Track how you're doing"
-                onClick={() => setActiveKey("assessments")}
-              />
+      <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Chapter sections">
+        {primaryTabs.map(tabButton)}
+        {moreTabs.length > 0 && (
+          <div ref={moreRef} className="relative">
+            <button
+              type="button"
+              aria-expanded={moreOpen}
+              aria-haspopup="true"
+              onClick={() => setMoreOpen((v) => !v)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                moreActive
+                  ? "bg-(--color-primary)/10 text-(--color-primary)"
+                  : "text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)",
+              )}
+            >
+              {moreActive ? moreActive.label : "More"}
+              <ChevronDown className={cn("h-4 w-4 transition-transform", moreOpen && "rotate-180")} aria-hidden />
+            </button>
+            {moreOpen && (
+              <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-(--color-border) bg-(--color-card) p-1.5 shadow-lg">
+                {moreTabs.map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => openTab(t.key)}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-(--color-muted)",
+                      activeKey === t.key && "bg-(--color-primary)/10 font-semibold text-(--color-primary)",
+                    )}
+                  >
+                    {t.icon}
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         )}
+      </div>
 
-        {/* Tab strip — bigger pills, full rounded, prominent active
-            state with subtle shadow. The active tab carries an
-            invisible-on-rest, visible-on-hover scale that gives
-            tactile feedback without distracting from focus. */}
-        <div className="mb-6 flex flex-wrap gap-1 rounded-2xl border border-(--color-border) bg-(--color-card) p-1.5 shadow-sm">
-          {visibleTabs.map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveKey(t.key)}
-              className={cn(
-                "flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all",
-                activeKey === t.key
-                  ? "bg-(--color-primary) text-(--color-primary-foreground) shadow-md"
-                  : "text-(--color-muted-foreground) hover:scale-[1.02] hover:bg-(--color-muted) hover:text-(--color-foreground)",
-              )}
-            >
-              {t.icon}
-              {t.label}
-            </button>
-          ))}
-        </div>
+      {pathSteps.length > 0 && (
+        <Card className="rounded-2xl px-5 py-3">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <div className="flex items-center gap-3">
+              <h2 className="font-display text-base font-bold">Your path</h2>
+              <span className="text-sm text-(--color-muted-foreground)">
+                {doneCount} of {pathSteps.length}
+              </span>
+              <div
+                className="h-2 w-24 overflow-hidden rounded-full bg-(--color-muted)"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={pathSteps.length}
+                aria-valuenow={doneCount}
+                aria-label="Chapter steps done"
+              >
+                <div
+                  className="h-full rounded-full bg-(--color-primary)"
+                  style={{ width: `${Math.round((doneCount / pathSteps.length) * 100)}%` }}
+                />
+              </div>
+            </div>
+            <ol className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1">
+              {pathSteps.map((s, i) => {
+                const done = isDone(s);
+                const current = s === nextStep;
+                const dot = (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold",
+                      done
+                        ? "bg-(--color-primary) text-(--color-primary-foreground)"
+                        : "bg-(--color-muted) text-(--color-muted-foreground)",
+                    )}
+                  >
+                    {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                  </span>
+                );
+                const rowClass = cn(
+                  "flex items-center gap-2 py-1 text-left text-sm",
+                  current && "font-semibold",
+                );
+                return (
+                  <li key={s.id}>
+                    {s.tab ? (
+                      <button type="button" className={rowClass} onClick={() => openTab(s.tab as TabKey)}>
+                        {dot}
+                        {s.label}
+                      </button>
+                    ) : (
+                      <Link className={rowClass} to={`/quick-quiz?chapter=${ch.id}`}>
+                        {dot}
+                        {s.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+            {nextStep ? (
+              nextStep.tab ? (
+                <Button className="rounded-xl" onClick={() => openTab(nextStep.tab as TabKey)}>
+                  Next: {nextStep.label.toLowerCase()}
+                </Button>
+              ) : (
+                <Button asChild className="rounded-xl">
+                  <Link to={`/quick-quiz?chapter=${ch.id}`}>Next: take the quiz</Link>
+                </Button>
+              )
+            ) : (
+              <span className="text-sm text-(--color-muted-foreground)">
+                All steps done. A fresh quiz keeps it sharp.
+              </span>
+            )}
+          </div>
+        </Card>
+      )}
 
-        {/* Active tab content. The `key` forces React to remount on
-            tab change so the entrance animation re-fires — gentle
-            fade + slide-up gives switches a sense of motion without
-            being distracting. */}
-        <div key={activeKey} className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {activeTab?.render()}
-        </div>
-        </div>
+      {/* Active tab content. The `key` forces React to remount on tab change
+          so the entrance animation re-fires. */}
+      <div key={activeKey} className="min-w-0 space-y-4 animate-in fade-in duration-300">
+        {activeTab?.render()}
       </div>
     </div>
   );
+}
+
+interface PathStep {
+  id: string;
+  label: string;
+  /** The tab that opens this step, or null for the quiz step. */
+  tab: TabKey | null;
+}
+
+/** The tabs a learner has already seen in this chapter, kept on this device. */
+function readVisited(key: string): Set<TabKey> {
+  try {
+    const raw = localStorage.getItem(key);
+    return new Set(raw ? (JSON.parse(raw) as TabKey[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function writeVisited(key: string, seen: Set<TabKey>): void {
+  try {
+    localStorage.setItem(key, JSON.stringify([...seen]));
+  } catch {
+    // Storage can be blocked; the path simply will not be remembered.
+  }
 }
 
 
@@ -993,78 +1036,6 @@ function TopicsTab({
   );
 }
 
-
-/**
- * Colourful shortcut chip rendered in the band between the chapter
- * hero and the tab strip. Each chip:
- *   - has its own accent colour (passed in) — the band carries 4 chips
- *     in 4 different hues so the page picks up visible colour variety
- *     beyond just the subject palette
- *   - shows a coloured icon plate, a friendly label, and a one-line
- *     hint explaining what the section is for
- *   - is fully clickable; switches to the corresponding tab
- *
- * Visual treatment is intentionally bold (filled icon plate, gradient,
- * shadow on hover, gentle scale) so the band reads as the "what would
- * you like to do?" entry point rather than a navigational footnote.
- */
-function ExploreChip({
-  accentColor,
-  accentSoft,
-  icon,
-  label,
-  hint,
-  onClick,
-}: {
-  accentColor: string;
-  accentSoft: string;
-  icon: ReactNode;
-  label: string;
-  hint: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex items-center gap-3 rounded-2xl border border-(--color-border) bg-(--color-card) p-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]"
-      style={{
-        // We can't statically extract a dynamic accent colour into a
-        // hover:border class, so we set borderColor inline on hover via
-        // a JS handler. Rest border stays --color-border for cohesion
-        // with the surrounding cards.
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = accentColor)}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "")}
-    >
-      <div
-        className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform group-hover:scale-105 group-hover:rotate-3"
-        style={{
-          background: `linear-gradient(135deg, ${accentColor}, color-mix(in oklab, ${accentColor} 70%, black))`,
-          color: "white",
-        }}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold leading-tight md:text-base">
-          {label}
-        </div>
-        <div className="mt-0.5 text-xs text-(--color-muted-foreground)">
-          {hint}
-        </div>
-      </div>
-      <ArrowRight
-        className="h-4 w-4 flex-shrink-0 text-(--color-muted-foreground) transition-all group-hover:translate-x-1"
-        style={{}}
-      />
-      {/* Hidden swatch — keeps `accentSoft` referenced so its
-          colour fans out into per-chip subtle tinted hovers if we
-          adopt that pattern later. Lint-quiet, zero render cost. */}
-      <span aria-hidden style={{ display: "none", color: accentSoft }} />
-    </button>
-  );
-}
 
 
 /**
@@ -1573,6 +1544,131 @@ function AssessmentsTab({
 }
 
 
+// Google Drive file ids are URL-safe base64-ish tokens. Validating before we
+// build a URL means a bad row can never smuggle a different host or path
+// into the iframe `src`.
+const DRIVE_ID_RE = /^[A-Za-z0-9_-]{20,100}$/;
+
+function videoEmbedUrl(video: ChapterVideo): string | null {
+  if (video.provider === "gdrive" && DRIVE_ID_RE.test(video.external_id)) {
+    return `https://drive.google.com/file/d/${video.external_id}/preview`;
+  }
+  return null;
+}
+
+function VideosTab({
+  videos,
+  themeColor,
+}: {
+  videos: ChapterVideo[];
+  themeColor: string;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (videos.length === 0) {
+    return (
+      <Empty
+        scene="puzzle"
+        accent={themeColor}
+        title="Video lectures on the way"
+        description="Lessons for this chapter will appear here when they're ready."
+      />
+    );
+  }
+
+  const index = Math.min(activeIndex, videos.length - 1);
+  const current = videos[index];
+  const src = videoEmbedUrl(current);
+
+  return (
+    <ThemedSection themeColor={themeColor}>
+      <CardHeader>
+        <CardTitle className="flex items-center text-xl md:text-2xl">
+          <ThemedTitleMark themeColor={themeColor} />
+          Video lectures
+        </CardTitle>
+        <CardDescription className="text-base">
+          Watch the lesson first, then the word-by-word parts, before you try
+          the worksheets.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl border bg-black">
+          {src ? (
+            <>
+              <iframe
+                // Re-mount per video so switching parts resets the player.
+                key={current.id}
+                src={src}
+                title={current.title}
+                className="h-full w-full"
+                // No picture-in-picture: it would pull the video out of the page.
+                allow="autoplay; fullscreen"
+                allowFullScreen
+                // `allow-popups` is deliberately NOT granted. Google's player has a
+                // "pop out" button that opens the file on drive.google.com in a
+                // new tab, where the URL can be copied and shared. Without the
+                // permission the browser refuses to open any new window from here.
+                sandbox="allow-scripts allow-same-origin allow-presentation"
+              />
+              {/* Belt and braces: swallow clicks on the corner where the player
+                  draws its pop-out button, and its right-click menu. */}
+              <div
+                aria-hidden
+                className="absolute right-0 top-0 z-10 h-16 w-20"
+                onContextMenu={(e) => e.preventDefault()}
+              />
+            </>
+          ) : (
+            <div className="flex h-full items-center justify-center p-6 text-center text-sm text-white/80">
+              This video can't be played right now.
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <p className="min-w-0 truncate text-base font-medium">
+            {current.title}
+          </p>
+          <div className="flex shrink-0 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={index === 0}
+              onClick={() => setActiveIndex(index - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={index === videos.length - 1}
+              onClick={() => setActiveIndex(index + 1)}
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {videos.map((v, i) => (
+            <Button
+              key={v.id}
+              className="w-full justify-start rounded-xl py-5 text-base"
+              variant={i === index ? "default" : "outline"}
+              onClick={() => setActiveIndex(i)}
+            >
+              <PlayCircle className="h-5 w-5" />
+              <span className="min-w-0 truncate">{v.title}</span>
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </ThemedSection>
+  );
+}
+
+
 function SimulationsTab({
   simulations,
   themeColor,
@@ -1580,6 +1676,113 @@ function SimulationsTab({
   simulations: GeneratedContent[];
   themeColor: string;
 }) {
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const [src, setSrc] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  // Native browser full screen is tracked from the `fullscreenchange` event;
+  // `expanded` is the CSS fallback for browsers with no element full screen
+  // (notably iPhone Safari), where we cover the viewport ourselves instead.
+  const [nativeFull, setNativeFull] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const urlRef = useRef<string | null>(null);
+  // Bumped on every open/close so a slow, superseded fetch can't overwrite
+  // the simulation the learner has since switched to.
+  const requestRef = useRef(0);
+
+  const isFull = nativeFull || expanded;
+  const active = simulations.find((s) => s.id === activeId) ?? null;
+
+  function releaseUrl() {
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+      urlRef.current = null;
+    }
+  }
+
+  // Free the blob when the tab is left.
+  useEffect(() => releaseUrl, []);
+
+  useEffect(() => {
+    const onChange = () => setNativeFull(document.fullscreenElement === viewerRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expanded]);
+
+  async function play(sim: GeneratedContent) {
+    const ticket = ++requestRef.current;
+    releaseUrl();
+    setActiveId(sim.id);
+    setSrc(null);
+    setLoading(true);
+    try {
+      const loaded = await loadArtifactObjectUrl(sim.id);
+      if (ticket !== requestRef.current) {
+        if (loaded) URL.revokeObjectURL(loaded.url);
+        return;
+      }
+      if (!loaded) {
+        // Already explained to the user with a toast.
+        setActiveId(null);
+        return;
+      }
+      urlRef.current = loaded.url;
+      setSrc(loaded.url);
+    } catch (err) {
+      if (ticket === requestRef.current) {
+        setActiveId(null);
+        toast.error(humanError(err));
+      }
+    } finally {
+      if (ticket === requestRef.current) setLoading(false);
+    }
+  }
+
+  function closeViewer() {
+    requestRef.current++;
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    releaseUrl();
+    setExpanded(false);
+    setSrc(null);
+    setActiveId(null);
+    setLoading(false);
+  }
+
+  async function toggleFullScreen() {
+    // Leaving: clear both modes, whichever one is active.
+    if (document.fullscreenElement || expanded) {
+      setExpanded(false);
+      if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+      return;
+    }
+    const el = viewerRef.current;
+    if (el?.requestFullscreen) {
+      // Real browsers answer straight away. Some embedded browsers / WebViews
+      // accept the request but never settle it, so don't wait forever: if it
+      // hasn't taken effect shortly, cover the viewport ourselves instead.
+      const entered = await Promise.race([
+        el.requestFullscreen().then(
+          () => true,
+          () => false, // denied or unsupported here
+        ),
+        new Promise<boolean>((resolve) =>
+          setTimeout(() => resolve(document.fullscreenElement === el), 800),
+        ),
+      ]);
+      if (entered) return;
+    }
+    setExpanded(true);
+  }
+
   if (simulations.length === 0) {
     return (
       <Empty
@@ -1598,28 +1801,99 @@ function SimulationsTab({
           Simulations
         </CardTitle>
         <CardDescription className="text-base">
-          Tap any one to play — they open in a new tab so you can flip back
-          to the chapter without losing your place.
+          Tap any one to play it right here. Use Full screen for a bigger view.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {simulations.map((sim) => (
-          <Button
-            key={sim.id}
-            className="w-full justify-start rounded-xl py-6 text-base transition-transform hover:-translate-y-0.5 hover:shadow-md"
-            variant="outline"
-            onClick={async () => {
-              try {
-                await openArtifact(sim.id, { title: sim.title });
-              } catch (err) {
-                toast.error(humanError(err));
-              }
-            }}
+      <CardContent className="space-y-4">
+        {active && (
+          <div
+            ref={viewerRef}
+            className={cn(
+              "flex flex-col overflow-hidden border bg-(--color-card) shadow-sm",
+              expanded ? "fixed inset-0 z-50 rounded-none" : "rounded-xl",
+              nativeFull && "rounded-none",
+            )}
           >
-            <PlayCircle className="h-5 w-5" />
-            {sim.title || "Play simulation"}
-          </Button>
-        ))}
+            <div className="flex items-center justify-between gap-2 border-b px-3 py-2">
+              <p className="min-w-0 truncate text-sm font-medium md:text-base">
+                {active.title || "Simulation"}
+              </p>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => void toggleFullScreen()}
+                  title={isFull ? "Exit full screen" : "Full screen"}
+                >
+                  {isFull ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                  <span className="hidden sm:inline">{isFull ? "Exit full screen" : "Full screen"}</span>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  title="Open in a new tab"
+                  aria-label="Open in a new tab"
+                  onClick={async () => {
+                    try {
+                      await openArtifact(active.id, { title: active.title });
+                    } catch (err) {
+                      toast.error(humanError(err));
+                    }
+                  }}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  title="Close"
+                  aria-label="Close simulation"
+                  onClick={closeViewer}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div
+              className={cn(
+                "relative bg-white",
+                isFull ? "min-h-0 flex-1" : "h-[70vh] min-h-[420px]",
+              )}
+            >
+              {loading || !src ? (
+                <div className="flex h-full items-center justify-center gap-2 text-sm text-(--color-muted-foreground)">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Loading simulation…
+                </div>
+              ) : (
+                <iframe
+                  key={active.id}
+                  src={src}
+                  title={active.title || "Simulation"}
+                  className="absolute inset-0 h-full w-full border-0"
+                  allowFullScreen
+                  // Simulations are generated, self-contained pages. Running them
+                  // in an opaque-origin sandbox (no `allow-same-origin`) means their
+                  // scripts cannot read this app's login token or call its API.
+                  sandbox="allow-scripts allow-modals"
+                />
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {simulations.map((sim) => (
+            <Button
+              key={sim.id}
+              className="w-full justify-start rounded-xl py-6 text-base transition-transform hover:-translate-y-0.5 hover:shadow-md"
+              variant={sim.id === activeId ? "default" : "outline"}
+              onClick={() => void play(sim)}
+            >
+              <PlayCircle className="h-5 w-5" />
+              {sim.title || "Play simulation"}
+            </Button>
+          ))}
+        </div>
       </CardContent>
     </ThemedSection>
   );
@@ -2517,6 +2791,3 @@ function LessonPlanTab({ plan }: { plan: LessonPlanOutput }) {
   );
 }
 
-
-// Used implicitly via type inference on .id; suppress unused-import warning.
-export type _ = GeneratedContent;

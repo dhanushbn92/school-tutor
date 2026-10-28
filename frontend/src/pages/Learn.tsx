@@ -1,9 +1,7 @@
-import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, BookOpen, Loader2 } from "lucide-react";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { ThemedPage } from "@/components/themed";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { BookOpen, Loader2 } from "lucide-react";
+import { SubjectCard } from "@/components/SubjectCard";
 import { Empty } from "@/components/ui/empty";
 import { BoardContextBar, labelForSubject } from "@/components/BoardContextBar";
 import { Label } from "@/components/ui/label";
@@ -15,14 +13,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/lib/auth";
-import { useMySections } from "@/lib/queries";
-import { useAvailableClasses, useAvailableSubjects } from "@/lib/scope";
 import {
-  subjectIcon,
-  subjectTheme,
-  subjectVar,
-  subjectVarForeground,
-} from "@/lib/subjectTheme";
+  useFeaturedVideos,
+  useMySections,
+  useMyStudents,
+  useStudentMastery,
+} from "@/lib/queries";
+import { rollupChapters, rollupSubjects } from "@/lib/progress";
+import { useAvailableClasses, useAvailableSubjects } from "@/lib/scope";
+import { cn } from "@/lib/utils";
+
+type Filter = "all" | "progress" | "videos";
+
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "All subjects" },
+  { key: "progress", label: "In progress" },
+  { key: "videos", label: "With videos" },
+];
 
 export function LearnPage() {
   const { user } = useAuth();
@@ -60,6 +67,33 @@ export function LearnPage() {
     ? subjects.filter((s) => s.id === urlSubjectId)
     : subjects;
 
+  // Learners also see where they are up to in each subject, and how many
+  // videos it has; both come from data the home page already loads.
+  const [filter, setFilter] = useState<Filter>("all");
+  const section = sectionsQ.data?.[0];
+  const studentsQ = useMyStudents(isMultiClass ? undefined : section?.id);
+  const myStudent = studentsQ.data?.find((st) => st.user_id === user?.id);
+  const masteryQ = useStudentMastery({
+    student_id: myStudent?.id,
+    class_level: section?.class_level ?? undefined,
+    allSubjects: true,
+  });
+  const featuredQ = useFeaturedVideos();
+  const progressBySubject = useMemo(() => {
+    const m = new Map<number, ReturnType<typeof rollupSubjects>[number]>();
+    for (const r of rollupSubjects(rollupChapters(masteryQ.data))) {
+      if (r.subject_id !== null) m.set(r.subject_id, r);
+    }
+    return m;
+  }, [masteryQ.data]);
+  const videosBySubject = useMemo(() => {
+    const m = new Map<number, number>();
+    for (const c of featuredQ.data?.chapters ?? []) {
+      m.set(c.subject_id, (m.get(c.subject_id) ?? 0) + c.video_count);
+    }
+    return m;
+  }, [featuredQ.data]);
+
   function setClass(level: number) {
     const next = new URLSearchParams(params);
     next.set("class", String(level));
@@ -87,7 +121,7 @@ export function LearnPage() {
   if (user?.role === "teacher" && available.classes.length === 0) {
     return (
       <div>
-        <PageHeader title="Learn" description="Subjects you've been assigned to teach." />
+        <PageTitle title="Learn" subtitle="Subjects you've been assigned to teach." />
         <Empty
           icon={<BookOpen className="h-6 w-6" />}
           title="No subjects assigned to you yet"
@@ -97,19 +131,49 @@ export function LearnPage() {
     );
   }
 
+  const showFilters = !isMultiClass;
+  const visibleSubjects = filteredSubjects.filter((sub) => {
+    if (!showFilters || filter === "all") return true;
+    if (filter === "videos") return (videosBySubject.get(sub.id) ?? 0) > 0;
+    return hasStarted(progressBySubject.get(sub.id));
+  });
+  const board = subjects[0]?.board;
+
   return (
-    <ThemedPage>
-      <PageHeader
-        title="Learn"
-        description={
-          classLevel
-            ? `Subjects for Class ${classLevel}. Pick one to browse chapters, topics, and practice material.`
-            : "Subjects for your class."
-        }
-      />
+    <div>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <PageTitle
+          title="Learn"
+          subtitle={
+            classLevel
+              ? `Class ${classLevel}${board ? ` · ${board}` : ""}. Pick a subject to ${isMultiClass ? "browse chapters and practice material" : "continue"}.`
+              : "Subjects for your class."
+          }
+        />
+        {showFilters && (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filter subjects">
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                onClick={() => setFilter(f.key)}
+                aria-pressed={filter === f.key}
+                className={cn(
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                  filter === f.key
+                    ? "border-(--color-foreground) bg-(--color-foreground) text-(--color-background)"
+                    : "border-(--color-border) bg-(--color-card) text-(--color-muted-foreground) hover:text-(--color-foreground)",
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {isMultiClass && (
-        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-md border border-(--color-border) bg-(--color-card) p-3">
+        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-2xl border border-(--color-border) bg-(--color-card) p-3">
           <div className="grid gap-1.5">
             <Label htmlFor="learn-class" className="text-xs">
               Class
@@ -181,76 +245,62 @@ export function LearnPage() {
               : "Your class doesn't have subjects configured yet. Please check back soon."
           }
         />
+      ) : visibleSubjects.length === 0 ? (
+        <Empty
+          icon={<BookOpen className="h-6 w-6" />}
+          title="Nothing matches this filter"
+          description="Try All subjects to see everything in your class."
+        />
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filteredSubjects.map((s) => {
-            // Resolve subject colour for inline use. We bind via inline
-            // style props (rather than `bg-(--theme)` Tailwind shortcuts)
-            // because the theme tokens are runtime-cascaded and inline
-            // style is the most reliable way to consume them.
-            const theme = subjectTheme(s.name);
-            const Icon = subjectIcon(theme);
-            const themeColor = subjectVar(theme);
-            const themeFg = subjectVarForeground(theme);
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-5">
+          {visibleSubjects.map((sub) => {
+            const prog = progressBySubject.get(sub.id);
+            const started = !isMultiClass && hasStarted(prog);
+            const chapters = prog?.chapters.length;
+            const where = isMultiClass
+              ? `Class ${classLevel ?? ""}`
+              : prog?.current
+                ? `Chapter ${prog.current.chapter_number} of ${chapters}`
+                : chapters
+                  ? `${chapters} chapters`
+                  : "Not started";
             return (
-              <Link
-                key={s.id}
-                to={`/learn/subjects/${s.id}`}
-                className="group block focus:outline-none"
-              >
-                <Card
-                  className="relative overflow-hidden rounded-2xl shadow-sm transition-all duration-150 group-hover:-translate-y-1 group-hover:shadow-xl"
-                  style={{ borderLeft: `4px solid ${themeColor}` }}
-                >
-                  {/* Bigger subject-coloured halo in the top-right
-                      corner. Large enough to read as decoration; the
-                      title still anchors the eye thanks to higher
-                      visual weight (bold display font, dark colour). */}
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-25 blur-2xl"
-                    style={{ background: themeColor }}
-                  />
-                  <CardHeader className="relative">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {/* Big subject icon tile with a vivid gradient
-                            fill. Same shape language as the chapter and
-                            subject heroes so the visual identity stays
-                            consistent across the learning flow. */}
-                        <div
-                          className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-md ring-1 ring-white/30"
-                          style={{
-                            background: `linear-gradient(135deg, ${themeColor}, color-mix(in oklab, ${themeColor} 70%, black))`,
-                            color: themeFg,
-                          }}
-                        >
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        <CardTitle className="text-xl">{s.name}</CardTitle>
-                      </div>
-                      <ArrowRight className="h-5 w-5 text-(--color-muted-foreground) transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <CardDescription className="mt-2 flex items-center gap-2">
-                      {/* Board chip — lets the viewer tell CBSE Maths from
-                          NIOS Maths without opening the card. */}
-                      {s.board && (
-                        <Badge className="text-[10px] font-bold uppercase tracking-wide">
-                          {s.board}
-                        </Badge>
-                      )}
-                      <span>Class {classLevel ?? "—"}</span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="relative text-sm text-(--color-muted-foreground)">
-                    Browse chapters, topic summaries, and practice quizzes.
-                  </CardContent>
-                </Card>
-              </Link>
+              <SubjectCard
+                key={sub.id}
+                size="large"
+                name={sub.name}
+                board={sub.board}
+                percent={isMultiClass ? null : (prog?.percent ?? 0)}
+                where={where}
+                chapterCount={chapters}
+                videos={videosBySubject.get(sub.id) ?? 0}
+                highlight={started}
+                cta={isMultiClass ? "Open" : started ? "Continue" : "Start"}
+                to={
+                  started && prog?.current
+                    ? `/learn/chapters/${prog.current.chapter_id}`
+                    : `/learn/subjects/${sub.id}`
+                }
+              />
             );
           })}
         </div>
       )}
-    </ThemedPage>
+    </div>
+  );
+}
+
+/** True once the learner has attempted anything in the subject. */
+function hasStarted(p: { chapters: { outcomes_attempted: number }[] } | undefined): boolean {
+  return p?.chapters.some((c) => c.outcomes_attempted > 0) ?? false;
+}
+
+/** The flat page heading used on the learner-facing pages. */
+function PageTitle({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div>
+      <h1 className="font-display text-3xl font-extrabold tracking-tight">{title}</h1>
+      <p className="mt-1.5 text-base text-(--color-muted-foreground)">{subtitle}</p>
+    </div>
   );
 }

@@ -40,22 +40,21 @@ const INLINE_VIEWABLE = new Set([
  * point of getting a Window handle to navigate. Once the navigation
  * completes we set `tab.opener = null` ourselves to sever the back-ref.
  */
-export async function openArtifact(
+/**
+ * Fetch an artifact's bytes with the user's JWT.
+ *
+ * Returns `null` when the failure was one we already explained to the user with
+ * a toast; rethrows anything we couldn't classify so the caller can decide.
+ */
+async function fetchArtifactBlob(
   contentId: number,
-  opts?: { title?: string },
-): Promise<void> {
-  // Open synchronously inside the click handler so the browser treats it as
-  // user-initiated. Note: no `noopener` — we need the Window reference.
-  const tab = window.open("about:blank", "_blank");
-
+): Promise<{ blob: Blob; contentType: string } | null> {
   let response: AxiosResponse<Blob>;
   try {
     response = await api.get<Blob>(`/generated-content/${contentId}/artifact`, {
       responseType: "blob",
     });
   } catch (err) {
-    // Don't leave a blank tab hanging if the fetch fails.
-    tab?.close();
     // For 4xx errors the backend returns JSON in the response body
     // (e.g. {"detail": "Auto-heal failed: ..."}). Axios delivers it
     // as a Blob because we asked for responseType:"blob" — convert
@@ -72,7 +71,7 @@ export async function openArtifact(
         const status = axiosErr.response?.status ?? "?";
         if (parsed?.detail) {
           toast.error(`Couldn't open simulation (HTTP ${status}): ${parsed.detail}`);
-          return;
+          return null;
         }
       } catch {
         /* fall through */
@@ -85,7 +84,7 @@ export async function openArtifact(
       toast.error(
         "Network error reaching the server. Check your connection; if it persists, the backend may be down or returning a 5xx without CORS headers.",
       );
-      return;
+      return null;
     }
     throw err;
   }
@@ -93,9 +92,47 @@ export async function openArtifact(
   const contentType = String(
     response.headers["content-type"] ?? "application/octet-stream",
   );
+  return { blob: new Blob([response.data], { type: contentType }), contentType };
+}
+
+/**
+ * Fetch an artifact and return a blob URL for showing it inside the page
+ * (e.g. in an `<iframe>`). The caller owns the URL and must call
+ * `URL.revokeObjectURL` when done. Returns `null` if the failure was already
+ * reported to the user.
+ */
+export async function loadArtifactObjectUrl(
+  contentId: number,
+): Promise<{ url: string; contentType: string } | null> {
+  const fetched = await fetchArtifactBlob(contentId);
+  if (!fetched) return null;
+  return { url: URL.createObjectURL(fetched.blob), contentType: fetched.contentType };
+}
+
+export async function openArtifact(
+  contentId: number,
+  opts?: { title?: string },
+): Promise<void> {
+  // Open synchronously inside the click handler so the browser treats it as
+  // user-initiated. Note: no `noopener` — we need the Window reference.
+  const tab = window.open("about:blank", "_blank");
+
+  let fetched: { blob: Blob; contentType: string } | null;
+  try {
+    fetched = await fetchArtifactBlob(contentId);
+  } catch (err) {
+    // Don't leave a blank tab hanging if the fetch fails.
+    tab?.close();
+    throw err;
+  }
+  if (!fetched) {
+    tab?.close();
+    return;
+  }
+
+  const { blob, contentType } = fetched;
   const inlineKey = contentType.split(";")[0].trim();
   const ext = extensionFor(contentType);
-  const blob = new Blob([response.data], { type: contentType });
   const objectUrl = URL.createObjectURL(blob);
 
   if (INLINE_VIEWABLE.has(inlineKey)) {

@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { humanError } from "@/lib/api";
 import {
+  useChapterDetail,
   useChapters,
   useMySections,
   useQuickQuiz,
@@ -59,10 +60,23 @@ export function QuickQuizPage() {
   })();
   const sectionsQ = useMySections();
   const classLevel = sectionsQ.data?.[0]?.class_level ?? undefined;
-  const subjectsQ = useSubjects(classLevel);
-  const [subjectId, setSubjectId] = useState<number | undefined>();
-  const chaptersQ = useChapters({ class_level: classLevel, subject_id: subjectId });
-  const [chapterId, setChapterId] = useState<number | undefined>(presetChapterId);
+  // Arriving from a chapter page (?chapter=N): the subject comes from that
+  // chapter, which may not be in the learner's own class, so list every
+  // subject they can see rather than just one class.
+  const subjectsQ = useSubjects(presetChapterId ? undefined : classLevel, {
+    fetchAllWhenUndefined: presetChapterId !== undefined,
+  });
+  const presetQ = useChapterDetail(presetChapterId);
+  const [pickedSubjectId, setPickedSubjectId] = useState<number | undefined>();
+  const defaultSubjectId =
+    presetChapterId !== undefined
+      ? (presetQ.data?.subject_id ?? undefined)
+      : (subjectsQ.data?.find((s) => s.name === "Science") ?? subjectsQ.data?.[0])?.id;
+  const subjectId = pickedSubjectId ?? defaultSubjectId;
+  const chaptersQ = useChapters({ class_level: subjectId ? undefined : classLevel, subject_id: subjectId });
+  const [pickedChapterId, setPickedChapterId] = useState<number | undefined>(presetChapterId);
+  // Until a chapter is picked, the first one of the subject is selected.
+  const chapterId = pickedChapterId ?? chaptersQ.data?.[0]?.id;
   const [mode, setMode] = useState<"single" | "cumulative">("single");
   const [kind, setKind] = useState<QuizKind>("mixed");
   const [selectedChapters, setSelectedChapters] = useState<number[]>([]);
@@ -76,19 +90,6 @@ export function QuickQuizPage() {
   const [duration, setDuration] = useState(15);
 
   const quick = useQuickQuiz();
-
-  useEffect(() => {
-    if (!subjectId && subjectsQ.data?.length) {
-      const science =
-        subjectsQ.data.find((s) => s.name === "Science") ?? subjectsQ.data[0];
-      setSubjectId(science.id);
-    }
-  }, [subjectId, subjectsQ.data]);
-  useEffect(() => {
-    if (!chapterId && chaptersQ.data?.length) {
-      setChapterId(chaptersQ.data[0].id);
-    }
-  }, [chapterId, chaptersQ.data]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -161,7 +162,14 @@ export function QuickQuizPage() {
                   <Label>Subject</Label>
                   <Select
                     value={subjectId !== undefined ? String(subjectId) : ""}
-                    onValueChange={(v) => setSubjectId(Number(v))}
+                    onValueChange={(v) => {
+                      // Radix reports "" while its item list is still settling.
+                      if (!v) return;
+                      setPickedSubjectId(Number(v));
+                      // The old chapter belongs to the previous subject.
+                      setPickedChapterId(undefined);
+                      setSelectedChapters([]);
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Subject" />
@@ -220,7 +228,7 @@ export function QuickQuizPage() {
                   <Label>Chapter</Label>
                   <Select
                     value={chapterId !== undefined ? String(chapterId) : ""}
-                    onValueChange={(v) => setChapterId(Number(v))}
+                    onValueChange={(v) => v && setPickedChapterId(Number(v))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Chapter" />
